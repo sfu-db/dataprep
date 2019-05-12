@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "dataprep"
+version = "0.1.0"
+description = "Dataprep: Data Preparation in Python"
+authors = [
+    "Jiannan Wang <jnwang@sfu.ca>", 
+    "Weiyuan Wu <youngw@sfu.com>", 
+    "Jinglin Peng <jinglin_peng@sfu.ca>",
+    "Pei Wang <peiw@sfu.ca>",
+    "Brandon Lockhart <brandon_lockhart@sfu.ca>",
+    "Song Bian <biansonghz@gmail.com>"
+]
+
+license = "MIT"
+
+readme = "README.md"  # Markdown files are supported
+
+repository = "https://github.com/sfu-db/dataprep"
+homepage = "https://github.com/sfu-db/dataprep"
+
+keywords = ["dataprep", "eda", "data connector", "data science", "exploratory data analysis", "data exploration"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+# Dependencies for EDA
+dask = { version = "~2.9", extras = [ "complete" ]}
+pandas = "~0.25"
+numpy = "~1.17"
+scipy = "~1.3"
+holoviews = "~1.12"
+bokeh = "~1.4"
+probscale = "~0.2"
+
+# Dependencies for DataConnector
+jsonschema = "~3.1"
+requests = "~2.22"
+jinja2 = "~2.10"
+jsonpath2 = "~0.4"
+lxml = "~4.4"
+
+[tool.poetry.dev-dependencies]
+pylint = "~2.4"
+pytype = "~2019.8"
+pytest = "~5.1"
+mypy = "~0.740"
+black = "19.10b0"
+sphinx = "~2.2"
+
+[build-system]
+requires = ["poetry>=1"]
+build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py36', 'py37']
+exclude = '''
+(
+    /(
+        \.eggs
+    | \.git
+    | \.pytype
+    | \.pytest_cache
+    | build
+    | dist
+    )/
+)
+'''

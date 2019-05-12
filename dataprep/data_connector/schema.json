@@ -1,0 +1,249 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The config for a data connector",
+    "required": [
+        "version",
+        "request",
+        "response"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "version": {
+            "$id": "#/properties/version",
+            "type": "number",
+            "title": "The Version Schema",
+            "description": "The version number of the schema",
+            "default": 1,
+            "minimum": 1
+        },
+        "request": {
+            "$id": "#/properties/request",
+            "type": "object",
+            "title": "The Request Schema",
+            "description": "",
+            "required": [
+                "url",
+                "method"
+            ],
+            "properties": {
+                "url": {
+                    "$id": "#/properties/request/properties/url",
+                    "type": "string",
+                    "title": "The Url Schema",
+                    "description": "The Url of the API endpoint. This can also be a Jinja template",
+                    "default": "",
+                    "examples": [
+                        "http://example.com/api"
+                    ],
+                    "format": "uri"
+                },
+                "method": {
+                    "$id": "#/properties/request/properties/method",
+                    "type": "string",
+                    "title": "The Method Schema",
+                    "examples": [
+                        "GET"
+                    ],
+                    "enum": [
+                        "GET",
+                        "POST",
+                        "PUT"
+                    ]
+                },
+                "authorization": {
+                    "$ref": "#/definitions/authorization"
+                },
+                "headers": {
+                    "$ref": "#/definitions/fields"
+                },
+                "params": {
+                    "$ref": "#/definitions/fields"
+                },
+                "body": {
+                    "$id": "#/properties/request/properties/body",
+                    "type": "object",
+                    "title": "The Body Schema",
+                    "properties": {
+                        "ctype": {
+                            "$id": "#/properties/request/properties/body/properties/ctype",
+                            "type": "string",
+                            "title": "The content type schema",
+                            "default": "application/json",
+                            "enum": [
+                                "application/x-www-form-urlencoded",
+                                "application/json"
+                            ]
+                        },
+                        "content": {
+                            "$ref": "#/definitions/fields"
+                        }
+                    }
+                },
+                "cookies": {
+                    "$ref": "#/definitions/fields"
+                }
+            },
+            "additionalProperties": false
+        },
+        "response": {
+            "$id": "#/properties/response",
+            "type": "object",
+            "title": "The Response Schema",
+            "required": [
+                "ctype",
+                "tablePath",
+                "schema"
+            ],
+            "properties": {
+                "ctype": {
+                    "$id": "#/properties/response/properties/ctype",
+                    "type": "string",
+                    "title": "The Response Content Type Schema",
+                    "default": "application/json",
+                    "enum": [
+                        "application/x-www-form-urlencoded",
+                        "application/json",
+                        "application/xml"
+                    ]
+                },
+                "tablePath": {
+                    "$id": "#/properties/response/properties/tablePath",
+                    "type": "string",
+                    "title": "The Path to the Table Object",
+                    "default": ""
+                },
+                "schema": {
+                    "$ref": "#/definitions/schema"
+                },
+                "orient": {
+                    "$id": "#/properties/response/properties/orient",
+                    "type": "string",
+                    "title": "The Orient for the Table",
+                    "default": "records",
+                    "enum": [
+                        "split",
+                        "records"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "additionalProperties": false
+    },
+    "definitions": {
+        "fields": {
+            "$id": "#/definitions/fields",
+            "type": "object",
+            "title": "Spec for Fields Definition",
+            "additionalProperties": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "required",
+                            "removeIfEmpty"
+                        ],
+                        "properties": {
+                            "required": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "fromKey": {
+                                "type": "string"
+                            },
+                            "toKey": {
+                                "type": "string"
+                            },
+                            "template": {
+                                "type": "string"
+                            },
+                            "removeIfEmpty": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                ]
+            }
+        },
+        "authorization": {
+            "$id": "#/definitions/authorization",
+            "oneOf": [
+                {
+                    "type": "object",
+                    "required": [
+                        "type",
+                        "grantType",
+                        "tokenServerUrl"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "OAuth2"
+                            ]
+                        },
+                        "grantType": {
+                            "type": "string",
+                            "enum": [
+                                "ClientCredentials",
+                                "AuthorizationCode"
+                            ]
+                        },
+                        "tokenServerUrl": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "string",
+                    "enum": [
+                        "Bearer"
+                    ]
+                }
+            ]
+        },
+        "schema": {
+            "$id": "#/definitions/schema",
+            "type": "object",
+            "title": "Spec for table definition",
+            "additionalProperties": {
+                "type": "object",
+                "title": "Spec for schema item",
+                "properties": {
+                    "target": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "string",
+                            "int",
+                            "float",
+                            "boolean",
+                            "object"
+                        ]
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "target",
+                    "type"
+                ],
+                "additionalProperties": false
+            }
+        }
+    }
+}

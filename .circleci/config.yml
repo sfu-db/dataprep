@@ -1,0 +1,107 @@
+version: 2.0
+jobs:
+  install_dependencies:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - &step_add_path
+        run:
+          name: Add python user PATH into PATH
+          command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
+      - &step_install_pipenv
+        run: 
+          name: Install python tools
+          command: pip install --user poetry==1.0.0b9
+      - &step_inproject_venv
+        run:
+          name: Set venv inproject
+          command: poetry config virtualenvs.in-project true
+      - checkout
+      - run:
+          name: Install dependencies
+          command: poetry install
+          no_output_timeout: 1200
+      - run:
+          name: Plot tool versions
+          command: poetry run mypy --version & poetry run pytype --version && poetry run pylint --version && poetry run pytest --version && poetry run black --version
+      - persist_to_workspace:
+          root: .
+          paths: .venv
+  check:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - *step_add_path
+      - *step_install_pipenv
+      - *step_inproject_venv
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check if the code is formatted
+          command: poetry run black --check --quiet dataprep
+      - run:
+          name: Type check the project
+          command: poetry run pytype dataprep && poetry run mypy dataprep
+      - run:
+          name: Test the project
+          command: poetry run pytest dataprep
+      - run:
+          name: Style check the project
+          command: poetry run pylint dataprep
+  docs-build:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - *step_add_path
+      - *step_install_pipenv
+      - *step_inproject_venv
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Build docs
+          command: poetry run sphinx-build -M html docs/source docs/build
+      - persist_to_workspace:
+          root: .
+          paths: docs/build/html
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b7:f1:2a:54:c8:90:80:78:ba:30:d9:9b:b8:7d:03:10"
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci@sfu.db"
+            git config user.name "ci"
+      - run:
+          name: Disable jekyll builds
+          command: touch docs/build/html/.nojekyll
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/build/html
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - install_dependencies
+      - check:
+          requires:
+            - install_dependencies
+      - docs-build:
+          requires:
+            - install_dependencies
+      - docs-deploy:
+          requires:
+            - check
+            - docs-build
+          filters:
+            branches:
+              only: master
