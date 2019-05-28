@@ -25,8 +25,9 @@ def give_count(dataframe : DF, col : str) -> Dict[str, int]:
     dict : A dict of (category : count) for the input col 
 
         """
-    x = dataframe.groupby(col)[col].count()
-    return dict(x)
+    dx = dd.from_pandas(dataframe, npartitions=1)
+    x = dx.groupby(col)[col].count()
+    return dict(x.compute())
 
 def give_hist(dataframe : DF, col : str, nbins : int = 10) -> List[float]:
     """Returns the histogram array for the continuous
