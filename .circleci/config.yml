@@ -9,14 +9,20 @@ jobs:
           command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV 
       - run: 
           name: Install python tools
-          command: pip install --user pylint pytest 
+          command: pip install --user pipenv
       - checkout
       - run:
-          name: pylint the project
-          command: pylint dataprep
+          name: Install dependencies
+          command: pipenv install -d
       - run:
-          name: test the project
-          command: pytest dataprep
+          name: Type check the project
+          command: pipenv run pytype dataprep
+      - run:
+          name: Test the project
+          command: pipenv run pytest dataprep
+      - run:
+          name: Style check the project
+          command: pipenv run pylint dataprep
 workflows:
   version: 2
   build_and_test:
