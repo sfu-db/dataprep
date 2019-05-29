@@ -1,22 +1,25 @@
 import datetime
 
+# noinspection PyUnresolvedReferences
 import numpy as np
 import pandas as pd
 from pandas import Timestamp
 
-from ...eda.EDA_plot_2 import boxplot, plot, scatterplot, stackedplot
+from ...eda.EDA_plot_2 import plot
 
 
-class TestClass_EDA_2(object):
+class TestClass2:
 
     def test_normal(self):
         self.data = {
 
             'id': [chr(97 + c) for c in range(1, 21)],
 
-            'x': ['d', 'c', 'b', 'a', 'b', 'd', 'c', 'a', 'a', 'a', 'c', 'b', 'c', 'a', 'd', 'b', 'b', 'b', 'b', 'b'],
+            'x': ['d', 'c', 'b', 'a', 'b', 'd', 'c', 'a', 'a', 'a', 'c', 'b',
+                  'c', 'a', 'd', 'b', 'b', 'b', 'b', 'b'],
 
-            'y': [794, 652, 158, 134, 448, 682, 135, 795, 353, 395, 403, 498, 622, 80, 654, 772, 867, 676, 670, 736],
+            'y': [794, 652, 158, 134, 448, 682, 135, 795, 353, 395, 403, 498,
+                  622, 80, 654, 772, 867, 676, 670, 736],
 
             's1': np.ones(20),
 
@@ -94,7 +97,6 @@ class TestClass_EDA_2(object):
         assert self.df_expected_2 == res_2
 
     def test_corner(self):
-
         self.df_2 = pd.DataFrame({
             'empty': [],
             'another_empty': []
