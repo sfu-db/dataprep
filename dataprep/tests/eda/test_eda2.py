@@ -1,3 +1,7 @@
+"""
+    tests for plot(df) function.
+"""
+
 import datetime
 
 # noinspection PyUnresolvedReferences
@@ -5,13 +9,19 @@ import numpy as np
 import pandas as pd
 from pandas import Timestamp
 
-from ...eda.EDA_plot_2 import plot
+from ...eda.eda_plot_2 import plot
 
 
 class TestClass2:
-
+    """
+    Test class containing tests functions
+    """
     def test_normal(self):
-        self.data = {
+        """
+
+        :return:
+        """
+        data = {
 
             'id': [chr(97 + c) for c in range(1, 21)],
 
@@ -44,65 +54,69 @@ class TestClass2:
                          datetime.datetime(1950, 12, 9)],
         }
 
-        self.df = pd.DataFrame(self.data)
+        df_data = pd.DataFrame(data)
 
-        self.df_expected = {'a': {'25%': 134.0,
-                                  '50%': 353.0,
-                                  '75%': 395.0,
-                                  'iqr': 261.0,
-                                  'max': 395,
-                                  'min': 80,
-                                  'outliers': [795]},
-                            'b': {'25%': 485.5,
-                                  '50%': 673.0,
-                                  '75%': 745.0,
-                                  'iqr': 259.5,
-                                  'max': 867,
-                                  'min': 158,
-                                  'outliers': []},
-                            'c': {'25%': 336.0,
-                                  '50%': 512.5,
-                                  '75%': 629.5,
-                                  'iqr': 293.5,
-                                  'max': 652,
-                                  'min': 135,
-                                  'outliers': []},
-                            'd': {'25%': 668.0,
-                                  '50%': 682.0,
-                                  '75%': 738.0,
-                                  'iqr': 70.0,
-                                  'max': 794,
-                                  'min': 654,
-                                  'outliers': []}}
-        res = plot(self.df, 'y', 'x')
+        df_expected = {'a': {'25%': 134.0,
+                             '50%': 353.0,
+                             '75%': 395.0,
+                             'iqr': 261.0,
+                             'max': 395,
+                             'min': 80,
+                             'outliers': [795]},
+                       'b': {'25%': 485.5,
+                             '50%': 673.0,
+                             '75%': 745.0,
+                             'iqr': 259.5,
+                             'max': 867,
+                             'min': 158,
+                             'outliers': []},
+                       'c': {'25%': 336.0,
+                             '50%': 512.5,
+                             '75%': 629.5,
+                             'iqr': 293.5,
+                             'max': 652,
+                             'min': 135,
+                             'outliers': []},
+                       'd': {'25%': 668.0,
+                             '50%': 682.0,
+                             '75%': 738.0,
+                             'iqr': 70.0,
+                             'max': 794,
+                             'min': 654,
+                             'outliers': []}}
+        res = plot(df_data, 'y', 'x')
 
-        assert res['a'] == self.df_expected['a']
-        assert res['b'] == self.df_expected['b']
-        assert res['c'] == self.df_expected['c']
-        assert res['d'] == self.df_expected['d']
+        assert res['a'] == df_expected['a']
+        assert res['b'] == df_expected['b']
+        assert res['c'] == df_expected['c']
+        assert res['d'] == df_expected['d']
 
-        self.df_expected_2 = {('a', Timestamp('1898-01-02 00:00:00')): 1,
-                              ('a', Timestamp('1950-12-09 00:00:00')): 3,
-                              ('a', Timestamp('1990-12-09 00:00:00')): 1,
-                              ('b', Timestamp('1898-01-02 00:00:00')): 1,
-                              ('b', Timestamp('1950-12-09 00:00:00')): 7,
-                              ('c', Timestamp('1898-01-02 00:00:00')): 1,
-                              ('c', Timestamp('1950-12-09 00:00:00')): 2,
-                              ('d', Timestamp('1950-12-09 00:00:00')): 1,
-                              ('d', Timestamp('1990-12-09 00:00:00')): 1,
-                              ('d', Timestamp('2011-07-04 00:00:00')): 1
-                              }
+        df_expected_2 = {('a', Timestamp('1898-01-02 00:00:00')): 1,
+                         ('a', Timestamp('1950-12-09 00:00:00')): 3,
+                         ('a', Timestamp('1990-12-09 00:00:00')): 1,
+                         ('b', Timestamp('1898-01-02 00:00:00')): 1,
+                         ('b', Timestamp('1950-12-09 00:00:00')): 7,
+                         ('c', Timestamp('1898-01-02 00:00:00')): 1,
+                         ('c', Timestamp('1950-12-09 00:00:00')): 2,
+                         ('d', Timestamp('1950-12-09 00:00:00')): 1,
+                         ('d', Timestamp('1990-12-09 00:00:00')): 1,
+                         ('d', Timestamp('2011-07-04 00:00:00')): 1
+                        }
 
-        res_2 = plot(self.df, 'x', 'somedate')
-        assert self.df_expected_2 == res_2
+        res_2 = plot(df_data, 'x', 'somedate')
+        assert df_expected_2 == res_2
 
     def test_corner(self):
-        self.df_2 = pd.DataFrame({
+        """
+
+        :return:
+        """
+        df_2 = pd.DataFrame({
             'empty': [],
             'another_empty': []
         })
 
-        self.df_2_expected = dict()
+        df_2_expected = dict()
 
-        res = plot(self.df_2, 'empty', 'another_empty')
-        assert res == self.df_2_expected
+        res = plot(df_2, 'empty', 'another_empty')
+        assert res == df_2_expected
