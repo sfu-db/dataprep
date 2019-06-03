@@ -210,7 +210,7 @@ STRING_LIST = List[str]
 def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
          col_y: Optional[str] = None, force_cat: Optional[STRING_LIST] = None,
          force_num: Optional[STRING_LIST] = None,
-        ) -> Dict[str, Union[np.array, dict]]:
+        ) -> dict:
     """
     Returns an intermediate representation for the plots of
         different columns in the data_frame.
