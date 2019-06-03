@@ -270,7 +270,7 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
     result = dict()
 
     if col_x is None and col_y is None:
-        result = plot_df(data_frame)
+        result = plot_df(data_frame, force_cat, force_num)
 
     elif col_x is None and col_y is not None or col_x is not None and col_y is None:
 
