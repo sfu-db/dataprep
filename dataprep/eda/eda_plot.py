@@ -187,7 +187,7 @@ def get_type(data: pd.Series) -> str:
     str representing the type of the data.
     """
 
-    col_type = None
+    col_type = 'TYPE_UNSUP'
     try:
         if pd.api.types.is_bool_dtype(data):
             col_type = 'TYPE_CAT'
@@ -199,7 +199,6 @@ def get_type(data: pd.Series) -> str:
             col_type = 'TYPE_CAT'
     except NotImplementedError as error:    #TODO
         LOGGER.info("Type cannot be determined due to : %s", error)
-        col_type = 'TYPE_UNSUP'
 
     return col_type
 
@@ -230,8 +229,7 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
     dict : A (column: [array/dict]) dict to encapsulate the
     intermediate results.
     """
-    result = None
-
+    result = dict()
 
     if col_x is None and col_y is None:
         col_list = []
@@ -303,7 +301,7 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
             LOGGER.info("Plot could not be obtained due to : %s", error)
             result = dict()
     else:
-        result = dict()
+        pass
         # TO-DO to be added
 
     return result
