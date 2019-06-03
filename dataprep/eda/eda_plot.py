@@ -53,13 +53,13 @@ def calc_box(dataframe: pd.DataFrame, col_x: str,
             max_value = -np.inf
             for value in filter(
                     lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
-                                stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                        stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
                 min_value = value if value < min_value else min_value
                 max_value = value if value > max_value else max_value
 
             for value in itertools.filterfalse(
                     lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
-                                stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                        stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
                 outliers.append(value)
             stats['min'] = min_value
             stats['max'] = max_value
@@ -197,19 +197,57 @@ def get_type(data: pd.Series) -> str:
             col_type = 'TYPE_NUM'
         else:
             col_type = 'TYPE_CAT'
-    except NotImplementedError as error:    #TODO
+    except NotImplementedError as error:    #TO-DO
         LOGGER.info("Type cannot be determined due to : %s", error)
 
     return col_type
 
 
 # Type aliasing
-STRING_LIST = List[str]
+String_List = List[str]
 
+
+def plot_df(data_frame: pd.DataFrame, force_cat: Optional[String_List] = None,
+            force_num: Optional[String_List] = None) -> dict:
+    """
+        Supporting funtion to the main plot function
+    :param data_frame: pandas dataframe
+    :param force_cat: list of categorical columns defined explicitly
+    :param force_num: list of numerical columns defined explicitly
+    :return:
+    """
+    col_list = []
+    dask_result = list()
+
+    for col in data_frame.columns:
+        if data_frame[col].count() == 0:
+            col_list.append(col)
+            dask_result.append([])
+            continue
+
+        elif get_type(data_frame[col]) == 'TYPE_CAT' or (
+                force_cat is not None and col in force_cat):
+            cnt_series = dask.delayed(calc_count)(data_frame, col)
+            dask_result.append(cnt_series)
+            col_list.append(col)
+
+        elif get_type(data_frame[col]) == 'TYPE_NUM' or (
+                force_num is not None and col in force_num):
+            hist = dask.delayed(calc_hist)(data_frame, col)
+            dask_result.append(hist)
+            col_list.append(col)
+
+    column_dict = dict()
+    computed_res, = dask.compute(dask_result)
+
+    for each in zip(col_list, computed_res):
+        column_dict[each[0]] = each[1]
+
+    return column_dict
 
 def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
-         col_y: Optional[str] = None, force_cat: Optional[STRING_LIST] = None,
-         force_num: Optional[STRING_LIST] = None,
+         col_y: Optional[str] = None, force_cat: Optional[String_List] = None,
+         force_num: Optional[String_List] = None
         ) -> dict:
     """
     Returns an intermediate representation for the plots of
@@ -232,34 +270,7 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
     result = dict()
 
     if col_x is None and col_y is None:
-        col_list = []
-        dask_result = list()
-
-        for col in data_frame.columns:
-            if data_frame[col].count() == 0:
-                col_list.append(col)
-                dask_result.append([])
-                continue
-
-            elif get_type(data_frame[col]) == 'TYPE_CAT' or (
-                    force_cat is not None and col in force_cat):
-                cnt_series = dask.delayed(calc_count)(data_frame, col)
-                dask_result.append(cnt_series)
-                col_list.append(col)
-
-            elif get_type(data_frame[col]) == 'TYPE_NUM' or (
-                    force_num is not None and col in force_num):
-                hist = dask.delayed(calc_hist)(data_frame, col)
-                dask_result.append(hist)
-                col_list.append(col)
-
-        column_dict = dict()
-        computed_res, = dask.compute(dask_result)
-
-        for each in zip(col_list, computed_res):
-            column_dict[each[0]] = each[1]
-
-        result = column_dict
+        result = plot_df(data_frame)
 
     elif col_x is None and col_y is not None or col_x is not None and col_y is None:
 
