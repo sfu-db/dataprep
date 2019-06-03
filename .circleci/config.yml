@@ -16,7 +16,7 @@ jobs:
           command: pipenv install -d
       - run:
           name: Type check the project
-          command: pipenv run pytype dataprep
+          command: pipenv run pytype dataprep && pipenv run mypy dataprep --strict --ignore-missing-imports
       - run:
           name: Test the project
           command: pipenv run pytest dataprep
