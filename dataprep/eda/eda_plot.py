@@ -204,11 +204,11 @@ def get_type(data: pd.Series) -> str:
 
 
 # Type aliasing
-String_List = List[str]
+StringList = List[str]
 
 
-def plot_df(data_frame: pd.DataFrame, force_cat: Optional[String_List] = None,
-            force_num: Optional[String_List] = None) -> dict:
+def plot_df(data_frame: pd.DataFrame, force_cat: Optional[StringList] = None,
+            force_num: Optional[StringList] = None) -> dict:
     """
         Supporting funtion to the main plot function
     :param data_frame: pandas dataframe
@@ -246,8 +246,8 @@ def plot_df(data_frame: pd.DataFrame, force_cat: Optional[String_List] = None,
     return column_dict
 
 def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
-         col_y: Optional[str] = None, force_cat: Optional[String_List] = None,
-         force_num: Optional[String_List] = None
+         col_y: Optional[str] = None, force_cat: Optional[StringList] = None,
+         force_num: Optional[StringList] = None
         ) -> dict:
     """
     Returns an intermediate representation for the plots of
