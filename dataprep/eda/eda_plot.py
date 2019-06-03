@@ -1,6 +1,7 @@
 """
     This module implements the plot(df) function.
 """
+import itertools
 import logging
 from typing import Dict, List, Union, Optional
 
@@ -12,8 +13,8 @@ import numpy as np
 import pandas as pd
 
 
-def calc_box(dataframe: pd.DataFrame, col_x: str, col_y: str) \
-    -> Dict[str, dict]:
+def calc_box(dataframe: pd.DataFrame, col_x: str,
+             col_y: str) -> Dict[str, dict]:
     """ Returns intermediate stats of the box plot
             of columns col_x and col_y.
 
@@ -31,19 +32,16 @@ def calc_box(dataframe: pd.DataFrame, col_x: str, col_y: str) \
     cat_col, num_col = (col_x, col_y) if (get_type(dataframe[col_x]) ==
                                           'TYPE_CAT') else (col_y, col_x)
 
-    dask_df = dask.dataframe.from_pandas(dataframe, npartitions=1)
-    grp_object = dask_df.groupby(cat_col)
-    # print (cat_col)
-    groups = list(dask_df[cat_col].unique().compute())
+    dask_df = dd.from_pandas(dataframe, npartitions=1)
     res = dict()
+    stats = dict()
 
-    for group in groups:
-        stats = dict()
-        grp_series = grp_object.get_group(group)[num_col]
+    for group in dask_df[cat_col].unique().compute():
+        stats = {}
+        grp_series = dask_df.groupby(cat_col).get_group(group)[num_col]
         quantiles = grp_series.quantile([.25, .50, .75]).compute()
         stats['25%'], stats['50%'], stats['75%'] = dask.delayed(
-            quantiles[.25]), dask.delayed(quantiles[.50]), dask.delayed(
-                quantiles[.75])
+            quantiles[.25]), dask.delayed(quantiles[.50]), dask.delayed(quantiles[.75])
         stats['iqr'] = stats['75%'] - stats['25%']
         outliers = list()
         grp_series = grp_series.compute()
@@ -51,14 +49,20 @@ def calc_box(dataframe: pd.DataFrame, col_x: str, col_y: str) \
             stats['min'] = grp_series.reset_index().iloc[0, 1]
             stats['max'] = stats['min']
         else:
-            for i in grp_series.index:
-                if (grp_series[i] < stats['25%'].compute() - (1.5 * stats[
-                        'iqr'].compute())) or (grp_series[i] > stats[
-                            '75%'].compute() + (1.5 * stats['iqr'].compute())):
-                    outliers.append(grp_series[i])
-                    grp_series.drop(index=i, inplace=True)
-            stats['min'] = grp_series.min()
-            stats['max'] = grp_series.max()
+            min_value = np.inf
+            max_value = -np.inf
+            for value in filter(
+                    lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
+                                stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                min_value = value if value < min_value else min_value
+                max_value = value if value > max_value else max_value
+
+            for value in itertools.filterfalse(
+                    lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
+                                stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                outliers.append(value)
+            stats['min'] = min_value
+            stats['max'] = max_value
 
         stats['outliers'] = outliers
 
@@ -69,7 +73,7 @@ def calc_box(dataframe: pd.DataFrame, col_x: str, col_y: str) \
 
 
 def calc_statcked(dataframe: pd.DataFrame, col_x: str, col_y: str) \
-    -> Dict[tuple, int]:
+        -> Dict[tuple, int]:
     """ Returns intermediate stats of the stacked column plot
             of columns col_x and col_y.
 
@@ -93,10 +97,10 @@ def calc_statcked(dataframe: pd.DataFrame, col_x: str, col_y: str) \
     return dict(grp_series)
 
 
-def calc_scatter(dataframe: pd.DataFrame, col_x: str, col_y: str) \
-    -> Dict[Union[int, float], Union[int, float]]:
+def calc_scatter(dataframe: pd.DataFrame, col_x: str,
+                 col_y: str) -> Dict[Union[int, float], Union[int, float]]:
     """
-        TODO: WARNING: For very large amount of points, implement Heat Map.
+        TO-DO: WARNING: For very large amount of points, implement Heat Map.
         Returns intermediate stats of the scattered plot
         of columns col_x and col_y.
 
@@ -121,6 +125,7 @@ def calc_scatter(dataframe: pd.DataFrame, col_x: str, col_y: str) \
 
     return dict(res)
 
+
 def calc_count(dataframe: pd.DataFrame, col: str) -> Dict[str, int]:
     """ Returns a dict {category: category_count} for the
         categorical column given as the second argument
@@ -139,8 +144,8 @@ def calc_count(dataframe: pd.DataFrame, col: str) -> Dict[str, int]:
     return dict(grp_object.compute())
 
 
-def calc_hist(dataframe: pd.DataFrame, col: str, nbins: int = 10) \
-    -> List[float]:
+def calc_hist(dataframe: pd.DataFrame, col: str,
+              nbins: int = 10) -> List[float]:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
 
@@ -171,7 +176,7 @@ def get_type(data: pd.Series) -> str:
         'TYPE_CAT' - if data is categorical.
         'TYPE_NUM' - if data is numeric.
         'TYPE_UNSUP' - type not supported.
-         TODO
+         TO-DO
 
     Parameter
     __________
@@ -192,7 +197,7 @@ def get_type(data: pd.Series) -> str:
             col_type = 'TYPE_NUM'
         else:
             col_type = 'TYPE_CAT'
-    except Exception as error:
+    except NotImplementedError as error:    #TODO
         LOGGER.info("Type cannot be determined due to : %s", error)
         col_type = 'TYPE_UNSUP'
 
@@ -204,10 +209,11 @@ STRING_LIST = List[str]
 
 
 def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
-         col_y: Optional[str] = None, force_cat: Optional[STRING_LIST] =
-         None, force_num: Optional[STRING_LIST] = None, **kwargs) \
-    -> Dict[str, Union[np.array, dict]]:
-    """ Returns an intermediate representation for the plots of
+         col_y: Optional[str] = None, force_cat: Optional[STRING_LIST] = None,
+         force_num: Optional[STRING_LIST] = None,
+        ) -> Dict[str, Union[np.array, dict]]:
+    """
+    Returns an intermediate representation for the plots of
         different columns in the data_frame.
 
     Parameters
@@ -226,64 +232,63 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
     """
     result = None
 
+
     if col_x is None and col_y is None:
         col_list = []
-        result = list()
+        dask_result = list()
 
         for col in data_frame.columns:
             if data_frame[col].count() == 0:
                 col_list.append(col)
-                result.append([])
+                dask_result.append([])
                 continue
 
             elif get_type(data_frame[col]) == 'TYPE_CAT' or (
                     force_cat is not None and col in force_cat):
                 cnt_series = dask.delayed(calc_count)(data_frame, col)
-                result.append(cnt_series)
+                dask_result.append(cnt_series)
                 col_list.append(col)
 
             elif get_type(data_frame[col]) == 'TYPE_NUM' or (
                     force_num is not None and col in force_num):
                 hist = dask.delayed(calc_hist)(data_frame, col)
-                result.append(hist)
+                dask_result.append(hist)
                 col_list.append(col)
 
-        computed_res, = dask.compute(result)
         column_dict = dict()
+        computed_res, = dask.compute(dask_result)
 
         for each in zip(col_list, computed_res):
             column_dict[each[0]] = each[1]
 
         result = column_dict
 
-    elif col_x is None and col_y is not None or col_x is not None and col_y \
-        is None:
+    elif col_x is None and col_y is not None or col_x is not None and col_y is None:
 
         target_col = col_x if col_y is None else col_y
+        dask_result = list()
+
         if data_frame[target_col].count() == 0:
-            result.append([])
+            dask_result.append([])
 
         elif get_type(data_frame[target_col]) == 'TYPE_CAT' or (
                 force_cat is not None and target_col in force_cat):
-            cnt_series = dask.delayed(calc_count)(data_frame, target_col)
-            result.append(cnt_series)
+            dask_result.append(dask.delayed(calc_count)(data_frame, target_col))
 
         elif get_type(data_frame[target_col]) == 'TYPE_NUM' or (
                 force_num is not None and target_col in force_num):
-            hist = dask.delayed(calc_hist)(data_frame, target_col)
-            result.append(hist)
+            dask_result.append(dask.delayed(calc_hist)(data_frame, target_col))
 
-        column_dict = {target_col : dask.compute(result)}
+        column_dict = {target_col: dask.compute(dask_result)}
         result = column_dict
 
     elif col_x is not None and col_y is not None:
         type_x = get_type(data_frame[col_x])
         type_y = get_type(data_frame[col_y])
-        result = None
 
         try:
-            if type_y == 'TYPE_CAT' and type_x == 'TYPE_NUM' or type_y == \
-                'TYPE_NUM' and type_x == 'TYPE_CAT':
+            if type_y == 'TYPE_CAT' and type_x == 'TYPE_NUM' or \
+                    type_y == 'TYPE_NUM' and type_x == 'TYPE_CAT':
                 result = calc_box(data_frame, col_x, col_y)
 
             elif type_x == 'TYPE_CAT' and type_y == 'TYPE_CAT':
@@ -293,11 +298,12 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
                 result = calc_scatter(data_frame, col_x, col_y)
             else:
                 pass
-                # WARNING: TODO
-        except Exception as error:
+                # WARNING: TO-DO
+        except NotImplementedError as error:   #TO-DO
             LOGGER.info("Plot could not be obtained due to : %s", error)
             result = dict()
     else:
         result = dict()
-        #TO-DO to be added
+        # TO-DO to be added
+
     return result

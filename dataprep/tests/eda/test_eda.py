@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from pandas import Timestamp
 
-from ...eda.eda_plot import plot
+from ...eda.eda_plot import plot  # dataprep.tests.eda.test_eda
 
 
 class TestClass:
@@ -178,6 +178,7 @@ class TestClass:
                                             dtype=np.int64)}
 
         res = plot(df_2, force_cat=['all_one', 'all_zeros'])
+        print (res)
 
         # assert np.all(res['all_nan'] == self.df_1_expected['all_nan'])
         assert res['all_one'] == df_1_expected['all_one']
