@@ -3,7 +3,7 @@
 """
 import itertools
 import logging
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional, Tuple
 
 # noinspection PyUnresolvedReferences
 import dask
@@ -14,7 +14,7 @@ import pandas as pd
 
 
 def calc_box(dataframe: pd.DataFrame, col_x: str,
-             col_y: str) -> Dict[str, dict]:
+             col_y: Optional[str] = None) -> Dict[str, dict]:
     """ Returns intermediate stats of the box plot
             of columns col_x and col_y.
 
@@ -24,21 +24,17 @@ def calc_box(dataframe: pd.DataFrame, col_x: str,
     col_x : a valid column name of the dataframe
     col_y : a valid column name of the dataframe
 
-
     RETURNS
     __________
     a (column_name: data) dict storing the intermediate results
     """
-    cat_col, num_col = (col_x, col_y) if (get_type(dataframe[col_x]) ==
-                                          'TYPE_CAT') else (col_y, col_x)
-
     dask_df = dd.from_pandas(dataframe, npartitions=1)
     res = dict()
     stats = dict()
 
-    for group in dask_df[cat_col].unique().compute():
+    if col_y == None:
         stats = {}
-        grp_series = dask_df.groupby(cat_col).get_group(group)[num_col]
+        grp_series = dask_df[col_x]
         quantiles = grp_series.quantile([.25, .50, .75]).compute()
         stats['25%'], stats['50%'], stats['75%'] = dask.delayed(
             quantiles[.25]), dask.delayed(quantiles[.50]), dask.delayed(quantiles[.75])
@@ -52,28 +48,64 @@ def calc_box(dataframe: pd.DataFrame, col_x: str,
             min_value = np.inf
             max_value = -np.inf
             for value in filter(
-                    lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
-                        stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
+                            stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
                 min_value = value if value < min_value else min_value
                 max_value = value if value > max_value else max_value
 
             for value in itertools.filterfalse(
-                    lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
-                        stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
+                            stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
                 outliers.append(value)
             stats['min'] = min_value
             stats['max'] = max_value
 
         stats['outliers'] = outliers
+        res = stats
 
-        res[group] = stats
+    else:
+
+        cat_col, num_col = (col_x, col_y) if (get_type(dataframe[col_x]) ==
+                                              'TYPE_CAT') else (col_y, col_x)
+
+        for group in dask_df[cat_col].unique().compute():
+            stats = {}
+            grp_series = dask_df.groupby(cat_col).get_group(group)[num_col]
+            quantiles = grp_series.quantile([.25, .50, .75]).compute()
+            stats['25%'], stats['50%'], stats['75%'] = dask.delayed(
+                quantiles[.25]), dask.delayed(quantiles[.50]), dask.delayed(quantiles[.75])
+            stats['iqr'] = stats['75%'] - stats['25%']
+            outliers = list()
+            grp_series = grp_series.compute()
+            if len(grp_series) == 1:
+                stats['min'] = grp_series.reset_index().iloc[0, 1]
+                stats['max'] = stats['min']
+            else:
+                min_value = np.inf
+                max_value = -np.inf
+                for value in filter(
+                        lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
+                            stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                    min_value = value if value < min_value else min_value
+                    max_value = value if value > max_value else max_value
+
+                for value in itertools.filterfalse(
+                        lambda row: stats['25%'].compute() - (1.5 * stats['iqr'].compute()) < row < \
+                            stats['75%'].compute() + (1.5 * stats['iqr'].compute()), grp_series):
+                    outliers.append(value)
+                stats['min'] = min_value
+                stats['max'] = max_value
+
+            stats['outliers'] = outliers
+
+            res[group] = stats
 
     res, = dask.compute(res)
-    return res
+    return {'box_plot' : res}
 
 
 def calc_statcked(dataframe: pd.DataFrame, col_x: str, col_y: str) \
-        -> Dict[tuple, int]:
+        -> Dict[str, dict]:
     """ Returns intermediate stats of the stacked column plot
             of columns col_x and col_y.
 
@@ -94,11 +126,11 @@ def calc_statcked(dataframe: pd.DataFrame, col_x: str, col_y: str) \
 
     grp_series = grp_object.count().compute().iloc[:, 0]
     # print (grp_series)
-    return dict(grp_series)
+    return {'stacked_column_plot' : dict(grp_series)}
 
 
 def calc_scatter(dataframe: pd.DataFrame, col_x: str,
-                 col_y: str) -> Dict[Union[int, float], Union[int, float]]:
+                 col_y: str) -> Dict[str, Dict[Union[int, float], Union[int, float]]]:
     """
         TO-DO: WARNING: For very large amount of points, implement Heat Map.
         Returns intermediate stats of the scattered plot
@@ -123,10 +155,26 @@ def calc_scatter(dataframe: pd.DataFrame, col_x: str,
     for each in zip(series_x, series_y):
         res.add(each)
 
-    return dict(res)
+    return {'scatter_plot' : dict(res)}
 
+def calc_pie(dataframe: pd.DataFrame, col: str) -> Dict[str, Dict[str, int]]:
+    """ Returns a dict {category: category_count} for the
+        categorical column given as the second argument
 
-def calc_count(dataframe: pd.DataFrame, col: str) -> Dict[str, int]:
+    Parameters
+    __________
+    dataframe : the input pandas dataframe
+    col : the str column of dataframe for which count needs to be calculated
+
+    Returns
+    __________
+    dict : A dict of (category : count) for the input col
+    """
+    dask_df = dd.from_pandas(dataframe, npartitions=1)
+    grp_object = (dask_df.groupby(col)[col].count()/dask_df[col].size)*100
+    return {'bar_plot' : dict(grp_object.compute())}
+
+def calc_bar(dataframe: pd.DataFrame, col: str) -> Dict[str, Dict[str, int]]:
     """ Returns a dict {category: category_count} for the
         categorical column given as the second argument
 
@@ -141,11 +189,40 @@ def calc_count(dataframe: pd.DataFrame, col: str) -> Dict[str, int]:
     """
     dask_df = dd.from_pandas(dataframe, npartitions=1)
     grp_object = dask_df.groupby(col)[col].count()
-    return dict(grp_object.compute())
+    return {'bar_plot' : dict(grp_object.compute())}
 
+def calc_hist_by_group(dataframe: pd.DataFrame, col_x: str, col_y: str,
+              nbins: int = 10) -> Dict[str, dict]:
+    """Returns the histogram array for the continuous
+        distribution of values in the column given as the second argument
+
+    Parameters
+    __________
+    dataframe : the input pandas dataframe
+    col : the str column of dataframe for which hist array needs to be
+    calculated
+
+    Returns
+    __________
+    np.array : An array of values representing histogram for the input col
+    """
+    col_cat, col_num = (col_x, col_y) if (get_type(dataframe[col_x]) ==
+                                          'TYPE_CAT') else (col_y, col_x)
+    dask_df = dd.from_pandas(dataframe, npartitions=1)
+
+    grp_hist = dict()
+    for group in dask_df[col_cat].unique().compute():
+        grp_series = dask_df.groupby(col_cat).get_group(group)[col_num]
+        minv = grp_series.min().compute()
+        maxv = grp_series.max().compute()
+        dframe = dd.from_array(grp_series).dropna()
+        hist_array, bins = da.histogram(dframe.values, range=[minv, maxv], bins=nbins)
+        grp_hist[group] = (hist_array, bins)
+
+    return {'histogram' : grp_hist}
 
 def calc_hist(dataframe: pd.DataFrame, col: str,
-              nbins: int = 10) -> List[float]:
+              nbins: int = 10) -> Dict[str, List]:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
 
@@ -162,9 +239,38 @@ def calc_hist(dataframe: pd.DataFrame, col: str,
     minv = dataframe[col].min()
     maxv = dataframe[col].max()
     dframe = dd.from_array(dataframe[col]).dropna()
-    hist_array, _ = da.histogram(dframe.values, range=[minv, maxv], bins=nbins)
-    return hist_array.compute()
+    hist_array, bins = da.histogram(dframe.values, range=[minv, maxv], bins=nbins)
+    return {'histogram' : [hist_array.compute(), bins]}
 
+DEFAULT_RANGE = [x for x in range(1, 101)]
+
+def calc_qqnorm(dataframe: pd.DataFrame, col: str, qrange: Optional[list] = DEFAULT_RANGE
+               ) -> Dict[str, List[Tuple[float, float]]]:
+    """
+        Calculates points of the QQ plot of the given column of the data frame.
+        :param dataframe - the input dataframe
+        :param col - the input column of the dataframe
+        :param qrange - the list of quantiles to be calculated. By default, all the percentiles are
+        calculated.
+    """
+    points = list()
+    dask_df = dd.from_pandas(dataframe, npartitions=10)
+    dask_series = dask_df[col]
+    try:
+        mean = dask_series.mean().compute()
+        std = dask_series.std().compute()
+        size_ = dask_series.size.compute()
+        np.random.seed(0)
+        normal_points = np.sort(np.random.standard_normal(size=(1, size_)))
+        x_points = np.percentile(normal_points, q=qrange)
+        y_points = dask_series.compute().sort_values().quantile([x/100 for x in qrange])
+        for point in zip(x_points, y_points):
+            points.append(point)
+    except TypeError:
+        #TO-DO
+        pass
+
+    return {'qqnorm_plot' : points}
 
 logging.basicConfig(level=logging.INFO, format="%(message)")
 LOGGER = logging.getLogger(__name__)
@@ -227,7 +333,7 @@ def plot_df(data_frame: pd.DataFrame, force_cat: Optional[StringList] = None,
 
         elif get_type(data_frame[col]) == 'TYPE_CAT' or (
                 force_cat is not None and col in force_cat):
-            cnt_series = dask.delayed(calc_count)(data_frame, col)
+            cnt_series = dask.delayed(calc_bar)(data_frame, col)
             dask_result.append(cnt_series)
             col_list.append(col)
 
@@ -272,7 +378,7 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
     if col_x is None and col_y is None:
         result = plot_df(data_frame, force_cat, force_num)
 
-    elif col_x is None and col_y is not None or col_x is not None and col_y is None:
+    elif (col_x is None and col_y is not None) or (col_x is not None and col_y is None):
 
         target_col = col_x if col_y is None else col_y
         dask_result = list()
@@ -282,11 +388,19 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
 
         elif get_type(data_frame[target_col]) == 'TYPE_CAT' or (
                 force_cat is not None and target_col in force_cat):
-            dask_result.append(dask.delayed(calc_count)(data_frame, target_col))
+            #BAR_PLOT
+            dask_result.append(dask.delayed(calc_bar)(data_frame, target_col))
+            #PIE_CHART
+            dask_result.append(dask.delayed(calc_pie)(data_frame, target_col))
 
         elif get_type(data_frame[target_col]) == 'TYPE_NUM' or (
                 force_num is not None and target_col in force_num):
+            #HISTOGRAM
             dask_result.append(dask.delayed(calc_hist)(data_frame, target_col))
+            #BOX_PLOT
+            dask_result.append(dask.delayed(calc_bar)(data_frame, target_col))
+            #QQ-NORM
+            dask_result.append(dask.delayed(calc_qqnorm)(data_frame, target_col))
 
         column_dict = {target_col: dask.compute(dask_result)}
         result = column_dict
@@ -294,17 +408,22 @@ def plot(data_frame: pd.DataFrame, col_x: Optional[str] = None,
     elif col_x is not None and col_y is not None:
         type_x = get_type(data_frame[col_x])
         type_y = get_type(data_frame[col_y])
+        dask_result = list()
 
         try:
             if type_y == 'TYPE_CAT' and type_x == 'TYPE_NUM' or \
                     type_y == 'TYPE_NUM' and type_x == 'TYPE_CAT':
-                result = calc_box(data_frame, col_x, col_y)
+                #BOX_PER_GROUP
+                dask_result.append(calc_box(data_frame, col_x, col_y))
+                #HISTOGRAM_PER_GROUP
+                dask_result.append(calc_hist_by_group(data_frame, col_x, col_y))
+
 
             elif type_x == 'TYPE_CAT' and type_y == 'TYPE_CAT':
-                result = calc_statcked(data_frame, col_x, col_y)
+                dask_result.append(calc_statcked(data_frame, col_x, col_y))
 
             elif type_x == 'TYPE_NUM' and type_y == 'TYPE_NUM':
-                result = calc_scatter(data_frame, col_x, col_y)
+                dask_result.append(calc_scatter(data_frame, col_x, col_y))
             else:
                 pass
                 # WARNING: TO-DO
