@@ -212,8 +212,8 @@ def _calc_hist_by_group(
     __________
     np.array : An array of values representing histogram for the input col
     """
-    col_cat, col_num = (col_x, col_y) if (get_type(dataframe[col_x]) ==
-                                          'TYPE_CAT') else (col_y, col_x)
+    col_cat, col_num = (col_x, col_y) if (get_type(dataframe[col_x]) == DataType.TYPE_CAT) \
+                                        else (col_y, col_x)
     dask_df = dd.from_pandas(dataframe, npartitions=DEFAULT_PARTITIONS)
 
     grp_hist: Dict[str, Tuple[Any, Any]] = dict()
@@ -440,7 +440,7 @@ def plot(
             result, = dask.compute(dask_result)
         except NotImplementedError as error:  # TODO
             LOGGER.info("Plot could not be obtained due to : %s", error)
-            result = dict()
+            result = {'Error': str(error)}
     else:
         pass
         # TODO to be added
