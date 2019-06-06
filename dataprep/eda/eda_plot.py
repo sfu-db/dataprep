@@ -364,7 +364,7 @@ def plot(
     col_y: Optional[str] = None,
     force_cat: Optional[StringList] = None,
     force_num: Optional[StringList] = None
-) -> Union[List, Dict[str, Any]]:
+) -> Union[List, Dict[Any, Any]]:
     """
     Returns an intermediate representation for the plots of
         different columns in the data_frame.
