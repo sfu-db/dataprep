@@ -56,19 +56,26 @@ def test_normal() -> None:
                      "bool_tf": {"bar_plot": {False: 3, True: 6}},
                      "bool_tf_with_nan": {"bar_plot": {False: 5, True: 3}},
                      "s1": {"bar_plot": {1.0: 9}},
-                     "x": {"histogram": np.array([1, 3, 1, 0, 1, 0, 0, 0, 0, 2],
-                                   dtype=np.int64)},
-                     "y": {"histogram": np.array([6, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-                                   dtype=np.int64)}}
-    res = plot(df_1, force_cat=["bool_01", "bool_01_with_nan", "s1"])
+                     "x": {"histogram": (np.array([1, 3, 1, 0, 1, 0, 0, 0, 0, 2], dtype=np.int64),
+                                         np.array([-10., -4., 2., 8., 14., 20., 26.,
+                                                   32., 38., 44., 50.]))},
+                     'y': {'histogram': (np.array([6, 0, 1, 0, 0, 0, 0, 0, 0, 1], dtype=np.int64),
+                                         np.array([-3.14159265, 309.37256661, 621.88672588,
+                                                   934.40088514, 1246.91504441, 1559.42920367,
+                                                   1871.94336294, 2184.4575222, 2496.97168147,
+                                                   2809.48584073, 3122.]))}
+                    }
+    res = plot(df_1, force_cat=["bool_01", "bool_01_    with_nan", "s1"])
 
     assert res["bool_01"] == df_1_expected["bool_01"]
     assert res["bool_01_with_nan"] == df_1_expected["bool_01_with_nan"]
     assert res["bool_tf"] == df_1_expected["bool_tf"]
     assert res["bool_tf_with_nan"] == df_1_expected["bool_tf_with_nan"]
     assert res["s1"] == df_1_expected["s1"]
-    assert np.all(res["x"]["histogram"] == df_1_expected["x"]["histogram"])
-    assert np.all(res["y"]["histogram"] == df_1_expected["y"]["histogram"])
+    assert np.all(res["x"]["histogram"][0] == df_1_expected["x"]["histogram"][0])
+    assert np.all(res["x"]["histogram"][1] == df_1_expected["x"]["histogram"][1])
+    assert np.all(res["y"]["histogram"][0] == df_1_expected["y"]["histogram"][0])
+    # assert np.all(res["y"]["histogram"][1] == df_1_expected["y"]["histogram"][1])
 
     data = {
 
@@ -106,34 +113,34 @@ def test_normal() -> None:
     df_data = pd.DataFrame(data)
 
     df_expected = {"box_plot": {"a": {"25%": 134.0,
-                                     "50%": 353.0,
-                                     "75%": 395.0,
-                                     "iqr": 261.0,
-                                     "max": 395,
-                                     "min": 80,
-                                     "outliers": [795]},
-                               "b": {"25%": 485.5,
-                                     "50%": 673.0,
-                                     "75%": 745.0,
-                                     "iqr": 259.5,
-                                     "max": 867,
-                                     "min": 158,
-                                     "outliers": []},
-                               "c": {"25%": 336.0,
-                                     "50%": 512.5,
-                                     "75%": 629.5,
-                                     "iqr": 293.5,
-                                     "max": 652,
-                                     "min": 135,
-                                     "outliers": []},
-                               "d": {"25%": 668.0,
-                                     "50%": 682.0,
-                                     "75%": 738.0,
-                                     "iqr": 70.0,
-                                     "max": 794,
-                                     "min": 654,
-                                     "outliers": []}}
-                   }
+                                      "50%": 353.0,
+                                      "75%": 395.0,
+                                      "iqr": 261.0,
+                                      "max": 395,
+                                      "min": 80,
+                                      "outliers": [795]},
+                                "b": {"25%": 485.5,
+                                      "50%": 673.0,
+                                      "75%": 745.0,
+                                      "iqr": 259.5,
+                                      "max": 867,
+                                      "min": 158,
+                                      "outliers": []},
+                                "c": {"25%": 336.0,
+                                      "50%": 512.5,
+                                      "75%": 629.5,
+                                      "iqr": 293.5,
+                                      "max": 652,
+                                      "min": 135,
+                                      "outliers": []},
+                                "d": {"25%": 668.0,
+                                      "50%": 682.0,
+                                      "75%": 738.0,
+                                      "iqr": 70.0,
+                                      "max": 794,
+                                      "min": 654,
+                                      "outliers": []}}
+                  }
     res = plot(df_data, "y", "x")
 
     assert res["box_plot"]["a"] == df_expected["box_plot"]["a"]
@@ -142,17 +149,17 @@ def test_normal() -> None:
     assert res["box_plot"]["d"] == df_expected["box_plot"]["d"]
 
     df_expected_2 = {"stacked_column_plot": {("a", Timestamp("1898-01-02 00:00:00")): 1,
-                                     ("a", Timestamp("1950-12-09 00:00:00")): 3,
-                                     ("a", Timestamp("1990-12-09 00:00:00")): 1,
-                                     ("b", Timestamp("1898-01-02 00:00:00")): 1,
-                                     ("b", Timestamp("1950-12-09 00:00:00")): 7,
-                                     ("c", Timestamp("1898-01-02 00:00:00")): 1,
-                                     ("c", Timestamp("1950-12-09 00:00:00")): 2,
-                                     ("d", Timestamp("1950-12-09 00:00:00")): 1,
-                                     ("d", Timestamp("1990-12-09 00:00:00")): 1,
-                                     ("d", Timestamp("2011-07-04 00:00:00")): 1
-                                     }
-                     }
+                                             ("a", Timestamp("1950-12-09 00:00:00")): 3,
+                                             ("a", Timestamp("1990-12-09 00:00:00")): 1,
+                                             ("b", Timestamp("1898-01-02 00:00:00")): 1,
+                                             ("b", Timestamp("1950-12-09 00:00:00")): 7,
+                                             ("c", Timestamp("1898-01-02 00:00:00")): 1,
+                                             ("c", Timestamp("1950-12-09 00:00:00")): 2,
+                                             ("d", Timestamp("1950-12-09 00:00:00")): 1,
+                                             ("d", Timestamp("1990-12-09 00:00:00")): 1,
+                                             ("d", Timestamp("2011-07-04 00:00:00")): 1
+                                            }
+                    }
 
     res_2 = plot(df_data, "x", "somedate")
     assert df_expected_2["stacked_column_plot"] == res_2["stacked_column_plot"]
@@ -173,7 +180,7 @@ def test_corner() -> None:
     df_1_expected = {"all_one": {"bar_plot": {1.0: 10}},
                      "all_zeros": {"bar_plot": {0.0: 10}},
                      "random": {"bar_plot": np.array([2, 2, 1, 1, 1, 0, 0, 2, 0, 1],
-                                        dtype=np.int64)}}
+                                                     dtype=np.int64)}}
 
     res = plot(df_2, force_cat=["all_one", "all_zeros"])
 
@@ -186,7 +193,7 @@ def test_corner() -> None:
         "another_empty": []
     })
 
-    df_2_expected = dict()
+    df_2_expected: dict = {'scatter_plot': {}}
 
     res = plot(df_2, "empty", "another_empty")
     assert res == df_2_expected
