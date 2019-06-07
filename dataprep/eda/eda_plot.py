@@ -264,7 +264,7 @@ def _calc_hist(
 
     if not hist_array.size == 0:
         return {'histogram': (hist_array, bins)}
-    return {'histogram': ()}
+    return {'histogram': (list(), list())}
 
 
 def _calc_qqnorm(
@@ -375,7 +375,7 @@ def plot(
         col_y: Optional[str] = None,
         force_cat: Optional[StringList] = None,
         force_num: Optional[StringList] = None
-) -> Dict[str, Union[List[Any], Dict[Any, Any]]]:
+) -> Dict[str, Dict[Union[List[Any], Dict[Any, Any]]]]:
     """
     Returns an intermediate representation for the plots of
         different columns in the data_frame.
