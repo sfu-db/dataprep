@@ -2,6 +2,7 @@
     module for testing plot(df, x, y) function.
 """
 import datetime
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -64,7 +65,7 @@ def test_normal() -> None:
                                                    934.40088514, 1246.91504441, 1559.42920367,
                                                    1871.94336294, 2184.4575222, 2496.97168147,
                                                    2809.48584073, 3122.]))}
-                    }
+                     }
     res = plot(df_1, force_cat=["bool_01", "bool_01_    with_nan", "s1"])
 
     assert res["bool_01"] == df_1_expected["bool_01"]
@@ -140,7 +141,7 @@ def test_normal() -> None:
                                       "max": 794,
                                       "min": 654,
                                       "outliers": []}}
-                  }
+                   }
     res = plot(df_data, "y", "x")
 
     assert res["box_plot"]["a"] == df_expected["box_plot"]["a"]
@@ -158,8 +159,8 @@ def test_normal() -> None:
                                              ("d", Timestamp("1950-12-09 00:00:00")): 1,
                                              ("d", Timestamp("1990-12-09 00:00:00")): 1,
                                              ("d", Timestamp("2011-07-04 00:00:00")): 1
-                                            }
-                    }
+                                             }
+                     }
 
     res_2 = plot(df_data, "x", "somedate")
     assert df_expected_2["stacked_column_plot"] == res_2["stacked_column_plot"]
@@ -193,7 +194,7 @@ def test_corner() -> None:
         "another_empty": []
     })
 
-    df_2_expected: dict = {'scatter_plot': {}}
+    df_2_expected: Dict[str, Any] = {'scatter_plot': {}}
 
     res = plot(df_2, "empty", "another_empty")
     assert res == df_2_expected

@@ -2,7 +2,7 @@
     This module implements the plot(df) function.
 """
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import dask
 import dask.array as da
@@ -22,7 +22,7 @@ class DataType(Enum):
     TYPE_UNSUP = 3
 
 
-DEFAULT_RANGE = [x for x in range(1, 101)]
+DEFAULT_RANGE: List[int] = list(range(1, 101))
 # Type aliasing
 StringList = List[str]
 
@@ -222,7 +222,7 @@ def _calc_hist_by_group(
     np.array : An array of values representing histogram for the input col
     """
     col_cat, col_num = (col_x, col_y) if (get_type(dataframe[col_x]) == DataType.TYPE_CAT) \
-                                        else (col_y, col_x)
+        else (col_y, col_x)
     dask_df = dd.from_pandas(dataframe, npartitions=DEFAULT_PARTITIONS)
 
     grp_hist: Dict[str, Tuple[Any, Any]] = dict()
@@ -375,7 +375,7 @@ def plot(
         col_y: Optional[str] = None,
         force_cat: Optional[StringList] = None,
         force_num: Optional[StringList] = None
-) -> Dict[str, Dict[Union[List[Any], Dict[Any, Any]]]]:
+) -> Dict[str, Dict[str, Union[List[Any], Dict[Any, Any]]]]:
     """
     Returns an intermediate representation for the plots of
         different columns in the data_frame.
@@ -394,14 +394,13 @@ def plot(
     dict : A (column: [array/dict]) dict to encapsulate the
     intermediate results.
     """
-    result: Dict[str, Dict[Union[List[Any], Dict[Any, Any]]]] = dict()
+    result: Dict[str, Dict[str, Union[List[Any], Dict[Any, Any]]]] = dict()
 
     if col_x is None and col_y is None:
         result = plot_df(data_frame, force_cat, force_num)
+    elif (col_x is None and col_y is not None) or (col_x is not None and col_y is None):
 
-    if (col_x is None and col_y is not None) or (col_x is not None and col_y is None):
-
-        target_col: str = col_x if col_y is None else col_y
+        target_col: str = cast(str, col_x if col_y is None else col_y)
         dask_result: List[Any] = list()
 
         if data_frame[target_col].count() == 0:
@@ -450,7 +449,7 @@ def plot(
             result, = dask.compute(temp_dask_result)
         except NotImplementedError as error:  # TODO
             LOGGER.info("Plot could not be obtained due to : %s", error)
-            result = {'Error': [str(error)]}
+            result = {"Error": [str(error)]}
     else:
         pass
         # TODO to be added
