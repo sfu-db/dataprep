@@ -1,0 +1,30 @@
+version: 2.0
+jobs:
+  check:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - run:
+          name: Add python user PATH into PATH
+          command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV 
+      - run: 
+          name: Install python tools
+          command: pip install --user pipenv
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pipenv install -d
+      - run:
+          name: Type check the project
+          command: pipenv run pytype dataprep && pipenv run mypy dataprep --strict --ignore-missing-imports
+      - run:
+          name: Test the project
+          command: pipenv run pytest dataprep
+      - run:
+          name: Style check the project
+          command: pipenv run pylint dataprep
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - check
