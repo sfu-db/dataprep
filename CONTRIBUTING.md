@@ -57,6 +57,7 @@ Must be one of the following:
 * **refactor**: A code change that neither fixes a bug nor adds a feature
 * **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 * **test**: Adding missing tests or correcting existing tests
+* **chore**: Other changes that cannot fit into any categories above (settings for github hook, etc)
 
 ### Scope
 The scope should be the name of the component affected (as perceived by the person reading the changelog generated from commit messages).
@@ -64,6 +65,5 @@ The scope should be the name of the component affected (as perceived by the pers
 The following is the list of supported scopes:
 
 * **dataprep**: modification to the whole project, seldom used.
-* **meta**: meta info like readme, code of conduct. Should be seldom used.
 * **eda.plot**
 * TODO
