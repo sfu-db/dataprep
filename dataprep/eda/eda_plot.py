@@ -9,6 +9,9 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import kendalltau
+
 
 from .__init__ import LOGGER, DEFAULT_PARTITIONS
 
@@ -298,6 +301,62 @@ def _calc_qqnorm(
     return {"qq_norm_plot": list()}
 
 
+def _calc_cov(
+        matrix: np.ndarray) -> np.ndarray:
+    """ Returns a np.ndarray as the covariance matrix of the input data
+
+    Parameters
+    __________
+    matrix : the input numpy matrix
+
+    Returns
+    __________
+    np.ndarray : A numpy matrix representing covariance of the input data
+    """
+    return np.cov(matrix)
+
+
+def _calc_std(
+        matrix: np.ndarray) -> np.ndarray:
+    """ Returns a np.ndarray as the standard deviation matrix of the original data
+
+    Parameters
+    __________
+    matrix : the input numpy matrix
+
+    Returns
+    __________
+    np.ndarray : A numpy matrix representing standard deviation matrix of the original data
+    """
+    return np.sqrt(np.diag(matrix))
+
+
+def _calc_div(matrix: np.ndarray,
+              arr: np.ndarray) -> np.ndarray:
+    """ Returns a np.ndarray as the correlation matrix of the original data
+
+    Parameters
+    __________
+    matrix : the input numpy matrix
+    arr : the input numpy array
+
+    Returns
+    __________
+    np.ndarray : A numpy matrix representing correlation matrix of the original data
+    """
+    return matrix / arr[:, None] / arr[None, :]
+
+
+def _calc_kendall(a, b) -> DataType:
+    kendallta, _ = kendalltau(a, b)
+    return kendallta
+
+
+def _value_to_rank(array) -> pd.Series:
+    array_ranks = pd.Series(array).rank()
+    return array_ranks.values
+
+
 def get_type(data: pd.Series) -> DataType:
     """ Returns the type of the input data.
         Identified types are according to the DataType Enumeration.
@@ -455,3 +514,104 @@ def plot(
         # TODO to be added
 
     return result
+
+
+def plot_correlation(df, x=None, y=None, k=None, method='pearson') -> np.ndarray:
+    if x is not None and y is not None and k is not None:
+        pass
+    elif x is not None and k is not None:
+        cal_matrix = df.values.T
+        cal_matrix = np.vstack((x, cal_matrix))
+
+        # TODO to optimize
+        cov_xy = dask.delayed(_calc_cov)(cal_matrix)
+        std_xy = dask.delayed(_calc_std)(cov_xy)
+        result_p = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
+        row_p = result_p[0, :]
+        row_p[0] = -1
+        idx_p = np.argsort(row_p)
+
+        # TODO to optimize
+        M, _ = np.shape(cal_matrix)
+        for i in range(M):
+            cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
+        cov_xy = dask.delayed(_calc_cov)(cal_matrix)
+        std_xy = dask.delayed(_calc_std)(cov_xy)
+        result_s = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
+        row_s = result_s[0, :]
+        row_s[0] = -1
+        idx_s = np.argsort(row_s)
+
+        M, _ = np.shape(cal_matrix)
+        result_k = np.ones(shape=(M, M))
+        for i in range(1):
+            for j in range(i + 1, M):
+                result_k[i][j] = dask.delayed(_calc_kendall)(cal_matrix[i, :], cal_matrix[j, :]).compute()
+                result_k[j][i] = result_k[i][j]
+        row_k = result_k[0, :]
+        row_k[0] = -1
+        idx_k = np.argsort(row_k)
+
+        result = np.stack((sorted(row_p[idx_p[-k:]], reverse=True),
+                           sorted(row_s[idx_s[-k:]], reverse=True),
+                           sorted(row_k[idx_k[-k:]], reverse=True)))
+    elif k is not None:
+        if method == 'pearson':
+            cal_matrix = df.values.T
+            cov_xy = dask.delayed(_calc_cov)(cal_matrix)
+            std_xy = dask.delayed(_calc_std)(cov_xy)
+            result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
+        elif method == 'spearman':
+            cal_matrix = df.values.T
+            M, _ = np.shape(cal_matrix)
+            for i in range(M):
+                cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
+            cov_xy = dask.delayed(_calc_cov)(cal_matrix)
+            std_xy = dask.delayed(_calc_std)(cov_xy)
+            result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
+        elif method == 'kendall':
+            cal_matrix = df.values.T
+            M, _ = np.shape(cal_matrix)
+            result = np.ones(shape=(M, M))
+            for i in range(M):
+                for j in range(i + 1, M):
+                    result[i][j] = dask.delayed(_calc_kendall)(cal_matrix[i, :], cal_matrix[j, :]).compute()
+                    result[j][i] = result[i][j]
+        else:
+            raise ValueError("Method Error")
+        M, _ = np.shape(result)
+        result_re = np.reshape(np.triu(result), (M * M,))
+        idx = np.argsort(result_re)
+        mask = np.zeros(shape=(M * M,))
+        mask[idx[:k]] = 1
+        mask[idx[-k:]] = 1
+        result = np.multiply(result_re, mask)
+        result = np.reshape(result, (M, M))
+        result += result.T - np.diag(result.diagonal())
+    else:
+        if method == 'pearson':
+            cal_matrix = df.values.T
+            cov_xy = dask.delayed(_calc_cov)(cal_matrix)
+            std_xy = dask.delayed(_calc_std)(cov_xy)
+            result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
+        elif method == 'spearman':
+            cal_matrix = df.values.T
+            M, _ = np.shape(cal_matrix)
+            for i in range(M):
+                cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
+            cov_xy = dask.delayed(_calc_cov)(cal_matrix)
+            std_xy = dask.delayed(_calc_std)(cov_xy)
+            result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
+        elif method == 'kendall':
+            cal_matrix = df.values.T
+            M, _ = np.shape(cal_matrix)
+            result = np.ones(shape=(M, M))
+            for i in range(M):
+                for j in range(i + 1, M):
+                    result[i][j] = dask.delayed(_calc_kendall)(cal_matrix[i, :], cal_matrix[j, :]).compute()
+                    result[j][i] = result[i][j]
+        else:
+            raise ValueError("Method Error")
+
+    return result
+
