@@ -507,11 +507,11 @@ def plot(
 def plot_correlation(df: pd.DataFrame,
                      x: np.ndarray = None,
                      y: np.ndarray = None,
-                     k: int = None,
+                     k: int = 0,
                      method: str = 'pearson') -> np.ndarray:
-    if x is not None and y is not None and k is not None:
+    if x is not None and y is not None and k != 0:
         pass
-    elif x is not None and k is not None:
+    elif x is not None and k != 0:
         cal_matrix = df.values.T
         cal_matrix = np.vstack((x, cal_matrix))
 
@@ -547,7 +547,7 @@ def plot_correlation(df: pd.DataFrame,
         result = np.stack((sorted(row_p[idx_p[-k:]], reverse=True),
                            sorted(row_s[idx_s[-k:]], reverse=True),
                            sorted(row_k[idx_k[-k:]], reverse=True)))
-    elif k is not None:
+    elif k != 0:
         if method == 'pearson':
             cal_matrix = df.values.T
             cov_xy = dask.delayed(_calc_cov)(cal_matrix)
