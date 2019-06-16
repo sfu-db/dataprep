@@ -331,7 +331,7 @@ def _calc_div(matrix: np.ndarray,
     return matrix / arr[:, None] / arr[None, :]
 
 
-def _calc_kendall(a: np.ndarray, b: np.ndarray) -> float:
+def _calc_kendall(a: np.ndarray, b: np.ndarray) -> Any:
     kendallta, _ = kendalltau(a, b)
     return kendallta
 
