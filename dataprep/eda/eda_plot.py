@@ -331,12 +331,12 @@ def _calc_div(matrix: np.ndarray,
     return matrix / arr[:, None] / arr[None, :]
 
 
-def _calc_kendall(a, b) -> DataType:
+def _calc_kendall(a: np.ndarray, b: np.ndarray) -> DataType:
     kendallta, _ = kendalltau(a, b)
     return kendallta
 
 
-def _value_to_rank(array) -> pd.Series:
+def _value_to_rank(array: np.ndarray) -> pd.Series:
     array_ranks = pd.Series(array).rank()
     return array_ranks.values
 
@@ -504,7 +504,11 @@ def plot(
     return result
 
 
-def plot_correlation(df, x=None, y=None, k=None, method='pearson') -> np.ndarray:
+def plot_correlation(df: pd.DataFrame,
+                     x: np.ndarray = None,
+                     y: np.ndarray = None,
+                     k: int = None,
+                     method: str = 'pearson') -> np.ndarray:
     if x is not None and y is not None and k is not None:
         pass
     elif x is not None and k is not None:
