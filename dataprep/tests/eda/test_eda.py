@@ -230,10 +230,10 @@ def test_corner() -> None:
 
 
 def test_plot_corr_df() -> None:
-    df = pd.DataFrame({'a': np.random.normal(0, 10, 100000000)})
-    df['b'] = df['a'] + np.random.normal(0, 10, 100000000)
-    df['c'] = df['a'] + np.random.normal(0, 10, 100000000)
-    df['d'] = df['a'] + np.random.normal(0, 10, 100000000)
+    df = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    df['b'] = df['a'] + np.random.normal(0, 10, 100)
+    df['c'] = df['a'] + np.random.normal(0, 10, 100)
+    df['d'] = df['a'] + np.random.normal(0, 10, 100)
 
     start_p_pd = time()
     res = df.corr(method='pearson')
