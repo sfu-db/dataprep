@@ -9,7 +9,6 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.stats import kendalltau
 
 
@@ -331,12 +330,23 @@ def _calc_div(matrix: np.ndarray,
     return matrix / arr[:, None] / arr[None, :]
 
 
-def _calc_kendall(a: np.ndarray, b: np.ndarray) -> Any:
-    kendallta, _ = kendalltau(a, b)
+def _calc_kendall(
+        data_a: np.ndarray, data_b: np.ndarray) -> Any:
+    """
+    :param data_a: the input numpy array
+    :param data_b: the input numpy array
+    :return: A float value which indicates the
+    correlation of two numpy array
+    """
+    kendallta, _ = kendalltau(data_a, data_b)
     return kendallta
 
 
 def _value_to_rank(array: np.ndarray) -> pd.Series:
+    """
+    :param array: the input numpy array
+    :return: the output numpy array
+    """
     array_ranks = pd.Series(array).rank()
     return array_ranks.values
 
@@ -504,18 +514,29 @@ def plot(
     return result
 
 
-def plot_correlation(df: pd.DataFrame,
-                     x: np.ndarray = None,
-                     y: np.ndarray = None,
-                     k: int = 0,
-                     method: str = 'pearson') -> np.ndarray:
-    if x is not None and y is not None and k != 0:
+def plot_correlation(
+        pd_data_frame: pd.DataFrame,
+        data_x: np.ndarray = None,
+        data_y: np.ndarray = None,
+        k: int = 0,
+        method: str = 'pearson') -> np.ndarray:
+    """
+    :param pd_data_frame: the pandas data_frame for which plots are calculated for each
+    column.
+    :param data_x: a valid column name of the dataframe which has been translated
+    to numpy array
+    :param data_y: a valid column name of the dataframe which has been translated
+    to numpy array
+    :param k: choose top-k element
+    :param method: Three method we can use to calculate the correlation matrix
+    :return: A correlation matrix
+    """
+    if data_x is not None and data_y is not None and k != 0:
         pass
-    elif x is not None and k != 0:
-        cal_matrix = df.values.T
-        cal_matrix = np.vstack((x, cal_matrix))
+    elif data_x is not None and k != 0:
+        cal_matrix = pd_data_frame.values.T
+        cal_matrix = np.vstack((data_x, cal_matrix))
 
-        # TODO to optimize
         cov_xy = dask.delayed(_calc_cov)(cal_matrix)
         std_xy = dask.delayed(_calc_std)(cov_xy)
         result_p = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
@@ -523,9 +544,8 @@ def plot_correlation(df: pd.DataFrame,
         row_p[0] = -1
         idx_p = np.argsort(row_p)
 
-        # TODO to optimize
-        M, _ = np.shape(cal_matrix)
-        for i in range(M):
+        matrix_row, _ = np.shape(cal_matrix)
+        for i in range(matrix_row):
             cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
         cov_xy = dask.delayed(_calc_cov)(cal_matrix)
         std_xy = dask.delayed(_calc_std)(cov_xy)
@@ -534,11 +554,12 @@ def plot_correlation(df: pd.DataFrame,
         row_s[0] = -1
         idx_s = np.argsort(row_s)
 
-        M, _ = np.shape(cal_matrix)
-        result_k = np.ones(shape=(M, M))
+        matrix_row, _ = np.shape(cal_matrix)
+        result_k = np.ones(shape=(matrix_row, matrix_row))
         for i in range(1):
-            for j in range(i + 1, M):
-                result_k[i][j] = dask.delayed(_calc_kendall)(cal_matrix[i, :], cal_matrix[j, :]).compute()
+            for j in range(i + 1, matrix_row):
+                result_k[i][j] = dask.delayed(_calc_kendall)(
+                    cal_matrix[i, :], cal_matrix[j, :]).compute()
                 result_k[j][i] = result_k[i][j]
         row_k = result_k[0, :]
         row_k[0] = -1
@@ -549,58 +570,63 @@ def plot_correlation(df: pd.DataFrame,
                            sorted(row_k[idx_k[-k:]], reverse=True)))
     elif k != 0:
         if method == 'pearson':
-            cal_matrix = df.values.T
+            cal_matrix = pd_data_frame.values.T
             cov_xy = dask.delayed(_calc_cov)(cal_matrix)
             std_xy = dask.delayed(_calc_std)(cov_xy)
             result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
         elif method == 'spearman':
-            cal_matrix = df.values.T
-            M, _ = np.shape(cal_matrix)
-            for i in range(M):
+            cal_matrix = pd_data_frame.values.T
+            matrix_row, _ = np.shape(cal_matrix)
+            for i in range(matrix_row):
                 cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
             cov_xy = dask.delayed(_calc_cov)(cal_matrix)
             std_xy = dask.delayed(_calc_std)(cov_xy)
             result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
         elif method == 'kendall':
-            cal_matrix = df.values.T
-            M, _ = np.shape(cal_matrix)
-            result = np.ones(shape=(M, M))
-            for i in range(M):
-                for j in range(i + 1, M):
-                    result[i][j] = dask.delayed(_calc_kendall)(cal_matrix[i, :], cal_matrix[j, :]).compute()
+            cal_matrix = pd_data_frame.values.T
+            matrix_row, _ = np.shape(cal_matrix)
+            result = np.ones(
+                shape=(matrix_row, matrix_row))
+            for i in range(matrix_row):
+                for j in range(i + 1, matrix_row):
+                    result[i][j] = dask.delayed(_calc_kendall)(
+                        cal_matrix[i, :], cal_matrix[j, :]).compute()
                     result[j][i] = result[i][j]
         else:
             raise ValueError("Method Error")
-        M, _ = np.shape(result)
-        result_re = np.reshape(np.triu(result), (M * M,))
+        matrix_row, _ = np.shape(result)
+        result_re = np.reshape(np.triu(result),
+                               (matrix_row * matrix_row,))
         idx = np.argsort(result_re)
-        mask = np.zeros(shape=(M * M,))
+        mask = np.zeros(shape=(matrix_row * matrix_row,))
         mask[idx[:k]] = 1
         mask[idx[-k:]] = 1
         result = np.multiply(result_re, mask)
-        result = np.reshape(result, (M, M))
+        result = np.reshape(result,
+                            (matrix_row, matrix_row))
         result += result.T - np.diag(result.diagonal())
     else:
         if method == 'pearson':
-            cal_matrix = df.values.T
+            cal_matrix = pd_data_frame.values.T
             cov_xy = dask.delayed(_calc_cov)(cal_matrix)
             std_xy = dask.delayed(_calc_std)(cov_xy)
             result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
         elif method == 'spearman':
-            cal_matrix = df.values.T
-            M, _ = np.shape(cal_matrix)
-            for i in range(M):
+            cal_matrix = pd_data_frame.values.T
+            matrix_row, _ = np.shape(cal_matrix)
+            for i in range(matrix_row):
                 cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
             cov_xy = dask.delayed(_calc_cov)(cal_matrix)
             std_xy = dask.delayed(_calc_std)(cov_xy)
             result = dask.delayed(_calc_div)(cov_xy, std_xy).compute()
         elif method == 'kendall':
-            cal_matrix = df.values.T
-            M, _ = np.shape(cal_matrix)
-            result = np.ones(shape=(M, M))
-            for i in range(M):
-                for j in range(i + 1, M):
-                    result[i][j] = dask.delayed(_calc_kendall)(cal_matrix[i, :], cal_matrix[j, :]).compute()
+            cal_matrix = pd_data_frame.values.T
+            matrix_row, _ = np.shape(cal_matrix)
+            result = np.ones(shape=(matrix_row, matrix_row))
+            for i in range(matrix_row):
+                for j in range(i + 1, matrix_row):
+                    result[i][j] = dask.delayed(_calc_kendall)(
+                        cal_matrix[i, :], cal_matrix[j, :]).compute()
                     result[j][i] = result[i][j]
         else:
             raise ValueError("Method Error")

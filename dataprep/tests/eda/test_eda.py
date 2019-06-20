@@ -4,9 +4,9 @@
 import datetime
 from typing import Any, Dict, Union, cast, Tuple
 
+from time import time
 import numpy as np
 import pandas as pd
-from time import time
 from pandas import Timestamp
 
 from ...eda.eda_plot import plot  # dataprep.tests.eda.test_eda
@@ -230,78 +230,86 @@ def test_corner() -> None:
 
 
 def test_plot_corr_df() -> None:
-    df = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
-    df['b'] = df['a'] + np.random.normal(0, 10, 100)
-    df['c'] = df['a'] + np.random.normal(0, 10, 100)
-    df['d'] = df['a'] + np.random.normal(0, 10, 100)
+    """
+
+    :return:
+    """
+    df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
 
     start_p_pd = time()
-    res = df.corr(method='pearson')
+    res = df_data.corr(method='pearson')
     end_p_pd = time()
     print(str(end_p_pd - start_p_pd) + " s")
     print("pd pearson: ", res)
 
     start_p = time()
-    res = plot_correlation(df, method='pearson')
+    res = plot_correlation(df_data, method='pearson')
     end_p = time()
     print(str(end_p - start_p) + " s")
     print("our pearson: ", res)
 
     start_s_pd = time()
-    res = df.corr(method='spearman')
+    res = df_data.corr(method='spearman')
     end_s_pd = time()
     print(str(end_s_pd - start_s_pd) + " s")
     print("pd spearman: ", res)
 
     start_s = time()
-    res = plot_correlation(df, method='spearman')
+    res = plot_correlation(df_data, method='spearman')
     end_s = time()
     print(str(end_s - start_s) + " s")
     print("our spearman: ", res)
 
     start_k_pd = time()
-    res = df.corr(method='kendall')
+    res = df_data.corr(method='kendall')
     end_k_pd = time()
     print(str(end_k_pd - start_k_pd) + " s")
     print("pd kendall: ", res)
 
     start_k = time()
-    res = plot_correlation(df, method='kendall')
+    res = plot_correlation(df_data, method='kendall')
     end_k = time()
     print(str(end_k - start_k) + " s")
     print("our kendall: ", res)
 
 
 def test_plot_corr_df_k() -> None:
-    df = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
-    df['b'] = df['a'] + np.random.normal(0, 10, 100)
-    df['c'] = df['a'] + np.random.normal(0, 10, 100)
-    df['d'] = df['a'] + np.random.normal(0, 10, 100)
+    """
+
+    :return:
+    """
+    df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     k = 5
-    res = df.corr(method='pearson')
+    res = df_data.corr(method='pearson')
     print("df: ", res)
-    res = plot_correlation(df=df, k=k)
+    res = plot_correlation(df=df_data, k=k)
     print("result: ", res)
 
 
 def test_plot_corr_df_x_k() -> None:
-    x = np.random.normal(0, 10, 100)
-    a = np.random.normal(0, 10, 100)
-    b = np.random.normal(0, 10, 100)
-    c = np.random.normal(0, 10, 100)
-    d = np.random.normal(0, 10, 100)
-    cal_matrix = np.vstack((x, a, b, c, d))
-    df = pd.DataFrame(cal_matrix.T)
-    res = df.corr(method='pearson')
+    """
+
+    :return:
+    """
+    data_x = np.random.normal(0, 10, 100)
+    data_a = np.random.normal(0, 10, 100)
+    data_b = np.random.normal(0, 10, 100)
+    data_c = np.random.normal(0, 10, 100)
+    data_d = np.random.normal(0, 10, 100)
+    cal_matrix = np.vstack((data_x, data_a, data_b, data_c, data_d))
+    df_data = pd.DataFrame(cal_matrix.T)
+    res = df_data.corr(method='pearson')
     print("pearson: ", res)
-    res = df.corr(method='spearman')
+    res = df_data.corr(method='spearman')
     print("spearman: ", res)
-    res = df.corr(method='kendall')
+    res = df_data.corr(method='kendall')
     print("kendall: ", res)
     k = 3
-    res = plot_correlation(df=df, x=x, k=k)
+    res = plot_correlation(df=df_data, x=data_x, k=k)
     print("top-k: ", res)
-
-
-def test_plot_corr_df_x_y_k() -> None:
-    pass
