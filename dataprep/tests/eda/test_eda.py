@@ -288,7 +288,7 @@ def test_plot_corr_df_k() -> None:
     k = 5
     res = df_data.corr(method='pearson')
     print("df: ", res)
-    res = plot_correlation(df=df_data, k=k)
+    res = plot_correlation(pd_data_frame=df_data, k=k)
     print("result: ", res)
 
 
@@ -311,5 +311,5 @@ def test_plot_corr_df_x_k() -> None:
     res = df_data.corr(method='kendall')
     print("kendall: ", res)
     k = 3
-    res = plot_correlation(df=df_data, x=data_x, k=k)
+    res = plot_correlation(pd_data_frame=df_data, data_x=data_x, k=k)
     print("top-k: ", res)
