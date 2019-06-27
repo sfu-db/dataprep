@@ -494,7 +494,7 @@ def plot_correlation_pd(
         pd_data_frame: pd.DataFrame,
         method: str = 'pearson'
 ) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any]]]:
+                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -545,7 +545,7 @@ def plot_correlation_pd_k(
         k: int = 0,
         method: str = 'pearson'
 ) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any]]]:
+                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -578,7 +578,7 @@ def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
         x_name: str = '',
         k: int = 0
 ) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any]]]:
+                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -644,7 +644,7 @@ def plot_correlation_pd_x_y_k(
         y_name: str = '',
         k: int = 0
 ) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any]]]:
+                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -711,7 +711,7 @@ def plot_correlation(
         k: int = 0,
         method: str = 'pearson'
 ) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any]]]:
+                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
     column.
