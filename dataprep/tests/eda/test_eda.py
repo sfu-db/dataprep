@@ -325,4 +325,3 @@ def test_plot_corr_df_x_y_k() -> None:
     k = 0
     res = plot_correlation(pd_data_frame=df_data, x_name=x_name, y_name=y_name, k=k)
     print(res)
-
