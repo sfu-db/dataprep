@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 import dask
 import dask.array as da
 import dask.dataframe as dd
+import math
 import numpy as np
 import pandas as pd
 from scipy.stats import kendalltau
@@ -305,6 +306,27 @@ def _value_to_rank(array: np.ndarray) -> pd.Series:
     return array_ranks.values
 
 
+def _line_fit(data_x, data_y):
+    """
+    :param data_x: the input numpy array
+    :param data_y: the input numpy array
+    :return: the parameter of line and the relationship
+    """
+    N = float(len(data_x))
+    sx, sy, sxx, syy, sxy = 0, 0, 0, 0, 0
+    for i in range(0, int(N)):
+        sx  += data_x[i]
+        sy  += data_y[i]
+        sxx += data_x[i] * data_x[i]
+        syy += data_y[i] * data_y[i]
+        sxy += data_x[i] * data_y[i]
+    a = (sy * sx / N - sxy) / (sx * sx / N - sxx)
+    b = (sy - a * sx) / N
+    r = abs(sy * sx / N - sxy) / \
+        math.sqrt((sxx - sx * sx / N) * (syy - sy * sy / N))
+    return a, b, r
+
+
 def get_type(data: dd.Series) -> DataType:
     """ Returns the type of the input data.
         Identified types are according to the DataType Enumeration.
@@ -470,20 +492,23 @@ def plot(
 
 def plot_correlation_pd(
         pd_data_frame: pd.DataFrame,
-        method: str = 'pearson') -> np.ndarray:
+        method: str = 'pearson'
+) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
+                     Tuple[Any], List[Any], Dict[Any, Any]]]:
     """
-
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
     :param method: Three method we can use to calculate
     the correlation matrix
-    :return: A correlation matrix
+    :return: A (column: [array/dict]) dict to encapsulate the
+    intermediate results.
     """
+    result = dict()
     if method == 'pearson':
         cal_matrix = pd_data_frame.values.T
         cov_xy = np.cov(cal_matrix)
         std_xy = np.sqrt(np.diag(cov_xy))
-        result = cov_xy / std_xy[:, None] / std_xy[None, :]
+        corr_matrix = cov_xy / std_xy[:, None] / std_xy[None, :]
     elif method == 'spearman':
         cal_matrix = pd_data_frame.values.T
         matrix_row, _ = np.shape(cal_matrix)
@@ -491,77 +516,86 @@ def plot_correlation_pd(
             cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
         cov_xy = np.cov(cal_matrix)
         std_xy = np.sqrt(np.diag(cov_xy))
-        result = cov_xy / std_xy[:, None] / std_xy[None, :]
+        corr_matrix = cov_xy / std_xy[:, None] / std_xy[None, :]
     elif method == 'kendall':
         cal_matrix = pd_data_frame.values.T
         matrix_row, _ = np.shape(cal_matrix)
-        result = np.ones(shape=(matrix_row, matrix_row))
-        result_list = []
+        corr_matrix = np.ones(shape=(matrix_row, matrix_row))
+        corr_list = []
         for i in range(matrix_row):
             for j in range(i + 1, matrix_row):
                 tmp = dask.delayed(_calc_kendall)(
                     cal_matrix[i, :], cal_matrix[j, :])
-                result_list.append(tmp)
-        result_comp = dask.compute(*result_list)
+                corr_list.append(tmp)
+        corr_comp = dask.compute(*corr_list)
         idx = 0
         for i in range(matrix_row):
             for j in range(i + 1, matrix_row):
-                result[i][j] = result_comp[idx]
-                result[j][i] = result[i][j]
+                corr_matrix[i][j] = corr_comp[idx]
+                corr_matrix[j][i] = corr_matrix[i][j]
                 idx = idx + 1
     else:
         raise ValueError("Method Error")
-
+    result['corr'] = corr_matrix
     return result
 
 
 def plot_correlation_pd_k(
         pd_data_frame: pd.DataFrame,
         k: int = 0,
-        method: str = 'pearson') -> np.ndarray:
+        method: str = 'pearson'
+) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
+                     Tuple[Any], List[Any], Dict[Any, Any]]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
     :param k: choose top-k
     :param method: Three method we can use to calculate
     the correlation matrix
-    :return: A correlation matrix
+    :return: A (column: [array/dict]) dict to encapsulate the
+    intermediate results.
     """
-    result = plot_correlation_pd(pd_data_frame=pd_data_frame, method=method)
-    matrix_row, _ = np.shape(result)
-    result_re = np.reshape(np.triu(result),
+    result = dict()
+    result_pd = plot_correlation_pd(pd_data_frame=pd_data_frame, method=method)
+    corr_matrix = result_pd['corr']
+    matrix_row, _ = np.shape(corr_matrix)
+    corr_matrix_re = np.reshape(np.triu(corr_matrix),
                            (matrix_row * matrix_row,))
-    idx = np.argsort(result_re)
+    idx = np.argsort(corr_matrix_re)
     mask = np.zeros(shape=(matrix_row * matrix_row,))
     mask[idx[:k]] = 1
     mask[idx[-k:]] = 1
-    result = np.multiply(result_re, mask)
-    result = np.reshape(result,
-                        (matrix_row, matrix_row))
-    result += result.T - np.diag(result.diagonal())
+    corr_matrix = np.multiply(corr_matrix_re, mask)
+    corr_matrix = np.reshape(corr_matrix,
+                             (matrix_row, matrix_row))
+    corr_matrix += corr_matrix.T - np.diag(corr_matrix.diagonal())
+    result['corr'] = corr_matrix
     return result
 
 
 def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
-        data_x: np.ndarray = None,
-        k: int = 0) -> np.ndarray:
+        x_name: str = '',
+        k: int = 0
+) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
+                     Tuple[Any], List[Any], Dict[Any, Any]]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
-    :param data_x: a valid column name of the dataframe which
-    has been translated to numpy array
+    :param x_name: a valid column name of the dataframe
     :param k: choose top-k
-    :return: A correlation matrix
+    :return: A (column: [array/dict]) dict to encapsulate the
+    intermediate results.
     """
+    name_list = pd_data_frame.columns.values.tolist()
+    name_idx = name_list.index(x_name)
     cal_matrix = pd_data_frame.values.T
-    cal_matrix = np.vstack((data_x, cal_matrix))
 
     cov_xy = np.cov(cal_matrix)
     std_xy = np.sqrt(np.diag(cov_xy))
-    result_p = cov_xy / std_xy[:, None] / std_xy[None, :]
-    row_p = result_p[0, :]
-    row_p[0] = -1
+    corr_matrix_p = cov_xy / std_xy[:, None] / std_xy[None, :]
+    row_p = corr_matrix_p[name_idx, :]
+    row_p[name_idx] = -1
     idx_p = np.argsort(row_p)
 
     matrix_row, _ = np.shape(cal_matrix)
@@ -569,60 +603,134 @@ def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
         cal_matrix[i, :] = _value_to_rank(cal_matrix[i, :])
     cov_xy = np.cov(cal_matrix)
     std_xy = np.sqrt(np.diag(cov_xy))
-    result_s = cov_xy / std_xy[:, None] / std_xy[None, :]
-    row_s = result_s[0, :]
-    row_s[0] = -1
+    corr_matrix_s = cov_xy / std_xy[:, None] / std_xy[None, :]
+    row_s = corr_matrix_s[name_idx, :]
+    row_s[name_idx] = -1
     idx_s = np.argsort(row_s)
 
     matrix_row, _ = np.shape(cal_matrix)
-    result_k = np.ones(shape=(matrix_row, matrix_row))
-    result_list = []
-    for i in range(1, matrix_row):
+    corr_matrix_k = np.ones(shape=(matrix_row, matrix_row))
+    corr_list = []
+    for i in range(0, name_idx):
         tmp = dask.delayed(_calc_kendall)(
-            cal_matrix[0, :], cal_matrix[i, :])
-        result_list.append(tmp)
-    result_comp = dask.compute(*result_list)
+            cal_matrix[name_idx, :], cal_matrix[i, :])
+        corr_list.append(tmp)
+    for i in range(name_idx + 1, matrix_row):
+        tmp = dask.delayed(_calc_kendall)(
+            cal_matrix[name_idx, :], cal_matrix[i, :])
+        corr_list.append(tmp)
+    corr_comp = dask.compute(*corr_list)
     idx = 0
-    for i in range(1, matrix_row):
-        result_k[0][i] = result_comp[idx]
-        result_k[i][0] = result_k[0][i]
+    for i in range(0, name_idx):
+        corr_matrix_k[name_idx][i] = corr_comp[idx]
+        corr_matrix_k[i][name_idx] = corr_matrix_k[name_idx][i]
         idx = idx + 1
-    row_k = result_k[0, :]
-    row_k[0] = -1
+    for i in range(name_idx + 1, matrix_row):
+        corr_matrix_k[name_idx][i] = corr_comp[idx]
+        corr_matrix_k[i][name_idx] = corr_matrix_k[name_idx][i]
+        idx = idx + 1
+    row_k = corr_matrix_k[name_idx, :]
+    row_k[name_idx] = -1
     idx_k = np.argsort(row_k)
-
-    result = np.stack((sorted(row_p[idx_p[-k:]], reverse=True),
-                       sorted(row_s[idx_s[-k:]], reverse=True),
-                       sorted(row_k[idx_k[-k:]], reverse=True)))
+    result = {'pearson': sorted(row_p[idx_p[-k:]], reverse=True),
+              'spearman': sorted(row_s[idx_s[-k:]], reverse=True),
+              'kendall': sorted(row_k[idx_k[-k:]], reverse=True)}
     return result
 
 
+def plot_correlation_pd_x_y_k(
+        pd_data_frame: pd.DataFrame,
+        x_name: str = '',
+        y_name: str = '',
+        k: int = 0
+) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
+                     Tuple[Any], List[Any], Dict[Any, Any]]]:
+    """
+    :param pd_data_frame: the pandas data_frame for which plots
+    are calculated for each column.
+    :param x_name: a valid column name of the dataframe
+    :param y_name: a valid column name of the dataframe
+    :param k: highlight k points which influence pearson correlation most
+    :return: A (column: [array/dict]) dict to encapsulate the
+    intermediate results.
+    """
+    data_x = pd_data_frame[x_name].values
+    data_y = pd_data_frame[y_name].values
+    if k == 0:
+        corr = np.corrcoef(data_x, data_y)[1, 0]
+        a, b, _ = _line_fit(data_x=data_x, data_y=data_y)
+        result = {'corr': corr, 'a': a, 'b': b}
+    else:
+        corr = np.corrcoef(data_x, data_y)[1, 0]
+        inc_point_x = []
+        inc_point_y = []
+        data_x_copy = data_x.copy()
+        data_y_copy = data_y.copy()
+        for i in range(k):
+            max_diff = 0
+            max_idx = 0
+            for j in range(len(data_x_copy)):
+                data_x_sel = np.append(data_x_copy[:j], data_x_copy[j + 1:])
+                data_y_sel = np.append(data_y_copy[:j], data_y_copy[j + 1:])
+                corr_sel = np.corrcoef(data_x_sel, data_y_sel)[1, 0]
+                if corr_sel - corr > max_diff:
+                    max_diff = corr_sel - corr
+                    max_idx = j
+            inc_point_x.append(data_x_copy[max_idx])
+            inc_point_y.append(data_y_copy[max_idx])
+            data_x_copy = np.delete(data_x_copy, max_idx)
+            data_y_copy = np.delete(data_y_copy, max_idx)
+        dec_point_x = []
+        dec_point_y = []
+        data_x_copy = data_x.copy()
+        data_y_copy = data_y.copy()
+        for i in range(k):
+            max_diff = 0
+            max_idx = 0
+            for j in range(len(data_x_copy)):
+                data_x_sel = np.append(data_x_copy[:j], data_x_copy[j + 1:])
+                data_y_sel = np.append(data_y_copy[:j], data_y_copy[j + 1:])
+                corr_sel = np.corrcoef(data_x_sel, data_y_sel)[1, 0]
+                if corr - corr_sel > max_diff:
+                    max_diff = corr - corr_sel
+                    max_idx = j
+            dec_point_x.append(data_x_copy[max_idx])
+            dec_point_y.append(data_y_copy[max_idx])
+            data_x_copy = np.delete(data_x_copy, max_idx)
+            data_y_copy = np.delete(data_y_copy, max_idx)
+        result = {'corr': corr, 'dec_point_x': dec_point_x,
+                  'dec_point_y': dec_point_y,
+                  'inc_point_x': inc_point_x,
+                  'inc_point_y': inc_point_y}
+    return result
+
 def plot_correlation(
         pd_data_frame: pd.DataFrame,
-        data_x: np.ndarray = None,
-        data_y: np.ndarray = None,
+        x_name: str = '',
+        y_name: str = '',
         k: int = 0,
-        method: str = 'pearson') -> np.ndarray:
+        method: str = 'pearson'
+) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
+                     Tuple[Any], List[Any], Dict[Any, Any]]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
     column.
-    :param data_x: a valid column name of the dataframe which has been translated
-    to numpy array
-    :param data_y: a valid column name of the dataframe which has been translated
-    to numpy array
+    :param x_name: a valid column name of the dataframe
+    :param y_name: a valid column name of the dataframe
     :param k: choose top-k element
     :param method: Three method we can use to calculate the correlation matrix
-    :return: A correlation matrix
+    :return: A (column: [array/dict]) dict to encapsulate the
+    intermediate results.
     """
-    if data_x is not None and data_y is not None and k != 0:
-        pass
-    elif data_x is not None and k != 0:
+    if x_name is not '' and y_name is not '':
+        result = plot_correlation_pd_x_y_k(pd_data_frame=pd_data_frame,
+                                           x_name=x_name, y_name=y_name, k=k)
+    elif x_name is not '' and k != 0:
         result = plot_correlation_pd_x_k(pd_data_frame=pd_data_frame,
-                                         data_x=data_x, k=k)
+                                         x_name=x_name, k=k)
     elif k != 0:
         result = plot_correlation_pd_k(pd_data_frame=pd_data_frame,
-                                       k=k, method=method)
+                                       method=method, k=k)
     else:
         result = plot_correlation_pd(pd_data_frame=pd_data_frame, method=method)
-
     return result
