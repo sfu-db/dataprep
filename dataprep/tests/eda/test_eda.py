@@ -242,38 +242,38 @@ def test_plot_corr_df() -> None:
     start_p_pd = time()
     res = df_data.corr(method='pearson')
     end_p_pd = time()
-    print(str(end_p_pd - start_p_pd) + " s")
-    print("pd pearson: ", res)
+    print("pd pearson time: ", str(end_p_pd - start_p_pd) + " s")
+    print("pd pearson: \n", res)
 
     start_p = time()
     res = plot_correlation(df_data, method='pearson')
     end_p = time()
-    print(str(end_p - start_p) + " s")
-    print("our pearson: ", res)
+    print("our pearson time: ", str(end_p - start_p) + " s")
+    print("our pearson: \n", res)
 
     start_s_pd = time()
     res = df_data.corr(method='spearman')
     end_s_pd = time()
-    print(str(end_s_pd - start_s_pd) + " s")
-    print("pd spearman: ", res)
+    print("pd spearman time: ", str(end_s_pd - start_s_pd) + " s")
+    print("pd spearman: \n", res)
 
     start_s = time()
     res = plot_correlation(df_data, method='spearman')
     end_s = time()
-    print(str(end_s - start_s) + " s")
-    print("our spearman: ", res)
+    print("our spearman time: ", str(end_s - start_s) + " s")
+    print("our spearman: \n", res)
 
     start_k_pd = time()
     res = df_data.corr(method='kendall')
     end_k_pd = time()
-    print(str(end_k_pd - start_k_pd) + " s")
-    print("pd kendall: ", res)
+    print("pd kendall time: ", str(end_k_pd - start_k_pd) + " s")
+    print("pd kendall: \n", res)
 
     start_k = time()
     res = plot_correlation(df_data, method='kendall')
     end_k = time()
-    print(str(end_k - start_k) + " s")
-    print("our kendall: ", res)
+    print("our kendall time: ", str(end_k - start_k) + " s")
+    print("our kendall: \n", res)
 
 
 def test_plot_corr_df_k() -> None:
@@ -287,9 +287,9 @@ def test_plot_corr_df_k() -> None:
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     k = 5
     res = df_data.corr(method='pearson')
-    print("df: ", res)
+    print("df: \n", res)
     res = plot_correlation(pd_data_frame=df_data, k=k)
-    print("result: ", res)
+    print("result: \n", res)
 
 
 def test_plot_corr_df_x_k() -> None:
@@ -305,11 +305,11 @@ def test_plot_corr_df_x_k() -> None:
     cal_matrix = np.vstack((data_x, data_a, data_b, data_c, data_d))
     df_data = pd.DataFrame(cal_matrix.T)
     res = df_data.corr(method='pearson')
-    print("pearson: ", res)
+    print("pearson: \n", res)
     res = df_data.corr(method='spearman')
-    print("spearman: ", res)
+    print("spearman: \n", res)
     res = df_data.corr(method='kendall')
-    print("kendall: ", res)
+    print("kendall: \n", res)
     k = 3
     res = plot_correlation(pd_data_frame=df_data, data_x=data_x, k=k)
-    print("top-k: ", res)
+    print("top-k: \n", res)
