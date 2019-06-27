@@ -319,8 +319,8 @@ def _line_fit(
     num = float(len(data_x))
     sum_x, sum_y, sum_xx, sum_yy, sum_xy = 0, 0, 0, 0, 0
     for i in range(0, int(num)):
-        sum_x  = sum_x + data_x[i]
-        sum_y  = sum_y + data_y[i]
+        sum_x = sum_x + data_x[i]
+        sum_y = sum_y + data_y[i]
         sum_xx = sum_xx + data_x[i] * data_x[i]
         sum_yy = sum_yy + data_y[i] * data_y[i]
         sum_xy = sum_xy + data_x[i] * data_y[i]
