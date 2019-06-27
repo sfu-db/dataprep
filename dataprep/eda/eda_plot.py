@@ -286,7 +286,8 @@ def _calc_qqnorm(
 
 
 def _calc_kendall(
-        data_a: np.ndarray, data_b: np.ndarray) -> Any:
+        data_a: np.ndarray,
+        data_b: np.ndarray) -> Any:
     """
     :param data_a: the input numpy array
     :param data_b: the input numpy array
@@ -306,7 +307,10 @@ def _value_to_rank(array: np.ndarray) -> pd.Series:
     return array_ranks.values
 
 
-def _line_fit(data_x, data_y):
+def _line_fit(
+        data_x: np.ndarray,
+        data_y: np.ndarray
+) -> Tuple[Union[float, Any], Union[float, Any], Union[float, Any]]:
     """
     :param data_x: the input numpy array
     :param data_y: the input numpy array
@@ -493,8 +497,7 @@ def plot(
 def plot_correlation_pd(
         pd_data_frame: pd.DataFrame,
         method: str = 'pearson'
-) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
+) -> Dict[str, Any]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -544,8 +547,7 @@ def plot_correlation_pd_k(
         pd_data_frame: pd.DataFrame,
         k: int = 0,
         method: str = 'pearson'
-) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
+) -> Dict[str, Any]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -575,10 +577,9 @@ def plot_correlation_pd_k(
 
 def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
-        x_name: str = '',
+        x_name: Optional[str] = None,
         k: int = 0
-) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
+) -> Dict[str, Any]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -640,11 +641,10 @@ def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
 
 def plot_correlation_pd_x_y_k(
         pd_data_frame: pd.DataFrame,
-        x_name: str = '',
-        y_name: str = '',
+        x_name: Optional[str] = None,
+        y_name: Optional[str] = None,
         k: int = 0
-) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
+) -> Dict[str, Any]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -706,12 +706,11 @@ def plot_correlation_pd_x_y_k(
 
 def plot_correlation(
         pd_data_frame: pd.DataFrame,
-        x_name: str = '',
-        y_name: str = '',
+        x_name: Optional[str] = None,
+        y_name: Optional[str] = None,
         k: int = 0,
         method: str = 'pearson'
-) -> Dict[str, Union[Dict[str, Union[List[Any], Dict[Any, Any]]],
-                     Tuple[Any], List[Any], Dict[Any, Any], float]]:
+) -> Dict[str, Any]:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
     column.
@@ -722,10 +721,10 @@ def plot_correlation(
     :return: A (column: [array/dict]) dict to encapsulate the
     intermediate results.
     """
-    if x_name is not '' and y_name is not '':
+    if x_name is not None and y_name is not None:
         result = plot_correlation_pd_x_y_k(pd_data_frame=pd_data_frame,
                                            x_name=x_name, y_name=y_name, k=k)
-    elif x_name is not '' and k != 0:
+    elif x_name is not None and k != 0:
         result = plot_correlation_pd_x_k(pd_data_frame=pd_data_frame,
                                          x_name=x_name, k=k)
     elif k != 0:
