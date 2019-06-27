@@ -542,7 +542,7 @@ def plot_correlation_pd_k(
     return result
 
 
-def plot_correlation_pd_x_k(
+def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
         data_x: np.ndarray = None,
         k: int = 0) -> np.ndarray:
