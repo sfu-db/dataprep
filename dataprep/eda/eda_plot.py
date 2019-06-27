@@ -4,10 +4,10 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
+import math
 import dask
 import dask.array as da
 import dask.dataframe as dd
-import math
 import numpy as np
 import pandas as pd
 from scipy.stats import kendalltau
@@ -316,19 +316,20 @@ def _line_fit(
     :param data_y: the input numpy array
     :return: the parameter of line and the relationship
     """
-    N = float(len(data_x))
-    sx, sy, sxx, syy, sxy = 0, 0, 0, 0, 0
-    for i in range(0, int(N)):
-        sx  += data_x[i]
-        sy  += data_y[i]
-        sxx += data_x[i] * data_x[i]
-        syy += data_y[i] * data_y[i]
-        sxy += data_x[i] * data_y[i]
-    a = (sy * sx / N - sxy) / (sx * sx / N - sxx)
-    b = (sy - a * sx) / N
-    r = abs(sy * sx / N - sxy) / \
-        math.sqrt((sxx - sx * sx / N) * (syy - sy * sy / N))
-    return a, b, r
+    num = float(len(data_x))
+    sum_x, sum_y, sum_xx, sum_yy, sum_xy = 0, 0, 0, 0, 0
+    for i in range(0, int(num)):
+        sum_x  = sum_x + data_x[i]
+        sum_y  = sum_y + data_y[i]
+        sum_xx = sum_xx + data_x[i] * data_x[i]
+        sum_yy = sum_yy + data_y[i] * data_y[i]
+        sum_xy = sum_xy + data_x[i] * data_y[i]
+    line_a = (sum_y * sum_x / num - sum_xy) / (sum_x * sum_x / num - sum_xx)
+    line_b = (sum_y - line_a * sum_x) / num
+    line_r = abs(sum_y * sum_x / num - sum_xy) / \
+        math.sqrt((sum_xx - sum_x * sum_x / num) *
+                  (sum_yy - sum_y * sum_y / num))
+    return line_a, line_b, line_r
 
 
 def get_type(data: dd.Series) -> DataType:
@@ -561,8 +562,7 @@ def plot_correlation_pd_k(
     result_pd = plot_correlation_pd(pd_data_frame=pd_data_frame, method=method)
     corr_matrix = result_pd['corr']
     matrix_row, _ = np.shape(corr_matrix)
-    corr_matrix_re = np.reshape(np.triu(corr_matrix),
-                           (matrix_row * matrix_row,))
+    corr_matrix_re = np.reshape(np.triu(corr_matrix), (matrix_row * matrix_row,))
     idx = np.argsort(corr_matrix_re)
     mask = np.zeros(shape=(matrix_row * matrix_row,))
     mask[idx[:k]] = 1
@@ -639,7 +639,7 @@ def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
     return result
 
 
-def plot_correlation_pd_x_y_k(
+def plot_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
         x_name: Optional[str] = None,
         y_name: Optional[str] = None,
@@ -658,15 +658,15 @@ def plot_correlation_pd_x_y_k(
     data_y = pd_data_frame[y_name].values
     if k == 0:
         corr = np.corrcoef(data_x, data_y)[1, 0]
-        a, b, _ = _line_fit(data_x=data_x, data_y=data_y)
-        result = {'corr': corr, 'a': a, 'b': b}
+        line_a, line_b, _ = _line_fit(data_x=data_x, data_y=data_y)
+        result = {'corr': corr, 'line_a': line_a, 'line_b': line_b}
     else:
         corr = np.corrcoef(data_x, data_y)[1, 0]
         inc_point_x = []
         inc_point_y = []
         data_x_copy = data_x.copy()
         data_y_copy = data_y.copy()
-        for i in range(k):
+        for _ in range(k):
             max_diff = 0
             max_idx = 0
             for j in range(len(data_x_copy)):
@@ -684,7 +684,7 @@ def plot_correlation_pd_x_y_k(
         dec_point_y = []
         data_x_copy = data_x.copy()
         data_y_copy = data_y.copy()
-        for i in range(k):
+        for _ in range(k):
             max_diff = 0
             max_idx = 0
             for j in range(len(data_x_copy)):
