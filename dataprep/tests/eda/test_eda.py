@@ -322,6 +322,6 @@ def test_plot_corr_df_x_y_k() -> None:
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     x_name = 'b'
     y_name = 'c'
-    k = 0
+    k = 3
     res = plot_correlation(pd_data_frame=df_data, x_name=x_name, y_name=y_name, k=k)
     print(res)

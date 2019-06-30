@@ -10,6 +10,8 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+import plotly.plotly as py
+import plotly.graph_objs as go
 from scipy.stats import kendalltau
 
 
@@ -495,7 +497,7 @@ def plot(
     return result
 
 
-def plot_correlation_pd(
+def plot_correlation_pd(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
         method: str = 'pearson'
 ) -> Dict[str, Any]:
@@ -541,6 +543,16 @@ def plot_correlation_pd(
     else:
         raise ValueError("Method Error")
     result['corr'] = corr_matrix
+    name_list = pd_data_frame.columns.values
+    trace = go.Heatmap(z=corr_matrix,
+                       x=name_list,
+                       y=name_list,
+                       colorscale='Blues',
+                       reversescale=True)
+    data = [trace]
+    py.plot(data,
+            filename='heatmap_' + method + '_corr_pd',
+            auto_open=True)
     return result
 
 
@@ -572,6 +584,16 @@ def plot_correlation_pd_k(
                              (matrix_row, matrix_row))
     corr_matrix += corr_matrix.T - np.diag(corr_matrix.diagonal())
     result['corr'] = corr_matrix
+    name_list = pd_data_frame.columns.values
+    trace = go.Heatmap(z=corr_matrix,
+                       x=name_list,
+                       y=name_list,
+                       colorscale='Blues',
+                       reversescale=True)
+    data = [trace]
+    py.plot(data,
+            filename='heatmap_' + method + '_corr_pd_k',
+            auto_open=True)
     return result
 
 
@@ -636,7 +658,125 @@ def plot_correlation_pd_x_k(  # pylint: disable=too-many-locals
     result = {'pearson': sorted(row_p[idx_p[-k:]], reverse=True),
               'spearman': sorted(row_s[idx_s[-k:]], reverse=True),
               'kendall': sorted(row_k[idx_k[-k:]], reverse=True)}
+    corr_matrix = np.array([result['pearson'],
+                            result['spearman'],
+                            result['kendall']])
+    name_list = [str(i) for i in range(1, k + 1)]
+    method_list = ['pearson', 'spearman', 'kendall']
+    trace = go.Heatmap(z=corr_matrix,
+                       x=name_list,
+                       y=method_list,
+                       colorscale='Blues',
+                       reversescale=True)
+    data = [trace]
+    py.plot(data,
+            filename='heatmap' + '_corr_pd_x_k',
+            auto_open=True)
     return result
+
+
+def vis_correlation_pd_x_y_k_zero(
+        data_x: np.ndarray,
+        data_y: np.ndarray,
+        result: Dict[str, Any]
+) -> None:
+    """
+    :param data_x: The column of dataframe
+    :param data_y: The column of dataframe
+    :param result: A dict to encapsulate the
+    intermediate results.
+    :return:
+    """
+    trace_zero = go.Scatter(
+        x=data_x,
+        y=data_y,
+        mode='markers',
+        name='origin data',
+        marker=dict(
+            size=10,
+            color='rgba(152, 0, 0, 0.8)',
+        )
+    )
+    sample_x = np.linspace(min(data_x), max(data_x), 100)
+    sample_y = result['line_a'] * sample_x + result['line_b']
+    trace_one = go.Scatter(
+        x=sample_x,
+        y=sample_y,
+        mode='lines',
+        name='regression line',
+        line=dict(
+            color='rgba(205, 12, 24, 0.6)',
+            width=4,
+        )
+    )
+    data = [trace_zero, trace_one]
+    layout = dict(title='plot_correlation_pd_x_y_k',
+                  xaxis=dict(zeroline=False, title='X'),
+                  yaxis=dict(zeroline=False, title='Y')
+                  )
+    fig = dict(data=data, layout=layout)
+    py.plot(fig, filename='plot_correlation_pd_x_y_k')
+
+
+def vis_correlation_pd_x_y_k(
+        data_x: np.ndarray,
+        data_y: np.ndarray,
+        result: Dict[str, Any]
+) -> None:
+    """
+    :param data_x: The column of dataframe
+    :param data_y: The column of dataframe
+    :param result: A dict to encapsulate the
+    intermediate results.
+    :return:
+    """
+    trace_zero = go.Scatter(
+        x=data_x,
+        y=data_y,
+        mode='markers',
+        name='origin data',
+        marker=dict(
+            size=10,
+            color='rgba(152, 0, 0, 0.8)',
+        )
+    )
+    trace_one = go.Scatter(
+        x=result['dec_point_x'],
+        y=result['dec_point_y'],
+        mode='markers',
+        name='decrease points',
+        marker=dict(
+            size=10,
+        )
+    )
+    trace_two = go.Scatter(
+        x=result['inc_point_x'],
+        y=result['inc_point_y'],
+        mode='markers',
+        name='increase points',
+        marker=dict(
+            size=10,
+        )
+    )
+    sample_x = np.linspace(min(data_x), max(data_x), 100)
+    sample_y = result['line_a'] * sample_x + result['line_b']
+    trace_three = go.Scatter(
+        x=sample_x,
+        y=sample_y,
+        mode='lines',
+        name='regression line',
+        line=dict(
+            color='rgba(205, 12, 24, 0.6)',
+            width=4,
+        )
+    )
+    data = [trace_zero, trace_one, trace_two, trace_three]
+    layout = dict(title='plot_correlation_pd_x_y_k',
+                  xaxis=dict(zeroline=False, title='X'),
+                  yaxis=dict(zeroline=False, title='Y')
+                  )
+    fig = dict(data=data, layout=layout)
+    py.plot(fig, filename='plot_correlation_pd_x_y_k')
 
 
 def plot_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
@@ -656,12 +796,16 @@ def plot_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     """
     data_x = pd_data_frame[x_name].values
     data_y = pd_data_frame[y_name].values
+    corr = np.corrcoef(data_x, data_y)[1, 0]
+    line_a, line_b, _ = _line_fit(data_x=data_x, data_y=data_y)
     if k == 0:
-        corr = np.corrcoef(data_x, data_y)[1, 0]
-        line_a, line_b, _ = _line_fit(data_x=data_x, data_y=data_y)
-        result = {'corr': corr, 'line_a': line_a, 'line_b': line_b}
+        result = {'corr': corr,
+                  'line_a': line_a,
+                  'line_b': line_b}
+        vis_correlation_pd_x_y_k_zero(data_x=data_x,
+                                      data_y=data_y,
+                                      result=result)
     else:
-        corr = np.corrcoef(data_x, data_y)[1, 0]
         inc_point_x = []
         inc_point_y = []
         data_x_copy = data_x.copy()
@@ -698,11 +842,18 @@ def plot_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
             dec_point_y.append(data_y_copy[max_idx])
             data_x_copy = np.delete(data_x_copy, max_idx)
             data_y_copy = np.delete(data_y_copy, max_idx)
-        result = {'corr': corr, 'dec_point_x': dec_point_x,
+        result = {'corr': corr,
+                  'dec_point_x': dec_point_x,
                   'dec_point_y': dec_point_y,
                   'inc_point_x': inc_point_x,
-                  'inc_point_y': inc_point_y}
+                  'inc_point_y': inc_point_y,
+                  'line_a': line_a,
+                  'line_b': line_b}
+        vis_correlation_pd_x_y_k(data_x=data_x,
+                                 data_y=data_y,
+                                 result=result)
     return result
+
 
 def plot_correlation(
         pd_data_frame: pd.DataFrame,
@@ -724,7 +875,7 @@ def plot_correlation(
     if x_name is not None and y_name is not None:
         result = plot_correlation_pd_x_y_k(pd_data_frame=pd_data_frame,
                                            x_name=x_name, y_name=y_name, k=k)
-    elif x_name is not None and k != 0:
+    elif x_name is not None:
         result = plot_correlation_pd_x_k(pd_data_frame=pd_data_frame,
                                          x_name=x_name, k=k)
     elif k != 0:
