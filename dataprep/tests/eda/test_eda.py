@@ -10,7 +10,7 @@ import pandas as pd
 from pandas import Timestamp
 
 from ...eda.eda_plot import plot  # dataprep.tests.eda.test_eda
-from ...eda.eda_plot import plot_correlation  # dataprep.tests.eda.test_eda
+from ...eda.eda_plot_corr import plot_correlation
 
 
 def test_normal() -> None:
