@@ -5,12 +5,13 @@ import datetime
 from typing import Any, Dict, Union, cast, Tuple
 
 from time import time
+import random
 import numpy as np
 import pandas as pd
 from pandas import Timestamp
 
 from ...eda.eda_plot import plot  # dataprep.tests.eda.test_eda
-from ...eda.eda_plot import plot_correlation  # dataprep.tests.eda.test_eda
+from ...eda.eda_plot_corr import plot_correlation
 
 
 def test_normal() -> None:
@@ -229,65 +230,95 @@ def test_corner() -> None:
     assert res == df_2_expected
 
 
-def test_plot_corr_df() -> None:
+def test_plot_corr_df(  # pylint: disable=too-many-locals
+) -> None:
     """
     :return:
     """
-    df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
-    df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
+    data = np.random.rand(100, 20)
+    df_data = pd.DataFrame(data)
 
     start_p_pd = time()
     res = df_data.corr(method='pearson')
     end_p_pd = time()
     print("pd pearson time: ", str(end_p_pd - start_p_pd) + " s")
-    print("pd pearson: \n", res)
 
     start_p = time()
-    res = plot_correlation(df_data, method='pearson')
+    _, intermediate = plot_correlation(
+        pd_data_frame=df_data,
+        method='pearson',
+        return_intermediate=True
+    )
     end_p = time()
     print("our pearson time: ", str(end_p - start_p) + " s")
-    print("our pearson: \n", res['corr'])
+    assert np.isclose(res, intermediate.result['corr']).all()
 
     start_s_pd = time()
     res = df_data.corr(method='spearman')
     end_s_pd = time()
     print("pd spearman time: ", str(end_s_pd - start_s_pd) + " s")
-    print("pd spearman: \n", res)
 
     start_s = time()
-    res = plot_correlation(df_data, method='spearman')
+    _, intermediate = plot_correlation(
+        pd_data_frame=df_data,
+        method='spearman',
+        return_intermediate=True
+    )
     end_s = time()
     print("our spearman time: ", str(end_s - start_s) + " s")
-    print("our spearman: \n", res['corr'])
+    assert np.isclose(res, intermediate.result['corr']).all()
 
     start_k_pd = time()
     res = df_data.corr(method='kendall')
     end_k_pd = time()
     print("pd kendall time: ", str(end_k_pd - start_k_pd) + " s")
-    print("pd kendall: \n", res)
 
     start_k = time()
-    res = plot_correlation(df_data, method='kendall')
+    _, intermediate = plot_correlation(
+        pd_data_frame=df_data,
+        method='kendall',
+        return_intermediate=True
+    )
     end_k = time()
     print("our kendall time: ", str(end_k - start_k) + " s")
-    print("our kendall: \n", res['corr'])
+    assert np.isclose(res, intermediate.result['corr']).all()
 
 
 def test_plot_corr_df_k() -> None:
     """
     :return:
     """
-    df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
-    df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
+    data = np.random.rand(100, 20)
+    df_data = pd.DataFrame(data)
     k = 5
     res = df_data.corr(method='pearson')
-    print("df: \n", res)
-    res = plot_correlation(pd_data_frame=df_data, k=k)
-    print("result: \n", res['corr'])
+    row, _ = np.shape(res)
+    res_re = np.reshape(
+        np.triu(res, 1),
+        (row * row,)
+    )
+    idx = np.argsort(res_re)
+    mask = np.zeros(
+        shape=(row * row,)
+    )
+    for i in range(k):
+        if res_re[idx[i]] < 0:
+            mask[idx[i]] = 1
+        if res_re[idx[-i - 1]] > 0:
+            mask[idx[-i - 1]] = 1
+    res = np.multiply(res_re, mask)
+    res = np.reshape(
+        res,
+        (row, row)
+    )
+    res += res.T - np.diag(res.diagonal())
+    _, intermediate = plot_correlation(
+        pd_data_frame=df_data,
+        return_intermediate=True,
+        k=k
+    )
+    assert np.isclose(intermediate.result['corr'], res).all()
+    assert np.isclose(intermediate.result['mask'], mask).all()
 
 
 def test_plot_corr_df_x_k() -> None:
@@ -299,17 +330,27 @@ def test_plot_corr_df_x_k() -> None:
     df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     x_name = 'b'
-    res = df_data.corr(method='pearson')
-    print("pearson: \n", res)
-    res = df_data.corr(method='spearman')
-    print("spearman: \n", res)
-    res = df_data.corr(method='kendall')
-    print("kendall: \n", res)
     k = 3
-    res = plot_correlation(pd_data_frame=df_data, x_name=x_name, k=k)
-    print("top-k pearson: ", res['pearson'])
-    print("top-k spearman: ", res['spearman'])
-    print("top-k kendall: ", res['kendall'])
+    name_list = list(df_data.columns.values)
+    idx_name = name_list.index(x_name)
+    res_p = df_data.corr(method='pearson').values
+    res_p[idx_name][idx_name] = -1
+    res_s = df_data.corr(method='spearman').values
+    res_s[idx_name][idx_name] = -1
+    res_k = df_data.corr(method='kendall').values
+    res_k[idx_name][idx_name] = -1
+    _, intermediate = plot_correlation(
+        pd_data_frame=df_data,
+        x_name=x_name,
+        return_intermediate=True,
+        k=k
+    )
+    assert np.isclose(sorted(res_p[idx_name], reverse=True)[:k],
+                      intermediate.result['pearson']).all()
+    assert np.isclose(sorted(res_s[idx_name], reverse=True)[:k],
+                      intermediate.result['spearman']).all()
+    assert np.isclose(sorted(res_k[idx_name], reverse=True)[:k],
+                      intermediate.result['kendall']).all()
 
 
 def test_plot_corr_df_x_y_k() -> None:
@@ -322,6 +363,24 @@ def test_plot_corr_df_x_y_k() -> None:
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     x_name = 'b'
     y_name = 'c'
-    k = 0
-    res = plot_correlation(pd_data_frame=df_data, x_name=x_name, y_name=y_name, k=k)
-    print(res)
+    k = 3
+    _ = plot_correlation(
+        pd_data_frame=df_data,
+        x_name=x_name,
+        y_name=y_name,
+        return_intermediate=False,
+        k=k
+    )
+
+    letters = ['a', 'b', 'c']
+    df_data_cat = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    df_data_cat['b'] = pd.Categorical([random.choice(letters) for _ in range(100)])
+    df_data_cat['c'] = pd.Categorical([random.choice(letters) for _ in range(100)])
+    _, intermediate = plot_correlation(
+        pd_data_frame=df_data_cat,
+        x_name='b',
+        y_name='c',
+        return_intermediate=True
+    )
+    assert np.isclose(pd.crosstab(df_data_cat['b'], df_data_cat['c']).values,
+                      intermediate.result['cross_table']).all()
