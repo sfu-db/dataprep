@@ -1,7 +1,7 @@
 """
     This module implements the plot_corr(df) function.
 """
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union, List
 
 import math
 import dask
@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import plotly.plotly as py
 import plotly.graph_objs as go
+from bokeh.plotting import figure, output_file, show
 from scipy.stats import kendalltau
 
 
@@ -59,6 +60,63 @@ def _line_fit(
     return line_a, line_b, line_r
 
 
+def vis_correlation_pd(
+        pd_data_frame: pd.DataFrame,
+        result: Dict[str, Any],
+        method: str = 'pearson'
+) -> None:
+    """
+    :param pd_data_frame: the pandas data_frame for
+    which plots are calculated for each column.
+    :param result: A dict to encapsulate the
+    intermediate results.
+    :param method: The method used for
+    calculating correlation.
+    :return:
+    """
+    corr_matrix = result['corr']
+    name_list = pd_data_frame.columns.values
+    color_map = ["#a6cee3"]
+    x_name = []
+    y_name = []
+    color = []
+    alpha = []
+    max_value = np.max(corr_matrix)
+    for i in range(len(corr_matrix)):
+        for j in range(len(corr_matrix[i])):
+            alpha.append(corr_matrix[i, j] / max_value)
+    for i in name_list:
+        for j in name_list:
+            x_name.append(i)
+            y_name.append(j)
+            color.append(color_map[0])
+    data = dict(
+        x_name=x_name,
+        y_name=y_name,
+        colors=color,
+        alphas=alpha,
+        value=corr_matrix.flatten(),
+    )
+    p = figure(title="Correlation Matrix",
+               x_axis_location="above", tools="hover,save",
+               x_range=list(reversed(name_list)), y_range=name_list,
+               tooltips=[('names', '@y_name, @x_name'), ('value', '@value')])
+    p.plot_width = 400
+    p.plot_height = 400
+    p.grid.grid_line_color = None
+    p.axis.axis_line_color = None
+    p.axis.major_tick_line_color = None
+    p.axis.major_label_text_font_size = "10pt"
+    p.axis.major_label_standoff = 0
+    p.xaxis.major_label_orientation = np.pi / 3
+    p.rect('x_name', 'y_name', 0.9, 0.9, source=data,
+           color='colors', alpha='alphas', line_color=None,
+           hover_line_color='black', hover_color='colors')
+    output_file("corr_pd_heatmap.html",
+                title="heatmap_" + method)
+    show(p)
+
+
 def vis_correlation_pd_x_k(
         result: Dict[str, Any],
         k: int
@@ -74,15 +132,44 @@ def vis_correlation_pd_x_k(
                             result['kendall']])
     name_list = [str(i) for i in range(1, k + 1)]
     method_list = ['pearson', 'spearman', 'kendall']
-    trace = go.Heatmap(z=corr_matrix,
-                       x=name_list,
-                       y=method_list,
-                       colorscale='Blues',
-                       reversescale=True)
-    data = [trace]
-    py.plot(data,
-            filename='heatmap' + '_corr_pd_x_k',
-            auto_open=True)
+    color_map = ["#a6cee3"]
+    x_name = []
+    y_name = []
+    color = []
+    alpha = []
+    max_value = np.max(corr_matrix)
+    for i in range(len(corr_matrix)):
+        for j in range(len(corr_matrix[i])):
+            alpha.append(corr_matrix[i, j] / max_value)
+    for m in name_list:
+        for n in method_list:
+            x_name.append(m)
+            y_name.append(n)
+            color.append(color_map[0])
+    data = dict(
+        x_name=x_name,
+        y_name=y_name,
+        colors=color,
+        alphas=alpha,
+        value=corr_matrix.flatten(),
+    )
+    p = figure(title="Correlation Matrix",
+               x_axis_location="above", tools="hover,save",
+               x_range=list(reversed(name_list)), y_range=method_list,
+               tooltips=[('names', '@y_name, @x_name'), ('value', '@value')])
+    p.plot_width = 400
+    p.plot_height = 400
+    p.grid.grid_line_color = None
+    p.axis.axis_line_color = None
+    p.axis.major_tick_line_color = None
+    p.axis.major_label_text_font_size = "10pt"
+    p.axis.major_label_standoff = 0
+    p.xaxis.major_label_orientation = np.pi / 3
+    p.rect('x_name', 'y_name', 0.9, 0.9, source=data,
+           color='colors', alpha='alphas', line_color=None,
+           hover_line_color='black', hover_color='colors')
+    output_file("corr_pd_x_k_heatmap.html", title="heatmap")
+    show(p)
 
 
 def vis_correlation_pd_x_y_k_zero(
@@ -97,34 +184,14 @@ def vis_correlation_pd_x_y_k_zero(
     intermediate results.
     :return:
     """
-    trace_zero = go.Scatter(
-        x=data_x,
-        y=data_y,
-        mode='markers',
-        name='origin data',
-        marker=dict(
-            size=10,
-            color='rgba(152, 0, 0, 0.8)',
-        )
-    )
-    sample_x = np.linspace(min(data_x), max(data_x), 100)
+    p = figure(plot_width=400, plot_height=400)
+    sample_x = np.linspace(min(data_x), max(data_y), 100)
     sample_y = result['line_a'] * sample_x + result['line_b']
-    trace_one = go.Scatter(
-        x=sample_x,
-        y=sample_y,
-        mode='lines',
-        name='regression line',
-        line=dict(
-            color='rgba(205, 12, 24, 0.6)',
-            width=4,
-        )
-    )
-    data = [trace_zero, trace_one]
-    layout = dict(title='plot_correlation_pd_x_y_k',
-                  xaxis=dict(zeroline=False, title='X'),
-                  yaxis=dict(zeroline=False, title='Y'))
-    fig = dict(data=data, layout=layout)
-    py.plot(fig, filename='plot_correlation_pd_x_y_k')
+    p.circle(data_x, data_y, size=10,
+             color='navy', alpha=0.5)
+    p.line(sample_x, sample_y, line_width=3)
+    output_file("pd_x_y_k_zero_scatter.html", title='relamap')
+    show(p)
 
 
 def vis_correlation_pd_x_y_k(
@@ -139,53 +206,20 @@ def vis_correlation_pd_x_y_k(
     intermediate results.
     :return:
     """
-    trace_zero = go.Scatter(
-        x=data_x,
-        y=data_y,
-        mode='markers',
-        name='origin data',
-        marker=dict(
-            size=10,
-            color='rgba(152, 0, 0, 0.8)',
-        )
-    )
-    trace_one = go.Scatter(
-        x=result['dec_point_x'],
-        y=result['dec_point_y'],
-        mode='markers',
-        name='decrease points',
-        marker=dict(
-            size=10,
-        )
-    )
-    trace_two = go.Scatter(
-        x=result['inc_point_x'],
-        y=result['inc_point_y'],
-        mode='markers',
-        name='increase points',
-        marker=dict(
-            size=10,
-        )
-    )
-    sample_x = np.linspace(min(data_x), max(data_x), 100)
+    p = figure(plot_width=400, plot_height=400)
+    sample_x = np.linspace(min(data_x), max(data_y), 100)
     sample_y = result['line_a'] * sample_x + result['line_b']
-    trace_three = go.Scatter(
-        x=sample_x,
-        y=sample_y,
-        mode='lines',
-        name='regression line',
-        line=dict(
-            color='rgba(205, 12, 24, 0.6)',
-            width=4,
-        )
-    )
-    data = [trace_zero, trace_one, trace_two, trace_three]
-    layout = dict(title='plot_correlation_pd_x_y_k',
-                  xaxis=dict(zeroline=False, title='X'),
-                  yaxis=dict(zeroline=False, title='Y')
-                  )
-    fig = dict(data=data, layout=layout)
-    py.plot(fig, filename='plot_correlation_pd_x_y_k')
+    p.circle(data_x, data_y, size=10,
+             color='navy', alpha=0.5)
+    p.circle(result['dec_point_x'],
+             result['dec_point_y'], size=10,
+             color='yellow', alpha=0.5)
+    p.circle(result['inc_point_x'],
+             result['inc_point_y'], size=10,
+             color='red', alpha=0.5)
+    p.line(sample_x, sample_y, line_width=3)
+    output_file("pd_x_y_k_scatter.html", title='relamap')
+    show(p)
 
 
 def cal_correlation_pd(  # pylint: disable=too-many-locals
@@ -234,16 +268,6 @@ def cal_correlation_pd(  # pylint: disable=too-many-locals
     else:
         raise ValueError("Method Error")
     result['corr'] = corr_matrix
-    name_list = pd_data_frame.columns.values
-    trace = go.Heatmap(z=corr_matrix,
-                       x=name_list,
-                       y=name_list,
-                       colorscale='Blues',
-                       reversescale=True)
-    data = [trace]
-    py.plot(data,
-            filename='heatmap_' + method + '_corr_pd',
-            auto_open=True)
     return result
 
 
@@ -275,16 +299,6 @@ def cal_correlation_pd_k(
                              (matrix_row, matrix_row))
     corr_matrix += corr_matrix.T - np.diag(corr_matrix.diagonal())
     result['corr'] = corr_matrix
-    name_list = pd_data_frame.columns.values
-    trace = go.Heatmap(z=corr_matrix,
-                       x=name_list,
-                       y=name_list,
-                       colorscale='Blues',
-                       reversescale=True)
-    data = [trace]
-    py.plot(data,
-            filename='heatmap_' + method + '_corr_pd_k',
-            auto_open=True)
     return result
 
 
@@ -357,9 +371,8 @@ def cal_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
         x_name: Optional[str] = None,
         y_name: Optional[str] = None,
         k: int = 0
-) -> Tuple[Union[Dict[str, Union[float, Any]],
-                 Dict[str, Union[Union[list, float], Any]]],
-           Any, Any]:
+) -> Tuple[Dict[str, Any],
+           List, List]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
@@ -454,14 +467,18 @@ def plot_correlation(
                                      data_y=data_y,
                                      result=result)
     elif x_name is not None:
-        result, data_x, data_y = cal_correlation_pd_x_k(
+        result = cal_correlation_pd_x_k(
             pd_data_frame=pd_data_frame,
             x_name=x_name, k=k)
         vis_correlation_pd_x_k(result=result, k=k)
     elif k != 0:
         result = cal_correlation_pd_k(pd_data_frame=pd_data_frame,
                                       method=method, k=k)
+        vis_correlation_pd(pd_data_frame=pd_data_frame,
+                           result=result, method=method)
     else:
         result = cal_correlation_pd(pd_data_frame=pd_data_frame,
                                     method=method)
+        vis_correlation_pd(pd_data_frame=pd_data_frame,
+                           result=result, method=method)
     return result
