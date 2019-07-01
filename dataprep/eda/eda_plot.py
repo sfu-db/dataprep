@@ -4,13 +4,11 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
-import math
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from scipy.stats import kendalltau
 
 
 from .__init__ import LOGGER, DEFAULT_PARTITIONS

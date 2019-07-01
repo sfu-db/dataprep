@@ -7,8 +7,6 @@ import math
 import dask
 import numpy as np
 import pandas as pd
-import plotly.plotly as py
-import plotly.graph_objs as go
 from bokeh.plotting import figure, output_file, show
 from scipy.stats import kendalltau
 
@@ -60,7 +58,7 @@ def _line_fit(
     return line_a, line_b, line_r
 
 
-def vis_correlation_pd(
+def vis_correlation_pd(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
         result: Dict[str, Any],
         method: str = 'pearson'
@@ -82,8 +80,8 @@ def vis_correlation_pd(
     color = []
     alpha = []
     max_value = np.max(corr_matrix)
-    for i in range(len(corr_matrix)):
-        for j in range(len(corr_matrix[i])):
+    for i, _ in enumerate(corr_matrix):
+        for j, _ in enumerate(corr_matrix[i]):
             alpha.append(corr_matrix[i, j] / max_value)
     for i in name_list:
         for j in name_list:
@@ -97,27 +95,27 @@ def vis_correlation_pd(
         alphas=alpha,
         value=corr_matrix.flatten(),
     )
-    p = figure(title="Correlation Matrix",
-               x_axis_location="above", tools="hover,save",
-               x_range=list(reversed(name_list)), y_range=name_list,
-               tooltips=[('names', '@y_name, @x_name'), ('value', '@value')])
-    p.plot_width = 400
-    p.plot_height = 400
-    p.grid.grid_line_color = None
-    p.axis.axis_line_color = None
-    p.axis.major_tick_line_color = None
-    p.axis.major_label_text_font_size = "10pt"
-    p.axis.major_label_standoff = 0
-    p.xaxis.major_label_orientation = np.pi / 3
-    p.rect('x_name', 'y_name', 0.9, 0.9, source=data,
-           color='colors', alpha='alphas', line_color=None,
-           hover_line_color='black', hover_color='colors')
+    fig = figure(title="Correlation Matrix",
+                 x_axis_location="above", tools="hover,save",
+                 x_range=list(reversed(name_list)), y_range=name_list,
+                 tooltips=[('names', '@y_name, @x_name'), ('value', '@value')])
+    fig.plot_width = 400
+    fig.plot_height = 400
+    fig.grid.grid_line_color = None
+    fig.axis.axis_line_color = None
+    fig.axis.major_tick_line_color = None
+    fig.axis.major_label_text_font_size = "10pt"
+    fig.axis.major_label_standoff = 0
+    fig.xaxis.major_label_orientation = np.pi / 3
+    fig.rect('x_name', 'y_name', 0.9, 0.9, source=data,
+             color='colors', alpha='alphas', line_color=None,
+             hover_line_color='black', hover_color='colors')
     output_file("corr_pd_heatmap.html",
                 title="heatmap_" + method)
-    show(p)
+    show(fig)
 
 
-def vis_correlation_pd_x_k(
+def vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
         result: Dict[str, Any],
         k: int
 ) -> None:
@@ -138,13 +136,13 @@ def vis_correlation_pd_x_k(
     color = []
     alpha = []
     max_value = np.max(corr_matrix)
-    for i in range(len(corr_matrix)):
-        for j in range(len(corr_matrix[i])):
+    for i, _ in enumerate(corr_matrix):
+        for j, _ in enumerate(corr_matrix[i]):
             alpha.append(corr_matrix[i, j] / max_value)
-    for m in name_list:
-        for n in method_list:
-            x_name.append(m)
-            y_name.append(n)
+    for name_name in name_list:
+        for method_name in method_list:
+            x_name.append(name_name)
+            y_name.append(method_name)
             color.append(color_map[0])
     data = dict(
         x_name=x_name,
@@ -153,23 +151,23 @@ def vis_correlation_pd_x_k(
         alphas=alpha,
         value=corr_matrix.flatten(),
     )
-    p = figure(title="Correlation Matrix",
-               x_axis_location="above", tools="hover,save",
-               x_range=list(reversed(name_list)), y_range=method_list,
-               tooltips=[('names', '@y_name, @x_name'), ('value', '@value')])
-    p.plot_width = 400
-    p.plot_height = 400
-    p.grid.grid_line_color = None
-    p.axis.axis_line_color = None
-    p.axis.major_tick_line_color = None
-    p.axis.major_label_text_font_size = "10pt"
-    p.axis.major_label_standoff = 0
-    p.xaxis.major_label_orientation = np.pi / 3
-    p.rect('x_name', 'y_name', 0.9, 0.9, source=data,
-           color='colors', alpha='alphas', line_color=None,
-           hover_line_color='black', hover_color='colors')
+    fig = figure(title="Correlation Matrix",
+                 x_axis_location="above", tools="hover,save",
+                 x_range=list(reversed(name_list)), y_range=method_list,
+                 tooltips=[('names', '@y_name, @x_name'), ('value', '@value')])
+    fig.plot_width = 400
+    fig.plot_height = 400
+    fig.grid.grid_line_color = None
+    fig.axis.axis_line_color = None
+    fig.axis.major_tick_line_color = None
+    fig.axis.major_label_text_font_size = "10pt"
+    fig.axis.major_label_standoff = 0
+    fig.xaxis.major_label_orientation = np.pi / 3
+    fig.rect('x_name', 'y_name', 0.9, 0.9, source=data,
+             color='colors', alpha='alphas', line_color=None,
+             hover_line_color='black', hover_color='colors')
     output_file("corr_pd_x_k_heatmap.html", title="heatmap")
-    show(p)
+    show(fig)
 
 
 def vis_correlation_pd_x_y_k_zero(
@@ -184,14 +182,14 @@ def vis_correlation_pd_x_y_k_zero(
     intermediate results.
     :return:
     """
-    p = figure(plot_width=400, plot_height=400)
+    fig = figure(plot_width=400, plot_height=400)
     sample_x = np.linspace(min(data_x), max(data_y), 100)
     sample_y = result['line_a'] * sample_x + result['line_b']
-    p.circle(data_x, data_y, size=10,
-             color='navy', alpha=0.5)
-    p.line(sample_x, sample_y, line_width=3)
+    fig.circle(data_x, data_y, size=10,
+               color='navy', alpha=0.5)
+    fig.line(sample_x, sample_y, line_width=3)
     output_file("pd_x_y_k_zero_scatter.html", title='relamap')
-    show(p)
+    show(fig)
 
 
 def vis_correlation_pd_x_y_k(
@@ -206,20 +204,20 @@ def vis_correlation_pd_x_y_k(
     intermediate results.
     :return:
     """
-    p = figure(plot_width=400, plot_height=400)
+    fig = figure(plot_width=400, plot_height=400)
     sample_x = np.linspace(min(data_x), max(data_y), 100)
     sample_y = result['line_a'] * sample_x + result['line_b']
-    p.circle(data_x, data_y, size=10,
-             color='navy', alpha=0.5)
-    p.circle(result['dec_point_x'],
-             result['dec_point_y'], size=10,
-             color='yellow', alpha=0.5)
-    p.circle(result['inc_point_x'],
-             result['inc_point_y'], size=10,
-             color='red', alpha=0.5)
-    p.line(sample_x, sample_y, line_width=3)
+    fig.circle(data_x, data_y, size=10,
+               color='navy', alpha=0.5)
+    fig.circle(result['dec_point_x'],
+               result['dec_point_y'], size=10,
+               color='yellow', alpha=0.5)
+    fig.circle(result['inc_point_x'],
+               result['inc_point_y'], size=10,
+               color='red', alpha=0.5)
+    fig.line(sample_x, sample_y, line_width=3)
     output_file("pd_x_y_k_scatter.html", title='relamap')
-    show(p)
+    show(fig)
 
 
 def cal_correlation_pd(  # pylint: disable=too-many-locals
@@ -372,7 +370,7 @@ def cal_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
         y_name: Optional[str] = None,
         k: int = 0
 ) -> Tuple[Dict[str, Any],
-           List, List]:
+           List[int], List[int]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots
     are calculated for each column.
