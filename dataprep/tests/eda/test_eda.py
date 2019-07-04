@@ -298,6 +298,9 @@ def test_plot_corr_df_x_k() -> None:
     df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
     df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['e'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['f'] = df_data['a'] + np.random.normal(0, 10, 100)
+    df_data['g'] = df_data['a'] + np.random.normal(0, 10, 100)
     x_name = 'b'
     res = df_data.corr(method='pearson')
     print("pearson: \n", res)
@@ -322,6 +325,13 @@ def test_plot_corr_df_x_y_k() -> None:
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     x_name = 'b'
     y_name = 'c'
-    k = 0
+    k = 3
     res = plot_correlation(pd_data_frame=df_data, x_name=x_name, y_name=y_name, k=k)
+    print(res)
+
+    df_data_cat = pd.DataFrame({'a': np.random.normal(0, 10, 5)})
+    df_data_cat['b'] = pd.Categorical(['a', 'b', 'b', 'a', 'c'])
+    df_data_cat['c'] = pd.Categorical(['a', 'b', 'a', 'b', 'a'])
+    print(pd.crosstab(df_data_cat['b'], df_data_cat['c']))
+    res = plot_correlation(pd_data_frame=df_data_cat, x_name='b', y_name='c')
     print(res)
