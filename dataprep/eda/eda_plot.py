@@ -1,7 +1,6 @@
 """
     This module implements the plot(df) function.
 """
-from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import dask
@@ -9,18 +8,10 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+from ..utils import get_type, DataType
 
 
 from .__init__ import LOGGER, DEFAULT_PARTITIONS
-
-
-class DataType(Enum):
-    """
-        Enumeration for storing the different types of data possible in a column
-    """
-    TYPE_NUM = 1
-    TYPE_CAT = 2
-    TYPE_UNSUP = 3
 
 
 # Type aliasing
@@ -281,35 +272,6 @@ def _calc_qqnorm(
     if points:
         return {"qq_norm_plot": points}
     return {"qq_norm_plot": list()}
-
-
-def get_type(data: dd.Series) -> DataType:
-    """ Returns the type of the input data.
-        Identified types are according to the DataType Enumeration.
-
-    Parameter
-    __________
-    The data for which the type needs to be identified.
-
-    Returns
-    __________
-    str representing the type of the data.
-    """
-
-    col_type = DataType.TYPE_UNSUP
-    try:
-        if pd.api.types.is_bool_dtype(data):
-            col_type = DataType.TYPE_CAT
-        elif pd.api.types.is_numeric_dtype(data) and data.dropna().unique().size.compute() == 2:
-            col_type = DataType.TYPE_CAT
-        elif pd.api.types.is_numeric_dtype(data):
-            col_type = DataType.TYPE_NUM
-        else:
-            col_type = DataType.TYPE_CAT
-    except NotImplementedError as error:  # TO-DO
-        LOGGER.info("Type cannot be determined due to : %s", error)
-
-    return col_type
 
 
 def plot_df(

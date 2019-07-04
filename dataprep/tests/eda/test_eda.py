@@ -245,7 +245,8 @@ def test_plot_corr_df() -> None:
     print("pd pearson: \n", res)
 
     start_p = time()
-    res = plot_correlation(df_data, method='pearson')
+    _, res = plot_correlation(df_data, method='pearson',
+                              show_intermediate=True)
     end_p = time()
     print("our pearson time: ", str(end_p - start_p) + " s")
     print("our pearson: \n", res['corr'])
@@ -257,7 +258,8 @@ def test_plot_corr_df() -> None:
     print("pd spearman: \n", res)
 
     start_s = time()
-    res = plot_correlation(df_data, method='spearman')
+    _, res = plot_correlation(df_data, method='spearman',
+                              show_intermediate=True)
     end_s = time()
     print("our spearman time: ", str(end_s - start_s) + " s")
     print("our spearman: \n", res['corr'])
@@ -269,7 +271,8 @@ def test_plot_corr_df() -> None:
     print("pd kendall: \n", res)
 
     start_k = time()
-    res = plot_correlation(df_data, method='kendall')
+    _, res = plot_correlation(df_data, method='kendall',
+                              show_intermediate=True)
     end_k = time()
     print("our kendall time: ", str(end_k - start_k) + " s")
     print("our kendall: \n", res['corr'])
@@ -286,7 +289,8 @@ def test_plot_corr_df_k() -> None:
     k = 5
     res = df_data.corr(method='pearson')
     print("df: \n", res)
-    res = plot_correlation(pd_data_frame=df_data, k=k)
+    _, res = plot_correlation(pd_data_frame=df_data, k=k,
+                              show_intermediate=True)
     print("result: \n", res['corr'])
 
 
@@ -309,7 +313,8 @@ def test_plot_corr_df_x_k() -> None:
     res = df_data.corr(method='kendall')
     print("kendall: \n", res)
     k = 3
-    res = plot_correlation(pd_data_frame=df_data, x_name=x_name, k=k)
+    _, res = plot_correlation(pd_data_frame=df_data, x_name=x_name, k=k,
+                              show_intermediate=True)
     print("top-k pearson: ", res['pearson'])
     print("top-k spearman: ", res['spearman'])
     print("top-k kendall: ", res['kendall'])
@@ -326,12 +331,16 @@ def test_plot_corr_df_x_y_k() -> None:
     x_name = 'b'
     y_name = 'c'
     k = 3
-    res = plot_correlation(pd_data_frame=df_data, x_name=x_name, y_name=y_name, k=k)
+    _, res = plot_correlation(pd_data_frame=df_data,
+                              x_name=x_name, y_name=y_name, k=k,
+                              show_intermediate=True)
     print(res)
 
     df_data_cat = pd.DataFrame({'a': np.random.normal(0, 10, 5)})
     df_data_cat['b'] = pd.Categorical(['a', 'b', 'b', 'a', 'c'])
     df_data_cat['c'] = pd.Categorical(['a', 'b', 'a', 'b', 'a'])
     print(pd.crosstab(df_data_cat['b'], df_data_cat['c']))
-    res = plot_correlation(pd_data_frame=df_data_cat, x_name='b', y_name='c')
+    _, res = plot_correlation(pd_data_frame=df_data_cat,
+                              x_name='b', y_name='c',
+                              show_intermediate=True)
     print(res)

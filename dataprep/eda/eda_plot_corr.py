@@ -8,9 +8,25 @@ import dask
 import holoviews as hv
 import numpy as np
 import pandas as pd
-from bokeh.io import save
-from bokeh.plotting import figure, output_file
+import random
+import string
+import tempfile
+from bokeh.io import output_notebook, output_file, show
+from bokeh.plotting import figure
 from scipy.stats import kendalltau
+from ..utils import is_notebook
+
+
+def _rand_str(
+        str_length: int = 20
+) -> Any:
+    """
+    :param str_length: The length of random string
+    :return: A generated random string
+    """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters)
+                   for _ in range(str_length))
 
 
 def _calc_kendall(
@@ -108,7 +124,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
         pd_data_frame: pd.DataFrame,
         result: Dict[str, Any],
         method: str = 'pearson'
-) -> None:
+) -> Any:
     """
     :param pd_data_frame: the pandas data_frame for
     which plots are calculated for each column.
@@ -116,7 +132,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
     intermediate results.
     :param method: The method used for
     calculating correlation.
-    :return:
+    :return: A figure object
     """
     hv.extension('bokeh')
     corr_matrix = result['corr']
@@ -132,19 +148,26 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
                                     width=325,
                                     toolbar='above',
                                     title="heatmap_" + method)
-    hv.save(heatmap,
-            filename=method + "_corr_pd_heatmap.html",
-            backend='bokeh')
+    fig = hv.render(heatmap, backend='bokeh')
+    if is_notebook():
+        output_notebook()
+        show(fig, notebook_handle=True)
+    else:
+        output_file(filename=tempfile.gettempdir() + '/' +
+                             _rand_str() + '.html',
+                    title='heat_map')
+        show(fig)
+    return fig
 
 
 def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
         result: Dict[str, Any]
-) -> None:
+) -> Any:
     """
     :param result: A dict to encapsulate the
     intermediate results.
-    :param k: choose top-k correlation value
-    :return:
+    :param k: Choose top-k correlation value
+    :return: A figure object
     """
     hv.extension('bokeh')
     corr_matrix = np.array([result['pearson'],
@@ -162,22 +185,29 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
                                     width=325,
                                     toolbar='above',
                                     title="heatmap")
-    hv.save(heatmap,
-            filename="corr_pd_x_k_heatmap.html",
-            backend='bokeh')
+    fig = hv.render(heatmap, backend='bokeh')
+    if is_notebook():
+        output_notebook()
+        show(fig, notebook_handle=True)
+    else:
+        output_file(filename=tempfile.gettempdir() + '/' +
+                             _rand_str() + '.html',
+                    title='heat_map')
+        show(fig)
+    return fig
 
 
 def _vis_correlation_pd_x_y_k_zero(
         data_x: np.ndarray,
         data_y: np.ndarray,
         result: Dict[str, Any]
-) -> None:
+) -> Any:
     """
     :param data_x: The column of data frame
     :param data_y: The column of data frame
     :param result: A dict to encapsulate the
     intermediate results.
-    :return:
+    :return: A figure object
     """
     fig = figure(plot_width=400, plot_height=400)
     sample_x = np.linspace(min(data_x), max(data_y), 100)
@@ -186,22 +216,28 @@ def _vis_correlation_pd_x_y_k_zero(
                legend='origin data', size=10,
                color='navy', alpha=0.5)
     fig.line(sample_x, sample_y, line_width=3)
-    output_file(filename='pd_x_y_k_zero_scatter.html',
-                title='scatter')
-    save(fig)
+    if is_notebook():
+        output_notebook()
+        show(fig, notebook_handle=True)
+    else:
+        output_file(filename=tempfile.gettempdir() + '/' +
+                             _rand_str() + '.html',
+                    title='scatter')
+        show(fig)
+    return fig
 
 
 def _vis_correlation_pd_x_y_k(
         data_x: np.ndarray,
         data_y: np.ndarray,
         result: Dict[str, Any]
-) -> None:
+) -> Any:
     """
     :param data_x: The column of data frame
     :param data_y: The column of data frame
     :param result: A dict to encapsulate the
     intermediate results.
-    :return:
+    :return: A figure object
     """
     fig = figure(plot_width=400, plot_height=400)
     sample_x = np.linspace(min(data_x), max(data_y), 100)
@@ -218,14 +254,20 @@ def _vis_correlation_pd_x_y_k(
                legend='increase points', size=10,
                color='red', alpha=0.5)
     fig.line(sample_x, sample_y, line_width=3)
-    output_file(filename='pd_x_y_k_scatter.html',
-                title='scatter')
-    save(fig)
+    if is_notebook():
+        output_notebook()
+        show(fig, notebook_handle=True)
+    else:
+        output_file(filename=tempfile.gettempdir() + '/' +
+                             _rand_str() + '.html',
+                    title='scatter')
+        show(fig)
+    return fig
 
 
 def _vis_cross_table(
         result: Dict[str, Any]
-) -> None:
+) -> Any:
     """
     :param result: A dict to encapsulate the
     intermediate results.
@@ -246,9 +288,16 @@ def _vis_cross_table(
                                     width=325,
                                     toolbar='above',
                                     title="heatmap")
-    hv.save(heatmap,
-            filename="cross_table.html",
-            backend='bokeh')
+    fig = hv.render(heatmap, backend='bokeh')
+    if is_notebook():
+        output_notebook()
+        show(fig, notebook_handle=True)
+    else:
+        output_file(filename=tempfile.gettempdir() + '/' +
+                             _rand_str() + '.html',
+                    title='cross_table')
+        show(fig)
+    return fig
 
 
 def _cal_correlation_pd(  # pylint: disable=too-many-locals
@@ -519,8 +568,9 @@ def plot_correlation(
         x_name: Optional[str] = None,
         y_name: Optional[str] = None,
         k: int = 0,
-        method: str = 'pearson'
-) -> Dict[str, Any]:
+        method: str = 'pearson',
+        show_intermediate: bool = False
+) -> Tuple[Optional[Any], Dict[str, Any]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
     column.
@@ -528,6 +578,7 @@ def plot_correlation(
     :param y_name: a valid column name of the data frame
     :param k: choose top-k element
     :param method: Three method we can use to calculate the correlation matrix
+    :param show_intermediate: whether show intermediate results to users
     :return: A (column: [array/dict]) dict to encapsulate the
     intermediate results.
     """
@@ -539,7 +590,7 @@ def plot_correlation(
                 result = _cal_cross_table(pd_data_frame=pd_data_frame,
                                           x_name=x_name,
                                           y_name=y_name)
-                _vis_cross_table(result=result)
+                fig = _vis_cross_table(result=result)
             else:
                 raise ValueError("Cannot calculate the correlation "
                                  "between two different dtype column")
@@ -548,11 +599,11 @@ def plot_correlation(
                 pd_data_frame=pd_data_frame,
                 x_name=x_name, y_name=y_name, k=k)
             if k == 0:
-                _vis_correlation_pd_x_y_k_zero(data_x=data_x,
+                fig = _vis_correlation_pd_x_y_k_zero(data_x=data_x,
                                                data_y=data_y,
                                                result=result)
             else:
-                _vis_correlation_pd_x_y_k(data_x=data_x,
+                fig = _vis_correlation_pd_x_y_k(data_x=data_x,
                                           data_y=data_y,
                                           result=result)
     elif x_name is not None:
@@ -563,17 +614,20 @@ def plot_correlation(
         result = _cal_correlation_pd_x_k(
             pd_data_frame=pd_data_frame,
             x_name=x_name, k=k)
-        _vis_correlation_pd_x_k(result=result)
+        fig = _vis_correlation_pd_x_k(result=result)
     elif k != 0:
         pd_data_frame = _del_column(pd_data_frame=pd_data_frame)
         result = _cal_correlation_pd_k(pd_data_frame=pd_data_frame,
                                        method=method, k=k)
-        _vis_correlation_pd(pd_data_frame=pd_data_frame,
-                            result=result, method=method)
+        fig = _vis_correlation_pd(pd_data_frame=pd_data_frame,
+                                  result=result, method=method)
     else:
         pd_data_frame = _del_column(pd_data_frame=pd_data_frame)
         result = _cal_correlation_pd(pd_data_frame=pd_data_frame,
                                      method=method)
-        _vis_correlation_pd(pd_data_frame=pd_data_frame,
-                            result=result, method=method)
-    return result
+        fig = _vis_correlation_pd(pd_data_frame=pd_data_frame,
+                                  result=result, method=method)
+    if show_intermediate:
+        return fig, result
+    else:
+        return fig
