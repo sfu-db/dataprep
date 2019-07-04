@@ -4,13 +4,13 @@
 from typing import Any, Dict, Optional, Tuple, Union
 
 import math
+import random
+import string
+import tempfile
 import dask
 import holoviews as hv
 import numpy as np
 import pandas as pd
-import random
-import string
-import tempfile
 from bokeh.io import output_notebook, output_file, show
 from bokeh.plotting import figure
 from scipy.stats import kendalltau
@@ -153,8 +153,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
         output_notebook()
         show(fig, notebook_handle=True)
     else:
-        output_file(filename=tempfile.gettempdir() + '/' +
-                             _rand_str() + '.html',
+        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
                     title='heat_map')
         show(fig)
     return fig
@@ -190,8 +189,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
         output_notebook()
         show(fig, notebook_handle=True)
     else:
-        output_file(filename=tempfile.gettempdir() + '/' +
-                             _rand_str() + '.html',
+        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
                     title='heat_map')
         show(fig)
     return fig
@@ -220,8 +218,7 @@ def _vis_correlation_pd_x_y_k_zero(
         output_notebook()
         show(fig, notebook_handle=True)
     else:
-        output_file(filename=tempfile.gettempdir() + '/' +
-                             _rand_str() + '.html',
+        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
                     title='scatter')
         show(fig)
     return fig
@@ -258,8 +255,7 @@ def _vis_correlation_pd_x_y_k(
         output_notebook()
         show(fig, notebook_handle=True)
     else:
-        output_file(filename=tempfile.gettempdir() + '/' +
-                             _rand_str() + '.html',
+        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
                     title='scatter')
         show(fig)
     return fig
@@ -293,8 +289,7 @@ def _vis_cross_table(
         output_notebook()
         show(fig, notebook_handle=True)
     else:
-        output_file(filename=tempfile.gettempdir() + '/' +
-                             _rand_str() + '.html',
+        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
                     title='cross_table')
         show(fig)
     return fig
@@ -563,14 +558,14 @@ def _cal_cross_table(
             'y_cat_list': y_cat_list}
 
 
-def plot_correlation(
+def plot_correlation(  # pylint: disable=too-many-arguments
         pd_data_frame: pd.DataFrame,
         x_name: Optional[str] = None,
         y_name: Optional[str] = None,
         k: int = 0,
         method: str = 'pearson',
         show_intermediate: bool = False
-) -> Tuple[Optional[Any], Dict[str, Any]]:
+) -> Any:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
     column.
@@ -600,12 +595,12 @@ def plot_correlation(
                 x_name=x_name, y_name=y_name, k=k)
             if k == 0:
                 fig = _vis_correlation_pd_x_y_k_zero(data_x=data_x,
-                                               data_y=data_y,
-                                               result=result)
+                                                     data_y=data_y,
+                                                     result=result)
             else:
                 fig = _vis_correlation_pd_x_y_k(data_x=data_x,
-                                          data_y=data_y,
-                                          result=result)
+                                                data_y=data_y,
+                                                result=result)
     elif x_name is not None:
         if _is_not_numerical(pd_data_frame[x_name]):
             raise ValueError("The dtype of data frame column "
@@ -629,5 +624,4 @@ def plot_correlation(
                                   result=result, method=method)
     if show_intermediate:
         return fig, result
-    else:
-        return fig
+    return fig
