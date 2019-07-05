@@ -5,6 +5,7 @@ import datetime
 from typing import Any, Dict, Union, cast, Tuple
 
 from time import time
+import random
 import numpy as np
 import pandas as pd
 from pandas import Timestamp
@@ -233,65 +234,69 @@ def test_plot_corr_df() -> None:
     """
     :return:
     """
-    df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
-    df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
+    data = np.random.rand(100, 20)
+    df_data = pd.DataFrame(data)
+    # df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    # df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
+    # df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
+    # df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
 
     start_p_pd = time()
     res = df_data.corr(method='pearson')
     end_p_pd = time()
-    print("pd pearson time: ", str(end_p_pd - start_p_pd) + " s")
-    print("pd pearson: \n", res)
+    # print("pd pearson time: ", str(end_p_pd - start_p_pd) + " s")
+    # print("pd pearson: \n", res)
 
     start_p = time()
     _, res = plot_correlation(df_data, method='pearson',
                               show_intermediate=True)
     end_p = time()
-    print("our pearson time: ", str(end_p - start_p) + " s")
-    print("our pearson: \n", res['corr'])
+    # print("our pearson time: ", str(end_p - start_p) + " s")
+    # print("our pearson: \n", res['corr'])
 
     start_s_pd = time()
     res = df_data.corr(method='spearman')
     end_s_pd = time()
-    print("pd spearman time: ", str(end_s_pd - start_s_pd) + " s")
-    print("pd spearman: \n", res)
+    # print("pd spearman time: ", str(end_s_pd - start_s_pd) + " s")
+    # print("pd spearman: \n", res)
 
     start_s = time()
     _, res = plot_correlation(df_data, method='spearman',
                               show_intermediate=True)
     end_s = time()
-    print("our spearman time: ", str(end_s - start_s) + " s")
-    print("our spearman: \n", res['corr'])
+    # print("our spearman time: ", str(end_s - start_s) + " s")
+    # print("our spearman: \n", res['corr'])
 
     start_k_pd = time()
     res = df_data.corr(method='kendall')
     end_k_pd = time()
-    print("pd kendall time: ", str(end_k_pd - start_k_pd) + " s")
-    print("pd kendall: \n", res)
+    # print("pd kendall time: ", str(end_k_pd - start_k_pd) + " s")
+    # print("pd kendall: \n", res)
 
     start_k = time()
     _, res = plot_correlation(df_data, method='kendall',
                               show_intermediate=True)
     end_k = time()
-    print("our kendall time: ", str(end_k - start_k) + " s")
-    print("our kendall: \n", res['corr'])
+    # print("our kendall time: ", str(end_k - start_k) + " s")
+    # print("our kendall: \n", res['corr'])
 
 
 def test_plot_corr_df_k() -> None:
     """
     :return:
     """
-    df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
-    df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
+    data = np.random.rand(100, 20)
+    df_data = pd.DataFrame(data)
+    # df_data = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    # df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
+    # df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
+    # df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
     k = 5
     res = df_data.corr(method='pearson')
-    print("df: \n", res)
+    # print("df: \n", res)
     _, res = plot_correlation(pd_data_frame=df_data, k=k,
                               show_intermediate=True)
-    print("result: \n", res['corr'])
+    # print("result: \n", res['corr'])
 
 
 def test_plot_corr_df_x_k() -> None:
@@ -302,22 +307,19 @@ def test_plot_corr_df_x_k() -> None:
     df_data['b'] = df_data['a'] + np.random.normal(0, 10, 100)
     df_data['c'] = df_data['a'] + np.random.normal(0, 10, 100)
     df_data['d'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['e'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['f'] = df_data['a'] + np.random.normal(0, 10, 100)
-    df_data['g'] = df_data['a'] + np.random.normal(0, 10, 100)
     x_name = 'b'
     res = df_data.corr(method='pearson')
-    print("pearson: \n", res)
+    # print("pearson: \n", res)
     res = df_data.corr(method='spearman')
-    print("spearman: \n", res)
+    # print("spearman: \n", res)
     res = df_data.corr(method='kendall')
-    print("kendall: \n", res)
+    # print("kendall: \n", res)
     k = 3
     _, res = plot_correlation(pd_data_frame=df_data, x_name=x_name, k=k,
                               show_intermediate=True)
-    print("top-k pearson: ", res['pearson'])
-    print("top-k spearman: ", res['spearman'])
-    print("top-k kendall: ", res['kendall'])
+    # print("top-k pearson: ", res['pearson'])
+    # print("top-k spearman: ", res['spearman'])
+    # print("top-k kendall: ", res['kendall'])
 
 
 def test_plot_corr_df_x_y_k() -> None:
@@ -334,13 +336,13 @@ def test_plot_corr_df_x_y_k() -> None:
     _, res = plot_correlation(pd_data_frame=df_data,
                               x_name=x_name, y_name=y_name, k=k,
                               show_intermediate=True)
-    print(res)
-
-    df_data_cat = pd.DataFrame({'a': np.random.normal(0, 10, 5)})
-    df_data_cat['b'] = pd.Categorical(['a', 'b', 'b', 'a', 'c'])
-    df_data_cat['c'] = pd.Categorical(['a', 'b', 'a', 'b', 'a'])
-    print(pd.crosstab(df_data_cat['b'], df_data_cat['c']))
+    # print(res)
+    letters = ['a', 'b', 'c']
+    df_data_cat = pd.DataFrame({'a': np.random.normal(0, 10, 100)})
+    df_data_cat['b'] = pd.Categorical([random.choice(letters) for _ in range(100)])
+    df_data_cat['c'] = pd.Categorical([random.choice(letters) for _ in range(100)])
+    # print(pd.crosstab(df_data_cat['b'], df_data_cat['c']))
     _, res = plot_correlation(pd_data_frame=df_data_cat,
                               x_name='b', y_name='c',
                               show_intermediate=True)
-    print(res)
+    # print(res)

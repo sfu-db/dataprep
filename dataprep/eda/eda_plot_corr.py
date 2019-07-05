@@ -4,29 +4,14 @@
 from typing import Any, Dict, Optional, Tuple, Union
 
 import math
-import random
-import string
-import tempfile
 import dask
 import holoviews as hv
 import numpy as np
 import pandas as pd
-from bokeh.io import output_notebook, output_file, show
+from bokeh.io import show
+from bokeh.models import HoverTool
 from bokeh.plotting import figure
 from scipy.stats import kendalltau
-from ..utils import is_notebook
-
-
-def _rand_str(
-        str_length: int = 20
-) -> Any:
-    """
-    :param str_length: The length of random string
-    :return: A generated random string
-    """
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters)
-                   for _ in range(str_length))
 
 
 def _calc_kendall(
@@ -134,7 +119,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
     calculating correlation.
     :return: A figure object
     """
-    hv.extension('bokeh')
+    hv.extension('bokeh', logo=False)
     corr_matrix = result['corr']
     name_list = pd_data_frame.columns.values
     data = []
@@ -143,19 +128,22 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
             data.append((name_list[i],
                          name_list[j],
                          corr_matrix[i, j]))
-    heatmap = hv.HeatMap(data).opts(tools=['hover'],
-                                    colorbar=True,
-                                    width=325,
-                                    toolbar='above',
-                                    title="heatmap_" + method)
+    tooltips = [
+        ('z', '@z'),
+    ]
+    hover = HoverTool(tooltips=tooltips)
+    heatmap = hv.HeatMap(data).redim.range(z=(-1, 1))
+    heatmap.opts(tools=[hover],
+                 colorbar=True,
+                 width=325,
+                 toolbar='above',
+                 title="heatmap_" + method)
     fig = hv.render(heatmap, backend='bokeh')
-    if is_notebook():
-        output_notebook()
-        show(fig, notebook_handle=True)
-    else:
-        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
-                    title='heat_map')
-        show(fig)
+    fig.toolbar_location = None
+    fig.toolbar.active_drag = None
+    fig.xaxis.axis_label = ''
+    fig.yaxis.axis_label = ''
+    show(fig)
     return fig
 
 
@@ -168,7 +156,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     :param k: Choose top-k correlation value
     :return: A figure object
     """
-    hv.extension('bokeh')
+    hv.extension('bokeh', logo=False)
     corr_matrix = np.array([result['pearson'],
                             result['spearman'],
                             result['kendall']])
@@ -179,19 +167,22 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
             data.append((method_list[i],
                          result['col_' + method_name[0]][j],
                          corr_matrix[i, j]))
-    heatmap = hv.HeatMap(data).opts(tools=['hover'],
-                                    colorbar=True,
-                                    width=325,
-                                    toolbar='above',
-                                    title="heatmap")
+    tooltips = [
+        ('z', '@z'),
+    ]
+    hover = HoverTool(tooltips=tooltips)
+    heatmap = hv.HeatMap(data).redim.range(z=(-1, 1))
+    heatmap.opts(tools=[hover],
+                 colorbar=True,
+                 width=325,
+                 toolbar='above',
+                 title="heatmap")
     fig = hv.render(heatmap, backend='bokeh')
-    if is_notebook():
-        output_notebook()
-        show(fig, notebook_handle=True)
-    else:
-        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
-                    title='heat_map')
-        show(fig)
+    fig.toolbar_location = None
+    fig.toolbar.active_drag = None
+    fig.xaxis.axis_label = ''
+    fig.yaxis.axis_label = ''
+    show(fig)
     return fig
 
 
@@ -214,13 +205,9 @@ def _vis_correlation_pd_x_y_k_zero(
                legend='origin data', size=10,
                color='navy', alpha=0.5)
     fig.line(sample_x, sample_y, line_width=3)
-    if is_notebook():
-        output_notebook()
-        show(fig, notebook_handle=True)
-    else:
-        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
-                    title='scatter')
-        show(fig)
+    fig.toolbar_location = None
+    fig.toolbar.active_drag = None
+    show(fig)
     return fig
 
 
@@ -251,13 +238,9 @@ def _vis_correlation_pd_x_y_k(
                legend='increase points', size=10,
                color='red', alpha=0.5)
     fig.line(sample_x, sample_y, line_width=3)
-    if is_notebook():
-        output_notebook()
-        show(fig, notebook_handle=True)
-    else:
-        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
-                    title='scatter')
-        show(fig)
+    fig.toolbar_location = None
+    fig.toolbar.active_drag = None
+    show(fig)
     return fig
 
 
@@ -269,7 +252,7 @@ def _vis_cross_table(
     intermediate results.
     :return:
     """
-    hv.extension('bokeh')
+    hv.extension('bokeh', logo=False)
     cross_matrix = result['cross_table']
     x_cat_list = result['x_cat_list']
     y_cat_list = result['y_cat_list']
@@ -279,19 +262,22 @@ def _vis_cross_table(
             data.append((x_cat_list[i],
                          y_cat_list[j],
                          cross_matrix[i, j]))
-    heatmap = hv.HeatMap(data).opts(tools=['hover'],
-                                    colorbar=True,
-                                    width=325,
-                                    toolbar='above',
-                                    title="heatmap")
+    tooltips = [
+        ('z', '@z'),
+    ]
+    hover = HoverTool(tooltips=tooltips)
+    heatmap = hv.HeatMap(data)
+    heatmap.opts(tools=[hover],
+                 colorbar=True,
+                 width=325,
+                 toolbar='above',
+                 title="cross_table")
     fig = hv.render(heatmap, backend='bokeh')
-    if is_notebook():
-        output_notebook()
-        show(fig, notebook_handle=True)
-    else:
-        output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html',
-                    title='cross_table')
-        show(fig)
+    fig.toolbar_location = None
+    fig.toolbar.active_drag = None
+    fig.xaxis.axis_label = ''
+    fig.yaxis.axis_label = ''
+    show(fig)
     return fig
 
 
@@ -362,6 +348,7 @@ def _cal_correlation_pd_k(
     result_pd = _cal_correlation_pd(pd_data_frame=pd_data_frame, method=method)
     corr_matrix = result_pd['corr']
     matrix_row, _ = np.shape(corr_matrix)
+    corr_matrix[range(matrix_row), range(matrix_row)] = 0
     corr_matrix_re = np.reshape(np.triu(corr_matrix), (matrix_row * matrix_row,))
     idx = np.argsort(corr_matrix_re)
     mask = np.zeros(shape=(matrix_row * matrix_row,))
@@ -372,6 +359,7 @@ def _cal_correlation_pd_k(
                              (matrix_row, matrix_row))
     corr_matrix += corr_matrix.T - np.diag(corr_matrix.diagonal())
     result['corr'] = corr_matrix
+    result['mask'] = mask
     return result
 
 

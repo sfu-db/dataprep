@@ -4,6 +4,8 @@
 from enum import Enum
 from typing import Any
 
+import string
+import random
 import pandas as pd
 import dask.dataframe as dd
 from IPython import get_ipython
@@ -61,3 +63,15 @@ def is_notebook() -> Any:
         return False
     except NameError:
         return False
+
+
+def _rand_str(
+        str_length: int = 20
+) -> Any:
+    """
+    :param str_length: The length of random string
+    :return: A generated random string
+    """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters)
+                   for _ in range(str_length))
