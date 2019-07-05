@@ -278,7 +278,8 @@ def test_plot_corr_df(  # pylint: disable=too-many-locals
     print("our kendall: \n", res['corr'])
 
 
-def test_plot_corr_df_k() -> None:
+def test_plot_corr_df_k(
+) -> None:
     """
     :return:
     """
@@ -292,7 +293,8 @@ def test_plot_corr_df_k() -> None:
     print("result: \n", res['corr'])
 
 
-def test_plot_corr_df_x_k() -> None:
+def test_plot_corr_df_x_k(
+) -> None:
     """
     :return:
     """
@@ -315,7 +317,8 @@ def test_plot_corr_df_x_k() -> None:
     print("top-k kendall: ", res['kendall'])
 
 
-def test_plot_corr_df_x_y_k() -> None:
+def test_plot_corr_df_x_y_k(
+) -> None:
     """
     :return:
     """
