@@ -35,7 +35,6 @@ def get_type(data: dd.Series) -> DataType:
     __________
     str representing the type of the data.
     """
-
     col_type = DataType.TYPE_UNSUP
     try:
         if pd.api.types.is_bool_dtype(data):
