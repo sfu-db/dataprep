@@ -50,5 +50,7 @@ __all__ = [
 ]
 
 
+__all__ = ["plot", "plot_correlation", "plot_missing"]
+
 if is_notebook():
     output_notebook(hide_banner=True)

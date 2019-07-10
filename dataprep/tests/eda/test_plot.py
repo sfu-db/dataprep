@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 from ...datasets import load_dataset
 
+from ...eda.common import Intermediate
 from ...eda import plot
 from ...eda.dtypes_v2 import Nominal, LatLong
 from ...eda.utils import to_dask
