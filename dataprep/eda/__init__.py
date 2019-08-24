@@ -2,15 +2,14 @@
 """Docstring
     Data preparation module
 """
-import logging
 import tempfile
 
 from bokeh.io import output_file, output_notebook
 
 from ..utils import _rand_str, is_notebook
-
-# Dask Default partitions
-DEFAULT_PARTITIONS = 1
+from .plot_df import plot
+from .correlation import plot_correlation
+from .missing import plot_missing
 
 if is_notebook():
     output_notebook(hide_banner=True)
