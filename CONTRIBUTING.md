@@ -6,6 +6,9 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 * All features or bug fixes **must be tested** by one or more specs (unit-tests).
 * All public API methods **must be documented**. (TODO when we start setting up the doc building tool)
+* Do not delete the code of others. If it is necessary, make a comment to illustrate the reason.
+* One pull request for only **one** functionality. If the functionality depends on the code that has not been merged, fork the related branch and finish the functionality.
+* Work in progress pull request should have a '**WIP**' before the pull request title.
 
 ## <a name="commit"></a> Commit Message Guidelines
 
