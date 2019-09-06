@@ -78,7 +78,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
         title.text = method + ' correlation matrix'
         title.align = 'center'
         fig.title = title
-        fig.xaxis.major_label_orientation = math.pi / 2
+        fig.xaxis.major_label_orientation = math.pi / 4
         _discard_unused_visual_elems(fig)
         tab = Panel(
             child=fig,
