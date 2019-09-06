@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 import holoviews as hv
 import numpy as np
+import math
 import scipy.stats
 from bokeh.models import HoverTool
 from bokeh.models.annotations import Title
@@ -51,6 +52,7 @@ def _vis_nonzero_count(  # pylint: disable=too-many-locals
     fig = hv.render(heatmap, backend='bokeh')
     fig.toolbar_location = None
     fig.toolbar.active_drag = None
+    fig.xaxis.major_label_orientation = math.pi / 4
     fig.xaxis.axis_label = 'Column Name'
     fig.yaxis.axis_label = 'Position'
     fig.yaxis.major_tick_line_color = None
@@ -101,6 +103,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
             )
             fig.xaxis.axis_label = 'Column Name'
             fig.yaxis.axis_label = 'Frequency'
+            fig.xaxis.major_label_orientation = math.pi / 4
             title = Title()
             title.text = 'Frequency of Value'
             fig.title = title
@@ -129,6 +132,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
             )
             fig.xaxis.axis_label = 'Column Name'
             fig.yaxis.axis_label = 'Frequency'
+            fig.xaxis.major_label_orientation = math.pi / 4
             title = Title()
             title.text = 'Frequency of Value'
             fig.title = title
