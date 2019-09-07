@@ -4,9 +4,9 @@
 """
 from typing import Any, Dict
 
+import math
 import holoviews as hv
 import numpy as np
-import math
 import scipy.stats
 from bokeh.models import HoverTool
 from bokeh.models.annotations import Title
