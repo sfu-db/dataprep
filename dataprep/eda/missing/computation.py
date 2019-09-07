@@ -44,7 +44,7 @@ def _calc_nonzero_count(
     The intermediate result contains the nonzero elements rate of each column and
     the distribution of nonzero elements
     """
-    pd_data_frame_value = np.isnan(pd_data_frame.values.T)
+    pd_data_frame_value = pd.isnull(pd_data_frame.values.T)
     count_nonzero_list = []
     row, col = pd_data_frame_value.shape
     for i in range(row):
