@@ -2,7 +2,7 @@
     This module implements the plot_missing(df, x, y) function's
     visualization part.
 """
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import math
 import holoviews as hv
@@ -63,7 +63,8 @@ def _vis_nonzero_count(  # pylint: disable=too-many-locals
 
 def _vis_missing_impact(  # pylint: disable=too-many-locals
         intermediate: Intermediate,
-        params: Dict[str, Any]
+        params: Dict[str, Any],
+        k: Optional[int] = 10
 ) -> Tabs:
     """
     :param intermediate: An object to encapsulate the
@@ -101,7 +102,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
                 ),
                 backend='bokeh'
             )
-            fig.xaxis.axis_label = 'Column Name'
+            fig.xaxis.axis_label = intermediate.raw_data['x_name']
             fig.yaxis.axis_label = 'Frequency'
             fig.xaxis.major_label_orientation = math.pi / 4
             title = Title()
@@ -115,11 +116,11 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
             ]
             hover = HoverTool(tooltips=tooltips)
             bars_origin = hv.Bars(
-                pd_data_frame[name].value_counts(),
+                pd_data_frame[name].value_counts(ascending=True)[:k],
                 label='Original Data'
             ).opts(alpha=params['alpha'], tools=[hover])
             bars_drop = hv.Bars(
-                df_data_drop[name].value_counts(),
+                df_data_drop[name].value_counts(ascending=True)[:k],
                 label='Updated Data'
             ).opts(alpha=params['alpha'], tools=[hover])
             fig = hv.render(
@@ -130,7 +131,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
                 ),
                 backend='bokeh'
             )
-            fig.xaxis.axis_label = 'Column Name'
+            fig.xaxis.axis_label = intermediate.raw_data['x_name']
             fig.yaxis.axis_label = 'Frequency'
             fig.xaxis.major_label_orientation = math.pi / 4
             title = Title()
@@ -184,17 +185,29 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
             (sample_x, hist_dist_origin.pdf(sample_x)),
             label='Original PDF'
         )
+        pdf_origin.opts(
+            color='red'
+        )
         cdf_origin = hv.Curve(
             (sample_x, hist_dist_origin.cdf(sample_x)),
             label='Original CDF'
         )
+        cdf_origin.opts(
+            color='red'
+        )
         pdf_drop = hv.Curve(
             (sample_x, hist_dist_drop.pdf(sample_x)),
-            label='Updated PDF'
+            label='Updated PDF',
+        )
+        pdf_drop.opts(
+            color='lightgreen'
         )
         cdf_drop = hv.Curve(
             (sample_x, hist_dist_drop.cdf(sample_x)),
             label='Updated CDF'
+        )
+        cdf_drop.opts(
+            color='lightgreen'
         )
         tooltips = [
             ('Frequency', '@Frequency'),
