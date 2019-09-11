@@ -146,6 +146,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
 
 
 def _vis_missing_impact_y(  # pylint: disable=too-many-locals
+        # pylint: disable=too-many-statements
         intermediate: Intermediate,
         params: Dict[str, Any]
 ) -> Tabs:
