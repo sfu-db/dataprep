@@ -222,19 +222,18 @@ def _calc_correlation_pd_x_k_pearson(  # pylint: disable=too-many-locals
     else:
         if k is not None:
             row_p = corr_matrix_p[name_idx, :]
-            row_p[name_idx] = -1
-            idx_p = np.argsort(row_p)
-            col_p = np.array(name_list)[idx_p[-k:]]
-            col_p = col_p[::-1]
+            row_p_abs = np.absolute(row_p)
+            idx_p = np.argsort(-row_p_abs)
+            col_p = np.array(name_list)[idx_p[:k]]
             result = {
-                'pearson': row_p[idx_p[-k:]],
+                'pearson': row_p[idx_p[:k]],
                 'col_p': col_p
             }
         else:
             row_p = corr_matrix_p[name_idx, :]
-            idx_p = np.argsort(row_p)
+            row_p_abs = np.absolute(row_p)
+            idx_p = np.argsort(-row_p_abs)
             col_p = np.array(name_list)[idx_p]
-            col_p = col_p[::-1]
             result = {
                 'pearson': row_p[idx_p],
                 'col_p': col_p
@@ -301,19 +300,18 @@ def _calc_correlation_pd_x_k_spearman(  # pylint: disable=too-many-locals
     else:
         if k is not None:
             row_s = corr_matrix_s[name_idx, :]
-            row_s[name_idx] = -1
-            idx_s = np.argsort(row_s)
-            col_s = np.array(name_list)[idx_s[-k:]]
-            col_s = col_s[::-1]
+            row_s_abs = np.absolute(row_s)
+            idx_s = np.argsort(-row_s_abs)
+            col_s = np.array(name_list)[idx_s[:k]]
             result = {
-                'spearman': row_s[idx_s[-k:]],
+                'spearman': row_s[idx_s[:k]],
                 'col_s': col_s
             }
         else:
             row_s = corr_matrix_s[name_idx, :]
-            idx_s = np.argsort(row_s)
+            row_s_abs = np.absolute(row_s)
+            idx_s = np.argsort(-row_s_abs)
             col_s = np.array(name_list)[idx_s]
-            col_s = col_s[::-1]
             result = {
                 'spearman': row_s[idx_s],
                 'col_s': col_s
@@ -399,19 +397,18 @@ def _calc_correlation_pd_x_k_kendall(  # pylint: disable=too-many-locals
     else:
         if k is not None:
             row_k = corr_matrix_k[name_idx, :]
-            row_k[name_idx] = -1
-            idx_k = np.argsort(row_k)
-            col_k = np.array(name_list)[idx_k[-k:]]
-            col_k = col_k[::-1]
+            row_k_abs = np.absolute(row_k)
+            idx_k = np.argsort(-row_k_abs)
+            col_k = np.array(name_list)[idx_k[:k]]
             result = {
-                'kendall': row_k[idx_k[-k:]],
+                'kendall': row_k[idx_k[:k]],
                 'col_k': col_k
             }
         else:
             row_k = corr_matrix_k[name_idx, :]
-            idx_k = np.argsort(row_k)
+            row_k_abs = np.absolute(row_k)
+            idx_k = np.argsort(-row_k_abs)
             col_k = np.array(name_list)[idx_k]
-            col_k = col_k[::-1]
             result = {
                 'kendall': row_k[idx_k],
                 'col_k': col_k
@@ -633,7 +630,7 @@ def plot_correlation(  # pylint: disable=too-many-arguments
         'alpha': 0.5,
         'plot_width': 400,
         'plot_height': 400,
-        'size': 10
+        'size': 6
     }
     if x_name is not None and y_name is not None:
         if get_type(pd_data_frame[x_name]) == DataType.TYPE_CAT and \
