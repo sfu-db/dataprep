@@ -64,6 +64,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
         heatmap = hv.HeatMap(data).redim.range(z=(-1, 1))
         heatmap.opts(
             tools=[hover],
+            cmap='RdGy',
             colorbar=True,
             width=params['width'],
             title="heatmap_" + method
@@ -100,6 +101,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     intermediate results.
     :return: A figure object
     """
+    x_name = intermediate.raw_data['x_name']
     result = intermediate.result
     hv.extension(
         'bokeh',
@@ -109,17 +111,23 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     data_s = []
     data_k = []
     for i, _ in enumerate(result['col_p']):
-        data_p.append(('pearson',
-                       result['col_p'][i],
-                       result['pearson'][i]))
+        data_p.append(
+            (x_name,
+             result['col_p'][i],
+             result['pearson'][i])
+        )
     for i, _ in enumerate(result['col_s']):
-        data_s.append(('spearman',
-                       result['col_s'][i],
-                       result['spearman'][i]))
+        data_s.append(
+            (x_name,
+             result['col_s'][i],
+             result['spearman'][i])
+        )
     for i, _ in enumerate(result['col_k']):
-        data_k.append(('kendall',
-                       result['col_k'][i],
-                       result['kendall'][i]))
+        data_k.append(
+            (x_name,
+             result['col_k'][i],
+             result['kendall'][i])
+        )
     tooltips = [
         ('x', '@x'),
         ('y', '@y'),
@@ -131,6 +139,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
         tools=[hover],
+        cmap='RdGy',
         colorbar=True,
         width=params['width'],
         toolbar='above'
@@ -138,6 +147,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     heatmap_s = hv.HeatMap(data_s).redim.range(z=(-1, 1))
     heatmap_s.opts(
         tools=[hover],
+        cmap='RdGy',
         colorbar=True,
         width=params['width'],
         toolbar='above'
@@ -145,6 +155,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     heatmap_k = hv.HeatMap(data_k).redim.range(z=(-1, 1))
     heatmap_k.opts(
         tools=[hover],
+        cmap='RdGy',
         colorbar=True,
         width=params['width'],
         toolbar='above',
@@ -221,7 +232,7 @@ def _vis_correlation_pd_x_y_k(
         alpha=params['alpha']
     )
     if intermediate.raw_data["k"] is not None:
-        for name, color in [("dec", "yellow"), ("inc", "red")]:
+        for name, color in [("dec", "black"), ("inc", "red")]:
             if name == 'inc':
                 legend_name = 'most influential (+)'
             else:
@@ -235,8 +246,6 @@ def _vis_correlation_pd_x_y_k(
                 alpha=params['alpha'],
                 name=name,
             )
-    else:
-        fig.legend.visible = False
     fig.line(
         sample_x,
         sample_y,
