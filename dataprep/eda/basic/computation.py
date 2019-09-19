@@ -388,7 +388,7 @@ def plot(
     if (col_x is None and col_y is not None) or (col_x is not None and col_y is None):
 
         target_col: str = cast(str, col_x if col_y is None else col_y)
-        dask_result: List[Any] = list()
+        dask_result: List[Intermediate] = list()
 
         if dask.compute(data_frame[target_col].count())[0] == 0:
             dask_result.append(Intermediate(dict(), {"col_x": target_col}))
@@ -413,7 +413,6 @@ def plot(
 
             # QQ-NORM
             dask_result.append(_calc_qqnorm(data_frame, target_col))
-
         Render.vizualise(Render(**kwrgs), dask_result, True)
         return dask_result  # if kwrgs.get("return_result") else None
 

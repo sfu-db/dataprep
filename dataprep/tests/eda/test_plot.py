@@ -8,12 +8,10 @@ from typing import Any, Dict, List, Tuple, Union
 import numpy as np
 import pandas as pd
 from pandas import Timestamp
-
 from ...eda.common import Intermediate
 from ...eda import plot
 
 LOGGER = logging.getLogger(__name__)
-
 
 def test_normal_1() -> None:
     """
