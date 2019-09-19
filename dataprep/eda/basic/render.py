@@ -15,6 +15,7 @@ from .viz_uni import UniViz
 
 
 class Render:
+    # pylint: disable=too-many-instance-attributes
     """
     Encapsulate Renderer functions.
     """
@@ -26,6 +27,8 @@ class Render:
         ncolumns: int = 5,
         band_width: float = 1.5,
         tile_size: float = 2,
+        n_bars: int = 10,
+        n_pies: int = 5,
     ) -> None:
         self.viz_uni = UniViz()
         self.viz_multi = MultiViz()
@@ -34,6 +37,8 @@ class Render:
         self.total_cols = ncolumns  # set the total number of columns to be displaced in the grid.
         self.band_width = band_width  # set the band width for the kde plot.
         self.tile_size = tile_size  # set the tile size for the scatter plot.
+        self.n_bars = n_bars  # set the max number of bars to show for bar plot.
+        self.n_pies = n_pies  # set the max number of pies to show for pie plot.
 
     def vizualise(  # pylint: disable=R0914
         self, intermediates_list: List[Intermediate], only_x: bool = False
@@ -66,7 +71,7 @@ class Render:
                     fig = delayed(self.viz_uni.qqnorm_viz)(data_dict["qqnorm_plot"], col_x)
                     plots.append(fig)
                 elif "bar_plot" in data_dict:
-                    fig = delayed(self.viz_uni.bar_viz)(data_dict["bar_plot"], col_x)
+                    fig = delayed(self.viz_uni.bar_viz)(data_dict["bar_plot"], col_x, self.n_bars)
                     plots.append(fig)
                 elif "pie_plot" in data_dict:
                     fig = delayed(self.viz_uni.pie_viz)(data_dict["pie_plot"], col_x)
