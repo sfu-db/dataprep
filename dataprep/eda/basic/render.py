@@ -45,7 +45,7 @@ class Render:
         self.n_pies = n_pies  # set the max number of pies to show for pie plot.
 
     def vizualise(  # pylint: disable=R0914
-        self, intermediates_list: List[Intermediate], only_x: bool = False
+        self, intermediates_list: List[Intermediate], ncolumns: int, only_x: bool = False
     ) -> None:
         """
             Shows up the viz on a notebook or browser
@@ -126,7 +126,7 @@ class Render:
                     children=plots_list,
                     sizing_mode=None,
                     toolbar_location=None,
-                    ncols=self.total_cols,
+                    ncols=max(ncolumns, 1),
                     plot_height=self.plot_height,
                     plot_width=self.plot_width,
                 )
