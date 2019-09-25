@@ -18,6 +18,7 @@ class DataType(Enum):
     """
         Enumeration for storing the different types of data possible in a column
     """
+
     TYPE_NUM = 1
     TYPE_CAT = 2
     TYPE_UNSUP = 3
@@ -39,8 +40,10 @@ def get_type(data: dd.Series) -> DataType:
     try:
         if pd.api.types.is_bool_dtype(data):
             col_type = DataType.TYPE_CAT
-        elif pd.api.types.is_numeric_dtype(data) and dask.compute(
-                data.dropna().unique().size) == 2:
+        elif (
+            pd.api.types.is_numeric_dtype(data)
+            and dask.compute(data.dropna().unique().size) == 2
+        ):
             col_type = DataType.TYPE_CAT
         elif pd.api.types.is_numeric_dtype(data):
             col_type = DataType.TYPE_NUM
@@ -58,28 +61,23 @@ def is_notebook() -> Any:
     """
     try:
         shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
+        if shell == "ZMQInteractiveShell":
             return True
         return False
     except NameError:
         return False
 
 
-def _rand_str(
-        str_length: int = 20
-) -> Any:
+def _rand_str(str_length: int = 20) -> Any:
     """
     :param str_length: The length of random string
     :return: A generated random string
     """
     letters = string.ascii_lowercase
-    return ''.join(random.choice(letters)
-                   for _ in range(str_length))
+    return "".join(random.choice(letters) for _ in range(str_length))
 
 
-def _drop_non_numerical_columns(
-        pd_data_frame: pd.DataFrame
-) -> pd.DataFrame:
+def _drop_non_numerical_columns(pd_data_frame: pd.DataFrame) -> pd.DataFrame:
     """
     :param pd_data_frame: the pandas data_frame for
     which plots are calculated for each column.
