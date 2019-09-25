@@ -84,7 +84,8 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
             tooltips = [("Frequency", "@Frequency")]
             hover = HoverTool(tooltips=tooltips)
             hist_origin = hv.Histogram(
-                np.histogram(pd_data_frame[name].values, num_bins), label="Original Data"
+                np.histogram(pd_data_frame[name].values, num_bins),
+                label="Original Data",
             ).opts(alpha=params["alpha"], tools=[hover])
             hist_drop = hv.Histogram(
                 np.histogram(df_data_drop[name].values, num_bins), label="Updated Data"
@@ -110,13 +111,15 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
         elif get_type(pd_data_frame[name]) == DataType.TYPE_CAT:
             tooltips = [("Frequency", "@c")]
             hover = HoverTool(tooltips=tooltips)
-            pd_data_frame_count = pd_data_frame[name].value_counts(ascending=True)[:k]
-            df_data_drop_count = df_data_drop[name].value_counts(ascending=True)[:k]
+            # pd_data_frame_count = pd_data_frame[name].value_counts(ascending=True)[:k]
+            # df_data_drop_count = df_data_drop[name].value_counts(ascending=True)[:k]
             bars_origin = hv.Bars(
-                pd_data_frame[name].value_counts(ascending=True)[:k], label="Original Data"
+                pd_data_frame[name].value_counts(ascending=True)[:k],
+                label="Original Data",
             ).opts(alpha=params["alpha"], tools=[hover])
             bars_drop = hv.Bars(
-                df_data_drop[name].value_counts(ascending=True)[:k], label="Updated Data"
+                df_data_drop[name].value_counts(ascending=True)[:k],
+                label="Updated Data",
             ).opts(alpha=params["alpha"], tools=[hover])
             fig = hv.render(
                 (bars_origin * bars_drop).opts(
@@ -169,13 +172,21 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
         hist_dist_origin = scipy.stats.rv_histogram(hist_data_origin)
         hist_dist_drop = scipy.stats.rv_histogram(hist_data_drop)
         sample_x = np.linspace(np.min(origin_data), np.max(origin_data), 100)
-        pdf_origin = hv.Curve((sample_x, hist_dist_origin.pdf(sample_x)), label="Original PDF")
+        pdf_origin = hv.Curve(
+            (sample_x, hist_dist_origin.pdf(sample_x)), label="Original PDF"
+        )
         pdf_origin.opts(color="red")
-        cdf_origin = hv.Curve((sample_x, hist_dist_origin.cdf(sample_x)), label="Original CDF")
+        cdf_origin = hv.Curve(
+            (sample_x, hist_dist_origin.cdf(sample_x)), label="Original CDF"
+        )
         cdf_origin.opts(color="red")
-        pdf_drop = hv.Curve((sample_x, hist_dist_drop.pdf(sample_x)), label="Updated PDF")
+        pdf_drop = hv.Curve(
+            (sample_x, hist_dist_drop.pdf(sample_x)), label="Updated PDF"
+        )
         pdf_drop.opts(color="lightgreen")
-        cdf_drop = hv.Curve((sample_x, hist_dist_drop.cdf(sample_x)), label="Updated CDF")
+        cdf_drop = hv.Curve(
+            (sample_x, hist_dist_drop.cdf(sample_x)), label="Updated CDF"
+        )
         cdf_drop.opts(color="lightgreen")
         tooltips = [("Frequency", "@Frequency")]
         hover = HoverTool(tooltips=tooltips)

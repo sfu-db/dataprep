@@ -22,7 +22,7 @@ jobs:
           command: pipenv run mypy --version & pipenv run pytype --version && pipenv run pylint --version && pipenv run pytest --version
       - run:
           name: Type check the project
-          command: pipenv run pytype dataprep && pipenv run mypy dataprep --strict --ignore-missing-imports
+          command: pipenv run pytype dataprep && pipenv run mypy dataprep
       - run:
           name: Test the project
           command: pipenv run pytest dataprep
