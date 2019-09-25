@@ -13,7 +13,7 @@ import probscale
 import scipy.stats as sm
 
 from ...utils import DataType, get_type
-from ..common import Intermediate
+from ..common import Intermediate, sample_n
 from .render import Render
 
 DEFAULT_PARTITIONS = 1
@@ -32,38 +32,43 @@ def __calc_box_stats(grp_series: dask.dataframe.core.Series) -> Dict[str, Any]:
     stats: Dict[str, Any] = dict()
 
     grp_series, = dask.compute(grp_series)
-    quantiles = grp_series.quantile([.25, .50, .75], interpolation="midpoint")
-    stats["tf"], stats["fy"], stats["sf"] = np.round(quantiles[.25], 2), \
-        np.round(quantiles[.50], 2), \
-        np.round(quantiles[.75], 2)
+    quantiles = grp_series.quantile([0.25, 0.50, 0.75], interpolation="midpoint")
+    stats["tf"], stats["fy"], stats["sf"] = (
+        np.round(quantiles[0.25], 2),
+        np.round(quantiles[0.50], 2),
+        np.round(quantiles[0.75], 2),
+    )
     stats["iqr"] = stats["sf"] - stats["tf"]
 
     if len(grp_series) == 1:
         val = grp_series.reset_index().iloc[0, 1]
-        stats["max"], stats["min"], stats["max_outlier"] = (val,)*3
+        stats["max"], stats["min"], stats["max_outlier"] = (val,) * 3
         stats["outliers"] = list(val)
     else:
-        bounded = grp_series[(grp_series > (stats["tf"] - 1.5 * stats[
-            "iqr"])) & (grp_series < (stats["sf"] + 1.5 * stats["iqr"]))]
+        bounded = grp_series[
+            (grp_series > (stats["tf"] - 1.5 * stats["iqr"]))
+            & (grp_series < (stats["sf"] + 1.5 * stats["iqr"]))
+        ]
         min_value, max_value = bounded.min(), bounded.max()
 
-        outliers = list(grp_series[(grp_series < (stats["tf"] - 1.5 * stats["iqr"])) |
-                                   (grp_series > (stats["sf"] + 1.5 * stats["iqr"]))].round(2))
+        outliers = list(
+            grp_series[
+                (grp_series < (stats["tf"] - 1.5 * stats["iqr"]))
+                | (grp_series > (stats["sf"] + 1.5 * stats["iqr"]))
+            ].round(2)
+        )
 
         max_outlier = np.nan if not outliers else max(outliers)
 
         stats["min"] = 0 if np.equal(min_value, np.inf) else np.round(min_value, 2)
-        stats["max"] = 0 if np.equal(max_value, -np.inf) else np.round(
-            max_value, 2)
+        stats["max"] = 0 if np.equal(max_value, -np.inf) else np.round(max_value, 2)
         stats["max_outlier"] = max_outlier
         stats["outliers"] = list(outliers)
     return stats
 
 
 def _calc_box(
-        dataframe: dd.DataFrame,
-        col_x: str,
-        col_y: Optional[str] = None
+    dataframe: dd.DataFrame, col_x: str, col_y: Optional[str] = None
 ) -> Intermediate:
     """
     Returns intermediate stats of the box plot
@@ -81,8 +86,10 @@ def _calc_box(
     """
     res: Dict[str, Any] = dict()
     cat_col, num_col = (
-        col_x, col_y) if (get_type(dataframe[col_x]) == DataType.TYPE_CAT) \
+        (col_x, col_y)
+        if (get_type(dataframe[col_x]) == DataType.TYPE_CAT)
         else (col_y, col_x)
+    )
 
     if col_y is None:
         col_series = dataframe[col_x]
@@ -91,17 +98,12 @@ def _calc_box(
         for group in dask.compute(dataframe[cat_col].unique())[0]:
             grp_series = dataframe.groupby([cat_col]).get_group(group)[num_col]
             res[group] = __calc_box_stats(grp_series)
-
-    raw_data = {"df": dataframe, "col_x": col_x, "col_y": col_y}
+    raw_data = {"df": dataframe, "col_x": cat_col, "col_y": num_col}
     result = {"box_plot": res}
     return Intermediate(result, raw_data)
 
 
-def _calc_statcked(
-        dataframe: dd.DataFrame,
-        col_x: str,
-        col_y: str
-) -> Intermediate:
+def _calc_statcked(dataframe: dd.DataFrame, col_x: str, col_y: str) -> Intermediate:
     """ Returns intermediate stats of the stacked column plot
             of columns col_x and col_y.
 
@@ -123,11 +125,7 @@ def _calc_statcked(
     return Intermediate(result, raw_data)
 
 
-def _calc_scatter(
-        dataframe: dd.DataFrame,
-        col_x: str,
-        col_y: str
-) -> Intermediate:
+def _calc_scatter(dataframe: dd.DataFrame, col_x: str, col_y: str) -> Intermediate:
     """
         TO-DO: WARNING: For very large amount of points, implement Heat Map.
         Returns intermediate stats of the scattered plot
@@ -197,10 +195,8 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
 
 
 def _calc_hist_by_group(
-        dataframe: dd.DataFrame,
-        col_x: str,
-        col_y: str,
-        nbins: int = 10) -> Intermediate:
+    dataframe: dd.DataFrame, col_x: str, col_y: str, nbins: int = 10
+) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
     _TODO write test
@@ -214,9 +210,11 @@ def _calc_hist_by_group(
     __________
     np.array : An array of values representing histogram for the input col
     """
-    col_cat, col_num = (col_x, col_y) if (get_type(dataframe[col_x]) ==
-                                          DataType.TYPE_CAT) \
+    col_cat, col_num = (
+        (col_x, col_y)
+        if (get_type(dataframe[col_x]) == DataType.TYPE_CAT)
         else (col_y, col_x)
+    )
 
     grp_hist: Dict[str, Tuple[Any, Any]] = dict()
     hist_interm: List[Any] = list()
@@ -235,15 +233,13 @@ def _calc_hist_by_group(
     for zipped_element in zip(grp_name_list, hist_interm):
         grp_hist[zipped_element[0]] = zipped_element[1]
 
-    return Intermediate({"histogram": grp_hist}, {"df": dataframe,
-                                                  "col_x": col_x,
-                                                  "col_y": col_y, "bins": nbins})
+    return Intermediate(
+        {"histogram": grp_hist},
+        {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": nbins},
+    )
 
 
-def _calc_hist(
-        dataframe: dd.DataFrame,
-        col_x: str,
-        nbins: int = 10) -> Intermediate:
+def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
 
@@ -278,23 +274,28 @@ def _calc_hist(
         maxv = 0 if np.isnan(dframe.max()) else dframe.max()
         hist_array, bins = np.histogram(dframe, bins=nbins, range=[minv, maxv])
 
-    return Intermediate({'histogram': (hist_array, bins)}, raw_data)
+    return Intermediate({"histogram": (hist_array, bins)}, raw_data)
 
 
-def _calc_qqnorm(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
+def _calc_qqnorm(df: dd.DataFrame, col_x: str) -> Intermediate:
     """
     Calculates points of the QQ plot of the given column of the data frame.
     :param dataframe - the input dataframe
     :param col - the input column of the dataframe
     :return: calculated quantiles
     """
-    dask_series = dataframe[col_x].dropna()
+    dask_series = df[col_x].dropna()
     position, y_points = probscale.plot_pos(dask.compute(dask_series)[0])
     mean, std = dask_series.mean().compute(), dask_series.std().compute()
-    result_dict = dict(theory=np.sort(np.array(sm.norm.ppf(position, mean, std))),
-                       sample=np.sort(np.array(y_points)))
-    return Intermediate({"qqnorm_plot": result_dict}, {"df": dataframe,
-                                                       "col_x": col_x, "col_y": None})
+    theory_ys = np.sort(np.asarray(sm.norm.ppf(position, mean, std)))
+    theory_ys = sample_n(theory_ys, 100)
+
+    actual_ys = np.sort(np.asarray(y_points))
+    actual_ys = sample_n(actual_ys, 100)
+    result_dict = dict(theory=theory_ys, sample=actual_ys)
+    return Intermediate(
+        {"qqnorm_plot": result_dict}, {"df": df, "col_x": col_x, "col_y": None}
+    )
 
 
 def _calc_hist_kde(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
@@ -306,13 +307,15 @@ def _calc_hist_kde(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
     """
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None}
     # hist = _calc_hist(dataframe, col_x)
-    return Intermediate({"kde_plot": np.array(dask.compute(dataframe[col_x])[0])}, raw_data)
+    return Intermediate(
+        {"kde_plot": np.array(dask.compute(dataframe[col_x])[0])}, raw_data
+    )
 
 
 def plot_df(
-        data_frame: dd.DataFrame,
-        force_cat: Optional[StringList] = None,
-        force_num: Optional[StringList] = None
+    data_frame: dd.DataFrame,
+    force_cat: Optional[StringList] = None,
+    force_num: Optional[StringList] = None,
 ) -> List[Intermediate]:
     """
     Supporting funtion to the main plot function
@@ -329,15 +332,17 @@ def plot_df(
             dask_result.append(Intermediate(dict(), {"col_x": col}))
 
         elif get_type(data_frame[col]) == DataType.TYPE_CAT or (
-                force_cat is not None and col in force_cat):
-            #print("df bar", type(data_frame))
+            force_cat is not None and col in force_cat
+        ):
+            # print("df bar", type(data_frame))
             cnt_series = dask.delayed(_calc_bar)(data_frame, col)
             dask_result.append(cnt_series)
             col_list.append(col)
 
         elif get_type(data_frame[col]) == DataType.TYPE_NUM or (
-                force_num is not None and col in force_num):
-            #print("df, hist", type(data_frame))
+            force_num is not None and col in force_num
+        ):
+            # print("df, hist", type(data_frame))
             hist = dask.delayed(_calc_hist)(data_frame, col)
             dask_result.append(hist)
             col_list.append(col)
@@ -347,12 +352,12 @@ def plot_df(
 
 
 def plot(
-        pd_data_frame: pd.DataFrame,
-        col_x: Optional[str] = None,
-        col_y: Optional[str] = None,
-        force_cat: Optional[StringList] = None,
-        force_num: Optional[StringList] = None,
-        **kwrgs: int
+    pd_data_frame: pd.DataFrame,
+    col_x: Optional[str] = None,
+    col_y: Optional[str] = None,
+    force_cat: Optional[StringList] = None,
+    force_num: Optional[StringList] = None,
+    **kwrgs: int
 ) -> List[Intermediate]:
     """
     Returns an intermediate representation for the plots of
@@ -381,7 +386,9 @@ def plot(
                 values.append(x)
         pd_data_frame[column] = values
     """
-    data_frame: dd.DataFrame = dd.from_pandas(pd_data_frame, npartitions=DEFAULT_PARTITIONS)
+    data_frame: dd.DataFrame = dd.from_pandas(
+        pd_data_frame, npartitions=DEFAULT_PARTITIONS
+    )
 
     list_of_intermediates: List[Intermediate] = list()
 
@@ -394,7 +401,8 @@ def plot(
             dask_result.append(Intermediate(dict(), {"col_x": target_col}))
 
         elif get_type(data_frame[target_col]) == DataType.TYPE_CAT or (
-                force_cat is not None and target_col in force_cat):
+            force_cat is not None and target_col in force_cat
+        ):
 
             # BAR_PLOT
             dask_result.append(_calc_bar(data_frame, target_col))
@@ -403,7 +411,8 @@ def plot(
             dask_result.append(_calc_pie(data_frame, target_col))
 
         elif get_type(data_frame[target_col]) == DataType.TYPE_NUM or (
-                force_num is not None and target_col in force_num):
+            force_num is not None and target_col in force_num
+        ):
 
             # HISTOGRAM
             dask_result.append(_calc_hist_kde(data_frame, target_col))
@@ -422,13 +431,16 @@ def plot(
 
         temp_result: List[Intermediate] = list()
         try:
-            if type_y == DataType.TYPE_CAT and type_x == DataType.TYPE_NUM or \
-                    type_y == DataType.TYPE_NUM and type_x == DataType.TYPE_CAT:
+            if (
+                type_y == DataType.TYPE_CAT
+                and type_x == DataType.TYPE_NUM
+                or type_y == DataType.TYPE_NUM
+                and type_x == DataType.TYPE_CAT
+            ):
                 # BOX_PER_GROUP
                 temp_result.append(_calc_box(data_frame, col_x, col_y))
                 # HISTOGRAM_PER_GROUP
-                temp_result.append(_calc_hist_by_group(data_frame, col_x,
-                                                       col_y))
+                temp_result.append(_calc_hist_by_group(data_frame, col_x, col_y))
 
             elif type_x == DataType.TYPE_CAT and type_y == DataType.TYPE_CAT:
                 temp_result.append(_calc_statcked(data_frame, col_x, col_y))
@@ -446,6 +458,8 @@ def plot(
 
     if col_x is None and col_y is None:
         Render.vizualise(Render(**kwrgs), plot_df(data_frame, force_cat, force_num))
-        return plot_df(data_frame, force_cat, force_num)  # if kwrgs.get("return_result") else None
+        return plot_df(
+            data_frame, force_cat, force_num
+        )  # if kwrgs.get("return_result") else None
 
     return list_of_intermediates

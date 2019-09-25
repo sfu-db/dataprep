@@ -3,7 +3,7 @@ This module is for the correct rendering of bokeh plot figures.
 """
 # pylint: disable=R0903
 # pylint: disable=R0912
-from typing import List
+from typing import List, Optional
 
 from bokeh.models import Panel, Tabs
 from bokeh.plotting import gridplot, show
@@ -26,15 +26,19 @@ class Render:
         plot_width: int = 350,
         ncolumns: int = 5,
         band_width: float = 1.5,
-        tile_size: float = 2,
+        tile_size: Optional[float] = None,
         n_bars: int = 10,
         n_pies: int = 5,
     ) -> None:
         self.viz_uni = UniViz()
         self.viz_multi = MultiViz()
-        self.plot_height = plot_height  # set the height of individual plots in the grid.
+        self.plot_height = (
+            plot_height
+        )  # set the height of individual plots in the grid.
         self.plot_width = plot_width  # set the width of individual plots in the grid.
-        self.total_cols = ncolumns  # set the total number of columns to be displaced in the grid.
+        self.total_cols = (
+            ncolumns
+        )  # set the total number of columns to be displaced in the grid.
         self.band_width = band_width  # set the band width for the kde plot.
         self.tile_size = tile_size  # set the tile size for the scatter plot.
         self.n_bars = n_bars  # set the max number of bars to show for bar plot.
@@ -68,10 +72,14 @@ class Render:
                     fig = delayed(self.viz_uni.box_viz)(data_dict["box_plot"], col_x)
                     plots.append(fig)
                 elif "qqnorm_plot" in data_dict:
-                    fig = delayed(self.viz_uni.qqnorm_viz)(data_dict["qqnorm_plot"], col_x)
+                    fig = delayed(self.viz_uni.qqnorm_viz)(
+                        data_dict["qqnorm_plot"], col_x
+                    )
                     plots.append(fig)
                 elif "bar_plot" in data_dict:
-                    fig = delayed(self.viz_uni.bar_viz)(data_dict["bar_plot"], col_x, self.n_bars)
+                    fig = delayed(self.viz_uni.bar_viz)(
+                        data_dict["bar_plot"], col_x, self.n_bars
+                    )
                     plots.append(fig)
                 elif "pie_plot" in data_dict:
                     fig = delayed(self.viz_uni.pie_viz)(data_dict["pie_plot"], col_x)
@@ -84,7 +92,9 @@ class Render:
             else:
                 if "stacked_column_plot" in data_dict:
                     fig = delayed(
-                        self.viz_multi.nest_cat_viz(data_dict["stacked_column_plot"], col_x, col_y)
+                        self.viz_multi.nest_cat_viz(
+                            data_dict["stacked_column_plot"], col_x, col_y
+                        )
                     )
                     plots.append(fig)
                 elif "scatter_plot" in data_dict:
@@ -95,7 +105,9 @@ class Render:
                     )
                     plots.append(fig)
                 elif "box_plot" in data_dict:
-                    fig = delayed(self.viz_uni.box_viz)(data_dict["box_plot"], col_x, col_y)
+                    fig = delayed(self.viz_uni.box_viz)(
+                        data_dict["box_plot"], col_x, col_y
+                    )
                     plots.append(fig)
 
         plots_list, = compute(plots)

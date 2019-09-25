@@ -4,7 +4,6 @@ This module implements functions for plotting visualizations for a single field.
 # pytype: disable=import-error
 # pylint: disable=R0903
 # pylint: disable=R0914
-# pylint: disable=E0611
 import math
 from typing import Any, Dict, Optional, Tuple
 
@@ -13,7 +12,6 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 from bokeh.models import (
-    BoxZoomTool,
     ColumnDataSource,
     FixedTicker,
     FuncTickFormatter,
@@ -22,19 +20,17 @@ from bokeh.models import (
     LinearAxis,
     Plot,
     Range1d,
-    ResetTool,
-    SaveTool,
-    WheelZoomTool,
 )
 from bokeh.models.annotations import Title
 from bokeh.models.glyphs import Circle, Rect, Segment, VBar
 from bokeh.models.ranges import FactorRange
-from bokeh.palettes import Category20
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 from holoviews import Cycle
 
-TOOLS = "wheel_zoom, box_zoom,reset, box_select"
+from ..palette import PALETTE
+
+TOOLS = ""
 
 
 class UniViz:
@@ -60,7 +56,10 @@ class UniViz:
         """
         chart_radius = 0.4
         data_df = (
-            pd.Series(data).dropna().reset_index(name="count").rename(columns={"index": "cat"})
+            pd.Series(data)
+            .dropna()
+            .reset_index(name="count")
+            .rename(columns={"index": "cat"})
         )
         total_count = sum(data_df["count"])
         data_df["percen"] = data_df["count"] / total_count * 100
@@ -68,7 +67,9 @@ class UniViz:
         color_list = bp.d3["Category20c"]  # pylint: disable=E1101
         color_list.update({1: ["#084594"], 2: ["#084594", "#9ecae1"]})
         data_df["colour"] = color_list[len(data_df)]
-        plot_figure = figure(title="{}".format(col_x), tools=TOOLS, toolbar_location=None)
+        plot_figure = figure(
+            title="{}".format(col_x), tools=TOOLS, toolbar_location=None
+        )
 
         plot_figure.wedge(
             x=0,
@@ -107,7 +108,10 @@ class UniViz:
         """
         data_sorted = sorted(data.items(), key=lambda x: x[1], reverse=True)[0:n_bars]
         data_source = pd.DataFrame(
-            {"count": [i[1] for i in data_sorted], "cat": [str(x[0]) for x in data_sorted]}
+            {
+                "count": [i[1] for i in data_sorted],
+                "cat": [str(x[0]) for x in data_sorted],
+            }
         )
         data_source["percen"] = data_source["count"] / data_source["count"].sum() * 100
         interm = ColumnDataSource(data_source)
@@ -127,7 +131,7 @@ class UniViz:
             ],
             mode="mouse",
         )
-        bars = VBar(x="cat", top="count", bottom=0, width=0.5, fill_color=Category20[20][0])
+        bars = VBar(x="cat", top="count", bottom=0, width=0.5, fill_color=PALETTE[0])
         plot_figure.add_glyph(interm, bars)
         plot_figure.add_tools(hover)
         plot_figure.xaxis.major_label_orientation = math.pi / 4
@@ -169,7 +173,9 @@ class UniViz:
         )
         interm = ColumnDataSource(data_source)
 
-        plot_figure = figure(tools=TOOLS, title="{}".format(col_x), toolbar_location=None)
+        plot_figure = figure(
+            tools=TOOLS, title="{}".format(col_x), toolbar_location=None
+        )
         hover = HoverTool(
             tooltips=[
                 ("Bin", "[@left, @right]"),
@@ -185,7 +191,7 @@ class UniViz:
             bottom=0,
             alpha=0.5,
             top="freq",
-            fill_color=Category20[20][0],
+            fill_color=PALETTE[0],
         )
         plot_figure.add_tools(hover)
         plot_figure.yaxis.major_label_text_font_size = "0pt"
@@ -201,7 +207,9 @@ class UniViz:
         plot_figure.xaxis.axis_label = col_x
         plot_figure.yaxis.axis_label = "Frequency"
         plot_figure.title.text_font_size = "10pt"
-        plot_figure.xaxis.axis_label = self.num_caption.format(bins_array[0], bins_array[-1])
+        plot_figure.xaxis.axis_label = self.num_caption.format(
+            bins_array[0], bins_array[-1]
+        )
         self.box = True
         return plot_figure
 
@@ -213,7 +221,12 @@ class UniViz:
         :return: Bokeh Plot Figure
         """
         plot = figure(tools=TOOLS, title="{}".format(col_x), toolbar_location=None)
-        plot.circle(x=list(in_data["theory"]), y=list(in_data["sample"]), size=3, color="#4292c6")
+        plot.circle(
+            x=list(in_data["theory"]),
+            y=list(in_data["sample"]),
+            size=3,
+            color=PALETTE[0],
+        )
         all_values = np.concatenate((in_data["theory"], in_data["sample"]))
         plot.line(
             x=[np.min(all_values), np.max(all_values)],
@@ -239,8 +252,12 @@ class UniViz:
         :param col_x: the name of the column
         :return: the Bokeh Plot Figure
         """
-        hover_hist = HoverTool(tooltips=[("Bin", "$edges"), ("Count", "$freq")], mode="vline")
-        hover_dist = HoverTool(tooltips=[("x", "$x{0.2f}"), ("y", "$y{0.2f}")], mode="mouse")
+        hover_hist = HoverTool(
+            tooltips=[("Bin", "$edges"), ("Count", "$freq")], mode="vline"
+        )
+        hover_dist = HoverTool(
+            tooltips=[("x", "$x{0.2f}"), ("y", "$y{0.2f}")], mode="mouse"
+        )
         freq, edges = np.histogram(data, density=True)
         hist = hv.Histogram((edges, freq)).opts(
             tools=[hover_hist], color="#c6dbef", line_color="#c6dbef"
@@ -252,10 +269,17 @@ class UniViz:
         plot_figure.toolbar_location = None
         plot_figure.title = Title(text=col_x)
         plot_figure.title.text_font_size = "10pt"
-        plot_figure.xaxis.axis_label = self.num_caption.format(np.min(data), np.max(data))
+        plot_figure.xaxis.axis_label = self.num_caption.format(
+            np.min(data), np.max(data)
+        )
         plot_figure.sizing_mode = "fixed"
         plot_figure.xaxis.major_label_text_font_size = "0pt"
         plot_figure.yaxis.major_label_text_font_size = "0pt"
+
+        # plot_figure.add_tools(
+        #     HoverTool(tooltips=[("Upper Whisker", "@uw")], mode="mouse", names=["upper"])
+        # )
+
         self.kde = True
         return plot_figure
 
@@ -275,87 +299,107 @@ class UniViz:
         :param box_width: width of each box
         :return: Bokeh Plot Figure
         """
-        d_f = pd.DataFrame(data)  # , index=range(0, len(data)))
-        d_f = d_f.append(
+        df = pd.DataFrame(data)  # , index=range(0, len(data)))
+        df = df.append(
             pd.Series(
-                {col: i for col, i in zip(d_f.columns, range(1, len(d_f.columns) + 1))}, name="x"
+                {col: i for col, i in zip(df.columns, range(1, len(df.columns) + 1))},
+                name="x",
             )
         )
-        d_f = d_f.transpose()
-        d_f["y"], d_f["w"] = (d_f["tf"] + d_f["sf"]) / 2, [box_width] * len(d_f)
-        d_f["x0"], d_f["x1"] = d_f["x"] - box_width / 2, d_f["x"] + box_width / 2
-        d_f["uw"], d_f["lw"] = d_f["sf"] + 1.5 * d_f["iqr"], d_f["tf"] - 1.5 * d_f["iqr"]
-        d_f["h"] = d_f["sf"] - d_f["tf"]
+        df = df.transpose()
+        df["y"], df["w"] = (df["tf"] + df["sf"]) / 2, [box_width] * len(df)
+        df["x0"], df["x1"] = df["x"] - box_width / 2, df["x"] + box_width / 2
+        df["uw"], df["lw"] = df["sf"] + 1.5 * df["iqr"], df["tf"] - 1.5 * df["iqr"]
+        df["h"] = df["sf"] - df["tf"]
 
         # Bokeh plotting code from here
-        y_min = min(d_f["lw"]) / 2 if min(d_f["lw"]) > 0 else min(d_f["lw"]) * 2
-        y_max = max(d_f["uw"]) if np.isnan(max(d_f["max_outlier"])) else max(d_f["max_outlier"])
+        y_min = min(df["lw"]) / 2 if min(df["lw"]) > 0 else min(df["lw"]) * 2
+        y_max = (
+            max(df["uw"])
+            if np.isnan(max(df["max_outlier"]))
+            else max(df["max_outlier"])
+        )
 
         if col_y is None:
             title = "{}".format(col_x)
         else:
-            title = "{} in {}".format(col_x, col_y)
+            title = "{} by {}".format(col_y, col_x)
 
         plot = Plot(
             plot_width=300,
             plot_height=500,
             min_border=0,
             toolbar_location=None,
+            tools=[],
             y_range=Range1d(y_min, 1.25 * y_max),
             title=Title(text=title),
         )
 
         hover_box = HoverTool(
-            tooltips=[("25%", "@tf"), ("50%", "@fy"), ("75%", "@sf")], mode="mouse", names=["box"]
+            tooltips=[("25%", "@tf"), ("50%", "@fy"), ("75%", "@sf")],
+            mode="mouse",
+            names=["box"],
         )
 
         plot.add_glyph(
-            ColumnDataSource(data=d_f),
-            Rect(x="x", y="y", width="w", height="h", fill_color="#cab2d6"),
+            ColumnDataSource(data=df),
+            Rect(x="x", y="y", width="w", height="h", fill_color=PALETTE[0]),
             name="box",
         )
         plot.add_glyph(
-            ColumnDataSource(data=d_f),
-            Segment(x0="x0", y0="fy", x1="x1", y1="fy", line_width=1.5, line_color="black"),
+            ColumnDataSource(data=df),
+            Segment(
+                x0="x0", y0="fy", x1="x1", y1="fy", line_width=1.5, line_color="black"
+            ),
         )
 
-        for cat in d_f.index:
-            series = d_f.loc[cat]
+        for cat in df.index:
+            series = df.loc[cat]
             temp_list = [series["x"]] * len(series["outliers"])
-            source = ColumnDataSource(data=pd.DataFrame({"x": temp_list, "y": series["outliers"]}))
-            outliers = Circle(x="x", y="y", size=3, fill_color="red")
+            source = ColumnDataSource(
+                data=pd.DataFrame({"x": temp_list, "y": series["outliers"]})
+            )
+            outliers = Circle(x="x", y="y", size=3, fill_color=PALETTE[6])
             plot.add_glyph(source, outliers, name="outlier")
 
         plot.add_glyph(
-            ColumnDataSource(data=d_f),
-            Segment(x0="x", y0="uw", x1="x", y1="sf", line_width=1.5, line_color="black"),
+            ColumnDataSource(data=df),
+            Segment(
+                x0="x", y0="uw", x1="x", y1="sf", line_width=1.5, line_color="black"
+            ),
         )
         plot.add_glyph(
-            ColumnDataSource(data=d_f),
-            Segment(x0="x", y0="lw", x1="x", y1="tf", line_width=1.5, line_color="black"),
+            ColumnDataSource(data=df),
+            Segment(
+                x0="x", y0="lw", x1="x", y1="tf", line_width=1.5, line_color="black"
+            ),
         )
         plot.add_glyph(
-            ColumnDataSource(data=d_f),
-            Segment(x0="x0", y0="uw", x1="x1", y1="uw", line_width=1.5, line_color="black"),
+            ColumnDataSource(data=df),
+            Segment(
+                x0="x0", y0="uw", x1="x1", y1="uw", line_width=1.5, line_color="black"
+            ),
             name="upper",
         )
         plot.add_glyph(
-            ColumnDataSource(data=d_f),
-            Segment(x0="x0", y0="lw", x1="x1", y1="lw", line_width=1.5, line_color="black"),
+            ColumnDataSource(data=df),
+            Segment(
+                x0="x0", y0="lw", x1="x1", y1="lw", line_width=1.5, line_color="black"
+            ),
             name="lower",
         )
 
         # Add Tools
-        plot.add_tools(WheelZoomTool())
-        plot.add_tools(SaveTool())
-        plot.add_tools(BoxZoomTool())
-        plot.add_tools(ResetTool())
         plot.add_tools(hover_box)
         plot.add_tools(
-            HoverTool(tooltips=[("Upper Whisker", "@uw")], mode="mouse", names=["upper"])
+            HoverTool(
+                tooltips=[("Upper Whisker", "@uw")], mode="mouse", names=["upper"]
+            )
         )
         plot.add_tools(
-            HoverTool(tooltips=[("Lower Whisker", "@lw")], mode="mouse", names=["lower"])
+            HoverTool(
+                tooltips=[("Lower Whisker", "@lw")], mode="mouse", names=["lower"]
+            )
         )
         plot.add_tools(HoverTool(tooltips=[("Value", "@y")], names=["outlier"]))
 
@@ -369,11 +413,11 @@ class UniViz:
         plot.add_layout(Grid(dimension=1, ticker=yaxis.ticker))
         plot.xaxis.major_label_orientation = math.pi / 4
         plot.yaxis.axis_label = col_y
-        plot.xaxis.ticker = FixedTicker(ticks=list(d_f["x"]))
+        plot.xaxis.ticker = FixedTicker(ticks=list(df["x"]))
         plot.xaxis.formatter = FuncTickFormatter(
             code="""
             var mapping = """
-            + str({key: value for key, value in zip(d_f["x"], d_f.index)})
+            + str({key: value for key, value in zip(df["x"], df.index)})
             + """;
             return mapping[tick];
         """
