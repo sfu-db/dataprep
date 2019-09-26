@@ -141,7 +141,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     hover = HoverTool(
         tooltips=tooltips
     )
-    if len(data_p) == 0 or len(data_k) == 0 or len(data_s) == 0:
+    if not data_p or not data_k or not data_s:
         raise Warning("The result is empty")
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
