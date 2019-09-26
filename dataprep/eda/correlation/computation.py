@@ -512,33 +512,24 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
         intermediate = Intermediate(result, raw_data)
         return intermediate
 
+    diff_inc = []
+    diff_dec = []
     inc_point_x = []
     inc_point_y = []
     dec_point_x = []
     dec_point_y = []
-    inc_mask = np.zeros(len(data_x))
-    dec_mask = np.zeros(len(data_x))
-    for _ in range(k):
-        max_diff_inc = 0
-        max_diff_dec = 0
-        max_idx_inc = 0
-        max_idx_dec = 0
-        for j in range(len(data_x)):
-            data_x_sel = np.append(data_x[:j], data_x[j + 1:])  # TODO: Avoid copy
-            data_y_sel = np.append(data_y[:j], data_y[j + 1:])
-            corr_sel = np.corrcoef(data_x_sel, data_y_sel)[1, 0]
-            if corr_sel - corr > max_diff_inc and inc_mask[j] != 1:
-                max_diff_inc = corr_sel - corr
-                max_idx_inc = j
-            if corr - corr_sel > max_diff_dec and dec_mask[j] != 1:
-                max_diff_dec = corr - corr_sel
-                max_idx_dec = j
-        inc_mask[max_idx_inc] = 1
-        dec_mask[max_idx_dec] = 1
-        inc_point_x.append(data_x[max_idx_inc])
-        inc_point_y.append(data_y[max_idx_inc])
-        dec_point_x.append(data_x[max_idx_dec])
-        dec_point_y.append(data_y[max_idx_dec])
+    for i in range(len(data_x)):
+        data_x_sel = np.append(data_x[:i], data_x[i + 1:])  # TODO: Avoid copy
+        data_y_sel = np.append(data_y[:i], data_y[i + 1:])
+        corr_sel = np.corrcoef(data_x_sel, data_y_sel)[1, 0]
+        diff_inc.append(corr_sel - corr)
+        diff_dec.append(corr - corr_sel)
+    diff_inc_sort = np.argsort(diff_inc)
+    diff_dec_sort = np.argsort(diff_dec)
+    inc_point_x.append(data_x[diff_inc_sort[-k:]])
+    inc_point_y.append(data_y[diff_inc_sort[-k:]])
+    dec_point_x.append(data_x[diff_dec_sort[-k:]])
+    dec_point_y.append(data_y[diff_dec_sort[-k:]])
     result = {
         'corr': corr,
         'dec_point_x': dec_point_x,
