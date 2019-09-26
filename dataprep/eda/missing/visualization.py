@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 import math
 import holoviews as hv
 import numpy as np
+import pandas as pd
 import scipy.stats
 from bokeh.models import HoverTool
 from bokeh.models.annotations import Title
@@ -29,7 +30,10 @@ def _vis_nonzero_count(  # pylint: disable=too-many-locals
     This function is designed to draw a heatmap,
     which is able to show the missing value's location and rate
     """
-    hv.extension('bokeh', logo=False)
+    hv.extension(
+        'bokeh',
+        logo=False
+    )
     distribution = intermediate.result['distribution']
     count = intermediate.result['count']
     row, col = distribution.shape
@@ -78,7 +82,10 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
     num_bins = intermediate.raw_data['num_bins']
     df_data_drop = intermediate.result['df_data_drop']
     columns_name = intermediate.result['columns_name']
-    hv.extension('bokeh', logo=False)
+    hv.extension(
+        'bokeh',
+        logo=False
+    )
     tab_list = []
     for name in columns_name:
         if get_type(pd_data_frame[name]) == DataType.TYPE_NUM:
@@ -105,6 +112,8 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
             fig.xaxis.axis_label = intermediate.raw_data['x_name']
             fig.yaxis.axis_label = 'Frequency'
             fig.xaxis.major_label_orientation = math.pi / 4
+            fig.toolbar_location = None
+            fig.toolbar.active_drag = None
             title = Title()
             title.text = 'Frequency of Value'
             fig.title = title
@@ -115,12 +124,16 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
                 ('Frequency', '@c'),
             ]
             hover = HoverTool(tooltips=tooltips)
+            pd_data_frame_count = pd_data_frame[name].value_counts(ascending=True)[:k]
+            df_data_drop_count = df_data_drop[name].value_counts(ascending=True)[:k]
             bars_origin = hv.Bars(
-                pd_data_frame[name].value_counts(ascending=True)[:k],
+                pd.DataFrame({'name': pd_data_frame_count.index,
+                              'c': pd_data_frame_count.values}),
                 label='Original Data'
             ).opts(alpha=params['alpha'], tools=[hover])
             bars_drop = hv.Bars(
-                df_data_drop[name].value_counts(ascending=True)[:k],
+                pd.DataFrame({'name': df_data_drop_count.index,
+                              'c': df_data_drop_count.values}),
                 label='Updated Data'
             ).opts(alpha=params['alpha'], tools=[hover])
             fig = hv.render(
@@ -134,6 +147,8 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
             fig.xaxis.axis_label = intermediate.raw_data['x_name']
             fig.yaxis.axis_label = 'Frequency'
             fig.xaxis.major_label_orientation = math.pi / 4
+            fig.toolbar_location = None
+            fig.toolbar.active_drag = None
             title = Title()
             title.text = 'Frequency of Value'
             fig.title = title
@@ -165,7 +180,10 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
     df_data_drop = intermediate.result['df_data_drop']
     origin_data = pd_data_frame[y_name].values
     drop_data = df_data_drop[y_name].values
-    hv.extension('bokeh', logo=False)
+    hv.extension(
+        'bokeh',
+        logo=False
+    )
     if get_type(pd_data_frame[y_name]) == DataType.TYPE_NUM:
         hist_data_origin = np.histogram(
             origin_data,
@@ -272,6 +290,14 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
             box_mixed,
             backend='bokeh'
         )
+        fig_hist.toolbar_location = None
+        fig_hist.toolbar.active_drag = None
+        fig_box.toolbar_location = None
+        fig_box.toolbar.active_drag = None
+        fig_pdf.toolbar_location = None
+        fig_pdf.toolbar.active_drag = None
+        fig_cdf.toolbar_location = None
+        fig_cdf.toolbar.active_drag = None
         tab_hist = Panel(child=fig_hist, title='histogram')
         tab_box = Panel(child=fig_box, title='box')
         tab_pdf = Panel(child=fig_pdf, title='pdf')
@@ -283,14 +309,16 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
         ]
         hover = HoverTool(tooltips=tooltips)
         bars_origin = hv.Bars(
-            pd_data_frame[y_name].value_counts(),
+            pd.DataFrame({'name': pd_data_frame[y_name].value_counts().index,
+                          'c': pd_data_frame[y_name].value_counts().values}),
             label='Original Data'
         ).opts(
             alpha=params['alpha'],
             tools=[hover]
         )
         bars_drop = hv.Bars(
-            df_data_drop[y_name].value_counts(),
+            pd.DataFrame({'name': df_data_drop[y_name].value_counts().index,
+                          'c': df_data_drop[y_name].value_counts().values}),
             label='Updated Data'
         ).opts(
             alpha=params['alpha'],
@@ -304,6 +332,8 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
             ),
             backend='bokeh'
         )
+        fig_bars.toolbar_location = None
+        fig_bars.toolbar.active_drag = None
         tab_bars = Panel(child=fig_bars, title='bars')
         tabs = Tabs(tabs=[tab_bars])
     else:

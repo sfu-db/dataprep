@@ -473,6 +473,7 @@ def _calc_correlation_pd_x_k(  # pylint: disable=too-many-statements
 
 
 def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
+        # pylint: disable=invalid-unary-operand-type
         pd_data_frame: pd.DataFrame,
         x_name: str,
         y_name: str,
