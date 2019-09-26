@@ -50,9 +50,14 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
         data = []
         for i, _ in enumerate(name_list):
             for j, _ in enumerate(name_list):
-                data.append((name_list[i],
-                             name_list[j],
-                             corr_matrix[i, j]))
+                if corr_matrix[i, j] != 0:
+                    data.append((name_list[i],
+                                 name_list[j],
+                                 corr_matrix[i, j]))
+                else:
+                    data.append((name_list[i],
+                                 name_list[j],
+                                 np.nan))
         tooltips = [
             ('x', '@x'),
             ('y', '@y'),
@@ -136,6 +141,8 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     hover = HoverTool(
         tooltips=tooltips
     )
+    if len(data_p) == 0 or len(data_k) == 0 or len(data_s) == 0:
+        raise Warning("The result is empty")
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
         tools=[hover],
