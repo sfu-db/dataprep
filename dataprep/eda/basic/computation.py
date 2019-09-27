@@ -186,11 +186,10 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
     """
     grp_object = dask.compute(dataframe.groupby([col_x])[col_x].count())[0]
     na, = dask.compute(dataframe[col_x].isna().sum())
-    if na > 0:
-        grp_object = grp_object.rename(index=str)
-        grp_object.loc["Missing"] = na
+    dict_grp_object = dict(grp_object)
+    dict_grp_object["Missing_values"] = na
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None}
-    result = {"bar_plot": dict(grp_object)}
+    result = {"bar_plot": dict_grp_object}
     return Intermediate(result, raw_data)
 
 
@@ -251,7 +250,6 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
     np.array : An array of values representing histogram for the input col
     """
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None, "bins": nbins}
-    # values = dask.compute(dataframe[col_x].values)[0]
     if dask.compute(dataframe[col_x].size)[0] == 0:
         return Intermediate({"histogram": (list(), list())}, raw_data)
 
@@ -261,7 +259,6 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
     dframe = dataframe[col_x].dropna().values
     hist_array = None
     bins = None
-    ticks = None
 
     if isinstance(dframe, dask.array.core.Array):
         hist_array, bins = da.histogram(dframe, range=[minv, maxv], bins=nbins)
@@ -276,21 +273,16 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
         bins_temp = [int(x) for x in np.ceil(bins)]
         if len(bins_temp) != len(set(bins_temp)):
             bins = [round(x, 2) for x in bins]
-            ticks = [round(bins[i] + (bins[i + 1] - bins[i]) / 2, 2) for i in range(len(bins) - 1)]
         else:
             bins = bins_temp
-            ticks = [int(bins[i] + (bins[i + 1] - bins[i]) / 2) for i in range(len(bins) - 1)]
     else:
         bins = [round(x, 2) for x in bins]
-        ticks = [round(bins[i] + (bins[i + 1] - bins[i]) / 2, 2) for i in range(len(bins) - 1)]
-    bins = ["%.2E" % x if abs(x) > 99999 else x for x in bins]
-    ticks = ["%.2E" % x if abs(x) > 99999 else str(x) for x in ticks]
 
     na, = dask.compute(dataframe[col_x].isna().sum())
     if na > 0:
         hist_array = np.append(hist_array, na)
 
-    return Intermediate({"histogram": (hist_array, bins, ticks)}, raw_data)
+    return Intermediate({"histogram": (hist_array, bins)}, raw_data)
 
 
 def _calc_qqnorm(df: dd.DataFrame, col_x: str) -> Intermediate:
@@ -369,7 +361,6 @@ def plot(
     col_y: Optional[str] = None,
     force_cat: Optional[StringList] = None,
     force_num: Optional[StringList] = None,
-    ncolumns: int = 5,
     **kwrgs: int
 ) -> List[Intermediate]:
     """
@@ -383,7 +374,6 @@ def plot(
     col_y : A column in the data_frame.
     force_cat: the list of columns which have to considered of type "TYPE_CAT"
     force_num: the list of columns which have to considered of type "TYPE_NUM"
-    ncolumns: the number of columns to be displayed in a grid
     kwargs : TO-DO
 
     Returns
@@ -434,7 +424,7 @@ def plot(
 
             # QQ-NORM
             dask_result.append(_calc_qqnorm(data_frame, target_col))
-        Render.vizualise(Render(**kwrgs), dask_result, ncolumns, True)
+        Render.vizualise(Render(**kwrgs), dask_result, True)
         return dask_result  # if kwrgs.get("return_result") else None
 
     if col_x is not None and col_y is not None:
@@ -462,14 +452,14 @@ def plot(
             else:
                 pass
                 # WARNING: _TODO
-            Render.vizualise(Render(**kwrgs), temp_result, ncolumns)
+            Render.vizualise(Render(**kwrgs), temp_result)
             return temp_result  # if kwrgs.get("return_result") else None
 
         except NotImplementedError as error:  # _TODO
             LOGGER.info("Plot could not be obtained due to : %s", error)
 
     if col_x is None and col_y is None:
-        Render.vizualise(Render(**kwrgs), plot_df(data_frame, force_cat, force_num), ncolumns)
+        Render.vizualise(Render(**kwrgs), plot_df(data_frame, force_cat, force_num))
         return plot_df(data_frame, force_cat, force_num)  # if kwrgs.get("return_result") else None
 
     return list_of_intermediates
