@@ -46,6 +46,7 @@ class UniViz:
     kde: bool = False  # to know if the kernel density plot is plotted error-lessly.
     cat_caption: str = "top {} of {} Categories"
     num_caption: str = "{} - {}"
+    max_xlab_len: int = 15  # maximum length of x axis label for bar plots
 
     def pie_viz(self, data: Dict[str, int], col_x: str) -> Any:
         """
@@ -101,16 +102,26 @@ class UniViz:
         :param n_bars: the number of bars to show in plot
         :return: Bokeh plot figure
         """
+        missing = data.pop("Missing_values", None)
         data_sorted = sorted(data.items(), key=lambda x: x[1], reverse=True)[0:n_bars]
         cat_list = [
-            (str(x[0])[:14] + "...") if len(str(x[0])) > 15 else str(x[0]) for x in data_sorted
+            (str(x[0])[: (self.max_xlab_len - 1)] + "...")
+            if len(str(x[0])) > self.max_xlab_len
+            else str(x[0])
+            for x in data_sorted
         ]
         data_source = pd.DataFrame({"count": [i[1] for i in data_sorted], "cat": cat_list})
-        data_source["percen"] = data_source["count"] / sum([y for (x, y) in data.items()]) * 100
+        total = sum([y for (x, y) in data.items()]) + missing
+        data_source["percen"] = data_source["count"] / total * 100
         interm = ColumnDataSource(data_source)
+        if missing > 0:
+            missing_percent = round(missing / total * 100, 1)
+            title = "{} ({}% missing values)".format(col_x, missing_percent)
+        else:
+            title = "{}".format(col_x)
         plot_figure = figure(
             tools=TOOLS,
-            title="{}".format(col_x),
+            title=title,
             x_range=FactorRange(factors=cat_list),
             # y_range=[0, max(data_source["count"])+10],
             toolbar_location=None,
@@ -137,7 +148,7 @@ class UniViz:
         # plot_figure.xaxis.axis_label = col_x
         plot_figure.yaxis.axis_label = "Count"
         plot_figure.title.text_font_size = "10pt"
-        if len(data.items()) > 10:
+        if len(data.items()) > n_bars:
             plot_figure.xaxis.axis_label = self.cat_caption.format(
                 data_source.shape[0], len(data.items())
             )
@@ -145,7 +156,7 @@ class UniViz:
         self.bar = True
         return plot_figure
 
-    def hist_viz(self, data: Tuple[np.array, np.array, list], col_x: str) -> Any:
+    def hist_viz(self, data: Tuple[np.array, np.array], col_x: str) -> Any:
         """
         Histogram for a column
         :param data: intermediate result
@@ -156,55 +167,65 @@ class UniViz:
         """
         hist_array = data[0]
         bins_array = data[1]
-        ticks = data[2]
-        bins = [
-            "[{}, {})".format(bins_array[i], bins_array[i + 1])
-            if i != len(bins_array) - 2
-            else "[{}, {}]".format(bins_array[i], bins_array[i + 1])
-            for i in range(len(bins_array) - 1)
-        ]
-
-        if len(hist_array) > len(ticks):
-            ticks.append("Missing")
-            bins.append("Missing")
+        hist_sum = np.sum(hist_array)
+        if len(bins_array) == len(hist_array):
+            na = hist_array[-1]
+            percent_na = np.round((na / hist_sum) * 100, 1)
+            hist_array = hist_array[:-1]
+            plot_figure = figure(
+                tools=TOOLS,
+                title="{} ({}% missing values)".format(col_x, percent_na),
+                toolbar_location=None,
+            )
+        else:
+            plot_figure = figure(tools=TOOLS, title="{}".format(col_x), toolbar_location=None)
 
         data_source = pd.DataFrame(
             {
-                "bins": bins,
+                "left": bins_array[:-1],
+                "right": bins_array[1:],
                 "freq": hist_array,
-                "percent": hist_array / np.sum(hist_array) * 100,
-                "ticks": ticks,
+                "percen": (hist_array / hist_sum) * 100,
             }
         )
-
         interm = ColumnDataSource(data_source)
-        plot_figure = figure(
-            tools=TOOLS,
-            title="{}".format(col_x),
-            x_range=FactorRange(factors=ticks),
-            # y_range=[0, max(data_source["count"])+10],
-            toolbar_location=None,
-        )
 
+        # plot_figure = figure(tools=TOOLS, title="{}".format(col_x), toolbar_location=None)
         hover = HoverTool(
-            tooltips=[("Bin", "@bins"), ("Frequency", "@freq"), ("Percentage", "@percent{0.2f}%")],
+            tooltips=[
+                ("Bin", "[@left, @right]"),
+                ("Frequency", "@freq"),
+                ("Percentage", "@percen{0.2f}%"),
+            ],
             mode="vline",
         )
-        bars = VBar(x="ticks", top="freq", bottom=0, width=0.9, fill_color=Category20[20][1])
-        plot_figure.add_glyph(interm, bars)
+        plot_figure.quad(
+            source=interm,
+            left="left",
+            right="right",
+            bottom=0,
+            alpha=0.5,
+            top="freq",
+            fill_color=Category20[20][0],
+        )
         plot_figure.add_tools(hover)
-        plot_figure.xaxis.major_label_orientation = math.pi / 3
-        plot_figure.xgrid.grid_line_color = None
-        plot_figure.ygrid.grid_line_color = None
         plot_figure.yaxis.major_label_text_font_size = "0pt"
-        # plot_figure.xaxis.major_label_text_font_size = "0pt"
         plot_figure.yaxis.major_tick_line_color = None
         plot_figure.yaxis.minor_tick_line_color = None
+
+        plot_figure.xaxis.major_label_orientation = math.pi / 3
+        plot_figure.xaxis.major_label_text_font_size = "10pt"
+        plot_figure.xaxis.major_tick_line_color = "black"
+        plot_figure.xaxis.minor_tick_line_color = None
+
+        plot_figure.xgrid.grid_line_color = None
+        plot_figure.ygrid.grid_line_color = None
         # plot_figure.xaxis.axis_label = col_x
         plot_figure.yaxis.axis_label = "Frequency"
         plot_figure.title.text_font_size = "10pt"
-
-        self.bar = True
+        # plot_figure.xaxis.axis_label = self.num_caption.format(bins_array[0], bins_array[-1])
+        plot_figure.xaxis.ticker = bins_array
+        self.hist = True
         return plot_figure
 
     def qqnorm_viz(self, in_data: Dict[str, Any], col_x: str) -> Any:
