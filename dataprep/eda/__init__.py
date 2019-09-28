@@ -15,4 +15,4 @@ __all__ = ["plot", "plot_correlation", "plot_missing"]
 if is_notebook():
     output_notebook(hide_banner=True)
 else:
-    output_file(filename=tempfile.gettempdir() + '/' + _rand_str() + '.html')
+    output_file(filename=tempfile.gettempdir() + "/" + _rand_str() + ".html")
