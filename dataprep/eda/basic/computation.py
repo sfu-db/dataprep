@@ -185,11 +185,9 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
     dict : A dict of (category : count) for the input col
     """
     grp_object = dask.compute(dataframe.groupby([col_x])[col_x].count())[0]
-    na, = dask.compute(dataframe[col_x].isna().sum())
-    dict_grp_object = dict(grp_object)
-    dict_grp_object["Missing_values"] = na
+    miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None}
-    result = {"bar_plot": dict_grp_object}
+    result = {"bar_plot": dict(grp_object), "missing": [miss_vals]}
     return Intermediate(result, raw_data)
 
 
@@ -231,7 +229,8 @@ def _calc_hist_by_group(
         grp_hist[zipped_element[0]] = zipped_element[1]
 
     return Intermediate(
-        {"histogram": grp_hist}, {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": nbins}
+        {"histogram": grp_hist, "missing": [0]},
+        {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": nbins},
     )
 
 
@@ -278,11 +277,9 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
     else:
         bins = [round(x, 2) for x in bins]
 
-    na, = dask.compute(dataframe[col_x].isna().sum())
-    if na > 0:
-        hist_array = np.append(hist_array, na)
+    miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
 
-    return Intermediate({"histogram": (hist_array, bins)}, raw_data)
+    return Intermediate({"histogram": (hist_array, bins), "missing": [miss_vals]}, raw_data)
 
 
 def _calc_qqnorm(df: dd.DataFrame, col_x: str) -> Intermediate:
