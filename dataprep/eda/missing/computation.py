@@ -13,14 +13,14 @@ from bokeh.plotting import Figure
 
 from ...utils import DataType, get_type
 from ..common import Intermediate
-from .visualization import (_vis_missing_impact, _vis_missing_impact_y,
-                            _vis_nonzero_count)
+from .visualization import (
+    _vis_missing_impact,
+    _vis_missing_impact_y,
+    _vis_nonzero_count,
+)
 
 
-def _calc_nonzero_rate(
-        data: np.ndarray,
-        length: int
-) -> Any:
+def _calc_nonzero_rate(data: np.ndarray, length: int) -> Any:
     """
     :param data: A column of data frame
     :param length: The length of array
@@ -31,9 +31,7 @@ def _calc_nonzero_rate(
     return np.count_nonzero(data) / length
 
 
-def _calc_nonzero_count(
-        pd_data_frame: pd.DataFrame
-) -> Intermediate:
+def _calc_nonzero_count(pd_data_frame: pd.DataFrame) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated
     for each column.
@@ -49,29 +47,17 @@ def _calc_nonzero_count(
     row, col = pd_data_frame_value.shape
     for i in range(row):
         count_nonzero_list.append(
-            dask.delayed(_calc_nonzero_rate)(
-                pd_data_frame_value[i, :], col
-            )
+            dask.delayed(_calc_nonzero_rate)(pd_data_frame_value[i, :], col)
         )
     count_nonzero_compute = dask.compute(*count_nonzero_list)
-    result = {
-        'distribution': pd_data_frame_value * 1,
-        'count': count_nonzero_compute
-    }
-    raw_data = {
-        'df': pd_data_frame
-    }
-    intermediate = Intermediate(
-        result=result,
-        raw_data=raw_data
-    )
+    result = {"distribution": pd_data_frame_value * 1, "count": count_nonzero_compute}
+    raw_data = {"df": pd_data_frame}
+    intermediate = Intermediate(result=result, raw_data=raw_data)
     return intermediate
 
 
 def _calc_missing_impact(
-        pd_data_frame: pd.DataFrame,
-        x_name: str,
-        num_bins: int = 10
+    pd_data_frame: pd.DataFrame, x_name: str, num_bins: int = 10
 ) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated
@@ -86,27 +72,14 @@ def _calc_missing_impact(
     df_data_drop = pd_data_frame.dropna(subset=[x_name])
     columns_name = list(pd_data_frame.columns)
     columns_name.remove(x_name)
-    result = {
-        'df_data_drop': df_data_drop,
-        'columns_name': columns_name
-    }
-    raw_data = {
-        'df': pd_data_frame,
-        'x_name': x_name,
-        'num_bins': num_bins
-    }
-    intermediate = Intermediate(
-        result=result,
-        raw_data=raw_data
-    )
+    result = {"df_data_drop": df_data_drop, "columns_name": columns_name}
+    raw_data = {"df": pd_data_frame, "x_name": x_name, "num_bins": num_bins}
+    intermediate = Intermediate(result=result, raw_data=raw_data)
     return intermediate
 
 
 def _calc_missing_impact_y(
-        pd_data_frame: pd.DataFrame,
-        x_name: str,
-        y_name: str,
-        num_bins: int = 10
+    pd_data_frame: pd.DataFrame, x_name: str, y_name: str, num_bins: int = 10
 ) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
@@ -122,30 +95,23 @@ def _calc_missing_impact_y(
     df_data_sel = pd_data_frame[[x_name, y_name]]
     df_data_drop = df_data_sel.dropna(subset=[x_name])
     columns_name = list(df_data_drop.columns)
-    result = {
-        'df_data_drop': df_data_drop,
-        'columns_name': columns_name
-    }
+    result = {"df_data_drop": df_data_drop, "columns_name": columns_name}
     raw_data = {
-        'df': pd_data_frame,
-        'x_name': x_name,
-        'y_name': y_name,
-        'num_bins': num_bins
+        "df": pd_data_frame,
+        "x_name": x_name,
+        "y_name": y_name,
+        "num_bins": num_bins,
     }
-    intermediate = Intermediate(
-        result=result,
-        raw_data=raw_data
-    )
+    intermediate = Intermediate(result=result, raw_data=raw_data)
     return intermediate
 
 
 def plot_missing(
-        pd_data_frame: pd.DataFrame,
-        x_name: Optional[str] = None,
-        y_name: Optional[str] = None,
-        return_intermediate: bool = False
-) -> Union[Union[Figure, Tabs],
-           Tuple[Union[Figure, Tabs], Any]]:
+    pd_data_frame: pd.DataFrame,
+    x_name: Optional[str] = None,
+    y_name: Optional[str] = None,
+    return_intermediate: bool = False,
+) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated for each
     column.
@@ -170,45 +136,26 @@ def plot_missing(
         otherwise => error
     """
     columns_name = list(pd_data_frame.columns)
-    params = {
-        'height': 375,
-        'width': 325,
-        'alpha': 0.3,
-        'legend_position': 'top'
-    }
+    params = {"height": 375, "width": 325, "alpha": 0.3, "legend_position": "top"}
     for name in columns_name:
-        if get_type(pd_data_frame[name]) != DataType.TYPE_NUM and \
-                get_type(pd_data_frame[name]) != DataType.TYPE_CAT:
+        if (
+            get_type(pd_data_frame[name]) != DataType.TYPE_NUM
+            and get_type(pd_data_frame[name]) != DataType.TYPE_CAT
+        ):
             raise ValueError("the column's data type is error")
     if x_name is not None and y_name is not None:
         intermediate = _calc_missing_impact_y(
-            pd_data_frame=pd_data_frame,
-            x_name=x_name,
-            y_name=y_name
+            pd_data_frame=pd_data_frame, x_name=x_name, y_name=y_name
         )
-        fig = _vis_missing_impact_y(
-            intermediate=intermediate,
-            params=params
-        )
+        fig = _vis_missing_impact_y(intermediate=intermediate, params=params)
     elif x_name is not None:
-        intermediate = _calc_missing_impact(
-            pd_data_frame=pd_data_frame,
-            x_name=x_name
-        )
-        fig = _vis_missing_impact(
-            intermediate=intermediate,
-            params=params
-        )
+        intermediate = _calc_missing_impact(pd_data_frame=pd_data_frame, x_name=x_name)
+        fig = _vis_missing_impact(intermediate=intermediate, params=params)
     elif x_name is None and y_name is not None:
         raise ValueError("Please give a value to x_name")
     else:
-        intermediate = _calc_nonzero_count(
-            pd_data_frame=pd_data_frame
-        )
-        fig = _vis_nonzero_count(
-            intermediate=intermediate,
-            params=params
-        )
+        intermediate = _calc_nonzero_count(pd_data_frame=pd_data_frame)
+        fig = _vis_nonzero_count(intermediate=intermediate, params=params)
     show(fig)
     if return_intermediate:
         return fig, intermediate
