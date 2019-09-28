@@ -3,8 +3,8 @@ from pipenv.project import Project
 from pipenv.utils import convert_deps_to_pip
 
 pfile = Project(chdir=False).parsed_pipfile
-requirements = convert_deps_to_pip(pfile['packages'], r=False)
-test_requirements = convert_deps_to_pip(pfile['dev-packages'], r=False)
+requirements = convert_deps_to_pip(pfile["packages"], r=False)
+test_requirements = convert_deps_to_pip(pfile["dev-packages"], r=False)
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -33,6 +33,6 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Cython",
-        "Topic :: Scientific/Engineering"
+        "Topic :: Scientific/Engineering",
     ],
 )
