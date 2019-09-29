@@ -135,7 +135,7 @@ class UniViz:
             ],
             mode="mouse",
         )
-        bars = VBar(x="cat", top="count", bottom=0, width=0.9, fill_color=Category20[20][0])
+        bars = VBar(x="cat", top="count", bottom=0, width=0.9, fill_color="#3182bd")
         plot_figure.add_glyph(interm, bars)
         plot_figure.add_tools(hover)
         plot_figure.xaxis.major_label_orientation = math.pi / 3
@@ -205,7 +205,7 @@ class UniViz:
             bottom=0,
             alpha=0.5,
             top="freq",
-            fill_color=Category20[20][0],
+            fill_color="#6baed6",
         )
         plot_figure.add_tools(hover)
         plot_figure.yaxis.major_label_text_font_size = "0pt"
