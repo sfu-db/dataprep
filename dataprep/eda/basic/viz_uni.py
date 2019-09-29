@@ -57,7 +57,10 @@ class UniViz:
         """
         chart_radius = 0.4
         data_df = (
-            pd.Series(data).dropna().reset_index(name="count").rename(columns={"index": "cat"})
+            pd.Series(data)
+            .dropna()
+            .reset_index(name="count")
+            .rename(columns={"index": "cat"})
         )
         total_count = sum(data_df["count"])
         data_df["percen"] = data_df["count"] / total_count * 100
@@ -65,7 +68,9 @@ class UniViz:
         color_list = bp.d3["Category20c"]  # pylint: disable=E1101
         color_list.update({1: ["#084594"], 2: ["#084594", "#9ecae1"]})
         data_df["colour"] = color_list[len(data_df)]
-        plot_figure = figure(title="{}".format(col_x), tools=TOOLS, toolbar_location=None)
+        plot_figure = figure(
+            title="{}".format(col_x), tools=TOOLS, toolbar_location=None
+        )
 
         plot_figure.wedge(
             x=0,
@@ -94,7 +99,9 @@ class UniViz:
         self.pie = True
         return plot_figure
 
-    def bar_viz(self, data: Dict[Any, Any], missing: List[int], col_x: str, n_bars: int) -> Any:
+    def bar_viz(
+        self, data: Dict[Any, Any], missing: List[int], col_x: str, n_bars: int
+    ) -> Any:
         """
         Bar chart vizualisation for the categorical data
         :param data: the result from the intermediate
@@ -110,7 +117,9 @@ class UniViz:
             else str(x[0])
             for x in data_sorted
         ]
-        data_source = pd.DataFrame({"count": [i[1] for i in data_sorted], "cat": cat_list})
+        data_source = pd.DataFrame(
+            {"count": [i[1] for i in data_sorted], "cat": cat_list}
+        )
         total = sum([y for (x, y) in data.items()]) + miss_cnt
         data_source["percen"] = data_source["count"] / total * 100
         interm = ColumnDataSource(data_source)
@@ -156,7 +165,9 @@ class UniViz:
         self.barplot = True
         return plot_figure
 
-    def hist_viz(self, data: Tuple[np.array, np.array], missing: List[int], col_x: str) -> Any:
+    def hist_viz(
+        self, data: Tuple[np.array, np.array], missing: List[int], col_x: str
+    ) -> Any:
         """
         Histogram for a column
         :param data: intermediate result
@@ -177,7 +188,9 @@ class UniViz:
                 toolbar_location=None,
             )
         else:
-            plot_figure = figure(tools=TOOLS, title="{}".format(col_x), toolbar_location=None)
+            plot_figure = figure(
+                tools=TOOLS, title="{}".format(col_x), toolbar_location=None
+            )
 
         data_source = pd.DataFrame(
             {
@@ -235,7 +248,12 @@ class UniViz:
         :return: Bokeh Plot Figure
         """
         plot = figure(tools=TOOLS, title="{}".format(col_x), toolbar_location=None)
-        plot.circle(x=list(in_data["theory"]), y=list(in_data["sample"]), size=3, color=PALETTE[0])
+        plot.circle(
+            x=list(in_data["theory"]),
+            y=list(in_data["sample"]),
+            size=3,
+            color=PALETTE[0],
+        )
         all_values = np.concatenate((in_data["theory"], in_data["sample"]))
         plot.line(
             x=[np.min(all_values), np.max(all_values)],
@@ -261,8 +279,12 @@ class UniViz:
         :param col_x: the name of the column
         :return: the Bokeh Plot Figure
         """
-        hover_hist = HoverTool(tooltips=[("Bin", "$edges"), ("Count", "$freq")], mode="mouse")
-        hover_dist = HoverTool(tooltips=[("x", "$x{0.2f}"), ("y", "$y{0.2f}")], mode="mouse")
+        hover_hist = HoverTool(
+            tooltips=[("Bin", "$edges"), ("Count", "$freq")], mode="mouse"
+        )
+        hover_dist = HoverTool(
+            tooltips=[("x", "$x{0.2f}"), ("y", "$y{0.2f}")], mode="mouse"
+        )
         freq, edges = np.histogram(data, density=True)
         hist = hv.Histogram((edges, freq)).opts(
             tools=[hover_hist], color="#c6dbef", line_color="#c6dbef"
@@ -274,7 +296,9 @@ class UniViz:
         plot_figure.toolbar_location = None
         plot_figure.title = Title(text=col_x)
         plot_figure.title.text_font_size = "10pt"
-        plot_figure.xaxis.axis_label = self.num_caption.format(np.min(data), np.max(data))
+        plot_figure.xaxis.axis_label = self.num_caption.format(
+            np.min(data), np.max(data)
+        )
         plot_figure.sizing_mode = "fixed"
         plot_figure.xaxis.major_label_text_font_size = "0pt"
         plot_figure.yaxis.major_label_text_font_size = "0pt"
@@ -305,7 +329,8 @@ class UniViz:
         df = pd.DataFrame(data)  # , index=range(0, len(data)))
         df = df.append(
             pd.Series(
-                {col: i for col, i in zip(df.columns, range(1, len(df.columns) + 1))}, name="x"
+                {col: i for col, i in zip(df.columns, range(1, len(df.columns) + 1))},
+                name="x",
             )
         )
         df = df.transpose()
@@ -316,7 +341,11 @@ class UniViz:
 
         # Bokeh plotting code from here
         y_min = min(df["lw"]) / 2 if min(df["lw"]) > 0 else min(df["lw"]) * 2
-        y_max = max(df["uw"]) if np.isnan(max(df["max_outlier"])) else max(df["max_outlier"])
+        y_max = (
+            max(df["uw"])
+            if np.isnan(max(df["max_outlier"]))
+            else max(df["max_outlier"])
+        )
 
         if col_y is None:
             title = "{}".format(col_x)
@@ -334,7 +363,9 @@ class UniViz:
         )
 
         hover_box = HoverTool(
-            tooltips=[("25%", "@tf"), ("50%", "@fy"), ("75%", "@sf")], mode="mouse", names=["box"]
+            tooltips=[("25%", "@tf"), ("50%", "@fy"), ("75%", "@sf")],
+            mode="mouse",
+            names=["box"],
         )
 
         plot.add_glyph(
@@ -344,42 +375,58 @@ class UniViz:
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(x0="x0", y0="fy", x1="x1", y1="fy", line_width=1.5, line_color="black"),
+            Segment(
+                x0="x0", y0="fy", x1="x1", y1="fy", line_width=1.5, line_color="black"
+            ),
         )
 
         for cat in df.index:
             series = df.loc[cat]
             temp_list = [series["x"]] * len(series["outliers"])
-            source = ColumnDataSource(data=pd.DataFrame({"x": temp_list, "y": series["outliers"]}))
+            source = ColumnDataSource(
+                data=pd.DataFrame({"x": temp_list, "y": series["outliers"]})
+            )
             outliers = Circle(x="x", y="y", size=3, fill_color=PALETTE[6])
             plot.add_glyph(source, outliers, name="outlier")
 
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(x0="x", y0="uw", x1="x", y1="sf", line_width=1.5, line_color="black"),
+            Segment(
+                x0="x", y0="uw", x1="x", y1="sf", line_width=1.5, line_color="black"
+            ),
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(x0="x", y0="lw", x1="x", y1="tf", line_width=1.5, line_color="black"),
+            Segment(
+                x0="x", y0="lw", x1="x", y1="tf", line_width=1.5, line_color="black"
+            ),
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(x0="x0", y0="uw", x1="x1", y1="uw", line_width=1.5, line_color="black"),
+            Segment(
+                x0="x0", y0="uw", x1="x1", y1="uw", line_width=1.5, line_color="black"
+            ),
             name="upper",
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(x0="x0", y0="lw", x1="x1", y1="lw", line_width=1.5, line_color="black"),
+            Segment(
+                x0="x0", y0="lw", x1="x1", y1="lw", line_width=1.5, line_color="black"
+            ),
             name="lower",
         )
 
         # Add Tools
         plot.add_tools(hover_box)
         plot.add_tools(
-            HoverTool(tooltips=[("Upper Whisker", "@uw")], mode="mouse", names=["upper"])
+            HoverTool(
+                tooltips=[("Upper Whisker", "@uw")], mode="mouse", names=["upper"]
+            )
         )
         plot.add_tools(
-            HoverTool(tooltips=[("Lower Whisker", "@lw")], mode="mouse", names=["lower"])
+            HoverTool(
+                tooltips=[("Lower Whisker", "@lw")], mode="mouse", names=["lower"]
+            )
         )
         plot.add_tools(HoverTool(tooltips=[("Value", "@y")], names=["outlier"]))
 
