@@ -67,7 +67,9 @@ def __calc_box_stats(grp_series: dask.dataframe.core.Series) -> Dict[str, Any]:
     return stats
 
 
-def _calc_box(dataframe: dd.DataFrame, col_x: str, col_y: Optional[str] = None) -> Intermediate:
+def _calc_box(
+    dataframe: dd.DataFrame, col_x: str, col_y: Optional[str] = None
+) -> Intermediate:
     """
     Returns intermediate stats of the box plot
     of columns col_x and col_y.
@@ -84,7 +86,9 @@ def _calc_box(dataframe: dd.DataFrame, col_x: str, col_y: Optional[str] = None) 
     """
     res: Dict[str, Any] = dict()
     cat_col, num_col = (
-        (col_x, col_y) if (get_type(dataframe[col_x]) == DataType.TYPE_CAT) else (col_y, col_x)
+        (col_x, col_y)
+        if (get_type(dataframe[col_x]) == DataType.TYPE_CAT)
+        else (col_y, col_x)
     )
 
     if col_y is None:
@@ -208,7 +212,9 @@ def _calc_hist_by_group(
     np.array : An array of values representing histogram for the input col
     """
     col_cat, col_num = (
-        (col_x, col_y) if (get_type(dataframe[col_x]) == DataType.TYPE_CAT) else (col_y, col_x)
+        (col_x, col_y)
+        if (get_type(dataframe[col_x]) == DataType.TYPE_CAT)
+        else (col_y, col_x)
     )
 
     grp_hist: Dict[str, Tuple[Any, Any]] = dict()
@@ -279,7 +285,9 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
 
     miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
 
-    return Intermediate({"histogram": (hist_array, bins), "missing": [miss_vals]}, raw_data)
+    return Intermediate(
+        {"histogram": (hist_array, bins), "missing": [miss_vals]}, raw_data
+    )
 
 
 def _calc_qqnorm(df: dd.DataFrame, col_x: str) -> Intermediate:
@@ -298,7 +306,9 @@ def _calc_qqnorm(df: dd.DataFrame, col_x: str) -> Intermediate:
     actual_ys = np.sort(np.asarray(y_points))
     actual_ys = sample_n(actual_ys, 100)
     result_dict = dict(theory=theory_ys, sample=actual_ys)
-    return Intermediate({"qqnorm_plot": result_dict}, {"df": df, "col_x": col_x, "col_y": None})
+    return Intermediate(
+        {"qqnorm_plot": result_dict}, {"df": df, "col_x": col_x, "col_y": None}
+    )
 
 
 def _calc_hist_kde(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
@@ -310,7 +320,9 @@ def _calc_hist_kde(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
     """
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None}
     # hist = _calc_hist(dataframe, col_x)
-    return Intermediate({"kde_plot": np.array(dask.compute(dataframe[col_x])[0])}, raw_data)
+    return Intermediate(
+        {"kde_plot": np.array(dask.compute(dataframe[col_x])[0])}, raw_data
+    )
 
 
 def plot_df(
@@ -387,7 +399,9 @@ def plot(
                 values.append(x)
         pd_data_frame[column] = values
     """
-    data_frame: dd.DataFrame = dd.from_pandas(pd_data_frame, npartitions=DEFAULT_PARTITIONS)
+    data_frame: dd.DataFrame = dd.from_pandas(
+        pd_data_frame, npartitions=DEFAULT_PARTITIONS
+    )
 
     list_of_intermediates: List[Intermediate] = list()
 
@@ -457,6 +471,8 @@ def plot(
 
     if col_x is None and col_y is None:
         Render.vizualise(Render(**kwrgs), plot_df(data_frame, force_cat, force_num))
-        return plot_df(data_frame, force_cat, force_num)  # if kwrgs.get("return_result") else None
+        return plot_df(
+            data_frame, force_cat, force_num
+        )  # if kwrgs.get("return_result") else None
 
     return list_of_intermediates
