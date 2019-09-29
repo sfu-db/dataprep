@@ -23,8 +23,8 @@ class Render:
     def __init__(  # pylint: disable=too-many-arguments
         self,
         plot_height: int = 300,
-        plot_width: int = 350,
-        ncolumns: int = 5,
+        plot_width: int = 324,
+        ncolumns: int = 3,
         band_width: float = 1.5,
         tile_size: Optional[float] = None,
         n_bars: int = 10,
@@ -66,7 +66,9 @@ class Render:
 
             if col_y is None:
                 if "histogram" in data_dict:
-                    fig = delayed(self.viz_uni.hist_viz)(data_dict["histogram"], col_x)
+                    fig = delayed(self.viz_uni.hist_viz)(
+                        data_dict["histogram"], data_dict["missing"], col_x
+                    )
                     plots.append(fig)
                 elif "box_plot" in data_dict:
                     fig = delayed(self.viz_uni.box_viz)(data_dict["box_plot"], col_x)
@@ -78,7 +80,7 @@ class Render:
                     plots.append(fig)
                 elif "bar_plot" in data_dict:
                     fig = delayed(self.viz_uni.bar_viz)(
-                        data_dict["bar_plot"], col_x, self.n_bars
+                        data_dict["bar_plot"], data_dict["missing"], col_x, self.n_bars
                     )
                     plots.append(fig)
                 elif "pie_plot" in data_dict:

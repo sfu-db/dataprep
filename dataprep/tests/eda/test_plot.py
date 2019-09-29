@@ -16,7 +16,6 @@ LOGGER = logging.getLogger(__name__)
 
 def test_normal_1() -> None:
     """
-
     :return:
     """
     # TEST - 1 for plot(df)
@@ -55,39 +54,43 @@ def test_normal_1() -> None:
 
     df_1 = pd.DataFrame(data_1)
 
-    df_1_expected: Dict[str, Dict[str, Union[Dict[Any, Any], Tuple[Any, Any]]]] = {
-        "bool_01": {"bar_plot": {0: 4, 1: 5}},
-        "bool_01_with_nan": {"bar_plot": {0.0: 4, 1.0: 4}},
-        "bool_tf": {"bar_plot": {False: 3, True: 6}},
-        "bool_tf_with_nan": {"bar_plot": {False: 5, True: 3}},
-        "s1": {"bar_plot": {1.0: 9}},
+    df_1_expected: Dict[
+        str, Dict[str, Union[Dict[Any, Any], Tuple[Any, Any], List[int]]]
+    ] = {
+        "bool_01": {"bar_plot": {0: 4, 1: 5}, "missing": [0]},
+        "bool_01_with_nan": {"bar_plot": {0.0: 4, 1.0: 4}, "missing": [1]},
+        "bool_tf": {"bar_plot": {False: 3, True: 6}, "missing": [0]},
+        "bool_tf_with_nan": {"bar_plot": {False: 5, True: 3}, "missing": [1]},
+        "s1": {"bar_plot": {1.0: 9}, "missing": [0]},
         "x": {
             "histogram": (
                 np.array([1, 3, 1, 0, 1, 0, 0, 0, 0, 2], dtype=np.int64),
                 np.array(
                     [-10.0, -4.0, 2.0, 8.0, 14.0, 20.0, 26.0, 32.0, 38.0, 44.0, 50.0]
                 ),
-            )
+            ),
+            "missing": [1],
         },
         "y": {
             "histogram": (
                 np.array([6, 0, 1, 0, 0, 0, 0, 0, 0, 1], dtype=np.int64),
                 np.array(
                     [
-                        -3.14159265,
-                        309.37256661,
-                        621.88672588,
-                        934.40088514,
-                        1246.91504441,
-                        1559.42920367,
-                        1871.94336294,
-                        2184.4575222,
-                        2496.97168147,
-                        2809.48584073,
+                        -3.14,
+                        309.37,
+                        621.89,
+                        934.4,
+                        1246.92,
+                        1559.43,
+                        1871.94,
+                        2184.46,
+                        2496.97,
+                        2809.49,
                         3122.0,
                     ]
                 ),
-            )
+            ),
+            "missing": [1],
         },
     }
     returned_1: List[Intermediate] = plot(
