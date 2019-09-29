@@ -66,9 +66,9 @@ class Render:
 
             if col_y is None:
                 if "histogram" in data_dict:
-                    fig = delayed(self.viz_uni.hist_viz)(data_dict["histogram"],
-                                                         data_dict["missing"],
-                                                         col_x)
+                    fig = delayed(self.viz_uni.hist_viz)(
+                        data_dict["histogram"], data_dict["missing"], col_x
+                    )
                     plots.append(fig)
                 elif "box_plot" in data_dict:
                     fig = delayed(self.viz_uni.box_viz)(data_dict["box_plot"], col_x)
@@ -79,10 +79,9 @@ class Render:
                     )
                     plots.append(fig)
                 elif "bar_plot" in data_dict:
-                    fig = delayed(self.viz_uni.bar_viz)(data_dict["bar_plot"],
-                                                        data_dict["missing"],
-                                                        col_x,
-                                                        self.n_bars)
+                    fig = delayed(self.viz_uni.bar_viz)(
+                        data_dict["bar_plot"], data_dict["missing"], col_x, self.n_bars
+                    )
                     plots.append(fig)
                 elif "pie_plot" in data_dict:
                     fig = delayed(self.viz_uni.pie_viz)(data_dict["pie_plot"], col_x)
