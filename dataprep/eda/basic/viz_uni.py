@@ -5,7 +5,7 @@ This module implements functions for plotting visualizations for a single field.
 # pylint: disable=R0903
 # pylint: disable=R0914
 import math
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, List
 
 import bokeh.palettes as bp
 import holoviews as hv
@@ -94,7 +94,7 @@ class UniViz:
         self.pie = True
         return plot_figure
 
-    def bar_viz(self, data: Dict[Any, Any], col_x: str, n_bars: int) -> Any:
+    def bar_viz(self, data: Dict[Any, Any], missing: List[int], col_x: str, n_bars: int) -> Any:
         """
         Bar chart vizualisation for the categorical data
         :param data: the result from the intermediate
@@ -102,7 +102,7 @@ class UniViz:
         :param n_bars: the number of bars to show in plot
         :return: Bokeh plot figure
         """
-        missing = data.pop("Missing_values", None)
+        miss_cnt = missing[0]
         data_sorted = sorted(data.items(), key=lambda x: x[1], reverse=True)[0:n_bars]
         cat_list = [
             (str(x[0])[: (self.max_xlab_len - 1)] + "...")
@@ -111,12 +111,12 @@ class UniViz:
             for x in data_sorted
         ]
         data_source = pd.DataFrame({"count": [i[1] for i in data_sorted], "cat": cat_list})
-        total = sum([y for (x, y) in data.items()]) + missing
+        total = sum([y for (x, y) in data.items()]) + miss_cnt
         data_source["percen"] = data_source["count"] / total * 100
         interm = ColumnDataSource(data_source)
-        if missing > 0:
-            missing_percent = round(missing / total * 100, 1)
-            title = "{} ({}% missing values)".format(col_x, missing_percent)
+        if miss_cnt > 0:
+            miss_perc = round(miss_cnt / total * 100, 1)
+            title = "{} ({}% missing values)".format(col_x, miss_perc)
         else:
             title = "{}".format(col_x)
         plot_figure = figure(
@@ -153,10 +153,10 @@ class UniViz:
                 data_source.shape[0], len(data.items())
             )
 
-        self.bar = True
+        self.barplot = True
         return plot_figure
 
-    def hist_viz(self, data: Tuple[np.array, np.array], col_x: str) -> Any:
+    def hist_viz(self, data: Tuple[np.array, np.array], missing: List[int], col_x: str) -> Any:
         """
         Histogram for a column
         :param data: intermediate result
@@ -167,14 +167,13 @@ class UniViz:
         """
         hist_array = data[0]
         bins_array = data[1]
+        miss_cnt = missing[0]
         hist_sum = np.sum(hist_array)
-        if len(bins_array) == len(hist_array):
-            na = hist_array[-1]
-            percent_na = np.round((na / hist_sum) * 100, 1)
-            hist_array = hist_array[:-1]
+        if miss_cnt > 0:
+            miss_perc = np.round(miss_cnt / (hist_sum + miss_cnt) * 100, 1)
             plot_figure = figure(
                 tools=TOOLS,
-                title="{} ({}% missing values)".format(col_x, percent_na),
+                title="{} ({}% missing values)".format(col_x, miss_perc),
                 toolbar_location=None,
             )
         else:
