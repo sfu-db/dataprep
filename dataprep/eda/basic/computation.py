@@ -189,8 +189,9 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
     dict : A dict of (category : count) for the input col
     """
     grp_object = dask.compute(dataframe.groupby([col_x])[col_x].count())[0]
+    miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None}
-    result = {"bar_plot": dict(grp_object)}
+    result = {"bar_plot": dict(grp_object), "missing": [miss_vals]}
     return Intermediate(result, raw_data)
 
 
@@ -234,7 +235,7 @@ def _calc_hist_by_group(
         grp_hist[zipped_element[0]] = zipped_element[1]
 
     return Intermediate(
-        {"histogram": grp_hist},
+        {"histogram": grp_hist, "missing": [0]},
         {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": nbins},
     )
 
@@ -254,7 +255,6 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
     np.array : An array of values representing histogram for the input col
     """
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None, "bins": nbins}
-    # values = dask.compute(dataframe[col_x].values)[0]
     if dask.compute(dataframe[col_x].size)[0] == 0:
         return Intermediate({"histogram": (list(), list())}, raw_data)
 
@@ -274,7 +274,20 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
         maxv = 0 if np.isnan(dframe.max()) else dframe.max()
         hist_array, bins = np.histogram(dframe, bins=nbins, range=[minv, maxv])
 
-    return Intermediate({"histogram": (hist_array, bins)}, raw_data)
+    if dask.compute(np.issubdtype(dataframe[col_x], np.int64))[0]:
+        bins_temp = [int(x) for x in np.ceil(bins)]
+        if len(bins_temp) != len(set(bins_temp)):
+            bins = [round(x, 2) for x in bins]
+        else:
+            bins = bins_temp
+    else:
+        bins = [round(x, 2) for x in bins]
+
+    miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
+
+    return Intermediate(
+        {"histogram": (hist_array, bins), "missing": [miss_vals]}, raw_data
+    )
 
 
 def _calc_qqnorm(df: dd.DataFrame, col_x: str) -> Intermediate:
