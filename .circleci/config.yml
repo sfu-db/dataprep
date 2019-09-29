@@ -19,7 +19,10 @@ jobs:
           no_output_timeout: 1200
       - run:
           name: Plot tool versions
-          command: pipenv run mypy --version & pipenv run pytype --version && pipenv run pylint --version && pipenv run pytest --version
+          command: pipenv run mypy --version & pipenv run pytype --version && pipenv run pylint --version && pipenv run pytest --version && pipenv run black --version
+      - run:
+          name: Check if the code is formatted
+          command: pipenv run black --check --quiet dataprep
       - run:
           name: Type check the project
           command: pipenv run pytype dataprep && pipenv run mypy dataprep
