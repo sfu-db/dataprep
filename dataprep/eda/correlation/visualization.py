@@ -106,27 +106,15 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
         warnings.warn("The spearman correlation matrix is empty")
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
-        tools=[hover],
-        cmap=BIPALETTE,
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
+        tools=[hover], cmap=BIPALETTE, colorbar=True, width=params["width"], toolbar="above"
     )
     heatmap_s = hv.HeatMap(data_s).redim.range(z=(-1, 1))
     heatmap_s.opts(
-        tools=[hover],
-        cmap=BIPALETTE,
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
+        tools=[hover], cmap=BIPALETTE, colorbar=True, width=params["width"], toolbar="above"
     )
     heatmap_k = hv.HeatMap(data_k).redim.range(z=(-1, 1))
     heatmap_k.opts(
-        tools=[hover],
-        cmap=BIPALETTE,
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
+        tools=[hover], cmap=BIPALETTE, colorbar=True, width=params["width"], toolbar="above"
     )
     fig_p = hv.render(heatmap_p, backend="bokeh")
     fig_s = hv.render(heatmap_s, backend="bokeh")
@@ -141,9 +129,7 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     return tabs
 
 
-def _vis_correlation_pd_x_y_k(
-    intermediate: Intermediate, params: Dict[str, Any]
-) -> Figure:
+def _vis_correlation_pd_x_y_k(intermediate: Intermediate, params: Dict[str, Any]) -> Figure:
     """
     :param intermediate: An object to encapsulate the
     intermediate results.
@@ -155,11 +141,7 @@ def _vis_correlation_pd_x_y_k(
     data_y_sample = result["data_y_sample"]
     tooltips = [("x", "@x"), ("y", "@y")]
     hover = HoverTool(tooltips=tooltips, names=["dec", "inc"])
-    fig = figure(
-        plot_width=params["plot_width"],
-        plot_height=params["plot_height"],
-        tools=[hover],
-    )
+    fig = figure(plot_width=params["plot_width"], plot_height=params["plot_height"], tools=[hover])
     sample_x = np.linspace(min(data_x), max(data_x), 100)
     sample_y = result["line_a"] * sample_x + result["line_b"]
     fig.circle(
@@ -216,11 +198,7 @@ def _vis_cross_table(intermediate: Intermediate, params: Dict[str, Any]) -> Figu
     hover = HoverTool(tooltips=tooltips)
     heatmap = hv.HeatMap(data)
     heatmap.opts(
-        tools=[hover],
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
-        title="cross_table",
+        tools=[hover], colorbar=True, width=params["width"], toolbar="above", title="cross_table"
     )
     fig = hv.render(heatmap, backend="bokeh")
     _discard_unused_visual_elems(fig)
