@@ -97,8 +97,12 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
         data_k.append((x_name, result["col_k"][i], result["kendall"][i]))
     tooltips = [("x", "@x"), ("y", "@y"), ("z", "@z")]
     hover = HoverTool(tooltips=tooltips)
-    if not data_p or not data_k or not data_s:
-        raise Warning("The result is empty")
+    if not data_p:
+        print("Warning: The pearson correlation matrix is empty")
+    if not data_k:
+        print("Warning: The kendall correlation matrix is empty")
+    if not data_s:
+        print("Warning: The spearman correlation matrix is empty")
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
         tools=[hover],
