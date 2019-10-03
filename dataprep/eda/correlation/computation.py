@@ -121,16 +121,13 @@ def _calc_correlation_pd_k(pd_data_frame: pd.DataFrame, k: int) -> Any:
         corr_matrix = intermediate_pd.result["corr_" + method[0]]
         matrix_row, _ = np.shape(corr_matrix)
         corr_matrix_re = np.reshape(np.triu(corr_matrix, 1), (matrix_row * matrix_row,))
-        idx = np.argsort(corr_matrix_re)
+        idx = np.argsort(np.absolute(corr_matrix_re))
         mask = np.zeros(shape=(matrix_row * matrix_row,))
         for i in range(k):
-            if corr_matrix_re[idx[i]] < 0:
-                mask[idx[i]] = 1
-            if corr_matrix_re[idx[-i - 1]] > 0:
-                mask[idx[-i - 1]] = 1
+            mask[idx[-i - 1]] = 1
         corr_matrix = np.multiply(corr_matrix_re, mask)
         corr_matrix = np.reshape(corr_matrix, (matrix_row, matrix_row))
-        corr_matrix += corr_matrix.T - np.diag(corr_matrix.diagonal())
+        corr_matrix = corr_matrix.T
         result["corr_" + method[0]] = corr_matrix
         result["mask_" + method[0]] = mask
     raw_data = {"df": pd_data_frame, "method_list": method_list, "k": k}
