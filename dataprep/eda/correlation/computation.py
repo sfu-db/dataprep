@@ -425,8 +425,18 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     line_a, line_b = np.linalg.lstsq(
         np.vstack([data_x, np.ones(len(data_x))]).T, data_y, rcond=None
     )[0]
+
+    sample_array = np.random.choice(len(data_x), int(len(data_x) / 10))
+    data_x_sample = data_x[sample_array]
+    data_y_sample = data_y[sample_array]
     if k is None:
-        result = {"corr": corr, "line_a": line_a, "line_b": line_b}
+        result = {
+            "corr": corr,
+            "line_a": line_a,
+            "line_b": line_b,
+            "data_x_sample": data_x_sample,
+            "data_y_sample": data_y_sample
+        }
         raw_data = {"df": pd_data_frame, "x_name": x_name, "y_name": y_name, "k": k}
         intermediate = Intermediate(result, raw_data)
         return intermediate
@@ -437,34 +447,41 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     inc_point_y = []
     dec_point_x = []
     dec_point_y = []
-    for i in range(len(data_x)):
-        data_x_sel = np.append(data_x[:i], data_x[i + 1 :])  # TODO: Avoid copy
-        data_y_sel = np.append(data_y[:i], data_y[i + 1 :])
+    data_mask = np.array([True for _, _ in enumerate(data_x_sample)], dtype=bool)
+    for i in range(len(data_x_sample)):
+        data_mask[i] = False
+        data_x_sel = data_x_sample[data_mask]
+        data_y_sel = data_y_sample[data_mask]
         corr_sel = np.corrcoef(data_x_sel, data_y_sel)[1, 0]
         diff_inc.append(corr_sel - corr)
         diff_dec.append(corr - corr_sel)
+        data_mask[i] = True
     diff_inc_sort = np.argsort(diff_inc)
     diff_dec_sort = np.argsort(diff_dec)
     inc_point_x.append(
-        data_x[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_x_sample[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     inc_point_y.append(
-        data_y[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_y_sample[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     dec_point_x.append(
-        data_x[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_x_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     dec_point_y.append(
-        data_y[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_y_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
+    data_x_sample = np.delete(data_x_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None)
+    data_y_sample = np.delete(data_y_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None)
     result = {
         "corr": corr,
+        "line_a": line_a,
+        "line_b": line_b,
+        "data_x_sample": data_x_sample,
+        "data_y_sample": data_y_sample,
         "dec_point_x": dec_point_x,
         "dec_point_y": dec_point_y,
         "inc_point_x": inc_point_x,
         "inc_point_y": inc_point_y,
-        "line_a": line_a,
-        "line_b": line_b,
     }
     raw_data = {"df": pd_data_frame, "x_name": x_name, "y_name": y_name, "k": k}
     intermediate = Intermediate(result, raw_data)

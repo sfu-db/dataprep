@@ -3,6 +3,7 @@
     plot_correlation(df) function
 """
 import math
+import sys
 from typing import Any, Dict
 
 import holoviews as hv
@@ -50,7 +51,7 @@ def _vis_correlation_pd(  # pylint: disable=too-many-locals
                     data.append((name_list[i], name_list[j], corr_matrix[i, j]))
                 else:
                     data.append((name_list[i], name_list[j], np.nan))
-        tooltips = [("x", "@x"), ("y", "@y"), ("z", "@z")]
+        tooltips = [("name", "@x"), ("name", "@y"), ("correlation", "@z")]
         hover = HoverTool(tooltips=tooltips)
         heatmap = hv.HeatMap(data).redim.range(z=(-1, 1))
         heatmap.opts(
@@ -95,14 +96,14 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
         data_s.append((x_name, result["col_s"][i], result["spearman"][i]))
     for i, _ in enumerate(result["col_k"]):
         data_k.append((x_name, result["col_k"][i], result["kendall"][i]))
-    tooltips = [("x", "@x"), ("y", "@y"), ("z", "@z")]
+    tooltips = [("name", "@x"), ("name", "@y"), ("correlation", "@z")]
     hover = HoverTool(tooltips=tooltips)
     if not data_p:
-        print("Warning: The pearson correlation matrix is empty")
+        print("Warning: The pearson correlation matrix is empty", file=sys.stderr)
     if not data_k:
-        print("Warning: The kendall correlation matrix is empty")
+        print("Warning: The kendall correlation matrix is empty", file=sys.stderr)
     if not data_s:
-        print("Warning: The spearman correlation matrix is empty")
+        print("Warning: The spearman correlation matrix is empty", file=sys.stderr)
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
         tools=[hover],
@@ -149,8 +150,9 @@ def _vis_correlation_pd_x_y_k(
     :return: A figure object
     """
     data_x = intermediate.raw_data["df"][intermediate.raw_data["x_name"]].values
-    data_y = intermediate.raw_data["df"][intermediate.raw_data["y_name"]].values
     result = intermediate.result
+    data_x_sample = result["data_x_sample"]
+    data_y_sample = result["data_y_sample"]
     tooltips = [("x", "@x"), ("y", "@y")]
     hover = HoverTool(tooltips=tooltips, names=["dec", "inc"])
     fig = figure(
@@ -158,25 +160,36 @@ def _vis_correlation_pd_x_y_k(
         plot_height=params["plot_height"],
         tools=[hover],
     )
-    sample_x = np.linspace(min(data_x), max(data_y), 100)
+    sample_x = np.linspace(min(data_x), max(data_x), 100)
     sample_y = result["line_a"] * sample_x + result["line_b"]
-    fig.circle(data_x, data_y, size=params["size"], color="navy", alpha=params["alpha"])
+    fig.circle(
+        x=data_x_sample,
+        y=data_y_sample,
+        size=params["size"],
+        color="navy",
+        alpha=params["alpha"],
+        name="all",
+    )
     if intermediate.raw_data["k"] is not None:
-        for name, color in [("dec", "black"), ("inc", "red")]:
+        for name, color in [("inc", "red"), ("dec", "black")]:
             if name == "inc":
                 legend_name = "most influential (+)"
             else:
                 legend_name = "most influential (-)"
             fig.circle(
-                result[f"{name}_point_x"],
-                result[f"{name}_point_y"],
+                x=result[f"{name}_point_x"][0],
+                y=result[f"{name}_point_y"][0],
                 legend=legend_name,
                 size=params["size"],
                 color=color,
                 alpha=params["alpha"],
                 name=name,
             )
-    fig.line(sample_x, sample_y, line_width=3)
+    fig.line(
+        x=sample_x,
+        y=sample_y,
+        line_width=3,
+    )
     fig.toolbar_location = None
     fig.toolbar.active_drag = None
     title = Title()
