@@ -39,6 +39,8 @@ def __calc_box_stats(grp_series: dask.dataframe.core.Series) -> Dict[str, Any]:
         np.round(quantiles[0.75], 2),
     )
     stats["iqr"] = stats["sf"] - stats["tf"]
+    stats["lw"] = grp_series[grp_series > stats["tf"] - 1.5 * stats["iqr"]].min()
+    stats["uw"] = grp_series[grp_series < stats["sf"] + 1.5 * stats["iqr"]].max()
 
     if len(grp_series) == 1:
         val = grp_series.reset_index().iloc[0, 1]
@@ -196,7 +198,7 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
 
 
 def _calc_hist_by_group(
-    dataframe: dd.DataFrame, col_x: str, col_y: str, nbins: int = 10
+    dataframe: dd.DataFrame, col_x: str, col_y: str, bins: int = 10
 ) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
@@ -206,6 +208,7 @@ def _calc_hist_by_group(
     dataframe : the input pandas dataframe
     col : the str column of dataframe for which hist array needs to be
     calculated
+    bins : number of bins to use in the histogram
 
     Returns
     __________
@@ -225,7 +228,7 @@ def _calc_hist_by_group(
         grp_series = dataframe.groupby([col_cat]).get_group(group)[col_num]
         minv = dask.compute(grp_series.min())[0]
         maxv = dask.compute(grp_series.max())[0]
-        hist = da.histogram(grp_series, range=[minv, maxv], bins=nbins)
+        hist = da.histogram(grp_series, range=[minv, maxv], bins=bins)
         hist_interm.append(hist)
         grp_name_list.append(group)
 
@@ -236,11 +239,13 @@ def _calc_hist_by_group(
 
     return Intermediate(
         {"histogram": grp_hist, "missing": [0]},
-        {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": nbins},
+        {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": bins},
     )
 
 
-def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermediate:
+def _calc_hist(
+    dataframe: dd.DataFrame, col_x: str, inp_spec: Tuple[int, bool], bins: int = 10
+) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
 
@@ -249,12 +254,15 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
     dataframe : the input pandas dataframe
     col : the str column of dataframe for which hist array needs to be
     calculated
+    inp_spec : The input specifications (1) length of original dataset
+    and (2) True if plot(df, x)
+    bins : number of bins to use in the histogram
 
     Returns
     __________
     np.array : An array of values representing histogram for the input col
     """
-    raw_data = {"df": dataframe, "col_x": col_x, "col_y": None, "bins": nbins}
+    raw_data = {"df": dataframe, "col_x": col_x, "col_y": None, "bins": bins}
     if dask.compute(dataframe[col_x].size)[0] == 0:
         return Intermediate({"histogram": (list(), list())}, raw_data)
 
@@ -263,30 +271,35 @@ def _calc_hist(dataframe: dd.DataFrame, col_x: str, nbins: int = 10) -> Intermed
 
     dframe = dataframe[col_x].dropna().values
     hist_array = None
-    bins = None
+    bins_array = None
 
     if isinstance(dframe, dask.array.core.Array):
-        hist_array, bins = da.histogram(dframe, range=[minv, maxv], bins=nbins)
+        hist_array, bins_array = da.histogram(dframe, range=[minv, maxv], bins=bins)
         hist_array, = dask.compute(hist_array)
     elif isinstance(dframe, np.ndarray):
         dframe, = dask.compute(dframe)
         minv = 0 if np.isnan(dframe.min()) else dframe.min()
         maxv = 0 if np.isnan(dframe.max()) else dframe.max()
-        hist_array, bins = np.histogram(dframe, bins=nbins, range=[minv, maxv])
+        hist_array, bins_array = np.histogram(dframe, bins=bins, range=[minv, maxv])
 
     if dask.compute(np.issubdtype(dataframe[col_x], np.int64))[0]:
-        bins_temp = [int(x) for x in np.ceil(bins)]
+        bins_temp = [int(x) for x in np.ceil(bins_array)]
         if len(bins_temp) != len(set(bins_temp)):
-            bins = [round(x, 2) for x in bins]
+            bins_array = [round(x, 2) for x in bins_array]
         else:
-            bins = bins_temp
+            bins_array = bins_temp
     else:
-        bins = [round(x, 2) for x in bins]
+        bins_array = [round(x, 2) for x in bins_array]
 
     miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
 
     return Intermediate(
-        {"histogram": (hist_array, bins), "missing": [miss_vals]}, raw_data
+        {
+            "histogram": (hist_array, bins_array),
+            "missing": [miss_vals],
+            "inp_spec": inp_spec,
+        },
+        raw_data,
     )
 
 
@@ -327,12 +340,15 @@ def _calc_hist_kde(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
 
 def plot_df(
     data_frame: dd.DataFrame,
+    inp_spec: Tuple[int, bool],
     force_cat: Optional[StringList] = None,
     force_num: Optional[StringList] = None,
 ) -> List[Intermediate]:
     """
     Supporting funtion to the main plot function
     :param data_frame: dask dataframe
+    :param inp_spec: input specifications (1) length of original
+    data set and (2) True if plot(df, x)
     :param force_cat: list of categorical columns defined explicitly
     :param force_num: list of numerical columns defined explicitly
     :return:
@@ -356,7 +372,7 @@ def plot_df(
             force_num is not None and col in force_num
         ):
             # print("df, hist", type(data_frame))
-            hist = dask.delayed(_calc_hist)(data_frame, col)
+            hist = dask.delayed(_calc_hist)(data_frame, col, inp_spec)
             dask_result.append(hist)
             col_list.append(col)
 
@@ -370,8 +386,12 @@ def plot(
     col_y: Optional[str] = None,
     force_cat: Optional[StringList] = None,
     force_num: Optional[StringList] = None,
-    **kwrgs: int
+    bins: int = 10,
+    value_range: Optional[Tuple[float, float]] = None,
+    **kwrgs: Any
 ) -> List[Intermediate]:
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals
     """
     Returns an intermediate representation for the plots of
         different columns in the data_frame.
@@ -383,6 +403,8 @@ def plot(
     col_y : A column in the data_frame.
     force_cat: the list of columns which have to considered of type "TYPE_CAT"
     force_num: the list of columns which have to considered of type "TYPE_NUM"
+    bins: the number of bins to show for the plot(df, x) histogram
+    value_range: the range of values to plot in the plot(df, x) histogram
     kwargs : TO-DO
 
     Returns
@@ -405,6 +427,26 @@ def plot(
 
     list_of_intermediates: List[Intermediate] = list()
 
+    init_len = len(data_frame)
+    if (
+        col_x is not None
+        and value_range is not None
+        and get_type(data_frame[col_x]) is DataType.TYPE_NUM
+    ):
+        assert value_range[0] <= np.nanmax(
+            data_frame[col_x]
+        ), "Lower bound greater than maximum number"
+        assert value_range[1] >= np.nanmin(
+            data_frame[col_x]
+        ), "Upper bound less than minimum number"
+        assert (
+            value_range[0] < value_range[1]
+        ), "Lower bound must be greater than upper bound"
+        data_frame = data_frame[
+            (data_frame[col_x] >= value_range[0])
+            & (data_frame[col_x] <= value_range[1])
+        ]
+
     if (col_x is None and col_y is not None) or (col_x is not None and col_y is None):
 
         target_col: str = cast(str, col_x if col_y is None else col_y)
@@ -416,7 +458,6 @@ def plot(
         elif get_type(data_frame[target_col]) == DataType.TYPE_CAT or (
             force_cat is not None and target_col in force_cat
         ):
-
             # BAR_PLOT
             dask_result.append(_calc_bar(data_frame, target_col))
 
@@ -426,8 +467,12 @@ def plot(
         elif get_type(data_frame[target_col]) == DataType.TYPE_NUM or (
             force_num is not None and target_col in force_num
         ):
-
             # HISTOGRAM
+            dask_result.append(
+                _calc_hist(data_frame, target_col, (init_len, True), bins)
+            )
+
+            # KDE_PLOT
             dask_result.append(_calc_hist_kde(data_frame, target_col))
 
             # BOX_PLOT
@@ -470,9 +515,12 @@ def plot(
             LOGGER.info("Plot could not be obtained due to : %s", error)
 
     if col_x is None and col_y is None:
-        Render.vizualise(Render(**kwrgs), plot_df(data_frame, force_cat, force_num))
+        Render.vizualise(
+            Render(**kwrgs),
+            plot_df(data_frame, (init_len, False), force_cat, force_num),
+        )
         return plot_df(
-            data_frame, force_cat, force_num
+            data_frame, (init_len, False), force_cat, force_num
         )  # if kwrgs.get("return_result") else None
 
     return list_of_intermediates
