@@ -471,10 +471,20 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
         data_y_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     data_x_sample = np.delete(
-        data_x_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None
+        data_x_sample,  # pylint: disable=invalid-unary-operand-type
+        np.append(
+            diff_inc_sort[-k:],  # pylint: disable=invalid-unary-operand-type
+            diff_dec_sort[-k:],  # pylint: disable=invalid-unary-operand-type
+        ),
+        None,
     )
     data_y_sample = np.delete(
-        data_y_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None
+        data_y_sample,  # pylint: disable=invalid-unary-operand-type
+        np.append(
+            diff_inc_sort[-k:],  # pylint: disable=invalid-unary-operand-type
+            diff_dec_sort[-k:],  # pylint: disable=invalid-unary-operand-type
+        ),
+        None,
     )
     result = {
         "corr": corr,
