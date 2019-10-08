@@ -435,7 +435,7 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
             "line_a": line_a,
             "line_b": line_b,
             "data_x_sample": data_x_sample,
-            "data_y_sample": data_y_sample
+            "data_y_sample": data_y_sample,
         }
         raw_data = {"df": pd_data_frame, "x_name": x_name, "y_name": y_name, "k": k}
         intermediate = Intermediate(result, raw_data)
@@ -470,8 +470,12 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     dec_point_y.append(
         data_y_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
-    data_x_sample = np.delete(data_x_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None)
-    data_y_sample = np.delete(data_y_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None)
+    data_x_sample = np.delete(
+        data_x_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None
+    )
+    data_y_sample = np.delete(
+        data_y_sample, np.append(diff_inc_sort[-k:], diff_dec_sort[-k:]), None
+    )
     result = {
         "corr": corr,
         "line_a": line_a,
