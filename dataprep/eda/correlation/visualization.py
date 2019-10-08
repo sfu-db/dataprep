@@ -185,11 +185,7 @@ def _vis_correlation_pd_x_y_k(
                 alpha=params["alpha"],
                 name=name,
             )
-    fig.line(
-        x=sample_x,
-        y=sample_y,
-        line_width=3,
-    )
+    fig.line(x=sample_x, y=sample_y, line_width=3)
     fig.toolbar_location = None
     fig.toolbar.active_drag = None
     title = Title()
