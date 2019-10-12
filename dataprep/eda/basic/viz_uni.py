@@ -56,7 +56,10 @@ class UniViz:
         """
         Pie chart vizualisation for categorical data
         :param data: the result from the intermediate
-        :param name: the name of the field
+        :param col_x: the plotted column
+        :param bars: number of slices to show in the pie
+        :param ascending: if True plot smallest to largest slices of pie,
+        else plot largest to smallest
         :return: Bokeh plot figure
         """
         chart_radius = 0.62
@@ -132,8 +135,11 @@ class UniViz:
         """
         Bar chart vizualisation for the categorical data
         :param data: the result from the intermediate
+        :param missing: number of missing values in column
         :param col_x: the name of the field
         :param bars: the number of bars to show in plot
+        :param ascending: if True show bars plotted in ascending order,
+        else show bars plotted in descending order
         :return: Bokeh plot figure
         """
         miss_cnt = missing[0]
@@ -201,25 +207,25 @@ class UniViz:
         self,
         data: Tuple[np.array, np.array],
         missing: List[int],
-        inp_spec: Tuple[int, bool],
+        orig_df_len: int,
+        yaxis_labels: bool,
         col_x: str,
         yscale: str,
     ) -> Any:
         """
         Histogram for a column
         :param data: intermediate result
+        :param missing: the number of missing values
+        :param orig_df_len: the original dataframe length
+        :param yaxis_labels: if True show y axis labels
         :param col_x: name of the column
-        :param n_bins: max number of bins to show
-        :param element_color: color of bins
         :return: Bokeh Plot Figure
         """
         hist_array = data[0]
         bins_array = data[1]
         miss_cnt = missing[0]
-        init_len = inp_spec[0]
-        plot_df_x = inp_spec[1]
         if miss_cnt > 0:
-            miss_perc = np.round(miss_cnt / init_len * 100, 1)
+            miss_perc = np.round(miss_cnt / orig_df_len * 100, 1)
             title = "{} ({}% missing values)".format(col_x, miss_perc)
         else:
             title = "{}".format(col_x)
@@ -233,7 +239,7 @@ class UniViz:
                 "left": bins_array[:-1],
                 "right": bins_array[1:],
                 "freq": hist_array,
-                "percen": hist_array / init_len * 100,
+                "percen": hist_array / orig_df_len * 100,
             }
         )
         interm = ColumnDataSource(data_source)
@@ -265,7 +271,7 @@ class UniViz:
         plot_figure.yaxis.axis_label = "Frequency"
         plot_figure.title.text_font_size = "10pt"
         plot_figure.xaxis.ticker = bins_array
-        if not plot_df_x:
+        if not yaxis_labels:
             plot_figure.yaxis.major_label_text_font_size = "0pt"
             plot_figure.yaxis.major_tick_line_color = None
             plot_figure.yaxis.minor_tick_line_color = None

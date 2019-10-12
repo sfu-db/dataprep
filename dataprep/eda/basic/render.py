@@ -29,7 +29,6 @@ class Render:
         tile_size: Optional[float] = None,
         bars: int = 10,
         n_pies: int = 5,
-        bins: int = 10,
         yscale: str = "linear",
         ascending: bool = False,
     ) -> None:
@@ -46,7 +45,6 @@ class Render:
         self.tile_size = tile_size  # set the tile size for the scatter plot.
         self.bars = bars  # set the max number of bars to show for bar plot.
         self.n_pies = n_pies  # set the max number of pies to show for pie plot.
-        self.bins = bins  # set the number of bins in a histogram
         self.yscale = yscale  # scale of the y axis labels for the histogram
         self.ascending = ascending  # sort the bars in a bar plot ascending
 
@@ -75,7 +73,8 @@ class Render:
                     fig = delayed(self.viz_uni.hist_viz)(
                         data_dict["histogram"],
                         data_dict["missing"],
-                        data_dict["inp_spec"],
+                        data_dict["orig_df_len"],
+                        data_dict["yaxis_labels"],
                         col_x,
                         self.yscale,
                     )

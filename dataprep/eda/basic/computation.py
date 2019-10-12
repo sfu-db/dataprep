@@ -198,7 +198,7 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
 
 
 def _calc_hist_by_group(
-    dataframe: dd.DataFrame, col_x: str, col_y: str, bins: int = 10
+    dataframe: dd.DataFrame, col_x: str, col_y: str, bins: int
 ) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
@@ -244,7 +244,7 @@ def _calc_hist_by_group(
 
 
 def _calc_hist(
-    dataframe: dd.DataFrame, col_x: str, inp_spec: Tuple[int, bool], bins: int = 10
+    dataframe: dd.DataFrame, col_x: str, orig_df_len: int, yaxis_labels: bool, bins: int
 ) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
@@ -254,8 +254,8 @@ def _calc_hist(
     dataframe : the input pandas dataframe
     col : the str column of dataframe for which hist array needs to be
     calculated
-    inp_spec : The input specifications (1) length of original dataset
-    and (2) True if plot(df, x)
+    orig_df_len : length of the original dataframe
+    yaxis_labels : show y_axis_labels in visualization if True
     bins : number of bins to use in the histogram
 
     Returns
@@ -272,7 +272,6 @@ def _calc_hist(
     dframe = dataframe[col_x].dropna().values
     hist_array = None
     bins_array = None
-
     if isinstance(dframe, dask.array.core.Array):
         hist_array, bins_array = da.histogram(dframe, range=[minv, maxv], bins=bins)
         hist_array, = dask.compute(hist_array)
@@ -297,7 +296,8 @@ def _calc_hist(
         {
             "histogram": (hist_array, bins_array),
             "missing": [miss_vals],
-            "inp_spec": inp_spec,
+            "orig_df_len": orig_df_len,
+            "yaxis_labels": yaxis_labels,
         },
         raw_data,
     )
@@ -340,17 +340,17 @@ def _calc_hist_kde(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
 
 def plot_df(
     data_frame: dd.DataFrame,
-    inp_spec: Tuple[int, bool],
+    bins: int,
     force_cat: Optional[StringList] = None,
     force_num: Optional[StringList] = None,
 ) -> List[Intermediate]:
     """
     Supporting funtion to the main plot function
     :param data_frame: dask dataframe
-    :param inp_spec: input specifications (1) length of original
     data set and (2) True if plot(df, x)
     :param force_cat: list of categorical columns defined explicitly
     :param force_num: list of numerical columns defined explicitly
+    :param bins: number of bins to show in the histogram
     :return:
     """
     col_list = list()
@@ -372,7 +372,9 @@ def plot_df(
             force_num is not None and col in force_num
         ):
             # print("df, hist", type(data_frame))
-            hist = dask.delayed(_calc_hist)(data_frame, col, inp_spec)
+            hist = dask.delayed(_calc_hist)(
+                data_frame, col, len(data_frame), False, bins
+            )
             dask_result.append(hist)
             col_list.append(col)
 
@@ -392,6 +394,7 @@ def plot(
 ) -> List[Intermediate]:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
+    # pylint: disable=too-many-branches
     """
     Returns an intermediate representation for the plots of
         different columns in the data_frame.
@@ -426,26 +429,7 @@ def plot(
     )
 
     list_of_intermediates: List[Intermediate] = list()
-
-    init_len = len(data_frame)
-    if (
-        col_x is not None
-        and value_range is not None
-        and get_type(data_frame[col_x]) is DataType.TYPE_NUM
-    ):
-        assert value_range[0] <= np.nanmax(
-            data_frame[col_x]
-        ), "Lower bound greater than maximum number"
-        assert value_range[1] >= np.nanmin(
-            data_frame[col_x]
-        ), "Upper bound less than minimum number"
-        assert (
-            value_range[0] < value_range[1]
-        ), "Lower bound must be greater than upper bound"
-        data_frame = data_frame[
-            (data_frame[col_x] >= value_range[0])
-            & (data_frame[col_x] <= value_range[1])
-        ]
+    orig_df_len = len(data_frame)
 
     if (col_x is None and col_y is not None) or (col_x is not None and col_y is None):
 
@@ -467,9 +451,21 @@ def plot(
         elif get_type(data_frame[target_col]) == DataType.TYPE_NUM or (
             force_num is not None and target_col in force_num
         ):
+            if value_range is not None:
+                if (
+                    (value_range[0] <= np.nanmax(data_frame[col_x]))
+                    and (value_range[1] >= np.nanmin(data_frame[col_x]))
+                    and (value_range[0] < value_range[1])
+                ):
+                    data_frame = data_frame[
+                        (data_frame[col_x] >= value_range[0])
+                        & (data_frame[col_x] <= value_range[1])
+                    ]
+                else:
+                    raise ValueError("Invalid range of values for this column")
             # HISTOGRAM
             dask_result.append(
-                _calc_hist(data_frame, target_col, (init_len, True), bins)
+                _calc_hist(data_frame, target_col, orig_df_len, True, bins)
             )
 
             # KDE_PLOT
@@ -498,7 +494,7 @@ def plot(
                 # BOX_PER_GROUP
                 temp_result.append(_calc_box(data_frame, col_x, col_y))
                 # HISTOGRAM_PER_GROUP
-                temp_result.append(_calc_hist_by_group(data_frame, col_x, col_y))
+                temp_result.append(_calc_hist_by_group(data_frame, col_x, col_y, bins))
 
             elif type_x == DataType.TYPE_CAT and type_y == DataType.TYPE_CAT:
                 temp_result.append(_calc_statcked(data_frame, col_x, col_y))
@@ -516,11 +512,10 @@ def plot(
 
     if col_x is None and col_y is None:
         Render.vizualise(
-            Render(**kwrgs),
-            plot_df(data_frame, (init_len, False), force_cat, force_num),
+            Render(**kwrgs), plot_df(data_frame, bins, force_cat, force_num)
         )
         return plot_df(
-            data_frame, (init_len, False), force_cat, force_num
+            data_frame, bins, force_cat, force_num
         )  # if kwrgs.get("return_result") else None
 
     return list_of_intermediates
