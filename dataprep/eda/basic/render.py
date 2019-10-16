@@ -28,7 +28,6 @@ class Render:
         band_width: float = 1.5,
         tile_size: Optional[float] = None,
         bars: int = 10,
-        n_pies: int = 5,
         yscale: str = "linear",
         ascending: bool = False,
     ) -> None:
@@ -44,7 +43,6 @@ class Render:
         self.band_width = band_width  # set the band width for the kde plot.
         self.tile_size = tile_size  # set the tile size for the scatter plot.
         self.bars = bars  # set the max number of bars to show for bar plot.
-        self.n_pies = n_pies  # set the max number of pies to show for pie plot.
         self.yscale = yscale  # scale of the y axis labels for the histogram
         self.ascending = ascending  # sort the bars in a bar plot ascending
 
@@ -74,7 +72,7 @@ class Render:
                         data_dict["histogram"],
                         data_dict["missing"],
                         data_dict["orig_df_len"],
-                        data_dict["yaxis_labels"],
+                        data_dict["show_y_label"],
                         col_x,
                         self.yscale,
                     )
