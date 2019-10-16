@@ -2,6 +2,7 @@
     This module implements the plot(df) function.
 """
 import logging
+import sys
 from typing import Any, Dict, List, Optional, Tuple, cast
 
 import dask
@@ -244,7 +245,7 @@ def _calc_hist_by_group(
 
 
 def _calc_hist(
-    dataframe: dd.DataFrame, col_x: str, orig_df_len: int, yaxis_labels: bool, bins: int
+    dataframe: dd.DataFrame, col_x: str, orig_df_len: int, show_y_label: bool, bins: int
 ) -> Intermediate:
     """Returns the histogram array for the continuous
         distribution of values in the column given as the second argument
@@ -255,7 +256,7 @@ def _calc_hist(
     col : the str column of dataframe for which hist array needs to be
     calculated
     orig_df_len : length of the original dataframe
-    yaxis_labels : show y_axis_labels in visualization if True
+    show_y_label : show y_axis_labels in visualization if True
     bins : number of bins to use in the histogram
 
     Returns
@@ -297,7 +298,7 @@ def _calc_hist(
             "histogram": (hist_array, bins_array),
             "missing": [miss_vals],
             "orig_df_len": orig_df_len,
-            "yaxis_labels": yaxis_labels,
+            "show_y_label": show_y_label,
         },
         raw_data,
     )
@@ -347,10 +348,9 @@ def plot_df(
     """
     Supporting funtion to the main plot function
     :param data_frame: dask dataframe
-    data set and (2) True if plot(df, x)
+    :param bins: number of bins to show in the histogram
     :param force_cat: list of categorical columns defined explicitly
     :param force_num: list of numerical columns defined explicitly
-    :param bins: number of bins to show in the histogram
     :return:
     """
     col_list = list()
@@ -462,7 +462,8 @@ def plot(
                         & (data_frame[col_x] <= value_range[1])
                     ]
                 else:
-                    raise ValueError("Invalid range of values for this column")
+                    print("Invalid range of values for this column", file=sys.stderr)
+                    return dask_result
             # HISTOGRAM
             dask_result.append(
                 _calc_hist(data_frame, target_col, orig_df_len, True, bins)

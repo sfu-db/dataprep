@@ -208,7 +208,7 @@ class UniViz:
         data: Tuple[np.array, np.array],
         missing: List[int],
         orig_df_len: int,
-        yaxis_labels: bool,
+        show_y_label: bool,
         col_x: str,
         yscale: str,
     ) -> Any:
@@ -217,8 +217,9 @@ class UniViz:
         :param data: intermediate result
         :param missing: the number of missing values
         :param orig_df_len: the original dataframe length
-        :param yaxis_labels: if True show y axis labels
+        :param show_y_label: if True show y axis labels
         :param col_x: name of the column
+        :param yscale: linear or logarithmic y axis
         :return: Bokeh Plot Figure
         """
         hist_array = data[0]
@@ -271,7 +272,7 @@ class UniViz:
         plot_figure.yaxis.axis_label = "Frequency"
         plot_figure.title.text_font_size = "10pt"
         plot_figure.xaxis.ticker = bins_array
-        if not yaxis_labels:
+        if not show_y_label:
             plot_figure.yaxis.major_label_text_font_size = "0pt"
             plot_figure.yaxis.major_tick_line_color = None
             plot_figure.yaxis.minor_tick_line_color = None
