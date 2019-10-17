@@ -405,7 +405,11 @@ def _calc_correlation_pd_x_k(  # pylint: disable=too-many-statements
 
 
 def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
-    pd_data_frame: pd.DataFrame, x_name: str, y_name: str, k: Optional[int] = None
+    pd_data_frame: pd.DataFrame,
+    x_name: str,
+    y_name: str,
+    sample_size: Optional[int] = 1000,
+    k: Optional[int] = None,
 ) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots
@@ -425,10 +429,21 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     line_a, line_b = np.linalg.lstsq(
         np.vstack([data_x, np.ones(len(data_x))]).T, data_y, rcond=None
     )[0]
-
-    sample_array = np.random.choice(len(data_x), int(len(data_x) / 10))
-    data_x_sample = data_x[sample_array]
-    data_y_sample = data_y[sample_array]
+    if sample_size is not None:
+        if sample_size >= 1:
+            if sample_size > len(data_x):
+                data_x_sample = data_x
+                data_y_sample = data_y
+            else:
+                sample_array = np.random.choice(len(data_x), sample_size)
+                data_x_sample = data_x[sample_array]
+                data_y_sample = data_y[sample_array]
+        elif sample_size > 0:
+            sample_array = np.random.choice(len(data_x), int(len(data_x) * sample_size))
+            data_x_sample = data_x[sample_array]
+            data_y_sample = data_y[sample_array]
+        else:
+            raise ValueError("Sample size should be larger than 0")
     if k is None:
         result = {
             "corr": corr,
@@ -469,22 +484,6 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     )
     dec_point_y.append(
         data_y_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
-    )
-    data_x_sample = np.delete(
-        data_x_sample,  # pylint: disable=invalid-unary-operand-type
-        np.append(
-            diff_inc_sort[-k:],  # pylint: disable=invalid-unary-operand-type
-            diff_dec_sort[-k:],  # pylint: disable=invalid-unary-operand-type
-        ),
-        None,
-    )
-    data_y_sample = np.delete(
-        data_y_sample,  # pylint: disable=invalid-unary-operand-type
-        np.append(
-            diff_inc_sort[-k:],  # pylint: disable=invalid-unary-operand-type
-            diff_dec_sort[-k:],  # pylint: disable=invalid-unary-operand-type
-        ),
-        None,
     )
     result = {
         "corr": corr,
