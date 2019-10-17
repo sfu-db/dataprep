@@ -6,7 +6,7 @@ This module implements functions for plotting visualizations for a single field.
 # pylint: disable=R0914
 import math
 from typing import Any, Dict, Optional, Tuple, List
-
+from operator import itemgetter
 import bokeh.palettes as bp
 import numpy as np
 import pandas as pd
@@ -97,7 +97,6 @@ class UniViz:
             end_angle=cumsum("angle"),
             line_color="white",
             fill_color="colour",
-            # legend="cat",
             source=data_df,
         )
         hover = HoverTool(
@@ -143,7 +142,7 @@ class UniViz:
         :return: Bokeh plot figure
         """
         miss_cnt = missing[0]
-        data_sorted = sorted(data.items(), key=lambda x: x[1], reverse=(not ascending))[
+        data_sorted = sorted(data.items(), key=itemgetter(1), reverse=(not ascending))[
             0:bars
         ]
         cat_list = [
@@ -167,7 +166,6 @@ class UniViz:
             tools=TOOLS,
             title=title,
             x_range=FactorRange(factors=cat_list),
-            # y_range=[0, max(data_source["count"])+10],
             toolbar_location=None,
         )
 
@@ -403,7 +401,6 @@ class UniViz:
             min_border=0,
             toolbar_location=None,
             tools=[],
-            # y_range=Range1d(y_min, 1.25 * y_max),
             title=Title(text=title),
         )
 
