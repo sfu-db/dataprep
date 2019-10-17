@@ -3,7 +3,7 @@
     plot_correlation(df) function
 """
 import math
-import sys
+import warnings
 from typing import Any, Dict
 
 import holoviews as hv
@@ -99,11 +99,11 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     tooltips = [("name", "@x"), ("name", "@y"), ("correlation", "@z")]
     hover = HoverTool(tooltips=tooltips)
     if not data_p:
-        print("Warning: The pearson correlation matrix is empty", file=sys.stderr)
+        warnings.warn("The pearson correlation matrix is empty")
     if not data_k:
-        print("Warning: The kendall correlation matrix is empty", file=sys.stderr)
+        warnings.warn("The kendall correlation matrix is empty")
     if not data_s:
-        print("Warning: The spearman correlation matrix is empty", file=sys.stderr)
+        warnings.warn("The spearman correlation matrix is empty")
     heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
     heatmap_p.opts(
         tools=[hover],
