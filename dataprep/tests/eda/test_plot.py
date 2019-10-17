@@ -203,6 +203,8 @@ def test_normal_1() -> None:
                 "min": 80,
                 "max_outlier": 795,
                 "outliers": [795],
+                "lw": 80,
+                "uw": 395,
             },
             "b": {
                 "tf": 473.0,
@@ -213,6 +215,8 @@ def test_normal_1() -> None:
                 "min": 158,
                 "max_outlier": np.nan,
                 "outliers": [],
+                "lw": 158,
+                "uw": 867,
             },
             "c": {
                 "tf": 269.0,
@@ -223,6 +227,8 @@ def test_normal_1() -> None:
                 "min": 135,
                 "max_outlier": np.nan,
                 "outliers": [],
+                "lw": 135,
+                "uw": 652,
             },
             "d": {
                 "tf": 668.0,
@@ -233,6 +239,8 @@ def test_normal_1() -> None:
                 "min": 654,
                 "max_outlier": np.nan,
                 "outliers": [],
+                "lw": 654,
+                "uw": 794,
             },
         },
         "histogram": {
