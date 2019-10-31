@@ -408,7 +408,7 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     pd_data_frame: pd.DataFrame,
     x_name: str,
     y_name: str,
-    sample_size: Optional[int] = 1000,
+    sample_size: float,
     k: Optional[int] = None,
 ) -> Intermediate:
     """
@@ -429,21 +429,20 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     line_a, line_b = np.linalg.lstsq(
         np.vstack([data_x, np.ones(len(data_x))]).T, data_y, rcond=None
     )[0]
-    if sample_size is not None:
-        if sample_size >= 1:
-            if sample_size > len(data_x):
-                data_x_sample = data_x
-                data_y_sample = data_y
-            else:
-                sample_array = np.random.choice(len(data_x), sample_size)
-                data_x_sample = data_x[sample_array]
-                data_y_sample = data_y[sample_array]
-        elif sample_size > 0:
-            sample_array = np.random.choice(len(data_x), int(len(data_x) * sample_size))
+    if sample_size >= 1:
+        if sample_size > len(data_x):
+            data_x_sample = data_x
+            data_y_sample = data_y
+        else:
+            sample_array = np.random.choice(len(data_x), int(sample_size))
             data_x_sample = data_x[sample_array]
             data_y_sample = data_y[sample_array]
-        else:
-            raise ValueError("Sample size should be larger than 0")
+    elif sample_size > 0:
+        sample_array = np.random.choice(len(data_x), int(len(data_x) * sample_size))
+        data_x_sample = data_x[sample_array]
+        data_y_sample = data_y[sample_array]
+    else:
+        raise ValueError("Sample size should be larger than 0")
     if k is None:
         result = {
             "corr": corr,
@@ -564,6 +563,7 @@ def plot_correlation(  # pylint: disable=too-many-arguments
         "plot_width": 400,
         "plot_height": 400,
         "size": 6,
+        "sample_size": 1000,
     }
     if x_name is not None and y_name is not None:
         if (
@@ -579,7 +579,11 @@ def plot_correlation(  # pylint: disable=too-many-arguments
             and not get_type(pd_data_frame[y_name]) != DataType.TYPE_NUM
         ):
             intermediate = _calc_correlation_pd_x_y_k(
-                pd_data_frame=pd_data_frame, x_name=x_name, y_name=y_name, k=k
+                pd_data_frame=pd_data_frame,
+                x_name=x_name,
+                y_name=y_name,
+                k=k,
+                sample_size=params["sample_size"],
             )
             fig = _vis_correlation_pd_x_y_k(intermediate=intermediate, params=params)
         else:
