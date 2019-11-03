@@ -60,16 +60,13 @@ def test_plot_corr_df_k() -> None:
     res = df_data.corr(method="pearson")
     row, _ = np.shape(res)
     res_re = np.reshape(np.triu(res, 1), (row * row,))
-    idx = np.argsort(res_re)
+    idx = np.argsort(np.absolute(res_re))
     mask = np.zeros(shape=(row * row,))
     for i in range(k):
-        if res_re[idx[i]] < 0:
-            mask[idx[i]] = 1
-        if res_re[idx[-i - 1]] > 0:
-            mask[idx[-i - 1]] = 1
+        mask[idx[-i - 1]] = 1
     res = np.multiply(res_re, mask)
     res = np.reshape(res, (row, row))
-    res += res.T - np.diag(res.diagonal())
+    res = res.T
     _, intermediate = plot_correlation(
         pd_data_frame=df_data, return_intermediate=True, k=k
     )
