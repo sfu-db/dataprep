@@ -121,16 +121,13 @@ def _calc_correlation_pd_k(pd_data_frame: pd.DataFrame, k: int) -> Any:
         corr_matrix = intermediate_pd.result["corr_" + method[0]]
         matrix_row, _ = np.shape(corr_matrix)
         corr_matrix_re = np.reshape(np.triu(corr_matrix, 1), (matrix_row * matrix_row,))
-        idx = np.argsort(corr_matrix_re)
+        idx = np.argsort(np.absolute(corr_matrix_re))
         mask = np.zeros(shape=(matrix_row * matrix_row,))
         for i in range(k):
-            if corr_matrix_re[idx[i]] < 0:
-                mask[idx[i]] = 1
-            if corr_matrix_re[idx[-i - 1]] > 0:
-                mask[idx[-i - 1]] = 1
+            mask[idx[-i - 1]] = 1
         corr_matrix = np.multiply(corr_matrix_re, mask)
         corr_matrix = np.reshape(corr_matrix, (matrix_row, matrix_row))
-        corr_matrix += corr_matrix.T - np.diag(corr_matrix.diagonal())
+        corr_matrix = corr_matrix.T
         result["corr_" + method[0]] = corr_matrix
         result["mask_" + method[0]] = mask
     raw_data = {"df": pd_data_frame, "method_list": method_list, "k": k}
@@ -408,7 +405,11 @@ def _calc_correlation_pd_x_k(  # pylint: disable=too-many-statements
 
 
 def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
-    pd_data_frame: pd.DataFrame, x_name: str, y_name: str, k: Optional[int] = None
+    pd_data_frame: pd.DataFrame,
+    x_name: str,
+    y_name: str,
+    sample_size: float,
+    k: Optional[int] = None,
 ) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots
@@ -428,8 +429,28 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     line_a, line_b = np.linalg.lstsq(
         np.vstack([data_x, np.ones(len(data_x))]).T, data_y, rcond=None
     )[0]
+    if sample_size >= 1:
+        if sample_size > len(data_x):
+            data_x_sample = data_x
+            data_y_sample = data_y
+        else:
+            sample_array = np.random.choice(len(data_x), int(sample_size))
+            data_x_sample = data_x[sample_array]
+            data_y_sample = data_y[sample_array]
+    elif sample_size > 0:
+        sample_array = np.random.choice(len(data_x), int(len(data_x) * sample_size))
+        data_x_sample = data_x[sample_array]
+        data_y_sample = data_y[sample_array]
+    else:
+        raise ValueError("Sample size should be larger than 0")
     if k is None:
-        result = {"corr": corr, "line_a": line_a, "line_b": line_b}
+        result = {
+            "corr": corr,
+            "line_a": line_a,
+            "line_b": line_b,
+            "data_x_sample": data_x_sample,
+            "data_y_sample": data_y_sample,
+        }
         raw_data = {"df": pd_data_frame, "x_name": x_name, "y_name": y_name, "k": k}
         intermediate = Intermediate(result, raw_data)
         return intermediate
@@ -440,34 +461,39 @@ def _calc_correlation_pd_x_y_k(  # pylint: disable=too-many-locals
     inc_point_y = []
     dec_point_x = []
     dec_point_y = []
-    for i in range(len(data_x)):
-        data_x_sel = np.append(data_x[:i], data_x[i + 1 :])  # TODO: Avoid copy
-        data_y_sel = np.append(data_y[:i], data_y[i + 1 :])
+    data_mask = np.array([True for _, _ in enumerate(data_x_sample)], dtype=bool)
+    for i in range(len(data_x_sample)):
+        data_mask[i] = False
+        data_x_sel = data_x_sample[data_mask]
+        data_y_sel = data_y_sample[data_mask]
         corr_sel = np.corrcoef(data_x_sel, data_y_sel)[1, 0]
         diff_inc.append(corr_sel - corr)
         diff_dec.append(corr - corr_sel)
+        data_mask[i] = True
     diff_inc_sort = np.argsort(diff_inc)
     diff_dec_sort = np.argsort(diff_dec)
     inc_point_x.append(
-        data_x[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_x_sample[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     inc_point_y.append(
-        data_y[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_y_sample[diff_inc_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     dec_point_x.append(
-        data_x[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_x_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     dec_point_y.append(
-        data_y[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
+        data_y_sample[diff_dec_sort[-k:]]  # pylint: disable=invalid-unary-operand-type
     )
     result = {
         "corr": corr,
+        "line_a": line_a,
+        "line_b": line_b,
+        "data_x_sample": data_x_sample,
+        "data_y_sample": data_y_sample,
         "dec_point_x": dec_point_x,
         "dec_point_y": dec_point_y,
         "inc_point_x": inc_point_x,
         "inc_point_y": inc_point_y,
-        "line_a": line_a,
-        "line_b": line_b,
     }
     raw_data = {"df": pd_data_frame, "x_name": x_name, "y_name": y_name, "k": k}
     intermediate = Intermediate(result, raw_data)
@@ -537,6 +563,7 @@ def plot_correlation(  # pylint: disable=too-many-arguments
         "plot_width": 400,
         "plot_height": 400,
         "size": 6,
+        "sample_size": 1000,
     }
     if x_name is not None and y_name is not None:
         if (
@@ -552,7 +579,11 @@ def plot_correlation(  # pylint: disable=too-many-arguments
             and not get_type(pd_data_frame[y_name]) != DataType.TYPE_NUM
         ):
             intermediate = _calc_correlation_pd_x_y_k(
-                pd_data_frame=pd_data_frame, x_name=x_name, y_name=y_name, k=k
+                pd_data_frame=pd_data_frame,
+                x_name=x_name,
+                y_name=y_name,
+                k=k,
+                sample_size=params["sample_size"],
             )
             fig = _vis_correlation_pd_x_y_k(intermediate=intermediate, params=params)
         else:
