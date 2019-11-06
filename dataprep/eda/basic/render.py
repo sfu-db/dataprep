@@ -34,12 +34,12 @@ class Render:
         self.viz_uni = UniViz()
         self.viz_multi = MultiViz()
         self.plot_height = (
-            plot_height
-        )  # set the height of individual plots in the grid.
+            plot_height  # set the height of individual plots in the grid.
+        )
         self.plot_width = plot_width  # set the width of individual plots in the grid.
         self.total_cols = (
-            ncolumns
-        )  # set the total number of columns to be displaced in the grid.
+            ncolumns  # set the total number of columns to be displaced in the grid.
+        )
         self.band_width = band_width  # set the band width for the kde plot.
         self.tile_size = tile_size  # set the tile size for the scatter plot.
         self.bars = bars  # set the max number of bars to show for bar plot.
@@ -125,7 +125,7 @@ class Render:
                     )
                     plots.append(fig)
 
-        plots_list, = compute(plots)
+        (plots_list,) = compute(plots)
 
         if only_x:
             tab_list = list()

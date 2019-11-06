@@ -1,6 +1,6 @@
 version: 2.0
 jobs:
-  check:
+  install_dependencies:
     docker:
       - image: circleci/python:3.7.2
     steps:
@@ -18,6 +18,22 @@ jobs:
       - run:
           name: Plot tool versions
           command: pipenv run mypy --version & pipenv run pytype --version && pipenv run pylint --version && pipenv run pytest --version && pipenv run black --version
+      - persist_to_workspace:
+          root: .
+          paths: .venv
+  check:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - run:
+          name: Add python user PATH into PATH
+          command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
+      - run: 
+          name: Install python tools
+          command: pip install --user pipenv
+      - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Check if the code is formatted
           command: pipenv run black --check --quiet dataprep
@@ -30,8 +46,62 @@ jobs:
       - run:
           name: Style check the project
           command: pipenv run pylint dataprep
+  docs-build:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - run:
+          name: Add python user PATH into PATH
+          command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
+      - run: 
+          name: Install python tools
+          command: pip install --user pipenv
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Build docs
+          command: pipenv run sphinx-build -M html docs/source docs/build
+      - persist_to_workspace:
+          root: .
+          paths: docs/build/html
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b7:f1:2a:54:c8:90:80:78:ba:30:d9:9b:b8:7d:03:10"
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci@sfu.db"
+            git config user.name "ci"
+      - run:
+          name: Disable jekyll builds
+          command: touch docs/build/html/.nojekyll
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/build/html
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - check
+      - install_dependencies
+      - check:
+          requires:
+            - install_dependencies
+      - docs-build:
+          requires:
+            - install_dependencies
+      - docs-deploy:
+          requires:
+            - check
+            - docs-build
+          filters:
+            branches:
+              only: master
