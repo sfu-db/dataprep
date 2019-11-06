@@ -32,7 +32,7 @@ def __calc_box_stats(grp_series: dask.dataframe.core.Series) -> Dict[str, Any]:
     """
     stats: Dict[str, Any] = dict()
 
-    grp_series, = dask.compute(grp_series)
+    (grp_series,) = dask.compute(grp_series)
     quantiles = grp_series.quantile([0.25, 0.50, 0.75], interpolation="midpoint")
     stats["tf"], stats["fy"], stats["sf"] = (
         np.round(quantiles[0.25], 2),
@@ -233,7 +233,7 @@ def _calc_hist_by_group(
         hist_interm.append(hist)
         grp_name_list.append(group)
 
-    hist_interm, = dask.compute(hist_interm)
+    (hist_interm,) = dask.compute(hist_interm)
 
     for zipped_element in zip(grp_name_list, hist_interm):
         grp_hist[zipped_element[0]] = zipped_element[1]
@@ -267,20 +267,21 @@ def _calc_hist(
     if dask.compute(dataframe[col_x].size)[0] == 0:
         return Intermediate({"histogram": (list(), list())}, raw_data)
 
-    minv, = dask.compute(dataframe[col_x].min())
-    maxv, = dask.compute(dataframe[col_x].max())
+    (minv,) = dask.compute(dataframe[col_x].min())
+    (maxv,) = dask.compute(dataframe[col_x].max())
 
     dframe = dataframe[col_x].dropna().values
     hist_array = None
     bins_array = None
     if isinstance(dframe, dask.array.core.Array):
         hist_array, bins_array = da.histogram(dframe, range=[minv, maxv], bins=bins)
-        hist_array, = dask.compute(hist_array)
+        (hist_array,) = dask.compute(hist_array)
     elif isinstance(dframe, np.ndarray):
-        dframe, = dask.compute(dframe)
+        (dframe,) = dask.compute(dframe)
         minv = 0 if np.isnan(dframe.min()) else dframe.min()
         maxv = 0 if np.isnan(dframe.max()) else dframe.max()
         hist_array, bins_array = np.histogram(dframe, bins=bins, range=[minv, maxv])
+    bins_array = cast(Any, bins_array)
 
     if dask.compute(np.issubdtype(dataframe[col_x], np.int64))[0]:
         bins_temp = [int(x) for x in np.ceil(bins_array)]
