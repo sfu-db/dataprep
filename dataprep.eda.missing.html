@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.missing package &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dataprep-eda-missing-package">
+<h1>dataprep.eda.missing package<a class="headerlink" href="#dataprep-eda-missing-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dataprep.eda.missing.computation">
+<span id="dataprep-eda-missing-computation-module"></span><h2>dataprep.eda.missing.computation module<a class="headerlink" href="#module-dataprep.eda.missing.computation" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot_missing(df) function’s
+calculating intermediate part</p>
+<dl class="function">
+<dt id="dataprep.eda.missing.computation.plot_missing">
+<code class="sig-prename descclassname">dataprep.eda.missing.computation.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">x_name: Optional[str] = None</em>, <em class="sig-param">y_name: Optional[str] = None</em>, <em class="sig-param">return_intermediate: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs, Tuple[Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs], Any]]<a class="reference internal" href="_modules/dataprep/eda/missing/computation.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.computation.plot_missing" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pd_data_frame</strong> – the pandas data_frame for which plots are calculated for each</p>
+</dd>
+</dl>
+<p>column.
+:param x_name: a valid column name of the data frame
+:param y_name: a valid column name of the data frame
+:param return_intermediate: whether show intermediate results to users
+:return: A dict to encapsulate the
+intermediate results.</p>
+<p>This function is designed to deal with missing values</p>
+<p>There are three functions: plot_missing(df), plot_missing(df, x)
+plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
+bars for categorical column, qq-plot, box-plot, jitter plot,
+CDF, PDF
+case (Some, None) =&gt; histogram for numerical column and
+bars for categorical column
+case (None, None) =&gt; heatmap
+otherwise =&gt; error</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.missing.visualization">
+<span id="dataprep-eda-missing-visualization-module"></span><h2>dataprep.eda.missing.visualization module<a class="headerlink" href="#module-dataprep.eda.missing.visualization" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot_missing(df, x, y) function’s
+visualization part.</p>
+</div>
+<div class="section" id="module-dataprep.eda.missing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda.missing" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot_missing(df) function</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dataprep.eda.missing package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.missing.computation">dataprep.eda.missing.computation module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.missing.visualization">dataprep.eda.missing.visualization module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.missing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/dataprep.eda.missing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

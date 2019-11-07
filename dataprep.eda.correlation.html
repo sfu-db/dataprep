@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.correlation package &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dataprep-eda-correlation-package">
+<h1>dataprep.eda.correlation package<a class="headerlink" href="#dataprep-eda-correlation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dataprep.eda.correlation.computation">
+<span id="dataprep-eda-correlation-computation-module"></span><h2>dataprep.eda.correlation.computation module<a class="headerlink" href="#module-dataprep.eda.correlation.computation" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the intermediates computation
+for plot_correlation(df) function.</p>
+<dl class="function">
+<dt id="dataprep.eda.correlation.computation.merge_dicts">
+<code class="sig-prename descclassname">dataprep.eda.correlation.computation.</code><code class="sig-name descname">merge_dicts</code><span class="sig-paren">(</span><em class="sig-param">*dict_args: Dict[str, Any]</em><span class="sig-paren">)</span> &#x2192; Dict[str, Any]<a class="reference internal" href="_modules/dataprep/eda/correlation/computation.html#merge_dicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.correlation.computation.merge_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dict_args</strong> – The dictionary we want to merge</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>merged dictionary</p>
+</dd>
+</dl>
+<p>Given any number of dicts, shallow copy and merge into a new dict,
+precedence goes to key value pairs in latter dicts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.correlation.computation.plot_correlation">
+<code class="sig-prename descclassname">dataprep.eda.correlation.computation.</code><code class="sig-name descname">plot_correlation</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">x_name: Optional[str] = None</em>, <em class="sig-param">y_name: Optional[str] = None</em>, <em class="sig-param">value_range: Optional[List[float]] = None</em>, <em class="sig-param">k: Optional[int] = None</em>, <em class="sig-param">return_intermediate: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs, Tuple[Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs], Any]]<a class="reference internal" href="_modules/dataprep/eda/correlation/computation.html#plot_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.correlation.computation.plot_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pd_data_frame</strong> – the pandas data_frame for which plots are calculated for each</p>
+</dd>
+</dl>
+<p>column.
+:param x_name: a valid column name of the data frame
+:param y_name: a valid column name of the data frame
+:param value_range: range of value
+:param k: choose top-k element
+:param return_intermediate: whether show intermediate results to users
+:return: A (column: [array/dict]) dict to encapsulate the
+intermediate results.</p>
+<dl class="simple">
+<dt>match (x_name, y_name, k)</dt><dd><p>case (None, None, None) =&gt; heatmap
+case (Some, None, Some) =&gt; Top K columns for (pearson, spearman, kendall)
+case (Some, Some, _) =&gt; Scatter with regression line with/without top k outliers
+otherwise =&gt; error</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.correlation.visualization">
+<span id="dataprep-eda-correlation-visualization-module"></span><h2>dataprep.eda.correlation.visualization module<a class="headerlink" href="#module-dataprep.eda.correlation.visualization" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the visualization for
+plot_correlation(df) function</p>
+</div>
+<div class="section" id="module-dataprep.eda.correlation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda.correlation" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot_correlation(df) function.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dataprep.eda.correlation package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.correlation.computation">dataprep.eda.correlation.computation module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.correlation.visualization">dataprep.eda.correlation.visualization module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.correlation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/dataprep.eda.correlation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.missing.computation &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.eda.missing.computation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module implements the plot_missing(df) function&#39;s</span>
+<span class="sd">    calculating intermediate part</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.models.widgets</span> <span class="k">import</span> <span class="n">Tabs</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">Figure</span>
+
+<span class="kn">from</span> <span class="nn">...utils</span> <span class="k">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">get_type</span>
+<span class="kn">from</span> <span class="nn">..common</span> <span class="k">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">.visualization</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">_vis_missing_impact</span><span class="p">,</span>
+    <span class="n">_vis_missing_impact_y</span><span class="p">,</span>
+    <span class="n">_vis_nonzero_count</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_nonzero_rate</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param data: A column of data frame</span>
+<span class="sd">    :param length: The length of array</span>
+<span class="sd">    :return: The count of None, Nan, Null</span>
+
+<span class="sd">    This function is used to calculate the rate of nonzero elements of each column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">length</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_nonzero_count</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param pd_data_frame: the pandas data_frame for which plots are calculated</span>
+<span class="sd">    for each column.</span>
+<span class="sd">    :return: An object to encapsulate the</span>
+<span class="sd">    intermediate results.</span>
+
+<span class="sd">    This function is designed to calculate the intermediate result</span>
+<span class="sd">    The intermediate result contains the nonzero elements rate of each column and</span>
+<span class="sd">    the distribution of nonzero elements</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pd_data_frame_value</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">count_nonzero_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">pd_data_frame_value</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+        <span class="n">count_nonzero_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_calc_nonzero_rate</span><span class="p">)(</span><span class="n">pd_data_frame_value</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">col</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">count_nonzero_compute</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">count_nonzero_list</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;distribution&quot;</span><span class="p">:</span> <span class="n">pd_data_frame_value</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">count_nonzero_compute</span><span class="p">}</span>
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">pd_data_frame</span><span class="p">}</span>
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">raw_data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">intermediate</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_missing_impact</span><span class="p">(</span>
+    <span class="n">pd_data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param pd_data_frame: the pandas data_frame for which plots are calculated</span>
+<span class="sd">    for each column.</span>
+<span class="sd">    :param x_name: The column whose value missing influence other columns</span>
+<span class="sd">    :return: An object to encapsulate the</span>
+<span class="sd">    intermediate results.</span>
+
+<span class="sd">    This function is designed to delete rows whose x_name column are None, Nan, Null,</span>
+<span class="sd">    then output data character of other columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_data_drop</span> <span class="o">=</span> <span class="n">pd_data_frame</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">x_name</span><span class="p">])</span>
+    <span class="n">columns_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">columns_name</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">x_name</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;df_data_drop&quot;</span><span class="p">:</span> <span class="n">df_data_drop</span><span class="p">,</span> <span class="s2">&quot;columns_name&quot;</span><span class="p">:</span> <span class="n">columns_name</span><span class="p">}</span>
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">pd_data_frame</span><span class="p">,</span> <span class="s2">&quot;x_name&quot;</span><span class="p">:</span> <span class="n">x_name</span><span class="p">,</span> <span class="s2">&quot;num_bins&quot;</span><span class="p">:</span> <span class="n">num_bins</span><span class="p">}</span>
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">raw_data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">intermediate</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_missing_impact_y</span><span class="p">(</span>
+    <span class="n">pd_data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param pd_data_frame: the pandas data_frame for which plots are calculated for each</span>
+<span class="sd">    column.</span>
+<span class="sd">    :param x_name:</span>
+<span class="sd">    :param y_name:</span>
+<span class="sd">    :return: An object to encapsulate the</span>
+<span class="sd">    intermediate results.</span>
+
+<span class="sd">    This function is designed to delete rows whose x_name column are None, Nan, Null,</span>
+<span class="sd">    then output data character of y_name column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_data_sel</span> <span class="o">=</span> <span class="n">pd_data_frame</span><span class="p">[[</span><span class="n">x_name</span><span class="p">,</span> <span class="n">y_name</span><span class="p">]]</span>
+    <span class="n">df_data_drop</span> <span class="o">=</span> <span class="n">df_data_sel</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">x_name</span><span class="p">])</span>
+    <span class="n">columns_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_data_drop</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;df_data_drop&quot;</span><span class="p">:</span> <span class="n">df_data_drop</span><span class="p">,</span> <span class="s2">&quot;columns_name&quot;</span><span class="p">:</span> <span class="n">columns_name</span><span class="p">}</span>
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">pd_data_frame</span><span class="p">,</span>
+        <span class="s2">&quot;x_name&quot;</span><span class="p">:</span> <span class="n">x_name</span><span class="p">,</span>
+        <span class="s2">&quot;y_name&quot;</span><span class="p">:</span> <span class="n">y_name</span><span class="p">,</span>
+        <span class="s2">&quot;num_bins&quot;</span><span class="p">:</span> <span class="n">num_bins</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">raw_data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">intermediate</span>
+
+
+<div class="viewcode-block" id="plot_missing"><a class="viewcode-back" href="../../../../dataprep.eda.missing.html#dataprep.eda.plot_missing">[docs]</a><span class="k">def</span> <span class="nf">plot_missing</span><span class="p">(</span>
+    <span class="n">pd_data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_intermediate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param pd_data_frame: the pandas data_frame for which plots are calculated for each</span>
+<span class="sd">    column.</span>
+<span class="sd">    :param x_name: a valid column name of the data frame</span>
+<span class="sd">    :param y_name: a valid column name of the data frame</span>
+<span class="sd">    :param return_intermediate: whether show intermediate results to users</span>
+<span class="sd">    :return: A dict to encapsulate the</span>
+<span class="sd">    intermediate results.</span>
+
+<span class="sd">    This function is designed to deal with missing values</span>
+
+<span class="sd">    There are three functions: plot_missing(df), plot_missing(df, x)</span>
+<span class="sd">    plot_missing(df, x, y)</span>
+
+<span class="sd">    match (x_name, y_name)</span>
+<span class="sd">        case (Some, Some) =&gt; histogram for numerical column,</span>
+<span class="sd">        bars for categorical column, qq-plot, box-plot, jitter plot,</span>
+<span class="sd">        CDF, PDF</span>
+<span class="sd">        case (Some, None) =&gt; histogram for numerical column and</span>
+<span class="sd">        bars for categorical column</span>
+<span class="sd">        case (None, None) =&gt; heatmap</span>
+<span class="sd">        otherwise =&gt; error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">columns_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">375</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">325</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;legend_position&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">columns_name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">get_type</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">[</span><span class="n">name</span><span class="p">])</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_NUM</span>
+            <span class="ow">and</span> <span class="n">get_type</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">[</span><span class="n">name</span><span class="p">])</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_CAT</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the column&#39;s data type is error&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">_calc_missing_impact_y</span><span class="p">(</span>
+            <span class="n">pd_data_frame</span><span class="o">=</span><span class="n">pd_data_frame</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="n">x_name</span><span class="p">,</span> <span class="n">y_name</span><span class="o">=</span><span class="n">y_name</span>
+        <span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">_vis_missing_impact_y</span><span class="p">(</span><span class="n">intermediate</span><span class="o">=</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">x_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">_calc_missing_impact</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">=</span><span class="n">pd_data_frame</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="n">x_name</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">_vis_missing_impact</span><span class="p">(</span><span class="n">intermediate</span><span class="o">=</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">x_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please give a value to x_name&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">_calc_nonzero_count</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">=</span><span class="n">pd_data_frame</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">_vis_nonzero_count</span><span class="p">(</span><span class="n">intermediate</span><span class="o">=</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">show</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_intermediate</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">intermediate</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

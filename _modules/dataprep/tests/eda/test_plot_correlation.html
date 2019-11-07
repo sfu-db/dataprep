@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.tests.eda.test_plot_correlation &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.tests.eda.test_plot_correlation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    module for testing plot_corr(df, x, y) function.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">...eda</span> <span class="k">import</span> <span class="n">plot_correlation</span>
+
+
+<div class="viewcode-block" id="test_plot_corr_df"><a class="viewcode-back" href="../../../../dataprep.tests.eda.html#dataprep.tests.eda.test_plot_correlation.test_plot_corr_df">[docs]</a><span class="k">def</span> <span class="nf">test_plot_corr_df</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-many-locals</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">start_p_pd</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;pearson&quot;</span><span class="p">)</span>
+    <span class="n">end_p_pd</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pd pearson time: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_p_pd</span> <span class="o">-</span> <span class="n">start_p_pd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+
+    <span class="n">start_p</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">intermediate</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data</span><span class="p">,</span> <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">end_p</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;our pearson time: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_p</span> <span class="o">-</span> <span class="n">start_p</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;corr_p&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">start_s_pd</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">)</span>
+    <span class="n">end_s_pd</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pd spearman time: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_s_pd</span> <span class="o">-</span> <span class="n">start_s_pd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+
+    <span class="n">start_s</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">intermediate</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data</span><span class="p">,</span> <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">end_s</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;our spearman time: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_s</span> <span class="o">-</span> <span class="n">start_s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;corr_s&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">start_k_pd</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;kendall&quot;</span><span class="p">)</span>
+    <span class="n">end_k_pd</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pd kendall time: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_k_pd</span> <span class="o">-</span> <span class="n">start_k_pd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+
+    <span class="n">start_k</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">intermediate</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data</span><span class="p">,</span> <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">end_k</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;our kendall time: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_k</span> <span class="o">-</span> <span class="n">start_k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; s&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;corr_k&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="test_plot_corr_df_k"><a class="viewcode-back" href="../../../../dataprep.tests.eda.html#dataprep.tests.eda.test_plot_correlation.test_plot_corr_df_k">[docs]</a><span class="k">def</span> <span class="nf">test_plot_corr_df_k</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;pearson&quot;</span><span class="p">)</span>
+    <span class="n">row</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">res_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">row</span> <span class="o">*</span> <span class="n">row</span><span class="p">,))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">res_re</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">row</span> <span class="o">*</span> <span class="n">row</span><span class="p">,))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">res_re</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">intermediate</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span>
+        <span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data</span><span class="p">,</span> <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">intermediate</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;corr_p&quot;</span><span class="p">],</span> <span class="n">res</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">intermediate</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;mask_p&quot;</span><span class="p">],</span> <span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="test_plot_corr_df_x_k"><a class="viewcode-back" href="../../../../dataprep.tests.eda.html#dataprep.tests.eda.test_plot_correlation.test_plot_corr_df_x_k">[docs]</a><span class="k">def</span> <span class="nf">test_plot_corr_df_x_k</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)})</span>
+    <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">x_name</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">name_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">idx_name</span> <span class="o">=</span> <span class="n">name_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x_name</span><span class="p">)</span>
+    <span class="n">res_p</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;pearson&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">res_p</span><span class="p">[</span><span class="n">idx_name</span><span class="p">][</span><span class="n">idx_name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">res_s</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">res_s</span><span class="p">[</span><span class="n">idx_name</span><span class="p">][</span><span class="n">idx_name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">res_k</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;kendall&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">res_k</span><span class="p">[</span><span class="n">idx_name</span><span class="p">][</span><span class="n">idx_name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span>
+        <span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="n">x_name</span><span class="p">,</span> <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_plot_corr_df_x_y_k"><a class="viewcode-back" href="../../../../dataprep.tests.eda.html#dataprep.tests.eda.test_plot_correlation.test_plot_corr_df_x_y_k">[docs]</a><span class="k">def</span> <span class="nf">test_plot_corr_df_x_y_k</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)})</span>
+    <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">x_name</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
+    <span class="n">y_name</span> <span class="o">=</span> <span class="s2">&quot;c&quot;</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span>
+        <span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data</span><span class="p">,</span>
+        <span class="n">x_name</span><span class="o">=</span><span class="n">x_name</span><span class="p">,</span>
+        <span class="n">y_name</span><span class="o">=</span><span class="n">y_name</span><span class="p">,</span>
+        <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">letters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]</span>
+    <span class="n">df_data_cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)})</span>
+    <span class="n">df_data_cat</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)])</span>
+    <span class="n">df_data_cat</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)])</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">intermediate</span> <span class="o">=</span> <span class="n">plot_correlation</span><span class="p">(</span>
+        <span class="n">pd_data_frame</span><span class="o">=</span><span class="n">df_data_cat</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">y_name</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">return_intermediate</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df_data_cat</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">],</span> <span class="n">df_data_cat</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">intermediate</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;cross_table&quot;</span><span class="p">],</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

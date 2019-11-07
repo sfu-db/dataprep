@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.basic.viz_multi &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.eda.basic.viz_multi</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module implements functions for plotting visualizations for two fields.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># pytype: disable=import-error</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="k">import</span> <span class="n">ColorBar</span><span class="p">,</span> <span class="n">ColumnDataSource</span><span class="p">,</span> <span class="n">FactorRange</span><span class="p">,</span> <span class="n">HoverTool</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="k">import</span> <span class="n">viridis</span>  <span class="c1"># pylint: disable=E0611</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="k">import</span> <span class="n">linear_cmap</span>
+<span class="kn">from</span> <span class="nn">..common</span> <span class="k">import</span> <span class="n">sample_n</span>
+
+<span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="MultiViz"><a class="viewcode-back" href="../../../../dataprep.eda.basic.html#dataprep.eda.basic.viz_multi.MultiViz">[docs]</a><span class="k">class</span> <span class="nc">MultiViz</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Encapsulation for multivariate vizualisations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nested_cat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">scatter</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="MultiViz.nest_cat_viz"><a class="viewcode-back" href="../../../../dataprep.eda.basic.html#dataprep.eda.basic.viz_multi.MultiViz.nest_cat_viz">[docs]</a>    <span class="k">def</span> <span class="nf">nest_cat_viz</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">col_x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">col_y</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Nested categories plot</span>
+<span class="sd">        :param data: the intermediates result</span>
+<span class="sd">        :param col_x: column X</span>
+<span class="sd">        :param col_y: column Y</span>
+<span class="sd">        :return: Bokeh Plot Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">data_source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x_values</span><span class="o">=</span><span class="n">x_values</span><span class="p">,</span> <span class="n">counts</span><span class="o">=</span><span class="n">counts</span><span class="p">))</span>
+
+        <span class="n">plot_figure</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">x_values</span><span class="p">),</span>
+            <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_y</span><span class="p">,</span> <span class="n">col_x</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x_values&quot;</span><span class="p">,</span>
+            <span class="n">top</span><span class="o">=</span><span class="s2">&quot;counts&quot;</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">data_source</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">line_width</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">x_range</span><span class="o">.</span><span class="n">range_padding</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Count&quot;</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> categorized in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_x</span><span class="p">,</span> <span class="n">col_y</span><span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nested_cat</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10pt&quot;</span>
+        <span class="k">return</span> <span class="n">plot_figure</span></div>
+
+<div class="viewcode-block" id="MultiViz.scatter_viz"><a class="viewcode-back" href="../../../../dataprep.eda.basic.html#dataprep.eda.basic.viz_multi.MultiViz.scatter_viz">[docs]</a>    <span class="k">def</span> <span class="nf">scatter_viz</span><span class="p">(</span>  <span class="c1"># pylint: disable=C0330, R0914</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">points</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">col_x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">col_y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Modified Hex bin scatter plot</span>
+<span class="sd">        :param points: list of points to be plotted</span>
+<span class="sd">        :param col_x: column X</span>
+<span class="sd">        :param col_y: column Y</span>
+<span class="sd">        :param tile_size: hex tile size</span>
+<span class="sd">        :return: Bokeh Plot Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">points</span><span class="p">])</span>
+        <span class="n">y_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">points</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">tile_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x_values</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_values</span><span class="p">)</span>
+            <span class="n">xsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span> <span class="o">//</span> <span class="mi">20</span>
+            <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y_values</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">y_values</span><span class="p">)</span>
+            <span class="n">ysize</span> <span class="o">=</span> <span class="p">(</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span><span class="p">)</span> <span class="o">//</span> <span class="mi">20</span>
+
+            <span class="n">tile_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">)</span>
+
+        <span class="n">plot_figure</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
+            <span class="n">match_aspect</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> v/s </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_x</span><span class="p">,</span> <span class="n">col_y</span><span class="p">),</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">background_fill_color</span><span class="o">=</span><span class="s2">&quot;#f5f5f5&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">cmap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">viridis</span><span class="p">(</span><span class="mi">256</span><span class="p">)))</span>
+
+        <span class="n">renderer</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">plot_figure</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span>
+            <span class="n">x_values</span><span class="p">,</span>
+            <span class="n">y_values</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">,</span>
+            <span class="n">hover_alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+            <span class="n">hover_color</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">aspect_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bins</span><span class="o">.</span><span class="n">counts</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">max_bin_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">min_bin_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">max_bin_count</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bins</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+            <span class="n">min_bin_count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bins</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+
+        <span class="n">color_mapper</span> <span class="o">=</span> <span class="n">linear_cmap</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">min_bin_count</span><span class="p">,</span> <span class="n">max_bin_count</span><span class="p">)</span>
+
+        <span class="n">x_values</span><span class="p">,</span> <span class="n">y_values</span> <span class="o">=</span> <span class="n">sample_n</span><span class="p">(</span><span class="n">x_values</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">sample_n</span><span class="p">(</span><span class="n">y_values</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x_values</span><span class="p">,</span> <span class="n">y_values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">)</span>
+
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span>
+            <span class="n">HoverTool</span><span class="p">(</span>
+                <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Count&quot;</span><span class="p">,</span> <span class="s2">&quot;@c&quot;</span><span class="p">)],</span>
+                <span class="n">point_policy</span><span class="o">=</span><span class="s2">&quot;follow_mouse&quot;</span><span class="p">,</span>
+                <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">renderer</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span>
+            <span class="n">HoverTool</span><span class="p">(</span>
+                <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;$x&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;$y&quot;</span><span class="p">)],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;mouse&quot;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;points&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">color_bar</span> <span class="o">=</span> <span class="n">ColorBar</span><span class="p">(</span>
+            <span class="n">color_mapper</span><span class="o">=</span><span class="n">color_mapper</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_x</span><span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_y</span><span class="p">)</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scatter</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">plot_figure</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10pt&quot;</span>
+        <span class="k">return</span> <span class="n">plot_figure</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

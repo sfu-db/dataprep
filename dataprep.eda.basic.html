@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.basic package &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dataprep-eda-basic-package">
+<h1>dataprep.eda.basic package<a class="headerlink" href="#dataprep-eda-basic-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dataprep.eda.basic.computation">
+<span id="dataprep-eda-basic-computation-module"></span><h2>dataprep.eda.basic.computation module<a class="headerlink" href="#module-dataprep.eda.basic.computation" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot(df) function.</p>
+<dl class="function">
+<dt id="dataprep.eda.basic.computation.plot">
+<code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.common.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns an intermediate representation for the plots of</dt><dd><p>different columns in the data_frame.</p>
+</dd>
+</dl>
+<p>Parameters
+data_frame: the pandas data_frame for which plots are calculated for each
+column.
+col_x : A column in the data_frame.
+col_y : A column in the data_frame.
+force_cat: the list of columns which have to considered of type “TYPE_CAT”
+force_num: the list of columns which have to considered of type “TYPE_NUM”
+bins: the number of bins to show for the plot(df, x) histogram
+value_range: the range of values to plot in the plot(df, x) histogram
+kwargs : TO-DO</p>
+<p>dict : A (column: [array/dict]) dict to encapsulate the
+intermediate results.</p>
+<dl>
+<dt>for column in pd_data_frame:</dt><dd><p>values = list()
+for x in pd_data_frame[column]:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>if type(x)==’str’:</dt><dd><p>values.append(re.escape(x))</p>
+</dd>
+<dt>else:</dt><dd><p>values.append(x)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>pd_data_frame[column] = values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.basic.computation.plot_df">
+<code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot_df</code><span class="sig-paren">(</span><em class="sig-param">data_frame: dask.dataframe.core.DataFrame</em>, <em class="sig-param">bins: int</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.common.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supporting funtion to the main plot function
+:param data_frame: dask dataframe
+:param bins: number of bins to show in the histogram
+:param force_cat: list of categorical columns defined explicitly
+:param force_num: list of numerical columns defined explicitly
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.basic.render">
+<span id="dataprep-eda-basic-render-module"></span><h2>dataprep.eda.basic.render module<a class="headerlink" href="#module-dataprep.eda.basic.render" title="Permalink to this headline">¶</a></h2>
+<p>This module is for the correct rendering of bokeh plot figures.</p>
+<dl class="class">
+<dt id="dataprep.eda.basic.render.Render">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.basic.render.</code><code class="sig-name descname">Render</code><span class="sig-paren">(</span><em class="sig-param">plot_height: int = 300</em>, <em class="sig-param">plot_width: int = 324</em>, <em class="sig-param">ncolumns: int = 3</em>, <em class="sig-param">band_width: float = 1.5</em>, <em class="sig-param">tile_size: Optional[float] = None</em>, <em class="sig-param">bars: int = 10</em>, <em class="sig-param">yscale: str = 'linear'</em>, <em class="sig-param">ascending: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic/render.html#Render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.Render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Encapsulate Renderer functions.</p>
+<dl class="method">
+<dt id="dataprep.eda.basic.render.Render.vizualise">
+<code class="sig-name descname">vizualise</code><span class="sig-paren">(</span><em class="sig-param">intermediates_list: List[dataprep.eda.common.Intermediate], only_x: bool = False</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/dataprep/eda/basic/render.html#Render.vizualise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.Render.vizualise" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Shows up the viz on a notebook or browser</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>intermediates_list</strong> – as returned from plot function</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.basic.viz_multi">
+<span id="dataprep-eda-basic-viz-multi-module"></span><h2>dataprep.eda.basic.viz_multi module<a class="headerlink" href="#module-dataprep.eda.basic.viz_multi" title="Permalink to this headline">¶</a></h2>
+<p>This module implements functions for plotting visualizations for two fields.</p>
+<dl class="class">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.basic.viz_multi.</code><code class="sig-name descname">MultiViz</code><a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Encapsulation for multivariate vizualisations.</p>
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.nest_cat_viz">
+<code class="sig-name descname">nest_cat_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[Tuple[Any, Any], int], col_x: str, col_y: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.nest_cat_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.nest_cat_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nested categories plot
+:param data: the intermediates result
+:param col_x: column X
+:param col_y: column Y
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.nested_cat">
+<code class="sig-name descname">nested_cat</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.nested_cat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.scatter">
+<code class="sig-name descname">scatter</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.scatter_viz">
+<code class="sig-name descname">scatter_viz</code><span class="sig-paren">(</span><em class="sig-param">points: List[Tuple[Any, Any]], col_x: str, col_y: str, tile_size: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.scatter_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.scatter_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modified Hex bin scatter plot
+:param points: list of points to be plotted
+:param col_x: column X
+:param col_y: column Y
+:param tile_size: hex tile size
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.basic.viz_uni">
+<span id="dataprep-eda-basic-viz-uni-module"></span><h2>dataprep.eda.basic.viz_uni module<a class="headerlink" href="#module-dataprep.eda.basic.viz_uni" title="Permalink to this headline">¶</a></h2>
+<p>This module implements functions for plotting visualizations for a single field.</p>
+<dl class="class">
+<dt id="dataprep.eda.basic.viz_uni.UniViz">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.basic.viz_uni.</code><code class="sig-name descname">UniViz</code><a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Encapsulation for Univariate visualizations.</p>
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.bar_viz">
+<code class="sig-name descname">bar_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[Any, Any], missing: List[int], col_x: str, bars: int, ascending: bool</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.bar_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.bar_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bar chart vizualisation for the categorical data
+:param data: the result from the intermediate
+:param missing: number of missing values in column
+:param col_x: the name of the field
+:param bars: the number of bars to show in plot
+:param ascending: if True show bars plotted in ascending order,
+else show bars plotted in descending order
+:return: Bokeh plot figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.barplot">
+<code class="sig-name descname">barplot</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.barplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.box">
+<code class="sig-name descname">box</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.box_viz">
+<code class="sig-name descname">box_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[str, Dict[str, Any]], col_x: str, col_y: Optional[str] = None, box_width: float = 0.25</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.box_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.box_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id1"><span class="problematic" id="id2">*</span></a>SPECIAL CASE
+Box plot for any number of categories or a single column
+:param data: intermediate result
+:param col_x: name in case of a single column
+:param col_y: name of column y in plot(df, x, y)
+:param box_width: width of each box
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.cat_caption">
+<code class="sig-name descname">cat_caption</code><em class="property"> = 'Top {} of {} categories'</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.cat_caption" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.hist">
+<code class="sig-name descname">hist</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.hist_kde_viz">
+<code class="sig-name descname">hist_kde_viz</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.array</em>, <em class="sig-param">bandwidth: float</em>, <em class="sig-param">col_x: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.hist_kde_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.hist_kde_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>histogram + KDE visualization
+:param data: tuple containing frequency, bins and values
+:param bandwidth: required bandwidth of the kde
+:param col_x: the name of the column
+:return: the Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.hist_viz">
+<code class="sig-name descname">hist_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Tuple[numpy.array, numpy.array], missing: List[int], orig_df_len: int, show_y_label: bool, col_x: str, yscale: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.hist_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.hist_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Histogram for a column
+:param data: intermediate result
+:param missing: the number of missing values
+:param orig_df_len: the original dataframe length
+:param show_y_label: if True show y axis labels
+:param col_x: name of the column
+:param yscale: linear or logarithmic y axis
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.kde">
+<code class="sig-name descname">kde</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.kde" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.max_bar_labels">
+<code class="sig-name descname">max_bar_labels</code><em class="property"> = 30</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.max_bar_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.max_num_legend">
+<code class="sig-name descname">max_num_legend</code><em class="property"> = 7</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.max_num_legend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.max_xlab_len">
+<code class="sig-name descname">max_xlab_len</code><em class="property"> = 15</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.max_xlab_len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.num_x_vals">
+<code class="sig-name descname">num_x_vals</code><em class="property"> = 50</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.num_x_vals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.pie">
+<code class="sig-name descname">pie</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.pie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.pie_viz">
+<code class="sig-name descname">pie_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[str, int], col_x: str, bars: int, ascending: bool</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.pie_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.pie_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pie chart vizualisation for categorical data
+:param data: the result from the intermediate
+:param col_x: the plotted column
+:param bars: number of slices to show in the pie
+:param ascending: if True plot smallest to largest slices of pie,
+else plot largest to smallest
+:return: Bokeh plot figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.qqnorm">
+<code class="sig-name descname">qqnorm</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.qqnorm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_uni.UniViz.qqnorm_viz">
+<code class="sig-name descname">qqnorm_viz</code><span class="sig-paren">(</span><em class="sig-param">in_data: Dict[str, Any], col_x: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.qqnorm_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.qqnorm_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>QQ-Norm plot for a column
+:param in_data: intermediate result
+:param col_x: name of the field
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.basic">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda.basic" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the code for plot(df,…)</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dataprep.eda.basic package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic.computation">dataprep.eda.basic.computation module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic.viz_multi">dataprep.eda.basic.viz_multi module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic.viz_uni">dataprep.eda.basic.viz_uni module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/dataprep.eda.basic.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

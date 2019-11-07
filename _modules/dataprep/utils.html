@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.utils &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module implements the utils function.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">IPython</span> <span class="k">import</span> <span class="n">get_ipython</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../dataprep.html#dataprep.utils.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enumeration for storing the different types of data possible in a column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TYPE_NUM</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">TYPE_CAT</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">TYPE_UNSUP</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="get_type"><a class="viewcode-back" href="../../dataprep.html#dataprep.utils.get_type">[docs]</a><span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataType</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Returns the type of the input data.</span>
+<span class="sd">        Identified types are according to the DataType Enumeration.</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    __________</span>
+<span class="sd">    The data for which the type needs to be identified.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    __________</span>
+<span class="sd">    str representing the type of the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">col_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_UNSUP</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_bool_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">col_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_CAT</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">):</span>
+            <span class="n">col_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_CAT</span>
+        <span class="k">elif</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">col_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_NUM</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">col_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_CAT</span>
+    <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># TO-DO</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Type cannot be determined due to : </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">col_type</span></div>
+
+
+<div class="viewcode-block" id="is_notebook"><a class="viewcode-back" href="../../dataprep.html#dataprep.utils.is_notebook">[docs]</a><span class="k">def</span> <span class="nf">is_notebook</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :return: whether it is running in jupyter notebook</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">if</span> <span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;ZMQInteractiveShell&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<span class="k">def</span> <span class="nf">_rand_str</span><span class="p">(</span><span class="n">str_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param str_length: The length of random string</span>
+<span class="sd">    :return: A generated random string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">letters</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">str_length</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_drop_non_numerical_columns</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param pd_data_frame: the pandas data_frame for</span>
+<span class="sd">    which plots are calculated for each column.</span>
+<span class="sd">    :return: the numerical pandas data_frame for</span>
+<span class="sd">    which plots are calculated for each column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">drop_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">pd_data_frame</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">get_type</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">[</span><span class="n">column_name</span><span class="p">])</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_NUM</span><span class="p">:</span>
+            <span class="n">drop_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
+    <span class="n">pd_data_frame</span> <span class="o">=</span> <span class="n">pd_data_frame</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">drop_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd_data_frame</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Weiyuan Wu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>
