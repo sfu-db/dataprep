@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from pandas import Timestamp
 from ...eda.common import Intermediate
 from ...eda import plot
 
@@ -57,11 +56,11 @@ def test_normal_1() -> None:
     df_1_expected: Dict[
         str, Dict[str, Union[Dict[Any, Any], Tuple[Any, Any], List[int]]]
     ] = {
-        "bool_01": {"bar_plot": {0: 4, 1: 5}, "missing": [0]},
-        "bool_01_with_nan": {"bar_plot": {0.0: 4, 1.0: 4}, "missing": [1]},
-        "bool_tf": {"bar_plot": {False: 3, True: 6}, "missing": [0]},
-        "bool_tf_with_nan": {"bar_plot": {False: 5, True: 3}, "missing": [1]},
-        "s1": {"bar_plot": {1.0: 9}, "missing": [0]},
+        "bool_01": {"bar_chart": {0: 4, 1: 5}, "missing": [0]},
+        "bool_01_with_nan": {"bar_chart": {0.0: 4, 1.0: 4}, "missing": [1]},
+        "bool_tf": {"bar_chart": {False: 3, True: 6}, "missing": [0]},
+        "bool_tf_with_nan": {"bar_chart": {False: 5, True: 3}, "missing": [1]},
+        "s1": {"bar_chart": {1.0: 9}, "missing": [0]},
         "x": {
             "histogram": (
                 np.array([1, 3, 1, 0, 1, 0, 0, 0, 0, 2], dtype=np.int64),
@@ -357,17 +356,12 @@ def test_normal_1() -> None:
 
     # TEST - 3 for plot(df, x, y)
     df_2_expected_2 = {
-        "stacked_column_plot": {
-            ("a", Timestamp("1898-01-02 00:00:00")): 1,
-            ("a", Timestamp("1950-12-09 00:00:00")): 3,
-            ("a", Timestamp("1990-12-09 00:00:00")): 1,
-            ("b", Timestamp("1898-01-02 00:00:00")): 1,
-            ("b", Timestamp("1950-12-09 00:00:00")): 7,
-            ("c", Timestamp("1898-01-02 00:00:00")): 1,
-            ("c", Timestamp("1950-12-09 00:00:00")): 2,
-            ("d", Timestamp("1950-12-09 00:00:00")): 1,
-            ("d", Timestamp("1990-12-09 00:00:00")): 1,
-            ("d", Timestamp("2011-07-04 00:00:00")): 1,
+        "stacked_bar_chart": {
+            "1898-01-02 00:00:00": [12.5, 20.0, 33.33333333333333, 0],
+            "1950-12-09 00:00:00": [87.5, 60.0, 66.66666666666666, 33.33333333333333],
+            "1990-12-09 00:00:00": [0, 20.0, 0, 33.33333333333333],
+            "2011-07-04 00:00:00": [0, 0, 0, 33.33333333333333],
+            "x_categories": ["b", "a", "c", "d"],
         }
     }
     returned_3: List[Intermediate] = plot(df_2, "x", "somedate")
@@ -375,15 +369,14 @@ def test_normal_1() -> None:
     # TESTING
     for intermediate in returned_3:
         result = intermediate.result
+
         LOGGER.info(
             "Testing %s and %s",
             intermediate.raw_data["col_x"],
             intermediate.raw_data["col_y"],
         )
-        if "stacked_column_plot" in result:
-            assert (
-                df_2_expected_2["stacked_column_plot"] == result["stacked_column_plot"]
-            )
+        if "stacked_bar_chart" in result:
+            assert df_2_expected_2["stacked_bar_chart"] == result["stacked_bar_chart"]
             LOGGER.info(".....Checked.")
 
 

@@ -366,7 +366,7 @@ class UniViz:
         data: Dict[str, Dict[str, Any]],
         col_x: str,
         col_y: Optional[str] = None,
-        box_width: float = 0.25,
+        box_width: float = 0.9,
     ) -> Any:
         """
         *SPECIAL CASE
@@ -417,9 +417,7 @@ class UniViz:
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x0", y0="fy", x1="x1", y1="fy", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x0", y0="fy", x1="x1", y1="fy", line_color="black"),
         )
 
         for cat in df.index:
@@ -433,28 +431,20 @@ class UniViz:
 
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x", y0="uw", x1="x", y1="sf", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x", y0="uw", x1="x", y1="sf", line_color="black"),
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x", y0="lw", x1="x", y1="tf", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x", y0="lw", x1="x", y1="tf", line_color="black"),
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x0", y0="uw", x1="x1", y1="uw", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x0", y0="uw", x1="x1", y1="uw", line_color="black"),
             name="upper",
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x0", y0="lw", x1="x1", y1="lw", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x0", y0="lw", x1="x1", y1="lw", line_color="black"),
             name="lower",
         )
 
@@ -479,7 +469,7 @@ class UniViz:
         plot.add_layout(xaxis, "below")
         plot.add_layout(Grid(dimension=0, ticker=xaxis.ticker))
         plot.add_layout(Grid(dimension=1, ticker=yaxis.ticker))
-        plot.xaxis.major_label_orientation = math.pi / 4
+        plot.xaxis.major_label_orientation = math.pi / 3
         plot.yaxis.axis_label = col_y
         plot.xaxis.ticker = FixedTicker(ticks=list(df["x"]))
         plot.xaxis.formatter = FuncTickFormatter(
