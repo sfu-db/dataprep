@@ -22,8 +22,11 @@ class Render:
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        plot_height: int = 300,
-        plot_width: int = 324,
+        plot_height_small: int = 300,
+        plot_width_small: int = 324,
+        plot_height_large: int = 500,
+        plot_width_large: int = 500,
+        plot_width_wide: int = 972,
         ncolumns: int = 3,
         band_width: float = 1.5,
         tile_size: Optional[float] = None,
@@ -33,22 +36,28 @@ class Render:
     ) -> None:
         self.viz_uni = UniViz()
         self.viz_multi = MultiViz()
-        self.plot_height = (
-            plot_height  # set the height of individual plots in the grid.
-        )
-        self.plot_width = plot_width  # set the width of individual plots in the grid.
+        self.plot_height_small = (
+            plot_height_small
+        )  # set the height of individual plots in the grid.
+        self.plot_width_small = (
+            plot_width_small
+        )  # set the width of individual plots in the grid.
+        self.plot_height_large = plot_height_large  # height for large plots
+        self.plot_width_large = plot_width_large  # width for large plots
+        self.plot_width_wide = plot_width_wide  # wide width for plots
         self.total_cols = (
             ncolumns  # set the total number of columns to be displaced in the grid.
         )
         self.band_width = band_width  # set the band width for the kde plot.
-        self.tile_size = tile_size  # set the tile size for the scatter plot.
-        self.bars = bars  # set the max number of bars to show for bar plot.
+        self.tile_size = tile_size  # set the tile size for the hexbin plot.
+        self.bars = bars  # set the max number of bars to show for bar chart.
         self.yscale = yscale  # scale of the y axis labels for the histogram
-        self.ascending = ascending  # sort the bars in a bar plot ascending
+        self.ascending = ascending  # sort the bars in a bar chart ascending
 
-    def vizualise(  # pylint: disable=R0914
+    def vizualise(
         self, intermediates_list: List[Intermediate], only_x: bool = False
     ) -> None:
+        # pylint: disable=too-many-statements
         """
             Shows up the viz on a notebook or browser
         :param intermediates_list: as returned from plot function
@@ -85,18 +94,18 @@ class Render:
                         data_dict["qqnorm_plot"], col_x
                     )
                     plots.append(fig)
-                elif "bar_plot" in data_dict:
+                elif "bar_chart" in data_dict:
                     fig = delayed(self.viz_uni.bar_viz)(
-                        data_dict["bar_plot"],
+                        data_dict["bar_chart"],
                         data_dict["missing"],
                         col_x,
                         self.bars,
                         self.ascending,
                     )
                     plots.append(fig)
-                elif "pie_plot" in data_dict:
+                elif "pie_chart" in data_dict:
                     fig = delayed(self.viz_uni.pie_viz)(
-                        data_dict["pie_plot"], col_x, self.bars, self.ascending
+                        data_dict["pie_chart"], col_x, self.bars, self.ascending
                     )
                     plots.append(fig)
                 elif "kde_plot" in data_dict:
@@ -105,17 +114,44 @@ class Render:
                     )
                     plots.append(fig)
             else:
-                if "stacked_column_plot" in data_dict:
+                if "line_chart" in data_dict:
+                    fig = delayed(self.viz_multi.line_viz)(
+                        data_dict["line_chart"], col_x, col_y
+                    )
+                    plots.append(fig)
+                if "nested_bar_chart" in data_dict:
                     fig = delayed(
-                        self.viz_multi.nest_cat_viz(
-                            data_dict["stacked_column_plot"], col_x, col_y
+                        self.viz_multi.nested_viz(
+                            data_dict["nested_bar_chart"], col_x, col_y
                         )
+                    )
+                    plots.append(fig)
+                elif "stacked_bar_chart" in data_dict:
+                    fig = delayed(
+                        self.viz_multi.stacked_viz(
+                            data_dict["stacked_bar_chart"],
+                            data_dict["sub_categories"],
+                            col_x,
+                            col_y,
+                        )
+                    )
+                    plots.append(fig)
+                elif "heat_map" in data_dict:
+                    fig = delayed(
+                        self.viz_multi.heat_map_viz(data_dict["heat_map"], col_x, col_y)
                     )
                     plots.append(fig)
                 elif "scatter_plot" in data_dict:
                     fig = delayed(
                         self.viz_multi.scatter_viz(
-                            data_dict["scatter_plot"], col_x, col_y, self.tile_size
+                            data_dict["scatter_plot"], col_x, col_y
+                        )
+                    )
+                    plots.append(fig)
+                elif "hexbin_plot" in data_dict:
+                    fig = delayed(
+                        self.viz_multi.hexbin_viz(
+                            data_dict["hexbin_plot"], col_x, col_y, self.tile_size
                         )
                     )
                     plots.append(fig)
@@ -130,8 +166,15 @@ class Render:
         if only_x:
             tab_list = list()
             for interm, plot in zip(intermediates_list, plots_list):
-                plot.height = self.plot_height
-                plot.width = self.plot_width
+                plot.height = self.plot_height_large
+                plot.width = self.plot_width_large
+                if (
+                    list(interm.result.keys())[0] == "stacked_bar_chart"
+                    or list(interm.result.keys())[0] == "nested_bar_chart"
+                    or list(interm.result.keys())[0] == "heat_map"
+                ):
+                    plot.height = self.plot_height_small
+                    plot.width = self.plot_width_wide
                 tab = Panel(child=plot, title=list(interm.result.keys())[0])
                 tab_list.append(tab)
             show(Tabs(tabs=tab_list))
@@ -142,7 +185,7 @@ class Render:
                     sizing_mode=None,
                     toolbar_location=None,
                     ncols=self.total_cols,
-                    plot_height=self.plot_height,
-                    plot_width=self.plot_width,
+                    plot_height=self.plot_height_small,
+                    plot_width=self.plot_width_small,
                 )
             )
