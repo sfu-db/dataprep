@@ -536,7 +536,7 @@ def _calc_hist(
     bins : number of bins to use in the histogram
 
     Returns
-    __________
+    _______
     np.array : An array of values representing histogram for the input col
     """
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None, "bins": bins}
