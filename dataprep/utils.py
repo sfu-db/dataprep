@@ -9,7 +9,6 @@ from typing import Any
 import dask
 import dask.dataframe as dd
 import pandas as pd
-from IPython import get_ipython
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,11 +59,17 @@ def is_notebook() -> Any:
     :return: whether it is running in jupyter notebook
     """
     try:
+
+        # pytype: disable=import-error
+        from IPython import get_ipython
+
+        # pytype: enable=import-error
+
         shell = get_ipython().__class__.__name__
         if shell == "ZMQInteractiveShell":
             return True
         return False
-    except NameError:
+    except (NameError, ImportError):
         return False
 
 
@@ -79,14 +84,19 @@ def _rand_str(str_length: int = 20) -> Any:
 
 def _drop_non_numerical_columns(pd_data_frame: pd.DataFrame) -> pd.DataFrame:
     """
-    :param pd_data_frame: the pandas data_frame for
-    which plots are calculated for each column.
-    :return: the numerical pandas data_frame for
-    which plots are calculated for each column.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataframe for which plots are calculated for each column.
+
+    Returns
+    -------
+    pd.DataFrame
+        The numerical dataframe for which plots are calculated for each column.
     """
     drop_list = []
     for column_name in pd_data_frame.columns.values:
         if get_type(pd_data_frame[column_name]) != DataType.TYPE_NUM:
             drop_list.append(column_name)
-    pd_data_frame = pd_data_frame.drop(columns=drop_list)
-    return pd_data_frame
+    df = pd_data_frame.drop(columns=drop_list)
+    return df
