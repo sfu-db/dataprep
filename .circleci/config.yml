@@ -4,10 +4,12 @@ jobs:
     docker:
       - image: circleci/python:3.7.2
     steps:
-      - run:
+      - &step_add_path
+        run:
           name: Add python user PATH into PATH
           command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
-      - run: 
+      - &step_install_pipenv
+        run: 
           name: Install python tools
           command: pip install --user pipenv
       - checkout
@@ -25,12 +27,8 @@ jobs:
     docker:
       - image: circleci/python:3.7.2
     steps:
-      - run:
-          name: Add python user PATH into PATH
-          command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
-      - run: 
-          name: Install python tools
-          command: pip install --user pipenv
+      - *step_add_path
+      - *step_install_pipenv
       - checkout
       - attach_workspace:
           at: .
@@ -50,12 +48,8 @@ jobs:
     docker:
       - image: circleci/python:3.7.2
     steps:
-      - run:
-          name: Add python user PATH into PATH
-          command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
-      - run: 
-          name: Install python tools
-          command: pip install --user pipenv
+      - *step_add_path
+      - *step_install_pipenv
       - checkout
       - attach_workspace:
           at: .
