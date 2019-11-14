@@ -46,7 +46,6 @@
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">IPython</span> <span class="k">import</span> <span class="n">get_ipython</span>
 
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -97,11 +96,17 @@
 <span class="sd">    :return: whether it is running in jupyter notebook</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
+
+        <span class="c1"># pytype: disable=import-error</span>
+        <span class="kn">from</span> <span class="nn">IPython</span> <span class="k">import</span> <span class="n">get_ipython</span>
+
+        <span class="c1"># pytype: enable=import-error</span>
+
         <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">if</span> <span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;ZMQInteractiveShell&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">NameError</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
@@ -116,17 +121,22 @@
 
 <span class="k">def</span> <span class="nf">_drop_non_numerical_columns</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param pd_data_frame: the pandas data_frame for</span>
-<span class="sd">    which plots are calculated for each column.</span>
-<span class="sd">    :return: the numerical pandas data_frame for</span>
-<span class="sd">    which plots are calculated for each column.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pd.DataFrame</span>
+<span class="sd">        The dataframe for which plots are calculated for each column.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        The numerical dataframe for which plots are calculated for each column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">drop_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">pd_data_frame</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">get_type</span><span class="p">(</span><span class="n">pd_data_frame</span><span class="p">[</span><span class="n">column_name</span><span class="p">])</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TYPE_NUM</span><span class="p">:</span>
             <span class="n">drop_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
-    <span class="n">pd_data_frame</span> <span class="o">=</span> <span class="n">pd_data_frame</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">drop_list</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">pd_data_frame</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd_data_frame</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">drop_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
 </pre></div>
 
           </div>
