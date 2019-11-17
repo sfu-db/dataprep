@@ -137,6 +137,7 @@ def _calc_correlation_pd_k(pd_data_frame: pd.DataFrame, k: int) -> Any:
 
 def _calc_correlation_pd_x_k_pearson(  # pylint: disable=too-many-locals
     # pylint: disable=invalid-unary-operand-type
+    # pylint: disable=too-many-branches
     name_list: List[str],
     x_name: str,
     cal_matrix: np.ndarray,
@@ -178,6 +179,12 @@ def _calc_correlation_pd_x_k_pearson(  # pylint: disable=too-many-locals
             end_p = result["end_p"]
             result["pearson"] = row_p[idx_p[start_p:end_p]]
             result["col_p"] = np.array(name_list)[idx_p[start_p:end_p]]
+            for i, _ in enumerate(np.array(name_list)[idx_p[start_p:end_p]]):
+                if np.array(name_list)[idx_p[start_p:end_p]][i] == x_name:
+                    result["start_p"] = result["end_p"] - k - 1
+                    start_p = result["start_p"]
+                    result["pearson"] = row_p[idx_p[start_p:end_p]]
+                    result["col_p"] = np.array(name_list)[idx_p[start_p:end_p]]
         else:
             start_p = result["start_p"]
             end_p = result["end_p"]
@@ -190,6 +197,12 @@ def _calc_correlation_pd_x_k_pearson(  # pylint: disable=too-many-locals
             idx_p = np.argsort(-row_p_abs)
             col_p = np.array(name_list)[idx_p[:k]]
             result = {"pearson": row_p[idx_p[:k]], "col_p": col_p}
+            for i, _ in enumerate(col_p):
+                if col_p[i] == x_name:
+                    result = {
+                        "pearson": row_p[idx_p[: k + 1]],
+                        "col_p": np.array(name_list)[idx_p[: k + 1]],
+                    }
         else:
             row_p = corr_matrix_p[name_idx, :]
             row_p_abs = np.absolute(row_p)
@@ -201,6 +214,8 @@ def _calc_correlation_pd_x_k_pearson(  # pylint: disable=too-many-locals
 
 def _calc_correlation_pd_x_k_spearman(  # pylint: disable=too-many-locals
     # pylint: disable=invalid-unary-operand-type
+    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-statements
     name_list: List[str],
     x_name: str,
     cal_matrix: np.ndarray,
@@ -245,6 +260,12 @@ def _calc_correlation_pd_x_k_spearman(  # pylint: disable=too-many-locals
             end_s = result["end_s"]
             result["spearman"] = row_s[idx_s[start_s:end_s]]
             result["col_s"] = np.array(name_list)[idx_s[start_s:end_s]]
+            for i, _ in enumerate(np.array(name_list)[idx_s[start_s:end_s]]):
+                if np.array(name_list)[idx_s[start_s:end_s]][i] == x_name:
+                    result["start_s"] = result["end_s"] - k - 1
+                    start_s = result["start_s"]
+                    result["spearman"] = row_s[idx_s[start_s:end_s]]
+                    result["col_s"] = np.array(name_list)[idx_s[start_s:end_s]]
         else:
             start_s = result["start_s"]
             end_s = result["end_s"]
@@ -257,6 +278,12 @@ def _calc_correlation_pd_x_k_spearman(  # pylint: disable=too-many-locals
             idx_s = np.argsort(-row_s_abs)
             col_s = np.array(name_list)[idx_s[:k]]
             result = {"spearman": row_s[idx_s[:k]], "col_s": col_s}
+            for i, _ in enumerate(col_s):
+                if col_s[i] == x_name:
+                    result = {
+                        "spearman": row_s[idx_s[: k + 1]],
+                        "col_s": np.array(name_list)[idx_s[: k + 1]],
+                    }
         else:
             row_s = corr_matrix_s[name_idx, :]
             row_s_abs = np.absolute(row_s)
@@ -327,6 +354,12 @@ def _calc_correlation_pd_x_k_kendall(  # pylint: disable=too-many-locals
             end_k = result["end_k"]
             result["kendall"] = row_k[idx_k[start_k:end_k]]
             result["col_k"] = np.array(name_list)[idx_k[start_k:end_k]]
+            for i, _ in enumerate(np.array(name_list)[idx_k[start_k:end_k]]):
+                if np.array(name_list)[idx_k[start_k:end_k]][i] == x_name:
+                    result["start_k"] = result["end_k"] - k - 1
+                    start_k = result["start_k"]
+                    result["kendall"] = row_k[idx_k[start_k:end_k]]
+                    result["col_k"] = np.array(name_list)[idx_k[start_k:end_k]]
         else:
             start_k = result["start_k"]
             end_k = result["end_k"]
@@ -339,6 +372,12 @@ def _calc_correlation_pd_x_k_kendall(  # pylint: disable=too-many-locals
             idx_k = np.argsort(-row_k_abs)
             col_k = np.array(name_list)[idx_k[:k]]
             result = {"kendall": row_k[idx_k[:k]], "col_k": col_k}
+            for i, _ in enumerate(col_k):
+                if col_k[i] == x_name:
+                    result = {
+                        "kendall": row_k[idx_k[: k + 1]],
+                        "col_k": np.array(name_list)[idx_k[: k + 1]],
+                    }
         else:
             row_k = corr_matrix_k[name_idx, :]
             row_k_abs = np.absolute(row_k)
