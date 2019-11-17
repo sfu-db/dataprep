@@ -91,12 +91,15 @@ def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
     data_s = []
     data_k = []
     for i, _ in enumerate(result["col_p"]):
-        data_p.append((x_name, result["col_p"][i], result["pearson"][i]))
+        if x_name != result["col_p"][i]:
+            data_p.append((x_name, result["col_p"][i], result["pearson"][i]))
     for i, _ in enumerate(result["col_s"]):
-        data_s.append((x_name, result["col_s"][i], result["spearman"][i]))
+        if x_name != result["col_s"][i]:
+            data_s.append((x_name, result["col_s"][i], result["spearman"][i]))
     for i, _ in enumerate(result["col_k"]):
-        data_k.append((x_name, result["col_k"][i], result["kendall"][i]))
-    tooltips = [("name", "@x"), ("name", "@y"), ("correlation", "@z")]
+        if x_name != result["col_k"][i]:
+            data_k.append((x_name, result["col_k"][i], result["kendall"][i]))
+    tooltips = [("name", "@y"), ("correlation", "@z")]
     hover = HoverTool(tooltips=tooltips)
     if not data_p:
         warnings.warn("The pearson correlation matrix is empty")
