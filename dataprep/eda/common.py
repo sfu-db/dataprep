@@ -5,7 +5,7 @@ from typing import Any, Dict
 import numpy as np
 
 
-class Intermediate:  # pylint: disable=too-few-public-methods
+class Intermediate:
     """
        This is class of intermediate
        There are two variables
