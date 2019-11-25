@@ -1,0 +1,77 @@
+{
+    "version": 1,
+    "request": {
+        "url": "https://api.yelp.com/v3/businesses/search",
+        "method": "GET",
+        "authorization": "Bearer",
+        "params": {
+            "term": true,
+            "location": false,
+            "latitude": false,
+            "longitude": false
+        }
+    },
+    "response": {
+        "ctype": "application/json",
+        "tablePath": "$.businesses[*]",
+        "schema": {
+            "rating": {
+                "target": "$.rating",
+                "type": "float"
+            },
+            "price": {
+                "target": "$.price",
+                "type": "string"
+            },
+            "phone": {
+                "target": "$.phone",
+                "type": "string"
+            },
+            "name": {
+                "target": "$.name",
+                "type": "string"
+            },
+            "url": {
+                "target": "$.url",
+                "type": "string"
+            },
+            "latitude": {
+                "target": "$.coordinates.latitude",
+                "type": "float"
+            },
+            "longtitude": {
+                "target": "$.coordinates.longitude",
+                "type": "float"
+            },
+            "city": {
+                "target": "$.location.city",
+                "type": "string"
+            },
+            "country": {
+                "target": "$.location.country",
+                "type": "string"
+            },
+            "address2": {
+                "target": "$.location.address2",
+                "type": "string"
+            },
+            "address3": {
+                "target": "$.location.address3",
+                "type": "string"
+            },
+            "state": {
+                "target": "$.location.state",
+                "type": "string"
+            },
+            "address1": {
+                "target": "$.location.address1",
+                "type": "string"
+            },
+            "zip_code": {
+                "target": "$.location.zip_code",
+                "type": "string"
+            }
+        },
+        "orient": "records"
+    }
+}

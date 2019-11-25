@@ -1,0 +1,33 @@
+{
+    "version": 1,
+    "request": {
+        "url": "https://api.spotify.com/v1/search/tweets.json",
+        "method": "GET",
+        "authorization": "Bearer",
+        "params": {
+            "q": true,
+            "result_type": false,
+            "count": false
+
+        }
+    },
+    "response": {
+        "ctype": "application/json",
+        "tablePath": "$.tweets[*]",
+        "schema": {
+            "created_at": {
+                "target": "$.date",
+                "type": "string"
+            },
+            "text": {
+                "target": "$.text",
+                "type": "string"
+            },
+            "truncated": {
+                "target": "$.truncated",
+                "type": "boolean"
+            }
+        },
+        "orient": "records"
+    }
+}
