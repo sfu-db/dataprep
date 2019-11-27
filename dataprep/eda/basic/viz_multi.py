@@ -15,6 +15,7 @@ from bokeh.models import (
     PrintfTickFormatter,
     BasicTicker,
     Legend,
+    FuncTickFormatter,
 )
 from bokeh.palettes import viridis, Pastel1  # pylint: disable=E0611
 from bokeh.plotting import figure
@@ -37,25 +38,59 @@ class MultiViz:
     hexbin: bool = False
     max_label_len: int = 15  # maximum length of an axis label
 
+    @classmethod
+    def _make_title(cls, grp_cnt_stats: Dict[str, int], col_x: str, col_y: str) -> Any:
+        """
+        Make title of plot
+        :param grp_cnt_stats: group count statistics
+        :param col_x: column X
+        :param col_y: column Y
+        :return: title
+        """
+
+        x_total = grp_cnt_stats["x_total"]
+        x_show = grp_cnt_stats["x_show"]
+        if "y_total" in grp_cnt_stats:
+            y_total = grp_cnt_stats["y_total"]
+            y_show = grp_cnt_stats["y_show"]
+
+            if x_total > x_show and y_total > y_show:
+                return "(top {} out of {}) {} by (top {} out of {}) {}".format(
+                    y_show, y_total, col_y, x_show, x_total, col_x
+                )
+            if y_total > y_show:
+                return "(top {} out of {}) {} by {}".format(
+                    y_show, y_total, col_y, col_x
+                )
+        if x_total > x_show:
+            return "{} by (top {} out of {}) {}".format(col_y, x_show, x_total, col_x)
+        return "{} by {}".format(col_y, col_x)
+
     def nested_viz(
-        self, data: Dict[Tuple[Any, Any], int], col_x: str, col_y: str
+        self,
+        data: Dict[Tuple[Any, Any], int],
+        col_x: str,
+        col_y: str,
+        grp_cnt_stats: Dict[str, int],
     ) -> Any:
         """
         Nested categories plot
         :param data: the intermediates result
         :param col_x: column X
         :param col_y: column Y
+        :param grp_cnt_stats: group count statistics
         :return: Bokeh Plot Figure
         """
         x_values = list([tuple(map(str, i)) for i in data.keys()])
         counts = list(data.values())
         data_source = ColumnDataSource(data=dict(x_values=x_values, counts=counts))
+        title = self._make_title(grp_cnt_stats, col_x, col_y)
 
         plot_figure = figure(
             x_range=FactorRange(*x_values),
             tools=TOOLS,
             toolbar_location=None,
-            title="{} by {}".format(col_y, col_x),
+            title=title,
         )
 
         plot_figure.vbar(
@@ -76,12 +111,24 @@ class MultiViz:
         plot_figure.xgrid.grid_line_color = None
         plot_figure.yaxis.axis_label = "Count"
         plot_figure.xaxis.major_label_orientation = math.pi / 2
-        self.nested_cat = True
         plot_figure.title.text_font_size = "10pt"
+        plot_figure.xaxis.formatter = FuncTickFormatter(
+            code="""
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
+        """
+            % (self.max_label_len, self.max_label_len)
+        )
+        self.nested_cat = True
         return plot_figure
 
-    def stacked_viz(
-        self, data: Dict[str, int], sub_categories: List[str], col_x: str, col_y: str
+    def stacked_viz(  # pylint: disable=too-many-arguments
+        self,
+        data: Dict[str, int],
+        sub_categories: List[str],
+        col_x: str,
+        col_y: str,
+        grp_cnt_stats: Dict[str, int],
     ) -> Any:
         """
         Stacked categories plot
@@ -89,12 +136,14 @@ class MultiViz:
         :param sub_categories: list of all subcategories
         :param col_x: column X
         :param col_y: column Y
+        :param grp_cnt_stats: group count statistics
         :return: Bokeh Plot Figure
         """
+        title = self._make_title(grp_cnt_stats, col_x, col_y)
         plot_figure = figure(
             x_range=data["x_categories"],
             toolbar_location=None,
-            title="{} by {}".format(col_y, col_x),
+            title=title,
             tools="hover",
             tooltips=[
                 ("Category", "@x_categories, $name"),
@@ -126,25 +175,30 @@ class MultiViz:
         plot_figure.xgrid.grid_line_color = None
         plot_figure.yaxis.axis_label = "Percent"
         plot_figure.xaxis.major_label_orientation = math.pi / 3
-        self.stacked_cat = True
         plot_figure.title.text_font_size = "10pt"
+        plot_figure.xaxis.formatter = FuncTickFormatter(
+            code="""
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
+        """
+            % (self.max_label_len, self.max_label_len)
+        )
+        self.stacked_cat = True
         return plot_figure
 
-    def heat_map_viz(self, data: pd.DataFrame, col_x: str, col_y: str) -> Any:
+    def heat_map_viz(
+        self, data: pd.DataFrame, col_x: str, col_y: str, grp_cnt_stats: Dict[str, int]
+    ) -> Any:
         """
         Stacked categories plot
         :param data: the intermediates result
         :param col_x: column X
         :param col_y: column Y
+        :param grp_cnt_stats: group count statistics
         :return: Bokeh Plot Figure
         """
-        data[col_x] = data[col_x].astype(str)
-        data[col_y] = data[col_y].astype(str)
-        data = data.applymap(
-            lambda x: (x[: (self.max_label_len - 1)] + "...")
-            if isinstance(x, str) and len(x) > self.max_label_len
-            else x
-        )
+        title = self._make_title(grp_cnt_stats, col_x, col_y)
+
         source = ColumnDataSource(data)
         palette = BIPALETTE[(len(BIPALETTE) // 2 - 1) :]
         mapper = LinearColorMapper(
@@ -158,7 +212,7 @@ class MultiViz:
             toolbar_location=None,
             tools=TOOLS,
             x_axis_location="below",
-            title="{} by {}".format(col_y, col_x),
+            title=title,
         )
 
         renderer = plot_figure.rect(
@@ -192,27 +246,53 @@ class MultiViz:
         plot_figure.xaxis.major_label_orientation = math.pi / 3
         plot_figure.xgrid.grid_line_color = None
         plot_figure.ygrid.grid_line_color = None
+        plot_figure.xaxis.formatter = FuncTickFormatter(
+            code="""
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
+        """
+            % (self.max_label_len, self.max_label_len)
+        )
+        plot_figure.yaxis.formatter = FuncTickFormatter(
+            code="""
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
+        """
+            % (self.max_label_len, self.max_label_len)
+        )
         self.heatmap_cat = True
         return plot_figure
 
     def scatter_viz(  # pylint: disable=C0330, R0914
-        self, points: List[Tuple[Any, Any]], col_x: str, col_y: str
+        self,
+        points: List[Tuple[Any, Any]],
+        col_x: str,
+        col_y: str,
+        sample_size: int = 1000,
     ) -> Any:
         """
         Scatter plot
         :param points: list of points to be plotted
         :param col_x: column X
         :param col_y: column Y
+        :param sample_size: sample size for points to plot
         :return: Bokeh Plot Figure
         """
         x_values = np.array([t[0] for t in points])
         y_values = np.array([t[1] for t in points])
 
-        plot_figure = figure(
-            tools=TOOLS, title="{} by {}".format(col_y, col_x), toolbar_location=None
+        x_values, y_values = (
+            sample_n(x_values, sample_size),
+            sample_n(y_values, sample_size),
         )
 
-        x_values, y_values = sample_n(x_values, 1000), sample_n(y_values, 1000)
+        if len(x_values) == sample_size:
+            title = "{} by {} (sample size {})".format(col_y, col_x, sample_size)
+        else:
+            title = "{} by {}".format(col_y, col_x)
+
+        plot_figure = figure(tools=TOOLS, title=title, toolbar_location=None)
+
         renderer = plot_figure.circle(
             x_values, y_values, color=PALETTE[0], size=4, name="points"
         )
@@ -233,11 +313,12 @@ class MultiViz:
         plot_figure.title.text_font_size = "10pt"
         return plot_figure
 
-    def hexbin_viz(  # pylint: disable=C0330, R0914
+    def hexbin_viz(  # pylint: disable=C0330, R0914, R0913
         self,
         points: List[Tuple[Any, Any]],
         col_x: str,
         col_y: str,
+        sample_size: int = 1000,
         tile_size: Optional[float] = None,
     ) -> Any:
         """
@@ -245,11 +326,16 @@ class MultiViz:
         :param points: list of points to be plotted
         :param col_x: column X
         :param col_y: column Y
+        :param sample_size: sample size for points to plot
         :param tile_size: hex tile size
         :return: Bokeh Plot Figure
         """
         x_values = np.array([t[0] for t in points])
         y_values = np.array([t[1] for t in points])
+        x_values, y_values = (
+            sample_n(x_values, sample_size),
+            sample_n(y_values, sample_size),
+        )
 
         if tile_size is None:
             xmin, xmax = np.nanmin(x_values), np.nanmax(x_values)
@@ -257,12 +343,17 @@ class MultiViz:
             ymin, ymax = np.nanmin(y_values), np.nanmax(y_values)
             ysize = (ymax - ymin) // 20
 
-            tile_size = max(xsize, ysize) + 0.1
+            tile_size = max(xsize, ysize) + 1
+
+        if len(x_values) == sample_size:
+            title = "{} by {} (sample size {})".format(col_y, col_x, sample_size)
+        else:
+            title = "{} by {}".format(col_y, col_x)
 
         plot_figure = figure(
             match_aspect=True,
             tools=TOOLS,
-            title="{} by {}".format(col_y, col_x),
+            title=title,
             toolbar_location=None,
             background_fill_color="#f5f5f5",
         )
@@ -311,23 +402,25 @@ class MultiViz:
         return plot_figure
 
     def line_viz(  # pylint: disable=C0330, R0914
-        self, data: Dict[str, Tuple[Any, Any]], col_x: str, col_y: str
+        self,
+        data: Dict[str, Tuple[Any, Any]],
+        col_x: str,
+        col_y: str,
+        grp_cnt_stats: Dict[str, int],
     ) -> Any:
         """
         Multi-line graph
         :param data: the intermediates result
         :param col_x: column X
         :param col_y: column Y
+        :param grp_cnt_stats: group count statistics
         :return: Bokeh Plot Figure
         """
         categories = list(data.keys())
         palette = PALETTE * (len(categories) // len(PALETTE) + 1)
+        title = self._make_title(grp_cnt_stats, col_x, col_y)
 
-        plot_figure = figure(
-            tools=TOOLS,
-            title="{} frequency by {}".format(col_y, col_x),
-            toolbar_location=None,
-        )
+        plot_figure = figure(tools=TOOLS, title=title, toolbar_location=None)
 
         plot_dict = dict()
         for cat, colour in zip(categories, palette):

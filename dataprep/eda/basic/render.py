@@ -24,8 +24,8 @@ class Render:
         self,
         plot_height_small: int = 300,
         plot_width_small: int = 324,
-        plot_height_large: int = 500,
-        plot_width_large: int = 500,
+        plot_height_large: int = 400,
+        plot_width_large: int = 450,
         plot_width_wide: int = 972,
         ncolumns: int = 3,
         band_width: float = 1.5,
@@ -37,11 +37,11 @@ class Render:
         self.viz_uni = UniViz()
         self.viz_multi = MultiViz()
         self.plot_height_small = (
-            plot_height_small
-        )  # set the height of individual plots in the grid.
+            plot_height_small  # set the height of individual plots in the grid.
+        )
         self.plot_width_small = (
-            plot_width_small
-        )  # set the width of individual plots in the grid.
+            plot_width_small  # set the width of individual plots in the grid.
+        )
         self.plot_height_large = plot_height_large  # height for large plots
         self.plot_width_large = plot_width_large  # width for large plots
         self.plot_width_wide = plot_width_wide  # wide width for plots
@@ -116,13 +116,19 @@ class Render:
             else:
                 if "line_chart" in data_dict:
                     fig = delayed(self.viz_multi.line_viz)(
-                        data_dict["line_chart"], col_x, col_y
+                        data_dict["line_chart"],
+                        col_x,
+                        col_y,
+                        data_dict["grp_cnt_stats"],
                     )
                     plots.append(fig)
                 if "nested_bar_chart" in data_dict:
                     fig = delayed(
                         self.viz_multi.nested_viz(
-                            data_dict["nested_bar_chart"], col_x, col_y
+                            data_dict["nested_bar_chart"],
+                            col_x,
+                            col_y,
+                            data_dict["grp_cnt_stats"],
                         )
                     )
                     plots.append(fig)
@@ -133,12 +139,18 @@ class Render:
                             data_dict["sub_categories"],
                             col_x,
                             col_y,
+                            data_dict["grp_cnt_stats"],
                         )
                     )
                     plots.append(fig)
                 elif "heat_map" in data_dict:
                     fig = delayed(
-                        self.viz_multi.heat_map_viz(data_dict["heat_map"], col_x, col_y)
+                        self.viz_multi.heat_map_viz(
+                            data_dict["heat_map"],
+                            col_x,
+                            col_y,
+                            data_dict["grp_cnt_stats"],
+                        )
                     )
                     plots.append(fig)
                 elif "scatter_plot" in data_dict:
@@ -151,13 +163,19 @@ class Render:
                 elif "hexbin_plot" in data_dict:
                     fig = delayed(
                         self.viz_multi.hexbin_viz(
-                            data_dict["hexbin_plot"], col_x, col_y, self.tile_size
+                            data_dict["hexbin_plot"],
+                            col_x,
+                            col_y,
+                            tile_size=self.tile_size,
                         )
                     )
                     plots.append(fig)
                 elif "box_plot" in data_dict:
                     fig = delayed(self.viz_uni.box_viz)(
-                        data_dict["box_plot"], col_x, col_y
+                        data_dict["box_plot"],
+                        col_x,
+                        col_y,
+                        grp_cnt_stats=data_dict["grp_cnt_stats"],
                     )
                     plots.append(fig)
 
