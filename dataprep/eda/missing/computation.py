@@ -113,19 +113,37 @@ def plot_missing(
     return_intermediate: bool = False,
 ) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
     """
-    :param pd_data_frame: the pandas data_frame for which plots are calculated for each
-    column.
-    :param x_name: a valid column name of the data frame
-    :param y_name: a valid column name of the data frame
-    :param return_intermediate: whether show intermediate results to users
-    :return: A dict to encapsulate the
-    intermediate results.
-
     This function is designed to deal with missing values
-
     There are three functions: plot_missing(df), plot_missing(df, x)
     plot_missing(df, x, y)
 
+    Parameters
+    ----------
+    pd_data_frame: pd.DataFrame
+        the pandas data_frame for which plots are calculated for each column
+    x_name: str, optional
+        a valid column name of the data frame
+    y_name: str, optional
+        a valid column name of the data frame
+    return_intermediate: bool
+        whether show intermediate results to users
+
+    Returns
+    ----------
+    An object of figure or
+        An object of figure and
+        An intermediate representation for the plots of different columns in the data_frame.
+
+    Examples
+    ----------
+    >>> from dataprep.eda.missing.computation import plot_missing
+    >>> import pandas as pd
+    >>> df = pd.read_csv("suicide-rate.csv")
+    >>> plot_missing(df, "HDI_for_year")
+    >>> plot_missing(df, "HDI_for_year", "population")
+
+    Notes
+    ----------
     match (x_name, y_name)
         case (Some, Some) => histogram for numerical column,
         bars for categorical column, qq-plot, box-plot, jitter plot,
