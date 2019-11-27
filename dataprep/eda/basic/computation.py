@@ -70,12 +70,96 @@ def __calc_box_stats(grp_series: dask.dataframe.core.Series) -> Dict[str, Any]:
     return stats
 
 
+def __calc_groups(
+    dataframe: dd.DataFrame,
+    col_x: str,
+    num_x_cats: int,
+    col_y: Optional[str] = None,
+    num_y_cats: Optional[int] = None,
+) -> Dict[str, Any]:
+    """
+    Auxiliary function to group the dataframe along specified columns.
+
+    Parameters
+    ----------
+    dataframe : Dask DataFrame
+        Dataframe to be grouped over by specified columns.
+
+    col_x : str
+        The name of a column in the input data frame.
+
+    num_x_cats : int
+        Number of groups with the highest count kept after grouping
+        the dataframe over column col_x. If the total number of groups
+        in col_x after grouping is less than num_x_cats, keep all groups.
+
+    col_y : str, optional
+        The name of a column in the input data frame.
+
+    num_y_cats : int, optional
+        Number of groups with the highest count kept after grouping
+        the dataframe over column col_y. If the total number of groups
+        in col_y after grouping is less than num_y_cats, keep all groups.
+    """
+
+    # group count statistics to inform user of the sampled output
+    grp_cnt_stats = dict()
+
+    # remove missing values
+    if col_y is not None:
+        df = dataframe.dropna(subset=[col_x, col_y])
+    else:
+        df = dataframe.dropna(subset=[col_x])
+
+    # group by col_x and compute the count in each group
+    grp = df.groupby(col_x)
+    grp_series = dask.compute(grp[col_x].count())[0]
+    # parse dataset to consist of only largest categories
+    num_cats = min(len(grp_series), num_x_cats)
+    largest_cats = list(grp_series.nlargest(n=num_cats).keys())
+    df = df[df[col_x].isin(largest_cats)]
+
+    if len(grp_series) > num_x_cats:
+        grp_cnt_stats["x_total"] = len(grp_series)
+    else:
+        grp_cnt_stats["x_total"] = num_x_cats
+    grp_cnt_stats["x_show"] = num_x_cats
+
+    if col_y is None:
+        return {"df": df, "grp_cnt_stats": grp_cnt_stats}
+
+    if num_y_cats is not None:
+        # group by col_y and compute the count in each group
+        grp = df.groupby(col_y)
+        grp_series = dask.compute(grp[col_y].count())[0]
+        # parse dataset to consist of only largest categories
+        num_cats = min(len(grp_series), num_y_cats)
+        largest_cats = list(grp_series.nlargest(n=num_cats).keys())
+        df = df[df[col_y].isin(largest_cats)]
+
+        if len(grp_series) > num_y_cats:
+            grp_cnt_stats["y_total"] = len(grp_series)
+        else:
+            grp_cnt_stats["y_total"] = num_y_cats
+        grp_cnt_stats["y_show"] = num_y_cats
+
+    # group by col_x and col_y and compute the count in each group
+    grp_object = df.groupby([col_x, col_y])
+    grp_series = dask.compute(grp_object[col_x].count())[0]
+
+    return {
+        "grp_series": grp_series,
+        "categories": largest_cats,
+        "grp_cnt_stats": grp_cnt_stats,
+    }
+
+
 def _calc_box(
     dataframe: dd.DataFrame,
     col_x: str,
     bins: int,
     col_y: Optional[str] = None,
-    num_x_cats: int = 10,
+    num_cats: int = 10,
 ) -> Intermediate:
     # pylint: disable=too-many-locals
     """
@@ -88,18 +172,14 @@ def _calc_box(
     col_x : a valid column name of the dataframe
     bins : number of bins to group by on x axis if numerical x
     col_y : a valid column name of the dataframe
-    num_x_cats : number of categories to show for categorical variable
+    num_cats : number of categories to show for categorical variable
 
     RETURNS
     __________
     a (column_name: data) dict storing the intermediate results
     """
     res: Dict[str, Any] = dict()
-    cat_col, num_col = (
-        (col_x, col_y)
-        if (get_type(dataframe[col_x]) == DataType.TYPE_CAT)
-        else (col_y, col_x)
-    )
+    grp_cnt_stats = None  # for if we group over categorical variable
 
     # remove missing values
     df = dataframe.dropna(subset=[col_x])
@@ -113,7 +193,6 @@ def _calc_box(
         get_type(dataframe[col_x]) == DataType.TYPE_NUM
         and get_type(dataframe[col_y]) == DataType.TYPE_NUM
     ):
-        cat_col, num_col = col_x, col_y
         df = df[[col_x, col_y]].compute()
         bin_endpoints = np.linspace(df[col_x].min(), df[col_x].max(), num=bins + 1)
         if np.issubdtype(df[col_x], np.int64):
@@ -128,19 +207,21 @@ def _calc_box(
             group = "({},{})".format(str(bin_endpoints[i]), str(bin_endpoints[i + 1]))
             res[str(group)] = __calc_box_stats(grp_series)
     else:
-        # find largest categories
-        grp = df.groupby(cat_col)
-        grp_series = dask.compute(grp[cat_col].count())[0]
-        num_large_cats = min(len(grp_series), num_x_cats)
-        largest_cats = list(grp_series.nlargest(n=num_large_cats).keys())
-        df = df[df[cat_col].isin(largest_cats)]
+        col_x, col_y = (
+            (col_x, col_y)
+            if (get_type(dataframe[col_x]) == DataType.TYPE_CAT)
+            else (col_y, col_x)
+        )
+        grouped_data = __calc_groups(df, col_x, num_cats)
+        df = grouped_data["df"]
+        grp_cnt_stats = grouped_data["grp_cnt_stats"]
 
         # create box plot for each category
-        for group in dask.compute(df[cat_col].unique())[0]:
-            grp_series = df.groupby([cat_col]).get_group(group)[num_col]
+        for group in dask.compute(df[col_x].unique())[0]:
+            grp_series = df.groupby([col_x]).get_group(group)[col_y]
             res[str(group)] = __calc_box_stats(grp_series)
-    raw_data = {"df": dataframe, "col_x": cat_col, "col_y": num_col}
-    result = {"box_plot": res}
+    raw_data = {"df": dataframe, "col_x": col_x, "col_y": col_y}
+    result = {"box_plot": res, "grp_cnt_stats": grp_cnt_stats}
     return Intermediate(result, raw_data)
 
 
@@ -167,22 +248,14 @@ def _calc_nested(
     __________
     a (column_name: data) dict storing the intermediate results
     """
-    # remove missing values
-    df = dataframe.dropna(subset=[col_x, col_y])
 
-    # group by col_x and compute the count in each group
-    grp = df.groupby(col_x)
-    grp_series = dask.compute(grp[col_x].count())[0]
-    # parse dataset to consist of only largest categories
-    num_large_cats = min(len(grp_series), num_x_cats)
-    largest_cats = list(grp_series.nlargest(n=num_large_cats).keys())
-    df = df[df[col_x].isin(largest_cats)]
-
-    # group by col_x and col_y and compute the count in each group
-    grp_object = df.groupby([col_x, col_y])
-    grp_series = dask.compute(grp_object[col_x].count())[0]
+    grouped_data = __calc_groups(dataframe, col_x, num_x_cats, col_y)
+    grp_series = grouped_data["grp_series"]
+    largest_cats = grouped_data["categories"]
+    grp_cnt_stats = grouped_data["grp_cnt_stats"]
 
     # create the final dataframe with only the largest subcategories
+    most_sub_cats = 0
     final_series = pd.Series([])
     for category in largest_cats:
         largest_cats = list(set(grp_series[category].nlargest(n=num_y_cats).keys()))
@@ -190,9 +263,17 @@ def _calc_nested(
         final_series = final_series.append(
             grp_series[grp_series.index.isin(isolate)].sort_values(ascending=False)
         )
+        if len(grp_series[category]) > most_sub_cats:
+            most_sub_cats = len(grp_series[category])
+
+    if most_sub_cats > num_y_cats:
+        grp_cnt_stats["y_total"] = most_sub_cats
+    else:
+        grp_cnt_stats["y_total"] = num_y_cats
+    grp_cnt_stats["y_show"] = num_y_cats
 
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": col_y}
-    result = {"nested_bar_chart": dict(final_series)}
+    result = {"nested_bar_chart": dict(final_series), "grp_cnt_stats": grp_cnt_stats}
     return Intermediate(result, raw_data)
 
 
@@ -219,25 +300,15 @@ def _calc_stacked(
     __________
     a (column_name: data) dict storing the intermediate results
     """
-    # remove missing values
-    df = dataframe.dropna(subset=[col_x, col_y])
+    grouped_data = __calc_groups(dataframe, col_x, num_x_cats, col_y)
+    grp_series = grouped_data["grp_series"]
+    largest_cats = grouped_data["categories"]
 
-    # group by col_x and compute the count in each group
-    grp = df.groupby(col_x)
-    grp_series = dask.compute(grp[col_x].count())[0]
-    # parse dataset to consist of only largest categories
-    num_cats = min(len(grp_series), num_x_cats)
-    largest_cats = list(grp_series.nlargest(n=num_cats).keys())
-    df = df[df[col_x].isin(largest_cats)]
+    # lists to create final dataframe in format for a stacked bar chart
+    index1: List[Any] = []  # group values that serve as first index of resulting df
+    index2: List[Any] = []  # group values that serve as second index of resulting df
+    values: List[Any] = []  # corresponding values to the groups in index1 and index2
 
-    # group by col_x and col_y and compute the count in each group
-    grp_object = df.groupby([col_x, col_y])
-    grp_series = dask.compute(grp_object[col_x].count())[0]
-
-    # lists to create final dataframe
-    index1: List[Any] = []
-    index2: List[Any] = []
-    values: List[Any] = []
     for category in largest_cats:
         # find largest subcategories in each category
         num_cats = min(len(grp_series[category]), num_y_cats)
@@ -280,7 +351,11 @@ def _calc_stacked(
                 final_data_dict[sub_val].append(0)
     final_data_dict["x_categories"] = list(map(str, largest_cats))
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": col_y}
-    result = {"stacked_bar_chart": final_data_dict, "sub_categories": sub_categories}
+    result = {
+        "stacked_bar_chart": final_data_dict,
+        "sub_categories": sub_categories,
+        "grp_cnt_stats": grouped_data["grp_cnt_stats"],
+    }
     return Intermediate(result, raw_data)
 
 
@@ -307,31 +382,17 @@ def _calc_heat_map(
     __________
     a (column_name: data) dict storing the intermediate results
     """
-    # group by col_x and compute the count in each group
-    grp = dataframe.groupby(col_x)
-    grp_series = dask.compute(grp[col_x].count())[0]
-    # parse dataset to consist of only largest categories
-    num_large_cats = min(len(grp_series), num_x_cats)
-    largest_cats = list(grp_series.nlargest(n=num_large_cats).keys())
-    df = dataframe[dataframe[col_x].isin(largest_cats)]
+    grouped_data = __calc_groups(dataframe, col_x, num_x_cats, col_y, num_y_cats)
+    grp_series = grouped_data["grp_series"]
 
-    # group by col_y and compute the count in each group
-    grp = df.groupby(col_y)
-    grp_series = dask.compute(grp[col_y].count())[0]
-    # parse dataset to consist of only largest categories
-    num_large_cats = min(len(grp_series), num_y_cats)
-    largest_cats = list(grp_series.nlargest(n=num_large_cats).keys())
-    df = df[df[col_y].isin(largest_cats)]
-
-    # group by col_x and col_y, and format for final dataframe
-    grp_object = df.groupby([col_x, col_y])
-    grp_series = dask.compute(grp_object[col_x].count())[0]
     grp_df = grp_series.to_frame().unstack(fill_value=0).stack()
     grp_df.columns = ["total"]
     grp_df = grp_df.reset_index(level=[col_x, col_y])
+    grp_df[col_x] = grp_df[col_x].astype(str)
+    grp_df[col_y] = grp_df[col_y].astype(str)
 
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": col_y}
-    result = {"heat_map": grp_df}
+    result = {"heat_map": grp_df, "grp_cnt_stats": grouped_data["grp_cnt_stats"]}
     return Intermediate(result, raw_data)
 
 
@@ -436,16 +497,10 @@ def _calc_hist_by_group(
     hist_interm: List[Any] = list()
     grp_name_list: List[str] = list()
 
-    # find largest categories
-    df = dataframe.dropna(subset=[col_x, col_y])
-    grp = df.groupby(col_x)
-    grp_series = dask.compute(grp[col_x].count())[0]
-    # parse dataset to consist of only largest categories
-    num_large_cats = min(len(grp_series), num_x_cats)
-    largest_cats = list(grp_series.nlargest(n=num_large_cats).keys())
-    df = df[df[col_x].isin(largest_cats)]
+    grouped_data = __calc_groups(dataframe, col_cat, num_x_cats)
+    df = grouped_data["df"].dropna(subset=[col_num])
 
-    # create a box plot for each category
+    # create a histogram for each category
     for group in dask.compute(df[col_cat].unique())[0]:
         grp_series = df.groupby([col_cat]).get_group(group)[col_num]
         minv = dask.compute(grp_series.min())[0]
@@ -460,8 +515,8 @@ def _calc_hist_by_group(
         grp_hist[zipped_element[0]] = zipped_element[1]
 
     return Intermediate(
-        {"line_chart": grp_hist},
-        {"df": dataframe, "col_x": col_x, "col_y": col_y, "bins": bins},
+        {"line_chart": grp_hist, "grp_cnt_stats": grouped_data["grp_cnt_stats"]},
+        {"df": dataframe, "col_x": col_cat, "col_y": col_num, "bins": bins},
     )
 
 
@@ -492,8 +547,7 @@ def _calc_hist(
     (maxv,) = dask.compute(dataframe[col_x].max())
 
     dframe = dataframe[col_x].dropna().values
-    hist_array = None
-    bins_array = None
+
     if isinstance(dframe, dask.array.core.Array):
         hist_array, bins_array = da.histogram(dframe, range=[minv, maxv], bins=bins)
         (hist_array,) = dask.compute(hist_array)
@@ -502,7 +556,6 @@ def _calc_hist(
         minv = 0 if np.isnan(dframe.min()) else dframe.min()
         maxv = 0 if np.isnan(dframe.max()) else dframe.max()
         hist_array, bins_array = np.histogram(dframe, bins=bins, range=[minv, maxv])
-    bins_array = cast(Any, bins_array)
 
     if dask.compute(np.issubdtype(dataframe[col_x], np.int64))[0]:
         bins_temp = [int(x) for x in np.ceil(bins_array)]
@@ -621,12 +674,24 @@ def plot(
     """Generates plots for exploratory data analysis.
 
     If col_x and col_y are unspecified, the distribution of
-    each coloumn is plotted. If col_x is specified and col_y
-    is unspecified, the distribution of col_x is plotted in
-    various ways. If col_x and col_y are specified, plots depicting
-    the relationship between the variables will be displayed.
-    This function automatically detects whether a column contains
-    categorical or numerical values.
+    each coloumn is plotted. A histogram is plotted if the
+    column contains numerical values, and a bar chart is plotted
+    if the column contains categorical values.
+
+    If col_x is specified and col_y is unspecified, the
+    distribution of col_x is plotted in various ways. If col_x
+    contains categorical values, a bar chart and pie chart are
+    plotted. If col_x contains numerical values, a histogram,
+    kernel density estimate plot, box plot, and qq plot are plotted.
+
+    If col_x and col_y are specified, plots depicting
+    the relationship between the variables will be displayed. If
+    col_x and col_y contain numerical values, a scatter plot, hexbin
+    plot, and binned box plot are plotted. If one of col_x and col_y
+    contain categorical values and the other contains numerical values,
+    a box plot and multi-line histogram are plotted. If col_X and col_y
+    contain categorical vales, a nested bar chart, stacked bar chart, and
+    heat map are plotted.
 
     Parameters:
     ----------
@@ -778,11 +843,8 @@ def plot(
             LOGGER.info("Plot could not be obtained due to : %s", error)
 
     if col_x is None and col_y is None:
-        Render.vizualise(
-            Render(**kwrgs), plot_df(data_frame, bins, force_cat, force_num)
-        )
-        return plot_df(
-            data_frame, bins, force_cat, force_num
-        )  # if kwrgs.get("return_result") else None
+        intermediates = plot_df(data_frame, bins, force_cat, force_num)
+        Render.vizualise(Render(**kwrgs), intermediates)
+        return intermediates
 
     return list_of_intermediates
