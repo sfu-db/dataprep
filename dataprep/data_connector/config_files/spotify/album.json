@@ -1,0 +1,42 @@
+{
+    "version": 1,
+    "request": {
+        "url": "https://api.spotify.com/v1/search?type=album",
+        "method": "GET",
+        "authorization": "Bearer",
+        "params": {
+            "q": true
+        }
+    },
+    "response": {
+        "ctype": "application/json",
+        "tablePath": "$.albums.items[*]",
+        "schema": {
+            "album_name": {
+                "target": "$.name",
+                "type": "string"
+            },
+            "release_date":{
+                "target": "$.release_date",
+                "type": "string"
+            },
+            "total_tracks":{
+                "target": "$.total_tracks",
+                "type": "string"
+            },
+            "artist":{
+                "target": "$.artists[0].name",
+                "type": "string"
+            },
+            "available_markets":{
+                "target": "$.available_markets",
+                "type": "string"
+            },
+            "image":{
+                "target": "$.images[0].url",
+                "type": "string"
+            }
+        },
+        "orient": "records"
+    }
+}
