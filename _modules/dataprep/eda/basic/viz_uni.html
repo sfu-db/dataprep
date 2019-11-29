@@ -42,13 +42,13 @@
 <span class="c1"># pylint: disable=R0903</span>
 <span class="c1"># pylint: disable=R0914</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
 <span class="kn">import</span> <span class="nn">bokeh.palettes</span> <span class="k">as</span> <span class="nn">bp</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">gaussian_kde</span>
-<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ColumnDataSource</span><span class="p">,</span>
     <span class="n">FixedTicker</span><span class="p">,</span>
     <span class="n">FuncTickFormatter</span><span class="p">,</span>
@@ -59,13 +59,13 @@
     <span class="n">Legend</span><span class="p">,</span>
     <span class="n">LegendItem</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">bokeh.models.annotations</span> <span class="k">import</span> <span class="n">Title</span>
-<span class="kn">from</span> <span class="nn">bokeh.models.glyphs</span> <span class="k">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">Rect</span><span class="p">,</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">VBar</span>
-<span class="kn">from</span> <span class="nn">bokeh.models.ranges</span> <span class="k">import</span> <span class="n">FactorRange</span>
-<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">figure</span>
-<span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="k">import</span> <span class="n">cumsum</span>
+<span class="kn">from</span> <span class="nn">bokeh.models.annotations</span> <span class="kn">import</span> <span class="n">Title</span>
+<span class="kn">from</span> <span class="nn">bokeh.models.glyphs</span> <span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">Rect</span><span class="p">,</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">VBar</span>
+<span class="kn">from</span> <span class="nn">bokeh.models.ranges</span> <span class="kn">import</span> <span class="n">FactorRange</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="kn">import</span> <span class="n">cumsum</span>
 
-<span class="kn">from</span> <span class="nn">..palette</span> <span class="k">import</span> <span class="n">PALETTE</span>
+<span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">PALETTE</span>
 
 <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 

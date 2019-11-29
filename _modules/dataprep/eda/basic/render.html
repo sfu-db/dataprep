@@ -40,15 +40,15 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># pylint: disable=R0903</span>
 <span class="c1"># pylint: disable=R0912</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="k">import</span> <span class="n">Panel</span><span class="p">,</span> <span class="n">Tabs</span>
-<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">show</span>
-<span class="kn">from</span> <span class="nn">dask</span> <span class="k">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">Panel</span><span class="p">,</span> <span class="n">Tabs</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">dask</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">delayed</span>
 
-<span class="kn">from</span> <span class="nn">..common</span> <span class="k">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">.viz_multi</span> <span class="k">import</span> <span class="n">MultiViz</span>
-<span class="kn">from</span> <span class="nn">.viz_uni</span> <span class="k">import</span> <span class="n">UniViz</span>
+<span class="kn">from</span> <span class="nn">..common</span> <span class="kn">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">.viz_multi</span> <span class="kn">import</span> <span class="n">MultiViz</span>
+<span class="kn">from</span> <span class="nn">.viz_uni</span> <span class="kn">import</span> <span class="n">UniViz</span>
 
 
 <div class="viewcode-block" id="Render"><a class="viewcode-back" href="../../../../dataprep.eda.basic.html#dataprep.eda.basic.render.Render">[docs]</a><span class="k">class</span> <span class="nc">Render</span><span class="p">:</span>
@@ -57,7 +57,7 @@
 <span class="sd">    Encapsulate Renderer functions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
         <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">324</span><span class="p">,</span>

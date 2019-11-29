@@ -39,18 +39,18 @@
 <span class="sd">    This module implements the plot_missing(df) function&#39;s</span>
 <span class="sd">    calculating intermediate part</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">show</span>
-<span class="kn">from</span> <span class="nn">bokeh.models.widgets</span> <span class="k">import</span> <span class="n">Tabs</span>
-<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.models.widgets</span> <span class="kn">import</span> <span class="n">Tabs</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span>
 
-<span class="kn">from</span> <span class="nn">...utils</span> <span class="k">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">get_type</span>
-<span class="kn">from</span> <span class="nn">..common</span> <span class="k">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">.visualization</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">...utils</span> <span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">get_type</span>
+<span class="kn">from</span> <span class="nn">..common</span> <span class="kn">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">.visualization</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_vis_missing_impact</span><span class="p">,</span>
     <span class="n">_vis_missing_impact_y</span><span class="p">,</span>
     <span class="n">_vis_nonzero_count</span><span class="p">,</span>
