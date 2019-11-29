@@ -391,7 +391,7 @@ def plot(
     force_num: Optional[StringList] = None,
     bins: int = 10,
     value_range: Optional[Tuple[float, float]] = None,
-    **kwrgs: Any
+    **kwrgs: Any,
 ) -> List[Intermediate]:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
