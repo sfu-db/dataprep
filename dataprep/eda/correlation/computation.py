@@ -580,21 +580,56 @@ def plot_correlation(  # pylint: disable=too-many-arguments
     return_intermediate: bool = False,
 ) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
     """
-    :param pd_data_frame: the pandas data_frame for which plots are calculated for each
-    column.
-    :param x_name: a valid column name of the data frame
-    :param y_name: a valid column name of the data frame
-    :param value_range: range of value
-    :param k: choose top-k element
-    :param return_intermediate: whether show intermediate results to users
-    :return: A (column: [array/dict]) dict to encapsulate the
-    intermediate results.
+    This function is designed to calculate the correlation between columns
+    There are three functions: plot_correlation(df), plot_correlation(df, x)
+    plot_correlation(df, x, y)
+    There are also some parameters such as k and value_range to satisfy your requirement
 
+    Parameters
+    ----------
+    pd_data_frame: pd.DataFrame
+        the pandas data_frame for which plots are calculated for each column
+    x_name: str, optional
+        a valid column name of the data frame
+    y_name: str, optional
+        a valid column name of the data frame
+    value_range: list[float], optional
+        range of value
+    k: int, optional
+        choose top-k element
+    return_intermediate: bool
+        whether show intermediate results to users
+
+    Returns
+    ----------
+    An object of figure or
+        An object of figure and
+        An intermediate representation for the plots of different columns in the data_frame.
+
+    Examples
+    ----------
+    >>> from dataprep.eda.correlation.computation import plot_correlation
+    >>> import pandas as pd
+    >>> df = pd.read_csv("suicide-rate.csv")
+    >>> plot_correlation(df)
+    >>> plot_correlation(df, k=6)
+    >>> plot_correlation(df, "suicides")
+    >>> plot_correlation(df, "suicides", k=3)
+    >>> plot_correlation(df, "suicides", value_range=[-1, 0.3])
+    >>> plot_correlation(df, "suicides", value_range=[-1, 0.3], k=2)
+    >>> plot_correlation(df, x_name="population", y_name="suicides_no")
+    >>> plot_correlation(df, x_name="population", y_name="suicides", k=5)
+
+    Notes
+    ----------
     match (x_name, y_name, k)
         case (None, None, None) => heatmap
         case (Some, None, Some) => Top K columns for (pearson, spearman, kendall)
         case (Some, Some, _) => Scatter with regression line with/without top k outliers
         otherwise => error
+
+    This function only supports numerical or categorical data,
+    and it is better to drop None, Nan and Null value before using it
     """
     params = {
         "width": 325,
