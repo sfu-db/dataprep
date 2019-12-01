@@ -4,227 +4,266 @@
 """
 import math
 import warnings
-from typing import Any, Dict
+from typing import Any, Dict, List, Sequence, Tuple, Optional
 
 import holoviews as hv
 import numpy as np
-from bokeh.models import HoverTool
+from bokeh.io import show
+from bokeh.models import (
+    BasicTicker,
+    CategoricalColorMapper,
+    ColorBar,
+    FactorRange,
+    HoverTool,
+    LinearColorMapper,
+    PrintfTickFormatter,
+    LegendItem,
+    Legend,
+)
 from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import Figure, figure
 
 from ..common import Intermediate
-from ..palette import BIPALETTE
+from ..palette import BIPALETTE, BRG
+
+__all__ = ["render_correlation"]
+
+# def _vis_cross_table(intermediate: Intermediate, params: Dict[str, Any]) -> Figure:
+#     """
+#     :param intermediate: An object to encapsulate the
+#     intermediate results.
+#     :return: A figure object
+#     """
+#     result = intermediate.result
+#     hv.extension("bokeh", logo=False)
+#     cross_matrix = result["cross_table"]
+#     x_cat_list = result["x_cat_list"]
+#     y_cat_list = result["y_cat_list"]
+#     data = []
+#     for i, _ in enumerate(x_cat_list):
+#         for j, _ in enumerate(y_cat_list):
+#             data.append((x_cat_list[i], y_cat_list[j], cross_matrix[i, j]))
+#     tooltips = [("z", "@z")]
+#     hover = HoverTool(tooltips=tooltips)
+#     heatmap = hv.HeatMap(data)
+#     heatmap.opts(
+#         tools=[hover],
+#         colorbar=True,
+#         width=params["width"],
+#         toolbar="above",
+#         title="cross_table",
+#     )
+#     fig = hv.render(heatmap, backend="bokeh")
+#     _discard_unused_visual_elems(fig)
+#     return fig
+
+########## HeatMaps ##########
+def tweak_figure(p: Figure) -> None:
+    p.grid.grid_line_color = None
+    p.axis.axis_line_color = None
+    p.axis.major_tick_line_color = None
+    p.axis.major_label_text_font_size = "9pt"
+    p.axis.major_label_standoff = 0
+    p.xaxis.major_label_orientation = math.pi / 3
 
 
-def _discard_unused_visual_elems(fig: Figure) -> None:
-    """
-    :param fig: A figure object
-    """
-    fig.toolbar_location = None
-    fig.toolbar.active_drag = None
-    fig.xaxis.axis_label = ""
-    fig.yaxis.axis_label = ""
-
-
-def _vis_correlation_pd(  # pylint: disable=too-many-locals
-    intermediate: Intermediate, params: Dict[str, Any]
+def render_correlation_heatmaps(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
 ) -> Tabs:
-    """
-    :param intermediate: An object to encapsulate the
-    intermediate results.
-    :return: A figure object
-    """
-    tab_list = []
-    pd_data_frame = intermediate.raw_data["df"]
-    method_list = intermediate.raw_data["method_list"]
-    result = intermediate.result
-    hv.extension("bokeh", logo=False)
+    tabs: List[Panel] = []
+    tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
+    axis_range = itmdt["axis_range"]
 
-    for method in method_list:
-        corr_matrix = result["corr_" + method[0]]
-        name_list = pd_data_frame.columns.values
-        data = []
-        for i, _ in enumerate(name_list):
-            for j, _ in enumerate(name_list):
-                if corr_matrix[i, j] != 0:
-                    data.append((name_list[i], name_list[j], corr_matrix[i, j]))
-                else:
-                    data.append((name_list[i], name_list[j], np.nan))
-        tooltips = [("name", "@x"), ("name", "@y"), ("correlation", "@z")]
-        hover = HoverTool(tooltips=tooltips)
-        heatmap = hv.HeatMap(data).redim.range(z=(-1, 1))
-        heatmap.opts(
-            tools=[hover],
-            cmap=BIPALETTE,
-            colorbar=True,
-            width=params["width"],
-            title="heatmap_" + method,
+    for method, df in itmdt["data"].items():
+        # in case of numerical column names
+        df = df.copy()
+        df["x"] = df["x"].apply(str)
+        df["y"] = df["y"].apply(str)
+
+        mapper, color_bar = create_color_mapper(palette)
+        x_range = FactorRange(*axis_range)
+        y_range = FactorRange(*reversed(axis_range))
+        p = figure(
+            x_range=x_range,
+            y_range=y_range,
+            plot_width=plot_width,
+            plot_height=plot_height,
+            x_axis_location="above",
+            tools="hover",
+            toolbar_location=None,
+            tooltips=tooltips,
         )
-        fig = hv.render(heatmap, backend="bokeh")
-        fig.plot_width = params["plot_width"]
-        fig.plot_height = params["plot_height"]
-        title = Title()
-        title.text = method + " correlation matrix"
-        title.align = "center"
-        fig.title = title
-        fig.xaxis.major_label_orientation = math.pi / 4
-        _discard_unused_visual_elems(fig)
-        tab = Panel(child=fig, title=method)
-        tab_list.append(tab)
-    tabs = Tabs(tabs=tab_list)
+
+        tweak_figure(p)
+
+        p.rect(
+            x="x",
+            y="y",
+            width=1,
+            height=1,
+            source=df,
+            fill_color={"field": "correlation", "transform": mapper},
+            line_color=None,
+        )
+
+        p.add_layout(color_bar, "right")
+
+        tab = Panel(child=p, title=method)
+        tabs.append(tab)
+
+    tabs = Tabs(tabs=tabs)
     return tabs
 
 
-def _vis_correlation_pd_x_k(  # pylint: disable=too-many-locals
-    intermediate: Intermediate, params: Dict[str, Any]
+def render_correlation_single_heatmaps(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
 ) -> Tabs:
-    """
-    :param intermediate: An object to encapsulate the
-    intermediate results.
-    :return: A figure object
-    """
-    x_name = intermediate.raw_data["x_name"]
-    result = intermediate.result
-    hv.extension("bokeh", logo=False)
-    data_p = []
-    data_s = []
-    data_k = []
-    for i, _ in enumerate(result["col_p"]):
-        if x_name != result["col_p"][i]:
-            data_p.append((x_name, result["col_p"][i], result["pearson"][i]))
-    for i, _ in enumerate(result["col_s"]):
-        if x_name != result["col_s"][i]:
-            data_s.append((x_name, result["col_s"][i], result["spearman"][i]))
-    for i, _ in enumerate(result["col_k"]):
-        if x_name != result["col_k"][i]:
-            data_k.append((x_name, result["col_k"][i], result["kendall"][i]))
-    tooltips = [("name", "@y"), ("correlation", "@z")]
-    hover = HoverTool(tooltips=tooltips)
-    if not data_p:
-        warnings.warn("The pearson correlation matrix is empty")
-    if not data_k:
-        warnings.warn("The kendall correlation matrix is empty")
-    if not data_s:
-        warnings.warn("The spearman correlation matrix is empty")
-    heatmap_p = hv.HeatMap(data_p).redim.range(z=(-1, 1))
-    heatmap_p.opts(
-        tools=[hover],
-        cmap=BIPALETTE,
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
-    )
-    heatmap_s = hv.HeatMap(data_s).redim.range(z=(-1, 1))
-    heatmap_s.opts(
-        tools=[hover],
-        cmap=BIPALETTE,
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
-    )
-    heatmap_k = hv.HeatMap(data_k).redim.range(z=(-1, 1))
-    heatmap_k.opts(
-        tools=[hover],
-        cmap=BIPALETTE,
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
-    )
-    fig_p = hv.render(heatmap_p, backend="bokeh")
-    fig_s = hv.render(heatmap_s, backend="bokeh")
-    fig_k = hv.render(heatmap_k, backend="bokeh")
-    _discard_unused_visual_elems(fig_p)
-    _discard_unused_visual_elems(fig_s)
-    _discard_unused_visual_elems(fig_k)
-    tab_p = Panel(child=fig_p, title="pearson")
-    tab_s = Panel(child=fig_s, title="spearman")
-    tab_k = Panel(child=fig_k, title="kendall")
-    tabs = Tabs(tabs=[tab_p, tab_s, tab_k])
+    tabs: List[Panel] = []
+    tooltips = [("y", "@y"), ("correlation", "@correlation{1.11}")]
+
+    for method, df in itmdt["data"].items():
+        mapper, color_bar = create_color_mapper(palette)
+
+        x_range = FactorRange(*df["x"].unique())
+        y_range = FactorRange(*df["y"].unique())
+        p = figure(
+            x_range=x_range,
+            y_range=y_range,
+            plot_width=plot_width,
+            plot_height=plot_height,
+            x_axis_location="below",
+            tools="hover",
+            toolbar_location=None,
+            tooltips=tooltips,
+        )
+
+        tweak_figure(p)
+
+        p.rect(
+            x="x",
+            y="y",
+            width=1,
+            height=1,
+            source=df,
+            fill_color={"field": "correlation", "transform": mapper},
+            line_color=None,
+        )
+
+        p.add_layout(color_bar, "right")
+
+        tab = Panel(child=p, title=method)
+        tabs.append(tab)
+
+    tabs = Tabs(tabs=tabs)
     return tabs
 
 
-def _vis_correlation_pd_x_y_k(
-    intermediate: Intermediate, params: Dict[str, Any]
+def create_color_mapper(palette: Sequence[str]) -> Tuple[LinearColorMapper, ColorBar]:
+    mapper = LinearColorMapper(palette=palette, low=-1, high=1)
+    colorbar = ColorBar(
+        color_mapper=mapper,
+        major_label_text_font_size="8pt",
+        ticker=BasicTicker(),
+        formatter=PrintfTickFormatter(format="%.2f"),
+        label_standoff=6,
+        border_line_color=None,
+        location=(0, 0),
+    )
+    return mapper, colorbar
+
+
+######### Scatter #########
+def render_scatter(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+) -> Figure:
+    df = itmdt["data"]
+    xcol, ycol, *maybe_label = df.columns
+
+    tooltips = [(xcol, f"@{xcol}"), (ycol, f"@{ycol}")]
+    fig = Figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        toolbar_location=None,
+        title=Title(text="Scatter Plot & Regression", align="center"),
+        tools=[],
+        x_axis_label=xcol,
+        y_axis_label=ycol,
+    )
+
+    # Scatter
+    scatter = fig.scatter(x=df.columns[0], y=df.columns[1], source=df)
+    if maybe_label:
+        assert len(maybe_label) == 1
+        mapper = CategoricalColorMapper(factors=["=", "+", "-"], palette=palette)
+        scatter.glyph.fill_color = {"field": maybe_label[0], "transform": mapper}
+        scatter.glyph.line_color = {"field": maybe_label[0], "transform": mapper}
+
+    # Regression line
+    coeff_a, coeff_b = itmdt["coeffs"]
+    line_x = np.asarray([df.iloc[:, 0].min(), df.iloc[:, 0].max()])
+    line_y = coeff_a * line_x + coeff_b
+    fig.line(x=line_x, y=line_y, line_width=3)
+
+    # Not adding the tooltips before because we only want to apply tooltip to the scatter
+    hover = HoverTool(tooltips=tooltips, renderers=[scatter])
+    fig.add_tools(hover)
+
+    # Add legends
+    if maybe_label:
+        nidx = df.index[df[maybe_label[0]] == "-"][0]
+        pidx = df.index[df[maybe_label[0]] == "+"][0]
+
+        legend = Legend(
+            items=[
+                LegendItem(
+                    label="Most Influential (-)", renderers=[scatter], index=nidx
+                ),
+                LegendItem(
+                    label="Most Influential (+)", renderers=[scatter], index=pidx
+                ),
+            ],
+            margin=0,
+            padding=0,
+        )
+
+        fig.add_layout(legend, place="right")
+    return fig
+
+
+def render_correlation(
+    itmdt: Intermediate,
+    plot_width: int = 400,
+    plot_height: int = 300,
+    palette: Optional[Sequence[str]] = None,
 ) -> Figure:
     """
-    :param intermediate: An object to encapsulate the
-    intermediate results.
-    :return: A figure object
-    """
-    data_x = intermediate.raw_data["df"][intermediate.raw_data["x_name"]].values
-    result = intermediate.result
-    data_x_sample = result["data_x_sample"]
-    data_y_sample = result["data_y_sample"]
-    tooltips = [("x", "@x"), ("y", "@y")]
-    hover = HoverTool(tooltips=tooltips, names=["dec", "inc"])
-    fig = figure(
-        plot_width=params["plot_width"],
-        plot_height=params["plot_height"],
-        tools=[hover],
-    )
-    sample_x = np.linspace(min(data_x), max(data_x), 100)
-    sample_y = result["line_a"] * sample_x + result["line_b"]
-    fig.circle(
-        x=data_x_sample,
-        y=data_y_sample,
-        size=params["size"],
-        color="navy",
-        alpha=params["alpha"],
-        name="all",
-    )
-    if intermediate.raw_data["k"] is not None:
-        for name, color in [("inc", "red"), ("dec", "black")]:
-            if name == "inc":
-                legend_name = "most influential (+)"
-            else:
-                legend_name = "most influential (-)"
-            fig.circle(
-                x=result[f"{name}_point_x"][0],
-                y=result[f"{name}_point_y"][0],
-                legend=legend_name,
-                size=params["size"],
-                color=color,
-                alpha=params["alpha"],
-                name=name,
-            )
-    fig.line(x=sample_x, y=sample_y, line_width=3)
-    fig.toolbar_location = None
-    fig.toolbar.active_drag = None
-    title = Title()
-    title.text = "scatter plot"
-    title.align = "center"
-    fig.title = title
-    fig.xaxis.axis_label = intermediate.raw_data["x_name"]
-    fig.yaxis.axis_label = intermediate.raw_data["y_name"]
-    return fig
+    Render a correlation plot
 
+    Parameters
+    ----------
+    itmdt : Intermediate
+    plot_width : int = 400
+        The width of the plot
+    plot_height : int = 300
+        The height of the plot
+    palette : Union[Sequence[str], str] = None
+        The palette to use. By default (None),
+        the palette will be automatically chosen based on different visualization types.
 
-def _vis_cross_table(intermediate: Intermediate, params: Dict[str, Any]) -> Figure:
+    Returns
+    -------
+    Figure
+        The bokeh Figure instance.
     """
-    :param intermediate: An object to encapsulate the
-    intermediate results.
-    :return: A figure object
-    """
-    result = intermediate.result
-    hv.extension("bokeh", logo=False)
-    cross_matrix = result["cross_table"]
-    x_cat_list = result["x_cat_list"]
-    y_cat_list = result["y_cat_list"]
-    data = []
-    for i, _ in enumerate(x_cat_list):
-        for j, _ in enumerate(y_cat_list):
-            data.append((x_cat_list[i], y_cat_list[j], cross_matrix[i, j]))
-    tooltips = [("z", "@z")]
-    hover = HoverTool(tooltips=tooltips)
-    heatmap = hv.HeatMap(data)
-    heatmap.opts(
-        tools=[hover],
-        colorbar=True,
-        width=params["width"],
-        toolbar="above",
-        title="cross_table",
-    )
-    fig = hv.render(heatmap, backend="bokeh")
-    _discard_unused_visual_elems(fig)
-    return fig
+    if itmdt.visual_type == "correlation_heatmaps":
+        ve = render_correlation_heatmaps(
+            itmdt, plot_width, plot_height, palette or BIPALETTE
+        )
+    elif itmdt.visual_type == "correlation_single_heatmaps":
+        ve = render_correlation_single_heatmaps(
+            itmdt, plot_width, plot_height, palette or BIPALETTE
+        )
+    elif itmdt.visual_type == "correlation_scatter":
+        ve = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+    return ve

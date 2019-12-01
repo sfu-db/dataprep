@@ -4,19 +4,28 @@ build-docs:
 black:
   poetry run black dataprep
   
-ci: ci-black ci-pytype ci-mypy ci-pytest ci-pylint
+ci: format ci-black typeck test lint
 
 ci-black:
   poetry run black --check --quiet dataprep
 
+format:
+  poetry run black dataprep
+
+typeck: ci-pytype ci-mypy
+
+test:
+  poetry run pytest dataprep
+
+testf +ARGS="dataprep":
+  poetry run pytest {{ARGS}}
+
+lint:
+  poetry run pylint dataprep
+
+
 ci-pytype:
   poetry run pytype dataprep
 
-ci-pytest:
-  poetry run pytest dataprep
-
 ci-mypy:
   poetry run mypy dataprep
-
-ci-pylint:
-  poetry run pylint dataprep
