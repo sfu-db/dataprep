@@ -5,14 +5,17 @@ import random
 from time import time
 
 import dask.dataframe as dd
+import dask.array as da
 import numpy as np
 import pandas as pd
 import pytest
 
-from ...eda.correlation import compute_correlation, to_dask
+from ...eda.correlation import compute_correlation, plot_correlation
+from ...eda.correlation.compute import pearson_nxn, spearman_nxn, kendall_tau_nxn, pearson_1xn, spearman_1xn, kendall_tau_1xn
+from ...utils import to_dask
 
 
-@pytest.fixture(scope="module")  # mypy: diable
+@pytest.fixture(scope="module")  # mypy: disable
 def simpledf() -> dd.DataFrame:
     df = pd.DataFrame(np.random.rand(100, 3), columns=["a", "b", "c"])
     df = pd.concat([df, pd.Series(["a"] * 100)], axis=1)
@@ -22,87 +25,125 @@ def simpledf() -> dd.DataFrame:
     return df
 
 
-def sanity_compute_1(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df)
+def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf)
+    plot_correlation(simpledf, show_plot=False)
 
 
-def sanity_compute_2(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, k=1)
+def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, k=1)
+    plot_correlation(simpledf, k=1, show_plot=False)
 
 
-def sanity_compute_3(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="a")
+def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="a")
+    plot_correlation(simpledf, x="a", show_plot=False)
 
 
-def sanity_compute_4(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="a", value_range=(0.5, 0.8))
+def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="a", value_range=(0.5, 0.8))
+    plot_correlation(simpledf, x="a", value_range=(0.5, 0.8), show_plot=False)
 
 
-def sanity_compute_5(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="a", k=1)
+def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="a", k=1)
+    plot_correlation(simpledf, x="a", k=1, show_plot=False)
 
 
-def sanity_compute_6(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="a", k=0)
+def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="a", k=0)
+    plot_correlation(simpledf, x="a", k=0, show_plot=False)
 
 
-def sanity_compute_7(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="b", y="a")
+def test_sanity_compute_7(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="b", y="a")
+    plot_correlation(simpledf, x="b", y="a", show_plot=False)
 
 
-def sanity_compute_8(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="b", y="a", k=1)
-
-
-@pytest.mark.xfail
-def sanity_compute_fail_1(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, value_range=(0.3, 0.7))
+def test_sanity_compute_8(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="b", y="a", k=1)
+    plot_correlation(simpledf, x="b", y="a", k=1, show_plot=False)
 
 
 @pytest.mark.xfail
-def sanity_compute_fail_2(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, k=3, value_range=(0.3, 0.7))
+def test_sanity_compute_fail_1(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, value_range=(0.3, 0.7))
+    plot_correlation(simpledf, value_range=(0.3, 0.7), show_plot=False)
 
 
 @pytest.mark.xfail
-def sanity_compute_fail_3(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="a", value_range=(0.5, 0.8), k=3)
+def test_sanity_compute_fail_2(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, k=3, value_range=(0.3, 0.7))
+    plot_correlation(simpledf, k=3, value_range=(0.3, 0.7), show_plot=False)
 
 
 @pytest.mark.xfail
-def sanity_compute_fail_4(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, y="a")
+def test_sanity_compute_fail_3(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3)
+    plot_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3, show_plot=False)
 
 
 @pytest.mark.xfail
-def sanity_compute_fail_5(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="d")
+def test_sanity_compute_fail_4(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, y="a")
+    plot_correlation(simpledf, y="a", show_plot=False)
 
 
 @pytest.mark.xfail
-def sanity_compute_fail_6(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="b", y="a", value_range=(0.5, 0.8))
+def test_sanity_compute_fail_5(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="d")
+    plot_correlation(simpledf, x="d", show_plot=False)
 
 
 @pytest.mark.xfail
-def sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
-    df = simpledf
-    compute_correlation(df, x="b", y="a", value_range=(0.5, 0.8), k=3)
+def test_test_sanity_compute_fail_6(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8))
+    plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), show_plot=False)
 
+
+@pytest.mark.xfail
+def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
+    compute_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3)
+    plot_correlation(
+        simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3, show_plot=False
+    )
+
+
+def test_compute_pearson():
+    array = np.random.rand(100, 10)
+    darray = da.from_array(array)
+    a = pearson_nxn(darray).compute()
+    b = pd.DataFrame(data=array).corr("pearson").values
+    assert np.isclose(a, b).all()
+
+    for i in range(array.shape[1]):
+        _, a = pearson_1xn(darray[:,i], darray)
+        assert np.isclose(a, np.sort(b[:, i])).all()
+
+
+
+def test_compute_spearman():
+    array = np.random.rand(100, 10)
+    darray = da.from_array(array)
+    a = spearman_nxn(darray).compute()
+    b = pd.DataFrame(data=array).corr("spearman").values
+    assert np.isclose(a, b).all()
+
+    for i in range(array.shape[1]):
+        _, a = spearman_1xn(darray[:,i], darray)
+        assert np.isclose(a, np.sort(b[:, i])).all()
+
+
+def test_compute_kendall():
+    array = np.random.rand(100, 10)
+    darray = da.from_array(array)
+    a = kendall_tau_nxn(darray).compute()
+    b = pd.DataFrame(data=array).corr("kendall").values
+    assert np.isclose(a, b).all()
+
+    for i in range(array.shape[1]):
+        _, a = kendall_tau_1xn(darray[:,i], darray)
+        assert np.isclose(a, np.sort(b[:, i])).all()
 
 # def test_plot_corr_df() -> None:  # pylint: disable=too-many-locals
 #     """

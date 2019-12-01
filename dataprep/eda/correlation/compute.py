@@ -2,8 +2,9 @@
     This module implements the intermediates computation
     for plot_correlation(df) function.
 """
+import sys
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Tuple, Union, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import dask
 import dask.array as da
@@ -15,12 +16,12 @@ from bokeh.models.widgets import Tabs
 from bokeh.plotting import Figure
 from scipy.stats import kendalltau
 
+from ...errors import UnreachableError
 from ...utils import DataType, get_type, to_dask
 from ..common import Intermediate
 from ..dtypes import CATEGORICAL_DTYPES, NUMERICAL_DTYPES, is_categorical, is_numerical
 
-
-from ...errors import UnreachableError
+__all__ = ["compute_correlation"]
 
 
 class CorrelationMethod(Enum):
@@ -36,7 +37,7 @@ def compute_correlation(  # pylint: disable=too-many-arguments
     *,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
+) -> Intermediate:
     """
     Parameters
     ----------
@@ -53,8 +54,7 @@ def compute_correlation(  # pylint: disable=too-many-arguments
 
     Returns
     -------
-    Figure
-        A (column: [array/dict]) dict to encapsulate the intermediate results.
+    Intermediate
 
     Note
     ----
@@ -66,8 +66,9 @@ def compute_correlation(  # pylint: disable=too-many-arguments
     """
 
     df = to_dask(df)
+    df.columns = [str(e) for e in df.columns] # convert column names to string
 
-    if x is None and y is None and k is None:
+    if x is None and y is None:
         assert value_range is None
         df = df.select_dtypes(NUMERICAL_DTYPES)
         assert len(df.columns) != 0, f"No numerical columns found"
@@ -76,42 +77,30 @@ def compute_correlation(  # pylint: disable=too-many-arguments
         # TODO Can we remove this? Without the computing, data has unknown rows so da.cov will fail.
         data.compute_chunk_sizes()
 
-        df = dd.concat(
-            [dd.from_dask_array(c) for c in _correlation_nxn(data, columns=df.columns)],
-            axis=1,
-        )
-        df.columns = ["x", "y", "correlation", "method"]
-
-        return df
-    elif x is None and y is None and k is not None:
-        assert value_range is None
-        df = df.select_dtypes(NUMERICAL_DTYPES)
-        assert len(df.columns) != 0, f"No numerical columns found"
-
-        data = df.to_dask_array()
-        # TODO Can we remove this? Without the computing, data has unknown rows so da.cov will fail.
-        data.compute_chunk_sizes()
-
+        cordx, cordy, corrs = correlation_nxn(data)
+        cordx, cordy = dd.from_dask_array(cordx), dd.from_dask_array(cordy)
         columns = df.columns
-        df = dd.concat([dd.from_dask_array(c) for c in _correlation_nxn(data)], axis=1)
-        df.columns = ["x", "y", "correlation", "method"]
 
-        df = df[
-            df["y"] > df["x"].max() - df["x"]
-        ]  # Retain only upper triangle (w/o diag)
+        dfs = {}
+        for method, corr in corrs.items():
+            df = dd.concat([cordx, cordy, dd.from_dask_array(corr)], axis=1)
+            df.columns = ["x", "y", "correlation"]
+            if k is not None:
+                df = df[df["y"] < df["x"]]  # Retain only upper triangle (w/o diag)
+                thresh = df["correlation"].abs().nlargest(k).compute().iloc[-1]
+                df = df[(df["correlation"] >= thresh) | (df["correlation"] <= -thresh)]
 
-        filtered: List[dd.DataFrame] = []
-        for meth in CorrelationMethod:
-            subdf = df[df["method"] == meth.name]
-            thresh = subdf["correlation"].abs().nlargest(k).compute().iloc[-1]
-            filtered.append(subdf[subdf["correlation"] >= thresh])
-        df = dd.concat(filtered, axis=0)
+            # Translate int x,y coordinates to categorical labels
+            # Hint the return type of the function to dask through param "meta"
+            df["x"] = df["x"].apply(lambda e: columns[e], meta=("x", np.object))
+            df["y"] = df["y"].apply(lambda e: columns[e], meta=("y", np.object))
+            dfs[method.name] = df.compute()
 
-        # Provide the return type of the function through "meta"
-        df["x"] = df["x"].apply(lambda e: columns[e], meta=("x", np.object))
-        df["y"] = df["y"].apply(lambda e: columns[e], meta=("y", np.object))
-
-        return df
+        return Intermediate(
+            data=dfs,
+            axis_range=list(columns.unique()),
+            visual_type="correlation_heatmaps",
+        )
     elif x is not None and y is None:
         df = df.select_dtypes(NUMERICAL_DTYPES)
         assert len(df.columns) != 0, f"No numerical columns found"
@@ -121,26 +110,28 @@ def compute_correlation(  # pylint: disable=too-many-arguments
         xarr = df[x].to_dask_array().compute_chunk_sizes()
         data = df[columns].to_dask_array().compute_chunk_sizes()
 
-        funcs = [_pearson_1xn, _spearman_1xn, _kendall_tau_1xn]
+        funcs = [pearson_1xn, spearman_1xn, kendall_tau_1xn]
 
-        dfs = []
+        dfs = {}
         for meth, func in zip(CorrelationMethod, funcs):
-            idx, corrs = func(xarr, data, value_range=value_range, k=k)
-
-            df = dd.concat(
-                [
-                    dd.from_array(columns[idx]),
-                    dd.from_array(corrs),
-                    dd.from_dask_array(da.full(len(idx), meth.name)),
-                ],
-                axis=1,
+            indices, corrs = func(xarr, data, value_range=value_range, k=k)
+            if len(indices) == 0:
+                print(
+                    f"Correlation for {meth.name} is empty, try to broaden the value_range.",
+                    file=sys.stderr,
+                )
+            df = pd.DataFrame(
+                {
+                    "x": np.full(len(indices), x),
+                    "y": columns[indices],
+                    "correlation": corrs,
+                }
             )
-            dfs.append(df)
-        df = dd.concat(dfs, axis=0)
-        df.columns = ["x", "correlation", "method"]
-        return df
+            dfs[meth.name] = df
+
+        return Intermediate(data=dfs, visual_type="correlation_single_heatmaps")
     elif x is None and y is not None:
-        raise ValueError("Please give a value to x")
+        raise ValueError("Please give the value to x instead of y")
     elif x is not None and y is not None:
         assert value_range is None
         assert x in df.columns, f"{x} not in columns names"
@@ -154,16 +145,24 @@ def compute_correlation(  # pylint: disable=too-many-arguments
             # intermediate = _cross_table(df=df, x=x, y=y)
             # return intermediate
         elif is_numerical(xdtype) and is_numerical(ydtype):
-            results = _scatter_with_regression(
+            coeffs, df, influences = scatter_with_regression(
                 df[x].values.compute_chunk_sizes(),
-                df[x].values.compute_chunk_sizes(),
+                df[y].values.compute_chunk_sizes(),
                 k=k,
                 sample_size=1000,
             )
-            results["scatterdf"] = results["scatterdf"].rename(columns={"x": x, "y": y})
-            if "infdf" in results:
-                results["infdf"] = results["infdf"].rename(columns={"x": x, "y": y})
-            return results
+            result = {
+                "coeffs": dd.compute(coeffs)[0],
+                "data": df.rename(columns={"x": x, "y": y}).compute(),
+            }
+
+            if influences is not None:
+                infidx = np.argsort(influences)
+                labels = np.full(len(influences), "=")
+                labels[infidx[-k:]] = "-"
+                labels[infidx[:k]] = "+"
+                result["data"]["influence"] = labels
+            return Intermediate(**result, visual_type="correlation_scatter")
         else:
             raise ValueError(
                 "Cannot calculate the correlation between two different dtype column"
@@ -172,9 +171,9 @@ def compute_correlation(  # pylint: disable=too-many-arguments
         raise UnreachableError
 
 
-def _scatter_with_regression(
+def scatter_with_regression(
     xarr: da.Array, yarr: da.Array, sample_size: int, k: Optional[int] = None,
-) -> Dict[str, Any]:
+) -> Tuple[Tuple[float, float], dd.DataFrame, Optional[np.ndarray]]:
     """
     Calculate pearson correlation on 2 given arrays. 
 
@@ -204,15 +203,11 @@ def _scatter_with_regression(
         xarr = xarr[samplesel]
         yarr = yarr[samplesel]
 
-    scatterdf = dd.concat([dd.from_dask_array(arr) for arr in [xarr, yarr]], axis=1)
-    scatterdf.columns = ["x", "y"]
+    df = dd.concat([dd.from_dask_array(arr) for arr in [xarr, yarr]], axis=1)
+    df.columns = ["x", "y"]
 
     if k is None:
-        result = {
-            "coeff": (coeffa, coeffb),
-            "scatterdf": scatterdf,
-        }
-        return result
+        return (coeffa, coeffb), df, None
 
     influences = np.zeros(len(xarr))
     mask = np.ones(len(xarr), dtype=bool)
@@ -224,68 +219,38 @@ def _scatter_with_regression(
         influences[i] = corr - corrlo1
         mask[i] = True
 
-    infsorted = np.argsort(influences)
-
-    xkinf = da.concatenate([xarr[infsorted[-k:]], xarr[infsorted[:k]]])
-    ykinf = da.concatenate([yarr[infsorted[-k:]], yarr[infsorted[:k]]])
-    labels = da.concatenate(
-        [
-            da.repeat(da.asarray(["Positive"]), k),
-            da.repeat(da.asarray(["Negative"]), k),
-        ]
-    )
-
-    infdf = dd.concat(
-        [dd.from_dask_array(arr) for arr in [xkinf, ykinf, labels]], axis=1
-    )
-    infdf.columns = ["x", "y", "effect"]
-    result = {
-        "coeff": (coeffa, coeffb),
-        "scatterdf": scatterdf,
-        "infdf": infdf,
-    }
-    return result
+    return (coeffa, coeffb), df, influences
 
 
-def _correlation_nxn(
+def correlation_nxn(
     data: da.Array, columns: Optional[Sequence[str]] = None
-) -> Tuple[da.Array, da.Array, da.Array, da.Array]:
+) -> Tuple[da.Array, da.Array, Dict[CorrelationMethod, da.Array]]:
     _, ncols = data.shape
-    cordy, cordx = da.meshgrid(range(ncols), range(ncols))
+    cordx, cordy = da.meshgrid(range(ncols), range(ncols))
+    cordx, cordy = cordy.ravel(), cordx.ravel()
 
-    corrs = da.concatenate(
-        [
-            _pearson_nxn(data).ravel(),
-            _spearman_nxn(data).ravel(),
-            _kendall_taus_nxn(data).ravel(),
-        ]
-    )
-    cordy = da.tile(da.flip(cordy.T.ravel(), axis=0), 3)
-    cordx = da.tile(cordx.T.ravel(), 3)
-    labels = da.concatenate(
-        [
-            da.repeat(da.asarray([CorrelationMethod.Pearson.name]), ncols ** 2),
-            da.repeat(da.asarray([CorrelationMethod.Spearman.name]), ncols ** 2),
-            da.repeat(da.asarray([CorrelationMethod.KendallTau.name]), ncols ** 2),
-        ]
-    )
+    corrs = {
+        CorrelationMethod.Pearson: pearson_nxn(data).ravel(),
+        CorrelationMethod.Spearman: spearman_nxn(data).ravel(),
+        CorrelationMethod.KendallTau: kendall_tau_nxn(data).ravel(),
+    }
 
     if columns is not None:
         # The number of columns usually is not too large
         cordx = da.from_array(columns[cordx.compute()], chunks=1)
         cordy = da.from_array(columns[cordy.compute()], chunks=1)
 
-    return cordx, cordy, corrs, labels
+    return cordx, cordy, corrs
 
 
-def _pearson_nxn(data: da.Array) -> da.Array:
+def pearson_nxn(data: da.Array) -> da.Array:
     cov = da.cov(data.T)
     stderr = da.sqrt(da.diag(cov))
     corrmat = cov / stderr[:, None] / stderr[None, :]
     return corrmat
 
 
-def _spearman_nxn(data: da.Array) -> da.Array:
+def spearman_nxn(data: da.Array) -> da.Array:
 
     _, ncols = data.shape
     data = data.compute()  # TODO: How to compute rank distributedly?
@@ -294,22 +259,21 @@ def _spearman_nxn(data: da.Array) -> da.Array:
     for j in range(ncols):
         ranks[:, j] = pd.Series(data[:, j]).rank()
     ranks = da.from_array(ranks)
-    corrmat = _pearson_nxn(ranks)
+    corrmat = pearson_nxn(ranks)
     return corrmat
 
 
-def _kendall_taus_nxn(data: da.Array) -> da.Array:
+def kendall_tau_nxn(data: da.Array) -> da.Array:
 
     _, ncols = data.shape
 
-    corrmat = np.ones(shape=(ncols, ncols))
+    corrmat = np.zeros(shape=(ncols, ncols))
     corr_list = []
     for i in range(ncols):
         for j in range(i + 1, ncols):
-            tmp = dask.delayed(lambda a, b: kendalltau(a, b)[0])(data[:, i], data[:, j])
+            tmp = dask.delayed(lambda a, b: kendalltau(a, b).correlation)(data[:, i], data[:, j])
             corr_list.append(tmp)
     corr_comp = dask.compute(*corr_list)  # TODO avoid explicitly compute
-
     idx = 0
     for i in range(ncols):  # TODO: Optimize by using numpy api
         for j in range(i + 1, ncols):
@@ -317,18 +281,18 @@ def _kendall_taus_nxn(data: da.Array) -> da.Array:
             idx = idx + 1
 
     corrmat2 = corrmat + corrmat.T
-    np.fill_diagonal(corrmat2, np.diag(corrmat))
+    np.fill_diagonal(corrmat2, 1)
     corrmat = da.from_array(corrmat2)
 
     return corrmat
 
 
-def _pearson_1xn(
+def pearson_1xn(
     x: da.Array,
     data: da.Array,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-) -> Tuple[da.Array, da.Array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Parameters
     ----------
@@ -347,15 +311,15 @@ def _pearson_1xn(
     (corrs,) = da.compute(corrs)
     corrs = np.asarray(corrs)
 
-    return _corr_filter(corrs, value_range, k)
+    return corr_filter(corrs, value_range, k)
 
 
-def _spearman_1xn(
+def spearman_1xn(
     x: da.Array,
     data: da.Array,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-) -> Tuple[da.Array, da.Array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Parameters
     ----------
@@ -375,15 +339,15 @@ def _spearman_1xn(
     xrank = pd.Series(x.compute()).rank()
     xrank = da.from_array(xrank)
 
-    return _pearson_1xn(xrank, ranks, value_range, k)
+    return pearson_1xn(xrank, ranks, value_range, k)
 
 
-def _kendall_tau_1xn(
+def kendall_tau_1xn(
     x: da.Array,
     data: da.Array,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-) -> Tuple[da.Array, da.Array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Parameters
     ----------
@@ -402,22 +366,22 @@ def _kendall_tau_1xn(
 
     (corrs,) = da.compute(corrs)
     corrs = np.asarray(corrs)
-    return _corr_filter(corrs, value_range, k)
+    return corr_filter(corrs, value_range, k)
 
 
-def _corr_filter(
-    corrs: da.Array,
+def corr_filter(
+    corrs: np.ndarray,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-) -> Tuple[da.Array, da.Array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     assert (value_range is None) or (
         k is None
     ), "value_range and k cannot be present in both"
 
     if k is not None:
-        sorted_idx = np.argsort(-np.absolute(corrs))
+        sorted_idx = np.argsort(corrs)
         sorted_corrs = corrs[sorted_idx]
-        return sorted_idx[:k], corrs[sorted_idx[:k]]
+        return sorted_idx[-k:], corrs[sorted_idx[-k:]]
     else:
         sorted_idx = np.argsort(corrs)
         sorted_corrs = corrs[sorted_idx]
@@ -426,6 +390,5 @@ def _corr_filter(
             start, end = value_range
             istart = np.searchsorted(sorted_corrs, start)
             iend = np.searchsorted(sorted_corrs, end, side="right")
-
             return sorted_idx[istart:iend], sorted_corrs[istart:iend]
         return sorted_idx, sorted_corrs
