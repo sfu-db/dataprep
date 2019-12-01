@@ -141,19 +141,42 @@ for x in pd_data_frame[column]:</p>
 <dl class="function">
 <dt id="dataprep.eda.plot_correlation">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_correlation</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">x_name: Optional[str] = None</em>, <em class="sig-param">y_name: Optional[str] = None</em>, <em class="sig-param">value_range: Optional[List[float]] = None</em>, <em class="sig-param">k: Optional[int] = None</em>, <em class="sig-param">return_intermediate: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs, Tuple[Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs], Any]]<a class="reference internal" href="_modules/dataprep/eda/correlation/computation.html#plot_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_correlation" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pd_data_frame</strong> – the pandas data_frame for which plots are calculated for each</p>
+<dd><p>This function is designed to calculate the correlation between columns
+There are three functions: plot_correlation(df), plot_correlation(df, x)
+plot_correlation(df, x, y)
+There are also some parameters such as k and value_range to satisfy your requirement</p>
+<dl class="simple">
+<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+</dd>
+<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>value_range: list[float], optional</dt><dd><p>range of value</p>
+</dd>
+<dt>k: int, optional</dt><dd><p>choose top-k element</p>
+</dd>
+<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
 </dd>
 </dl>
-<p>column.
-:param x_name: a valid column name of the data frame
-:param y_name: a valid column name of the data frame
-:param value_range: range of value
-:param k: choose top-k element
-:param return_intermediate: whether show intermediate results to users
-:return: A (column: [array/dict]) dict to encapsulate the
-intermediate results.</p>
+<dl class="simple">
+<dt>An object of figure or</dt><dd><p>An object of figure and
+An intermediate representation for the plots of different columns in the data_frame.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.correlation.computation</span> <span class="kn">import</span> <span class="n">plot_correlation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;suicides&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;suicides&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;suicides&quot;</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;suicides&quot;</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;population&quot;</span><span class="p">,</span> <span class="n">y_name</span><span class="o">=</span><span class="s2">&quot;suicides_no&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;population&quot;</span><span class="p">,</span> <span class="n">y_name</span><span class="o">=</span><span class="s2">&quot;suicides&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="simple">
 <dt>match (x_name, y_name, k)</dt><dd><p>case (None, None, None) =&gt; heatmap
 case (Some, None, Some) =&gt; Top K columns for (pearson, spearman, kendall)
@@ -161,25 +184,38 @@ case (Some, Some, _) =&gt; Scatter with regression line with/without top k outli
 otherwise =&gt; error</p>
 </dd>
 </dl>
+<p>This function only supports numerical or categorical data,
+and it is better to drop None, Nan and Null value before using it</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="dataprep.eda.plot_missing">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">x_name: Optional[str] = None</em>, <em class="sig-param">y_name: Optional[str] = None</em>, <em class="sig-param">return_intermediate: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs, Tuple[Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs], Any]]<a class="reference internal" href="_modules/dataprep/eda/missing/computation.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pd_data_frame</strong> – the pandas data_frame for which plots are calculated for each</p>
+<dd><p>This function is designed to deal with missing values
+There are three functions: plot_missing(df), plot_missing(df, x)
+plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+</dd>
+<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
 </dd>
 </dl>
-<p>column.
-:param x_name: a valid column name of the data frame
-:param y_name: a valid column name of the data frame
-:param return_intermediate: whether show intermediate results to users
-:return: A dict to encapsulate the
-intermediate results.</p>
-<p>This function is designed to deal with missing values</p>
-<p>There are three functions: plot_missing(df), plot_missing(df, x)
-plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>An object of figure or</dt><dd><p>An object of figure and
+An intermediate representation for the plots of different columns in the data_frame.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,

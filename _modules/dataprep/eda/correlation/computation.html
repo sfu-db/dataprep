@@ -617,21 +617,56 @@
     <span class="n">return_intermediate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param pd_data_frame: the pandas data_frame for which plots are calculated for each</span>
-<span class="sd">    column.</span>
-<span class="sd">    :param x_name: a valid column name of the data frame</span>
-<span class="sd">    :param y_name: a valid column name of the data frame</span>
-<span class="sd">    :param value_range: range of value</span>
-<span class="sd">    :param k: choose top-k element</span>
-<span class="sd">    :param return_intermediate: whether show intermediate results to users</span>
-<span class="sd">    :return: A (column: [array/dict]) dict to encapsulate the</span>
-<span class="sd">    intermediate results.</span>
+<span class="sd">    This function is designed to calculate the correlation between columns</span>
+<span class="sd">    There are three functions: plot_correlation(df), plot_correlation(df, x)</span>
+<span class="sd">    plot_correlation(df, x, y)</span>
+<span class="sd">    There are also some parameters such as k and value_range to satisfy your requirement</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pd_data_frame: pd.DataFrame</span>
+<span class="sd">        the pandas data_frame for which plots are calculated for each column</span>
+<span class="sd">    x_name: str, optional</span>
+<span class="sd">        a valid column name of the data frame</span>
+<span class="sd">    y_name: str, optional</span>
+<span class="sd">        a valid column name of the data frame</span>
+<span class="sd">    value_range: list[float], optional</span>
+<span class="sd">        range of value</span>
+<span class="sd">    k: int, optional</span>
+<span class="sd">        choose top-k element</span>
+<span class="sd">    return_intermediate: bool</span>
+<span class="sd">        whether show intermediate results to users</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    An object of figure or</span>
+<span class="sd">        An object of figure and</span>
+<span class="sd">        An intermediate representation for the plots of different columns in the data_frame.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; from dataprep.eda.correlation.computation import plot_correlation</span>
+<span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">    &gt;&gt;&gt; df = pd.read_csv(&quot;suicide-rate.csv&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, k=6)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;, k=3)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;, value_range=[-1, 0.3])</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;, value_range=[-1, 0.3], k=2)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, x_name=&quot;population&quot;, y_name=&quot;suicides_no&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, x_name=&quot;population&quot;, y_name=&quot;suicides&quot;, k=5)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----------</span>
 <span class="sd">    match (x_name, y_name, k)</span>
 <span class="sd">        case (None, None, None) =&gt; heatmap</span>
 <span class="sd">        case (Some, None, Some) =&gt; Top K columns for (pearson, spearman, kendall)</span>
 <span class="sd">        case (Some, Some, _) =&gt; Scatter with regression line with/without top k outliers</span>
 <span class="sd">        otherwise =&gt; error</span>
+
+<span class="sd">    This function only supports numerical or categorical data,</span>
+<span class="sd">    and it is better to drop None, Nan and Null value before using it</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">325</span><span class="p">,</span>

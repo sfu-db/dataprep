@@ -45,20 +45,31 @@ calculating intermediate part</p>
 <dl class="function">
 <dt id="dataprep.eda.missing.computation.plot_missing">
 <code class="sig-prename descclassname">dataprep.eda.missing.computation.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">x_name: Optional[str] = None</em>, <em class="sig-param">y_name: Optional[str] = None</em>, <em class="sig-param">return_intermediate: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs, Tuple[Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs], Any]]<a class="reference internal" href="_modules/dataprep/eda/missing/computation.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.computation.plot_missing" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pd_data_frame</strong> – the pandas data_frame for which plots are calculated for each</p>
+<dd><p>This function is designed to deal with missing values
+There are three functions: plot_missing(df), plot_missing(df, x)
+plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+</dd>
+<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
 </dd>
 </dl>
-<p>column.
-:param x_name: a valid column name of the data frame
-:param y_name: a valid column name of the data frame
-:param return_intermediate: whether show intermediate results to users
-:return: A dict to encapsulate the
-intermediate results.</p>
-<p>This function is designed to deal with missing values</p>
-<p>There are three functions: plot_missing(df), plot_missing(df, x)
-plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>An object of figure or</dt><dd><p>An object of figure and
+An intermediate representation for the plots of different columns in the data_frame.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,
