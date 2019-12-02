@@ -24,7 +24,6 @@ from bokeh.models import (
 )
 from bokeh.models.annotations import Title
 from bokeh.models.glyphs import Circle, Rect, Segment, VBar
-from bokeh.models.ranges import FactorRange
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 
@@ -145,14 +144,10 @@ class UniViz:
         data_sorted = sorted(data.items(), key=itemgetter(1), reverse=(not ascending))[
             0:bars
         ]
-        cat_list = [
-            (str(x[0])[: (self.max_xlab_len - 1)] + "...")
-            if len(str(x[0])) > self.max_xlab_len
-            else str(x[0])
-            for x in data_sorted
-        ]
+        cat_vals = [str(elem[0]) for elem in data_sorted]
+
         data_source = pd.DataFrame(
-            {"count": [i[1] for i in data_sorted], "cat": cat_list}
+            {"count": [i[1] for i in data_sorted], "cat": cat_vals}
         )
         total = sum([y for (x, y) in data.items()]) + miss_cnt
         data_source["percen"] = data_source["count"] / total * 100
@@ -163,10 +158,7 @@ class UniViz:
         else:
             title = "{}".format(col_x)
         plot_figure = figure(
-            tools=TOOLS,
-            title=title,
-            x_range=FactorRange(factors=cat_list),
-            toolbar_location=None,
+            tools=TOOLS, title=title, x_range=cat_vals, toolbar_location=None
         )
 
         hover = HoverTool(
@@ -197,7 +189,13 @@ class UniViz:
             )
         if bars > self.max_bar_labels:
             plot_figure.xaxis.major_label_text_font_size = "0pt"
-
+        plot_figure.xaxis.formatter = FuncTickFormatter(
+            code="""
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
+        """
+            % (self.max_xlab_len, self.max_xlab_len)
+        )
         self.barplot = True
         return plot_figure
 
@@ -225,7 +223,7 @@ class UniViz:
         miss_cnt = missing[0]
         if miss_cnt > 0:
             miss_perc = np.round(miss_cnt / orig_df_len * 100, 1)
-            title = "{} ({}% missing values)".format(col_x, miss_perc)
+            title = "{} ({}% missing)".format(col_x, miss_perc)
         else:
             title = "{}".format(col_x)
 
@@ -361,12 +359,14 @@ class UniViz:
         self.kde = True
         return plot_figure
 
-    def box_viz(
+    def box_viz(  # pylint: disable=too-many-arguments
         self,
         data: Dict[str, Dict[str, Any]],
         col_x: str,
         col_y: Optional[str] = None,
-        box_width: float = 0.25,
+        box_width: float = 0.9,
+        grp_cnt_stats: Optional[Dict[str, int]] = None,
+        sample_ouliers_size: int = 50,
     ) -> Any:
         """
         *SPECIAL CASE
@@ -375,6 +375,8 @@ class UniViz:
         :param col_x: name in case of a single column
         :param col_y: name of column y in plot(df, x, y)
         :param box_width: width of each box
+        :param grp_cnt_stats: group count statistics
+        :param sample_outlier_size: number of outliers to plot
         :return: Bokeh Plot Figure
         """
         df = pd.DataFrame(data)  # , index=range(0, len(data)))
@@ -390,10 +392,17 @@ class UniViz:
         df["h"] = df["sf"] - df["tf"]
 
         # Bokeh plotting code from here
-        if col_y is None:
+        if col_x is not None and col_y is None:
             title = "{}".format(col_x)
         else:
-            title = "{} by {}".format(col_y, col_x)
+            if grp_cnt_stats is None:
+                title = "{} by {}".format(col_y, col_x)
+            elif grp_cnt_stats["x_total"] > grp_cnt_stats["x_show"]:
+                title = "{} by (top {} out of {}) {}".format(
+                    col_y, grp_cnt_stats["x_show"], grp_cnt_stats["x_total"], col_x
+                )
+            else:
+                title = "{} by {}".format(col_y, col_x)
 
         plot = Plot(
             plot_width=300,
@@ -417,44 +426,38 @@ class UniViz:
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x0", y0="fy", x1="x1", y1="fy", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x0", y0="fy", x1="x1", y1="fy", line_color="black"),
         )
-
         for cat in df.index:
             series = df.loc[cat]
-            temp_list = [series["x"]] * len(series["outliers"])
+            outliers = series["outliers"]
+            if len(outliers) > sample_ouliers_size:
+                outliers = np.random.choice(
+                    a=np.asarray(outliers), size=sample_ouliers_size, replace=False
+                )
+            temp_list = [series["x"]] * len(outliers)
             source = ColumnDataSource(
-                data=pd.DataFrame({"x": temp_list, "y": series["outliers"]})
+                data=pd.DataFrame({"x": temp_list, "y": outliers})
             )
             outliers = Circle(x="x", y="y", size=3, fill_color=PALETTE[6])
             plot.add_glyph(source, outliers, name="outlier")
 
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x", y0="uw", x1="x", y1="sf", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x", y0="uw", x1="x", y1="sf", line_color="black"),
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x", y0="lw", x1="x", y1="tf", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x", y0="lw", x1="x", y1="tf", line_color="black"),
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x0", y0="uw", x1="x1", y1="uw", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x0", y0="uw", x1="x1", y1="uw", line_color="black"),
             name="upper",
         )
         plot.add_glyph(
             ColumnDataSource(data=df),
-            Segment(
-                x0="x0", y0="lw", x1="x1", y1="lw", line_width=1.5, line_color="black"
-            ),
+            Segment(x0="x0", y0="lw", x1="x1", y1="lw", line_color="black"),
             name="lower",
         )
 
@@ -479,7 +482,7 @@ class UniViz:
         plot.add_layout(xaxis, "below")
         plot.add_layout(Grid(dimension=0, ticker=xaxis.ticker))
         plot.add_layout(Grid(dimension=1, ticker=yaxis.ticker))
-        plot.xaxis.major_label_orientation = math.pi / 4
+        plot.xaxis.major_label_orientation = math.pi / 3
         plot.yaxis.axis_label = col_y
         plot.xaxis.ticker = FixedTicker(ticks=list(df["x"]))
         plot.xaxis.formatter = FuncTickFormatter(
@@ -487,9 +490,14 @@ class UniViz:
             var mapping = """
             + str({key: value for key, value in zip(df["x"], df.index)})
             + """;
-            return mapping[tick];
+            tick = mapping[tick];
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
         """
+            % (self.max_xlab_len, self.max_xlab_len)
         )
+        if col_x is not None and col_y is not None:
+            plot.xaxis.axis_label = col_x
         self.box = True
         plot.title.text_font_size = "10pt"
         return plot
