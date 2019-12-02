@@ -44,36 +44,53 @@
 <dl class="function">
 <dt id="dataprep.eda.basic.computation.plot">
 <code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.common.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Returns an intermediate representation for the plots of</dt><dd><p>different columns in the data_frame.</p>
+<dd><p>Generates plots for exploratory data analysis.</p>
+<p>If col_x and col_y are unspecified, the distribution of
+each coloumn is plotted. A histogram is plotted if the
+column contains numerical values, and a bar chart is plotted
+if the column contains categorical values.</p>
+<p>If col_x is specified and col_y is unspecified, the
+distribution of col_x is plotted in various ways. If col_x
+contains categorical values, a bar chart and pie chart are
+plotted. If col_x contains numerical values, a histogram,
+kernel density estimate plot, box plot, and qq plot are plotted.</p>
+<p>If col_x and col_y are specified, plots depicting
+the relationship between the variables will be displayed. If
+col_x and col_y contain numerical values, a scatter plot, hexbin
+plot, and binned box plot are plotted. If one of col_x and col_y
+contain categorical values and the other contains numerical values,
+a box plot and multi-line histogram are plotted. If col_X and col_y
+contain categorical vales, a nested bar chart, stacked bar chart, and
+heat map are plotted.</p>
+<dl class="simple">
+<dt>pd_data_frame<span class="classifier">pandas DataFrame</span></dt><dd><p>The input data frame from which charts or plots are to
+be generated.</p>
+</dd>
+<dt>col_x<span class="classifier">str, optional</span></dt><dd><p>The name of a column in the input data frame.</p>
+</dd>
+<dt>col_y<span class="classifier">str, optional</span></dt><dd><p>The name of a column in the input data frame.</p>
+</dd>
+<dt>force_cat<span class="classifier">List[str], optional</span></dt><dd><p>A list of column names which forces these columns to be treated
+as having categorical values.</p>
+</dd>
+<dt>force_num<span class="classifier">List[str], optional</span></dt><dd><p>A list of column names which forces these columns to be treated
+as having numerical values.</p>
+</dd>
+<dt>bins<span class="classifier">int, optional, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p>
+</dd>
+<dt>value_range<span class="classifier">(float, float), optional</span></dt><dd><p>The lower and upper bounds on the histogram plotted when
+col_x is numerical, and col_y is unspecified.</p>
 </dd>
 </dl>
-<p>Parameters
-data_frame: the pandas data_frame for which plots are calculated for each
-column.
-col_x : A column in the data_frame.
-col_y : A column in the data_frame.
-force_cat: the list of columns which have to considered of type “TYPE_CAT”
-force_num: the list of columns which have to considered of type “TYPE_NUM”
-bins: the number of bins to show for the plot(df, x) histogram
-value_range: the range of values to plot in the plot(df, x) histogram
-kwargs : TO-DO</p>
-<p>dict : A (column: [array/dict]) dict to encapsulate the
-intermediate results.</p>
-<dl>
-<dt>for column in pd_data_frame:</dt><dd><p>values = list()
-for x in pd_data_frame[column]:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>if type(x)==’str’:</dt><dd><p>values.append(re.escape(x))</p>
-</dd>
-<dt>else:</dt><dd><p>values.append(x)</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>pd_data_frame[column] = values</p>
-</dd>
-</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_length&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_width&quot;</span><span class="p">,</span> <span class="s2">&quot;species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -93,7 +110,7 @@ for x in pd_data_frame[column]:</p>
 <p>This module is for the correct rendering of bokeh plot figures.</p>
 <dl class="class">
 <dt id="dataprep.eda.basic.render.Render">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.basic.render.</code><code class="sig-name descname">Render</code><span class="sig-paren">(</span><em class="sig-param">plot_height: int = 300</em>, <em class="sig-param">plot_width: int = 324</em>, <em class="sig-param">ncolumns: int = 3</em>, <em class="sig-param">band_width: float = 1.5</em>, <em class="sig-param">tile_size: Optional[float] = None</em>, <em class="sig-param">bars: int = 10</em>, <em class="sig-param">yscale: str = 'linear'</em>, <em class="sig-param">ascending: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic/render.html#Render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.Render" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.basic.render.</code><code class="sig-name descname">Render</code><span class="sig-paren">(</span><em class="sig-param">plot_height_small: int = 300</em>, <em class="sig-param">plot_width_small: int = 324</em>, <em class="sig-param">plot_height_large: int = 400</em>, <em class="sig-param">plot_width_large: int = 450</em>, <em class="sig-param">plot_width_wide: int = 972</em>, <em class="sig-param">ncolumns: int = 3</em>, <em class="sig-param">band_width: float = 1.5</em>, <em class="sig-param">tile_size: Optional[float] = None</em>, <em class="sig-param">bars: int = 10</em>, <em class="sig-param">yscale: str = 'linear'</em>, <em class="sig-param">ascending: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic/render.html#Render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.Render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Encapsulate Renderer functions.</p>
 <dl class="method">
@@ -124,19 +141,69 @@ for x in pd_data_frame[column]:</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Encapsulation for multivariate vizualisations.</p>
 <dl class="method">
-<dt id="dataprep.eda.basic.viz_multi.MultiViz.nest_cat_viz">
-<code class="sig-name descname">nest_cat_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[Tuple[Any, Any], int], col_x: str, col_y: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.nest_cat_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.nest_cat_viz" title="Permalink to this definition">¶</a></dt>
-<dd><p>Nested categories plot
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.heat_map_viz">
+<code class="sig-name descname">heat_map_viz</code><span class="sig-paren">(</span><em class="sig-param">data: pandas.core.frame.DataFrame, col_x: str, col_y: str, grp_cnt_stats: Dict[str, int]</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.heat_map_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.heat_map_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stacked categories plot
 :param data: the intermediates result
 :param col_x: column X
 :param col_y: column Y
+:param grp_cnt_stats: group count statistics
 :return: Bokeh Plot Figure</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.heatmap_cat">
+<code class="sig-name descname">heatmap_cat</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.heatmap_cat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.hexbin">
+<code class="sig-name descname">hexbin</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.hexbin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.hexbin_viz">
+<code class="sig-name descname">hexbin_viz</code><span class="sig-paren">(</span><em class="sig-param">points: List[Tuple[Any, Any]], col_x: str, col_y: str, sample_size: int = 1000, tile_size: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.hexbin_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.hexbin_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modified hexbin scatter plot
+:param points: list of points to be plotted
+:param col_x: column X
+:param col_y: column Y
+:param sample_size: sample size for points to plot
+:param tile_size: hex tile size
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.line_viz">
+<code class="sig-name descname">line_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[str, Tuple[Any, Any]], col_x: str, col_y: str, grp_cnt_stats: Dict[str, int]</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.line_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.line_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multi-line graph
+:param data: the intermediates result
+:param col_x: column X
+:param col_y: column Y
+:param grp_cnt_stats: group count statistics
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.max_label_len">
+<code class="sig-name descname">max_label_len</code><em class="property"> = 15</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.max_label_len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="dataprep.eda.basic.viz_multi.MultiViz.nested_cat">
 <code class="sig-name descname">nested_cat</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.nested_cat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.nested_viz">
+<code class="sig-name descname">nested_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[Tuple[Any, Any], int], col_x: str, col_y: str, grp_cnt_stats: Dict[str, int]</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.nested_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.nested_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nested categories plot
+:param data: the intermediates result
+:param col_x: column X
+:param col_y: column Y
+:param grp_cnt_stats: group count statistics
+:return: Bokeh Plot Figure</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="dataprep.eda.basic.viz_multi.MultiViz.scatter">
@@ -145,12 +212,29 @@ for x in pd_data_frame[column]:</p>
 
 <dl class="method">
 <dt id="dataprep.eda.basic.viz_multi.MultiViz.scatter_viz">
-<code class="sig-name descname">scatter_viz</code><span class="sig-paren">(</span><em class="sig-param">points: List[Tuple[Any, Any]], col_x: str, col_y: str, tile_size: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.scatter_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.scatter_viz" title="Permalink to this definition">¶</a></dt>
-<dd><p>Modified Hex bin scatter plot
+<code class="sig-name descname">scatter_viz</code><span class="sig-paren">(</span><em class="sig-param">points: List[Tuple[Any, Any]], col_x: str, col_y: str, sample_size: int = 1000</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.scatter_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.scatter_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scatter plot
 :param points: list of points to be plotted
 :param col_x: column X
 :param col_y: column Y
-:param tile_size: hex tile size
+:param sample_size: sample size for points to plot
+:return: Bokeh Plot Figure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.stacked_cat">
+<code class="sig-name descname">stacked_cat</code><em class="property"> = False</em><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.stacked_cat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataprep.eda.basic.viz_multi.MultiViz.stacked_viz">
+<code class="sig-name descname">stacked_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[str, int], sub_categories: List[str], col_x: str, col_y: str, grp_cnt_stats: Dict[str, int]</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_multi.html#MultiViz.stacked_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_multi.MultiViz.stacked_viz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stacked categories plot
+:param data: the intermediates result
+:param sub_categories: list of all subcategories
+:param col_x: column X
+:param col_y: column Y
+:param grp_cnt_stats: group count statistics
 :return: Bokeh Plot Figure</p>
 </dd></dl>
 
@@ -190,13 +274,15 @@ else show bars plotted in descending order
 
 <dl class="method">
 <dt id="dataprep.eda.basic.viz_uni.UniViz.box_viz">
-<code class="sig-name descname">box_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[str, Dict[str, Any]], col_x: str, col_y: Optional[str] = None, box_width: float = 0.25</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.box_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.box_viz" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">box_viz</code><span class="sig-paren">(</span><em class="sig-param">data: Dict[str, Dict[str, Any]], col_x: str, col_y: Optional[str] = None, box_width: float = 0.9, grp_cnt_stats: Optional[Dict[str, int]] = None, sample_ouliers_size: int = 50</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/basic/viz_uni.html#UniViz.box_viz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.viz_uni.UniViz.box_viz" title="Permalink to this definition">¶</a></dt>
 <dd><p><a href="#id1"><span class="problematic" id="id2">*</span></a>SPECIAL CASE
 Box plot for any number of categories or a single column
 :param data: intermediate result
 :param col_x: name in case of a single column
 :param col_y: name of column y in plot(df, x, y)
 :param box_width: width of each box
+:param grp_cnt_stats: group count statistics
+:param sample_outlier_size: number of outliers to plot
 :return: Bokeh Plot Figure</p>
 </dd></dl>
 
