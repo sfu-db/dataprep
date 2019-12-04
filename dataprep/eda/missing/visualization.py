@@ -111,14 +111,28 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
         elif get_type(pd_data_frame[name]) == DataType.TYPE_CAT:
             tooltips = [("Frequency", "@c")]
             hover = HoverTool(tooltips=tooltips)
-            # pd_data_frame_count = pd_data_frame[name].value_counts(ascending=True)[:k]
-            # df_data_drop_count = df_data_drop[name].value_counts(ascending=True)[:k]
             bars_origin = hv.Bars(
-                pd_data_frame[name].value_counts(ascending=True)[:k],
+                pd.DataFrame(
+                    {
+                        "name": pd_data_frame[name]
+                        .value_counts(ascending=True)
+                        .index[:k],
+                        "c": pd_data_frame[name]
+                        .value_counts(ascending=True)
+                        .values[:k],
+                    }
+                ),
                 label="Original Data",
             ).opts(alpha=params["alpha"], tools=[hover])
             bars_drop = hv.Bars(
-                df_data_drop[name].value_counts(ascending=True)[:k],
+                pd.DataFrame(
+                    {
+                        "name": df_data_drop[name]
+                        .value_counts(ascending=True)
+                        .index[:k],
+                        "c": df_data_drop[name].value_counts(ascending=True).values[:k],
+                    }
+                ),
                 label="Updated Data",
             ).opts(alpha=params["alpha"], tools=[hover])
             fig = hv.render(
