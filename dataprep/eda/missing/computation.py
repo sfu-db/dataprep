@@ -31,7 +31,11 @@ def _calc_nonzero_rate(data: np.ndarray, length: int) -> Any:
     return np.count_nonzero(data) / length
 
 
-def _calc_nonzero_count(pd_data_frame: pd.DataFrame) -> Intermediate:
+def _calc_nonzero_count(
+    pd_data_frame: pd.DataFrame,
+    num_rows: Optional[int] = None,
+    num_cols: Optional[int] = None,
+) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated
     for each column.
@@ -50,7 +54,16 @@ def _calc_nonzero_count(pd_data_frame: pd.DataFrame) -> Intermediate:
             dask.delayed(_calc_nonzero_rate)(pd_data_frame_value[i, :], col)
         )
     count_nonzero_compute = dask.compute(*count_nonzero_list)
-    result = {"distribution": pd_data_frame_value * 1, "count": count_nonzero_compute}
+    pd_data_frame_value = pd_data_frame_value * 1
+    if num_rows is not None and num_cols is not None:
+        pd_data_frame_value = pd_data_frame_value[:num_cols, :num_rows]
+    elif num_cols is not None:
+        pd_data_frame_value = pd_data_frame_value[:num_cols, :]
+    elif num_rows is not None:
+        pd_data_frame_value = pd_data_frame_value[:, :num_rows]
+    else:
+        pd_data_frame_value = pd_data_frame_value
+    result = {"distribution": pd_data_frame_value, "count": count_nonzero_compute}
     raw_data = {"df": pd_data_frame}
     intermediate = Intermediate(result=result, raw_data=raw_data, visual_type="dummy")
     return intermediate
@@ -110,6 +123,8 @@ def plot_missing(
     pd_data_frame: pd.DataFrame,
     x_name: Optional[str] = None,
     y_name: Optional[str] = None,
+    num_rows: Optional[int] = None,
+    num_cols: Optional[int] = None,
     return_intermediate: bool = False,
 ) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
     """
@@ -172,7 +187,9 @@ def plot_missing(
     elif x_name is None and y_name is not None:
         raise ValueError("Please give a value to x_name")
     else:
-        intermediate = _calc_nonzero_count(pd_data_frame=pd_data_frame)
+        intermediate = _calc_nonzero_count(
+            pd_data_frame=pd_data_frame, num_rows=num_rows, num_cols=num_cols
+        )
         fig = _vis_nonzero_count(intermediate=intermediate, params=params)
     show(fig)
     if return_intermediate:
