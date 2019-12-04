@@ -120,6 +120,7 @@ def _calc_missing_impact_y(
 
 
 def plot_missing(
+    # pylint: disable=too-many-arguments
     pd_data_frame: pd.DataFrame,
     x_name: Optional[str] = None,
     y_name: Optional[str] = None,
@@ -140,6 +141,10 @@ def plot_missing(
         a valid column name of the data frame
     y_name: str, optional
         a valid column name of the data frame
+    num_rows: int, optional
+        The number of rows in the figure
+    num_cols: int, optional
+        The number of columns in the figure
     return_intermediate: bool
         whether show intermediate results to users
 
