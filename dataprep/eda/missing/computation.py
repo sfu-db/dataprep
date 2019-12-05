@@ -32,9 +32,7 @@ def _calc_nonzero_rate(data: np.ndarray, length: int) -> Any:
 
 
 def _calc_nonzero_count(
-    pd_data_frame: pd.DataFrame,
-    num_rows: Optional[int] = None,
-    num_cols: Optional[int] = None,
+    pd_data_frame: pd.DataFrame, num_cols: Optional[int] = None, bins_num: int = 10
 ) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated
@@ -55,15 +53,16 @@ def _calc_nonzero_count(
         )
     count_nonzero_compute = dask.compute(*count_nonzero_list)
     pd_data_frame_value = pd_data_frame_value * 1
-    if num_rows is not None and num_cols is not None:
-        pd_data_frame_value = pd_data_frame_value[:num_cols, :num_rows]
-    elif num_cols is not None:
+    if num_cols is not None:
         pd_data_frame_value = pd_data_frame_value[:num_cols, :]
-    elif num_rows is not None:
-        pd_data_frame_value = pd_data_frame_value[:, :num_rows]
     else:
         pd_data_frame_value = pd_data_frame_value
-    result = {"distribution": pd_data_frame_value, "count": count_nonzero_compute}
+    pd_data_frame_ab = np.zeros(shape=(pd_data_frame_value.shape[0], bins_num))
+    for col in range(pd_data_frame_value.shape[0]):
+        pd_data_frame_ab[col, :] = np.histogram(pd_data_frame_value[col, :])[0]
+    if np.max(pd_data_frame_ab) != 0:
+        pd_data_frame_ab = pd_data_frame_ab / np.max(pd_data_frame_ab)
+    result = {"distribution": pd_data_frame_ab, "count": count_nonzero_compute}
     raw_data = {"df": pd_data_frame}
     intermediate = Intermediate(result=result, raw_data=raw_data, visual_type="dummy")
     return intermediate
@@ -124,8 +123,8 @@ def plot_missing(
     pd_data_frame: pd.DataFrame,
     x_name: Optional[str] = None,
     y_name: Optional[str] = None,
-    num_rows: Optional[int] = None,
     num_cols: Optional[int] = None,
+    bins_num: int = 10,
     return_intermediate: bool = False,
 ) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
     """
@@ -141,10 +140,10 @@ def plot_missing(
         a valid column name of the data frame
     y_name: str, optional
         a valid column name of the data frame
-    num_rows: int, optional
-        The number of rows in the figure
     num_cols: int, optional
         The number of columns in the figure
+    bins_num: int
+        The number of rows in the figure
     return_intermediate: bool
         whether show intermediate results to users
 
@@ -193,7 +192,7 @@ def plot_missing(
         raise ValueError("Please give a value to x_name")
     else:
         intermediate = _calc_nonzero_count(
-            pd_data_frame=pd_data_frame, num_rows=num_rows, num_cols=num_cols
+            pd_data_frame=pd_data_frame, bins_num=bins_num, num_cols=num_cols
         )
         fig = _vis_nonzero_count(intermediate=intermediate, params=params)
     show(fig)
