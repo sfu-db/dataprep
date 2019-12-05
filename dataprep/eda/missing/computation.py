@@ -46,10 +46,10 @@ def _calc_nonzero_count(
     """
     pd_data_frame_value = pd.isnull(pd_data_frame.values.T)
     count_nonzero_list = []
-    row, col = pd_data_frame_value.shape
-    for i in range(row):
+    col, row = pd_data_frame_value.shape
+    for i in range(col):
         count_nonzero_list.append(
-            dask.delayed(_calc_nonzero_rate)(pd_data_frame_value[i, :], col)
+            dask.delayed(_calc_nonzero_rate)(pd_data_frame_value[i, :], row)
         )
     count_nonzero_compute = dask.compute(*count_nonzero_list)
     pd_data_frame_value = pd_data_frame_value * 1
@@ -58,8 +58,14 @@ def _calc_nonzero_count(
     else:
         pd_data_frame_value = pd_data_frame_value
     pd_data_frame_ab = np.zeros(shape=(pd_data_frame_value.shape[0], bins_num))
-    for col in range(pd_data_frame_value.shape[0]):
-        pd_data_frame_ab[col, :] = np.histogram(pd_data_frame_value[col, :])[0]
+    for col_now in range(pd_data_frame_value.shape[0]):
+        for bins in range(bins_num):
+            pd_data_frame_ab[col_now, bins] = np.sum(
+                pd_data_frame_value[
+                    col_now,
+                    int(bins * row / bins_num) : int((bins + 1) * row / bins_num),
+                ]
+            )
     if np.max(pd_data_frame_ab) != 0:
         pd_data_frame_ab = pd_data_frame_ab / np.max(pd_data_frame_ab)
     result = {"distribution": pd_data_frame_ab, "count": count_nonzero_compute}
