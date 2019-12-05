@@ -32,7 +32,7 @@ def _calc_nonzero_rate(data: np.ndarray, length: int) -> Any:
 
 
 def _calc_nonzero_count(
-    pd_data_frame: pd.DataFrame, num_cols: Optional[int] = None, bins_num: int = 10
+    pd_data_frame: pd.DataFrame, bins_num: int = 10, num_cols: int = 50
 ) -> Intermediate:
     """
     :param pd_data_frame: the pandas data_frame for which plots are calculated
@@ -55,8 +55,6 @@ def _calc_nonzero_count(
     pd_data_frame_value = pd_data_frame_value * 1
     if num_cols is not None:
         pd_data_frame_value = pd_data_frame_value[:num_cols, :]
-    else:
-        pd_data_frame_value = pd_data_frame_value
     pd_data_frame_ab = np.zeros(shape=(pd_data_frame_value.shape[0], bins_num))
     for col_now in range(pd_data_frame_value.shape[0]):
         for bins in range(bins_num):
@@ -129,8 +127,8 @@ def plot_missing(
     pd_data_frame: pd.DataFrame,
     x_name: Optional[str] = None,
     y_name: Optional[str] = None,
-    num_cols: Optional[int] = None,
     bins_num: int = 10,
+    num_cols: int = 50,
     return_intermediate: bool = False,
 ) -> Union[Union[Figure, Tabs], Tuple[Union[Figure, Tabs], Any]]:
     """
