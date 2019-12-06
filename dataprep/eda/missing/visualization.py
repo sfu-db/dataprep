@@ -41,20 +41,21 @@ def _vis_nonzero_count(  # pylint: disable=too-many-locals
     ]
     tooltips = [("z", "@z")]
     hover = HoverTool(tooltips=tooltips)
-    heatmap = hv.HeatMap(data_d).redim.range(z=(-1, 1))
+    heatmap = hv.HeatMap(data_d).redim.range(z=(0, 1))
     heatmap.opts(
         tools=[hover],
-        colorbar=False,
+        colorbar=True,
         height=params["height"],
         width=params["width"],
         title="Position of Missing Value",
         show_grid=False,
+        cmap="Greys",
     )
     fig = hv.render(heatmap, backend="bokeh")
     fig.toolbar_location = None
     fig.toolbar.active_drag = None
-    fig.xaxis.major_label_orientation = math.pi / 4
-    fig.xaxis.axis_label = "Column Name"
+    fig.xaxis.major_label_orientation = math.pi / 2
+    fig.xaxis.axis_label = None
     fig.yaxis.axis_label = "Position"
     fig.yaxis.major_tick_line_color = None
     fig.yaxis.minor_tick_line_color = None
