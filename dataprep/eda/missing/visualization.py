@@ -9,7 +9,7 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 import scipy.stats
-from bokeh.models import HoverTool
+from bokeh.models import FuncTickFormatter, HoverTool
 from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import Figure
@@ -54,8 +54,15 @@ def _vis_nonzero_count(  # pylint: disable=too-many-locals
     fig = hv.render(heatmap, backend="bokeh")
     fig.toolbar_location = None
     fig.toolbar.active_drag = None
-    fig.xaxis.major_label_orientation = math.pi / 2
+    fig.xaxis.major_label_orientation = math.pi / 3
     fig.xaxis.axis_label = None
+    fig.xaxis.formatter = FuncTickFormatter(
+        code="""
+             if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+             else return tick;
+        """
+        % (params["max_xlab_len"], params["max_xlab_len"])
+    )
     fig.yaxis.axis_label = "Position"
     fig.yaxis.major_tick_line_color = None
     fig.yaxis.minor_tick_line_color = None
