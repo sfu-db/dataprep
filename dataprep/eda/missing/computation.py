@@ -177,7 +177,13 @@ def plot_missing(
         otherwise => error
     """
     columns_name = list(pd_data_frame.columns)
-    params = {"height": 375, "width": 325, "alpha": 0.3, "legend_position": "top"}
+    params = {
+        "height": 375,
+        "width": 325,
+        "alpha": 0.3,
+        "legend_position": "top",
+        "max_xlab_len": 30,
+    }
     for name in columns_name:
         if (
             get_type(pd_data_frame[name]) != DataType.TYPE_NUM
