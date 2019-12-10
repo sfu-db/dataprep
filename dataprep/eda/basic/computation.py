@@ -465,7 +465,7 @@ def _calc_bar(dataframe: dd.DataFrame, col_x: str) -> Intermediate:
     miss_vals = dask.compute(dataframe[col_x].isna().sum())[0]
     raw_data = {"df": dataframe, "col_x": col_x, "col_y": None}
     result = {"bar_chart": dict(grp_object), "missing": [miss_vals]}
-    return Intermediate(result, raw_data)
+    return Intermediate(result=result, raw_data=raw_data)
 
 
 def _calc_hist_by_group(

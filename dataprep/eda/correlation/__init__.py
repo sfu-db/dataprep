@@ -2,10 +2,12 @@
     This module implements the plot_correlation(df) function.
 """
 
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple, Union
 
+import dask.dataframe as dd
 import pandas as pd
 from bokeh.io import show
+from bokeh.plotting import Figure
 
 from .compute import compute_correlation
 from .render import render_correlation
@@ -13,15 +15,15 @@ from .render import render_correlation
 __all__ = ["render_correlation", "compute_correlation", "plot_correlation"]
 
 
-def plot_correlation(  # TODO: Copy pasted from master, just to make sure the document is not overrided.
-    df: pd.DataFrame,
+def plot_correlation(
+    df: Union[pd.DataFrame, dd.DataFrame],
     x: Optional[str] = None,
     y: Optional[str] = None,
     *,
-    value_range: Optional[List[float]] = None,
+    value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
     show_plot: bool = True,
-) -> None:
+) -> Figure:
     """
     This function is designed to calculate the correlation between columns
     There are three functions: plot_correlation(df), plot_correlation(df, x)

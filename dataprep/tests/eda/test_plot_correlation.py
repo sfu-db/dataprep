@@ -11,11 +11,18 @@ import pandas as pd
 import pytest
 
 from ...eda.correlation import compute_correlation, plot_correlation
-from ...eda.correlation.compute import pearson_nxn, spearman_nxn, kendall_tau_nxn, pearson_1xn, spearman_1xn, kendall_tau_1xn
+from ...eda.correlation.compute import (
+    pearson_nxn,
+    spearman_nxn,
+    kendall_tau_nxn,
+    pearson_1xn,
+    spearman_1xn,
+    kendall_tau_1xn,
+)
 from ...utils import to_dask
 
 
-@pytest.fixture(scope="module")  # mypy: disable
+@pytest.fixture(scope="module")  # type: ignore
 def simpledf() -> dd.DataFrame:
     df = pd.DataFrame(np.random.rand(100, 3), columns=["a", "b", "c"])
     df = pd.concat([df, pd.Series(["a"] * 100)], axis=1)
@@ -65,43 +72,43 @@ def test_sanity_compute_8(simpledf: dd.DataFrame) -> None:
     plot_correlation(simpledf, x="b", y="a", k=1, show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_1(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, value_range=(0.3, 0.7))
     plot_correlation(simpledf, value_range=(0.3, 0.7), show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_2(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, k=3, value_range=(0.3, 0.7))
     plot_correlation(simpledf, k=3, value_range=(0.3, 0.7), show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_3(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3)
     plot_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3, show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_4(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, y="a")
     plot_correlation(simpledf, y="a", show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_5(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, x="d")
     plot_correlation(simpledf, x="d", show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_test_sanity_compute_fail_6(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8))
     plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), show_plot=False)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3)
     plot_correlation(
@@ -109,7 +116,7 @@ def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
     )
 
 
-def test_compute_pearson():
+def test_compute_pearson() -> None:
     array = np.random.rand(100, 10)
     darray = da.from_array(array)
     a = pearson_nxn(darray).compute()
@@ -117,12 +124,11 @@ def test_compute_pearson():
     assert np.isclose(a, b).all()
 
     for i in range(array.shape[1]):
-        _, a = pearson_1xn(darray[:,i], darray)
+        _, a = pearson_1xn(darray[:, i], darray)
         assert np.isclose(a, np.sort(b[:, i])).all()
 
 
-
-def test_compute_spearman():
+def test_compute_spearman() -> None:
     array = np.random.rand(100, 10)
     darray = da.from_array(array)
     a = spearman_nxn(darray).compute()
@@ -130,11 +136,11 @@ def test_compute_spearman():
     assert np.isclose(a, b).all()
 
     for i in range(array.shape[1]):
-        _, a = spearman_1xn(darray[:,i], darray)
+        _, a = spearman_1xn(darray[:, i], darray)
         assert np.isclose(a, np.sort(b[:, i])).all()
 
 
-def test_compute_kendall():
+def test_compute_kendall() -> None:
     array = np.random.rand(100, 10)
     darray = da.from_array(array)
     a = kendall_tau_nxn(darray).compute()
@@ -142,8 +148,9 @@ def test_compute_kendall():
     assert np.isclose(a, b).all()
 
     for i in range(array.shape[1]):
-        _, a = kendall_tau_1xn(darray[:,i], darray)
+        _, a = kendall_tau_1xn(darray[:, i], darray)
         assert np.isclose(a, np.sort(b[:, i])).all()
+
 
 # def test_plot_corr_df() -> None:  # pylint: disable=too-many-locals
 #     """
