@@ -1,7 +1,8 @@
 """
-    Intermediate class
+Intermediate class
 """
-from typing import Any, Dict, Sequence
+from typing import Any, Dict
+
 import numpy as np
 
 
@@ -26,7 +27,7 @@ class Intermediate(Dict[str, Any]):
             super().__init__(**kwargs)
             self.visual_type = visual_type
         else:
-            assert False, "Unsupported inivialization"
+            assert False, "Unsupported initialization"
 
 
 def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103

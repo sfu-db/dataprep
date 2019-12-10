@@ -30,10 +30,10 @@ def _vis_nonzero_count(  # pylint: disable=too-many-locals
     which is able to show the missing value's location and rate
     """
     hv.extension("bokeh", logo=False)
-    distribution = intermediate.result["distribution"]
-    count = intermediate.result["count"]
+    distribution = intermediate["result"]["distribution"]
+    count = intermediate["result"]["count"]
     row, col = distribution.shape
-    columns_name = list(intermediate.raw_data["df"].columns.values)
+    columns_name = list(intermediate["raw_data"]["df"].columns.values)
     data_d = [
         (columns_name[i] + "(%0.2f" % (count[i] * 100) + "%)", j, distribution[i, j])
         for i in range(row)
@@ -73,10 +73,10 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
     This function is designed to show histogram or bars of
     original data and updated data
     """
-    pd_data_frame = intermediate.raw_data["df"]
-    num_bins = intermediate.raw_data["num_bins"]
-    df_data_drop = intermediate.result["df_data_drop"]
-    columns_name = intermediate.result["columns_name"]
+    pd_data_frame = intermediate["raw_data"]["df"]
+    num_bins = intermediate["raw_data"]["num_bins"]
+    df_data_drop = intermediate["result"]["df_data_drop"]
+    columns_name = intermediate["result"]["columns_name"]
     hv.extension("bokeh", logo=False)
     tab_list = []
     for name in columns_name:
@@ -98,7 +98,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
                 ),
                 backend="bokeh",
             )
-            fig.xaxis.axis_label = intermediate.raw_data["x_name"]
+            fig.xaxis.axis_label = intermediate["raw_data"]["x_name"]
             fig.yaxis.axis_label = "Frequency"
             fig.xaxis.major_label_orientation = math.pi / 4
             fig.toolbar_location = None
@@ -129,7 +129,7 @@ def _vis_missing_impact(  # pylint: disable=too-many-locals
                 ),
                 backend="bokeh",
             )
-            fig.xaxis.axis_label = intermediate.raw_data["x_name"]
+            fig.xaxis.axis_label = intermediate["raw_data"]["x_name"]
             fig.yaxis.axis_label = "Frequency"
             fig.xaxis.major_label_orientation = math.pi / 4
             fig.toolbar_location = None
@@ -159,10 +159,10 @@ def _vis_missing_impact_y(  # pylint: disable=too-many-locals
     original data and updated data.
     Compared with _vis_missing_impact function, the data is y_name column
     """
-    pd_data_frame = intermediate.raw_data["df"]
-    y_name = intermediate.raw_data["y_name"]
-    num_bins = intermediate.raw_data["num_bins"]
-    df_data_drop = intermediate.result["df_data_drop"]
+    pd_data_frame = intermediate["raw_data"]["df"]
+    y_name = intermediate["raw_data"]["y_name"]
+    num_bins = intermediate["raw_data"]["num_bins"]
+    df_data_drop = intermediate["result"]["df_data_drop"]
     origin_data = pd_data_frame[y_name].values
     drop_data = df_data_drop[y_name].values
     hv.extension("bokeh", logo=False)

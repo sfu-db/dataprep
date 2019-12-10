@@ -3,22 +3,19 @@
     plot_correlation(df) function
 """
 import math
-import warnings
-from typing import Any, Dict, List, Sequence, Tuple, Optional
+from typing import List, Optional, Sequence, Tuple
 
-import holoviews as hv
 import numpy as np
-from bokeh.io import show
 from bokeh.models import (
     BasicTicker,
     CategoricalColorMapper,
     ColorBar,
     FactorRange,
     HoverTool,
+    Legend,
+    LegendItem,
     LinearColorMapper,
     PrintfTickFormatter,
-    LegendItem,
-    Legend,
 )
 from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
@@ -59,18 +56,24 @@ __all__ = ["render_correlation"]
 #     return fig
 
 ########## HeatMaps ##########
-def tweak_figure(p: Figure) -> None:
-    p.grid.grid_line_color = None
-    p.axis.axis_line_color = None
-    p.axis.major_tick_line_color = None
-    p.axis.major_label_text_font_size = "9pt"
-    p.axis.major_label_standoff = 0
-    p.xaxis.major_label_orientation = math.pi / 3
+def tweak_figure(fig: Figure) -> None:
+    """
+    Set some common attributes for a figure
+    """
+    fig.grid.grid_line_color = None
+    fig.axis.axis_line_color = None
+    fig.axis.major_tick_line_color = None
+    fig.axis.major_label_text_font_size = "9pt"
+    fig.axis.major_label_standoff = 0
+    fig.xaxis.major_label_orientation = math.pi / 3
 
 
 def render_correlation_heatmaps(
     itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
 ) -> Tabs:
+    """
+    Render correlation heatmaps in to tabs
+    """
     tabs: List[Panel] = []
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
     axis_range = itmdt["axis_range"]
@@ -84,7 +87,7 @@ def render_correlation_heatmaps(
         mapper, color_bar = create_color_mapper(palette)
         x_range = FactorRange(*axis_range)
         y_range = FactorRange(*reversed(axis_range))
-        p = figure(
+        fig = Figure(
             x_range=x_range,
             y_range=y_range,
             plot_width=plot_width,
@@ -95,9 +98,9 @@ def render_correlation_heatmaps(
             tooltips=tooltips,
         )
 
-        tweak_figure(p)
+        tweak_figure(fig)
 
-        p.rect(
+        fig.rect(
             x="x",
             y="y",
             width=1,
@@ -107,9 +110,9 @@ def render_correlation_heatmaps(
             line_color=None,
         )
 
-        p.add_layout(color_bar, "right")
+        fig.add_layout(color_bar, "right")
 
-        tab = Panel(child=p, title=method)
+        tab = Panel(child=fig, title=method)
         tabs.append(tab)
 
     tabs = Tabs(tabs=tabs)
@@ -119,6 +122,9 @@ def render_correlation_heatmaps(
 def render_correlation_single_heatmaps(
     itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
 ) -> Tabs:
+    """
+    Render correlation heatmaps, but with single column
+    """
     tabs: List[Panel] = []
     tooltips = [("y", "@y"), ("correlation", "@correlation{1.11}")]
 
@@ -127,7 +133,7 @@ def render_correlation_single_heatmaps(
 
         x_range = FactorRange(*df["x"].unique())
         y_range = FactorRange(*df["y"].unique())
-        p = figure(
+        fig = figure(
             x_range=x_range,
             y_range=y_range,
             plot_width=plot_width,
@@ -138,9 +144,9 @@ def render_correlation_single_heatmaps(
             tooltips=tooltips,
         )
 
-        tweak_figure(p)
+        tweak_figure(fig)
 
-        p.rect(
+        fig.rect(
             x="x",
             y="y",
             width=1,
@@ -150,9 +156,9 @@ def render_correlation_single_heatmaps(
             line_color=None,
         )
 
-        p.add_layout(color_bar, "right")
+        fig.add_layout(color_bar, "right")
 
-        tab = Panel(child=p, title=method)
+        tab = Panel(child=fig, title=method)
         tabs.append(tab)
 
     tabs = Tabs(tabs=tabs)
@@ -160,6 +166,9 @@ def render_correlation_single_heatmaps(
 
 
 def create_color_mapper(palette: Sequence[str]) -> Tuple[LinearColorMapper, ColorBar]:
+    """
+    Create a color mapper and a colorbar for heatmap
+    """
     mapper = LinearColorMapper(palette=palette, low=-1, high=1)
     colorbar = ColorBar(
         color_mapper=mapper,
@@ -177,6 +186,12 @@ def create_color_mapper(palette: Sequence[str]) -> Tuple[LinearColorMapper, Colo
 def render_scatter(
     itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
 ) -> Figure:
+    """
+    Render scatter plot with a regression line and possible most influencial points
+    """
+
+    # pylint: disable=too-many-locals
+
     df = itmdt["data"]
     xcol, ycol, *maybe_label = df.columns
 
@@ -257,13 +272,13 @@ def render_correlation(
         The bokeh Figure instance.
     """
     if itmdt.visual_type == "correlation_heatmaps":
-        ve = render_correlation_heatmaps(
+        visual_elem = render_correlation_heatmaps(
             itmdt, plot_width, plot_height, palette or BIPALETTE
         )
     elif itmdt.visual_type == "correlation_single_heatmaps":
-        ve = render_correlation_single_heatmaps(
+        visual_elem = render_correlation_single_heatmaps(
             itmdt, plot_width, plot_height, palette or BIPALETTE
         )
     elif itmdt.visual_type == "correlation_scatter":
-        ve = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
-    return ve
+        visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+    return visual_elem

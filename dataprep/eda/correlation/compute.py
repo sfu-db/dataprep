@@ -4,33 +4,34 @@
 """
 import sys
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Dict, Optional, Sequence, Tuple, Union
 
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from bokeh.io import show
-from bokeh.models.widgets import Tabs
-from bokeh.plotting import Figure
 from scipy.stats import kendalltau
 
 from ...errors import UnreachableError
-from ...utils import DataType, get_type, to_dask
+from ...utils import to_dask
 from ..common import Intermediate
-from ..dtypes import CATEGORICAL_DTYPES, NUMERICAL_DTYPES, is_categorical, is_numerical
+from ..dtypes import NUMERICAL_DTYPES, is_categorical, is_numerical
 
 __all__ = ["compute_correlation"]
 
 
 class CorrelationMethod(Enum):
+    """
+    Supported correlation methods
+    """
+
     Pearson = auto()
     Spearman = auto()
     KendallTau = auto()
 
 
-def compute_correlation(  # pylint: disable=too-many-arguments
+def compute_correlation(
     df: Union[pd.DataFrame, dd.DataFrame],
     x: Optional[str] = None,
     y: Optional[str] = None,
@@ -64,11 +65,12 @@ def compute_correlation(  # pylint: disable=too-many-arguments
         case (Some, Some, _) => Scatter with regression line with/without top k outliers
         otherwise => error
     """
+    # pylint: disable=too-many-locals,too-many-statements,too-many-branches
 
     df = to_dask(df)
-    df.columns = [str(e) for e in df.columns] # convert column names to string
+    df.columns = [str(e) for e in df.columns]  # convert column names to string
 
-    if x is None and y is None:
+    if x is None and y is None:  # pylint: disable=no-else-return
         assert value_range is None
         df = df.select_dtypes(NUMERICAL_DTYPES)
         assert len(df.columns) != 0, f"No numerical columns found"
@@ -139,9 +141,9 @@ def compute_correlation(  # pylint: disable=too-many-arguments
 
         xdtype = df[x].dtype
         ydtype = df[y].dtype
+        # pylint: disable=no-else-raise
         if is_categorical(xdtype) and is_categorical(ydtype):
             raise NotImplementedError
-
             # intermediate = _cross_table(df=df, x=x, y=y)
             # return intermediate
         elif is_numerical(xdtype) and is_numerical(ydtype):
@@ -156,26 +158,31 @@ def compute_correlation(  # pylint: disable=too-many-arguments
                 "data": df.rename(columns={"x": x, "y": y}).compute(),
             }
 
-            if influences is not None:
+            assert (influences is None) == (k is None)
+
+            if influences is not None and k is not None:
                 infidx = np.argsort(influences)
                 labels = np.full(len(influences), "=")
-                labels[infidx[-k:]] = "-"
+                # pylint: disable=invalid-unary-operand-type
+                labels[infidx[-k:]] = "-"  # type: ignore
+                # pylint: enable=invalid-unary-operand-type
                 labels[infidx[:k]] = "+"
                 result["data"]["influence"] = labels
+
             return Intermediate(**result, visual_type="correlation_scatter")
         else:
             raise ValueError(
                 "Cannot calculate the correlation between two different dtype column"
             )
-    else:
-        raise UnreachableError
+
+    raise UnreachableError
 
 
 def scatter_with_regression(
     xarr: da.Array, yarr: da.Array, sample_size: int, k: Optional[int] = None,
 ) -> Tuple[Tuple[float, float], dd.DataFrame, Optional[np.ndarray]]:
     """
-    Calculate pearson correlation on 2 given arrays. 
+    Calculate pearson correlation on 2 given arrays.
 
     Parameters
     ----------
@@ -225,6 +232,9 @@ def scatter_with_regression(
 def correlation_nxn(
     data: da.Array, columns: Optional[Sequence[str]] = None
 ) -> Tuple[da.Array, da.Array, Dict[CorrelationMethod, da.Array]]:
+    """
+    Calculation of a n x n correlation matrix for n columns
+    """
     _, ncols = data.shape
     cordx, cordy = da.meshgrid(range(ncols), range(ncols))
     cordx, cordy = cordy.ravel(), cordx.ravel()
@@ -244,6 +254,9 @@ def correlation_nxn(
 
 
 def pearson_nxn(data: da.Array) -> da.Array:
+    """
+    Pearson correlation calculation of a n x n correlation matrix for n columns
+    """
     cov = da.cov(data.T)
     stderr = da.sqrt(da.diag(cov))
     corrmat = cov / stderr[:, None] / stderr[None, :]
@@ -251,7 +264,9 @@ def pearson_nxn(data: da.Array) -> da.Array:
 
 
 def spearman_nxn(data: da.Array) -> da.Array:
-
+    """
+    Spearman correlation calculation of a n x n correlation matrix for n columns
+    """
     _, ncols = data.shape
     data = data.compute()  # TODO: How to compute rank distributedly?
 
@@ -264,14 +279,18 @@ def spearman_nxn(data: da.Array) -> da.Array:
 
 
 def kendall_tau_nxn(data: da.Array) -> da.Array:
-
+    """
+    Kendal Tau correlation calculation of a n x n correlation matrix for n columns
+    """
     _, ncols = data.shape
 
     corrmat = np.zeros(shape=(ncols, ncols))
     corr_list = []
     for i in range(ncols):
         for j in range(i + 1, ncols):
-            tmp = dask.delayed(lambda a, b: kendalltau(a, b).correlation)(data[:, i], data[:, j])
+            tmp = dask.delayed(lambda a, b: kendalltau(a, b).correlation)(
+                data[:, i], data[:, j]
+            )
             corr_list.append(tmp)
     corr_comp = dask.compute(*corr_list)  # TODO avoid explicitly compute
     idx = 0
@@ -374,6 +393,10 @@ def corr_filter(
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Filter correlation values by k and value_range
+    """
+
     assert (value_range is None) or (
         k is None
     ), "value_range and k cannot be present in both"
@@ -381,14 +404,19 @@ def corr_filter(
     if k is not None:
         sorted_idx = np.argsort(corrs)
         sorted_corrs = corrs[sorted_idx]
-        return sorted_idx[-k:], corrs[sorted_idx[-k:]]
-    else:
-        sorted_idx = np.argsort(corrs)
-        sorted_corrs = corrs[sorted_idx]
+        # pylint: disable=invalid-unary-operand-type
+        return (
+            sorted_idx[-k:],
+            corrs[sorted_idx[-k:]],
+        )
+        # pylint: enable=invalid-unary-operand-type
 
-        if value_range is not None:
-            start, end = value_range
-            istart = np.searchsorted(sorted_corrs, start)
-            iend = np.searchsorted(sorted_corrs, end, side="right")
-            return sorted_idx[istart:iend], sorted_corrs[istart:iend]
-        return sorted_idx, sorted_corrs
+    sorted_idx = np.argsort(corrs)
+    sorted_corrs = corrs[sorted_idx]
+
+    if value_range is not None:
+        start, end = value_range
+        istart = np.searchsorted(sorted_corrs, start)
+        iend = np.searchsorted(sorted_corrs, end, side="right")
+        return sorted_idx[istart:iend], sorted_corrs[istart:iend]
+    return sorted_idx, sorted_corrs
