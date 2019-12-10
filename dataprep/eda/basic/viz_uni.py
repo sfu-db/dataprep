@@ -379,12 +379,9 @@ class UniViz:
         :param sample_outlier_size: number of outliers to plot
         :return: Bokeh Plot Figure
         """
-        df = pd.DataFrame(data)  # , index=range(0, len(data)))
+        df = pd.DataFrame(data)
         df = df.append(
-            pd.Series(
-                {col: i for col, i in zip(df.columns, range(1, len(df.columns) + 1))},
-                name="x",
-            )
+            pd.Series({col: i + 1 for col, i in enumerate(df.columns)}, name="x",)
         )
         df = df.transpose()
         df["y"], df["w"] = (df["tf"] + df["sf"]) / 2, [box_width] * len(df)
@@ -485,6 +482,7 @@ class UniViz:
         plot.xaxis.major_label_orientation = math.pi / 3
         plot.yaxis.axis_label = col_y
         plot.xaxis.ticker = FixedTicker(ticks=list(df["x"]))
+        # pylint: disable=unnecessary-comprehension
         plot.xaxis.formatter = FuncTickFormatter(
             code="""
             var mapping = """
@@ -496,6 +494,7 @@ class UniViz:
         """
             % (self.max_xlab_len, self.max_xlab_len)
         )
+        # pylint: enable=unnecessary-comprehension
         if col_x is not None and col_y is not None:
             plot.xaxis.axis_label = col_x
         self.box = True

@@ -1,12 +1,20 @@
-import pandas as pd
-import numpy as np
+"""
+Module for auxiliary type detection functions
+"""
+
 from typing import Any
+
+import numpy as np
+import pandas as pd
 
 CATEGORICAL_DTYPES = [pd.CategoricalDtype, np.bool, np.object, pd.PeriodDtype]
 NUMERICAL_DTYPES = [np.number, np.datetime64, pd.DatetimeTZDtype]
 
 
 def is_categorical(dtype: Any) -> bool:
+    """
+    Given a type, return if that type is a categorical type
+    """
     if isinstance(dtype, np.dtype):
         dtype = dtype.type
 
@@ -16,6 +24,9 @@ def is_categorical(dtype: Any) -> bool:
 
 
 def is_numerical(dtype: Any) -> bool:
+    """
+    Given a type, return if that type is a numerical type
+    """
     if isinstance(dtype, np.dtype):
         dtype = dtype.type
 
