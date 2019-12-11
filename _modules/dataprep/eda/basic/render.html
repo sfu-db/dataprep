@@ -102,8 +102,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">plots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">intermediate</span> <span class="ow">in</span> <span class="n">intermediates_list</span><span class="p">:</span>
-            <span class="n">raw_data</span> <span class="o">=</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">raw_data</span>
-            <span class="n">data_dict</span> <span class="o">=</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">result</span>
+            <span class="n">raw_data</span> <span class="o">=</span> <span class="n">intermediate</span><span class="p">[</span><span class="s2">&quot;raw_data&quot;</span><span class="p">]</span>
+            <span class="n">data_dict</span> <span class="o">=</span> <span class="n">intermediate</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span>
 
             <span class="n">col_x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">()</span>
             <span class="n">col_y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">()</span>
@@ -224,13 +224,13 @@
                 <span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_height_large</span>
                 <span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_width_large</span>
                 <span class="k">if</span> <span class="p">(</span>
-                    <span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;stacked_bar_chart&quot;</span>
-                    <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nested_bar_chart&quot;</span>
-                    <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;heat_map&quot;</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;stacked_bar_chart&quot;</span>
+                    <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nested_bar_chart&quot;</span>
+                    <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;heat_map&quot;</span>
                 <span class="p">):</span>
                     <span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_height_small</span>
                     <span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_width_wide</span>
-                <span class="n">tab</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">plot</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">tab</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">plot</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">interm</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">tab_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab</span><span class="p">)</span>
             <span class="n">show</span><span class="p">(</span><span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tab_list</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -280,7 +280,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
     </div>
   </body>
 </html>

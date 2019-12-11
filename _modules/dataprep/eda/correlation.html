@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.correlation &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.eda.correlation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module implements the plot_correlation(df) function.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span>
+
+<span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute_correlation</span>
+<span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render_correlation</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;compute_correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;plot_correlation&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="plot_correlation"><a class="viewcode-back" href="../../../dataprep.eda.correlation.html#dataprep.eda.plot_correlation">[docs]</a><span class="k">def</span> <span class="nf">plot_correlation</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is designed to calculate the correlation between columns</span>
+<span class="sd">    There are three functions: plot_correlation(df), plot_correlation(df, x)</span>
+<span class="sd">    plot_correlation(df, x, y)</span>
+<span class="sd">    There are also some parameters such as k and value_range to satisfy your requirement</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pd_data_frame: pd.DataFrame</span>
+<span class="sd">        the pandas data_frame for which plots are calculated for each column</span>
+<span class="sd">    x_name: str, optional</span>
+<span class="sd">        a valid column name of the data frame</span>
+<span class="sd">    y_name: str, optional</span>
+<span class="sd">        a valid column name of the data frame</span>
+<span class="sd">    value_range: list[float], optional</span>
+<span class="sd">        range of value</span>
+<span class="sd">    k: int, optional</span>
+<span class="sd">        choose top-k element</span>
+<span class="sd">    show_plot: bool</span>
+<span class="sd">        Whether to show the plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    An object of figure or</span>
+<span class="sd">        An object of figure and</span>
+<span class="sd">        An intermediate representation for the plots of different columns in the data_frame.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; from dataprep.eda.correlation.computation import plot_correlation</span>
+<span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">    &gt;&gt;&gt; df = pd.read_csv(&quot;suicide-rate.csv&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, k=6)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;, k=3)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;, value_range=[-1, 0.3])</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, &quot;suicides&quot;, value_range=[-1, 0.3], k=2)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, x_name=&quot;population&quot;, y_name=&quot;suicides_no&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plot_correlation(df, x_name=&quot;population&quot;, y_name=&quot;suicides&quot;, k=5)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    match (x_name, y_name, k)</span>
+<span class="sd">        case (None, None, None) =&gt; heatmap</span>
+<span class="sd">        case (Some, None, Some) =&gt; Top K columns for (pearson, spearman, kendall)</span>
+<span class="sd">        case (Some, Some, _) =&gt; Scatter with regression line with/without top k outliers</span>
+<span class="sd">        otherwise =&gt; error</span>
+
+<span class="sd">    This function only supports numerical or categorical data,</span>
+<span class="sd">    and it is better to drop None, Nan and Null value before using it</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">intermediate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">figure</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    </div>
+  </body>
+</html>

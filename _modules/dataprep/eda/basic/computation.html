@@ -502,7 +502,7 @@
     <span class="n">miss_vals</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">col_x</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">dataframe</span><span class="p">,</span> <span class="s2">&quot;col_x&quot;</span><span class="p">:</span> <span class="n">col_x</span><span class="p">,</span> <span class="s2">&quot;col_y&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;bar_chart&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">grp_object</span><span class="p">),</span> <span class="s2">&quot;missing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">miss_vals</span><span class="p">]}</span>
-    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">raw_data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_calc_hist_by_group</span><span class="p">(</span>
@@ -573,7 +573,7 @@
 <span class="sd">    bins : number of bins to use in the histogram</span>
 
 <span class="sd">    Returns</span>
-<span class="sd">    __________</span>
+<span class="sd">    _______</span>
 <span class="sd">    np.array : An array of values representing histogram for the input col</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">dataframe</span><span class="p">,</span> <span class="s2">&quot;col_x&quot;</span><span class="p">:</span> <span class="n">col_x</span><span class="p">,</span> <span class="s2">&quot;col_y&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="n">bins</span><span class="p">}</span>
@@ -921,7 +921,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
     </div>
   </body>
 </html>
