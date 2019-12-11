@@ -1,40 +1,33 @@
 """
-    Intermediate class
+Intermediate class
 """
 from typing import Any, Dict
+
 import numpy as np
 
 
-class Intermediate:
+class Intermediate(Dict[str, Any]):
     """
-       This is class of intermediate
-       There are two variables
-       result: intermediate result
-       raw_data: input data
+    This class contains intermediate results.
     """
 
-    result: Dict[str, Any]
-    raw_data: Dict[str, Any]
+    visual_type: str
 
-    def __init__(self, result: Dict[str, Any], raw_data: Dict[str, Any]) -> None:
-        """
-        :param result: The intermediate result calculated by us
-        :param raw_data: The raw data input by the users
-        """
-        self.result = result
-        self.raw_data = raw_data
-
-    def __setattr__(self, name: str, value: Dict[str, Any]) -> None:
-        """
-        :param name: object's attribute name
-        :param value: object's attribute type
-        :return:
-        """
-        if name == "result" and not isinstance(value, dict):
-            raise TypeError("A.result must be a dict")
-        if name == "raw_data" and not isinstance(value, dict):
-            raise TypeError("A.raw_data must be a dict")
-        super().__setattr__(name, value)
+    def __init__(self, *args: Any, **kwargs: Any):
+        if (
+            len(args) == 1
+            and isinstance(args[0], dict)
+            and len(kwargs) == 1
+            and "visual_type" in kwargs
+        ):
+            super().__init__(args[0])
+            self.visual_type = kwargs["visual_type"]
+        elif len(args) == 0:
+            visual_type = kwargs.pop("visual_type")
+            super().__init__(**kwargs)
+            self.visual_type = visual_type
+        else:
+            assert False, "Unsupported initialization"
 
 
 def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103

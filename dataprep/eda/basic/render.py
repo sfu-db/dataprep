@@ -65,8 +65,8 @@ class Render:
         """
         plots = list()
         for intermediate in intermediates_list:
-            raw_data = intermediate.raw_data
-            data_dict = intermediate.result
+            raw_data = intermediate["raw_data"]
+            data_dict = intermediate["result"]
 
             col_x: str = str()
             col_y: str = str()
@@ -187,13 +187,13 @@ class Render:
                 plot.height = self.plot_height_large
                 plot.width = self.plot_width_large
                 if (
-                    list(interm.result.keys())[0] == "stacked_bar_chart"
-                    or list(interm.result.keys())[0] == "nested_bar_chart"
-                    or list(interm.result.keys())[0] == "heat_map"
+                    list(interm["result"].keys())[0] == "stacked_bar_chart"
+                    or list(interm["result"].keys())[0] == "nested_bar_chart"
+                    or list(interm["result"].keys())[0] == "heat_map"
                 ):
                     plot.height = self.plot_height_small
                     plot.width = self.plot_width_wide
-                tab = Panel(child=plot, title=list(interm.result.keys())[0])
+                tab = Panel(child=plot, title=list(interm["result"].keys())[0])
                 tab_list.append(tab)
             show(Tabs(tabs=tab_list))
         else:

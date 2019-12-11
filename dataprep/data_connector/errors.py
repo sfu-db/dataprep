@@ -1,25 +1,10 @@
 """
 Module defines errors used in this library.
 """
+from ..errors import DataprepError
 
 
-class Error(Exception):
-    """Base class for exceptions in this module."""
-
-
-class UnimplementedError(Error):
-    """
-    Error indicating some features in the library is not implemented yet.
-    """
-
-
-class UnreachableError(Error):
-    """
-    Error indicating some path of the code is unreachable.
-    """
-
-
-class RequestError(Error):
+class RequestError(DataprepError):
     """
     A error indicating the status code of the API response
     is not 200.

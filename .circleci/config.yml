@@ -11,11 +11,11 @@ jobs:
       - &step_install_pipenv
         run: 
           name: Install python tools
-          command: pip install --user poetry
+          command: pip install --user poetry==1.0.0b9
       - &step_inproject_venv
         run:
           name: Set venv inproject
-          command: poetry config settings.virtualenvs.in-project true
+          command: poetry config virtualenvs.in-project true
       - checkout
       - run:
           name: Install dependencies

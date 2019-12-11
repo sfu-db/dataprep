@@ -42,7 +42,7 @@ def test_plot_missing_df() -> None:
     _, intermediate = plot_missing(pd_data_frame=df_data, return_intermediate=True)
     end2 = time()
     print("Numpy time used: ", end2 - start2)
-    assert intermediate.result["count"] == count_none_comp
+    assert intermediate["result"]["count"] == count_none_comp
 
 
 def test_plot_missing_df_x() -> None:
