@@ -9,7 +9,8 @@ import pandas as pd
 from jinja2 import Environment
 from requests import Request, Response, Session
 
-from .errors import RequestError, UnreachableError
+from .errors import RequestError
+from ..errors import UnreachableError
 from .implicit_database import ImplicitDatabase, ImplicitTable
 
 
@@ -110,7 +111,7 @@ class Connector:
         """
         Query the API to get a table.
 
-        parameters
+        Parameters
         ----------
         table : str
             The table name.
@@ -122,7 +123,7 @@ class Connector:
         **where: Dict[str, Any]
             The additional parameters required for the query.
 
-        returns
+        Returns
         -------
             pd.DataFrame
         """

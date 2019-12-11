@@ -52,7 +52,7 @@ def _calc_nonzero_count(pd_data_frame: pd.DataFrame) -> Intermediate:
     count_nonzero_compute = dask.compute(*count_nonzero_list)
     result = {"distribution": pd_data_frame_value * 1, "count": count_nonzero_compute}
     raw_data = {"df": pd_data_frame}
-    intermediate = Intermediate(result=result, raw_data=raw_data)
+    intermediate = Intermediate(result=result, raw_data=raw_data, visual_type="dummy")
     return intermediate
 
 
@@ -74,7 +74,7 @@ def _calc_missing_impact(
     columns_name.remove(x_name)
     result = {"df_data_drop": df_data_drop, "columns_name": columns_name}
     raw_data = {"df": pd_data_frame, "x_name": x_name, "num_bins": num_bins}
-    intermediate = Intermediate(result=result, raw_data=raw_data)
+    intermediate = Intermediate(result=result, raw_data=raw_data, visual_type="dummy")
     return intermediate
 
 
@@ -102,7 +102,7 @@ def _calc_missing_impact_y(
         "y_name": y_name,
         "num_bins": num_bins,
     }
-    intermediate = Intermediate(result=result, raw_data=raw_data)
+    intermediate = Intermediate(result=result, raw_data=raw_data, visual_type="dummy")
     return intermediate
 
 

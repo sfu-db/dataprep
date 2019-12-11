@@ -15,7 +15,7 @@ from jsonpath2 import Path as JPath
 from lxml import etree  # pytype: disable=import-error
 from requests import Response
 
-from .errors import UnimplementedError, UnreachableError
+from ..errors import UnreachableError
 from .schema import CONFIG_SCHEMA
 from .types import Authorization, AuthorizationType, Fields, Orient
 
@@ -83,7 +83,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
                 auth_params = {**auth_def}
                 del auth_params["type"]
             else:
-                raise UnimplementedError
+                raise NotImplementedError
             self.authorization = Authorization(type=auth_type, params=auth_params)
 
         for key in ["headers", "params", "cookies"]:
@@ -158,7 +158,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
                 table_data[column_name] = col
         else:
             # TODO: split orient
-            raise UnimplementedError
+            raise NotImplementedError
 
         return table_data
 
@@ -199,7 +199,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
                 table_data[column_name] = col
         else:
             # TODO: split orient
-            raise UnimplementedError
+            raise NotImplementedError
 
         return table_data
 

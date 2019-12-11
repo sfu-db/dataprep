@@ -5,7 +5,7 @@ from typing import Any, Dict, NamedTuple, Optional, cast
 from enum import Enum
 from jinja2 import Environment
 
-from .errors import UnreachableError
+from ..errors import UnreachableError
 
 
 class AuthorizationType(Enum):
