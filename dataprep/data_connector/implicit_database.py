@@ -79,12 +79,11 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
                 auth_type = AuthorizationType[auth_def]
                 auth_params: Dict[str, str] = {}
             elif isinstance(auth_def, dict):
-                auth_type = AuthorizationType[auth_def["type"]]
+                auth_type = AuthorizationType[auth_def.pop("type")]
                 auth_params = {**auth_def}
-                del auth_params["type"]
             else:
                 raise NotImplementedError
-            self.authorization = Authorization(type=auth_type, params=auth_params)
+            self.authorization = Authorization(auth_type=auth_type, params=auth_params)
 
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
@@ -123,6 +122,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         data = jloads(data)
         table_data = {}
         root = self.table_path
+
         if self.orient == Orient.Records:
             data_rows = [
                 row_node.current_value for row_node in JPath.parse_str(root).match(data)
