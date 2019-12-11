@@ -16,9 +16,6 @@
             "title": "The Version Schema",
             "description": "The version number of the schema",
             "default": 1,
-            "examples": [
-                1
-            ],
             "minimum": 1
         },
         "request": {
@@ -181,27 +178,34 @@
                 {
                     "type": "object",
                     "required": [
-                        "type"
+                        "type",
+                        "grantType",
+                        "tokenServerUrl"
                     ],
                     "properties": {
                         "type": {
                             "type": "string",
                             "enum": [
-                                "APIKey",
-                                "OAuth",
-                                "Bearer",
-                                "Password"
+                                "OAuth2"
                             ]
+                        },
+                        "grantType": {
+                            "type": "string",
+                            "enum": [
+                                "ClientCredentials",
+                                "AuthorizationCode"
+                            ]
+                        },
+                        "tokenServerUrl": {
+                            "type": "string"
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 },
                 {
                     "type": "string",
                     "enum": [
-                        "APIKey",
-                        "OAuth",
-                        "Bearer",
-                        "Password"
+                        "Bearer"
                     ]
                 }
             ]
