@@ -2,6 +2,7 @@
 Module for auxiliary type detection functions
 """
 
+from enum import Enum, auto
 from typing import Any
 
 import numpy as np
@@ -9,6 +10,11 @@ import pandas as pd
 
 CATEGORICAL_DTYPES = [pd.CategoricalDtype, np.bool, np.object, pd.PeriodDtype]
 NUMERICAL_DTYPES = [np.number, np.datetime64, pd.DatetimeTZDtype]
+
+
+class DType(Enum):
+    Categorical = auto()
+    Numerical = auto()
 
 
 def is_categorical(dtype: Any) -> bool:

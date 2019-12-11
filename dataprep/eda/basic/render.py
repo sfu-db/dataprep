@@ -1,209 +1,301 @@
 """
 This module is for the correct rendering of bokeh plot figures.
 """
+from math import pi
+
 # pylint: disable=R0903
 # pylint: disable=R0912
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from bokeh.models import Panel, Tabs
-from bokeh.plotting import gridplot, show
-from dask import compute, delayed
+import numpy as np
+from bokeh.models import (
+    Box,
+    FuncTickFormatter,
+    HoverTool,
+    LayoutDOM,
+    Legend,
+    LegendItem,
+    Panel,
+    Tabs,
+)
+from bokeh.plotting import Figure, gridplot, show
+from bokeh.transform import cumsum
 
 from ..intermediate import Intermediate
-from .viz_multi import MultiViz
-from .viz_uni import UniViz
+from ..dtypes import DType
+from ..palette import PALETTE
 
 
-class Render:
-    # pylint: disable=too-many-instance-attributes
-    """
-    Encapsulate Renderer functions.
-    """
-
-    def __init__(  # pylint: disable=too-many-arguments
-        self,
-        plot_height_small: int = 300,
-        plot_width_small: int = 324,
-        plot_height_large: int = 400,
-        plot_width_large: int = 450,
-        plot_width_wide: int = 972,
-        ncolumns: int = 3,
-        band_width: float = 1.5,
-        tile_size: Optional[float] = None,
-        bars: int = 10,
-        yscale: str = "linear",
-        ascending: bool = False,
-    ) -> None:
-        self.viz_uni = UniViz()
-        self.viz_multi = MultiViz()
-        self.plot_height_small = (
-            plot_height_small  # set the height of individual plots in the grid.
-        )
-        self.plot_width_small = (
-            plot_width_small  # set the width of individual plots in the grid.
-        )
-        self.plot_height_large = plot_height_large  # height for large plots
-        self.plot_width_large = plot_width_large  # width for large plots
-        self.plot_width_wide = plot_width_wide  # wide width for plots
-        self.total_cols = (
-            ncolumns  # set the total number of columns to be displaced in the grid.
-        )
-        self.band_width = band_width  # set the band width for the kde plot.
-        self.tile_size = tile_size  # set the tile size for the hexbin plot.
-        self.bars = bars  # set the max number of bars to show for bar chart.
-        self.yscale = yscale  # scale of the y axis labels for the histogram
-        self.ascending = ascending  # sort the bars in a bar chart ascending
-
-    def vizualise(
-        self, intermediates_list: List[Intermediate], only_x: bool = False
-    ) -> None:
-        # pylint: disable=too-many-statements
+def tweak_figure(
+    p: Figure, ptype: Optional[str] = None, max_label_len: int = 15
+) -> None:
+    p.grid.grid_line_color = None
+    p.axis.minor_tick_line_color = None
+    p.axis.major_label_text_font_size = "9pt"
+    p.xaxis.major_label_orientation = pi / 3
+    p.title.text_font_size = "10pt"
+    if ptype == "bar":
+        p.yaxis.major_tick_line_color = None
+        p.yaxis.major_label_text_font_size = "0pt"
+        p.xaxis.formatter = FuncTickFormatter(
+            code="""
+            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
+            else return tick;
         """
-            Shows up the viz on a notebook or browser
-        :param intermediates_list: as returned from plot function
-        :return: None
-        """
-        plots = list()
-        for intermediate in intermediates_list:
-            raw_data = intermediate["raw_data"]
-            data_dict = intermediate["result"]
+            % (max_label_len, max_label_len)
+        )
+    elif ptype == "pie":
+        p.axis.major_label_text_font_size = "0pt"
+        p.axis.major_tick_line_color = None
 
-            col_x: str = str()
-            col_y: str = str()
-            if "col_x" in raw_data:
-                col_x = raw_data["col_x"]
-                if "col_y" in raw_data:
-                    col_y = raw_data["col_y"]
 
-            if col_y is None:
-                if "histogram" in data_dict:
-                    fig = delayed(self.viz_uni.hist_viz)(
-                        data_dict["histogram"],
-                        data_dict["missing"],
-                        data_dict["orig_df_len"],
-                        data_dict["show_y_label"],
-                        col_x,
-                        self.yscale,
-                    )
-                    plots.append(fig)
-                elif "box_plot" in data_dict:
-                    fig = delayed(self.viz_uni.box_viz)(data_dict["box_plot"], col_x)
-                    plots.append(fig)
-                elif "qqnorm_plot" in data_dict:
-                    fig = delayed(self.viz_uni.qqnorm_viz)(
-                        data_dict["qqnorm_plot"], col_x
-                    )
-                    plots.append(fig)
-                elif "bar_chart" in data_dict:
-                    fig = delayed(self.viz_uni.bar_viz)(
-                        data_dict["bar_chart"],
-                        data_dict["missing"],
-                        col_x,
-                        self.bars,
-                        self.ascending,
-                    )
-                    plots.append(fig)
-                elif "pie_chart" in data_dict:
-                    fig = delayed(self.viz_uni.pie_viz)(
-                        data_dict["pie_chart"], col_x, self.bars, self.ascending
-                    )
-                    plots.append(fig)
-                elif "kde_plot" in data_dict:
-                    fig = delayed(self.viz_uni.hist_kde_viz)(
-                        data_dict["kde_plot"], self.band_width, col_x
-                    )
-                    plots.append(fig)
-            else:
-                if "line_chart" in data_dict:
-                    fig = delayed(self.viz_multi.line_viz)(
-                        data_dict["line_chart"],
-                        col_x,
-                        col_y,
-                        data_dict["grp_cnt_stats"],
-                    )
-                    plots.append(fig)
-                if "nested_bar_chart" in data_dict:
-                    fig = delayed(
-                        self.viz_multi.nested_viz(
-                            data_dict["nested_bar_chart"],
-                            col_x,
-                            col_y,
-                            data_dict["grp_cnt_stats"],
-                        )
-                    )
-                    plots.append(fig)
-                elif "stacked_bar_chart" in data_dict:
-                    fig = delayed(
-                        self.viz_multi.stacked_viz(
-                            data_dict["stacked_bar_chart"],
-                            data_dict["sub_categories"],
-                            col_x,
-                            col_y,
-                            data_dict["grp_cnt_stats"],
-                        )
-                    )
-                    plots.append(fig)
-                elif "heat_map" in data_dict:
-                    fig = delayed(
-                        self.viz_multi.heat_map_viz(
-                            data_dict["heat_map"],
-                            col_x,
-                            col_y,
-                            data_dict["grp_cnt_stats"],
-                        )
-                    )
-                    plots.append(fig)
-                elif "scatter_plot" in data_dict:
-                    fig = delayed(
-                        self.viz_multi.scatter_viz(
-                            data_dict["scatter_plot"], col_x, col_y
-                        )
-                    )
-                    plots.append(fig)
-                elif "hexbin_plot" in data_dict:
-                    fig = delayed(
-                        self.viz_multi.hexbin_viz(
-                            data_dict["hexbin_plot"],
-                            col_x,
-                            col_y,
-                            tile_size=self.tile_size,
-                        )
-                    )
-                    plots.append(fig)
-                elif "box_plot" in data_dict:
-                    fig = delayed(self.viz_uni.box_viz)(
-                        data_dict["box_plot"],
-                        col_x,
-                        col_y,
-                        grp_cnt_stats=data_dict["grp_cnt_stats"],
-                    )
-                    plots.append(fig)
+def basic_x_cat_setup(data_dict: Dict[str, Any], col: str) -> Any:
+    miss_perc = data_dict["miss_perc"]
+    tooltips = [
+        ("" + col + "", f"@{col}"),
+        ("Count", "@count"),
+        ("Percentage", "@percent{0.2f}%"),
+    ]
+    title = f"{col} ({miss_perc}% missing)" if miss_perc > 0 else f"{col}"
+    return title, tooltips
 
-        (plots_list,) = compute(plots)
 
-        if only_x:
-            tab_list = list()
-            for interm, plot in zip(intermediates_list, plots_list):
-                plot.height = self.plot_height_large
-                plot.width = self.plot_width_large
-                if (
-                    list(interm["result"].keys())[0] == "stacked_bar_chart"
-                    or list(interm["result"].keys())[0] == "nested_bar_chart"
-                    or list(interm["result"].keys())[0] == "heat_map"
-                ):
-                    plot.height = self.plot_height_small
-                    plot.width = self.plot_width_wide
-                tab = Panel(child=plot, title=list(interm["result"].keys())[0])
-                tab_list.append(tab)
-            show(Tabs(tabs=tab_list))
-        else:
-            show(
-                gridplot(
-                    children=plots_list,
-                    sizing_mode=None,
-                    toolbar_location=None,
-                    ncols=self.total_cols,
-                    plot_height=self.plot_height_small,
-                    plot_width=self.plot_width_small,
-                )
-            )
+def bar_viz(
+    data_dict: Dict[str, Any], col: str, plot_width: int, plot_height: int,
+) -> Figure:
+
+    title, tooltips = basic_x_cat_setup(data_dict, col)
+    df = data_dict["data"][:-1]
+    total_groups = data_dict["total_groups"]
+    p = Figure(
+        x_range=list(df[col]),
+        title=title,
+        plot_width=plot_width,
+        plot_height=plot_height,
+        tools="hover",
+        toolbar_location=None,
+        tooltips=tooltips,
+    )
+    p.vbar(x=col, top="count", width=0.9, source=df)
+    tweak_figure(p, "bar")
+    p.yaxis.axis_label = "Count"
+    if total_groups > len(df):
+        p.xaxis.axis_label = f"Top {len(df)} of {total_groups} {col}"
+        p.xaxis.axis_label_standoff = 0
+    return p
+
+
+def pie_viz(
+    data_dict: Dict[str, Any], col: str, plot_width: int, plot_height: int,
+) -> Panel:
+
+    title, tooltips = basic_x_cat_setup(data_dict, col)
+    df = data_dict["data"]
+    df["angle"] = df["count"] / df["count"].sum() * 2 * pi
+    p = Figure(
+        title=title,
+        plot_width=plot_width,
+        plot_height=plot_height,
+        tools="hover",
+        toolbar_location=None,
+        tooltips=tooltips,
+    )
+    color_list = PALETTE * (len(df) // len(PALETTE) + 1)
+    df["colour"] = color_list[0 : len(df)]
+    if df.iloc[-1]["count"] == 0:
+        df = df[:-1]
+    pie = p.wedge(
+        x=0,
+        y=1,
+        radius=0.9,
+        start_angle=cumsum("angle", include_zero=True),
+        end_angle=cumsum("angle"),
+        line_color="white",
+        fill_color="colour",
+        source=df,
+    )
+    legend = Legend(items=[LegendItem(label=dict(field=col), renderers=[pie])])
+    legend.label_text_font_size = "8pt"
+    p.add_layout(legend, "right")
+    tweak_figure(p, "pie")
+    return Panel(child=p, title="bar chart")
+
+
+def hist_viz(
+    data_dict: Dict[str, Any],
+    col: str,
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
+    show_y_label: bool,
+) -> Figure:
+    df = data_dict["hist_df"]
+    miss_perc = data_dict["miss_perc"]
+    if miss_perc > 0:
+        title = "{} ({}% missing)".format(col, miss_perc)
+    else:
+        title = "{}".format(col)
+    tooltips = [
+        ("Bin", "[@left, @right]"),
+        ("Frequency", "@freq"),
+        ("Percentage", "@percent{0.2f}%"),
+    ]
+    p = Figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        toolbar_location=None,
+        title=title,
+        tools=[],
+        y_axis_type=yscale,
+    )
+    p.quad(
+        source=df,
+        left="left",
+        right="right",
+        bottom=0.01,
+        alpha=0.5,
+        top="freq",
+        fill_color="#6baed6",
+    )
+    hover = HoverTool(tooltips=tooltips, mode="vline",)
+    p.add_tools(hover)
+    tweak_figure(p)
+    p.yaxis.axis_label = "Frequency"
+    x_ticks = list(df["left"])
+    x_ticks.append(df.iloc[-1]["right"])
+    p.xaxis.ticker = x_ticks
+    if not show_y_label:
+        p.yaxis.major_label_text_font_size = "0pt"
+        p.yaxis.major_tick_line_color = None
+    return p
+
+
+def hist_kde_viz(  # pylint: disable=too-many-arguments
+    data_dict: Dict[str, Any], col: str, yscale: str, plot_width: int, plot_height: int,
+) -> Panel:
+
+    df = data_dict["hist_df"]
+    calc_pts = data_dict["calc_pts"]
+    pdf = data_dict["pdf"]
+
+    p = Figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        title=f"{col}",
+        tools=[],
+        toolbar_location=None,
+    )
+    hist = p.quad(
+        source=df,
+        left="left",
+        right="right",
+        bottom=1e-7,
+        alpha=0.5,
+        top="freq",
+        fill_color="#6baed6",
+    )
+    hover_hist = HoverTool(
+        renderers=[hist], tooltips=[("Bin", "[@left, @right]"), ("Density", "@freq")],
+    )
+    line = p.line(calc_pts, pdf, line_color="#9467bd", line_width=2, alpha=0.5)
+    hover_dist = HoverTool(
+        renderers=[line], tooltips=[("x", "@x"), ("y", "@y")], mode="mouse"
+    )
+    p.add_tools(hover_hist)
+    p.add_tools(hover_dist)
+    tweak_figure(p)
+    p.yaxis.axis_label = "Density"
+    x_ticks = list(df["left"])
+    x_ticks.append(df.iloc[-1]["right"])
+    p.xaxis.ticker = x_ticks
+    return Panel(child=p, title="KDE plot")
+
+
+def qqnorm_viz(
+    actual_qs: np.ndarray,
+    theory_qs: np.ndarray,
+    col: str,
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
+
+    tooltips = [("x", "@x"), ("y", "@y")]
+    p = Figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        title=f"{col}",
+        tools="hover",
+        toolbar_location=None,
+        tooltips=tooltips,
+    )
+    p.circle(
+        x=theory_qs, y=actual_qs, size=3, color=PALETTE[0],
+    )
+    all_values = np.concatenate((theory_qs, actual_qs))
+    p.line(
+        x=[np.min(all_values), np.max(all_values)],
+        y=[np.min(all_values), np.max(all_values)],
+        color="red",
+    )
+    tweak_figure(p)
+    p.xaxis.axis_label = "Normal Quantiles"
+    p.yaxis.axis_label = f"Quantiles of {col}"
+    return Panel(child=p, title="QQ normal plot")
+
+
+def render_basic(
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
+) -> Box:
+    figs = list()
+    for col, dtype, data in itmdt["datas"]:
+        if dtype == DType.Categorical:
+            fig = bar_viz(data, col, plot_width, plot_height)
+            figs.append(fig)
+        elif dtype == DType.Numerical:
+            fig = hist_viz(data, col, yscale, plot_width, plot_height, False)
+            figs.append(fig)
+    return gridplot(children=figs, sizing_mode=None, toolbar_location=None, ncols=3,)
+
+
+def render_basic_x_cat(itmdt: Intermediate, plot_width: int, plot_height: int) -> Tabs:
+    tabs: List[Panel] = []
+    fig = bar_viz(itmdt["data"], itmdt["col"], plot_width, plot_height)
+    tabs.append(Panel(child=fig, title="bar chart"))
+    tabs.append(pie_viz(itmdt["data"], itmdt["col"], plot_width, plot_height))
+    tabs = Tabs(tabs=tabs)
+    return Tabs
+
+
+def render_basic_x_num(
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
+) -> Tabs:
+    tabs: List[Panel] = []
+    fig = hist_viz(
+        itmdt["hist_dict"], itmdt["col"], yscale, plot_width, plot_height, True
+    )
+    tabs.append(Panel(child=fig, title="histogram"))
+    tabs.append(
+        hist_kde_viz(itmdt["kde_dict"], itmdt["col"], yscale, plot_width, plot_height)
+    )
+    actual_qs, theory_qs = itmdt["qqdata"]
+    tabs.append(qqnorm_viz(actual_qs, theory_qs, itmdt["col"], plot_width, plot_height))
+    tabs = Tabs(tabs=tabs)
+    return tabs
+
+
+def render(
+    itmdt: Intermediate,
+    yscale: str = "linear",
+    tile_size: Optional[float] = None,
+    plot_height_small: int = 300,
+    plot_width_small: int = 324,
+    plot_height_large: int = 400,
+    plot_width_large: int = 450,
+    plot_width_wide: int = 972,
+) -> LayoutDOM:
+    if itmdt.visual_type == "basic_grid":
+        return render_basic(itmdt, yscale, plot_width_small, plot_height_small)
+    elif itmdt.visual_type == "categorical_column":
+        return render_basic_x_cat(itmdt, plot_width_large, plot_height_large)
+    elif itmdt.visual_type == "numerical_column":
+        return render_basic_x_num(itmdt, yscale, plot_width_large, plot_height_large)
