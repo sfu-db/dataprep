@@ -3,8 +3,6 @@ Intermediate class
 """
 from typing import Any, Dict
 
-import numpy as np
-
 
 class Intermediate(Dict[str, Any]):
     """
@@ -28,16 +26,3 @@ class Intermediate(Dict[str, Any]):
             self.visual_type = visual_type
         else:
             assert False, "Unsupported initialization"
-
-
-def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103
-    """
-    Sample n values uniformly from the range of the `arr`,
-    not from the distribution of `arr`'s elems.
-    """
-    if len(arr) <= n:
-        return arr
-
-    subsel = np.linspace(0, len(arr) - 1, n)
-    subsel = np.floor(subsel).astype(int)
-    return arr[subsel]
