@@ -9,7 +9,7 @@ from bokeh.models import Panel, Tabs
 from bokeh.plotting import gridplot, show
 from dask import compute, delayed
 
-from ..common import Intermediate
+from ..intermediate import Intermediate
 from .viz_multi import MultiViz
 from .viz_uni import UniViz
 
