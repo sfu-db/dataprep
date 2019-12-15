@@ -3,6 +3,7 @@ This module implements the code for plot(df,...)
 """
 import holoviews as hv
 
-from .computation import plot
+from .compute import compute
+from .render import render
 
 hv.extension("bokeh", logo=False)
