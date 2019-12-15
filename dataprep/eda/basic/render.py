@@ -23,7 +23,7 @@ from bokeh.models import (
     ColorBar,
     FactorRange,
 )
-from bokeh.plotting import Figure, gridplot, show, figure
+from bokeh.plotting import Figure, gridplot, figure
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
 from bokeh.palettes import viridis, Pastel1  # pylint: disable=E0611 # type: ignore
@@ -691,7 +691,6 @@ def render_basic(
             df, miss_pct = data
             fig = hist_viz(df, miss_pct, col, yscale, plot_width, plot_height, False)
             figs.append(fig)
-    show(gridplot(children=figs, sizing_mode=None, toolbar_location=None, ncols=3,))
     return gridplot(children=figs, sizing_mode=None, toolbar_location=None, ncols=3,)
 
 
@@ -705,7 +704,6 @@ def render_basic_x_cat(itmdt: Intermediate, plot_width: int, plot_height: int) -
     tabs.append(Panel(child=fig, title="bar chart"))
     tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
     tabs = Tabs(tabs=tabs)
-    show(tabs)
     return Tabs
 
 
@@ -728,7 +726,6 @@ def render_basic_x_num(
     df, outx, outy, _ = itmdt["boxdata"]
     tabs.append(box_viz(df, outx, outy, itmdt["col"], plot_width, plot_height))
     tabs = Tabs(tabs=tabs)
-    show(tabs)
     return tabs
 
 
@@ -766,7 +763,6 @@ def render_cat_and_num_cols(
         )
     )
     tabs = Tabs(tabs=tabs)
-    show(tabs)
     return tabs
 
 
@@ -805,7 +801,6 @@ def render_two_num_cols(
         )
     )
     tabs = Tabs(tabs=tabs)
-    show(tabs)
     return tabs
 
 
@@ -829,7 +824,6 @@ def render_two_cat_cols(
         heatmap_viz(df, itmdt["x"], itmdt["y"], grp_cnt_stats, plot_width, plot_height)
     )
     tabs = Tabs(tabs=tabs)
-    show(tabs)
     return tabs
 
 
