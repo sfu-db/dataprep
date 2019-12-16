@@ -71,7 +71,10 @@ def compute_correlation(
     df.columns = [str(e) for e in df.columns]  # convert column names to string
 
     if x is None and y is None:  # pylint: disable=no-else-return
-        assert value_range is None
+        assert (value_range is None) or (
+            k is None
+        ), "value_range and k cannot be present in both"
+
         df = df.select_dtypes(NUMERICAL_DTYPES)
         assert len(df.columns) != 0, f"No numerical columns found"
 
@@ -87,10 +90,16 @@ def compute_correlation(
         for method, corr in corrs.items():
             df = dd.concat([cordx, cordy, dd.from_dask_array(corr)], axis=1)
             df.columns = ["x", "y", "correlation"]
+            df = df[df["y"] > df["x"]]  # Retain only lower triangle (w/o diag)
+
             if k is not None:
-                df = df[df["y"] < df["x"]]  # Retain only upper triangle (w/o diag)
                 thresh = df["correlation"].abs().nlargest(k).compute().iloc[-1]
                 df = df[(df["correlation"] >= thresh) | (df["correlation"] <= -thresh)]
+            elif value_range is not None:
+                mask = (value_range[0] <= df["correlation"]) & (
+                    df["correlation"] <= value_range[1]
+                )
+                df = df[mask]
 
             # Translate int x,y coordinates to categorical labels
             # Hint the return type of the function to dask through param "meta"
