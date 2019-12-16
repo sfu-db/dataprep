@@ -72,8 +72,7 @@ def test_sanity_compute_8(simpledf: dd.DataFrame) -> None:
     plot_correlation(simpledf, x="b", y="a", k=1, show_plot=False)
 
 
-@pytest.mark.xfail  # type: ignore
-def test_sanity_compute_fail_1(simpledf: dd.DataFrame) -> None:
+def test_sanity_compute_9(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, value_range=(0.3, 0.7))
     plot_correlation(simpledf, value_range=(0.3, 0.7), show_plot=False)
 
