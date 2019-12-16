@@ -12,10 +12,10 @@ import numpy as np
 import pandas as pd
 from scipy.stats import gaussian_kde, norm
 
-from ..utils import to_dask
-from ..intermediate import Intermediate
-from ..dtypes import is_categorical, is_numerical, DType
 from ...errors import UnreachableError
+from ..dtypes import DType, is_categorical, is_numerical
+from ..intermediate import Intermediate
+from ..utils import to_dask
 
 __all__ = ["compute"]
 

@@ -13,6 +13,10 @@ NUMERICAL_DTYPES = [np.number, np.datetime64, pd.DatetimeTZDtype]
 
 
 class DType(Enum):
+    """
+    Possible dtypes for a column, currently we only support categorical and numerical dtypes.
+    """
+
     Categorical = auto()
     Numerical = auto()
 
