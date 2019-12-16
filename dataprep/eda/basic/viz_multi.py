@@ -20,7 +20,7 @@ from bokeh.models import (
 from bokeh.palettes import viridis, Pastel1  # pylint: disable=E0611
 from bokeh.plotting import figure
 from bokeh.transform import linear_cmap, transform
-from ..common import sample_n
+from ..utils import sample_n
 from ..palette import PALETTE, BIPALETTE
 
 TOOLS = ""

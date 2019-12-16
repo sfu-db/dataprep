@@ -21,7 +21,7 @@ from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import Figure, figure
 
-from ..common import Intermediate
+from ..intermediate import Intermediate
 from ..palette import BIPALETTE, BRG
 
 __all__ = ["render_correlation"]
@@ -248,8 +248,8 @@ def render_scatter(
 
 def render_correlation(
     itmdt: Intermediate,
-    plot_width: int = 400,
-    plot_height: int = 300,
+    plot_width: int = 500,
+    plot_height: int = 500,
     palette: Optional[Sequence[str]] = None,
 ) -> Figure:
     """
