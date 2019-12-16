@@ -12,8 +12,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import gaussian_kde, norm
 
-from ...utils import to_dask
-from ..common import Intermediate
+from ..utils import to_dask
+from ..intermediate import Intermediate
 from ..dtypes import is_categorical, is_numerical, DType
 from ...errors import UnreachableError
 
@@ -36,37 +36,29 @@ def compute(
     Parameters:
     ----------
     df : Union[pd.DataFrame, dd.DataFrame]
-        Dataframe from which plots are to be generated
-
+        Dataframe from which plots are to be generated.
     x : str, optional, default None
-        The name of a column in the input data frame.
-
+        A valid column name from the dataframe.
     y : str, optional, default None
-        The name of a column in the input data frame.
-
+        A valid column name from the dataframe.
     bins : int, default 10
         For a histogram or box plot with numerical x axis, it defines
         the number of equal-width bins to use when grouping.
-
     ngroups : int, default 10
         When grouping over a categorical column, it defines the
         number of groups to show in the plot. Ie, the number of
         bars to show in a bar chart.
-
     largest : bool, default True
         If true, when grouping over a categorical column, the groups
-        with the highest count will be output. If false, the groups
+        with the largest count will be output. If false, the groups
         with the smallest count will be output.
-
-    bandwidth : float, defualt 1.5
+    bandwidth : float, default 1.5
         Bandwidth for the kernel density estimation.
-
     sample_size : int, default 1000
-        Sample size for the scatter plot
-
+        Sample size for the scatter plot.
     value_range : (float, float), optional, default None
         The lower and upper bounds on the range of a numerical column.
-        Applies when column x is specified and column y is not
+        Applies when column x is specified and column y is unspecified.
 
     Returns
     -------

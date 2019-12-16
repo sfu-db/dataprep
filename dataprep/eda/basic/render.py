@@ -206,7 +206,7 @@ def hist_viz(
     return fig
 
 
-def hist_kde_viz(  # pylint: disable=too-many-arguments
+def hist_kde_viz(
     df: pd.DataFrame,
     pts_rng: np.ndarray,
     pdf: np.ndarray,
@@ -287,7 +287,7 @@ def qqnorm_viz(
     return Panel(child=fig, title="QQ normal plot")
 
 
-def box_viz(  # pylint: disable=too-many-arguments
+def box_viz(
     df: pd.DataFrame,
     outx: List[str],
     outy: List[float],
@@ -566,7 +566,7 @@ def nested_viz(
     return Panel(child=fig, title="nested bar chart")
 
 
-def stacked_viz(  # pylint: disable=too-many-arguments
+def stacked_viz(
     df: pd.DataFrame,
     x: str,
     y: str,
@@ -704,7 +704,7 @@ def render_basic_x_cat(itmdt: Intermediate, plot_width: int, plot_height: int) -
     tabs.append(Panel(child=fig, title="bar chart"))
     tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
     tabs = Tabs(tabs=tabs)
-    return Tabs
+    return tabs
 
 
 def render_basic_x_num(
@@ -830,12 +830,12 @@ def render_two_cat_cols(
 def render(
     itmdt: Intermediate,
     yscale: str = "linear",
+    tile_size: Optional[float] = None,
     plot_width_small: int = 324,
     plot_height_small: int = 300,
     plot_width_large: int = 450,
     plot_height_large: int = 400,
     plot_width_wide: int = 972,
-    tile_size: Optional[float] = None,
 ) -> LayoutDOM:
     """
     Render a basic plot
@@ -843,9 +843,12 @@ def render(
     Parameters
     ----------
     itmdt : Intermediate
-        The Intermediate containing results from the compute function
+        The Intermediate containing results from the compute function.
     yscale: str = "linear"
-        The sclae to show on the y axis. Can be "linear" or "log".
+        The scale to show on the y axis. Can be "linear" or "log".
+    tile_size : Optional[float] = None
+        Size of the tile for the hexbin plot. Measured from the middle
+        of a hexagon to its left or right corner.
     plot_width_small : int = 324,
         The width of the small plots
     plot_height_small: int = 300,
@@ -856,9 +859,6 @@ def render(
         The height of the large plots
     plot_width_large : int = 972,
         The width of the wide plots
-    tile_size : Optional[float] = None
-        Size of the tile for the hexbin plot. Measured from the middle
-        of a hexagon to its left or right corner
 
     Returns
     -------
