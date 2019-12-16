@@ -13,8 +13,8 @@ import pandas as pd
 import probscale
 import scipy.stats as sm
 
-from ...utils import DataType, get_type
-from ..common import Intermediate, sample_n
+from ..utils import DataType, get_type, sample_n
+from ..intermediate import Intermediate
 from .render import Render
 
 DEFAULT_PARTITIONS = 1

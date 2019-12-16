@@ -14,8 +14,8 @@ import pandas as pd
 from scipy.stats import kendalltau
 
 from ...errors import UnreachableError
-from ...utils import to_dask
-from ..common import Intermediate
+from ..utils import to_dask
+from ..intermediate import Intermediate
 from ..dtypes import NUMERICAL_DTYPES, is_categorical, is_numerical
 
 __all__ = ["compute_correlation"]

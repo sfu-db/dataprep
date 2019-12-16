@@ -5,7 +5,7 @@ Module containing plot_outlier function.
 
 import dask.dataframe as dd
 
-from ..common import Intermediate
+from ..intermediate import Intermediate
 
 DEFAULT_PARTITIONS = 1
 
