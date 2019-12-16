@@ -43,7 +43,7 @@
 <p>This module implements the plot(df) function.</p>
 <dl class="function">
 <dt id="dataprep.eda.basic.computation.plot">
-<code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.common.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.intermediate.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates plots for exploratory data analysis.</p>
 <p>If col_x and col_y are unspecified, the distribution of
 each coloumn is plotted. A histogram is plotted if the
@@ -95,7 +95,7 @@ col_x is numerical, and col_y is unspecified.</p>
 
 <dl class="function">
 <dt id="dataprep.eda.basic.computation.plot_df">
-<code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot_df</code><span class="sig-paren">(</span><em class="sig-param">data_frame: dask.dataframe.core.DataFrame</em>, <em class="sig-param">bins: int</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.common.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot_df" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.basic.computation.</code><code class="sig-name descname">plot_df</code><span class="sig-paren">(</span><em class="sig-param">data_frame: dask.dataframe.core.DataFrame</em>, <em class="sig-param">bins: int</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.intermediate.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.computation.plot_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supporting funtion to the main plot function
 :param data_frame: dask dataframe
 :param bins: number of bins to show in the histogram
@@ -115,7 +115,7 @@ col_x is numerical, and col_y is unspecified.</p>
 <p>Encapsulate Renderer functions.</p>
 <dl class="method">
 <dt id="dataprep.eda.basic.render.Render.vizualise">
-<code class="sig-name descname">vizualise</code><span class="sig-paren">(</span><em class="sig-param">intermediates_list: List[dataprep.eda.common.Intermediate], only_x: bool = False</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/dataprep/eda/basic/render.html#Render.vizualise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.Render.vizualise" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">vizualise</code><span class="sig-paren">(</span><em class="sig-param">intermediates_list: List[dataprep.eda.intermediate.Intermediate], only_x: bool = False</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/dataprep/eda/basic/render.html#Render.vizualise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.Render.vizualise" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Shows up the viz on a notebook or browser</p>
 </div></blockquote>

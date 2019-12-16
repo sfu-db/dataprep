@@ -59,8 +59,8 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dataprep.eda.missing.html">dataprep.eda.missing package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dataprep.eda.missing.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing.computation">dataprep.eda.missing.computation module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing.visualization">dataprep.eda.missing.visualization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.missing.html#dataprep-eda-missing-computation-module">dataprep.eda.missing.computation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.missing.html#dataprep-eda-missing-visualization-module">dataprep.eda.missing.visualization module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing">Module contents</a></li>
 </ul>
 </li>
@@ -73,7 +73,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.common">dataprep.eda.common module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#dataprep-eda-common-module">dataprep.eda.common module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.palette">dataprep.eda.palette module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda">Module contents</a></li>
 </ul>
@@ -99,58 +99,8 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-dataprep.utils">
-<span id="dataprep-utils-module"></span><h2>dataprep.utils module<a class="headerlink" href="#module-dataprep.utils" title="Permalink to this headline">¶</a></h2>
-<p>This module implements the utils function.</p>
-<dl class="class">
-<dt id="dataprep.utils.DataType">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.utils.</code><code class="sig-name descname">DataType</code><a class="reference internal" href="_modules/dataprep/utils.html#DataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.utils.DataType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Enumeration for storing the different types of data possible in a column</p>
-<dl class="attribute">
-<dt id="dataprep.utils.DataType.TYPE_CAT">
-<code class="sig-name descname">TYPE_CAT</code><em class="property"> = 2</em><a class="headerlink" href="#dataprep.utils.DataType.TYPE_CAT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.utils.DataType.TYPE_NUM">
-<code class="sig-name descname">TYPE_NUM</code><em class="property"> = 1</em><a class="headerlink" href="#dataprep.utils.DataType.TYPE_NUM" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.utils.DataType.TYPE_UNSUP">
-<code class="sig-name descname">TYPE_UNSUP</code><em class="property"> = 3</em><a class="headerlink" href="#dataprep.utils.DataType.TYPE_UNSUP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.utils.get_type">
-<code class="sig-prename descclassname">dataprep.utils.</code><code class="sig-name descname">get_type</code><span class="sig-paren">(</span><em class="sig-param">data: dask.dataframe.core.Series</em><span class="sig-paren">)</span> &#x2192; dataprep.utils.DataType<a class="reference internal" href="_modules/dataprep/utils.html#get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.utils.get_type" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Returns the type of the input data.</dt><dd><p>Identified types are according to the DataType Enumeration.</p>
-</dd>
-</dl>
-<p>The data for which the type needs to be identified.</p>
-<p>str representing the type of the data.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.utils.is_notebook">
-<code class="sig-prename descclassname">dataprep.utils.</code><code class="sig-name descname">is_notebook</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/utils.html#is_notebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.utils.is_notebook" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>whether it is running in jupyter notebook</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.utils.to_dask">
-<code class="sig-prename descclassname">dataprep.utils.</code><code class="sig-name descname">to_dask</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame]</em><span class="sig-paren">)</span> &#x2192; dask.dataframe.core.DataFrame<a class="reference internal" href="_modules/dataprep/utils.html#to_dask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.utils.to_dask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a dataframe to a dask dataframe.</p>
-</dd></dl>
-
+<div class="section" id="dataprep-utils-module">
+<h2>dataprep.utils module<a class="headerlink" href="#dataprep-utils-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-dataprep">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep" title="Permalink to this headline">¶</a></h2>
@@ -170,7 +120,7 @@ Data preparation module</p>
 <li><a class="reference internal" href="#">dataprep package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-dataprep.utils">dataprep.utils module</a></li>
+<li><a class="reference internal" href="#dataprep-utils-module">dataprep.utils module</a></li>
 <li><a class="reference internal" href="#module-dataprep">Module contents</a></li>
 </ul>
 </li>

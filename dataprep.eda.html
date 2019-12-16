@@ -57,8 +57,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.missing.html">dataprep.eda.missing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing.computation">dataprep.eda.missing.computation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing.visualization">dataprep.eda.missing.visualization module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#dataprep-eda-missing-computation-module">dataprep.eda.missing.computation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#dataprep-eda-missing-visualization-module">dataprep.eda.missing.visualization module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing">Module contents</a></li>
 </ul>
 </li>
@@ -74,23 +74,8 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-dataprep.eda.common">
-<span id="dataprep-eda-common-module"></span><h2>dataprep.eda.common module<a class="headerlink" href="#module-dataprep.eda.common" title="Permalink to this headline">¶</a></h2>
-<p>Intermediate class</p>
-<dl class="class">
-<dt id="dataprep.eda.common.Intermediate">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.common.</code><code class="sig-name descname">Intermediate</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/common.html#Intermediate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.common.Intermediate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code></p>
-<p>This class contains intermediate results.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.common.sample_n">
-<code class="sig-prename descclassname">dataprep.eda.common.</code><code class="sig-name descname">sample_n</code><span class="sig-paren">(</span><em class="sig-param">arr: numpy.ndarray</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/dataprep/eda/common.html#sample_n"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.common.sample_n" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sample n values uniformly from the range of the <cite>arr</cite>,
-not from the distribution of <cite>arr</cite>’s elems.</p>
-</dd></dl>
-
+<div class="section" id="dataprep-eda-common-module">
+<h2>dataprep.eda.common module<a class="headerlink" href="#dataprep-eda-common-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-dataprep.eda.palette">
 <span id="dataprep-eda-palette-module"></span><h2>dataprep.eda.palette module<a class="headerlink" href="#module-dataprep.eda.palette" title="Permalink to this headline">¶</a></h2>
@@ -102,7 +87,7 @@ not from the distribution of <cite>arr</cite>’s elems.</p>
 Data preparation module</p>
 <dl class="function">
 <dt id="dataprep.eda.plot">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.common.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.intermediate.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates plots for exploratory data analysis.</p>
 <p>If col_x and col_y are unspecified, the distribution of
 each coloumn is plotted. A histogram is plotted if the
@@ -204,7 +189,7 @@ and it is better to drop None, Nan and Null value before using it</p>
 
 <dl class="function">
 <dt id="dataprep.eda.compute_correlation">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.common.Intermediate<a class="reference internal" href="_modules/dataprep/eda/correlation/compute.html#compute_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/correlation/compute.html#compute_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>The pandas dataframe for which plots are calculated for each column.</p>
 </dd>
@@ -229,7 +214,7 @@ otherwise =&gt; error</p>
 
 <dl class="function">
 <dt id="dataprep.eda.render_correlation">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">render_correlation</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.common.Intermediate</em>, <em class="sig-param">plot_width: int = 400</em>, <em class="sig-param">plot_height: int = 300</em>, <em class="sig-param">palette: Optional[Sequence[str]] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation/render.html#render_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.render_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">render_correlation</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">plot_width: int = 500</em>, <em class="sig-param">plot_height: int = 500</em>, <em class="sig-param">palette: Optional[Sequence[str]] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation/render.html#render_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.render_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a correlation plot</p>
 <p>itmdt : Intermediate
 plot_width : int = 400</p>
@@ -250,8 +235,8 @@ the palette will be automatically chosen based on different visualization types.
 </dd></dl>
 
 <dl class="function">
-<dt id="dataprep.eda.plot_missing">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">x_name: Optional[str] = None</em>, <em class="sig-param">y_name: Optional[str] = None</em>, <em class="sig-param">return_intermediate: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs, Tuple[Union[bokeh.plotting.figure.Figure, bokeh.models.layouts.Tabs], Any]]<a class="reference internal" href="_modules/dataprep/eda/missing/computation.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
+<dt id="dataprep.eda.compute_missing">
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, num_bins: int = 100, num_cols: int = 50</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
@@ -261,6 +246,60 @@ plot_missing(df, x, y)</p>
 <dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
 </dd>
 <dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>num_cols: int, optional</dt><dd><p>The number of columns in the figure</p>
+</dd>
+<dt>bins_num: int</dt><dd><p>The number of rows in the figure</p>
+</dd>
+<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>An object of figure or</dt><dd><p>An object of figure and
+An intermediate representation for the plots of different columns in the data_frame.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
+bars for categorical column, qq-plot, box-plot, jitter plot,
+CDF, PDF
+case (Some, None) =&gt; histogram for numerical column and
+bars for categorical column
+case (None, None) =&gt; heatmap
+otherwise =&gt; error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.render_missing">
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">render_missing</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">plot_width: int = 500</em>, <em class="sig-param">plot_height: int = 500</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing/render.html#render_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.render_missing" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;Jinglin write here</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.plot_missing">
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, num_bins: int = 100, num_cols: int = 50, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is designed to deal with missing values
+There are three functions: plot_missing(df), plot_missing(df, x)
+plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>df: Union[pd.DataFrame, dd.DataFrame]</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+</dd>
+<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>num_cols: int, optional</dt><dd><p>The number of columns in the figure</p>
+</dd>
+<dt>bins_num: int</dt><dd><p>The number of rows in the figure</p>
 </dd>
 <dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
 </dd>
@@ -303,7 +342,7 @@ otherwise =&gt; error</p>
 <li><a class="reference internal" href="#">dataprep.eda package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda.common">dataprep.eda.common module</a></li>
+<li><a class="reference internal" href="#dataprep-eda-common-module">dataprep.eda.common module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda.palette">dataprep.eda.palette module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda">Module contents</a></li>
 </ul>

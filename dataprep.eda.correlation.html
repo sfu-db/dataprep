@@ -49,7 +49,7 @@
 <p>This module implements the plot_correlation(df) function.</p>
 <dl class="function">
 <dt id="dataprep.eda.correlation.render_correlation">
-<code class="sig-prename descclassname">dataprep.eda.correlation.</code><code class="sig-name descname">render_correlation</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.common.Intermediate</em>, <em class="sig-param">plot_width: int = 400</em>, <em class="sig-param">plot_height: int = 300</em>, <em class="sig-param">palette: Optional[Sequence[str]] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation/render.html#render_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.correlation.render_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.correlation.</code><code class="sig-name descname">render_correlation</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">plot_width: int = 500</em>, <em class="sig-param">plot_height: int = 500</em>, <em class="sig-param">palette: Optional[Sequence[str]] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation/render.html#render_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.correlation.render_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a correlation plot</p>
 <p>itmdt : Intermediate
 plot_width : int = 400</p>
@@ -71,7 +71,7 @@ the palette will be automatically chosen based on different visualization types.
 
 <dl class="function">
 <dt id="dataprep.eda.correlation.compute_correlation">
-<code class="sig-prename descclassname">dataprep.eda.correlation.</code><code class="sig-name descname">compute_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.common.Intermediate<a class="reference internal" href="_modules/dataprep/eda/correlation/compute.html#compute_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.correlation.compute_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.correlation.</code><code class="sig-name descname">compute_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/correlation/compute.html#compute_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.correlation.compute_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>The pandas dataframe for which plots are calculated for each column.</p>
 </dd>

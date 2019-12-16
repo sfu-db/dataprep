@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.missing.render &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../missing.html" accesskey="U">dataprep.eda.missing</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.eda.missing.render</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module implements the plot_missing(df, x, y) function&#39;s</span>
+<span class="sd">    visualization part.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Panel</span><span class="p">,</span>
+    <span class="n">Tabs</span><span class="p">,</span>
+    <span class="n">FactorRange</span><span class="p">,</span>
+    <span class="n">Range1d</span><span class="p">,</span>
+    <span class="n">LinearColorMapper</span><span class="p">,</span>
+    <span class="n">ColorBar</span><span class="p">,</span>
+    <span class="n">BasicTicker</span><span class="p">,</span>
+    <span class="n">NumeralTickFormatter</span><span class="p">,</span>
+    <span class="n">CategoricalColorMapper</span><span class="p">,</span>
+    <span class="n">LayoutDOM</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># pylint: disable=no-name-in-module</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">Greys256</span><span class="p">,</span> <span class="n">Category10</span>  <span class="c1"># type: ignore</span>
+
+<span class="c1"># pylint: enable=no-name-in-module</span>
+
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span>
+
+<span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">is_categorical</span>
+<span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">relocate_legend</span><span class="p">,</span> <span class="n">cut_long_name</span><span class="p">,</span> <span class="n">fuse_missing_perc</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_missing&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">:</span> <span class="n">Figure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set some common attributes for a figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># fig.grid.grid_line_color = None</span>
+    <span class="c1"># fig.axis.axis_line_color = None</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9pt&quot;</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span> <span class="nf">render_dist</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">typ</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a distribution, CDF or PDF</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">typ</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;cdf&quot;</span><span class="p">]</span>
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;@x&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{typ}</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
+        <span class="n">Figure</span><span class="p">(</span>
+            <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">group</span><span class="p">),</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">),</span> <span class="n">Category10</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="n">relocate_legend</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span> <span class="nf">render_hist</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a histogram</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;@x&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="s2">&quot;@count&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">cmapper</span> <span class="o">=</span> <span class="n">CategoricalColorMapper</span><span class="p">(</span>
+        <span class="n">palette</span><span class="o">=</span><span class="n">Category10</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">factors</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.99</span>
+        <span class="n">x_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">x_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span><span class="p">)</span>
+
+    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
+        <span class="n">Figure</span><span class="p">(</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+        <span class="n">top</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">cmapper</span><span class="p">},</span>
+        <span class="n">legend_field</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">relocate_legend</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span> <span class="nf">render_boxwhisker</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a box-whisker plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Upper&quot;</span><span class="p">,</span> <span class="s2">&quot;@upper&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;75% Quantile&quot;</span><span class="p">,</span> <span class="s2">&quot;@q1&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;50% Quantile&quot;</span><span class="p">,</span> <span class="s2">&quot;@q2&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;25% Quantile&quot;</span><span class="p">,</span> <span class="s2">&quot;@q3&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Lower&quot;</span><span class="p">,</span> <span class="s2">&quot;@lower&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
+        <span class="n">Figure</span><span class="p">(</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+            <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># stems</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;q3&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+    <span class="c1"># boxes</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span>
+        <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;q2&quot;</span><span class="p">,</span> <span class="s2">&quot;q3&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#E08E79&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span>
+        <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;q2&quot;</span><span class="p">,</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#3B8686&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># whiskers (almost-0 height rects simpler than segments)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+    <span class="c1"># # outliers</span>
+    <span class="c1"># if not out.empty:</span>
+    <span class="c1">#     p.circle(outx, outy, size=6, color=&quot;#F38630&quot;, fill_alpha=0.6)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span> <span class="nf">create_color_mapper</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LinearColorMapper</span><span class="p">,</span> <span class="n">ColorBar</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a color mapper and a colorbar for spectrum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapper</span> <span class="o">=</span> <span class="n">LinearColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">Greys256</span><span class="p">)),</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">colorbar</span> <span class="o">=</span> <span class="n">ColorBar</span><span class="p">(</span>
+        <span class="n">color_mapper</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span>
+        <span class="n">major_label_text_font_size</span><span class="o">=</span><span class="s2">&quot;8pt&quot;</span><span class="p">,</span>
+        <span class="n">ticker</span><span class="o">=</span><span class="n">BasicTicker</span><span class="p">(),</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">NumeralTickFormatter</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;0 %&quot;</span><span class="p">),</span>
+        <span class="n">label_standoff</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">border_line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">mapper</span><span class="p">,</span> <span class="n">colorbar</span>
+
+
+<span class="k">def</span> <span class="nf">render_missing_spectrum</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render the missing specturm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapper</span><span class="p">,</span> <span class="n">color_bar</span> <span class="o">=</span> <span class="n">create_color_mapper</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">fuse_missing_perc</span><span class="p">(</span><span class="n">cut_long_name</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;missing_percent&quot;</span><span class="p">][</span><span class="n">c</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_end&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_start&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;column&quot;</span><span class="p">,</span> <span class="s2">&quot;@column&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;loc&quot;</span><span class="p">,</span> <span class="s2">&quot;@loc_start</span><span class="si">{1}</span><span class="s2">~@loc_end</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;missing%&quot;</span><span class="p">,</span> <span class="s2">&quot;@missing_rate{1%}&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">x_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="n">minimum</span><span class="p">,</span> <span class="n">maximum</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">maximum</span><span class="p">,</span> <span class="n">minimum</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
+        <span class="n">Figure</span><span class="p">(</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">x_axis_location</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;column&quot;</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;location&quot;</span><span class="p">,</span>
+        <span class="n">line_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">fill_color</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;missing_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">mapper</span><span class="p">},</span>
+        <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span> <span class="nf">render_missing_impact_1vn</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render the plot from `plot_missing(df, &quot;x&quot;)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dfs</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+
+    <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">render_hist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">col</span><span class="p">))</span>
+
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">panels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabs</span>
+
+
+<span class="k">def</span> <span class="nf">render_missing_impact_1v1</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">numerical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tabs</span><span class="p">,</span> <span class="n">Figure</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render the plot from `plot_missing(df, &quot;x&quot;, &quot;y&quot;)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">numerical</span><span class="p">:</span>
+        <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">render_hist</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;hist&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Histogram&quot;</span><span class="p">))</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">render_dist</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;dist&quot;</span><span class="p">],</span> <span class="s2">&quot;pdf&quot;</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;PDF&quot;</span><span class="p">))</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">render_dist</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;dist&quot;</span><span class="p">],</span> <span class="s2">&quot;cdf&quot;</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CDF&quot;</span><span class="p">))</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">render_boxwhisker</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Box&quot;</span><span class="p">))</span>
+
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">panels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">render_hist</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;hist&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span>
+
+
+<div class="viewcode-block" id="render_missing"><a class="viewcode-back" href="../../../../dataprep.eda.missing.html#dataprep.eda.render_missing">[docs]</a><span class="k">def</span> <span class="nf">render_missing</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LayoutDOM</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @Jinglin write here</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;missing_spectrum&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_missing_spectrum</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;missing_impact_1vn&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_missing_impact_1vn</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;missing_impact_1v1_numerical&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_missing_impact_1v1</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;missing_impact_1v1_categorical&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_missing_impact_1v1</span><span class="p">(</span>
+            <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">numerical</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UnreachableError</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../missing.html" >dataprep.eda.missing</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    </div>
+  </body>
+</html>
