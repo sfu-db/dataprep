@@ -92,10 +92,11 @@ def render_correlation_heatmaps(
             y_range=y_range,
             plot_width=plot_width,
             plot_height=plot_height,
-            x_axis_location="above",
+            x_axis_location="below",
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
+            background_fill_color="#fafafa",
         )
 
         tweak_figure(fig)
