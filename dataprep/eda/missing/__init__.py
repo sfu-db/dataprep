@@ -20,8 +20,8 @@ def plot_missing(
     x: Optional[str] = None,
     y: Optional[str] = None,
     *,
-    num_bins: int = 100,
-    num_cols: int = 50,
+    num_bins: int = 30,
+    num_cols: int = 30,
     show_plot: bool = True,
 ) -> LayoutDOM:
     """
