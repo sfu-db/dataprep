@@ -47,7 +47,10 @@ def histogram(
         return counts, edges
     elif is_categorical(srs.dtype):
         value_counts = srs.value_counts()
-        return value_counts.to_dask_array(), value_counts.index.to_dask_array()
+
+        counts = value_counts.to_dask_array()
+        centers = value_counts.index.to_dask_array()
+        return (counts, centers)
     else:
         raise UnreachableError()
 
@@ -93,7 +96,9 @@ def missing_spectrum(df: dd.DataFrame, num_bins: int, num_cols: int) -> Intermed
     )
 
 
-def missing_impact_1vn(df: dd.DataFrame, x: str, num_bins: int) -> Intermediate:
+def missing_impact_1vn(  # pylint: disable=too-many-locals
+    df: dd.DataFrame, x: str, num_bins: int
+) -> Intermediate:
     """
     Calculate the distribution change on other columns when
     the missing values in x is dropped.
@@ -105,22 +110,32 @@ def missing_impact_1vn(df: dd.DataFrame, x: str, num_bins: int) -> Intermediate:
     hists = {}
 
     for col in cols:
+        range = None  # pylint: disable=redefined-builtin
+        if is_numerical(df0[col].dtype):
+            range = (df0[col].min(axis=0), df0[col].max(axis=0))
+
         hists[col] = [
-            histogram(df[col], num_bins=num_bins, return_edges=False)
+            histogram(df[col], num_bins=num_bins, return_edges=False, range=range)
             for df in [df0, df1]
         ]
     (hists,) = dd.compute(hists)
 
     dfs = {}
     for col, hists_ in hists.items():
-        tuples = [np.stack(hist).T for hist in hists_]
-        nums = [len(t) for t in tuples]
-        labels = np.repeat(["Origin", "DropMissing"], nums)
+        counts, xs = zip(*hists_)
+        labels = np.repeat(["Origin", "DropMissing"], [len(x) for x in xs])
 
         df = pd.DataFrame(
-            data=np.concatenate(tuples)[:, [1, 0]], columns=["x", "count"]
+            {"x": np.concatenate(xs), "count": np.concatenate(counts), "label": labels}
         )
-        df["label"] = labels
+
+        # If the cardinality of a categorical column is too large,
+        # we show the top `num_bins` values, sorted by their count before drop
+        if len(counts[0]) > num_bins and is_categorical(df0[col].dtype):
+            sortidx = np.argsort(-counts[0])
+            selected_xs = xs[0][sortidx[:num_bins]]
+            df = df[df["x"].isin(selected_xs)]
+
         dfs[col] = df
 
     return Intermediate(data=dfs, visual_type="missing_impact_1vn")
@@ -212,8 +227,8 @@ def compute_missing(
     x: Optional[str] = None,
     y: Optional[str] = None,
     *,
-    num_bins: int = 100,
-    num_cols: int = 50,
+    num_bins: int = 30,
+    num_cols: int = 30,
 ) -> Intermediate:
     """
     This function is designed to deal with missing values
