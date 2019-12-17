@@ -36,7 +36,10 @@ __all__ = ["render"]
 
 
 def tweak_figure(
-    fig: Figure, ptype: Optional[str] = None, max_label_len: int = 15
+    fig: Figure,
+    ptype: Optional[str] = None,
+    show_yaxis: bool = False,
+    max_label_len: int = 15,
 ) -> None:
     """
     Set some common attributes for a figure
@@ -47,6 +50,9 @@ def tweak_figure(
     if ptype in ["bar", "pie", "hist", "kde", "qq", "box", "hex", "heatmap"]:
         fig.grid.grid_line_color = None
         fig.axis.minor_tick_line_color = None
+    if ptype in ["bar", "hist"] and not show_yaxis:
+        fig.yaxis.major_label_text_font_size = "0pt"
+        fig.yaxis.major_tick_line_color = None
     if ptype in ["bar", "nested", "stacked", "heatmap", "box"]:
         fig.xaxis.formatter = FuncTickFormatter(
             code="""
@@ -88,8 +94,10 @@ def bar_viz(
     total_grps: int,
     miss_pct: float,
     col: str,
+    yscale: str,
     plot_width: int,
     plot_height: int,
+    show_yaxis: bool,
 ) -> Figure:
     """
     Render a bar chart
@@ -102,14 +110,13 @@ def bar_viz(
         title=title,
         plot_width=plot_width,
         plot_height=plot_height,
+        y_axis_type=yscale,
         tools="hover",
         toolbar_location=None,
         tooltips=tooltips,
     )
-    fig.vbar(x=col, top="cnt", width=0.9, source=df)
-    tweak_figure(fig, "bar")
-    fig.yaxis.major_tick_line_color = None
-    fig.yaxis.major_label_text_font_size = "0pt"
+    fig.vbar(x=col, width=0.9, top="cnt", bottom=0.01, source=df)
+    tweak_figure(fig, "bar", show_yaxis)
     fig.yaxis.axis_label = "Count"
     if total_grps > len(df):
         fig.xaxis.axis_label = f"Top {len(df)} of {total_grps} {col}"
@@ -164,7 +171,7 @@ def hist_viz(
     yscale: str,
     plot_width: int,
     plot_height: int,
-    show_y_label: bool,
+    show_yaxis: bool,
 ) -> Figure:
     """
     Render a histogram
@@ -195,14 +202,11 @@ def hist_viz(
     )
     hover = HoverTool(tooltips=tooltips, mode="vline",)
     fig.add_tools(hover)
-    tweak_figure(fig, "hist")
+    tweak_figure(fig, "hist", show_yaxis)
     fig.yaxis.axis_label = "Frequency"
     x_ticks = list(df["left"])
     x_ticks.append(df.iloc[-1]["right"])
     fig.xaxis.ticker = x_ticks
-    if not show_y_label:
-        fig.yaxis.major_label_text_font_size = "0pt"
-        fig.yaxis.major_tick_line_color = None
     return fig
 
 
@@ -685,7 +689,16 @@ def render_basic(
     for col, dtype, data in itmdt["data"]:
         if dtype == DType.Categorical:
             df, total_grps, miss_pct = data
-            fig = bar_viz(df[:-1], total_grps, miss_pct, col, plot_width, plot_height)
+            fig = bar_viz(
+                df[:-1],
+                total_grps,
+                miss_pct,
+                col,
+                yscale,
+                plot_width,
+                plot_height,
+                False,
+            )
             figs.append(fig)
         elif dtype == DType.Numerical:
             df, miss_pct = data
@@ -694,13 +707,24 @@ def render_basic(
     return gridplot(children=figs, sizing_mode=None, toolbar_location=None, ncols=3,)
 
 
-def render_basic_x_cat(itmdt: Intermediate, plot_width: int, plot_height: int) -> Tabs:
+def render_basic_x_cat(
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
+) -> Tabs:
     """
     Render plots from plot(df, x) when x is a categorical column
     """
     tabs: List[Panel] = []
     df, total_grps, miss_pct = itmdt["data"]
-    fig = bar_viz(df[:-1], total_grps, miss_pct, itmdt["col"], plot_width, plot_height)
+    fig = bar_viz(
+        df[:-1],
+        total_grps,
+        miss_pct,
+        itmdt["col"],
+        yscale,
+        plot_width,
+        plot_height,
+        True,
+    )
     tabs.append(Panel(child=fig, title="bar chart"))
     tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
     tabs = Tabs(tabs=tabs)
@@ -869,7 +893,9 @@ def render(
     if itmdt.visual_type == "basic_grid":
         visual_elem = render_basic(itmdt, yscale, plot_width_small, plot_height_small)
     elif itmdt.visual_type == "categorical_column":
-        visual_elem = render_basic_x_cat(itmdt, plot_width_large, plot_height_large)
+        visual_elem = render_basic_x_cat(
+            itmdt, yscale, plot_width_large, plot_height_large
+        )
     elif itmdt.visual_type == "numerical_column":
         visual_elem = render_basic_x_num(
             itmdt, yscale, plot_width_large, plot_height_large
