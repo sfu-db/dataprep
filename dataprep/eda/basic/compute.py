@@ -243,7 +243,6 @@ def calc_hist(
 
     hist_array, bins_array = da.histogram(data, range=[minv, maxv], bins=bins)
     hist_array = hist_array.compute()
-    bins_array = format_bin_ticks(bins_array, data.dtype)
     hist_df = pd.DataFrame(
         {
             "left": bins_array[:-1],
@@ -280,7 +279,6 @@ def calc_hist_kde(
     minv, maxv = data.min().compute(), data.max().compute()
     hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins, density=True)
     hist_arr = hist_arr.compute()
-    bins_arr = format_bin_ticks(bins_arr, data.dtype)
     hist_df = pd.DataFrame(
         {"left": bins_arr[:-1], "right": bins_arr[1:], "freq": hist_arr}
     )
@@ -336,7 +334,7 @@ def calc_box(
         groups and another list of the outlier values, a dictionary
         logging the sampled group output
     """
-    grp_cnt_stats = None  # to iinform the user of sampled output
+    grp_cnt_stats = None  # to inform the user of sampled output
 
     x = df.columns[0]
     if len(df.columns) == 1:
@@ -345,19 +343,22 @@ def calc_box(
         y = df.columns[1]
         if is_numerical(df[x].dtype) and is_numerical(df[y].dtype):
             minv, maxv = df[x].min().compute(), df[x].max().compute()
-            bin_endpts = np.linspace(minv, maxv, num=bins + 1)
-            if np.issubdtype(df[x], np.int64):
-                bin_endpts = [int(val) for val in bin_endpts]
-            else:
-                bin_endpts = [np.round(val, 3) for val in bin_endpts]
+            if df[x].nunique().compute() < bins:
+                bins = df[x].nunique().compute() - 1
+            endpts = np.linspace(minv, maxv, num=bins + 1)
             # calculate a box plot over each bin
             df = dd.concat(
                 [
                     _calc_box_stats(
-                        df[df[x].between(bin_endpts[i], bin_endpts[i + 1])][y],
-                        f"({bin_endpts[i]},{bin_endpts[i+1]})",
+                        df[(df[x] >= endpts[i]) & (df[x] < endpts[i + 1])][y],
+                        f"[{endpts[i]},{endpts[i+1]})",
                     )
-                    for i in range(len(bin_endpts) - 1)
+                    if i != len(endpts) - 2
+                    else _calc_box_stats(
+                        df[(df[x] >= endpts[i]) & (df[x] <= endpts[i + 1])][y],
+                        f"[{endpts[i]},{endpts[i+1]}]",
+                    )
+                    for i in range(len(endpts) - 1)
                 ],
                 axis=1,
             ).compute()
@@ -441,7 +442,7 @@ def calc_scatter(df: dd.DataFrame, sample_size: int) -> pd.DataFrame:
     pd.DataFrame
         A dataframe containing the scatter points
     """
-    if sample_size / len(df) < 1:
+    if len(df) > sample_size:
         df = df.sample(frac=sample_size / len(df))
     return df.compute()
 
@@ -597,9 +598,8 @@ def _calc_box_stats(grp_srs: dd.Series, grp: str) -> pd.DataFrame:
     stats["uw"] = grp_srs[grp_srs <= stats["q3"] + 1.5 * iqr].max().compute()
 
     otlrs = grp_srs[(grp_srs < stats["lw"]) | (grp_srs > stats["uw"])]
-    if not otlrs.any():  # sample 100 outliers
-        if 100 / len(otlrs) < 1:
-            otlrs = otlrs.sample(frac=100 / len(otlrs))
+    if len(otlrs) > 100:  # sample 100 outliers
+        otlrs = otlrs.sample(frac=100 / len(otlrs))
     stats["otlrs"] = list(otlrs.compute())
 
     return pd.DataFrame({grp: stats})
@@ -637,31 +637,3 @@ def _calc_groups(
     grp_cnt_stats["x_show"] = len(largest_grps)
 
     return df, grp_cnt_stats, list(map(str, largest_grps))
-
-
-def format_bin_ticks(bins_arr: np.ndarray, dtype: np.dtype) -> np.ndarray:
-    """
-    Auxillary function for formatting the bin tick values
-    _TODO this function should be removed. The formatting should be done
-    in render.
-
-    Parameters
-    ----------
-    bins_arr: np.ndarray
-        bin tick values
-    dtype: np.dtype
-        column data type
-
-    Returns
-    -------
-        formatted bin tick values
-    """
-    if np.issubdtype(dtype, np.int64):
-        bins_temp = [int(x) for x in np.ceil(bins_arr)]
-        if len(bins_temp) != len(set(bins_temp)):
-            bins_arr = [round(x, 2) for x in bins_arr]
-        else:
-            bins_arr = bins_temp
-    else:
-        bins_arr = [round(x, 2) for x in bins_arr]
-    return bins_arr
