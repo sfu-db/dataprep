@@ -9,27 +9,17 @@ Subpackages
    dataprep.eda.basic
    dataprep.eda.correlation
    dataprep.eda.missing
-   dataprep.eda.outlier
 
 Submodules
 ----------
 
-dataprep.eda.common module
---------------------------
+dataprep.eda.intermediate module
+--------------------------------
 
-.. automodule:: dataprep.eda.common
+.. automodule:: dataprep.eda.intermediate
    :members:
    :undoc-members:
    :show-inheritance:
-
-dataprep.eda.palette module
----------------------------
-
-.. automodule:: dataprep.eda.palette
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------
