@@ -97,9 +97,9 @@ def render_hist(df: pd.DataFrame, plot_width: int, plot_height: int) -> Figure:
         x_range = FactorRange(*df["x"].unique())
     else:
         radius = df["x"][1] - df["x"][0]
-        x_range = Range1d(df["x"].min(), df["x"].max() * 1.05)
+        x_range = Range1d(df["x"].min() - radius, df["x"].max() + radius)
 
-    y_range = Range1d(df["count"].min(), df["count"].max() * 1.05)
+    y_range = Range1d(df["count"].min(), df["count"].max() * 1.01)
 
     fig = tweak_figure(
         Figure(
