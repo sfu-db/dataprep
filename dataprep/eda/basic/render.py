@@ -104,9 +104,9 @@ def bar_viz(
     """
     # pylint: disable=too-many-arguments
     title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
-    tooltips = [(f"{col}", f"@{col}"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    tooltips = [(f"{col}", "@col"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
     fig = Figure(
-        x_range=list(df[col]),
+        x_range=list(df["col"]),
         title=title,
         plot_width=plot_width,
         plot_height=plot_height,
@@ -115,7 +115,7 @@ def bar_viz(
         toolbar_location=None,
         tooltips=tooltips,
     )
-    fig.vbar(x=col, width=0.9, top="cnt", bottom=0.01, source=df)
+    fig.vbar(x="col", width=0.9, top="cnt", bottom=0.01, source=df)
     tweak_figure(fig, "bar", show_yaxis)
     fig.yaxis.axis_label = "Count"
     if total_grps > len(df):
@@ -131,7 +131,7 @@ def pie_viz(
     Render a pie chart
     """
     title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
-    tooltips = [(f"{col}", f"@{col}"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    tooltips = [(f"{col}", "@col"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
     df["angle"] = df["cnt"] / df["cnt"].sum() * 2 * pi
     fig = Figure(
         title=title,
@@ -155,7 +155,7 @@ def pie_viz(
         fill_color="colour",
         source=df,
     )
-    legend = Legend(items=[LegendItem(label=dict(field=col), renderers=[pie])])
+    legend = Legend(items=[LegendItem(label=dict(field="col"), renderers=[pie])])
     legend.label_text_font_size = "8pt"
     fig.add_layout(legend, "right")
     tweak_figure(fig, "pie")
@@ -627,14 +627,14 @@ def heatmap_viz(
     # pylint: disable=too-many-arguments
     title = _make_title(grp_cnt_stats, x, y)
 
-    source = ColumnDataSource(df)
+    source = ColumnDataSource(data=df)
     palette = BIPALETTE[(len(BIPALETTE) // 2 - 1) :]
     mapper = LinearColorMapper(
         palette=palette, low=df["cnt"].min() - 0.01, high=df["cnt"].max()
     )
     fig = figure(
-        x_range=list(set(df[x])),
-        y_range=list(set(df[y])),
+        x_range=list(set(df["x"])),
+        y_range=list(set(df["y"])),
         toolbar_location=None,
         tools=[],
         x_axis_location="below",
@@ -644,8 +644,8 @@ def heatmap_viz(
     )
 
     renderer = fig.rect(
-        x=x,
-        y=y,
+        x="x",
+        y="y",
         width=1,
         height=1,
         source=source,
@@ -661,7 +661,7 @@ def heatmap_viz(
     )
     fig.add_tools(
         HoverTool(
-            tooltips=[(x, f"@{x}"), (y, f"@{y}"), ("Count", "@cnt"),],
+            tooltips=[(x, "@x"), (y, "@y"), ("Count", "@cnt"),],
             mode="mouse",
             renderers=[renderer],
         )
