@@ -3,14 +3,16 @@ This module contains the Connector class,
 where every data fetching should begin with instantiating
 the Connector class.
 """
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from jinja2 import Environment
 from requests import Request, Response, Session
 
-from .errors import RequestError
 from ..errors import UnreachableError
+from .config_manager import config_directory, ensure_config
+from .errors import RequestError
 from .implicit_database import ImplicitDatabase, ImplicitTable
 
 
@@ -42,11 +44,21 @@ class Connector:
         **kwargs : Dict[str, Any]
             Additional parameters
         """
-        assert config_path.startswith("file://"), "Hosted config not implemented"
-        # TODO download config file from server
 
         self.session = Session()
-        self.impdb = ImplicitDatabase(config_path.lstrip("file://"))
+        if (
+            config_path.startswith(".")
+            or config_path.startswith("/")
+            or config_path.startswith("~")
+        ):
+            path = Path(config_path).resolve()
+            self.impdb = ImplicitDatabase(path)
+        else:
+            # From Github!
+            ensure_config(config_path)
+            path = config_directory() / config_path
+            self.impdb = ImplicitDatabase(path)
+
         self.vars = kwargs
         self.auth_params = auth_params or {}
         self.jenv = Environment()
