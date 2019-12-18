@@ -1,0 +1,718 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.basic.compute &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.eda.basic.compute</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module implements the intermediates computation</span>
+<span class="sd">    for plot(df) function.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span><span class="p">,</span> <span class="n">norm</span>
+
+<span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DType</span><span class="p">,</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">is_numerical</span>
+<span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compute&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="compute"><a class="viewcode-back" href="../../../../dataprep.eda.html#dataprep.eda.compute">[docs]</a><span class="k">def</span> <span class="nf">compute</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : Union[pd.DataFrame, dd.DataFrame]</span>
+<span class="sd">        Dataframe from which plots are to be generated.</span>
+<span class="sd">    x : str, optional, default None</span>
+<span class="sd">        A valid column name from the dataframe.</span>
+<span class="sd">    y : str, optional, default None</span>
+<span class="sd">        A valid column name from the dataframe.</span>
+<span class="sd">    bins : int, default 10</span>
+<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
+<span class="sd">        the number of equal-width bins to use when grouping.</span>
+<span class="sd">    ngroups : int, default 10</span>
+<span class="sd">        When grouping over a categorical column, it defines the</span>
+<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
+<span class="sd">        bars to show in a bar chart.</span>
+<span class="sd">    largest : bool, default True</span>
+<span class="sd">        If true, when grouping over a categorical column, the groups</span>
+<span class="sd">        with the largest count will be output. If false, the groups</span>
+<span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    bandwidth : float, default 1.5</span>
+<span class="sd">        Bandwidth for the kernel density estimation.</span>
+<span class="sd">    sample_size : int, default 1000</span>
+<span class="sd">        Sample size for the scatter plot.</span>
+<span class="sd">    value_range : (float, float), optional, default None</span>
+<span class="sd">        The lower and upper bounds on the range of a numerical column.</span>
+<span class="sd">        Applies when column x is specified and column y is unspecified.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Intermediate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-return-statements</span>
+    <span class="c1"># pylint: disable=no-else-return</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">orig_df_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">datas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+
+            <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="n">bardata</span> <span class="o">=</span> <span class="n">calc_bar_pie</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
+                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">Categorical</span><span class="p">,</span> <span class="n">bardata</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="n">histdata</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">orig_df_len</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">Numerical</span><span class="p">,</span> <span class="n">histdata</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnreachableError</span>
+
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">datas</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;basic_grid&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="c1"># data for bar and pie charts</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">calc_bar_pie</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">):</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid range of values for this column&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="c1"># qq plot</span>
+            <span class="n">qqdata</span> <span class="o">=</span> <span class="n">calc_qqnorm</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="c1"># histogram</span>
+            <span class="n">histdata</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">orig_df_len</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="c1"># kde plot</span>
+            <span class="n">kdedata</span> <span class="o">=</span> <span class="n">calc_hist_kde</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
+            <span class="c1"># box plot</span>
+            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
+                <span class="n">histdata</span><span class="o">=</span><span class="n">histdata</span><span class="p">,</span>
+                <span class="n">kdedata</span><span class="o">=</span><span class="n">kdedata</span><span class="p">,</span>
+                <span class="n">qqdata</span><span class="o">=</span><span class="n">qqdata</span><span class="p">,</span>
+                <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
+                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnreachableError</span>
+
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xdtype</span><span class="p">,</span> <span class="n">ydtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="c1"># box plot per group</span>
+            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="c1"># histogram per group</span>
+            <span class="n">hisdata</span> <span class="o">=</span> <span class="n">calc_hist_by_group</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
+                <span class="n">histdata</span><span class="o">=</span><span class="n">hisdata</span><span class="p">,</span>
+                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;cat_and_num_cols&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
+            <span class="c1"># nested bar chart</span>
+            <span class="n">nesteddata</span> <span class="o">=</span> <span class="n">calc_nested</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="c1"># stacked bar chart</span>
+            <span class="n">stackdata</span> <span class="o">=</span> <span class="n">calc_stacked</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="c1"># heat map</span>
+            <span class="n">heatmapdata</span> <span class="o">=</span> <span class="n">calc_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">nesteddata</span><span class="o">=</span><span class="n">nesteddata</span><span class="p">,</span>
+                <span class="n">stackdata</span><span class="o">=</span><span class="n">stackdata</span><span class="p">,</span>
+                <span class="n">heatmapdata</span><span class="o">=</span><span class="n">heatmapdata</span><span class="p">,</span>
+                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;two_cat_cols&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
+            <span class="c1"># scatter plot</span>
+            <span class="n">scatdata</span> <span class="o">=</span> <span class="n">calc_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">sample_size</span><span class="p">)</span>
+            <span class="c1"># hexbin plot</span>
+            <span class="n">hexbindata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+            <span class="c1"># box plot</span>
+            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">scatdata</span><span class="o">=</span><span class="n">scatdata</span><span class="p">,</span>
+                <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
+                <span class="n">hexbindata</span><span class="o">=</span><span class="n">hexbindata</span><span class="p">,</span>
+                <span class="n">spl_sz</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
+                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;two_num_cols&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnreachableError</span>
+    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">calc_bar_pie</span><span class="p">(</span>
+    <span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the group counts given a series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    srs : dd.Series</span>
+<span class="sd">        one categorical column</span>
+<span class="sd">    ngroups : int</span>
+<span class="sd">        number of groups to return</span>
+<span class="sd">    largest : bool</span>
+<span class="sd">        If true, show the groups with the largest count,</span>
+<span class="sd">        else show the groups with the smallest count</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, float]</span>
+<span class="sd">        A dataframe of the group counts, the total count of groups,</span>
+<span class="sd">        and the percent of missing values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">miss_pct</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">grp_srs</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="c1"># select largest or smallest groups</span>
+    <span class="k">if</span> <span class="n">largest</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">grp_srs</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">grp_srs</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span>
+    <span class="c1"># create a row containing the sum of the other groups</span>
+    <span class="n">other_cnt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">srs</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">],</span> <span class="s2">&quot;cnt&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">other_cnt</span><span class="p">]})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">to_dask</span><span class="p">(</span><span class="n">df2</span><span class="p">))</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;pct&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">grp_srs</span><span class="p">),</span> <span class="n">miss_pct</span>
+
+
+<span class="k">def</span> <span class="nf">calc_hist</span><span class="p">(</span>
+    <span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">orig_df_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a histogram over a given series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    srs : dd.Series</span>
+<span class="sd">        one numerical column over which to compute the histogram</span>
+<span class="sd">    bins : int</span>
+<span class="sd">        number of bins to use in the histogram</span>
+<span class="sd">    orig_df_len : int</span>
+<span class="sd">        length of the original dataframe</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, float]:</span>
+<span class="sd">        The histogram in a dataframe and the percent of missing values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">miss_pct</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+    <span class="n">hist_array</span><span class="p">,</span> <span class="n">bins_array</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+    <span class="n">hist_array</span> <span class="o">=</span> <span class="n">hist_array</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">hist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;left&quot;</span><span class="p">:</span> <span class="n">bins_array</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="n">bins_array</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+            <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="n">hist_array</span><span class="p">,</span>
+            <span class="s2">&quot;pct&quot;</span><span class="p">:</span> <span class="n">hist_array</span> <span class="o">/</span> <span class="n">orig_df_len</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">hist_df</span><span class="p">,</span> <span class="n">miss_pct</span>
+
+
+<span class="k">def</span> <span class="nf">calc_hist_kde</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a density histogram and its corresponding kernel density</span>
+<span class="sd">    estimate over a given series. The kernel is guassian.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: da.Array</span>
+<span class="sd">        one numerical column over which to compute the histogram and kde</span>
+<span class="sd">    bins : int</span>
+<span class="sd">        number of bins to use in the histogram</span>
+<span class="sd">    bandwidth: float</span>
+<span class="sd">        bandwidth for the kde</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, np.ndarray, np.ndarray]</span>
+<span class="sd">        The histogram in a dataframe, range of points for the kde,</span>
+<span class="sd">        and the kde calculated at the specified points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">hist_arr</span><span class="p">,</span> <span class="n">bins_arr</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">hist_arr</span> <span class="o">=</span> <span class="n">hist_arr</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">hist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;left&quot;</span><span class="p">:</span> <span class="n">bins_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="n">bins_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="n">hist_arr</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">pts_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">bw_method</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">)(</span><span class="n">pts_rng</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hist_df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span>
+
+
+<span class="k">def</span> <span class="nf">calc_qqnorm</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate QQ plot given a series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    srs : dd.Series</span>
+<span class="sd">        one numerical column from which to compute the quantiles</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[np.ndarray, np.ndarray]</span>
+<span class="sd">        A tuple of (actual quantiles, theoretical quantiles)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">q_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">actual_qs</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q_range</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">mean</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">srs</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">theory_qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">q_range</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span>
+
+
+<span class="k">def</span> <span class="nf">calc_box</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute a box plot over either</span>
+<span class="sd">        1) the values in one column</span>
+<span class="sd">        2) the values corresponding to groups in another column</span>
+<span class="sd">        3) the values corresponding to binning another column</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dd.DataFrame</span>
+<span class="sd">        dask dataframe with one or two columns</span>
+<span class="sd">    bins : int</span>
+<span class="sd">        number of bins to use if df has two numerical columns</span>
+<span class="sd">    ngroups : int</span>
+<span class="sd">        number of groups to show if df has a categorical and</span>
+<span class="sd">        numerical column</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, List[str], List[float], Dict[str, int]]</span>
+<span class="sd">        The box plot statistics in a dataframe, a list of the outlier</span>
+<span class="sd">        groups and another list of the outlier values, a dictionary</span>
+<span class="sd">        logging the sampled group output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">grp_cnt_stats</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># to inform the user of sampled output</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">_calc_box_stats</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">bins</span><span class="p">:</span>
+                <span class="n">bins</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">endpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># calculate a box plot over each bin</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">_calc_box_stats</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])][</span><span class="n">y</span><span class="p">],</span>
+                        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{endpts[i]}</span><span class="s2">,</span><span class="si">{endpts[i+1]}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">endpts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+                    <span class="k">else</span> <span class="n">_calc_box_stats</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])][</span><span class="n">y</span><span class="p">],</span>
+                        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{endpts[i]}</span><span class="s2">,</span><span class="si">{endpts[i+1]}</span><span class="s2">]&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endpts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">],</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+            <span class="c1"># calculate a box plot over each group</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_calc_box_stats</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">grp</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">grp</span><span class="p">)</span> <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">largest_grps</span><span class="p">],</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)},</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,))</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;grp&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x0&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.2</span>  <span class="c1"># width of whiskers for plotting</span>
+
+    <span class="n">outx</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list for the outlier groups</span>
+    <span class="n">outy</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list for the outlier values</span>
+    <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">otlrs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">grp</span><span class="p">][</span><span class="s2">&quot;otlrs&quot;</span><span class="p">]</span>
+        <span class="n">outx</span> <span class="o">=</span> <span class="n">outx</span> <span class="o">+</span> <span class="p">[</span><span class="n">grp</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">otlrs</span><span class="p">)</span>
+        <span class="n">outy</span> <span class="o">=</span> <span class="n">outy</span> <span class="o">+</span> <span class="n">otlrs</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">outx</span><span class="p">,</span> <span class="n">outy</span><span class="p">,</span> <span class="n">grp_cnt_stats</span>
+
+
+<span class="k">def</span> <span class="nf">calc_hist_by_group</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute a histogram over the values corresponding to the groups in another column</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dd.DataFrame</span>
+<span class="sd">        dask dataframe with one categorical and one numerical column</span>
+<span class="sd">    bins : int</span>
+<span class="sd">        number of bins to use in the histogram</span>
+<span class="sd">    ngroups : int</span>
+<span class="sd">        number of groups to show from the categorical column</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
+<span class="sd">        The histograms in a dataframe and a dictionary</span>
+<span class="sd">        logging the sampled group output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hist_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">hist_lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+
+    <span class="c1"># create a histogram for each group</span>
+    <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">largest_grps</span><span class="p">:</span>
+        <span class="n">grp_series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">grp</span><span class="p">)[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span> <span class="o">=</span> <span class="n">grp_series</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">grp_series</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="n">hist</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">grp_series</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+        <span class="n">hist_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span>
+
+    <span class="n">hist_lst</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">hist_lst</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">largest_grps</span><span class="p">,</span> <span class="n">hist_lst</span><span class="p">):</span>
+        <span class="n">hist_dict</span><span class="p">[</span><span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">hist_dict</span><span class="p">,</span> <span class="n">grp_cnt_stats</span>
+
+
+<span class="k">def</span> <span class="nf">calc_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TO-DO: WARNING: For very large amount of points, implement Heat Map.</span>
+<span class="sd">    Extracts the points to use in a scatter plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dd.DataFrame</span>
+<span class="sd">        two numerical columns</span>
+<span class="sd">    sample_size : int</span>
+<span class="sd">        the number of points to randomly sample in the scatter plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        A dataframe containing the scatter points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">sample_size</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="n">sample_size</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">calc_nested</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a nested bar chart of the counts of two columns</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dd.DataFrame</span>
+<span class="sd">        two categorical columns</span>
+<span class="sd">    ngroups : int</span>
+<span class="sd">        number of groups to show from the first column</span>
+<span class="sd">    nsubgroups : int</span>
+<span class="sd">        number of subgroups (from the second column) to show in each group</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
+<span class="sd">        The bar chart counts in a dataframe and a dictionary</span>
+<span class="sd">        logging the sampled group output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">max_subcol_cnt</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">df2</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;cnt&quot;</span><span class="p">]</span>
+    <span class="n">df_res</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">x</span><span class="p">)[[</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;cnt&quot;</span><span class="p">]]</span>
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">nsubgroups</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;cnt&quot;</span><span class="p">),</span>
+            <span class="n">meta</span><span class="o">=</span><span class="p">({</span><span class="n">y</span><span class="p">:</span> <span class="s2">&quot;f8&quot;</span><span class="p">,</span> <span class="s2">&quot;cnt&quot;</span><span class="p">:</span> <span class="s2">&quot;i8&quot;</span><span class="p">}),</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">df_res</span><span class="p">[</span><span class="s2">&quot;grp_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df_res</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">df_res</span><span class="p">[</span><span class="n">y</span><span class="p">]))</span>
+    <span class="n">df_res</span> <span class="o">=</span> <span class="n">df_res</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;level_1&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_ttl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_subcol_cnt</span>
+    <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_subcol_cnt</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_res</span><span class="p">,</span> <span class="n">grp_cnt_stats</span>
+
+
+<span class="k">def</span> <span class="nf">calc_stacked</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a stacked bar chart of the counts of two columns</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dd.DataFrame</span>
+<span class="sd">        two categorical columns</span>
+<span class="sd">    ngroups : int</span>
+<span class="sd">        number of groups to show from the first column</span>
+<span class="sd">    nsubgroups : int</span>
+<span class="sd">        number of subgroups (from the second column) to show in each group</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
+<span class="sd">        The bar chart counts in a dataframe and a dictionary</span>
+<span class="sd">        logging the sampled group output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">fin_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">largest_grps</span><span class="p">:</span>
+        <span class="n">df_grp</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">grp</span><span class="p">]</span>
+        <span class="n">df_res</span> <span class="o">=</span> <span class="n">df_grp</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">nsubgroups</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_grp</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">df_res</span> <span class="o">=</span> <span class="n">df_res</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">df_res</span><span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">df_res</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fin_df</span> <span class="o">=</span> <span class="n">fin_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_res</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">fin_df</span> <span class="o">=</span> <span class="n">fin_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">others</span> <span class="o">=</span> <span class="n">fin_df</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Others&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">others</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">:</span>
+        <span class="n">fin_df</span><span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">others</span>
+    <span class="n">fin_df</span><span class="p">[</span><span class="s2">&quot;grps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">largest_grps</span>
+    <span class="k">return</span> <span class="n">fin_df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span>
+
+
+<span class="k">def</span> <span class="nf">calc_heatmap</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">70</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a heatmap of the counts of two columns</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dd.DataFrame</span>
+<span class="sd">        two categorical columns</span>
+<span class="sd">    ngroups : int</span>
+<span class="sd">        number of groups to show from the first column</span>
+<span class="sd">    nsubgroups : int</span>
+<span class="sd">        number of subgroups (from the second column) to show in each group</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
+<span class="sd">        The heatmap counts in a dataframe and a dictionary</span>
+<span class="sd">        logging the sampled group output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">srs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">srs_lrgst</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">nsubgroups</span><span class="p">)</span>
+    <span class="n">largest_subgrps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">srs_lrgst</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">largest_subgrps</span><span class="p">)]</span>
+
+    <span class="n">df_res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df_res</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;cnt&quot;</span><span class="p">]</span>
+
+    <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_ttl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+    <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">largest_subgrps</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_res</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">grp_cnt_stats</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_box_stats</span><span class="p">(</span><span class="n">grp_srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">grp</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Auxiliary function to calculate the Tukey box plot statistics</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    grp_srs: dd.Series</span>
+<span class="sd">        one numerical column</span>
+<span class="sd">    grp: str</span>
+<span class="sd">        Name of the group of the corresponding series values</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        A dataframe containing box plot statistics</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># this is a bad fix for the problem of when there is no data passed to this function</span>
+        <span class="n">qntls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">grp_srs</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">])</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q1&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q2&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qntls</span><span class="p">[</span><span class="mf">0.25</span><span class="p">],</span> <span class="n">qntls</span><span class="p">[</span><span class="mf">0.50</span><span class="p">],</span> <span class="n">qntls</span><span class="p">[</span><span class="mf">0.75</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q1&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q2&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">iqr</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q3&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q1&quot;</span><span class="p">]</span>
+    <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;lw&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grp_srs</span><span class="p">[</span><span class="n">grp_srs</span> <span class="o">&gt;=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q1&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;uw&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grp_srs</span><span class="p">[</span><span class="n">grp_srs</span> <span class="o">&lt;=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;q3&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+    <span class="n">otlrs</span> <span class="o">=</span> <span class="n">grp_srs</span><span class="p">[(</span><span class="n">grp_srs</span> <span class="o">&lt;</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;lw&quot;</span><span class="p">])</span> <span class="o">|</span> <span class="p">(</span><span class="n">grp_srs</span> <span class="o">&gt;</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;uw&quot;</span><span class="p">])]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">otlrs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>  <span class="c1"># sample 100 outliers</span>
+        <span class="n">otlrs</span> <span class="o">=</span> <span class="n">otlrs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">100</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">otlrs</span><span class="p">))</span>
+    <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;otlrs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">otlrs</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">grp</span><span class="p">:</span> <span class="n">stats</span><span class="p">})</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_groups</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Auxillary function to parse the dataframe to consist</span>
+<span class="sd">    of only the groups with the largest counts</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df: dd.DataFrame</span>
+<span class="sd">        two columns, the first column is categorical</span>
+<span class="sd">    ngroups: int</span>
+<span class="sd">        the number of groups with the largest counts to isolate</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        The parsed dataframe, a dictionary logging the sampled groups,</span>
+<span class="sd">        and a list of the sampled groups</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># group count statistics to inform the user of the sampled output</span>
+    <span class="n">grp_cnt_stats</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">srs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">srs_lrgst</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span>
+    <span class="n">largest_grps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">srs_lrgst</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">largest_grps</span><span class="p">)]</span>
+
+    <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_ttl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+    <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">largest_grps</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">largest_grps</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    </div>
+  </body>
+</html>

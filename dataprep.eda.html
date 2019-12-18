@@ -41,10 +41,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.basic.html">dataprep.eda.basic package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.computation">dataprep.eda.basic.computation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#dataprep-eda-basic-computation-module">dataprep.eda.basic.computation module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.viz_multi">dataprep.eda.basic.viz_multi module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.viz_uni">dataprep.eda.basic.viz_uni module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#dataprep-eda-basic-viz-multi-module">dataprep.eda.basic.viz_multi module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#dataprep-eda-basic-viz-uni-module">dataprep.eda.basic.viz_uni module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic">Module contents</a></li>
 </ul>
 </li>
@@ -85,58 +85,6 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda" title="Permalink to this headline">¶</a></h2>
 <p>Docstring
 Data preparation module</p>
-<dl class="function">
-<dt id="dataprep.eda.plot">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">pd_data_frame: pandas.core.frame.DataFrame</em>, <em class="sig-param">col_x: Optional[str] = None</em>, <em class="sig-param">col_y: Optional[str] = None</em>, <em class="sig-param">force_cat: Optional[List[str]] = None</em>, <em class="sig-param">force_num: Optional[List[str]] = None</em>, <em class="sig-param">bins: int = 10</em>, <em class="sig-param">value_range: Optional[Tuple[float</em>, <em class="sig-param">float]] = None</em>, <em class="sig-param">**kwrgs: Any</em><span class="sig-paren">)</span> &#x2192; List[dataprep.eda.intermediate.Intermediate]<a class="reference internal" href="_modules/dataprep/eda/basic/computation.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates plots for exploratory data analysis.</p>
-<p>If col_x and col_y are unspecified, the distribution of
-each coloumn is plotted. A histogram is plotted if the
-column contains numerical values, and a bar chart is plotted
-if the column contains categorical values.</p>
-<p>If col_x is specified and col_y is unspecified, the
-distribution of col_x is plotted in various ways. If col_x
-contains categorical values, a bar chart and pie chart are
-plotted. If col_x contains numerical values, a histogram,
-kernel density estimate plot, box plot, and qq plot are plotted.</p>
-<p>If col_x and col_y are specified, plots depicting
-the relationship between the variables will be displayed. If
-col_x and col_y contain numerical values, a scatter plot, hexbin
-plot, and binned box plot are plotted. If one of col_x and col_y
-contain categorical values and the other contains numerical values,
-a box plot and multi-line histogram are plotted. If col_X and col_y
-contain categorical vales, a nested bar chart, stacked bar chart, and
-heat map are plotted.</p>
-<dl class="simple">
-<dt>pd_data_frame<span class="classifier">pandas DataFrame</span></dt><dd><p>The input data frame from which charts or plots are to
-be generated.</p>
-</dd>
-<dt>col_x<span class="classifier">str, optional</span></dt><dd><p>The name of a column in the input data frame.</p>
-</dd>
-<dt>col_y<span class="classifier">str, optional</span></dt><dd><p>The name of a column in the input data frame.</p>
-</dd>
-<dt>force_cat<span class="classifier">List[str], optional</span></dt><dd><p>A list of column names which forces these columns to be treated
-as having categorical values.</p>
-</dd>
-<dt>force_num<span class="classifier">List[str], optional</span></dt><dd><p>A list of column names which forces these columns to be treated
-as having numerical values.</p>
-</dd>
-<dt>bins<span class="classifier">int, optional, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
-the number of equal-width bins to use when grouping.</p>
-</dd>
-<dt>value_range<span class="classifier">(float, float), optional</span></dt><dd><p>The lower and upper bounds on the histogram plotted when
-col_x is numerical, and col_y is unspecified.</p>
-</dd>
-</dl>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_length&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_width&quot;</span><span class="p">,</span> <span class="s2">&quot;species&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
 <dl class="function">
 <dt id="dataprep.eda.plot_correlation">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation.html#plot_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_correlation" title="Permalink to this definition">¶</a></dt>
@@ -324,6 +272,136 @@ case (Some, None) =&gt; histogram for numerical column and
 bars for categorical column
 case (None, None) =&gt; heatmap
 otherwise =&gt; error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.plot">
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 10, ngroups: int = 10, largest: bool = True, bandwidth: float = 1.5, sample_size: int = 1000, value_range: Optional[Tuple[float, float]] = None, yscale: str = 'linear', tile_size: Optional[float] = None, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/basic.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates plots for exploratory data analysis.</p>
+<p>If col_x and col_y are unspecified, the distribution of
+each coloumn is plotted. A histogram is plotted if the
+column contains numerical values, and a bar chart is plotted
+if the column contains categorical values.</p>
+<p>If col_x is specified and col_y is unspecified, the
+distribution of col_x is plotted in various ways. If col_x
+contains categorical values, a bar chart and pie chart are
+plotted. If col_x contains numerical values, a histogram,
+kernel density estimate plot, box plot, and qq plot are plotted.</p>
+<p>If col_x and col_y are specified, plots depicting
+the relationship between the variables will be displayed. If
+col_x and col_y contain numerical values, a scatter plot, hexbin
+plot, and binned box plot are plotted. If one of col_x and col_y
+contain categorical values and the other contains numerical values,
+a box plot and multi-line histogram are plotted. If col_X and col_y
+contain categorical vales, a nested bar chart, stacked bar chart, and
+heat map are plotted.</p>
+<dl class="simple">
+<dt>df<span class="classifier">Union[pd.DataFrame, dd.DataFrame]</span></dt><dd><p>Dataframe from which plots are to be generated</p>
+</dd>
+<dt>x<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
+</dd>
+<dt>y<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
+</dd>
+<dt>bins<span class="classifier">int, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p>
+</dd>
+<dt>ngroups<span class="classifier">int, default 10</span></dt><dd><p>When grouping over a categorical column, it defines the
+number of groups to show in the plot. Ie, the number of
+bars to show in a bar chart.</p>
+</dd>
+<dt>largest<span class="classifier">bool, default True</span></dt><dd><p>If true, when grouping over a categorical column, the groups
+with the largest count will be output. If false, the groups
+with the smallest count will be output.</p>
+</dd>
+<dt>bandwidth<span class="classifier">float, default 1.5</span></dt><dd><p>Bandwidth for the kernel density estimation.</p>
+</dd>
+<dt>sample_size<span class="classifier">int, default 1000</span></dt><dd><p>Sample size for the scatter plot.</p>
+</dd>
+<dt>value_range<span class="classifier">(float, float), optional, default None</span></dt><dd><p>The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p>
+</dd>
+<dt>yscale: str, default “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
+</dd>
+<dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p>
+</dd>
+<dt>show_plot: bool, default True</dt><dd><p>Whether or not to show the plot.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>An object of figure or</dt><dd><p>An object of figure and
+An intermediate representation for the plots of different columns in the data_frame.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_length&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_width&quot;</span><span class="p">,</span> <span class="s2">&quot;species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.compute">
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 10, ngroups: int = 10, largest: bool = True, bandwidth: float = 1.5, sample_size: int = 1000, value_range: Optional[Tuple[float, float]] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/basic/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>df<span class="classifier">Union[pd.DataFrame, dd.DataFrame]</span></dt><dd><p>Dataframe from which plots are to be generated.</p>
+</dd>
+<dt>x<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
+</dd>
+<dt>y<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
+</dd>
+<dt>bins<span class="classifier">int, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p>
+</dd>
+<dt>ngroups<span class="classifier">int, default 10</span></dt><dd><p>When grouping over a categorical column, it defines the
+number of groups to show in the plot. Ie, the number of
+bars to show in a bar chart.</p>
+</dd>
+<dt>largest<span class="classifier">bool, default True</span></dt><dd><p>If true, when grouping over a categorical column, the groups
+with the largest count will be output. If false, the groups
+with the smallest count will be output.</p>
+</dd>
+<dt>bandwidth<span class="classifier">float, default 1.5</span></dt><dd><p>Bandwidth for the kernel density estimation.</p>
+</dd>
+<dt>sample_size<span class="classifier">int, default 1000</span></dt><dd><p>Sample size for the scatter plot.</p>
+</dd>
+<dt>value_range<span class="classifier">(float, float), optional, default None</span></dt><dd><p>The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p>
+</dd>
+</dl>
+<p>Intermediate</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.render">
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">yscale: str = 'linear'</em>, <em class="sig-param">tile_size: Optional[float] = None</em>, <em class="sig-param">plot_width_small: int = 324</em>, <em class="sig-param">plot_height_small: int = 300</em>, <em class="sig-param">plot_width_large: int = 450</em>, <em class="sig-param">plot_height_large: int = 400</em>, <em class="sig-param">plot_width_wide: int = 972</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/basic/render.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a basic plot</p>
+<dl class="simple">
+<dt>itmdt<span class="classifier">Intermediate</span></dt><dd><p>The Intermediate containing results from the compute function.</p>
+</dd>
+<dt>yscale: str = “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
+</dd>
+<dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p>
+</dd>
+<dt>plot_width_small<span class="classifier">int = 324,</span></dt><dd><p>The width of the small plots</p>
+</dd>
+<dt>plot_height_small: int = 300,</dt><dd><p>The height of the small plots</p>
+</dd>
+<dt>plot_width_large<span class="classifier">int = 450,</span></dt><dd><p>The width of the large plots</p>
+</dd>
+<dt>plot_height_large: int = 400,</dt><dd><p>The height of the large plots</p>
+</dd>
+<dt>plot_width_large<span class="classifier">int = 972,</span></dt><dd><p>The width of the wide plots</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>LayoutDOM</dt><dd><p>A bokeh layout domain.</p>
 </dd>
 </dl>
 </dd></dl>

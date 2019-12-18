@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.eda.basic &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.eda.basic</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module implements the plot(df) function.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span>
+
+<span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute</span>
+<span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render</span>
+
+
+<div class="viewcode-block" id="plot"><a class="viewcode-back" href="../../../dataprep.eda.basic.html#dataprep.eda.plot">[docs]</a><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Generates plots for exploratory data analysis.</span>
+
+<span class="sd">    If col_x and col_y are unspecified, the distribution of</span>
+<span class="sd">    each coloumn is plotted. A histogram is plotted if the</span>
+<span class="sd">    column contains numerical values, and a bar chart is plotted</span>
+<span class="sd">    if the column contains categorical values.</span>
+
+<span class="sd">    If col_x is specified and col_y is unspecified, the</span>
+<span class="sd">    distribution of col_x is plotted in various ways. If col_x</span>
+<span class="sd">    contains categorical values, a bar chart and pie chart are</span>
+<span class="sd">    plotted. If col_x contains numerical values, a histogram,</span>
+<span class="sd">    kernel density estimate plot, box plot, and qq plot are plotted.</span>
+
+<span class="sd">    If col_x and col_y are specified, plots depicting</span>
+<span class="sd">    the relationship between the variables will be displayed. If</span>
+<span class="sd">    col_x and col_y contain numerical values, a scatter plot, hexbin</span>
+<span class="sd">    plot, and binned box plot are plotted. If one of col_x and col_y</span>
+<span class="sd">    contain categorical values and the other contains numerical values,</span>
+<span class="sd">    a box plot and multi-line histogram are plotted. If col_X and col_y</span>
+<span class="sd">    contain categorical vales, a nested bar chart, stacked bar chart, and</span>
+<span class="sd">    heat map are plotted.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : Union[pd.DataFrame, dd.DataFrame]</span>
+<span class="sd">        Dataframe from which plots are to be generated</span>
+<span class="sd">    x : str, optional, default None</span>
+<span class="sd">        A valid column name from the dataframe.</span>
+<span class="sd">    y : str, optional, default None</span>
+<span class="sd">        A valid column name from the dataframe.</span>
+<span class="sd">    bins : int, default 10</span>
+<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
+<span class="sd">        the number of equal-width bins to use when grouping.</span>
+<span class="sd">    ngroups : int, default 10</span>
+<span class="sd">        When grouping over a categorical column, it defines the</span>
+<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
+<span class="sd">        bars to show in a bar chart.</span>
+<span class="sd">    largest : bool, default True</span>
+<span class="sd">        If true, when grouping over a categorical column, the groups</span>
+<span class="sd">        with the largest count will be output. If false, the groups</span>
+<span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    bandwidth : float, default 1.5</span>
+<span class="sd">        Bandwidth for the kernel density estimation.</span>
+<span class="sd">    sample_size : int, default 1000</span>
+<span class="sd">        Sample size for the scatter plot.</span>
+<span class="sd">    value_range : (float, float), optional, default None</span>
+<span class="sd">        The lower and upper bounds on the range of a numerical column.</span>
+<span class="sd">        Applies when column x is specified and column y is unspecified.</span>
+<span class="sd">    yscale: str, default &quot;linear&quot;</span>
+<span class="sd">        The scale to show on the y axis. Can be &quot;linear&quot; or &quot;log&quot;.</span>
+<span class="sd">    tile_size : Optional[float] = None</span>
+<span class="sd">        Size of the tile for the hexbin plot. Measured from the middle</span>
+<span class="sd">        of a hexagon to its left or right corner.</span>
+<span class="sd">    show_plot: bool, default True</span>
+<span class="sd">        Whether or not to show the plot.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An object of figure or</span>
+<span class="sd">        An object of figure and</span>
+<span class="sd">        An intermediate representation for the plots of different columns in the data_frame.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">    &gt;&gt;&gt; from dataprep.eda import *</span>
+<span class="sd">    &gt;&gt;&gt; iris = pd.read_csv(&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; plot(iris)</span>
+<span class="sd">    &gt;&gt;&gt; plot(iris, &quot;petal_length&quot;, bins=20, value_range=(1,5))</span>
+<span class="sd">    &gt;&gt;&gt; plot(iris, &quot;petal_width&quot;, &quot;species&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+        <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+        <span class="n">ngroups</span><span class="o">=</span><span class="n">ngroups</span><span class="p">,</span>
+        <span class="n">largest</span><span class="o">=</span><span class="n">largest</span><span class="p">,</span>
+        <span class="n">bandwidth</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">,</span>
+        <span class="n">sample_size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
+        <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">figure</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    </div>
+  </body>
+</html>
