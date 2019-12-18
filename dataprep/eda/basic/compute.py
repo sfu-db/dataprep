@@ -204,15 +204,15 @@ def calc_bar_pie(
     grp_srs = srs.groupby(srs).size()
     # select largest or smallest groups
     if largest:
-        df = grp_srs.nlargest(n=ngroups).to_frame()
+        df = grp_srs.nlargest(n=ngroups).to_frame().rename(columns={srs.name: "cnt"})
     else:
-        df = grp_srs.nsmallest(n=ngroups).to_frame()
-    df.columns = ["cnt"]
+        df = grp_srs.nsmallest(n=ngroups).to_frame().rename(columns={srs.name: "cnt"})
     # create a row containing the sum of the other groups
     other_cnt = len(srs) - df["cnt"].sum().compute()
     df2 = pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]})
     df = df.reset_index().append(to_dask(df2))
     df["pct"] = df["cnt"] / len(srs) * 100
+    df.columns = ["col", "cnt", "pct"]
     return df.compute(), len(grp_srs), miss_pct
 
 
@@ -561,7 +561,7 @@ def calc_heatmap(
     df = df[df[y].isin(largest_subgrps)]
 
     df_res = df.groupby([x, y]).size().reset_index()
-    df_res.columns = [x, y, "cnt"]
+    df_res.columns = ["x", "y", "cnt"]
 
     grp_cnt_stats["y_ttl"] = len(srs.index.compute())
     grp_cnt_stats["y_show"] = len(largest_subgrps)
