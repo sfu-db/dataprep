@@ -319,7 +319,7 @@ def box_viz(
 
     fig = figure(
         tools="",
-        x_range=list(df.index),
+        x_range=list(df["grp"]),
         toolbar_location=None,
         title=title,
         plot_width=plot_width,
@@ -406,7 +406,9 @@ def line_viz(
             for i in range(len(data[grp][1]) - 1)
         ]
         grp_name = (
-            (grp[: (max_label_len - 1)] + "...") if len(grp) > max_label_len else grp
+            (str(grp)[: (max_label_len - 1)] + "...")
+            if len(str(grp)) > max_label_len
+            else str(grp)
         )
 
         source = ColumnDataSource(
