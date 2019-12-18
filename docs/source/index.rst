@@ -7,7 +7,13 @@ Welcome to dataprep's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
+
+   introduction.rst
+   plot.rst
+   plot_correlation.rst
+   plot_missing.rst
+   
    :caption: Contents:
 
 
