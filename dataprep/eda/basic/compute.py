@@ -203,17 +203,16 @@ def calc_bar_pie(
     miss_pct = round(srs.isna().sum().compute() / len(srs) * 100, 1)
     grp_srs = srs.groupby(srs).size()
     # select largest or smallest groups
-    if largest:
-        df = grp_srs.nlargest(n=ngroups).to_frame().rename(columns={srs.name: "cnt"})
-    else:
-        df = grp_srs.nsmallest(n=ngroups).to_frame().rename(columns={srs.name: "cnt"})
+    smp_srs = grp_srs.nlargest(n=ngroups) if largest else grp_srs.nsmallest(n=ngroups)
+    df = smp_srs.to_frame().rename(columns={srs.name: "cnt"}).reset_index().compute()
+    df[srs.name] = df[srs.name].apply(str)
     # create a row containing the sum of the other groups
-    other_cnt = len(srs) - df["cnt"].sum().compute()
+    other_cnt = len(srs) - df["cnt"].sum()
     df2 = pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]})
-    df = df.reset_index().append(to_dask(df2))
+    df = df.append(df2)
     df["pct"] = df["cnt"] / len(srs) * 100
     df.columns = ["col", "cnt", "pct"]
-    return df.compute(), len(grp_srs), miss_pct
+    return df, len(grp_srs), miss_pct
 
 
 def calc_hist(
@@ -372,13 +371,15 @@ def calc_box(
 
     df = df.append(pd.Series({c: i + 1 for i, c in enumerate(df.columns)}, name="x",)).T
     df.index.name = "grp"
+    df = df.reset_index()
+    df["grp"] = df["grp"].apply(str)
     df["x0"], df["x1"] = df["x"] - 0.8, df["x"] - 0.2  # width of whiskers for plotting
 
     outx: List[str] = []  # list for the outlier groups
     outy: List[float] = []  # list for the outlier values
-    for grp in df.index:
-        otlrs = df.loc[grp]["otlrs"]
-        outx = outx + [grp] * len(otlrs)
+    for ind in df.index:
+        otlrs = df.loc[ind]["otlrs"]
+        outx = outx + [df.loc[ind]["grp"]] * len(otlrs)
         outy = outy + otlrs
 
     return df, outx, outy, grp_cnt_stats
@@ -412,9 +413,9 @@ def calc_hist_by_group(
 
     # create a histogram for each group
     for grp in largest_grps:
-        grp_series = df.groupby([df.columns[0]]).get_group(grp)[df.columns[1]]
-        minv, maxv = grp_series.min().compute(), grp_series.max().compute()
-        hist = da.histogram(grp_series, range=[minv, maxv], bins=bins)
+        grp_srs = df.groupby([df.columns[0]]).get_group(grp)[df.columns[1]]
+        minv, maxv = grp_srs.min().compute(), grp_srs.max().compute()
+        hist = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
         hist_lst.append(hist)
 
     hist_lst = dask.compute(*hist_lst)
@@ -483,7 +484,7 @@ def calc_nested(
         .reset_index()
         .compute()
     )
-    df_res["grp_names"] = list(zip(df_res[x], df_res[y]))
+    df_res["grp_names"] = list(zip(df_res[x].apply(str), df_res[y].apply(str)))
     df_res = df_res.drop([x, "level_1", y], axis=1)
     grp_cnt_stats["y_ttl"] = max_subcol_cnt
     grp_cnt_stats["y_show"] = min(max_subcol_cnt, nsubgroups)
@@ -520,6 +521,7 @@ def calc_stacked(
         df_grp = df[df[x] == grp]
         df_res = df_grp.groupby(y).size().nlargest(n=nsubgroups) / len(df_grp) * 100
         df_res = df_res.to_frame().compute().T
+        df_res.columns = list(map(str, df_res.columns))
         df_res["Others"] = 100 - df_res.sum(axis=1)
         fin_df = fin_df.append(df_res, sort=False)
 
@@ -527,7 +529,7 @@ def calc_stacked(
     others = fin_df.pop("Others")
     if others.sum() > 1e-4:
         fin_df["Others"] = others
-    fin_df["grps"] = largest_grps
+    fin_df["grps"] = list(map(str, largest_grps))
     return fin_df, grp_cnt_stats
 
 
@@ -560,13 +562,17 @@ def calc_heatmap(
     largest_subgrps = list(srs_lrgst.index.compute())
     df = df[df[y].isin(largest_subgrps)]
 
-    df_res = df.groupby([x, y]).size().reset_index()
+    df_res = df.groupby([x, y]).size().reset_index().compute()
     df_res.columns = ["x", "y", "cnt"]
+    df_res = pd.pivot_table(
+        df_res, index=["x", "y"], values="cnt", fill_value=0, aggfunc=np.sum,
+    ).reset_index()
+    df_res[["x", "y"]] = df_res[["x", "y"]].applymap(str)
 
     grp_cnt_stats["y_ttl"] = len(srs.index.compute())
     grp_cnt_stats["y_show"] = len(largest_subgrps)
 
-    return df_res.compute(), grp_cnt_stats
+    return df_res, grp_cnt_stats
 
 
 def _calc_box_stats(grp_srs: dd.Series, grp: str) -> pd.DataFrame:
@@ -636,4 +642,4 @@ def _calc_groups(
     grp_cnt_stats["x_ttl"] = len(srs.index.compute())
     grp_cnt_stats["x_show"] = len(largest_grps)
 
-    return df, grp_cnt_stats, list(map(str, largest_grps))
+    return df, grp_cnt_stats, largest_grps
