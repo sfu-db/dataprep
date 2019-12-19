@@ -188,7 +188,7 @@ def compute_correlation(
 
 
 def scatter_with_regression(
-    xarr: da.Array, yarr: da.Array, sample_size: int, k: Optional[int] = None,
+    xarr: da.Array, yarr: da.Array, sample_size: int, k: Optional[int] = None
 ) -> Tuple[Tuple[float, float], dd.DataFrame, Optional[np.ndarray]]:
     """
     Calculate pearson correlation on 2 given arrays.
@@ -208,8 +208,6 @@ def scatter_with_regression(
     if k == 0:
         raise ValueError("k should be larger than 0")
 
-    _, (corr, _) = da.corrcoef(xarr, yarr)
-
     xarrp1 = da.vstack([xarr, da.ones_like(xarr)]).T
     xarrp1 = xarrp1.rechunk((xarrp1.chunks[0], -1))
     (coeffa, coeffb), _, _, _ = da.linalg.lstsq(xarrp1, yarr)
@@ -225,15 +223,24 @@ def scatter_with_regression(
     if k is None:
         return (coeffa, coeffb), df, None
 
-    influences = np.zeros(len(xarr))
-    mask = np.ones(len(xarr), dtype=bool)
-
-    # TODO: Optimize, since some part of the coeffs can be reused.
-    for i in range(len(xarr)):
-        mask[i] = False
-        _, (corrlo1, _) = np.corrcoef(xarr[mask], yarr[mask])
-        influences[i] = corr - corrlo1
-        mask[i] = True
+    len_array = len(xarr)
+    numerator = (len_array - 1) * (
+        np.sum(np.multiply(xarr, yarr)) * np.ones(len_array) - np.multiply(xarr, yarr)
+    ) - np.multiply(
+        np.sum(xarr) * np.ones(len_array) - xarr,
+        np.sum(yarr) * np.ones(len_array) - yarr,
+    )
+    denominator = np.sqrt(
+        np.multiply(
+            (len_array - 1)
+            * (np.sum(np.square(xarr)) * np.ones(len_array) - np.square(xarr))
+            - np.square(np.sum(xarr) * np.ones(len_array) - xarr),
+            (len_array - 1)
+            * (np.sum(np.square(yarr)) * np.ones(len_array) - np.square(yarr))
+            - np.square(np.sum(yarr) * np.ones(len_array) - yarr),
+        )
+    )
+    influences = np.divide(numerator, denominator)
 
     return (coeffa, coeffb), df, influences
 
@@ -414,10 +421,7 @@ def corr_filter(
         sorted_idx = np.argsort(corrs)
         sorted_corrs = corrs[sorted_idx]
         # pylint: disable=invalid-unary-operand-type
-        return (
-            sorted_idx[-k:],
-            corrs[sorted_idx[-k:]],
-        )
+        return (sorted_idx[-k:], corrs[sorted_idx[-k:]])
         # pylint: enable=invalid-unary-operand-type
 
     sorted_idx = np.argsort(corrs)
