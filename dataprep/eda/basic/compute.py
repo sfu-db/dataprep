@@ -132,7 +132,7 @@ def compute(
         ):
             x, y = (x, y) if is_categorical(df[x].dtype) else (y, x)
             # box plot per group
-            boxdata = calc_box(df[[x, y]].dropna(), bins)
+            boxdata = calc_box(df[[x, y]].dropna(), bins, ngroups)
             # histogram per group
             hisdata = calc_hist_by_group(df[[x, y]].dropna(), bins)
             return Intermediate(
@@ -240,14 +240,16 @@ def calc_hist(
     data = srs.dropna().values
     minv, maxv = data.min().compute(), data.max().compute()
 
-    hist_array, bins_array = da.histogram(data, range=[minv, maxv], bins=bins)
-    hist_array = hist_array.compute()
+    hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins)
+    hist_arr = hist_arr.compute()
+    intervals = _format_bin_intervals(bins_arr)
     hist_df = pd.DataFrame(
         {
-            "left": bins_array[:-1],
-            "right": bins_array[1:],
-            "freq": hist_array,
-            "pct": hist_array / orig_df_len * 100,
+            "intervals": intervals,
+            "left": bins_arr[:-1],
+            "right": bins_arr[1:],
+            "freq": hist_arr,
+            "pct": hist_arr / orig_df_len * 100,
         }
     )
     return hist_df, miss_pct
@@ -278,8 +280,14 @@ def calc_hist_kde(
     minv, maxv = data.min().compute(), data.max().compute()
     hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins, density=True)
     hist_arr = hist_arr.compute()
+    intervals = _format_bin_intervals(bins_arr)
     hist_df = pd.DataFrame(
-        {"left": bins_arr[:-1], "right": bins_arr[1:], "freq": hist_arr}
+        {
+            "intervals": intervals,
+            "left": bins_arr[:-1],
+            "right": bins_arr[1:],
+            "freq": hist_arr,
+        }
     )
     pts_rng = np.linspace(minv, maxv, 1000)
     pdf = gaussian_kde(data.compute(), bw_method=bandwidth)(pts_rng)
@@ -407,16 +415,17 @@ def calc_hist_by_group(
         logging the sampled group output
     """
 
-    hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray]] = dict()
-    hist_lst: List[Any] = list()
+    hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]] = dict()
+    hist_lst: List[Tuple[np.ndarray, np.ndarray, List[str]]] = list()
     df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups)
 
     # create a histogram for each group
     for grp in largest_grps:
         grp_srs = df.groupby([df.columns[0]]).get_group(grp)[df.columns[1]]
         minv, maxv = grp_srs.min().compute(), grp_srs.max().compute()
-        hist = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
-        hist_lst.append(hist)
+        hist_arr, bins_arr = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
+        intervals = _format_bin_intervals(bins_arr)
+        hist_lst.append((hist_arr, bins_arr, intervals))
 
     hist_lst = dask.compute(*hist_lst)
 
@@ -643,3 +652,22 @@ def _calc_groups(
     grp_cnt_stats["x_show"] = len(largest_grps)
 
     return df, grp_cnt_stats, largest_grps
+
+
+def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
+    """
+    Auxillary function to format bin intervals in a histogram
+
+    Parameters
+    ----------
+    bins_arr: np.ndarray
+        Bin endpoints to format into intervals
+
+    Returns
+    -------
+        List of formatted bin intervals
+    """
+    bins_arr = np.round(bins_arr, 3)
+    intervals = [f"[{bins_arr[i]},{bins_arr[i+1]})" for i in range(len(bins_arr) - 2)]
+    intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
+    return intervals
