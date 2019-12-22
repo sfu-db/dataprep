@@ -4,6 +4,7 @@
 """
 import sys
 from enum import Enum, auto
+from operator import itruediv
 from typing import Dict, Optional, Sequence, Tuple, Union
 
 import dask
@@ -14,9 +15,9 @@ import pandas as pd
 from scipy.stats import kendalltau
 
 from ...errors import UnreachableError
-from ..utils import to_dask
-from ..intermediate import Intermediate
 from ..dtypes import NUMERICAL_DTYPES, is_categorical, is_numerical
+from ..intermediate import Intermediate
+from ..utils import to_dask
 
 __all__ = ["compute_correlation"]
 
@@ -188,7 +189,7 @@ def compute_correlation(
 
 
 def scatter_with_regression(
-    xarr: da.Array, yarr: da.Array, sample_size: int, k: Optional[int] = None,
+    xarr: da.Array, yarr: da.Array, sample_size: int, k: Optional[int] = None
 ) -> Tuple[Tuple[float, float], dd.DataFrame, Optional[np.ndarray]]:
     """
     Calculate pearson correlation on 2 given arrays.
@@ -208,8 +209,6 @@ def scatter_with_regression(
     if k == 0:
         raise ValueError("k should be larger than 0")
 
-    _, (corr, _) = da.corrcoef(xarr, yarr)
-
     xarrp1 = da.vstack([xarr, da.ones_like(xarr)]).T
     xarrp1 = xarrp1.rechunk((xarrp1.chunks[0], -1))
     (coeffa, coeffb), _, _, _ = da.linalg.lstsq(xarrp1, yarr)
@@ -225,17 +224,40 @@ def scatter_with_regression(
     if k is None:
         return (coeffa, coeffb), df, None
 
-    influences = np.zeros(len(xarr))
-    mask = np.ones(len(xarr), dtype=bool)
-
-    # TODO: Optimize, since some part of the coeffs can be reused.
-    for i in range(len(xarr)):
-        mask[i] = False
-        _, (corrlo1, _) = np.corrcoef(xarr[mask], yarr[mask])
-        influences[i] = corr - corrlo1
-        mask[i] = True
-
+    influences = pearson_influence(xarr, yarr)
     return (coeffa, coeffb), df, influences
+
+
+def pearson_influence(xarr: da.Array, yarr: da.Array) -> da.Array:
+    """
+    Calculating the influence for deleting a point on the pearson correlation
+    """
+    assert (
+        xarr.shape == yarr.shape
+    ), f"The shape of xarr and yarr should be same, got {xarr.shape}, {yarr.shape}"
+
+    # Fast calculating the influence for removing one element on the correlation
+    n = len(xarr)
+
+    x2, y2 = da.square(xarr), da.square(yarr)
+    xy = xarr * yarr
+
+    # The influence is vectorized on xarr and yarr, so we need to repeat all the sums for n times
+
+    xsum = da.ones(n) * da.sum(xarr)
+    ysum = da.ones(n) * da.sum(yarr)
+    xysum = da.ones(n) * da.sum(xy)
+    x2sum = da.ones(n) * da.sum(x2)
+    y2sum = da.ones(n) * da.sum(y2)
+
+    # Note: in we multiply (n-1)^2 to both denominator and numerator to avoid divisions.
+    numerator = (n - 1) * (xysum - xy) - (xsum - xarr) * (ysum - yarr)
+
+    varx = (n - 1) * (x2sum - x2) - da.square(xsum - xarr)
+    vary = (n - 1) * (y2sum - y2) - da.square(ysum - yarr)
+    denominator = da.sqrt(varx * vary)
+
+    return da.map_blocks(itruediv, numerator, denominator, dtype=numerator.dtype)
 
 
 def correlation_nxn(
@@ -414,10 +436,7 @@ def corr_filter(
         sorted_idx = np.argsort(corrs)
         sorted_corrs = corrs[sorted_idx]
         # pylint: disable=invalid-unary-operand-type
-        return (
-            sorted_idx[-k:],
-            corrs[sorted_idx[-k:]],
-        )
+        return (sorted_idx[-k:], corrs[sorted_idx[-k:]])
         # pylint: enable=invalid-unary-operand-type
 
     sorted_idx = np.argsort(corrs)
