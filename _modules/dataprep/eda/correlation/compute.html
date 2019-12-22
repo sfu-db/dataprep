@@ -42,6 +42,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itruediv</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
@@ -52,9 +53,9 @@
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">kendalltau</span>
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
-<span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
 <span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">NUMERICAL_DTYPES</span><span class="p">,</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">is_numerical</span>
+<span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compute_correlation&quot;</span><span class="p">]</span>
 
@@ -226,7 +227,7 @@
 
 
 <span class="k">def</span> <span class="nf">scatter_with_regression</span><span class="p">(</span>
-    <span class="n">xarr</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">yarr</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">xarr</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">yarr</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate pearson correlation on 2 given arrays.</span>
@@ -246,8 +247,6 @@
     <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;k should be larger than 0&quot;</span><span class="p">)</span>
 
-    <span class="n">_</span><span class="p">,</span> <span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">xarr</span><span class="p">,</span> <span class="n">yarr</span><span class="p">)</span>
-
     <span class="n">xarrp1</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">xarr</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">xarr</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
     <span class="n">xarrp1</span> <span class="o">=</span> <span class="n">xarrp1</span><span class="o">.</span><span class="n">rechunk</span><span class="p">((</span><span class="n">xarrp1</span><span class="o">.</span><span class="n">chunks</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
     <span class="p">(</span><span class="n">coeffa</span><span class="p">,</span> <span class="n">coeffb</span><span class="p">),</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">xarrp1</span><span class="p">,</span> <span class="n">yarr</span><span class="p">)</span>
@@ -263,17 +262,40 @@
     <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">coeffa</span><span class="p">,</span> <span class="n">coeffb</span><span class="p">),</span> <span class="n">df</span><span class="p">,</span> <span class="kc">None</span>
 
-    <span class="n">influences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xarr</span><span class="p">))</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xarr</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-
-    <span class="c1"># TODO: Optimize, since some part of the coeffs can be reused.</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xarr</span><span class="p">)):</span>
-        <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">_</span><span class="p">,</span> <span class="p">(</span><span class="n">corrlo1</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">xarr</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">yarr</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
-        <span class="n">influences</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">corr</span> <span class="o">-</span> <span class="n">corrlo1</span>
-        <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-
+    <span class="n">influences</span> <span class="o">=</span> <span class="n">pearson_influence</span><span class="p">(</span><span class="n">xarr</span><span class="p">,</span> <span class="n">yarr</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">coeffa</span><span class="p">,</span> <span class="n">coeffb</span><span class="p">),</span> <span class="n">df</span><span class="p">,</span> <span class="n">influences</span>
+
+
+<span class="k">def</span> <span class="nf">pearson_influence</span><span class="p">(</span><span class="n">xarr</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">yarr</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculating the influence for deleting a point on the pearson correlation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">xarr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">yarr</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The shape of xarr and yarr should be same, got </span><span class="si">{xarr.shape}</span><span class="s2">, </span><span class="si">{yarr.shape}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Fast calculating the influence for removing one element on the correlation</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xarr</span><span class="p">)</span>
+
+    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">xarr</span><span class="p">),</span> <span class="n">da</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">yarr</span><span class="p">)</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">xarr</span> <span class="o">*</span> <span class="n">yarr</span>
+
+    <span class="c1"># The influence is vectorized on xarr and yarr, so we need to repeat all the sums for n times</span>
+
+    <span class="n">xsum</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">da</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xarr</span><span class="p">)</span>
+    <span class="n">ysum</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">da</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">yarr</span><span class="p">)</span>
+    <span class="n">xysum</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">da</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
+    <span class="n">x2sum</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">da</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+    <span class="n">y2sum</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">da</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+
+    <span class="c1"># Note: in we multiply (n-1)^2 to both denominator and numerator to avoid divisions.</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xysum</span> <span class="o">-</span> <span class="n">xy</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">xsum</span> <span class="o">-</span> <span class="n">xarr</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ysum</span> <span class="o">-</span> <span class="n">yarr</span><span class="p">)</span>
+
+    <span class="n">varx</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2sum</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">-</span> <span class="n">da</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">xsum</span> <span class="o">-</span> <span class="n">xarr</span><span class="p">)</span>
+    <span class="n">vary</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2sum</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">-</span> <span class="n">da</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">ysum</span> <span class="o">-</span> <span class="n">yarr</span><span class="p">)</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">varx</span> <span class="o">*</span> <span class="n">vary</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">da</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span><span class="n">itruediv</span><span class="p">,</span> <span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numerator</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">correlation_nxn</span><span class="p">(</span>
@@ -452,10 +474,7 @@
         <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">corrs</span><span class="p">)</span>
         <span class="n">sorted_corrs</span> <span class="o">=</span> <span class="n">corrs</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
         <span class="c1"># pylint: disable=invalid-unary-operand-type</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">sorted_idx</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:],</span>
-            <span class="n">corrs</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:]],</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sorted_idx</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:],</span> <span class="n">corrs</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:]])</span>
         <span class="c1"># pylint: enable=invalid-unary-operand-type</span>
 
     <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">corrs</span><span class="p">)</span>
