@@ -132,7 +132,7 @@ def compute(
         ):
             x, y = (x, y) if is_categorical(df[x].dtype) else (y, x)
             # box plot per group
-            boxdata = calc_box(df[[x, y]].dropna(), bins)
+            boxdata = calc_box(df[[x, y]].dropna(), bins, ngroups)
             # histogram per group
             hisdata = calc_hist_by_group(df[[x, y]].dropna(), bins)
             return Intermediate(
@@ -203,17 +203,16 @@ def calc_bar_pie(
     miss_pct = round(srs.isna().sum().compute() / len(srs) * 100, 1)
     grp_srs = srs.groupby(srs).size()
     # select largest or smallest groups
-    if largest:
-        df = grp_srs.nlargest(n=ngroups).to_frame().rename(columns={srs.name: "cnt"})
-    else:
-        df = grp_srs.nsmallest(n=ngroups).to_frame().rename(columns={srs.name: "cnt"})
+    smp_srs = grp_srs.nlargest(n=ngroups) if largest else grp_srs.nsmallest(n=ngroups)
+    df = smp_srs.to_frame().rename(columns={srs.name: "cnt"}).reset_index().compute()
+    df[srs.name] = df[srs.name].apply(str)
     # create a row containing the sum of the other groups
-    other_cnt = len(srs) - df["cnt"].sum().compute()
+    other_cnt = len(srs) - df["cnt"].sum()
     df2 = pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]})
-    df = df.reset_index().append(to_dask(df2))
+    df = df.append(df2)
     df["pct"] = df["cnt"] / len(srs) * 100
     df.columns = ["col", "cnt", "pct"]
-    return df.compute(), len(grp_srs), miss_pct
+    return df, len(grp_srs), miss_pct
 
 
 def calc_hist(
@@ -241,14 +240,16 @@ def calc_hist(
     data = srs.dropna().values
     minv, maxv = data.min().compute(), data.max().compute()
 
-    hist_array, bins_array = da.histogram(data, range=[minv, maxv], bins=bins)
-    hist_array = hist_array.compute()
+    hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins)
+    hist_arr = hist_arr.compute()
+    intervals = _format_bin_intervals(bins_arr)
     hist_df = pd.DataFrame(
         {
-            "left": bins_array[:-1],
-            "right": bins_array[1:],
-            "freq": hist_array,
-            "pct": hist_array / orig_df_len * 100,
+            "intervals": intervals,
+            "left": bins_arr[:-1],
+            "right": bins_arr[1:],
+            "freq": hist_arr,
+            "pct": hist_arr / orig_df_len * 100,
         }
     )
     return hist_df, miss_pct
@@ -279,8 +280,14 @@ def calc_hist_kde(
     minv, maxv = data.min().compute(), data.max().compute()
     hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins, density=True)
     hist_arr = hist_arr.compute()
+    intervals = _format_bin_intervals(bins_arr)
     hist_df = pd.DataFrame(
-        {"left": bins_arr[:-1], "right": bins_arr[1:], "freq": hist_arr}
+        {
+            "intervals": intervals,
+            "left": bins_arr[:-1],
+            "right": bins_arr[1:],
+            "freq": hist_arr,
+        }
     )
     pts_rng = np.linspace(minv, maxv, 1000)
     pdf = gaussian_kde(data.compute(), bw_method=bandwidth)(pts_rng)
@@ -372,13 +379,15 @@ def calc_box(
 
     df = df.append(pd.Series({c: i + 1 for i, c in enumerate(df.columns)}, name="x",)).T
     df.index.name = "grp"
+    df = df.reset_index()
+    df["grp"] = df["grp"].apply(str)
     df["x0"], df["x1"] = df["x"] - 0.8, df["x"] - 0.2  # width of whiskers for plotting
 
     outx: List[str] = []  # list for the outlier groups
     outy: List[float] = []  # list for the outlier values
-    for grp in df.index:
-        otlrs = df.loc[grp]["otlrs"]
-        outx = outx + [grp] * len(otlrs)
+    for ind in df.index:
+        otlrs = df.loc[ind]["otlrs"]
+        outx = outx + [df.loc[ind]["grp"]] * len(otlrs)
         outy = outy + otlrs
 
     return df, outx, outy, grp_cnt_stats
@@ -406,16 +415,17 @@ def calc_hist_by_group(
         logging the sampled group output
     """
 
-    hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray]] = dict()
-    hist_lst: List[Any] = list()
+    hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]] = dict()
+    hist_lst: List[Tuple[np.ndarray, np.ndarray, List[str]]] = list()
     df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups)
 
     # create a histogram for each group
     for grp in largest_grps:
-        grp_series = df.groupby([df.columns[0]]).get_group(grp)[df.columns[1]]
-        minv, maxv = grp_series.min().compute(), grp_series.max().compute()
-        hist = da.histogram(grp_series, range=[minv, maxv], bins=bins)
-        hist_lst.append(hist)
+        grp_srs = df.groupby([df.columns[0]]).get_group(grp)[df.columns[1]]
+        minv, maxv = grp_srs.min().compute(), grp_srs.max().compute()
+        hist_arr, bins_arr = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
+        intervals = _format_bin_intervals(bins_arr)
+        hist_lst.append((hist_arr, bins_arr, intervals))
 
     hist_lst = dask.compute(*hist_lst)
 
@@ -483,7 +493,7 @@ def calc_nested(
         .reset_index()
         .compute()
     )
-    df_res["grp_names"] = list(zip(df_res[x], df_res[y]))
+    df_res["grp_names"] = list(zip(df_res[x].apply(str), df_res[y].apply(str)))
     df_res = df_res.drop([x, "level_1", y], axis=1)
     grp_cnt_stats["y_ttl"] = max_subcol_cnt
     grp_cnt_stats["y_show"] = min(max_subcol_cnt, nsubgroups)
@@ -520,6 +530,7 @@ def calc_stacked(
         df_grp = df[df[x] == grp]
         df_res = df_grp.groupby(y).size().nlargest(n=nsubgroups) / len(df_grp) * 100
         df_res = df_res.to_frame().compute().T
+        df_res.columns = list(map(str, df_res.columns))
         df_res["Others"] = 100 - df_res.sum(axis=1)
         fin_df = fin_df.append(df_res, sort=False)
 
@@ -527,7 +538,7 @@ def calc_stacked(
     others = fin_df.pop("Others")
     if others.sum() > 1e-4:
         fin_df["Others"] = others
-    fin_df["grps"] = largest_grps
+    fin_df["grps"] = list(map(str, largest_grps))
     return fin_df, grp_cnt_stats
 
 
@@ -560,13 +571,17 @@ def calc_heatmap(
     largest_subgrps = list(srs_lrgst.index.compute())
     df = df[df[y].isin(largest_subgrps)]
 
-    df_res = df.groupby([x, y]).size().reset_index()
+    df_res = df.groupby([x, y]).size().reset_index().compute()
     df_res.columns = ["x", "y", "cnt"]
+    df_res = pd.pivot_table(
+        df_res, index=["x", "y"], values="cnt", fill_value=0, aggfunc=np.sum,
+    ).reset_index()
+    df_res[["x", "y"]] = df_res[["x", "y"]].applymap(str)
 
     grp_cnt_stats["y_ttl"] = len(srs.index.compute())
     grp_cnt_stats["y_show"] = len(largest_subgrps)
 
-    return df_res.compute(), grp_cnt_stats
+    return df_res, grp_cnt_stats
 
 
 def _calc_box_stats(grp_srs: dd.Series, grp: str) -> pd.DataFrame:
@@ -636,4 +651,23 @@ def _calc_groups(
     grp_cnt_stats["x_ttl"] = len(srs.index.compute())
     grp_cnt_stats["x_show"] = len(largest_grps)
 
-    return df, grp_cnt_stats, list(map(str, largest_grps))
+    return df, grp_cnt_stats, largest_grps
+
+
+def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
+    """
+    Auxillary function to format bin intervals in a histogram
+
+    Parameters
+    ----------
+    bins_arr: np.ndarray
+        Bin endpoints to format into intervals
+
+    Returns
+    -------
+        List of formatted bin intervals
+    """
+    bins_arr = np.round(bins_arr, 3)
+    intervals = [f"[{bins_arr[i]},{bins_arr[i+1]})" for i in range(len(bins_arr) - 2)]
+    intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
+    return intervals
