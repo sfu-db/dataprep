@@ -179,7 +179,7 @@ def hist_viz(
     # pylint: disable=too-many-arguments
     title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
     tooltips = [
-        ("Bin", "[@left, @right]"),
+        ("Bin", "@intervals"),
         ("Frequency", "@freq"),
         ("Percent", "@pct{0.2f}%"),
     ]
@@ -242,7 +242,7 @@ def hist_kde_viz(
     )
     hover_hist = HoverTool(
         renderers=[hist],
-        tooltips=[("Bin", "[@left, @right]"), ("Density", "@freq")],
+        tooltips=[("Bin", "@intervals"), ("Density", "@freq")],
         mode="vline",
     )
     line = fig.line(pts_rng, pdf, line_color="#9467bd", line_width=2, alpha=0.5)
@@ -319,7 +319,7 @@ def box_viz(
 
     fig = figure(
         tools="",
-        x_range=list(df.index),
+        x_range=list(df["grp"]),
         toolbar_location=None,
         title=title,
         plot_width=plot_width,
@@ -373,7 +373,7 @@ def box_viz(
 
 
 def line_viz(
-    data: Dict[str, Tuple[np.ndarray, np.ndarray]],
+    data: Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]],
     x: str,
     y: str,
     yscale: str,
@@ -406,16 +406,13 @@ def line_viz(
             for i in range(len(data[grp][1]) - 1)
         ]
         grp_name = (
-            (grp[: (max_label_len - 1)] + "...") if len(grp) > max_label_len else grp
+            (str(grp)[: (max_label_len - 1)] + "...")
+            if len(str(grp)) > max_label_len
+            else str(grp)
         )
 
         source = ColumnDataSource(
-            {
-                "x": ticks,
-                "y": data[grp][0],
-                "left": data[grp][1][:-1],
-                "right": data[grp][1][1:],
-            }
+            {"x": ticks, "y": data[grp][0], "intervals": data[grp][2]}
         )
         plot_dict[grp_name] = fig.line(x="x", y="y", source=source, color=colour)
         fig.add_tools(
@@ -424,7 +421,7 @@ def line_viz(
                 tooltips=[
                     (f"{x}", f"{grp}"),
                     ("frequency", "@y"),
-                    (f"{y} bin", "[@left, @right]"),
+                    (f"{y} bin", "@intervals"),
                 ],
                 mode="mouse",
             )
