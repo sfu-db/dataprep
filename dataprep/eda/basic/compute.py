@@ -73,12 +73,13 @@ def compute(
     if x is None and y is None:
         datas: List[Tuple[str, DType, Any]] = []
         for column in df.columns:
-            dtype = df[column].dtype
-
-            if is_categorical(dtype):
+            if is_categorical(df[column].dtype):
+                df[column] = df[column].apply(str, meta=(column, str))
+                # bar chart
                 bardata = calc_bar_pie(df[column], ngroups, largest)
                 datas.append((column, DType.Categorical, bardata))
-            elif is_numerical(dtype):
+            elif is_numerical(df[column].dtype):
+                # histogram
                 histdata = calc_hist(df[column], orig_df_len, bins)
                 datas.append((column, DType.Numerical, histdata))
             else:
@@ -88,6 +89,7 @@ def compute(
     elif (x is None) != (y is None):
         col: str = cast(str, x or y)
         if is_categorical(df[col].dtype):
+            df[col] = df[col].apply(str, meta=(col, str))
             # data for bar and pie charts
             data = calc_bar_pie(df[col], ngroups, largest)
             return Intermediate(col=col, data=data, visual_type="categorical_column")
@@ -131,10 +133,11 @@ def compute(
             and is_categorical(ydtype)
         ):
             x, y = (x, y) if is_categorical(df[x].dtype) else (y, x)
+            df[x] = df[x].apply(str, meta=(x, str))
             # box plot per group
-            boxdata = calc_box(df[[x, y]].dropna(), bins, ngroups)
+            boxdata = calc_box(df[[x, y]].dropna(), bins, ngroups, largest)
             # histogram per group
-            hisdata = calc_hist_by_group(df[[x, y]].dropna(), bins)
+            hisdata = calc_hist_by_group(df[[x, y]].dropna(), bins, ngroups, largest)
             return Intermediate(
                 x=x,
                 y=y,
@@ -143,6 +146,8 @@ def compute(
                 visual_type="cat_and_num_cols",
             )
         if is_categorical(xdtype) and is_categorical(ydtype):
+            df[x] = df[x].apply(str, meta=(x, str))
+            df[y] = df[y].apply(str, meta=(y, str))
             # nested bar chart
             nesteddata = calc_nested(df[[x, y]].dropna())
             # stacked bar chart
@@ -205,11 +210,10 @@ def calc_bar_pie(
     # select largest or smallest groups
     smp_srs = grp_srs.nlargest(n=ngroups) if largest else grp_srs.nsmallest(n=ngroups)
     df = smp_srs.to_frame().rename(columns={srs.name: "cnt"}).reset_index().compute()
-    df[srs.name] = df[srs.name].apply(str)
-    # create a row containing the sum of the other groups
+    # add a row containing the sum of the other groups
     other_cnt = len(srs) - df["cnt"].sum()
-    df2 = pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]})
-    df = df.append(df2)
+    df = df.append(pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]}))
+    # add a column containing the percent of count in each group
     df["pct"] = df["cnt"] / len(srs) * 100
     df.columns = ["col", "cnt", "pct"]
     return df, len(grp_srs), miss_pct
@@ -316,7 +320,7 @@ def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray]:
 
 
 def calc_box(
-    df: dd.DataFrame, bins: int, ngroups: int = 10
+    df: dd.DataFrame, bins: int, ngroups: int = 10, largest: bool = True
 ) -> Tuple[pd.DataFrame, List[str], List[float], Optional[Dict[str, int]]]:
     """
     Compute a box plot over either
@@ -331,8 +335,9 @@ def calc_box(
     bins : int
         number of bins to use if df has two numerical columns
     ngroups : int
-        number of groups to show if df has a categorical and
-        numerical column
+        number of groups to show if df has a categorical and numerical column
+    largest: bool
+        when calculating a box plot per group, select the largest or smallest groups
 
     Returns
     -------
@@ -370,7 +375,7 @@ def calc_box(
                 axis=1,
             ).compute()
         else:
-            df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups)
+            df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups, largest)
             # calculate a box plot over each group
             df = dd.concat(
                 [_calc_box_stats(df[df[x] == grp][y], grp) for grp in largest_grps],
@@ -380,7 +385,6 @@ def calc_box(
     df = df.append(pd.Series({c: i + 1 for i, c in enumerate(df.columns)}, name="x",)).T
     df.index.name = "grp"
     df = df.reset_index()
-    df["grp"] = df["grp"].apply(str)
     df["x0"], df["x1"] = df["x"] - 0.8, df["x"] - 0.2  # width of whiskers for plotting
 
     outx: List[str] = []  # list for the outlier groups
@@ -394,7 +398,7 @@ def calc_box(
 
 
 def calc_hist_by_group(
-    df: dd.DataFrame, bins: int, ngroups: int = 10
+    df: dd.DataFrame, bins: int, ngroups: int, largest: bool
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Compute a histogram over the values corresponding to the groups in another column
@@ -407,6 +411,8 @@ def calc_hist_by_group(
         number of bins to use in the histogram
     ngroups : int
         number of groups to show from the categorical column
+    largest: bool
+        select the largest or smallest groups
 
     Returns
     -------
@@ -414,10 +420,11 @@ def calc_hist_by_group(
         The histograms in a dataframe and a dictionary
         logging the sampled group output
     """
+    # pylint: disable=too-many-locals
 
     hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]] = dict()
     hist_lst: List[Tuple[np.ndarray, np.ndarray, List[str]]] = list()
-    df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups)
+    df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups, largest)
 
     # create a histogram for each group
     for grp in largest_grps:
@@ -458,7 +465,7 @@ def calc_scatter(df: dd.DataFrame, sample_size: int) -> pd.DataFrame:
 
 
 def calc_nested(
-    df: dd.DataFrame, ngroups: int = 5, nsubgroups: int = 8,
+    df: dd.DataFrame, ngroups: int = 10, nsubgroups: int = 5,
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a nested bar chart of the counts of two columns
@@ -493,7 +500,7 @@ def calc_nested(
         .reset_index()
         .compute()
     )
-    df_res["grp_names"] = list(zip(df_res[x].apply(str), df_res[y].apply(str)))
+    df_res["grp_names"] = list(zip(df_res[x], df_res[y]))
     df_res = df_res.drop([x, "level_1", y], axis=1)
     grp_cnt_stats["y_ttl"] = max_subcol_cnt
     grp_cnt_stats["y_show"] = min(max_subcol_cnt, nsubgroups)
@@ -502,7 +509,7 @@ def calc_nested(
 
 
 def calc_stacked(
-    df: dd.DataFrame, ngroups: int = 20, nsubgroups: int = 5,
+    df: dd.DataFrame, ngroups: int = 10, nsubgroups: int = 5,
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a stacked bar chart of the counts of two columns
@@ -530,7 +537,7 @@ def calc_stacked(
         df_grp = df[df[x] == grp]
         df_res = df_grp.groupby(y).size().nlargest(n=nsubgroups) / len(df_grp) * 100
         df_res = df_res.to_frame().compute().T
-        df_res.columns = list(map(str, df_res.columns))
+        df_res.columns = list(df_res.columns)
         df_res["Others"] = 100 - df_res.sum(axis=1)
         fin_df = fin_df.append(df_res, sort=False)
 
@@ -538,12 +545,12 @@ def calc_stacked(
     others = fin_df.pop("Others")
     if others.sum() > 1e-4:
         fin_df["Others"] = others
-    fin_df["grps"] = list(map(str, largest_grps))
+    fin_df["grps"] = list(largest_grps)
     return fin_df, grp_cnt_stats
 
 
 def calc_heatmap(
-    df: dd.DataFrame, ngroups: int = 70, nsubgroups: int = 10,
+    df: dd.DataFrame, ngroups: int = 10, nsubgroups: int = 5,
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a heatmap of the counts of two columns
@@ -576,7 +583,6 @@ def calc_heatmap(
     df_res = pd.pivot_table(
         df_res, index=["x", "y"], values="cnt", fill_value=0, aggfunc=np.sum,
     ).reset_index()
-    df_res[["x", "y"]] = df_res[["x", "y"]].applymap(str)
 
     grp_cnt_stats["y_ttl"] = len(srs.index.compute())
     grp_cnt_stats["y_show"] = len(largest_subgrps)
@@ -621,7 +627,7 @@ def _calc_box_stats(grp_srs: dd.Series, grp: str) -> pd.DataFrame:
 
 
 def _calc_groups(
-    df: dd.DataFrame, ngroups: int
+    df: dd.DataFrame, ngroups: int, largest: bool = True
 ) -> Tuple[dd.DataFrame, Dict[str, int], List[str]]:
     """
     Auxillary function to parse the dataframe to consist
@@ -633,6 +639,8 @@ def _calc_groups(
         two columns, the first column is categorical
     ngroups: int
         the number of groups with the largest counts to isolate
+    largest: bool
+        find largest or smallest groups
 
     Returns
     -------
@@ -641,10 +649,10 @@ def _calc_groups(
     """
 
     # group count statistics to inform the user of the sampled output
-    grp_cnt_stats = dict()
+    grp_cnt_stats: Dict[str, int] = dict()
 
     srs = df.groupby(df.columns[0]).size()
-    srs_lrgst = srs.nlargest(n=ngroups)
+    srs_lrgst = srs.nlargest(n=ngroups) if largest else srs.nsmallest(n=ngroups)
     largest_grps = list(srs_lrgst.index.compute())
     df = df[df[df.columns[0]].isin(largest_grps)]
 
