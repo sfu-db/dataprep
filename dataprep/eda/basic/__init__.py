@@ -30,23 +30,23 @@ def plot(
 ) -> Figure:
     """Generates plots for exploratory data analysis.
 
-    If col_x and col_y are unspecified, the distribution of
+    If x and y are unspecified, the distribution of
     each coloumn is plotted. A histogram is plotted if the
     column contains numerical values, and a bar chart is plotted
     if the column contains categorical values.
 
-    If col_x is specified and col_y is unspecified, the
-    distribution of col_x is plotted in various ways. If col_x
+    If x is specified and y is unspecified, the
+    distribution of x is plotted in various ways. If x
     contains categorical values, a bar chart and pie chart are
-    plotted. If col_x contains numerical values, a histogram,
+    plotted. If x contains numerical values, a histogram,
     kernel density estimate plot, box plot, and qq plot are plotted.
 
-    If col_x and col_y are specified, plots depicting
+    If x and y are specified, plots depicting
     the relationship between the variables will be displayed. If
-    col_x and col_y contain numerical values, a scatter plot, hexbin
-    plot, and binned box plot are plotted. If one of col_x and col_y
+    x and y contain numerical values, a scatter plot, hexbin
+    plot, and binned box plot are plotted. If one of x and y
     contain categorical values and the other contains numerical values,
-    a box plot and multi-line histogram are plotted. If col_X and col_y
+    a box plot and multi-line histogram are plotted. If x and y
     contain categorical vales, a nested bar chart, stacked bar chart, and
     heat map are plotted.
 

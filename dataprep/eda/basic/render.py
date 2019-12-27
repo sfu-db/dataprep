@@ -39,7 +39,7 @@ def tweak_figure(
     fig: Figure,
     ptype: Optional[str] = None,
     show_yaxis: bool = False,
-    max_label_len: int = 15,
+    max_lbl_len: int = 15,
 ) -> None:
     """
     Set some common attributes for a figure
@@ -59,7 +59,7 @@ def tweak_figure(
             if (tick.length > %d) return tick.substring(0, %d-2) + '...';
             else return tick;
         """
-            % (max_label_len, max_label_len)
+            % (max_lbl_len, max_lbl_len)
         )
     if ptype in ["nested", "stacked"]:
         fig.y_range.start = 0
@@ -304,7 +304,7 @@ def box_viz(
     """
     Render a box plot visualization
     """
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-locals
     if y is None:
         title = f"{x}"
     else:
@@ -325,8 +325,12 @@ def box_viz(
         plot_width=plot_width,
         plot_height=plot_height,
     )
-    fig.segment(x0="grp", y0="uw", x1="grp", y1="q3", line_color="black", source=df)
-    fig.segment(x0="grp", y0="lw", x1="grp", y1="q1", line_color="black", source=df)
+    utail = fig.segment(
+        x0="grp", y0="uw", x1="grp", y1="q3", line_color="black", source=df
+    )
+    ltail = fig.segment(
+        x0="grp", y0="lw", x1="grp", y1="q1", line_color="black", source=df
+    )
     ubox = fig.vbar(
         x="grp",
         width=0.7,
@@ -356,12 +360,17 @@ def box_viz(
         fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
     fig.add_tools(
         HoverTool(
-            renderers=[lbox, ubox],
-            tooltips=[("25%", "@q1"), ("50%", "@q2"), ("75%", "@q3")],
+            renderers=[upw, utail, ubox, lbox, ltail, loww],
+            tooltips=[
+                ("Upper Whisker", "@uw"),
+                ("Upper Quartile", "@q3"),
+                ("Median", "@q2"),
+                ("Lower Quartile", "@q1"),
+                ("Lower Whisker", "@lw"),
+            ],
+            point_policy="follow_mouse",
         )
     )
-    fig.add_tools(HoverTool(renderers=[upw], tooltips=[("upper whisker", "@uw")],))
-    fig.add_tools(HoverTool(renderers=[loww], tooltips=[("lower whisker", "@lw")],))
     tweak_figure(fig, "box")
     if y is None:
         fig.xaxis.major_tick_line_color = None
@@ -380,7 +389,7 @@ def line_viz(
     plot_width: int,
     plot_height: int,
     grp_cnt_stats: Dict[str, int],
-    max_label_len: int = 15,
+    max_lbl_len: int = 15,
 ) -> Panel:
     """
     Render multi-line chart
@@ -405,11 +414,7 @@ def line_viz(
             (data[grp][1][i] + data[grp][1][i + 1]) / 2
             for i in range(len(data[grp][1]) - 1)
         ]
-        grp_name = (
-            (str(grp)[: (max_label_len - 1)] + "...")
-            if len(str(grp)) > max_label_len
-            else str(grp)
-        )
+        grp_name = (grp[: (max_lbl_len - 1)] + "...") if len(grp) > max_lbl_len else grp
 
         source = ColumnDataSource(
             {"x": ticks, "y": data[grp][0], "intervals": data[grp][2]}
@@ -617,6 +622,7 @@ def heatmap_viz(
     grp_cnt_stats: Dict[str, int],
     plot_width: int,
     plot_height: int,
+    max_lbl_len: int = 15,
 ) -> Panel:
     """
     Render a heatmap
@@ -671,7 +677,7 @@ def heatmap_viz(
         if (tick.length > %d) return tick.substring(0, %d-2) + '...';
         else return tick;
     """
-        % (15, 15)
+        % (max_lbl_len, max_lbl_len)
     )
     return Panel(child=fig, title="heat map")
 
