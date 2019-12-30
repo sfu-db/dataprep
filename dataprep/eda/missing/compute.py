@@ -17,6 +17,8 @@ from ..dtypes import is_categorical, is_numerical
 
 __all__ = ["compute_missing"]
 
+LABELS = ["Origin", "DropMissing"]
+
 
 def histogram(
     srs: dd.Series,
@@ -126,7 +128,7 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
     partial: Dict[str, Optional[Tuple[int, int]]] = {}
     for col, hists_ in hists.items():
         counts, xs = zip(*hists_)
-        labels = np.repeat(["Origin", "DropMissing"], [len(x) for x in xs])
+        labels = np.repeat(LABELS, [len(x) for x in xs])
 
         df = pd.DataFrame(
             {"x": np.concatenate(xs), "count": np.concatenate(counts), "label": labels}
@@ -177,7 +179,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
                 "x": np.tile(xs, 2),
                 "pdf": np.concatenate(pdfs),
                 "cdf": np.concatenate(cdfs),
-                "label": np.repeat(["Origin", "DropMissing"], num_dist_sample),
+                "label": np.repeat(LABELS, num_dist_sample),
             }
         )
 
@@ -188,9 +190,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
             {
                 "x": np.concatenate(xs),
                 "count": np.concatenate(counts),
-                "label": np.repeat(
-                    ["Origin", "DropMissing"], [len(count) for count in counts]
-                ),
+                "label": np.repeat(LABELS, [len(count) for count in counts]),
             }
         )
 
@@ -205,7 +205,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
         iqr = boxdf["q3"] - boxdf["q1"]
         boxdf["upper"] = np.minimum(boxdf["q3"] + 1.5 * iqr, boxdf["max"])
         boxdf["lower"] = np.maximum(boxdf["q3"] - 1.5 * iqr, boxdf["min"])
-        boxdf["label"] = ["Origin", "DropMissing"]
+        boxdf["label"] = LABELS
 
         itmdt = Intermediate(
             dist=distdf,
@@ -224,9 +224,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
             {
                 "x": np.concatenate(xs, axis=0),
                 "count": np.concatenate(counts, axis=0),
-                "label": np.repeat(
-                    ["Origin", "DropMissing"], [len(count) for count in counts]
-                ),
+                "label": np.repeat(LABELS, [len(count) for count in counts]),
             }
         )
 
@@ -258,6 +256,7 @@ def compute_missing(
     *,
     num_bins: int = 30,
     num_cols: int = 30,
+    num_dist_sample: int = 100,
 ) -> Intermediate:
     """
     This function is designed to deal with missing values
@@ -313,6 +312,8 @@ def compute_missing(
     elif x is not None and y is None:
         return missing_impact_1vn(df, x=x, num_bins=num_bins)
     elif x is not None and y is not None:
-        return missing_impact_1v1(df, x=x, y=y, num_bins=num_bins, num_dist_sample=100)
+        return missing_impact_1v1(
+            df, x=x, y=y, num_bins=num_bins, num_dist_sample=num_dist_sample
+        )
     else:
         return missing_spectrum(df, num_bins=num_bins, num_cols=num_cols)
