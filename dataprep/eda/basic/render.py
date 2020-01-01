@@ -105,6 +105,9 @@ def bar_viz(
     # pylint: disable=too-many-arguments
     title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
     tooltips = [(f"{col}", "@col"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    if show_yaxis:
+        if len(df) > 10:
+            plot_width = 28 * len(df)
     fig = Figure(
         x_range=list(df["col"]),
         title=title,
@@ -316,7 +319,9 @@ def box_viz(
             )
         else:
             title = f"{y} by {x}"
-
+    if grp_cnt_stats is not None:
+        if grp_cnt_stats["x_show"] > 10:
+            plot_width = 28 * grp_cnt_stats["x_show"]
     fig = figure(
         tools="",
         x_range=list(df["grp"]),
@@ -545,10 +550,11 @@ def nested_viz(
     # pylint: disable=too-many-arguments
     data_source = ColumnDataSource(data=df)
     title = _make_title(grp_cnt_stats, x, y)
-
+    plot_width = 19 * len(df) if len(df) > 50 else plot_width
     fig = figure(
         x_range=FactorRange(*df["grp_names"]),
-        tools=[],
+        tools="hover",
+        tooltips=[("Group", "@grp_names"), ("Count", "@cnt")],
         toolbar_location=None,
         title=title,
         plot_width=plot_width,
@@ -562,9 +568,6 @@ def nested_viz(
         source=data_source,
         line_color="white",
         line_width=3,
-    )
-    fig.add_tools(
-        HoverTool(tooltips=[("Group", "@grp_names"), ("Count", "@cnt")], mode="mouse")
     )
     tweak_figure(fig, "nested")
     fig.yaxis.axis_label = "Count"
@@ -585,6 +588,8 @@ def stacked_viz(
     """
     # pylint: disable=too-many-arguments
     title = _make_title(grp_cnt_stats, x, y)
+    if grp_cnt_stats["x_show"] > 30:
+        plot_width = 32 * grp_cnt_stats["x_show"]
     fig = figure(
         x_range=df["grps"],
         toolbar_location=None,
@@ -635,6 +640,10 @@ def heatmap_viz(
     mapper = LinearColorMapper(
         palette=palette, low=df["cnt"].min() - 0.01, high=df["cnt"].max()
     )
+    if grp_cnt_stats["x_show"] > 60:
+        plot_width = 16 * grp_cnt_stats["x_show"]
+    if grp_cnt_stats["y_show"] > 10:
+        plot_height = 70 + 18 * grp_cnt_stats["y_show"]
     fig = figure(
         x_range=list(set(df["x"])),
         y_range=list(set(df["y"])),
