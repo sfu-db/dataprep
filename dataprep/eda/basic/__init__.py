@@ -21,6 +21,7 @@ def plot(
     bins: int = 10,
     ngroups: int = 10,
     largest: bool = True,
+    nsubgroups: int = 5,
     bandwidth: float = 1.5,
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
@@ -69,6 +70,10 @@ def plot(
         If true, when grouping over a categorical column, the groups
         with the largest count will be output. If false, the groups
         with the smallest count will be output.
+    nsubgroups : int
+        If x and y are categorical columns, ngroups refers to
+        how many groups to show from column x, and nsubgroups refers to
+        how many subgroups to show from column y in each group in column x.
     bandwidth : float, default 1.5
         Bandwidth for the kernel density estimation.
     sample_size : int, default 1000
@@ -107,6 +112,7 @@ def plot(
         bins=bins,
         ngroups=ngroups,
         largest=largest,
+        nsubgroups=nsubgroups,
         bandwidth=bandwidth,
         sample_size=sample_size,
         value_range=value_range,

@@ -28,6 +28,7 @@ def compute(
     bins: int = 10,
     ngroups: int = 10,
     largest: bool = True,
+    nsubgroups: int = 5,
     bandwidth: float = 1.5,
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
@@ -52,6 +53,10 @@ def compute(
         If true, when grouping over a categorical column, the groups
         with the largest count will be output. If false, the groups
         with the smallest count will be output.
+    nsubgroups : int
+        If x and y are categorical columns, ngroups refers to
+        how many groups to show from column x, and nsubgroups refers to
+        how many subgroups to show from column y in each group in column x.
     bandwidth : float, default 1.5
         Bandwidth for the kernel density estimation.
     sample_size : int, default 1000
@@ -80,7 +85,7 @@ def compute(
                 datas.append((column, DType.Categorical, bardata))
             elif is_numerical(df[column].dtype):
                 # histogram
-                histdata = calc_hist(df[column], orig_df_len, bins)
+                histdata = calc_hist(df[column], bins, orig_df_len)
                 datas.append((column, DType.Numerical, histdata))
             else:
                 raise UnreachableError
@@ -107,7 +112,7 @@ def compute(
             # qq plot
             qqdata = calc_qqnorm(df[col].dropna())
             # histogram
-            histdata = calc_hist(df[col], orig_df_len, bins)
+            histdata = calc_hist(df[col], bins, orig_df_len)
             # kde plot
             kdedata = calc_hist_kde(df[col].dropna().values, bins, bandwidth)
             # box plot
@@ -149,11 +154,11 @@ def compute(
             df[x] = df[x].apply(str, meta=(x, str))
             df[y] = df[y].apply(str, meta=(y, str))
             # nested bar chart
-            nesteddata = calc_nested(df[[x, y]].dropna())
+            nesteddata = calc_nested(df[[x, y]].dropna(), ngroups, nsubgroups)
             # stacked bar chart
-            stackdata = calc_stacked(df[[x, y]].dropna())
+            stackdata = calc_stacked(df[[x, y]].dropna(), ngroups, nsubgroups)
             # heat map
-            heatmapdata = calc_heatmap(df[[x, y]].dropna())
+            heatmapdata = calc_heatmap(df[[x, y]].dropna(), ngroups, nsubgroups)
             return Intermediate(
                 x=x,
                 y=y,
@@ -220,7 +225,7 @@ def calc_bar_pie(
 
 
 def calc_hist(
-    srs: dd.Series, orig_df_len: int, bins: int
+    srs: dd.Series, bins: int, orig_df_len: int
 ) -> Tuple[pd.DataFrame, float]:
     """
     Calculate a histogram over a given series.
@@ -465,7 +470,7 @@ def calc_scatter(df: dd.DataFrame, sample_size: int) -> pd.DataFrame:
 
 
 def calc_nested(
-    df: dd.DataFrame, ngroups: int = 10, nsubgroups: int = 5,
+    df: dd.DataFrame, ngroups: int, nsubgroups: int,
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a nested bar chart of the counts of two columns
@@ -509,7 +514,7 @@ def calc_nested(
 
 
 def calc_stacked(
-    df: dd.DataFrame, ngroups: int = 10, nsubgroups: int = 5,
+    df: dd.DataFrame, ngroups: int, nsubgroups: int,
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a stacked bar chart of the counts of two columns
@@ -550,7 +555,7 @@ def calc_stacked(
 
 
 def calc_heatmap(
-    df: dd.DataFrame, ngroups: int = 10, nsubgroups: int = 5,
+    df: dd.DataFrame, ngroups: int, nsubgroups: int,
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a heatmap of the counts of two columns
