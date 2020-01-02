@@ -288,9 +288,27 @@ def pearson_nxn(data: da.Array) -> da.Array:
     """
     Pearson correlation calculation of a n x n correlation matrix for n columns
     """
-    cov = da.cov(data.T)
-    stderr = da.sqrt(da.diag(cov))
-    corrmat = cov / stderr[:, None] / stderr[None, :]
+    _, ncols = data.shape
+
+    corrmat = np.zeros(shape=(ncols, ncols))
+    corr_list = []
+    for i in range(ncols):
+        for j in range(i + 1, ncols):
+            mask = ~(da.isnan(data[:, i]) | da.isnan(data[:, j]))
+            tmp = dask.delayed(lambda a, b: np.corrcoef(a, b)[0, 1])(
+                data[:, i][mask], data[:, j][mask]
+            )
+            corr_list.append(tmp)
+    corr_comp = dask.compute(*corr_list)  # TODO avoid explicitly compute
+    idx = 0
+    for i in range(ncols):  # TODO: Optimize by using numpy api
+        for j in range(i + 1, ncols):
+            corrmat[i][j] = corr_comp[idx]
+            idx = idx + 1
+
+    corrmat2 = corrmat + corrmat.T
+    np.fill_diagonal(corrmat2, 1)
+    corrmat = da.from_array(corrmat2)
     return corrmat
 
 
@@ -319,8 +337,9 @@ def kendall_tau_nxn(data: da.Array) -> da.Array:
     corr_list = []
     for i in range(ncols):
         for j in range(i + 1, ncols):
+            mask = ~(da.isnan(data[:, i]) | da.isnan(data[:, j]))
             tmp = dask.delayed(lambda a, b: kendalltau(a, b).correlation)(
-                data[:, i], data[:, j]
+                data[:, i][mask], data[:, j][mask]
             )
             corr_list.append(tmp)
     corr_comp = dask.compute(*corr_list)  # TODO avoid explicitly compute
