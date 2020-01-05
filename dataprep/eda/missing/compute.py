@@ -2,7 +2,7 @@
     This module implements the plot_missing(df) function's
     calculating intermediate part
 """
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Dict
 
 import dask.array as da
 import dask.dataframe as dd
@@ -121,6 +121,9 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
     (hists,) = dd.compute(hists)
 
     dfs = {}
+    # partial stores total number of bins
+    # and how many columns are shown for each column
+    partial: Dict[str, Optional[Tuple[int, int]]] = {}
     for col, hists_ in hists.items():
         counts, xs = zip(*hists_)
         labels = np.repeat(["Origin", "DropMissing"], [len(x) for x in xs])
@@ -135,10 +138,14 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[:num_bins]]
             df = df[df["x"].isin(selected_xs)]
-
+            partial[col] = (num_bins, len(counts[0]))
+        else:
+            partial[col] = (len(counts[0]), len(counts[0]))
         dfs[col] = df
 
-    return Intermediate(data=dfs, visual_type="missing_impact_1vn")
+    return Intermediate(
+        data=dfs, x=x, partial=partial, visual_type="missing_impact_1vn"
+    )
 
 
 def missing_impact_1v1(  # pylint: disable=too-many-locals
@@ -204,20 +211,42 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
             dist=distdf,
             hist=histdf,
             box=boxdf,
+            x=x,
+            y=y,
             visual_type="missing_impact_1v1_numerical",
         )
         return itmdt
     else:
-        nums = [len(hist[0]) for hist in hists]
-        ys, xs = zip(*hists)
 
-        xs = np.concatenate(xs, axis=0)
-        ys = np.concatenate(ys, axis=0)
-        labels = np.repeat(["Origin", "DropMissing"], nums)
+        counts, xs = zip(*hists)
 
-        df = pd.DataFrame({"x": xs, "count": ys, "label": labels})
+        df = pd.DataFrame(
+            {
+                "x": np.concatenate(xs, axis=0),
+                "count": np.concatenate(counts, axis=0),
+                "label": np.repeat(
+                    ["Origin", "DropMissing"], [len(count) for count in counts]
+                ),
+            }
+        )
 
-        itmdt = Intermediate(hist=df, visual_type="missing_impact_1v1_categorical")
+        # If the cardinality of a categorical column is too large,
+        # we show the top `num_bins` values, sorted by their count before drop
+        if len(counts[0]) > num_bins:
+            sortidx = np.argsort(-counts[0])
+            selected_xs = xs[0][sortidx[:num_bins]]
+            df = df[df["x"].isin(selected_xs)]
+            partial = (num_bins, len(counts[0]))
+        else:
+            partial = (len(counts[0]), len(counts[0]))
+
+        itmdt = Intermediate(
+            hist=df,
+            x=x,
+            y=y,
+            partial=partial,
+            visual_type="missing_impact_1v1_categorical",
+        )
         return itmdt
 
 
