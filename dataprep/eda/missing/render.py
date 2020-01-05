@@ -17,6 +17,7 @@ from bokeh.models import (
     NumeralTickFormatter,
     CategoricalColorMapper,
     LayoutDOM,
+    Title,
 )
 
 # pylint: disable=no-name-in-module
@@ -60,8 +61,10 @@ def render_dist(
         (typ, f"@{typ}"),
         ("label", "@label"),
     ]
+
     fig = tweak_figure(
         Figure(
+            y_range=Range1d(0, df[typ].max() * 1.05),
             plot_width=plot_width,
             plot_height=plot_height,
             tools="hover",
@@ -99,7 +102,7 @@ def render_hist(df: pd.DataFrame, plot_width: int, plot_height: int) -> Figure:
         radius = df["x"][1] - df["x"][0]
         x_range = Range1d(df["x"].min() - radius, df["x"].max() + radius)
 
-    y_range = Range1d(df["count"].min(), df["count"].max() * 1.01)
+    y_range = Range1d(0, df["count"].max() * 1.05)
 
     fig = tweak_figure(
         Figure(
@@ -253,10 +256,19 @@ def render_missing_impact_1vn(
     """
 
     dfs = itmdt["data"]
+    x = itmdt["x"]
 
     panels = []
     for col, df in dfs.items():
         fig = render_hist(df, plot_width, plot_height)
+        shown, total = itmdt["partial"][col]
+
+        if shown != total:
+            fig.title = Title(
+                text=f"Missing impact of {x} by ({shown} out of {total}) {col}"
+            )
+        else:
+            fig.title = Title(text=f"Missing impact of {x} by {col}")
         panels.append(Panel(child=fig, title=col))
 
     tabs = Tabs(tabs=panels)
@@ -269,6 +281,7 @@ def render_missing_impact_1v1(
     """
     Render the plot from `plot_missing(df, "x", "y")`
     """
+    x, y = itmdt["x"], itmdt["y"]
 
     if numerical:
         panels = []
@@ -289,6 +302,14 @@ def render_missing_impact_1v1(
         return tabs
     else:
         fig = render_hist(itmdt["hist"], plot_width, plot_height)
+
+        shown, total = itmdt["partial"]
+        if shown != total:
+            fig.title = Title(
+                text=f"Missing impact of {x} by ({shown} out of {total}) {y}"
+            )
+        else:
+            fig.title = Title(text=f"Missing impact of {x} by {y}")
         return fig
 
 
