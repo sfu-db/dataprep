@@ -40,7 +40,7 @@
 <span class="sd">    This module implements the plot_missing(df) function&#39;s</span>
 <span class="sd">    calculating intermediate part</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
@@ -159,6 +159,9 @@
     <span class="p">(</span><span class="n">hists</span><span class="p">,)</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">hists</span><span class="p">)</span>
 
     <span class="n">dfs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># partial stores total number of bins</span>
+    <span class="c1"># and how many columns are shown for each column</span>
+    <span class="n">partial</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">hists_</span> <span class="ow">in</span> <span class="n">hists</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">counts</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">hists_</span><span class="p">)</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="s2">&quot;Origin&quot;</span><span class="p">,</span> <span class="s2">&quot;DropMissing&quot;</span><span class="p">],</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">])</span>
@@ -173,10 +176,14 @@
             <span class="n">sortidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">selected_xs</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">sortidx</span><span class="p">[:</span><span class="n">num_bins</span><span class="p">]]</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">selected_xs</span><span class="p">)]</span>
-
+            <span class="n">partial</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_bins</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">partial</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">dfs</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
 
-    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">dfs</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact_1vn&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">dfs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="n">partial</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact_1vn&quot;</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">missing_impact_1v1</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals</span>
@@ -242,20 +249,42 @@
             <span class="n">dist</span><span class="o">=</span><span class="n">distdf</span><span class="p">,</span>
             <span class="n">hist</span><span class="o">=</span><span class="n">histdf</span><span class="p">,</span>
             <span class="n">box</span><span class="o">=</span><span class="n">boxdf</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
             <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact_1v1_numerical&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">itmdt</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">nums</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">hist</span> <span class="ow">in</span> <span class="n">hists</span><span class="p">]</span>
-        <span class="n">ys</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">hists</span><span class="p">)</span>
 
-        <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="s2">&quot;Origin&quot;</span><span class="p">,</span> <span class="s2">&quot;DropMissing&quot;</span><span class="p">],</span> <span class="n">nums</span><span class="p">)</span>
+        <span class="n">counts</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">hists</span><span class="p">)</span>
 
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">xs</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">ys</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">labels</span><span class="p">})</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s2">&quot;Origin&quot;</span><span class="p">,</span> <span class="s2">&quot;DropMissing&quot;</span><span class="p">],</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
 
-        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">hist</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact_1v1_categorical&quot;</span><span class="p">)</span>
+        <span class="c1"># If the cardinality of a categorical column is too large,</span>
+        <span class="c1"># we show the top `num_bins` values, sorted by their count before drop</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">num_bins</span><span class="p">:</span>
+            <span class="n">sortidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">selected_xs</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">sortidx</span><span class="p">[:</span><span class="n">num_bins</span><span class="p">]]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">selected_xs</span><span class="p">)]</span>
+            <span class="n">partial</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_bins</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">partial</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">hist</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">partial</span><span class="o">=</span><span class="n">partial</span><span class="p">,</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact_1v1_categorical&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">itmdt</span>
 
 

@@ -55,6 +55,7 @@
     <span class="n">NumeralTickFormatter</span><span class="p">,</span>
     <span class="n">CategoricalColorMapper</span><span class="p">,</span>
     <span class="n">LayoutDOM</span><span class="p">,</span>
+    <span class="n">Title</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># pylint: disable=no-name-in-module</span>
@@ -98,8 +99,10 @@
         <span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{typ}</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
     <span class="p">]</span>
+
     <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
         <span class="n">Figure</span><span class="p">(</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span><span class="p">),</span>
             <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
             <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
             <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
@@ -137,7 +140,7 @@
         <span class="n">radius</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">x_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">radius</span><span class="p">)</span>
 
-    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.01</span><span class="p">)</span>
+    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
         <span class="n">Figure</span><span class="p">(</span>
@@ -291,10 +294,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dfs</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
 
     <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">render_hist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">shown</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;partial&quot;</span><span class="p">][</span><span class="n">col</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">shown</span> <span class="o">!=</span> <span class="n">total</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span>
+                <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Missing impact of </span><span class="si">{x}</span><span class="s2"> by (</span><span class="si">{shown}</span><span class="s2"> out of </span><span class="si">{total}</span><span class="s2">) </span><span class="si">{col}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Missing impact of </span><span class="si">{x}</span><span class="s2"> by </span><span class="si">{col}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">col</span><span class="p">))</span>
 
     <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">panels</span><span class="p">)</span>
@@ -307,6 +319,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render the plot from `plot_missing(df, &quot;x&quot;, &quot;y&quot;)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">numerical</span><span class="p">:</span>
         <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
@@ -327,6 +340,14 @@
         <span class="k">return</span> <span class="n">tabs</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">render_hist</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;hist&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+
+        <span class="n">shown</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;partial&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">shown</span> <span class="o">!=</span> <span class="n">total</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span>
+                <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Missing impact of </span><span class="si">{x}</span><span class="s2"> by (</span><span class="si">{shown}</span><span class="s2"> out of </span><span class="si">{total}</span><span class="s2">) </span><span class="si">{y}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Missing impact of </span><span class="si">{x}</span><span class="s2"> by </span><span class="si">{y}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span>
 
 
