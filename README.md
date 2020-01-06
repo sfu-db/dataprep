@@ -39,6 +39,8 @@ dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
 df = dc.query("businesses", term="ramen", location="vancouver")
 # df will be a pandas dataframe.
 ```
+![DataConnectorResult](assets/data_connector.png)
+
 
 ### EDA
 
@@ -49,7 +51,7 @@ between columns.
 The EDA module categorizes these EDA tasks into functions helping you finish EDA
 tasks with a single function call.
 
-Want to understand the distributions for each DataFrame column? Use `plot`.
+* Want to understand the distributions for each DataFrame column? Use `plot`.
 ```python
 from dataprep.eda import plot
 
@@ -57,8 +59,9 @@ df = ...
 
 plot(df)
 ```
+![DataConnectorResult](assets/plot(df).png)
 
-Want to understand the correlation between columns? Use `plot_correlation`.
+* Want to understand the correlation between columns? Use `plot_correlation`.
 
 ```python
 from dataprep.eda import plot_correlation
@@ -67,8 +70,9 @@ df = ...
 
 plot_correlation(df)
 ```
+<center><img src="assets/plot_correlation(df).png" width="50%" height="50%"/></center>
 
-Or, if you want to understand the impact of the missing values for each column, use `plot_missing`.
+* Or, if you want to understand the impact of the missing values for each column, use `plot_missing`.
 
 ```python
 from dataprep.eda import plot_missing
@@ -77,14 +81,17 @@ df = ...
 
 plot_missing(df)
 ```
+<center><img src="assets/plot_missing(df).png" width="50%" height="50%"/></center>
 
-You can even drill down to get more information by given `plot`, `plot_correlation` and `plot_missing` a column name.
+* You can even drill down to get more information by given `plot`, `plot_correlation` and `plot_missing` a column name.
 
 ```python
 df = ...
 
 plot_missing(df, x="some_column_name")
 ```
+
+<center><img src="assets/plot_missing(df,x).png" width="50%"/></center>
 
 Don't forget to checkout the [examples](examples) folder for detailed demostration!
 
