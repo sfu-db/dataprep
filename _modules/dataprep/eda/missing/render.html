@@ -246,21 +246,26 @@
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;column_with_perc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">fuse_missing_perc</span><span class="p">(</span><span class="n">cut_long_name</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;missing_percent&quot;</span><span class="p">][</span><span class="n">c</span><span class="p">])</span>
     <span class="p">)</span>
 
-    <span class="n">radius</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_end&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_start&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_end&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_start&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_end&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;loc_start&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">loc_tooltip</span> <span class="o">=</span> <span class="s2">&quot;@loc_start</span><span class="si">{1}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loc_tooltip</span> <span class="o">=</span> <span class="s2">&quot;@loc_start</span><span class="si">{1}</span><span class="s2">~@loc_end</span><span class="si">{1}</span><span class="s2">&quot;</span>
 
     <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">&quot;column&quot;</span><span class="p">,</span> <span class="s2">&quot;@column&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;loc&quot;</span><span class="p">,</span> <span class="s2">&quot;@loc_start</span><span class="si">{1}</span><span class="s2">~@loc_end</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;loc&quot;</span><span class="p">,</span> <span class="n">loc_tooltip</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;missing%&quot;</span><span class="p">,</span> <span class="s2">&quot;@missing_rate{1%}&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
-    <span class="n">x_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="n">x_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;column_with_perc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
     <span class="n">minimum</span><span class="p">,</span> <span class="n">maximum</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">maximum</span><span class="p">,</span> <span class="n">minimum</span><span class="p">)</span>
+    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">maximum</span> <span class="o">+</span> <span class="n">radius</span><span class="p">,</span> <span class="n">minimum</span> <span class="o">-</span> <span class="n">radius</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
         <span class="n">Figure</span><span class="p">(</span>
@@ -274,13 +279,15 @@
             <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;column&quot;</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;column_with_perc&quot;</span><span class="p">,</span>
         <span class="n">y</span><span class="o">=</span><span class="s2">&quot;location&quot;</span><span class="p">,</span>
         <span class="n">line_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
         <span class="n">fill_color</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;missing_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">mapper</span><span class="p">},</span>
         <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

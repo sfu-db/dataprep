@@ -59,6 +59,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">num_cols</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">num_dist_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">show_plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LayoutDOM</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -106,7 +107,9 @@
 <span class="sd">        case (None, None) =&gt; heatmap</span>
 <span class="sd">        otherwise =&gt; error</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">=</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="n">num_cols</span><span class="p">)</span>
+    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_missing</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">=</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">num_dist_sample</span><span class="o">=</span><span class="n">num_dist_sample</span>
+    <span class="p">)</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
         <span class="n">show</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
