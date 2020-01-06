@@ -63,41 +63,46 @@ def histogram(
         raise UnreachableError()
 
 
+def missing_perc_blockwise(block: np.ndarray) -> np.ndarray:
+    """
+    Compute the missing percentage in a block
+    """
+    return block.sum(axis=0, keepdims=True) / len(block)
+
+
 def missing_spectrum(df: dd.DataFrame, num_bins: int, num_cols: int) -> Intermediate:
     """
     Calculate a missing spectrum for each column
     """
     # pylint: disable=too-many-locals
+    num_bins = min(num_bins, len(df) - 1)
 
     df = df.iloc[:, :num_cols]
     cols = df.columns[:num_cols]
+    ncols = len(cols)
+    nrows = len(df)
+    chunk_size = len(df) // num_bins
 
     data = df.isnull().to_dask_array()
     data.compute_chunk_sizes()
+    data = data.rechunk((chunk_size, None))
 
     (notnull_counts,) = dd.compute(data.sum(axis=0) / data.shape[0])
     missing_percent = {col: notnull_counts[idx] for idx, col in enumerate(cols)}
 
-    locs = da.arange(data.shape[0])
+    missing_percs = data.map_blocks(missing_perc_blockwise, dtype=float).compute()
+    locs0 = np.arange(len(missing_percs)) * chunk_size
+    locs1 = np.minimum(locs0 + chunk_size, nrows)
+    locs_middle = locs0 + chunk_size / 2
 
-    hists = []
-    for j in range(data.shape[1]):
-        mask = data[:, j]
-        counts, edges = da.histogram(
-            locs[mask], bins=num_bins, range=(0, data.shape[0] - 1)
-        )
-        centers = (edges[:-1] + edges[1:]) / 2
-        radius = np.average(edges[1:] - edges[:-1])
-        hist = np.stack([centers, counts / radius, edges[:-1], edges[1:]]).T
-        hists.append(hist)
-    hists = da.compute(*hists)
-
-    data = np.concatenate(hists, axis=0)
-    labels = np.repeat(cols, [len(hist) for hist in hists])
-    data = np.concatenate([labels[:, None], data], axis=1)
     df = pd.DataFrame(
-        data=data,
-        columns=["column", "location", "missing_rate", "loc_start", "loc_end"],
+        {
+            "column": np.repeat(cols.values, len(missing_percs)),
+            "location": np.tile(locs_middle, ncols),
+            "missing_rate": missing_percs.T.ravel(),
+            "loc_start": np.tile(locs0, ncols),
+            "loc_end": np.tile(locs1, ncols),
+        }
     )
     return Intermediate(
         data=df, missing_percent=missing_percent, visual_type="missing_spectrum"

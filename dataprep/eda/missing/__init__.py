@@ -22,6 +22,7 @@ def plot_missing(
     *,
     num_bins: int = 30,
     num_cols: int = 30,
+    num_dist_sample: int = 100,
     show_plot: bool = True,
 ) -> LayoutDOM:
     """
@@ -69,7 +70,9 @@ def plot_missing(
         case (None, None) => heatmap
         otherwise => error
     """
-    itmdt = compute_missing(df, x, y, num_bins=num_bins, num_cols=num_cols)
+    itmdt = compute_missing(
+        df, x, y, num_bins=num_bins, num_cols=num_cols, num_dist_sample=num_dist_sample
+    )
     fig = render_missing(itmdt)
     if show_plot:
         show(fig)

@@ -208,21 +208,26 @@ def render_missing_spectrum(
 
     df = itmdt["data"].copy()
 
-    df["column"] = df["column"].apply(
+    df["column_with_perc"] = df["column"].apply(
         lambda c: fuse_missing_perc(cut_long_name(c), itmdt["missing_percent"][c])
     )
 
-    radius = df["loc_end"][0] - df["loc_start"][0]
+    radius = (df["loc_end"][0] - df["loc_start"][0]) / 2
+
+    if (df["loc_end"] - df["loc_start"]).max() <= 1:
+        loc_tooltip = "@loc_start{1}"
+    else:
+        loc_tooltip = "@loc_start{1}~@loc_end{1}"
 
     tooltips = [
         ("column", "@column"),
-        ("loc", "@loc_start{1}~@loc_end{1}"),
+        ("loc", loc_tooltip),
         ("missing%", "@missing_rate{1%}"),
     ]
 
-    x_range = FactorRange(*df["column"].unique())
+    x_range = FactorRange(*df["column_with_perc"].unique())
     minimum, maximum = df["location"].min(), df["location"].max()
-    y_range = Range1d(maximum, minimum)
+    y_range = Range1d(maximum + radius, minimum - radius)
 
     fig = tweak_figure(
         Figure(
@@ -236,13 +241,15 @@ def render_missing_spectrum(
             tooltips=tooltips,
         )
     )
+    fig.xgrid.grid_line_color = None
+    fig.ygrid.grid_line_color = None
 
     fig.rect(
-        x="column",
+        x="column_with_perc",
         y="location",
         line_width=0,
         width=0.95,
-        height=radius,
+        height=radius * 2,
         source=df,
         fill_color={"field": "missing_rate", "transform": mapper},
         line_color=None,
