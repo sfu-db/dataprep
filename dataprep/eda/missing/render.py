@@ -2,35 +2,37 @@
     This module implements the plot_missing(df, x, y) function's
     visualization part.
 """
+import math
 from typing import Tuple, Union
 
-import math
 import pandas as pd
 from bokeh.models import (
-    Panel,
-    Tabs,
-    FactorRange,
-    Range1d,
-    LinearColorMapper,
-    ColorBar,
     BasicTicker,
-    NumeralTickFormatter,
     CategoricalColorMapper,
+    ColorBar,
+    FactorRange,
     LayoutDOM,
+    LinearColorMapper,
+    NumeralTickFormatter,
+    Panel,
+    Range1d,
+    Tabs,
     Title,
 )
 
 # pylint: disable=no-name-in-module
-from bokeh.palettes import Greys256, Category10  # type: ignore
-
-# pylint: enable=no-name-in-module
-
+from bokeh.palettes import Category10, Greys256  # type: ignore
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
 from ..dtypes import is_categorical
 from ..intermediate import Intermediate
-from ..utils import relocate_legend, cut_long_name, fuse_missing_perc
+from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
+from .compute import LABELS
+from ..palette import PALETTE
+
+# pylint: enable=no-name-in-module
+
 
 __all__ = ["render_missing"]
 
@@ -61,10 +63,13 @@ def render_dist(
         (typ, f"@{typ}"),
         ("label", "@label"),
     ]
+    y_range = Range1d(0, df[typ].max() * 1.01)
+    x_range = Range1d(0, df["x"].max() * 1.01)
 
     fig = tweak_figure(
         Figure(
-            y_range=Range1d(0, df[typ].max() * 1.05),
+            x_range=x_range,
+            y_range=y_range,
             plot_width=plot_width,
             plot_height=plot_height,
             tools="hover",
@@ -72,9 +77,11 @@ def render_dist(
             tooltips=tooltips,
         )
     )
-
-    for (label, group), color in zip(df.groupby("label"), Category10[3]):
-        fig.line(x="x", y=typ, source=group, color=color, legend_label=label)
+    for idx, label in enumerate(LABELS):
+        group = df[df["label"] == label]
+        fig.line(
+            x="x", y=typ, source=group, color=Category10[3][idx], legend_label=label,
+        )
 
     relocate_legend(fig, "right")
 
@@ -91,9 +98,7 @@ def render_hist(df: pd.DataFrame, plot_width: int, plot_height: int) -> Figure:
         ("label", "@label"),
     ]
 
-    cmapper = CategoricalColorMapper(
-        palette=Category10[3], factors=df["label"].unique()
-    )
+    cmapper = CategoricalColorMapper(palette=Category10[3], factors=LABELS)
 
     if is_categorical(df["x"].dtype):
         radius = 0.99
@@ -161,10 +166,10 @@ def render_boxwhisker(df: pd.DataFrame, plot_width: int, plot_height: int) -> Fi
 
     # boxes
     fig.vbar(
-        "label", 0.7, "q2", "q3", source=df, fill_color="#E08E79", line_color="black",
+        "label", 0.7, "q2", "q3", source=df, fill_color=PALETTE[0], line_color="black",
     )
     fig.vbar(
-        "label", 0.7, "q2", "q1", source=df, fill_color="#3B8686", line_color="black",
+        "label", 0.7, "q2", "q1", source=df, fill_color=PALETTE[0], line_color="black",
     )
     # whiskers (almost-0 height rects simpler than segments)
     fig.rect("label", "lower", 0.2, 0.01, source=df, line_color="black")
