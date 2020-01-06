@@ -39,7 +39,7 @@ def tweak_figure(
     fig: Figure,
     ptype: Optional[str] = None,
     show_yaxis: bool = False,
-    max_label_len: int = 15,
+    max_lbl_len: int = 15,
 ) -> None:
     """
     Set some common attributes for a figure
@@ -59,7 +59,7 @@ def tweak_figure(
             if (tick.length > %d) return tick.substring(0, %d-2) + '...';
             else return tick;
         """
-            % (max_label_len, max_label_len)
+            % (max_lbl_len, max_lbl_len)
         )
     if ptype in ["nested", "stacked"]:
         fig.y_range.start = 0
@@ -105,6 +105,9 @@ def bar_viz(
     # pylint: disable=too-many-arguments
     title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
     tooltips = [(f"{col}", "@col"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    if show_yaxis:
+        if len(df) > 10:
+            plot_width = 28 * len(df)
     fig = Figure(
         x_range=list(df["col"]),
         title=title,
@@ -304,7 +307,7 @@ def box_viz(
     """
     Render a box plot visualization
     """
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-locals
     if y is None:
         title = f"{x}"
     else:
@@ -316,7 +319,9 @@ def box_viz(
             )
         else:
             title = f"{y} by {x}"
-
+    if grp_cnt_stats is not None:
+        if grp_cnt_stats["x_show"] > 10:
+            plot_width = 28 * grp_cnt_stats["x_show"]
     fig = figure(
         tools="",
         x_range=list(df["grp"]),
@@ -325,8 +330,12 @@ def box_viz(
         plot_width=plot_width,
         plot_height=plot_height,
     )
-    fig.segment(x0="grp", y0="uw", x1="grp", y1="q3", line_color="black", source=df)
-    fig.segment(x0="grp", y0="lw", x1="grp", y1="q1", line_color="black", source=df)
+    utail = fig.segment(
+        x0="grp", y0="uw", x1="grp", y1="q3", line_color="black", source=df
+    )
+    ltail = fig.segment(
+        x0="grp", y0="lw", x1="grp", y1="q1", line_color="black", source=df
+    )
     ubox = fig.vbar(
         x="grp",
         width=0.7,
@@ -356,12 +365,17 @@ def box_viz(
         fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
     fig.add_tools(
         HoverTool(
-            renderers=[lbox, ubox],
-            tooltips=[("25%", "@q1"), ("50%", "@q2"), ("75%", "@q3")],
+            renderers=[upw, utail, ubox, lbox, ltail, loww],
+            tooltips=[
+                ("Upper Whisker", "@uw"),
+                ("Upper Quartile", "@q3"),
+                ("Median", "@q2"),
+                ("Lower Quartile", "@q1"),
+                ("Lower Whisker", "@lw"),
+            ],
+            point_policy="follow_mouse",
         )
     )
-    fig.add_tools(HoverTool(renderers=[upw], tooltips=[("upper whisker", "@uw")],))
-    fig.add_tools(HoverTool(renderers=[loww], tooltips=[("lower whisker", "@lw")],))
     tweak_figure(fig, "box")
     if y is None:
         fig.xaxis.major_tick_line_color = None
@@ -380,7 +394,7 @@ def line_viz(
     plot_width: int,
     plot_height: int,
     grp_cnt_stats: Dict[str, int],
-    max_label_len: int = 15,
+    max_lbl_len: int = 15,
 ) -> Panel:
     """
     Render multi-line chart
@@ -405,11 +419,7 @@ def line_viz(
             (data[grp][1][i] + data[grp][1][i + 1]) / 2
             for i in range(len(data[grp][1]) - 1)
         ]
-        grp_name = (
-            (str(grp)[: (max_label_len - 1)] + "...")
-            if len(str(grp)) > max_label_len
-            else str(grp)
-        )
+        grp_name = (grp[: (max_lbl_len - 1)] + "...") if len(grp) > max_lbl_len else grp
 
         source = ColumnDataSource(
             {"x": ticks, "y": data[grp][0], "intervals": data[grp][2]}
@@ -540,10 +550,11 @@ def nested_viz(
     # pylint: disable=too-many-arguments
     data_source = ColumnDataSource(data=df)
     title = _make_title(grp_cnt_stats, x, y)
-
+    plot_width = 19 * len(df) if len(df) > 50 else plot_width
     fig = figure(
         x_range=FactorRange(*df["grp_names"]),
-        tools=[],
+        tools="hover",
+        tooltips=[("Group", "@grp_names"), ("Count", "@cnt")],
         toolbar_location=None,
         title=title,
         plot_width=plot_width,
@@ -557,9 +568,6 @@ def nested_viz(
         source=data_source,
         line_color="white",
         line_width=3,
-    )
-    fig.add_tools(
-        HoverTool(tooltips=[("Group", "@grp_names"), ("Count", "@cnt")], mode="mouse")
     )
     tweak_figure(fig, "nested")
     fig.yaxis.axis_label = "Count"
@@ -580,6 +588,8 @@ def stacked_viz(
     """
     # pylint: disable=too-many-arguments
     title = _make_title(grp_cnt_stats, x, y)
+    if grp_cnt_stats["x_show"] > 30:
+        plot_width = 32 * grp_cnt_stats["x_show"]
     fig = figure(
         x_range=df["grps"],
         toolbar_location=None,
@@ -617,6 +627,7 @@ def heatmap_viz(
     grp_cnt_stats: Dict[str, int],
     plot_width: int,
     plot_height: int,
+    max_lbl_len: int = 15,
 ) -> Panel:
     """
     Render a heatmap
@@ -629,6 +640,10 @@ def heatmap_viz(
     mapper = LinearColorMapper(
         palette=palette, low=df["cnt"].min() - 0.01, high=df["cnt"].max()
     )
+    if grp_cnt_stats["x_show"] > 60:
+        plot_width = 16 * grp_cnt_stats["x_show"]
+    if grp_cnt_stats["y_show"] > 10:
+        plot_height = 70 + 18 * grp_cnt_stats["y_show"]
     fig = figure(
         x_range=list(set(df["x"])),
         y_range=list(set(df["y"])),
@@ -671,7 +686,7 @@ def heatmap_viz(
         if (tick.length > %d) return tick.substring(0, %d-2) + '...';
         else return tick;
     """
-        % (15, 15)
+        % (max_lbl_len, max_lbl_len)
     )
     return Panel(child=fig, title="heat map")
 
