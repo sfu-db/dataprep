@@ -13,7 +13,7 @@ from scipy.stats import rv_histogram
 from ...errors import UnreachableError
 from ..utils import to_dask
 from ..intermediate import Intermediate
-from ..dtypes import is_categorical, is_numerical
+from ..dtypes import is_categorical, is_numerical, is_pandas_categorical
 
 __all__ = ["compute_missing"]
 
@@ -49,9 +49,15 @@ def histogram(
         return counts, edges
     elif is_categorical(srs.dtype):
         value_counts = srs.value_counts()
-
         counts = value_counts.to_dask_array()
-        centers = value_counts.index.to_dask_array()
+
+        # Dask array dones't understand the pandas dtypes such as categorical type.
+        # We convert these types into str before calling into `to_dask_array`.
+
+        if is_pandas_categorical(value_counts.index.dtype):
+            centers = value_counts.index.astype("str").to_dask_array()
+        else:
+            centers = value_counts.index.to_dask_array()
         return (counts, centers)
     else:
         raise UnreachableError()
