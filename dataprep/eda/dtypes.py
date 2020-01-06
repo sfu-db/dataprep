@@ -51,3 +51,10 @@ def is_numerical(dtype: Any) -> bool:
         return any(issubclass(dtype, c) for c in NUMERICAL_NUMPY_DTYPES)
     else:
         return any(isinstance(dtype, c) for c in NUMERICAL_PANDAS_DTYPES)
+
+
+def is_pandas_categorical(dtype: Any) -> bool:
+    """
+    Detect if a dtype is categorical and from pandas.
+    """
+    return any(isinstance(dtype, c) for c in CATEGORICAL_PANDAS_DTYPES)
