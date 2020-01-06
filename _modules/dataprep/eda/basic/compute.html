@@ -66,6 +66,7 @@
     <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
     <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -90,6 +91,10 @@
 <span class="sd">        If true, when grouping over a categorical column, the groups</span>
 <span class="sd">        with the largest count will be output. If false, the groups</span>
 <span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    nsubgroups : int</span>
+<span class="sd">        If x and y are categorical columns, ngroups refers to</span>
+<span class="sd">        how many groups to show from column x, and nsubgroups refers to</span>
+<span class="sd">        how many subgroups to show from column y in each group in column x.</span>
 <span class="sd">    bandwidth : float, default 1.5</span>
 <span class="sd">        Bandwidth for the kernel density estimation.</span>
 <span class="sd">    sample_size : int, default 1000</span>
@@ -111,13 +116,14 @@
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">datas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
-
-            <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+                <span class="c1"># bar chart</span>
                 <span class="n">bardata</span> <span class="o">=</span> <span class="n">calc_bar_pie</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
                 <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">Categorical</span><span class="p">,</span> <span class="n">bardata</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
-                <span class="n">histdata</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">orig_df_len</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="c1"># histogram</span>
+                <span class="n">histdata</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">bins</span><span class="p">,</span> <span class="n">orig_df_len</span><span class="p">)</span>
                 <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">Numerical</span><span class="p">,</span> <span class="n">histdata</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">UnreachableError</span>
@@ -126,6 +132,7 @@
     <span class="k">elif</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
             <span class="c1"># data for bar and pie charts</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">calc_bar_pie</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">)</span>
@@ -143,7 +150,7 @@
             <span class="c1"># qq plot</span>
             <span class="n">qqdata</span> <span class="o">=</span> <span class="n">calc_qqnorm</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
             <span class="c1"># histogram</span>
-            <span class="n">histdata</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">orig_df_len</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="n">histdata</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">bins</span><span class="p">,</span> <span class="n">orig_df_len</span><span class="p">)</span>
             <span class="c1"># kde plot</span>
             <span class="n">kdedata</span> <span class="o">=</span> <span class="n">calc_hist_kde</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
             <span class="c1"># box plot</span>
@@ -169,10 +176,11 @@
             <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
             <span class="c1"># box plot per group</span>
-            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
             <span class="c1"># histogram per group</span>
-            <span class="n">hisdata</span> <span class="o">=</span> <span class="n">calc_hist_by_group</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">)</span>
+            <span class="n">hisdata</span> <span class="o">=</span> <span class="n">calc_hist_by_group</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
                 <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
@@ -181,12 +189,14 @@
                 <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;cat_and_num_cols&quot;</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
             <span class="c1"># nested bar chart</span>
-            <span class="n">nesteddata</span> <span class="o">=</span> <span class="n">calc_nested</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="n">nesteddata</span> <span class="o">=</span> <span class="n">calc_nested</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
             <span class="c1"># stacked bar chart</span>
-            <span class="n">stackdata</span> <span class="o">=</span> <span class="n">calc_stacked</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="n">stackdata</span> <span class="o">=</span> <span class="n">calc_stacked</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
             <span class="c1"># heat map</span>
-            <span class="n">heatmapdata</span> <span class="o">=</span> <span class="n">calc_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+            <span class="n">heatmapdata</span> <span class="o">=</span> <span class="n">calc_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
                 <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
@@ -243,18 +253,17 @@
     <span class="c1"># select largest or smallest groups</span>
     <span class="n">smp_srs</span> <span class="o">=</span> <span class="n">grp_srs</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span> <span class="k">if</span> <span class="n">largest</span> <span class="k">else</span> <span class="n">grp_srs</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">smp_srs</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">srs</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;cnt&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="n">df</span><span class="p">[</span><span class="n">srs</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">srs</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-    <span class="c1"># create a row containing the sum of the other groups</span>
+    <span class="c1"># add a row containing the sum of the other groups</span>
     <span class="n">other_cnt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">srs</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">],</span> <span class="s2">&quot;cnt&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">other_cnt</span><span class="p">]})</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">srs</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">],</span> <span class="s2">&quot;cnt&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">other_cnt</span><span class="p">]}))</span>
+    <span class="c1"># add a column containing the percent of count in each group</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;pct&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
     <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="s2">&quot;cnt&quot;</span><span class="p">,</span> <span class="s2">&quot;pct&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">grp_srs</span><span class="p">),</span> <span class="n">miss_pct</span>
 
 
 <span class="k">def</span> <span class="nf">calc_hist</span><span class="p">(</span>
-    <span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">orig_df_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">orig_df_len</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a histogram over a given series.</span>
@@ -354,7 +363,7 @@
 
 
 <span class="k">def</span> <span class="nf">calc_box</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a box plot over either</span>
@@ -369,8 +378,9 @@
 <span class="sd">    bins : int</span>
 <span class="sd">        number of bins to use if df has two numerical columns</span>
 <span class="sd">    ngroups : int</span>
-<span class="sd">        number of groups to show if df has a categorical and</span>
-<span class="sd">        numerical column</span>
+<span class="sd">        number of groups to show if df has a categorical and numerical column</span>
+<span class="sd">    largest: bool</span>
+<span class="sd">        when calculating a box plot per group, select the largest or smallest groups</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -408,7 +418,7 @@
                 <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
             <span class="c1"># calculate a box plot over each group</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">_calc_box_stats</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">grp</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">grp</span><span class="p">)</span> <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">largest_grps</span><span class="p">],</span>
@@ -418,7 +428,6 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)},</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,))</span><span class="o">.</span><span class="n">T</span>
     <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;grp&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;grp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;grp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x0&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.2</span>  <span class="c1"># width of whiskers for plotting</span>
 
     <span class="n">outx</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list for the outlier groups</span>
@@ -432,7 +441,7 @@
 
 
 <span class="k">def</span> <span class="nf">calc_hist_by_group</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a histogram over the values corresponding to the groups in another column</span>
@@ -445,6 +454,8 @@
 <span class="sd">        number of bins to use in the histogram</span>
 <span class="sd">    ngroups : int</span>
 <span class="sd">        number of groups to show from the categorical column</span>
+<span class="sd">    largest: bool</span>
+<span class="sd">        select the largest or smallest groups</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -452,10 +463,11 @@
 <span class="sd">        The histograms in a dataframe and a dictionary</span>
 <span class="sd">        logging the sampled group output</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-locals</span>
 
     <span class="n">hist_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">hist_lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">largest_grps</span> <span class="o">=</span> <span class="n">_calc_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
 
     <span class="c1"># create a histogram for each group</span>
     <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">largest_grps</span><span class="p">:</span>
@@ -496,7 +508,7 @@
 
 
 <span class="k">def</span> <span class="nf">calc_nested</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a nested bar chart of the counts of two columns</span>
@@ -531,7 +543,7 @@
         <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="o">.</span><span class="n">compute</span><span class="p">()</span>
     <span class="p">)</span>
-    <span class="n">df_res</span><span class="p">[</span><span class="s2">&quot;grp_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df_res</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="n">df_res</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)))</span>
+    <span class="n">df_res</span><span class="p">[</span><span class="s2">&quot;grp_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df_res</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">df_res</span><span class="p">[</span><span class="n">y</span><span class="p">]))</span>
     <span class="n">df_res</span> <span class="o">=</span> <span class="n">df_res</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;level_1&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_ttl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_subcol_cnt</span>
     <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_subcol_cnt</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
@@ -540,7 +552,7 @@
 
 
 <span class="k">def</span> <span class="nf">calc_stacked</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a stacked bar chart of the counts of two columns</span>
@@ -568,7 +580,7 @@
         <span class="n">df_grp</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">grp</span><span class="p">]</span>
         <span class="n">df_res</span> <span class="o">=</span> <span class="n">df_grp</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">nsubgroups</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_grp</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
         <span class="n">df_res</span> <span class="o">=</span> <span class="n">df_res</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">df_res</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">df_res</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+        <span class="n">df_res</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">df_res</span><span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">df_res</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">fin_df</span> <span class="o">=</span> <span class="n">fin_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_res</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -576,12 +588,12 @@
     <span class="n">others</span> <span class="o">=</span> <span class="n">fin_df</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Others&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">others</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">:</span>
         <span class="n">fin_df</span><span class="p">[</span><span class="s2">&quot;Others&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">others</span>
-    <span class="n">fin_df</span><span class="p">[</span><span class="s2">&quot;grps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">largest_grps</span><span class="p">))</span>
+    <span class="n">fin_df</span><span class="p">[</span><span class="s2">&quot;grps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">largest_grps</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fin_df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span>
 
 
 <span class="k">def</span> <span class="nf">calc_heatmap</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">70</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a heatmap of the counts of two columns</span>
@@ -614,7 +626,6 @@
     <span class="n">df_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
         <span class="n">df_res</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;cnt&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="n">df_res</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df_res</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
     <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_ttl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
     <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">largest_subgrps</span><span class="p">)</span>
@@ -659,7 +670,7 @@
 
 
 <span class="k">def</span> <span class="nf">_calc_groups</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Auxillary function to parse the dataframe to consist</span>
@@ -671,6 +682,8 @@
 <span class="sd">        two columns, the first column is categorical</span>
 <span class="sd">    ngroups: int</span>
 <span class="sd">        the number of groups with the largest counts to isolate</span>
+<span class="sd">    largest: bool</span>
+<span class="sd">        find largest or smallest groups</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -679,10 +692,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># group count statistics to inform the user of the sampled output</span>
-    <span class="n">grp_cnt_stats</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">grp_cnt_stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="n">srs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="n">srs_lrgst</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span>
+    <span class="n">srs_lrgst</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span> <span class="k">if</span> <span class="n">largest</span> <span class="k">else</span> <span class="n">srs</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ngroups</span><span class="p">)</span>
     <span class="n">largest_grps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">srs_lrgst</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">largest_grps</span><span class="p">)]</span>
 
