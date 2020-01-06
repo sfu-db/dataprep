@@ -51,7 +51,7 @@
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">is_numerical</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">is_numerical</span><span class="p">,</span> <span class="n">is_pandas_categorical</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compute_missing&quot;</span><span class="p">]</span>
 
@@ -87,9 +87,15 @@
         <span class="k">return</span> <span class="n">counts</span><span class="p">,</span> <span class="n">edges</span>
     <span class="k">elif</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
         <span class="n">value_counts</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
-
         <span class="n">counts</span> <span class="o">=</span> <span class="n">value_counts</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">()</span>
-        <span class="n">centers</span> <span class="o">=</span> <span class="n">value_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">()</span>
+
+        <span class="c1"># Dask array dones&#39;t understand the pandas dtypes such as categorical type.</span>
+        <span class="c1"># We convert these types into str before calling into `to_dask_array`.</span>
+
+        <span class="k">if</span> <span class="n">is_pandas_categorical</span><span class="p">(</span><span class="n">value_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="n">centers</span> <span class="o">=</span> <span class="n">value_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">centers</span> <span class="o">=</span> <span class="n">value_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">centers</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">UnreachableError</span><span class="p">()</span>
