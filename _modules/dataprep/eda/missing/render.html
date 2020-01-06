@@ -40,35 +40,37 @@
 <span class="sd">    This module implements the plot_missing(df, x, y) function&#39;s</span>
 <span class="sd">    visualization part.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Panel</span><span class="p">,</span>
-    <span class="n">Tabs</span><span class="p">,</span>
-    <span class="n">FactorRange</span><span class="p">,</span>
-    <span class="n">Range1d</span><span class="p">,</span>
-    <span class="n">LinearColorMapper</span><span class="p">,</span>
-    <span class="n">ColorBar</span><span class="p">,</span>
     <span class="n">BasicTicker</span><span class="p">,</span>
-    <span class="n">NumeralTickFormatter</span><span class="p">,</span>
     <span class="n">CategoricalColorMapper</span><span class="p">,</span>
+    <span class="n">ColorBar</span><span class="p">,</span>
+    <span class="n">FactorRange</span><span class="p">,</span>
     <span class="n">LayoutDOM</span><span class="p">,</span>
+    <span class="n">LinearColorMapper</span><span class="p">,</span>
+    <span class="n">NumeralTickFormatter</span><span class="p">,</span>
+    <span class="n">Panel</span><span class="p">,</span>
+    <span class="n">Range1d</span><span class="p">,</span>
+    <span class="n">Tabs</span><span class="p">,</span>
     <span class="n">Title</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># pylint: disable=no-name-in-module</span>
-<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">Greys256</span><span class="p">,</span> <span class="n">Category10</span>  <span class="c1"># type: ignore</span>
-
-<span class="c1"># pylint: enable=no-name-in-module</span>
-
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">Category10</span><span class="p">,</span> <span class="n">Greys256</span>  <span class="c1"># type: ignore</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span>
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">is_categorical</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">relocate_legend</span><span class="p">,</span> <span class="n">cut_long_name</span><span class="p">,</span> <span class="n">fuse_missing_perc</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">cut_long_name</span><span class="p">,</span> <span class="n">fuse_missing_perc</span><span class="p">,</span> <span class="n">relocate_legend</span>
+<span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">LABELS</span>
+<span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">PALETTE</span>
+
+<span class="c1"># pylint: enable=no-name-in-module</span>
+
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_missing&quot;</span><span class="p">]</span>
 
@@ -99,10 +101,13 @@
         <span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{typ}</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
     <span class="p">]</span>
+    <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.01</span><span class="p">)</span>
+    <span class="n">x_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.01</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">tweak_figure</span><span class="p">(</span>
         <span class="n">Figure</span><span class="p">(</span>
-            <span class="n">y_range</span><span class="o">=</span><span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span><span class="p">),</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
             <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
             <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
             <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
@@ -110,9 +115,11 @@
             <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">group</span><span class="p">),</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">),</span> <span class="n">Category10</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">LABELS</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">label</span><span class="p">]</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">Category10</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">legend_label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="n">relocate_legend</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
 
@@ -129,9 +136,7 @@
         <span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
-    <span class="n">cmapper</span> <span class="o">=</span> <span class="n">CategoricalColorMapper</span><span class="p">(</span>
-        <span class="n">palette</span><span class="o">=</span><span class="n">Category10</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">factors</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-    <span class="p">)</span>
+    <span class="n">cmapper</span> <span class="o">=</span> <span class="n">CategoricalColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="n">Category10</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">factors</span><span class="o">=</span><span class="n">LABELS</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
         <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.99</span>
@@ -199,10 +204,10 @@
 
     <span class="c1"># boxes</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span>
-        <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;q2&quot;</span><span class="p">,</span> <span class="s2">&quot;q3&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#E08E79&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;q2&quot;</span><span class="p">,</span> <span class="s2">&quot;q3&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">PALETTE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span>
-        <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;q2&quot;</span><span class="p">,</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#3B8686&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;q2&quot;</span><span class="p">,</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">PALETTE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># whiskers (almost-0 height rects simpler than segments)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
