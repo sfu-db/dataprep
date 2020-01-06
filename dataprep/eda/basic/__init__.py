@@ -21,6 +21,7 @@ def plot(
     bins: int = 10,
     ngroups: int = 10,
     largest: bool = True,
+    nsubgroups: int = 5,
     bandwidth: float = 1.5,
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
@@ -30,23 +31,23 @@ def plot(
 ) -> Figure:
     """Generates plots for exploratory data analysis.
 
-    If col_x and col_y are unspecified, the distribution of
+    If x and y are unspecified, the distribution of
     each coloumn is plotted. A histogram is plotted if the
     column contains numerical values, and a bar chart is plotted
     if the column contains categorical values.
 
-    If col_x is specified and col_y is unspecified, the
-    distribution of col_x is plotted in various ways. If col_x
+    If x is specified and y is unspecified, the
+    distribution of x is plotted in various ways. If x
     contains categorical values, a bar chart and pie chart are
-    plotted. If col_x contains numerical values, a histogram,
+    plotted. If x contains numerical values, a histogram,
     kernel density estimate plot, box plot, and qq plot are plotted.
 
-    If col_x and col_y are specified, plots depicting
+    If x and y are specified, plots depicting
     the relationship between the variables will be displayed. If
-    col_x and col_y contain numerical values, a scatter plot, hexbin
-    plot, and binned box plot are plotted. If one of col_x and col_y
+    x and y contain numerical values, a scatter plot, hexbin
+    plot, and binned box plot are plotted. If one of x and y
     contain categorical values and the other contains numerical values,
-    a box plot and multi-line histogram are plotted. If col_X and col_y
+    a box plot and multi-line histogram are plotted. If x and y
     contain categorical vales, a nested bar chart, stacked bar chart, and
     heat map are plotted.
 
@@ -69,6 +70,10 @@ def plot(
         If true, when grouping over a categorical column, the groups
         with the largest count will be output. If false, the groups
         with the smallest count will be output.
+    nsubgroups : int
+        If x and y are categorical columns, ngroups refers to
+        how many groups to show from column x, and nsubgroups refers to
+        how many subgroups to show from column y in each group in column x.
     bandwidth : float, default 1.5
         Bandwidth for the kernel density estimation.
     sample_size : int, default 1000
@@ -107,6 +112,7 @@ def plot(
         bins=bins,
         ngroups=ngroups,
         largest=largest,
+        nsubgroups=nsubgroups,
         bandwidth=bandwidth,
         sample_size=sample_size,
         value_range=value_range,
