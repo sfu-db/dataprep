@@ -22,7 +22,7 @@ Currently, you can use `dataprep` to:
 
 ## Examples & Usages
 
-More detailed examples can be found at the [examples](examples) folder.
+More detailed examples can be found at the [examples] folder.
 
 ### Data Connector
 
@@ -31,13 +31,9 @@ using two lines of code, without taking deep looking into the Yelp documentation
 
 ```python
 from dataprep.data_connector import Connector
-# Put "yelp" as the first parameter to indicate we want to download some data from Yelp.
-# You also need the Yelp access token for programmably access. 
+
 dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
-# Here we want to download data from the "restaurant" endpoint 
-# with term "ramen" and location "vancouver"
 df = dc.query("businesses", term="ramen", location="vancouver")
-# df will be a pandas dataframe.
 ```
 ![DataConnectorResult](assets/data_connector.png)
 
@@ -59,7 +55,7 @@ df = ...
 
 plot(df)
 ```
-![DataConnectorResult](assets/plot(df).png)
+![DataConnectorResult](https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png)
 
 * Want to understand the correlation between columns? Use `plot_correlation`.
 
@@ -70,7 +66,7 @@ df = ...
 
 plot_correlation(df)
 ```
-<center><img src="assets/plot_correlation(df).png" width="50%" height="50%"/></center>
+<center><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_correlation(df).png" width="50%" height="50%"/></center>
 
 * Or, if you want to understand the impact of the missing values for each column, use `plot_missing`.
 
@@ -81,7 +77,7 @@ df = ...
 
 plot_missing(df)
 ```
-<center><img src="assets/plot_missing(df).png" width="50%" height="50%"/></center>
+<center><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_missing(df).png" width="50%" height="50%"/></center>
 
 * You can even drill down to get more information by given `plot`, `plot_correlation` and `plot_missing` a column name.
 
@@ -91,16 +87,18 @@ df = ...
 plot_missing(df, x="some_column_name")
 ```
 
-<center><img src="assets/plot_missing(df,x).png" width="50%"/></center>
+<center><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_missing(df,x).png" width="50%"/></center>
 
-Don't forget to checkout the [examples](examples) folder for detailed demostration!
+Don't forget to checkout the [examples] folder for detailed demonstration!
 
 ## Contribution
 Contribution is always welcome. 
-If you want to contribute to dataprep, be sure to read the [contribution guidelines](CONTRIBUTING.md).
+If you want to contribute to dataprep, be sure to read the [contribution guidelines].
 
 
 
 [Build Status]: https://img.shields.io/circleci/build/github/sfu-db/dataprep/master?style=flat-square&token=f68e38757f5c98771f46d1c7e700f285a0b9784d
 [Documentation]: https://sfu-db.github.io/dataprep/
 [Mail list & Forum]: https://groups.google.com/forum/#!forum/dataprep
+[contribution guidelines]: https://github.com/sfu-db/dataprep/blob/master/CONTRIBUTING.md
+[examples]: https://github.com/sfu-db/dataprep/tree/master/examples
