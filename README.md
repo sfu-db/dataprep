@@ -15,7 +15,9 @@ Currently, you can use `dataprep` to:
 
 ## Installation
 
-`pip install dataprep==0.1.0a2`
+```bash
+pip install dataprep
+```
 
 `dataprep` is in its alpha stage now, so please manually specific the version number.
 
@@ -35,7 +37,7 @@ from dataprep.data_connector import Connector
 dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
 df = dc.query("businesses", term="ramen", location="vancouver")
 ```
-![DataConnectorResult](assets/data_connector.png)
+![DataConnectorResult]
 
 
 ### EDA
@@ -55,7 +57,7 @@ df = ...
 
 plot(df)
 ```
-![DataConnectorResult](https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png)
+<center><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot(df).png"/></center>
 
 * Want to understand the correlation between columns? Use `plot_correlation`.
 
@@ -97,8 +99,11 @@ If you want to contribute to dataprep, be sure to read the [contribution guideli
 
 
 
+
+
 [Build Status]: https://img.shields.io/circleci/build/github/sfu-db/dataprep/master?style=flat-square&token=f68e38757f5c98771f46d1c7e700f285a0b9784d
 [Documentation]: https://sfu-db.github.io/dataprep/
 [Mail list & Forum]: https://groups.google.com/forum/#!forum/dataprep
 [contribution guidelines]: https://github.com/sfu-db/dataprep/blob/master/CONTRIBUTING.md
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
+[DataConnectorResult]: https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png
