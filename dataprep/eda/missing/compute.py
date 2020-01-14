@@ -2,7 +2,7 @@
     This module implements the plot_missing(df) function's
     calculating intermediate part
 """
-from typing import Optional, Tuple, Union, Dict
+from typing import Optional, Tuple, Union, List
 
 import dask.array as da
 import dask.dataframe as dd
@@ -12,7 +12,7 @@ from scipy.stats import rv_histogram
 
 from ...errors import UnreachableError
 from ..utils import to_dask
-from ..intermediate import Intermediate
+from ..intermediate import Intermediate, ColumnsMetadata
 from ..dtypes import is_categorical, is_numerical, is_pandas_categorical
 
 __all__ = ["compute_missing"]
@@ -25,7 +25,7 @@ def histogram(
     num_bins: Optional[int] = None,
     return_edges: bool = True,
     range: Optional[Tuple[int, int]] = None,  # pylint: disable=redefined-builtin
-) -> Tuple[da.Array, da.Array]:
+) -> Union[Tuple[da.Array, da.Array], Tuple[da.Array, da.Array, da.Array]]:
     """
     Calculate histogram for both numerical and categorical
     """
@@ -43,10 +43,11 @@ def histogram(
         counts, edges = da.histogram(
             srs.to_dask_array(), num_bins, range=[minimum, maximum]
         )
+        centers = (edges[:-1] + edges[1:]) / 2
+
         if not return_edges:
-            centers = (edges[:-1] + edges[1:]) / 2
             return counts, centers
-        return counts, edges
+        return counts, centers, edges
     elif is_categorical(srs.dtype):
         value_counts = srs.value_counts()
         counts = value_counts.to_dask_array()
@@ -128,22 +129,38 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
             range = (df0[col].min(axis=0), df0[col].max(axis=0))
 
         hists[col] = [
-            histogram(df[col], num_bins=num_bins, return_edges=False, range=range)
+            histogram(df[col], num_bins=num_bins, return_edges=True, range=range)
             for df in [df0, df1]
         ]
     (hists,) = dd.compute(hists)
 
     dfs = {}
-    # partial stores total number of bins
-    # and how many columns are shown for each column
-    partial: Dict[str, Optional[Tuple[int, int]]] = {}
+
+    meta = ColumnsMetadata()
+
     for col, hists_ in hists.items():
-        counts, xs = zip(*hists_)
+        counts, xs, *edges = zip(*hists_)
+
         labels = np.repeat(LABELS, [len(x) for x in xs])
 
-        df = pd.DataFrame(
-            {"x": np.concatenate(xs), "count": np.concatenate(counts), "label": labels}
-        )
+        data = {
+            "x": np.concatenate(xs),
+            "count": np.concatenate(counts),
+            "label": labels,
+        }
+
+        if edges:
+            lower_bound: List[float] = []
+            upper_bound: List[float] = []
+
+            for edge in edges[0]:
+                lower_bound.extend(edge[:-1])
+                upper_bound.extend(edge[1:])
+
+            data["lower_bound"] = lower_bound
+            data["upper_bound"] = upper_bound
+
+        df = pd.DataFrame(data)
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
@@ -151,14 +168,14 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[:num_bins]]
             df = df[df["x"].isin(selected_xs)]
-            partial[col] = (num_bins, len(counts[0]))
+            meta[col, "partial"] = (num_bins, len(counts[0]))
         else:
-            partial[col] = (len(counts[0]), len(counts[0]))
+            meta[col, "partial"] = (len(counts[0]), len(counts[0]))
+
+        meta[col, "dtype"] = df0[col].dtype
         dfs[col] = df
 
-    return Intermediate(
-        data=dfs, x=x, partial=partial, visual_type="missing_impact_1vn"
-    )
+    return Intermediate(data=dfs, x=x, meta=meta, visual_type="missing_impact_1vn")
 
 
 def missing_impact_1v1(  # pylint: disable=too-many-locals
@@ -175,11 +192,16 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
     srs0, srs1 = df0[y], df1[y]
     minimum, maximum = srs0.min(), srs0.max()
 
-    hists = [histogram(srs, num_bins=num_bins) for srs in [srs0, srs1]]
+    hists = [
+        histogram(srs, num_bins=num_bins, return_edges=True) for srs in [srs0, srs1]
+    ]
     hists = da.compute(*hists)
 
+    meta = ColumnsMetadata()
+    meta["y", "dtype"] = df[y].dtype
+
     if is_numerical(df[y].dtype):
-        dists = [rv_histogram(hist) for hist in hists]
+        dists = [rv_histogram((hist[0], hist[2])) for hist in hists]  # type: ignore
         xs = np.linspace(minimum, maximum, num_dist_sample)
 
         pdfs = [dist.pdf(xs) for dist in dists]
@@ -194,14 +216,22 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
             }
         )
 
-        counts, edges = zip(*hists)
-        xs = [(edge[1:] + edge[:-1]) / 2 for edge in edges]
+        counts, xs, edges = zip(*hists)
+
+        lower_bounds: List[float] = []
+        upper_bounds: List[float] = []
+
+        for edge in edges:
+            lower_bounds.extend(edge[:-1])
+            upper_bounds.extend(edge[1:])
 
         histdf = pd.DataFrame(
             {
                 "x": np.concatenate(xs),
                 "count": np.concatenate(counts),
                 "label": np.repeat(LABELS, [len(count) for count in counts]),
+                "lower_bound": lower_bounds,
+                "upper_bound": upper_bounds,
             }
         )
 
@@ -222,9 +252,10 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
             dist=distdf,
             hist=histdf,
             box=boxdf,
+            meta=meta["y"],
             x=x,
             y=y,
-            visual_type="missing_impact_1v1_numerical",
+            visual_type="missing_impact_1v1",
         )
         return itmdt
     else:
@@ -249,12 +280,10 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
         else:
             partial = (len(counts[0]), len(counts[0]))
 
+        meta["y", "partial"] = partial
+
         itmdt = Intermediate(
-            hist=df,
-            x=x,
-            y=y,
-            partial=partial,
-            visual_type="missing_impact_1v1_categorical",
+            hist=df, x=x, y=y, meta=meta["y"], visual_type="missing_impact_1v1",
         )
         return itmdt
 
