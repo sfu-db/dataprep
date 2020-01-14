@@ -25,8 +25,8 @@ from bokeh.palettes import Category10, Greys256  # type: ignore
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
-from ..dtypes import is_categorical
-from ..intermediate import Intermediate
+from ..dtypes import is_categorical, is_numerical
+from ..intermediate import Intermediate, ColumnMetadata
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
 from ..palette import PALETTE
@@ -52,16 +52,16 @@ def tweak_figure(fig: Figure) -> Figure:
 
 
 def render_dist(
-    df: pd.DataFrame, typ: str, plot_width: int, plot_height: int
+    df: pd.DataFrame, x: str, typ: str, plot_width: int, plot_height: int,
 ) -> Figure:
     """
     Render a distribution, CDF or PDF
     """
     assert typ in ["pdf", "cdf"]
     tooltips = [
-        ("x", "@x"),
-        (typ, f"@{typ}"),
-        ("label", "@label"),
+        (x, "@x"),
+        (typ.upper(), f"@{typ}"),
+        ("Label", "@label"),
     ]
     y_range = Range1d(0, df[typ].max() * 1.01)
     x_range = Range1d(0, df["x"].max() * 1.01)
@@ -88,15 +88,29 @@ def render_dist(
     return fig
 
 
-def render_hist(df: pd.DataFrame, plot_width: int, plot_height: int) -> Figure:
+def render_hist(
+    df: pd.DataFrame, x: str, meta: ColumnMetadata, plot_width: int, plot_height: int
+) -> Figure:
     """
     Render a histogram
     """
-    tooltips = [
-        ("x", "@x"),
-        ("count", "@count"),
-        ("label", "@label"),
-    ]
+    if is_categorical(meta["dtype"]):
+        tooltips = [
+            (x, "@x"),
+            ("Count", "@count"),
+            ("Label", "@label"),
+        ]
+    else:
+        df = df.copy()
+        df["repr"] = [
+            f"[{row.lower_bound:.0f}~{row.upper_bound:.0f})" for row in df.itertuples()
+        ]
+
+        tooltips = [
+            (x, "@repr"),
+            ("Frequency", "@count"),
+            ("Label", "@label"),
+        ]
 
     cmapper = CategoricalColorMapper(palette=Category10[3], factors=LABELS)
 
@@ -220,9 +234,9 @@ def render_missing_spectrum(
         loc_tooltip = "@loc_start{1}~@loc_end{1}"
 
     tooltips = [
-        ("column", "@column"),
-        ("loc", loc_tooltip),
-        ("missing%", "@missing_rate{1%}"),
+        ("Column", "@column"),
+        ("Loc", loc_tooltip),
+        ("Missing%", "@missing_rate{1%}"),
     ]
 
     x_range = FactorRange(*df["column_with_perc"].unique())
@@ -269,11 +283,12 @@ def render_missing_impact_1vn(
 
     dfs = itmdt["data"]
     x = itmdt["x"]
+    meta = itmdt["meta"]
 
     panels = []
     for col, df in dfs.items():
-        fig = render_hist(df, plot_width, plot_height)
-        shown, total = itmdt["partial"][col]
+        fig = render_hist(df, col, meta[col], plot_width, plot_height)
+        shown, total = meta[col]["partial"]
 
         if shown != total:
             fig.title = Title(
@@ -288,23 +303,24 @@ def render_missing_impact_1vn(
 
 
 def render_missing_impact_1v1(
-    itmdt: Intermediate, plot_width: int, plot_height: int, numerical: bool = True
+    itmdt: Intermediate, plot_width: int, plot_height: int
 ) -> Union[Tabs, Figure]:
     """
     Render the plot from `plot_missing(df, "x", "y")`
     """
     x, y = itmdt["x"], itmdt["y"]
+    meta = itmdt["meta"]
 
-    if numerical:
+    if is_numerical(meta["dtype"]):
         panels = []
 
-        fig = render_hist(itmdt["hist"], plot_width, plot_height)
+        fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height)
         panels.append(Panel(child=fig, title="Histogram"))
 
-        fig = render_dist(itmdt["dist"], "pdf", plot_width, plot_height)
+        fig = render_dist(itmdt["dist"], y, "pdf", plot_width, plot_height)
         panels.append(Panel(child=fig, title="PDF"))
 
-        fig = render_dist(itmdt["dist"], "cdf", plot_width, plot_height)
+        fig = render_dist(itmdt["dist"], y, "cdf", plot_width, plot_height)
         panels.append(Panel(child=fig, title="CDF"))
 
         fig = render_boxwhisker(itmdt["box"], plot_width, plot_height)
@@ -313,9 +329,9 @@ def render_missing_impact_1v1(
         tabs = Tabs(tabs=panels)
         return tabs
     else:
-        fig = render_hist(itmdt["hist"], plot_width, plot_height)
+        fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height)
 
-        shown, total = itmdt["partial"]
+        shown, total = meta["partial"]
         if shown != total:
             fig.title = Title(
                 text=f"Missing impact of {x} by ({shown} out of {total}) {y}"
@@ -335,11 +351,7 @@ def render_missing(
         return render_missing_spectrum(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "missing_impact_1vn":
         return render_missing_impact_1vn(itmdt, plot_width, plot_height)
-    elif itmdt.visual_type == "missing_impact_1v1_numerical":
+    elif itmdt.visual_type == "missing_impact_1v1":
         return render_missing_impact_1v1(itmdt, plot_width, plot_height)
-    elif itmdt.visual_type == "missing_impact_1v1_categorical":
-        return render_missing_impact_1v1(
-            itmdt, plot_width, plot_height, numerical=False
-        )
     else:
         raise UnreachableError
