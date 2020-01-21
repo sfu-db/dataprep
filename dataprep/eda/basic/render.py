@@ -92,9 +92,12 @@ def _make_title(grp_cnt_stats: Dict[str, int], x: str, y: str) -> str:
 def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
     """
     Format the x axis for histograms
-    """
+    """  # pylint: disable=too-many-locals
+    num_x_ticks = 5
+    # divisor for 5 ticks (5 results in ticks that are too close together)
+    divisor = 4.5
     # interval
-    gap = (maxv - minv) / 4.5
+    gap = (maxv - minv) / divisor
     # get exponent from scientific notation
     _, after = f"{gap:.0e}".split("e")
     # round to this amount
@@ -105,7 +108,7 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
     gap = np.round(gap, round_to)
 
     # make the tick values
-    ticks = [minv + i * gap for i in range(5)]
+    ticks = [minv + i * gap for i in range(num_x_ticks)]
     ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
     fig.xaxis.ticker = ticks
 
