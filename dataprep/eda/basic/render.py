@@ -89,6 +89,55 @@ def _make_title(grp_cnt_stats: Dict[str, int], x: str, y: str) -> str:
     return f"{y} by {x}"
 
 
+def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
+    """
+    Format the x axis for histograms
+    """  # pylint: disable=too-many-locals
+    num_x_ticks = 5
+    # divisor for 5 ticks (5 results in ticks that are too close together)
+    divisor = 4.5
+    # interval
+    gap = (maxv - minv) / divisor
+    # get exponent from scientific notation
+    _, after = f"{gap:.0e}".split("e")
+    # round to this amount
+    round_to = -1 * int(after)
+    # round the first x tick
+    minv = np.round(minv, round_to)
+    # round value between ticks
+    gap = np.round(gap, round_to)
+
+    # make the tick values
+    ticks = [minv + i * gap for i in range(num_x_ticks)]
+    ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
+    fig.xaxis.ticker = ticks
+
+    formatted_ticks = []
+    for tick in ticks:  # format the tick values
+        before, after = f"{tick:e}".split("e")
+        if float(after) > 1e15 or abs(tick) < 1e4:
+            formatted_ticks.append(str(tick))
+            continue
+        mod_exp = int(after) % 3
+        factor = 1 if mod_exp == 0 else 10 if mod_exp == 1 else 100
+        value = float(before) * factor
+        value = int(value) if value.is_integer() else value
+        if abs(tick) >= 1e12:
+            formatted_ticks.append(str(value) + "T")
+        elif abs(tick) >= 1e9:
+            formatted_ticks.append(str(value) + "B")
+        elif abs(tick) >= 1e6:
+            formatted_ticks.append(str(value) + "M")
+        elif abs(tick) >= 1e4:
+            formatted_ticks.append(str(value) + "K")
+
+    fig.xaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
+    fig.xaxis.major_label_text_font_size = "10pt"
+    fig.xaxis.major_label_standoff = 7
+    fig.xaxis.major_label_orientation = 0
+    fig.axis.major_tick_line_color = None
+
+
 def bar_viz(
     df: pd.DataFrame,
     total_grps: int,
@@ -207,9 +256,10 @@ def hist_viz(
     fig.add_tools(hover)
     tweak_figure(fig, "hist", show_yaxis)
     fig.yaxis.axis_label = "Frequency"
-    x_ticks = list(df["left"])
-    x_ticks.append(df.iloc[-1]["right"])
-    fig.xaxis.ticker = x_ticks
+    minv = df.iloc[0]["left"]
+    maxv = df.iloc[-1]["right"]
+    _format_xaxis(fig, minv, maxv)
+
     return fig
 
 
@@ -254,9 +304,9 @@ def hist_kde_viz(
     fig.add_tools(hover_dist)
     tweak_figure(fig, "kde")
     fig.yaxis.axis_label = "Density"
-    x_ticks = list(df["left"])
-    x_ticks.append(df.iloc[-1]["right"])
-    fig.xaxis.ticker = x_ticks
+    minv = df.iloc[0]["left"]
+    maxv = df.iloc[-1]["right"]
+    _format_xaxis(fig, minv, maxv)
     return Panel(child=fig, title="KDE plot")
 
 

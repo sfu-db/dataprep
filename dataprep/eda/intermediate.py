@@ -44,8 +44,10 @@ class ColumnsMetadata:
     def __setitem__(self, key: Tuple[str, str], val: Any) -> None:
         col, vtype = key
         if (
-            isinstance(val, (tuple, list, dict)) and vtype not in self.metadata.columns
-        ):  # pylint: disable=unsupported-membership-test
+            isinstance(val, (tuple, list, dict))
+            and vtype
+            not in self.metadata.columns  # pylint: disable=unsupported-membership-test
+        ):
             self.metadata[vtype] = pd.Series(dtype="object")
 
         self.metadata.loc[col, vtype] = val
