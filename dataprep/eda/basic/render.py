@@ -97,11 +97,11 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
     gap = (maxv - minv) / 4.5
     # get exponent from scientific notation
     _, after = f"{gap:.0e}".split("e")
-    # round minv to this amount
+    # round to this amount
     round_to = -1 * int(after)
-    # round minv
+    # round the first x tick
     minv = np.round(minv, round_to)
-    # gap = round(gap/mul)*mul
+    # round value between ticks
     gap = np.round(gap, round_to)
 
     # make the tick values
@@ -110,7 +110,7 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
     fig.xaxis.ticker = ticks
 
     formatted_ticks = []
-    for tick in ticks:
+    for tick in ticks:  # format the tick values
         before, after = f"{tick:e}".split("e")
         if float(after) > 1e15 or abs(tick) < 1e4:
             formatted_ticks.append(str(tick))
@@ -131,7 +131,6 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
     fig.xaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
     fig.xaxis.major_label_text_font_size = "10pt"
     fig.xaxis.major_label_standoff = 7
-
     fig.xaxis.major_label_orientation = 0
     fig.axis.major_tick_line_color = None
 
