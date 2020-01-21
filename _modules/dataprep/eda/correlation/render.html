@@ -107,7 +107,7 @@
 
 
 <span class="k">def</span> <span class="nf">render_correlation_heatmaps</span><span class="p">(</span>
-    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render correlation heatmaps in to tabs</span>
@@ -159,7 +159,7 @@
 
 
 <span class="k">def</span> <span class="nf">render_correlation_single_heatmaps</span><span class="p">(</span>
-    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render correlation heatmaps, but with single column</span>
@@ -310,7 +310,9 @@
 <span class="sd">    Figure</span>
 <span class="sd">        The bokeh Figure instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">:</span>
         <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_heatmaps</span><span class="p">(</span>
             <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BIPALETTE</span>
         <span class="p">)</span>
@@ -320,6 +322,7 @@
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_scatter&quot;</span><span class="p">:</span>
         <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_scatter</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BRG</span><span class="p">)</span>
+    <span class="c1"># TODO Can we raise an exception here? Otherwise, visual_elem will be used before assigned</span>
     <span class="k">return</span> <span class="n">visual_elem</span></div>
 </pre></div>
 

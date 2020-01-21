@@ -53,7 +53,7 @@
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">kendalltau</span>
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">NUMERICAL_DTYPES</span><span class="p">,</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">is_numerical</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">NUMERICAL_DTYPES</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
 
@@ -115,7 +115,8 @@
         <span class="p">),</span> <span class="s2">&quot;value_range and k cannot be present in both&quot;</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">NUMERICAL_DTYPES</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;No numerical columns found&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">visual_type</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">()</span>
         <span class="c1"># TODO Can we remove this? Without the computing, data has unknown rows so da.cov will fail.</span>
@@ -153,7 +154,8 @@
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">NUMERICAL_DTYPES</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;No numerical columns found&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">visual_type</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{x}</span><span class="s2"> not in numerical column names&quot;</span>
 
         <span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="n">x</span><span class="p">]</span>
@@ -186,15 +188,8 @@
         <span class="k">assert</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{x}</span><span class="s2"> not in columns names&quot;</span>
         <span class="k">assert</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{y}</span><span class="s2"> not in columns names&quot;</span>
-
-        <span class="n">xdtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="n">ydtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="c1"># pylint: disable=no-else-raise</span>
-        <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-            <span class="c1"># intermediate = _cross_table(df=df, x=x, y=y)</span>
-            <span class="c1"># return intermediate</span>
-        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">NUMERICAL_DTYPES</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="n">coeffs</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">influences</span> <span class="o">=</span> <span class="n">scatter_with_regression</span><span class="p">(</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">compute_chunk_sizes</span><span class="p">(),</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">compute_chunk_sizes</span><span class="p">(),</span>
@@ -219,9 +214,7 @@
 
             <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="o">**</span><span class="n">result</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_scatter&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot calculate the correlation between two different dtype column&quot;</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">visual_type</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="k">raise</span> <span class="n">UnreachableError</span></div>
 
@@ -326,9 +319,27 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Pearson correlation calculation of a n x n correlation matrix for n columns</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cov</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-    <span class="n">stderr</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
-    <span class="n">corrmat</span> <span class="o">=</span> <span class="n">cov</span> <span class="o">/</span> <span class="n">stderr</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">/</span> <span class="n">stderr</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">ncols</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">corrmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">ncols</span><span class="p">,</span> <span class="n">ncols</span><span class="p">))</span>
+    <span class="n">corr_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncols</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="o">|</span> <span class="n">da</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]))</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])(</span>
+                <span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">][</span><span class="n">mask</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">j</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">corr_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+    <span class="n">corr_comp</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">corr_list</span><span class="p">)</span>  <span class="c1"># TODO avoid explicitly compute</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncols</span><span class="p">):</span>  <span class="c1"># TODO: Optimize by using numpy api</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="p">):</span>
+            <span class="n">corrmat</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">corr_comp</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">corrmat2</span> <span class="o">=</span> <span class="n">corrmat</span> <span class="o">+</span> <span class="n">corrmat</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corrmat2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">corrmat</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">corrmat2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">corrmat</span>
 
 
@@ -357,8 +368,9 @@
     <span class="n">corr_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncols</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="o">|</span> <span class="n">da</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]))</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">)(</span>
-                <span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">][</span><span class="n">mask</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">j</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">corr_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
     <span class="n">corr_comp</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">corr_list</span><span class="p">)</span>  <span class="c1"># TODO avoid explicitly compute</span>
