@@ -15,7 +15,7 @@ import pandas as pd
 from scipy.stats import kendalltau
 
 from ...errors import UnreachableError
-from ..dtypes import NUMERICAL_DTYPES, is_categorical, is_numerical
+from ..dtypes import NUMERICAL_DTYPES
 from ..intermediate import Intermediate
 from ..utils import to_dask
 
@@ -77,7 +77,8 @@ def compute_correlation(
         ), "value_range and k cannot be present in both"
 
         df = df.select_dtypes(NUMERICAL_DTYPES)
-        assert len(df.columns) != 0, f"No numerical columns found"
+        if len(df.columns) == 0:
+            return Intermediate(visual_type=None)
 
         data = df.to_dask_array()
         # TODO Can we remove this? Without the computing, data has unknown rows so da.cov will fail.
@@ -115,7 +116,8 @@ def compute_correlation(
         )
     elif x is not None and y is None:
         df = df.select_dtypes(NUMERICAL_DTYPES)
-        assert len(df.columns) != 0, f"No numerical columns found"
+        if len(df.columns) == 0:
+            return Intermediate(visual_type=None)
         assert x in df.columns, f"{x} not in numerical column names"
 
         columns = df.columns[df.columns != x]
@@ -148,15 +150,8 @@ def compute_correlation(
         assert value_range is None
         assert x in df.columns, f"{x} not in columns names"
         assert y in df.columns, f"{y} not in columns names"
-
-        xdtype = df[x].dtype
-        ydtype = df[y].dtype
-        # pylint: disable=no-else-raise
-        if is_categorical(xdtype) and is_categorical(ydtype):
-            raise NotImplementedError
-            # intermediate = _cross_table(df=df, x=x, y=y)
-            # return intermediate
-        elif is_numerical(xdtype) and is_numerical(ydtype):
+        df = df.select_dtypes(NUMERICAL_DTYPES)
+        if x in df.columns and y in df.columns:
             coeffs, df, influences = scatter_with_regression(
                 df[x].values.compute_chunk_sizes(),
                 df[y].values.compute_chunk_sizes(),
@@ -181,9 +176,7 @@ def compute_correlation(
 
             return Intermediate(**result, visual_type="correlation_scatter")
         else:
-            raise ValueError(
-                "Cannot calculate the correlation between two different dtype column"
-            )
+            return Intermediate(visual_type=None)
 
     raise UnreachableError
 
@@ -288,9 +281,27 @@ def pearson_nxn(data: da.Array) -> da.Array:
     """
     Pearson correlation calculation of a n x n correlation matrix for n columns
     """
-    cov = da.cov(data.T)
-    stderr = da.sqrt(da.diag(cov))
-    corrmat = cov / stderr[:, None] / stderr[None, :]
+    _, ncols = data.shape
+
+    corrmat = np.zeros(shape=(ncols, ncols))
+    corr_list = []
+    for i in range(ncols):
+        for j in range(i + 1, ncols):
+            mask = ~(da.isnan(data[:, i]) | da.isnan(data[:, j]))
+            tmp = dask.delayed(lambda a, b: np.corrcoef(a, b)[0, 1])(
+                data[:, i][mask], data[:, j][mask]
+            )
+            corr_list.append(tmp)
+    corr_comp = dask.compute(*corr_list)  # TODO avoid explicitly compute
+    idx = 0
+    for i in range(ncols):  # TODO: Optimize by using numpy api
+        for j in range(i + 1, ncols):
+            corrmat[i][j] = corr_comp[idx]
+            idx = idx + 1
+
+    corrmat2 = corrmat + corrmat.T
+    np.fill_diagonal(corrmat2, 1)
+    corrmat = da.from_array(corrmat2)
     return corrmat
 
 
@@ -319,8 +330,9 @@ def kendall_tau_nxn(data: da.Array) -> da.Array:
     corr_list = []
     for i in range(ncols):
         for j in range(i + 1, ncols):
+            mask = ~(da.isnan(data[:, i]) | da.isnan(data[:, j]))
             tmp = dask.delayed(lambda a, b: kendalltau(a, b).correlation)(
-                data[:, i], data[:, j]
+                data[:, i][mask], data[:, j][mask]
             )
             corr_list.append(tmp)
     corr_comp = dask.compute(*corr_list)  # TODO avoid explicitly compute
