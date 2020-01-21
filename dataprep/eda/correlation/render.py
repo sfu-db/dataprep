@@ -69,7 +69,7 @@ def tweak_figure(fig: Figure) -> None:
 
 
 def render_correlation_heatmaps(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
 ) -> Tabs:
     """
     Render correlation heatmaps in to tabs
@@ -121,7 +121,7 @@ def render_correlation_heatmaps(
 
 
 def render_correlation_single_heatmaps(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
 ) -> Tabs:
     """
     Render correlation heatmaps, but with single column
@@ -272,7 +272,9 @@ def render_correlation(
     Figure
         The bokeh Figure instance.
     """
-    if itmdt.visual_type == "correlation_heatmaps":
+    if itmdt.visual_type is None:
+        visual_elem = Figure()
+    elif itmdt.visual_type == "correlation_heatmaps":
         visual_elem = render_correlation_heatmaps(
             itmdt, plot_width, plot_height, palette or BIPALETTE
         )
@@ -282,4 +284,5 @@ def render_correlation(
         )
     elif itmdt.visual_type == "correlation_scatter":
         visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+    # TODO Can we raise an exception here? Otherwise, visual_elem will be used before assigned
     return visual_elem
