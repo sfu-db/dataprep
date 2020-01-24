@@ -202,6 +202,9 @@ def scatter_with_regression(
     if k == 0:
         raise ValueError("k should be larger than 0")
 
+    mask = ~(da.isnan(xarr) | da.isnan(yarr))
+    xarr = da.from_array(np.array(xarr)[mask])
+    yarr = da.from_array(np.array(yarr)[mask])
     xarrp1 = da.vstack([xarr, da.ones_like(xarr)]).T
     xarrp1 = xarrp1.rechunk((xarrp1.chunks[0], -1))
     (coeffa, coeffb), _, _, _ = da.linalg.lstsq(xarrp1, yarr)
@@ -367,7 +370,8 @@ def pearson_1xn(
 
     corrs = []
     for j in range(ncols):
-        _, (corr, _) = da.corrcoef(x, data[:, j])
+        mask = ~(da.isnan(x) | da.isnan(data[:, j]))
+        _, (corr, _) = da.corrcoef(np.array(x)[mask], np.array(data[:, j])[mask])
         corrs.append(corr)
 
     (corrs,) = da.compute(corrs)
@@ -423,7 +427,10 @@ def kendall_tau_1xn(
 
     corrs = []
     for j in range(ncols):
-        corr = dask.delayed(lambda a, b: kendalltau(a, b)[0])(x, data[:, j])
+        mask = ~(da.isnan(x) | da.isnan(data[:, j]))
+        corr = dask.delayed(lambda a, b: kendalltau(a, b)[0])(
+            np.array(x)[mask], np.array(data[:, j])[mask]
+        )
         corrs.append(corr)
 
     (corrs,) = da.compute(corrs)
