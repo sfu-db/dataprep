@@ -60,7 +60,7 @@ def render_dist(
     assert typ in ["pdf", "cdf"]
     tooltips = [
         (x, "@x"),
-        (typ.upper(), f"@{typ}"),
+        (typ.upper(), f"@{{{typ}}}"),
         ("Label", "@label"),
     ]
     y_range = Range1d(0, df[typ].max() * 1.01)
