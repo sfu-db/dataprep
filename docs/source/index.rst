@@ -8,8 +8,11 @@ Welcome to dataprep's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   introduction
+   plot
+   plot_correlation
+   plot_missing
 
 
 Indices and tables
