@@ -6,16 +6,16 @@ Subpackages
 
 .. toctree::
 
+   dataprep.data_connector
    dataprep.eda
-   dataprep.tests
 
 Submodules
 ----------
 
-dataprep.utils module
----------------------
+dataprep.errors module
+----------------------
 
-.. automodule:: dataprep.utils
+.. automodule:: dataprep.errors
    :members:
    :undoc-members:
    :show-inheritance:
