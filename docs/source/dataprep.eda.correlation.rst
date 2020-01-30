@@ -4,18 +4,18 @@ dataprep.eda.correlation package
 Submodules
 ----------
 
-dataprep.eda.correlation.computation module
--------------------------------------------
+dataprep.eda.correlation.compute module
+---------------------------------------
 
-.. automodule:: dataprep.eda.correlation.computation
+.. automodule:: dataprep.eda.correlation.compute
    :members:
    :undoc-members:
    :show-inheritance:
 
-dataprep.eda.correlation.visualization module
----------------------------------------------
+dataprep.eda.correlation.render module
+--------------------------------------
 
-.. automodule:: dataprep.eda.correlation.visualization
+.. automodule:: dataprep.eda.correlation.render
    :members:
    :undoc-members:
    :show-inheritance:
