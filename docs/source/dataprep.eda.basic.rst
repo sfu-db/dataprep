@@ -4,10 +4,10 @@ dataprep.eda.basic package
 Submodules
 ----------
 
-dataprep.eda.basic.computation module
--------------------------------------
+dataprep.eda.basic.compute module
+---------------------------------
 
-.. automodule:: dataprep.eda.basic.computation
+.. automodule:: dataprep.eda.basic.compute
    :members:
    :undoc-members:
    :show-inheritance:
@@ -16,22 +16,6 @@ dataprep.eda.basic.render module
 --------------------------------
 
 .. automodule:: dataprep.eda.basic.render
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dataprep.eda.basic.viz\_multi module
-------------------------------------
-
-.. automodule:: dataprep.eda.basic.viz_multi
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dataprep.eda.basic.viz\_uni module
-----------------------------------
-
-.. automodule:: dataprep.eda.basic.viz_uni
    :members:
    :undoc-members:
    :show-inheritance:
