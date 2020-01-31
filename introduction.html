@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>An introduction to exploratory data analysis with dataprep.eda &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="plot: analyzing basic characteristics of dataset" href="plot.html" />
+    <link rel="prev" title="Welcome to dataprep’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plot.html" title="plot: analyzing basic characteristics of dataset"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to dataprep’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="an-introduction-to-exploratory-data-analysis-with-dataprep-eda">
+<h1>An introduction to exploratory data analysis with <cite>dataprep.eda</cite><a class="headerlink" href="#an-introduction-to-exploratory-data-analysis-with-dataprep-eda" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plot.html"><cite>plot</cite>: analyzing basic characteristics of dataset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plot_correlation.html"><cite>plot_correlation</cite>: analyzing the correlation between columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#loading-dataset">Loading dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#basic-exploration-for-all-columns-via-plot-df">Basic exploration for all columns via <cite>plot(df)</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#zooming-into-a-column-via-plot-df-x">Zooming into a column via <cite>plot(df, x)</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#zooming-into-two-columns-via-plot-df-x-y">Zooming into two columns via <cite>plot(df, x, y)</cite></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="topic">
+<p class="topic-title first">Section contents</p>
+<p>In this section, we introduce how to do exploratory data analysis throughout <cite>dataprep.eda</cite> and give serval
+simple examples.</p>
+</div>
+<div class="section" id="exploratory-data-analysis-functionality-description">
+<h2>Exploratory data analysis: functionality description<a class="headerlink" href="#exploratory-data-analysis-functionality-description" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.wikiwand.com/en/Exploratory_data_analysis">Exploratory data analysis (EDA)</a> is the procedure of exploring the dataset and summarize its main characteristics. The goal of <cite>dataprep.eda</cite> module is to simplify this procedure and allow user explore important characteristics as many as possible via only a few APIs. Each API allows user analyze dataset from high level to low level from different perspective. Specifically, we provide the following functionalities:</p>
+<ul class="simple">
+<li><p><strong>analyzing basic characteristics via `plot`</strong>: we provide an API <cite>plot</cite> to allow user analyze the basic characteristic of the dataset. It plots the distribution or bar chart for each column to give user a basic sense of the dataset.  If user is interested in one or two specific columns, it provides a more detailed plot for the specific columns by passing column names as the parameter.</p></li>
+<li><p><strong>analyzing correlation between columns via `plot_correlation`</strong>: We provide an API <cite>plot_correlation</cite> to analyze the correlation between columns. It plots the correlation matrix between columns. If user is interested the correlated columns for a specific column, e.g., the most correlated columns to column ‘A’, the API can provide a more detailed analysis by passing column names as the parameter.</p></li>
+<li><p><strong>analyzing the impact of missing values via `plot_missing`</strong>: We provide an API <cite>plot_missing</cite> to analyze the pattern and impact of missing values. At the first glace, it shows the position of missing values, which allows user be aware of data quality for each column or find any underlying pattern of missing values. To understand the impact of missing values from a specific column, user can pass the column name into the parameter. It will compare the distribution of each column with and without missing values from the given column, such that user could understand the impact of the missing values.</p></li>
+</ul>
+<p>In the following, we simply introduce <cite>plot</cite>, <cite>plot_correlation</cite> and <cite>plot_missing</cite> and demonstrate their basic functionalities.</p>
+</div>
+<div class="section" id="analyzing-basic-characteristics-via-plot">
+<span id="demo"></span><h2>Analyzing basic characteristics via <cite>plot</cite><a class="headerlink" href="#analyzing-basic-characteristics-via-plot" title="Permalink to this headline">¶</a></h2>
+<p>To analyze the basic characteristics of the dataset, such as the distribution of each column, user could call <cite>eda.plot</cite>. It mainly provides the following functionalities:</p>
+<ol class="arabic simple">
+<li><p>plot(df): plot basic characteristics (the histogram and the bar chart) for all columns.</p></li>
+<li><p>plot(df, x): zoom into column x and plot more refined characteristics.</p></li>
+<li><p>plot(df, x, y): zoom into column x and column y, and plot more refined characteristics to explore their relationship.</p></li>
+</ol>
+<p>In the following, we show an example of <cite>plot(df)</cite>, which plots the histogram for each numerical column and bar chart for each categorical column</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://www.openml.org/data/get_csv/1595261/phpMawTba&quot;</span><span class="p">,</span> <span class="n">na_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; ?&#39;</span><span class="p">])</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/plot.png"><img alt="_images/plot.png" class="align-center" src="_images/plot.png" style="width: 794.0px; height: 1201.0px;" /></a>
+</div>
+<div class="section" id="analyzing-correlation-via-plot-correlation">
+<h2>Analyzing correlation via <cite>plot_correlation</cite><a class="headerlink" href="#analyzing-correlation-via-plot-correlation" title="Permalink to this headline">¶</a></h2>
+<p>To analyze the correlation between columns, we provide <cite>plot_correlation</cite>. Its main functionalities could be summarized as follows:</p>
+<ol class="arabic simple">
+<li><p><cite>plot_correlation(df)</cite>: plot the correlation matrix of all columns.</p></li>
+<li><p><cite>plot_correlation(df, x)</cite>: plot the most correlated columns to column x.</p></li>
+<li><p><cite>plot_correlation(df, x, y)</cite>: plot the scatter plot between column x and column y, as well as the regression line. Besides, the point that has most impact on the correlation value could be identified by passing a parameter.</p></li>
+<li><p><cite>plot_correlation(df, x, y, k, value_range)</cite>: filter the result by correlation value or by top-k.</p></li>
+</ol>
+<p>In the following, we show an example of <cite>plot_correlation(df)</cite>, which plots the correlation matrix for <a class="reference external" href="https://www.wikiwand.com/en/Pearson_correlation_coefficient">Person</a>, <a class="reference external" href="https://www.wikiwand.com/en/Spearman%27s_rank_correlation_coefficient">Spearman</a> and <a class="reference external" href="https://www.wikiwand.com/en/Kendall_rank_correlation_coefficient">KendallTau</a> correlation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot_correlation</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv&quot;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+<span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/plot_correlation.png"><img alt="_images/plot_correlation.png" class="align-center" src="_images/plot_correlation.png" style="width: 529.0px; height: 534.0px;" /></a>
+</div>
+<div class="section" id="analyzing-missing-values-via-plot-missing">
+<h2>Analyzing missing values via <cite>plot_missing</cite><a class="headerlink" href="#analyzing-missing-values-via-plot-missing" title="Permalink to this headline">¶</a></h2>
+<p>To analyze the pattern and impact of missing values, we provide <cite>plot_missing</cite>. Its main functionalities could be summarized as follows:</p>
+<ol class="arabic simple">
+<li><p><cite>plot_missing(df)</cite>: plot the position of missing values.</p></li>
+<li><p><cite>plot_missing(df, x)</cite>: plot the impact on basic characteristics (histogram and bar chart) of missing values in column x to all other columns.</p></li>
+<li><p><cite>plot_missing(df, x, y)</cite>: zoom into column y, and plot the impact on more characteristics of missing values in column x to column y.</p></li>
+</ol>
+<p>In the following, we show an example of <cite>plot_missing(df)</cite>, which shows the positions of missing values as well as the percentage of missing value in each column:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot_missing</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://www.openml.org/data/get_csv/16826755/phpMYEkMl&quot;</span><span class="p">,</span> <span class="n">na_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;?&#39;</span><span class="p">])</span>
+<span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/plot_missing.png"><img alt="_images/plot_missing.png" class="align-center" src="_images/plot_missing.png" style="width: 508.0px; height: 501.0px;" /></a>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">An introduction to exploratory data analysis with <cite>dataprep.eda</cite></a><ul>
+<li><a class="reference internal" href="#exploratory-data-analysis-functionality-description">Exploratory data analysis: functionality description</a></li>
+<li><a class="reference internal" href="#analyzing-basic-characteristics-via-plot">Analyzing basic characteristics via <cite>plot</cite></a></li>
+<li><a class="reference internal" href="#analyzing-correlation-via-plot-correlation">Analyzing correlation via <cite>plot_correlation</cite></a></li>
+<li><a class="reference internal" href="#analyzing-missing-values-via-plot-missing">Analyzing missing values via <cite>plot_missing</cite></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to dataprep’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plot.html"
+                        title="next chapter"><cite>plot</cite>: analyzing basic characteristics of dataset</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plot.html" title="plot: analyzing basic characteristics of dataset"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to dataprep’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    </div>
+  </body>
+</html>

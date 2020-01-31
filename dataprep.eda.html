@@ -41,24 +41,22 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.basic.html">dataprep.eda.basic package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#dataprep-eda-basic-computation-module">dataprep.eda.basic.computation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#dataprep-eda-basic-viz-multi-module">dataprep.eda.basic.viz_multi module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#dataprep-eda-basic-viz-uni-module">dataprep.eda.basic.viz_uni module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.correlation.html">dataprep.eda.correlation package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.correlation.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.correlation.html#dataprep-eda-correlation-computation-module">dataprep.eda.correlation.computation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.correlation.html#dataprep-eda-correlation-visualization-module">dataprep.eda.correlation.visualization module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.correlation.html#module-dataprep.eda.correlation.compute">dataprep.eda.correlation.compute module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.correlation.html#module-dataprep.eda.correlation.render">dataprep.eda.correlation.render module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.correlation.html#module-dataprep.eda.correlation">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.missing.html">dataprep.eda.missing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#dataprep-eda-missing-computation-module">dataprep.eda.missing.computation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#dataprep-eda-missing-visualization-module">dataprep.eda.missing.visualization module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing.compute">dataprep.eda.missing.compute module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing.render">dataprep.eda.missing.render module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.missing.html#module-dataprep.eda.missing">Module contents</a></li>
 </ul>
 </li>
@@ -74,12 +72,159 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="dataprep-eda-common-module">
-<h2>dataprep.eda.common module<a class="headerlink" href="#dataprep-eda-common-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-dataprep.eda.dtypes">
+<span id="dataprep-eda-dtypes-module"></span><h2>dataprep.eda.dtypes module<a class="headerlink" href="#module-dataprep.eda.dtypes" title="Permalink to this headline">¶</a></h2>
+<p>Module for auxiliary type detection functions</p>
+<dl class="class">
+<dt id="dataprep.eda.dtypes.DType">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">DType</code><a class="reference internal" href="_modules/dataprep/eda/dtypes.html#DType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.DType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Possible dtypes for a column, currently we only support categorical and numerical dtypes.</p>
+<dl class="attribute">
+<dt id="dataprep.eda.dtypes.DType.Categorical">
+<code class="sig-name descname">Categorical</code><em class="property"> = 1</em><a class="headerlink" href="#dataprep.eda.dtypes.DType.Categorical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.dtypes.DType.Numerical">
+<code class="sig-name descname">Numerical</code><em class="property"> = 2</em><a class="headerlink" href="#dataprep.eda.dtypes.DType.Numerical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.dtypes.is_categorical">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_categorical</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/eda/dtypes.html#is_categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_categorical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a type, return if that type is a categorical type</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.dtypes.is_numerical">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_numerical</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/eda/dtypes.html#is_numerical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_numerical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a type, return if that type is a numerical type</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.dtypes.is_pandas_categorical">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_pandas_categorical</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/eda/dtypes.html#is_pandas_categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_pandas_categorical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect if a dtype is categorical and from pandas.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.intermediate">
+<span id="dataprep-eda-intermediate-module"></span><h2>dataprep.eda.intermediate module<a class="headerlink" href="#module-dataprep.eda.intermediate" title="Permalink to this headline">¶</a></h2>
+<p>Intermediate class</p>
+<dl class="class">
+<dt id="dataprep.eda.intermediate.ColumnMetadata">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">ColumnMetadata</code><span class="sig-paren">(</span><em class="sig-param">meta: pandas.core.series.Series</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/intermediate.html#ColumnMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container for storing a single column’s metadata.
+This is immutable</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="dataprep.eda.intermediate.ColumnsMetadata">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">ColumnsMetadata</code><a class="reference internal" href="_modules/dataprep/eda/intermediate.html#ColumnsMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container for storing each column’s metadata</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="dataprep.eda.intermediate.Intermediate">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">Intermediate</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/intermediate.html#Intermediate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code></p>
+<p>This class contains intermediate results.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dataprep.eda.palette">
 <span id="dataprep-eda-palette-module"></span><h2>dataprep.eda.palette module<a class="headerlink" href="#module-dataprep.eda.palette" title="Permalink to this headline">¶</a></h2>
 <p>This file defines palettes used for EDA.</p>
+</div>
+<div class="section" id="module-dataprep.eda.utils">
+<span id="dataprep-eda-utils-module"></span><h2>dataprep.eda.utils module<a class="headerlink" href="#module-dataprep.eda.utils" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the utils function.</p>
+<dl class="class">
+<dt id="dataprep.eda.utils.DataType">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">DataType</code><a class="reference internal" href="_modules/dataprep/eda/utils.html#DataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.DataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Enumeration for storing the different types of data possible in a column</p>
+<dl class="attribute">
+<dt id="dataprep.eda.utils.DataType.TYPE_CAT">
+<code class="sig-name descname">TYPE_CAT</code><em class="property"> = 2</em><a class="headerlink" href="#dataprep.eda.utils.DataType.TYPE_CAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.utils.DataType.TYPE_NUM">
+<code class="sig-name descname">TYPE_NUM</code><em class="property"> = 1</em><a class="headerlink" href="#dataprep.eda.utils.DataType.TYPE_NUM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataprep.eda.utils.DataType.TYPE_UNSUP">
+<code class="sig-name descname">TYPE_UNSUP</code><em class="property"> = 3</em><a class="headerlink" href="#dataprep.eda.utils.DataType.TYPE_UNSUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.cut_long_name">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">cut_long_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">max_len: int = 12</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/eda/utils.html#cut_long_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.cut_long_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the name is longer than <cite>max_len</cite>,
+cut it to <cite>max_len</cite> length and append “…”</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.fuse_missing_perc">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">fuse_missing_perc</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">perc: float</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/eda/utils.html#fuse_missing_perc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.fuse_missing_perc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append (x.y%) to the name if <cite>perc</cite> is not 0</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.get_type">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">get_type</code><span class="sig-paren">(</span><em class="sig-param">data: dask.dataframe.core.Series</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.utils.DataType<a class="reference internal" href="_modules/dataprep/eda/utils.html#get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns the type of the input data.</dt><dd><p>Identified types are according to the DataType Enumeration.</p>
+</dd>
+</dl>
+<p>The data for which the type needs to be identified.</p>
+<p>str representing the type of the data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.is_notebook">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">is_notebook</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/utils.html#is_notebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.is_notebook" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether it is running in jupyter notebook</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.rand_str">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">rand_str</code><span class="sig-paren">(</span><em class="sig-param">str_length: int = 20</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/eda/utils.html#rand_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.rand_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a random string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.relocate_legend">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">relocate_legend</code><span class="sig-paren">(</span><em class="sig-param">fig: bokeh.plotting.figure.Figure</em>, <em class="sig-param">loc: str</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/utils.html#relocate_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.relocate_legend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relocate legend(s) from center to <cite>loc</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.sample_n">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">sample_n</code><span class="sig-paren">(</span><em class="sig-param">arr: numpy.ndarray</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/dataprep/eda/utils.html#sample_n"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.sample_n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample n values uniformly from the range of the <cite>arr</cite>,
+not from the distribution of <cite>arr</cite>’s elems.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataprep.eda.utils.to_dask">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">to_dask</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame]</em><span class="sig-paren">)</span> &#x2192; dask.dataframe.core.DataFrame<a class="reference internal" href="_modules/dataprep/eda/utils.html#to_dask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.to_dask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dataframe to a dask dataframe.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dataprep.eda">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda" title="Permalink to this headline">¶</a></h2>
@@ -428,8 +573,10 @@ of a hexagon to its left or right corner.</p>
 <li><a class="reference internal" href="#">dataprep.eda package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#dataprep-eda-common-module">dataprep.eda.common module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.dtypes">dataprep.eda.dtypes module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.intermediate">dataprep.eda.intermediate module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda.palette">dataprep.eda.palette module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.utils">dataprep.eda.utils module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda">Module contents</a></li>
 </ul>
 </li>

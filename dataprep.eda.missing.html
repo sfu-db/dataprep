@@ -38,11 +38,65 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="dataprep-eda-missing-computation-module">
-<h2>dataprep.eda.missing.computation module<a class="headerlink" href="#dataprep-eda-missing-computation-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-dataprep.eda.missing.compute">
+<span id="dataprep-eda-missing-compute-module"></span><h2>dataprep.eda.missing.compute module<a class="headerlink" href="#module-dataprep.eda.missing.compute" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot_missing(df) function’s
+calculating intermediate part</p>
+<dl class="function">
+<dt id="dataprep.eda.missing.compute.compute_missing">
+<code class="sig-prename descclassname">dataprep.eda.missing.compute.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, num_bins: int = 30, num_cols: int = 30, num_dist_sample: int = 100</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.compute.compute_missing" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is designed to deal with missing values
+There are three functions: plot_missing(df), plot_missing(df, x)
+plot_missing(df, x, y)</p>
+<dl class="simple">
+<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+</dd>
+<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
+</dd>
+<dt>num_cols: int, optional</dt><dd><p>The number of columns in the figure</p>
+</dd>
+<dt>bins_num: int</dt><dd><p>The number of rows in the figure</p>
+</dd>
+<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>An object of figure or</dt><dd><p>An object of figure and
+An intermediate representation for the plots of different columns in the data_frame.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="dataprep-eda-missing-visualization-module">
-<h2>dataprep.eda.missing.visualization module<a class="headerlink" href="#dataprep-eda-missing-visualization-module" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
+bars for categorical column, qq-plot, box-plot, jitter plot,
+CDF, PDF
+case (Some, None) =&gt; histogram for numerical column and
+bars for categorical column
+case (None, None) =&gt; heatmap
+otherwise =&gt; error</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.missing.render">
+<span id="dataprep-eda-missing-render-module"></span><h2>dataprep.eda.missing.render module<a class="headerlink" href="#module-dataprep.eda.missing.render" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the plot_missing(df, x, y) function’s
+visualization part.</p>
+<dl class="function">
+<dt id="dataprep.eda.missing.render.render_missing">
+<code class="sig-prename descclassname">dataprep.eda.missing.render.</code><code class="sig-name descname">render_missing</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">plot_width: int = 500</em>, <em class="sig-param">plot_height: int = 500</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing/render.html#render_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.render.render_missing" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;Jinglin write here</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dataprep.eda.missing">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda.missing" title="Permalink to this headline">¶</a></h2>
@@ -154,8 +208,8 @@ otherwise =&gt; error</p>
   <ul>
 <li><a class="reference internal" href="#">dataprep.eda.missing package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#dataprep-eda-missing-computation-module">dataprep.eda.missing.computation module</a></li>
-<li><a class="reference internal" href="#dataprep-eda-missing-visualization-module">dataprep.eda.missing.visualization module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.missing.compute">dataprep.eda.missing.compute module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.missing.render">dataprep.eda.missing.render module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda.missing">Module contents</a></li>
 </ul>
 </li>

@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.data_connector.connector &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dataprep.data_connector.connector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the Connector class,</span>
+<span class="sd">where every data fetching should begin with instantiating</span>
+<span class="sd">the Connector class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span>
+<span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Session</span>
+
+<span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
+<span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">config_directory</span><span class="p">,</span> <span class="n">ensure_config</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">RequestError</span>
+<span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span><span class="p">,</span> <span class="n">ImplicitTable</span>
+
+
+<div class="viewcode-block" id="Connector"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.connector.Connector">[docs]</a><span class="k">class</span> <span class="nc">Connector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The main class of DataConnector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">impdb</span><span class="p">:</span> <span class="n">ImplicitDatabase</span>
+    <span class="nb">vars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">auth_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">session</span><span class="p">:</span> <span class="n">Session</span>
+    <span class="n">jenv</span><span class="p">:</span> <span class="n">Environment</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">auth_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connector</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        config_path : str</span>
+<span class="sd">            The path to the config. It can be hosted, e.g. &quot;yelp&quot;, or from</span>
+<span class="sd">            local filesystem, e.g. &quot;file://./yelp&quot;</span>
+<span class="sd">        **kwargs : Dict[str, Any]</span>
+<span class="sd">            Additional parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">config_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">config_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">config_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span> <span class="o">=</span> <span class="n">ImplicitDatabase</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># From Github!</span>
+            <span class="n">ensure_config</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">config_directory</span><span class="p">()</span> <span class="o">/</span> <span class="n">config_path</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span> <span class="o">=</span> <span class="n">ImplicitDatabase</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vars</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_params</span> <span class="o">=</span> <span class="n">auth_params</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jenv</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_fetch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">table</span><span class="p">:</span> <span class="n">ImplicitTable</span><span class="p">,</span>
+        <span class="n">auth_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">req_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;cookies&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+
+        <span class="n">merged_vars</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">authorization</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">authorization</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">req_data</span><span class="p">,</span> <span class="n">auth_params</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_params</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="s2">&quot;cookies&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instantiated_fields</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">jenv</span><span class="p">,</span> <span class="n">merged_vars</span>
+                <span class="p">)</span>
+                <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">instantiated_fields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># TODO: do we support binary body?</span>
+            <span class="n">instantiated_fields</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jenv</span><span class="p">,</span> <span class="n">merged_vars</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">body_ctype</span> <span class="o">==</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">:</span>
+                <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instantiated_fields</span>
+            <span class="k">elif</span> <span class="n">table</span><span class="o">.</span><span class="n">body_ctype</span> <span class="o">==</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
+                <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instantiated_fields</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnreachableError</span>
+
+        <span class="n">resp</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+            <span class="n">Request</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">],</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">],</span>
+                <span class="n">json</span><span class="o">=</span><span class="n">req_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">req_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">),</span>
+                <span class="n">cookies</span><span class="o">=</span><span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;cookies&quot;</span><span class="p">],</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RequestError</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">resp</span>
+
+<div class="viewcode-block" id="Connector.query"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.connector.Connector.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">auth_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">where</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Query the API to get a table.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        table : str</span>
+<span class="sd">            The table name.</span>
+<span class="sd">        auth_params : Optional[Dict[str, Any]] = None</span>
+<span class="sd">            The parameters for authentication. Usually the authentication parameters</span>
+<span class="sd">            should be defined when instantiating the Connector. In case some tables have different</span>
+<span class="sd">            authentication options, a different authentication parameter can be defined here.</span>
+<span class="sd">            This parameter will override the one from Connector if passed.</span>
+<span class="sd">        **where: Dict[str, Any]</span>
+<span class="sd">            The additional parameters required for the query.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            pd.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;No such table </span><span class="si">{table}</span><span class="s2"> in </span><span class="si">{self.impdb.name}</span><span class="s2">&quot;</span>
+
+        <span class="n">itable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">itable</span><span class="p">,</span> <span class="n">auth_params</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">itable</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">table_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return all the table names contained in this database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+    <span class="c1"># def show_schema(self):</span>
+    <span class="c1">#     res = self._request({&quot;term&quot;: &quot;hotpot&quot;, &quot;location&quot;: &quot;vancouver&quot;})</span>
+    <span class="c1">#     df = {}</span>
+    <span class="c1">#     if self.config[&quot;response&quot;][&quot;ctype&quot;] == &quot;application/json&quot;:</span>
+    <span class="c1">#         df = self._json(res)</span>
+    <span class="c1">#     elif self.config[&quot;response&quot;][&quot;ctype&quot;] == &quot;application/xml&quot;:</span>
+    <span class="c1">#         df = self._xml(res)</span>
+    <span class="c1">#     for col in pd.DataFrame(df).columns:</span>
+    <span class="c1">#         print(col)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    </div>
+  </body>
+</html>
