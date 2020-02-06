@@ -109,6 +109,7 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
 
     # make the tick values
     ticks = [minv + i * gap for i in range(num_x_ticks)]
+    ticks = np.round(ticks, round_to)
     ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
     fig.xaxis.ticker = ticks
 
