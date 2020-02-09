@@ -69,36 +69,36 @@ def compute(
     -------
     Intermediate
     """
-    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-return-statements
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-return-statements,too-many-statements
     # pylint: disable=no-else-return
 
     df = to_dask(df)
     orig_df_len = len(df)
 
     if x is None and y is None:
-        datas: List[Tuple[str, DType, Any]] = []
+        datas: List[Any] = []
+        col_names_dtypes: List[Tuple[str, DType]] = []
         for column in df.columns:
             if is_categorical(df[column].dtype):
-                df[column] = df[column].apply(str, meta=(column, str))
                 # bar chart
-                bardata = calc_bar_pie(df[column], ngroups, largest)
-                datas.append((column, DType.Categorical, bardata))
+                datas.append(dask.delayed(calc_bar_pie)(df[column], ngroups, largest))
+                col_names_dtypes.append((column, DType.Categorical))
             elif is_numerical(df[column].dtype):
                 # histogram
-                histdata = calc_hist(df[column], bins, orig_df_len)
-                datas.append((column, DType.Numerical, histdata))
+                datas.append(dask.delayed(calc_hist)(df[column], bins, orig_df_len))
+                col_names_dtypes.append((column, DType.Numerical))
             else:
                 raise UnreachableError
+        datas = dask.compute(*datas)
+        data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas)]
+        return Intermediate(data=data, visual_type="basic_grid")
 
-        return Intermediate(data=datas, visual_type="basic_grid")
     elif (x is None) != (y is None):
         col: str = cast(str, x or y)
         if is_categorical(df[col].dtype):
-            df[col] = df[col].apply(str, meta=(col, str))
             # data for bar and pie charts
-            data = calc_bar_pie(df[col], ngroups, largest)
-            return Intermediate(col=col, data=data, visual_type="categorical_column")
-
+            data = dask.compute(dask.delayed(calc_bar_pie)(df[col], ngroups, largest))
+            return Intermediate(col=col, data=data[0], visual_type="categorical_column")
         elif is_numerical(df[col].dtype):
             if value_range is not None:
                 if (
@@ -112,14 +112,14 @@ def compute(
             # qq plot
             qqdata = calc_qqnorm(df[col].dropna())
             # histogram
-            histdata = calc_hist(df[col], bins, orig_df_len)
+            histdata = dask.compute(dask.delayed(calc_hist)(df[col], bins, orig_df_len))
             # kde plot
             kdedata = calc_hist_kde(df[col].dropna().values, bins, bandwidth)
             # box plot
             boxdata = calc_box(df[[col]].dropna(), bins)
             return Intermediate(
                 col=col,
-                histdata=histdata,
+                histdata=histdata[0],
                 kdedata=kdedata,
                 qqdata=qqdata,
                 boxdata=boxdata,
@@ -150,7 +150,7 @@ def compute(
                 histdata=hisdata,
                 visual_type="cat_and_num_cols",
             )
-        if is_categorical(xdtype) and is_categorical(ydtype):
+        elif is_categorical(xdtype) and is_categorical(ydtype):
             df[x] = df[x].apply(str, meta=(x, str))
             df[y] = df[y].apply(str, meta=(y, str))
             # nested bar chart
@@ -210,17 +210,22 @@ def calc_bar_pie(
         A dataframe of the group counts, the total count of groups,
         and the percent of missing values
     """
-    miss_pct = round(srs.isna().sum().compute() / len(srs) * 100, 1)
-    grp_srs = srs.groupby(srs).size()
+    miss_pct = round(srs.isna().sum() / len(srs) * 100, 1)
+    try:
+        grp_srs = srs.groupby(srs).size()
+    except TypeError:
+        srs = srs.astype(str)
+        grp_srs = srs.groupby(srs).size()
     # select largest or smallest groups
     smp_srs = grp_srs.nlargest(n=ngroups) if largest else grp_srs.nsmallest(n=ngroups)
-    df = smp_srs.to_frame().rename(columns={srs.name: "cnt"}).reset_index().compute()
+    df = smp_srs.to_frame().rename(columns={srs.name: "cnt"}).reset_index()
     # add a row containing the sum of the other groups
     other_cnt = len(srs) - df["cnt"].sum()
     df = df.append(pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]}))
     # add a column containing the percent of count in each group
     df["pct"] = df["cnt"] / len(srs) * 100
     df.columns = ["col", "cnt", "pct"]
+    df["col"] = df["col"].astype(str)  # needed when numeric is cast as categorical
     return df, len(grp_srs), miss_pct
 
 
@@ -244,13 +249,12 @@ def calc_hist(
     Tuple[pd.DataFrame, float]:
         The histogram in a dataframe and the percent of missing values
     """
-    miss_pct = round(srs.isna().sum().compute() / len(srs) * 100, 1)
-
+    miss_pct = round(srs.isna().sum() / len(srs) * 100, 1)
     data = srs.dropna().values
-    minv, maxv = data.min().compute(), data.max().compute()
-
-    hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins)
-    hist_arr = hist_arr.compute()
+    if len(data) == 0:  # all values in column are missing
+        return pd.DataFrame({"left": [], "right": [], "freq": []}), miss_pct
+    minv, maxv = data.min(), data.max()
+    hist_arr, bins_arr = np.histogram(data, range=[minv, maxv], bins=bins)
     intervals = _format_bin_intervals(bins_arr)
     hist_df = pd.DataFrame(
         {
@@ -286,7 +290,7 @@ def calc_hist_kde(
         The histogram in a dataframe, range of points for the kde,
         and the kde calculated at the specified points
     """
-    minv, maxv = data.min().compute(), data.max().compute()
+    minv, maxv = dask.compute(data.min(), data.max())
     hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins, density=True)
     hist_arr = hist_arr.compute()
     intervals = _format_bin_intervals(bins_arr)
@@ -318,8 +322,7 @@ def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray]:
         A tuple of (actual quantiles, theoretical quantiles)
     """
     q_range = np.linspace(0.01, 0.99, 100)
-    actual_qs = srs.quantile(q_range).compute()
-    mean, std = srs.mean().compute(), srs.std().compute()
+    actual_qs, mean, std = dask.compute(srs.quantile(q_range), srs.mean(), srs.std())
     theory_qs = np.sort(np.asarray(norm.ppf(q_range, mean, std)))
     return actual_qs, theory_qs
 
@@ -351,6 +354,7 @@ def calc_box(
         groups and another list of the outlier values, a dictionary
         logging the sampled group output
     """
+    # pylint: disable=too-many-locals
     grp_cnt_stats = None  # to inform the user of sampled output
 
     x = df.columns[0]
@@ -359,9 +363,9 @@ def calc_box(
     else:
         y = df.columns[1]
         if is_numerical(df[x].dtype) and is_numerical(df[y].dtype):
-            minv, maxv = df[x].min().compute(), df[x].max().compute()
-            if df[x].nunique().compute() < bins:
-                bins = df[x].nunique().compute() - 1
+            minv, maxv, cnt = dask.compute(df[x].min(), df[x].max(), df[x].nunique())
+            if cnt < bins:
+                bins = cnt - 1
             endpts = np.linspace(minv, maxv, num=bins + 1)
             # calculate a box plot over each bin
             df = dd.concat(
@@ -434,7 +438,7 @@ def calc_hist_by_group(
     # create a histogram for each group
     for grp in largest_grps:
         grp_srs = df.groupby([df.columns[0]]).get_group(grp)[df.columns[1]]
-        minv, maxv = grp_srs.min().compute(), grp_srs.max().compute()
+        minv, maxv = dask.compute(grp_srs.min(), grp_srs.max())
         hist_arr, bins_arr = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
         intervals = _format_bin_intervals(bins_arr)
         hist_lst.append((hist_arr, bins_arr, intervals))
@@ -620,8 +624,9 @@ def _calc_box_stats(grp_srs: dd.Series, grp: str) -> pd.DataFrame:
         stats["q1"], stats["q2"], stats["q3"] = np.nan, np.nan, np.nan
 
     iqr = stats["q3"] - stats["q1"]
-    stats["lw"] = grp_srs[grp_srs >= stats["q1"] - 1.5 * iqr].min().compute()
-    stats["uw"] = grp_srs[grp_srs <= stats["q3"] + 1.5 * iqr].max().compute()
+    stats["lw"] = grp_srs[grp_srs >= stats["q1"] - 1.5 * iqr].min()
+    stats["uw"] = grp_srs[grp_srs <= stats["q3"] + 1.5 * iqr].max()
+    stats["lw"], stats["uw"] = dask.compute(stats["lw"], stats["uw"])
 
     otlrs = grp_srs[(grp_srs < stats["lw"]) | (grp_srs > stats["uw"])]
     if len(otlrs) > 100:  # sample 100 outliers
