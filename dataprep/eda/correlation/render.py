@@ -196,7 +196,8 @@ def render_scatter(
     df = itmdt["data"]
     xcol, ycol, *maybe_label = df.columns
 
-    tooltips = [(xcol, f"@{xcol}"), (ycol, f"@{ycol}")]
+    tooltips = [(xcol, f"@{{{xcol}}}"), (ycol, f"@{{{ycol}}}")]
+
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
