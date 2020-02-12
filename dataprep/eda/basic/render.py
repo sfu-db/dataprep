@@ -257,9 +257,10 @@ def hist_viz(
     fig.add_tools(hover)
     tweak_figure(fig, "hist", show_yaxis)
     fig.yaxis.axis_label = "Frequency"
-    minv = df.iloc[0]["left"]
-    maxv = df.iloc[-1]["right"]
-    _format_xaxis(fig, minv, maxv)
+    if not df.empty:
+        minv = df.iloc[0]["left"]
+        maxv = df.iloc[-1]["right"]
+        _format_xaxis(fig, minv, maxv)
 
     return fig
 
