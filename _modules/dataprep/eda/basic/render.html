@@ -295,9 +295,10 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="n">show_yaxis</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Frequency&quot;</span>
-    <span class="n">minv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;left&quot;</span><span class="p">]</span>
-    <span class="n">maxv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;right&quot;</span><span class="p">]</span>
-    <span class="n">_format_xaxis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">minv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;left&quot;</span><span class="p">]</span>
+        <span class="n">maxv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;right&quot;</span><span class="p">]</span>
+        <span class="n">_format_xaxis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span>
 
