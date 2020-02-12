@@ -234,7 +234,8 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
     <span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">,</span> <span class="o">*</span><span class="n">maybe_label</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
 
-    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xcol</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{xcol}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">ycol</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{ycol}</span><span class="s2">&quot;</span><span class="p">)]</span>
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xcol</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@{{</span><span class="si">{xcol}</span><span class="s2">}}&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">ycol</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@{{</span><span class="si">{ycol}</span><span class="s2">}}&quot;</span><span class="p">)]</span>
+
     <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
         <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
