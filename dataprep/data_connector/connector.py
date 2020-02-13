@@ -13,6 +13,8 @@ from .errors import RequestError
 from ..errors import UnreachableError
 from .implicit_database import ImplicitDatabase, ImplicitTable
 
+from pathlib import Path
+from json import load as jload
 
 class Connector:
     """
@@ -50,6 +52,7 @@ class Connector:
         self.vars = kwargs
         self.auth_params = auth_params or {}
         self.jenv = Environment()
+        self.config_path = config_path.lstrip("file://")
 
     def _fetch(
         self,
@@ -102,6 +105,7 @@ class Connector:
 
         return resp
 
+
     def query(
         self,
         table: str,
@@ -141,6 +145,35 @@ class Connector:
         Return all the table names contained in this database.
         """
         return list(self.impdb.tables.keys())
+
+
+    def show_schema(self, table_name: str) -> pd.DataFrame:
+        # read config file
+        path = Path(self.config_path)
+
+        for table_config_path in path.iterdir():
+            if not table_config_path.is_file():
+                # ignore configs that are not file
+                continue
+            if table_config_path.suffix != ".json":
+                # ifnote non json file
+                continue
+
+            if table_name != table_config_path.name.replace(".json", ''):
+                continue
+
+            #print(table_config_path.name)
+            # parse json and fetch schemas
+            with open(table_config_path) as f:
+                table_config_content = jload(f)
+                schema = table_config_content['response']['schema']
+                new_schema_dict = {}
+                for k in schema.keys():
+                    new_schema_dict[k] = schema[k]['type']
+                    #print("attribute name:", k, ", data type:", schema[k]['type'])
+                return pd.DataFrame.from_dict(new_schema_dict, orient='index', columns=['data_type'])
+
+        
 
     # def show_schema(self):
     #     res = self._request({"term": "hotpot", "location": "vancouver"})
