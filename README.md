@@ -94,8 +94,16 @@ plot_missing(df, x="some_column_name")
 Don't forget to checkout the [examples] folder for detailed demonstration!
 
 ## Contribution
-Contribution is always welcome. 
-If you want to contribute to dataprep, be sure to read the [contribution guidelines].
+Dataprep is in its very early stage. Any contribution including:
+* Filing an issue
+* Providing use cases
+* Write down your user experience
+* Submit a PR
+* ...
+
+are greatly appreciated!
+
+If you want to make code contribution to dataprep, be sure to read the [contribution guidelines].
 
 
 
