@@ -329,7 +329,7 @@ the palette will be automatically chosen based on different visualization types.
 
 <dl class="function">
 <dt id="dataprep.eda.compute_missing">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, num_bins: int = 30, num_cols: int = 30, num_dist_sample: int = 100</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 30, ncols: int = 30, ndist_sample: int = 100</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
@@ -340,11 +340,11 @@ plot_missing(df, x, y)</p>
 </dd>
 <dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
 </dd>
-<dt>num_cols: int, optional</dt><dd><p>The number of columns in the figure</p>
+<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
 </dd>
-<dt>bins_num: int</dt><dd><p>The number of rows in the figure</p>
+<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
 </dd>
-<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
+<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -379,7 +379,7 @@ otherwise =&gt; error</p>
 
 <dl class="function">
 <dt id="dataprep.eda.plot_missing">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, num_bins: int = 30, num_cols: int = 30, num_dist_sample: int = 100, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 30, ncols: int = 30, ndist_sample: int = 100, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
@@ -390,9 +390,11 @@ plot_missing(df, x, y)</p>
 </dd>
 <dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
 </dd>
-<dt>num_cols: int, optional</dt><dd><p>The number of columns in the figure</p>
+<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
 </dd>
-<dt>bins_num: int</dt><dd><p>The number of rows in the figure</p>
+<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
+</dd>
+<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
 </dd>
 <dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
 </dd>
