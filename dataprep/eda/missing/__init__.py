@@ -2,7 +2,7 @@
     This module implements the plot_missing(df) function
 """
 
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 import dask.dataframe as dd
 import pandas as pd
@@ -20,9 +20,9 @@ def plot_missing(
     x: Optional[str] = None,
     y: Optional[str] = None,
     *,
-    num_bins: int = 30,
-    num_cols: int = 30,
-    num_dist_sample: int = 100,
+    bins: int = 30,
+    ncols: int = 30,
+    ndist_sample: int = 100,
     show_plot: bool = True,
 ) -> LayoutDOM:
     """
@@ -38,10 +38,12 @@ def plot_missing(
         a valid column name of the data frame
     y_name: str, optional
         a valid column name of the data frame
-    num_cols: int, optional
+    ncols: int, optional
         The number of columns in the figure
-    bins_num: int
+    bins: int
         The number of rows in the figure
+    ndist_sample: int
+        The number of sample points
     return_intermediate: bool
         whether show intermediate results to users
 
@@ -70,9 +72,7 @@ def plot_missing(
         case (None, None) => heatmap
         otherwise => error
     """
-    itmdt = compute_missing(
-        df, x, y, num_bins=num_bins, num_cols=num_cols, num_dist_sample=num_dist_sample
-    )
+    itmdt = compute_missing(df, x, y, bins=bins, ncols=ncols, ndist_sample=ndist_sample)
     fig = render_missing(itmdt)
     if show_plot:
         show(fig)

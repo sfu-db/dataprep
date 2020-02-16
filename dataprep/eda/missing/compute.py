@@ -22,7 +22,7 @@ LABELS = ["Origin", "DropMissing"]
 
 def histogram(
     srs: dd.Series,
-    num_bins: Optional[int] = None,
+    bins: Optional[int] = None,
     return_edges: bool = True,
     range: Optional[Tuple[int, int]] = None,  # pylint: disable=redefined-builtin
 ) -> Union[Tuple[da.Array, da.Array], Tuple[da.Array, da.Array, da.Array]]:
@@ -37,11 +37,11 @@ def histogram(
             minimum, maximum = srs.min(axis=0), srs.max(axis=0)
 
         assert (
-            num_bins is not None
+            bins is not None
         ), "num_bins cannot be None if calculating numerical histograms"
 
         counts, edges = da.histogram(
-            srs.to_dask_array(), num_bins, range=[minimum, maximum]
+            srs.to_dask_array(), bins, range=[minimum, maximum]
         )
         centers = (edges[:-1] + edges[1:]) / 2
 
@@ -71,15 +71,15 @@ def missing_perc_blockwise(block: np.ndarray) -> np.ndarray:
     return block.sum(axis=0, keepdims=True) / len(block)
 
 
-def missing_spectrum(df: dd.DataFrame, num_bins: int, num_cols: int) -> Intermediate:
+def missing_spectrum(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
     """
     Calculate a missing spectrum for each column
     """
     # pylint: disable=too-many-locals
-    num_bins = min(num_bins, len(df) - 1)
+    num_bins = min(bins, len(df) - 1)
 
-    df = df.iloc[:, :num_cols]
-    cols = df.columns[:num_cols]
+    df = df.iloc[:, :ncols]
+    cols = df.columns[:ncols]
     ncols = len(cols)
     nrows = len(df)
     chunk_size = len(df) // num_bins
@@ -111,7 +111,7 @@ def missing_spectrum(df: dd.DataFrame, num_bins: int, num_cols: int) -> Intermed
 
 
 def missing_impact_1vn(  # pylint: disable=too-many-locals
-    df: dd.DataFrame, x: str, num_bins: int
+    df: dd.DataFrame, x: str, bins: int
 ) -> Intermediate:
     """
     Calculate the distribution change on other columns when
@@ -129,7 +129,7 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
             range = (df0[col].min(axis=0), df0[col].max(axis=0))
 
         hists[col] = [
-            histogram(df[col], num_bins=num_bins, return_edges=True, range=range)
+            histogram(df[col], bins=bins, return_edges=True, range=range)
             for df in [df0, df1]
         ]
     (hists,) = dd.compute(hists)
@@ -164,11 +164,11 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
-        if len(counts[0]) > num_bins and is_categorical(df0[col].dtype):
+        if len(counts[0]) > bins and is_categorical(df0[col].dtype):
             sortidx = np.argsort(-counts[0])
-            selected_xs = xs[0][sortidx[:num_bins]]
+            selected_xs = xs[0][sortidx[:bins]]
             df = df[df["x"].isin(selected_xs)]
-            meta[col, "partial"] = (num_bins, len(counts[0]))
+            meta[col, "partial"] = (bins, len(counts[0]))
         else:
             meta[col, "partial"] = (len(counts[0]), len(counts[0]))
 
@@ -179,7 +179,7 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
 
 
 def missing_impact_1v1(  # pylint: disable=too-many-locals
-    df: dd.DataFrame, x: str, y: str, num_bins: int, num_dist_sample: int
+    df: dd.DataFrame, x: str, y: str, bins: int, ndist_sample: int
 ) -> Intermediate:
     """
     Calculate the distribution change on another column y when
@@ -192,9 +192,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
     srs0, srs1 = df0[y], df1[y]
     minimum, maximum = srs0.min(), srs0.max()
 
-    hists = [
-        histogram(srs, num_bins=num_bins, return_edges=True) for srs in [srs0, srs1]
-    ]
+    hists = [histogram(srs, bins=bins, return_edges=True) for srs in [srs0, srs1]]
     hists = da.compute(*hists)
 
     meta = ColumnsMetadata()
@@ -202,7 +200,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
 
     if is_numerical(df[y].dtype):
         dists = [rv_histogram((hist[0], hist[2])) for hist in hists]  # type: ignore
-        xs = np.linspace(minimum, maximum, num_dist_sample)
+        xs = np.linspace(minimum, maximum, ndist_sample)
 
         pdfs = [dist.pdf(xs) for dist in dists]
         cdfs = [dist.cdf(xs) for dist in dists]
@@ -212,7 +210,7 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
                 "x": np.tile(xs, 2),
                 "pdf": np.concatenate(pdfs),
                 "cdf": np.concatenate(cdfs),
-                "label": np.repeat(LABELS, num_dist_sample),
+                "label": np.repeat(LABELS, ndist_sample),
             }
         )
 
@@ -272,11 +270,11 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
-        if len(counts[0]) > num_bins:
+        if len(counts[0]) > bins:
             sortidx = np.argsort(-counts[0])
-            selected_xs = xs[0][sortidx[:num_bins]]
+            selected_xs = xs[0][sortidx[:bins]]
             df = df[df["x"].isin(selected_xs)]
-            partial = (num_bins, len(counts[0]))
+            partial = (bins, len(counts[0]))
         else:
             partial = (len(counts[0]), len(counts[0]))
 
@@ -294,9 +292,9 @@ def compute_missing(
     x: Optional[str] = None,
     y: Optional[str] = None,
     *,
-    num_bins: int = 30,
-    num_cols: int = 30,
-    num_dist_sample: int = 100,
+    bins: int = 30,
+    ncols: int = 30,
+    ndist_sample: int = 100,
 ) -> Intermediate:
     """
     This function is designed to deal with missing values
@@ -311,12 +309,12 @@ def compute_missing(
         a valid column name of the data frame
     y_name: str, optional
         a valid column name of the data frame
-    num_cols: int, optional
+    ncols: int, optional
         The number of columns in the figure
-    bins_num: int
+    bins: int
         The number of rows in the figure
-    return_intermediate: bool
-        whether show intermediate results to users
+    ndist_sample: int
+        The number of sample points
 
     Returns
     ----------
@@ -350,10 +348,8 @@ def compute_missing(
     if x is None and y is not None:
         raise ValueError("x cannot be None while y has value")
     elif x is not None and y is None:
-        return missing_impact_1vn(df, x=x, num_bins=num_bins)
+        return missing_impact_1vn(df, x=x, bins=bins)
     elif x is not None and y is not None:
-        return missing_impact_1v1(
-            df, x=x, y=y, num_bins=num_bins, num_dist_sample=num_dist_sample
-        )
+        return missing_impact_1v1(df, x=x, y=y, bins=bins, ndist_sample=ndist_sample)
     else:
-        return missing_spectrum(df, num_bins=num_bins, num_cols=num_cols)
+        return missing_spectrum(df, bins=bins, ncols=ncols)
