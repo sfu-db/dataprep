@@ -152,7 +152,45 @@ class Connector:
         return itable.from_response(resp)
 
 
-    #def info():
+    def info(self):
+        # 1. show tables available for connection
+        print(len(self.table_names), 'table(s) available in', Path(self.config_path).stem, ':') 
+
+        path = Path(self.config_path)
+        for table_config_path in path.iterdir():
+            if not table_config_path.is_file():
+                # ignore configs that are not file
+                continue
+            if table_config_path.suffix != ".json":
+                # if non json file
+                continue
+
+            if table_config_path.name.startswith("_"):
+                continue
+
+            print(f"{table_config_path.name.replace('.json', '')} table: ")
+
+            # parse json and fetch required parameters
+            params_required = []
+            example_query_fields = []
+            c = 1
+            with open(table_config_path) as f:
+                table_config_content = jload(f)
+                for k in table_config_content['request']['params'].keys():
+                    if table_config_content['request']['params'][k] == True:
+                        params_required.append(k)
+                        example_query_fields.append(k + '=\'word' + str(c) + '\'')
+                        c += 1
+            print('---', 'requried parameters for quering:', params_required)
+
+            # 2. example query:
+            print(f"--- example query: dc.query('{table_config_path.name.replace('.json', '')}', {', '.join(example_query_fields)})")
+
+            # 3. other methods::
+            print('---', 'other methods:')
+            print('------', 'dc.table_names')
+            print('------', 'dc.show_schema(\'table name\')')
+
 
 
 
@@ -173,7 +211,7 @@ class Connector:
                 # ignore configs that are not file
                 continue
             if table_config_path.suffix != ".json":
-                # ifnote non json file
+                # if non json file
                 continue
 
             if table_name != table_config_path.name.replace(".json", ''):
