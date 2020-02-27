@@ -4,22 +4,22 @@
 import random
 from time import time
 
-import dask.dataframe as dd
 import dask.array as da
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import pytest
 
 from ...eda.correlation import compute_correlation, plot_correlation
 from ...eda.correlation.compute import (
-    pearson_nxn,
-    spearman_nxn,
+    kendall_tau_1xn,
     kendall_tau_nxn,
     pearson_1xn,
+    pearson_nxn,
     spearman_1xn,
-    kendall_tau_1xn,
+    spearman_nxn,
 )
-from ...utils import to_dask
+from ...eda.utils import to_dask
 
 
 @pytest.fixture(scope="module")  # type: ignore
@@ -72,8 +72,7 @@ def test_sanity_compute_8(simpledf: dd.DataFrame) -> None:
     plot_correlation(simpledf, x="b", y="a", k=1, show_plot=False)
 
 
-@pytest.mark.xfail  # type: ignore
-def test_sanity_compute_fail_1(simpledf: dd.DataFrame) -> None:
+def test_sanity_compute_9(simpledf: dd.DataFrame) -> None:
     compute_correlation(simpledf, value_range=(0.3, 0.7))
     plot_correlation(simpledf, value_range=(0.3, 0.7), show_plot=False)
 

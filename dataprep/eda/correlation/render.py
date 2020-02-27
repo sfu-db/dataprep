@@ -21,7 +21,7 @@ from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import Figure, figure
 
-from ..common import Intermediate
+from ..intermediate import Intermediate
 from ..palette import BIPALETTE, BRG
 
 __all__ = ["render_correlation"]
@@ -69,7 +69,7 @@ def tweak_figure(fig: Figure) -> None:
 
 
 def render_correlation_heatmaps(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
 ) -> Tabs:
     """
     Render correlation heatmaps in to tabs
@@ -92,10 +92,11 @@ def render_correlation_heatmaps(
             y_range=y_range,
             plot_width=plot_width,
             plot_height=plot_height,
-            x_axis_location="above",
+            x_axis_location="below",
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
+            background_fill_color="#fafafa",
         )
 
         tweak_figure(fig)
@@ -120,7 +121,7 @@ def render_correlation_heatmaps(
 
 
 def render_correlation_single_heatmaps(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str],
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
 ) -> Tabs:
     """
     Render correlation heatmaps, but with single column
@@ -195,7 +196,8 @@ def render_scatter(
     df = itmdt["data"]
     xcol, ycol, *maybe_label = df.columns
 
-    tooltips = [(xcol, f"@{xcol}"), (ycol, f"@{ycol}")]
+    tooltips = [(xcol, f"@{{{xcol}}}"), (ycol, f"@{{{ycol}}}")]
+
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
@@ -248,8 +250,8 @@ def render_scatter(
 
 def render_correlation(
     itmdt: Intermediate,
-    plot_width: int = 400,
-    plot_height: int = 300,
+    plot_width: int = 500,
+    plot_height: int = 500,
     palette: Optional[Sequence[str]] = None,
 ) -> Figure:
     """
@@ -271,7 +273,9 @@ def render_correlation(
     Figure
         The bokeh Figure instance.
     """
-    if itmdt.visual_type == "correlation_heatmaps":
+    if itmdt.visual_type is None:
+        visual_elem = Figure()
+    elif itmdt.visual_type == "correlation_heatmaps":
         visual_elem = render_correlation_heatmaps(
             itmdt, plot_width, plot_height, palette or BIPALETTE
         )
@@ -281,4 +285,5 @@ def render_correlation(
         )
     elif itmdt.visual_type == "correlation_scatter":
         visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+    # TODO Can we raise an exception here? Otherwise, visual_elem will be used before assigned
     return visual_elem

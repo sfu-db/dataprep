@@ -7,7 +7,7 @@ from io import StringIO
 from json import load as jload
 from json import loads as jloads
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 import jsonschema
 import pandas as pd
@@ -213,7 +213,7 @@ class ImplicitDatabase:
     name: str
     tables: Dict[str, ImplicitTable]
 
-    def __init__(self, config_path: str) -> None:
+    def __init__(self, config_path: Union[str, Path]) -> None:
         path = Path(config_path)
 
         self.name = path.name
@@ -222,6 +222,9 @@ class ImplicitDatabase:
         for table_config_path in path.iterdir():
             if not table_config_path.is_file():
                 # ignore configs that are not file
+                continue
+            if table_config_path.name == "_meta.json":
+                # ignore meta file
                 continue
             if table_config_path.suffix != ".json":
                 # ifnote non json file

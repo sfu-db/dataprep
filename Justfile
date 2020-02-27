@@ -23,9 +23,11 @@ testf +ARGS="dataprep":
 lint:
   poetry run pylint dataprep
 
-
 ci-pytype:
   poetry run pytype dataprep
 
 ci-mypy:
   poetry run mypy dataprep
+
+build:
+  poetry build
