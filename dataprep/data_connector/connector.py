@@ -146,33 +146,6 @@ class Connector:
         """
         return list(self.impdb.tables.keys())
 
-
-    def show_schema(self, table_name: str) -> pd.DataFrame:
-        # read config file
-        path = Path(self.config_path)
-
-        for table_config_path in path.iterdir():
-            if not table_config_path.is_file():
-                # ignore configs that are not file
-                continue
-            if table_config_path.suffix != ".json":
-                # ifnote non json file
-                continue
-
-            if table_name != table_config_path.name.replace(".json", ''):
-                continue
-
-            #print(table_config_path.name)
-            # parse json and fetch schemas
-            with open(table_config_path) as f:
-                table_config_content = jload(f)
-                schema = table_config_content['response']['schema']
-                new_schema_dict = {}
-                for k in schema.keys():
-                    new_schema_dict[k] = schema[k]['type']
-                    #print("attribute name:", k, ", data type:", schema[k]['type'])
-                return pd.DataFrame.from_dict(new_schema_dict, orient='index', columns=['data_type'])
-
         
 
     # def show_schema(self):
