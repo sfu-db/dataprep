@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from jinja2 import Environment
+from jinja2 import Environment, StrictUndefined
 from requests import Request, Response, Session
 
 from ..errors import UnreachableError
@@ -40,7 +40,7 @@ class Connector:
         ----------
         config_path : str
             The path to the config. It can be hosted, e.g. "yelp", or from
-            local filesystem, e.g. "file://./yelp"
+            local filesystem, e.g. "./yelp"
         **kwargs : Dict[str, Any]
             Additional parameters
         """
@@ -61,7 +61,7 @@ class Connector:
 
         self.vars = kwargs
         self.auth_params = auth_params or {}
-        self.jenv = Environment()
+        self.jenv = Environment(undefined=StrictUndefined)
 
     def _fetch(
         self,
