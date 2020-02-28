@@ -44,7 +44,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">UndefinedError</span>
 
 <span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 
@@ -135,7 +135,9 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="n">fields_config</span>
 
-<div class="viewcode-block" id="Fields.populate"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Fields.populate">[docs]</a>    <span class="k">def</span> <span class="nf">populate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jenv</span><span class="p">:</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="Fields.populate"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Fields.populate">[docs]</a>    <span class="k">def</span> <span class="nf">populate</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">jenv</span><span class="p">:</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Populate a dict based on the fields definition and provided vars.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -169,7 +171,10 @@
                         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">tmplt</span> <span class="o">=</span> <span class="n">jenv</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">tmplt</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">tmplt</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">UndefinedError</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># This empty string will be removed if `remove_if_empty` is True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">UnreachableError</span><span class="p">()</span>
 

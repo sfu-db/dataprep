@@ -44,7 +44,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span>
 <span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Session</span>
 
 <span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
@@ -77,7 +77,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        config_path : str</span>
 <span class="sd">            The path to the config. It can be hosted, e.g. &quot;yelp&quot;, or from</span>
-<span class="sd">            local filesystem, e.g. &quot;file://./yelp&quot;</span>
+<span class="sd">            local filesystem, e.g. &quot;./yelp&quot;</span>
 <span class="sd">        **kwargs : Dict[str, Any]</span>
 <span class="sd">            Additional parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -98,7 +98,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">vars</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">auth_params</span> <span class="o">=</span> <span class="n">auth_params</span> <span class="ow">or</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">jenv</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jenv</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">undefined</span><span class="o">=</span><span class="n">StrictUndefined</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_fetch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
