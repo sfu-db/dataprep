@@ -7,7 +7,7 @@ from time import time
 from typing import Any, Dict, Optional, cast
 
 import requests
-from jinja2 import Environment
+from jinja2 import Environment, UndefinedError
 
 from ..errors import UnreachableError
 
@@ -98,7 +98,9 @@ class Fields:
     def __init__(self, fields_config: Dict[str, Any]) -> None:
         self.fields = fields_config
 
-    def populate(self, jenv: Environment, params: Dict[str, Any]) -> Dict[str, str]:
+    def populate(  # pylint: disable=too-many-branches
+        self, jenv: Environment, params: Dict[str, Any]
+    ) -> Dict[str, str]:
         """
         Populate a dict based on the fields definition and provided vars.
         """
@@ -132,7 +134,10 @@ class Fields:
                         raise KeyError(from_key)
                 else:
                     tmplt = jenv.from_string(template)
-                    value = tmplt.render(**params)
+                    try:
+                        value = tmplt.render(**params)
+                    except UndefinedError:
+                        value = ""  # This empty string will be removed if `remove_if_empty` is True
             else:
                 raise UnreachableError()
 
