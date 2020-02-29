@@ -186,10 +186,11 @@ class Connector:
             # 2. example query:
             print(f"--- example query: dc.query('{table_config_path.name.replace('.json', '')}', {', '.join(example_query_fields)})")
 
-            # 3. other methods::
-            print('---', 'other methods:')
-            print('------', 'dc.table_names')
-            print('------', 'dc.show_schema(\'table name\')')
+        # 3. other methods::
+        print('\n')
+        print('other methods:')
+        print('---', 'dc.table_names')
+        print('---', 'dc.show_schema(\'table name\')')
 
 
 
@@ -217,16 +218,21 @@ class Connector:
             if table_name != table_config_path.name.replace(".json", ''):
                 continue
 
-            #print(table_config_path.name)
+            print('table:', table_config_path.name.replace(".json", ''))
             # parse json and fetch schemas
             with open(table_config_path) as f:
                 table_config_content = jload(f)
                 schema = table_config_content['response']['schema']
                 new_schema_dict = {}
+                c = 0
+                new_schema_dict['column_name'] = []
+                new_schema_dict['data_type'] = []
                 for k in schema.keys():
-                    new_schema_dict[k] = schema[k]['type']
+                    new_schema_dict['column_name'].append(k)
+                    new_schema_dict['data_type'].append(schema[k]['type'])
+                    c += 1
                     #print("attribute name:", k, ", data type:", schema[k]['type'])
-                return pd.DataFrame.from_dict(new_schema_dict, orient='index', columns=['data_type'])
+                return pd.DataFrame.from_dict(new_schema_dict)
 
     # def show_schema(self):
     #     res = self._request({"term": "hotpot", "location": "vancouver"})
