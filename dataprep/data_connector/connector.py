@@ -154,8 +154,9 @@ class Connector:
 
     def info(self):
         # 1. show tables available for connection
-        print(len(self.table_names), 'table(s) available in', Path(self.config_path).stem, ':') 
+        print(len(self.table_names), 'table(s) available in', Path(self.config_path).stem, ':\n') 
 
+        count = 0
         path = Path(self.config_path)
         for table_config_path in path.iterdir():
             if not table_config_path.is_file():
@@ -167,9 +168,8 @@ class Connector:
 
             if table_config_path.name.startswith("_"):
                 continue
-
-            print(f"{table_config_path.name.replace('.json', '')} table: ")
-
+            count += 1
+            print(f"({count}). {table_config_path.name.replace('.json', '')} table: ")
             # parse json and fetch required parameters
             params_required = []
             example_query_fields = []
@@ -181,17 +181,16 @@ class Connector:
                         params_required.append(k)
                         example_query_fields.append(k + '=\'word' + str(c) + '\'')
                         c += 1
-            print('---', 'requried parameters for quering:', params_required)
+            print('---', 'requried parameters for quering:\n>>>', params_required)
 
             # 2. example query:
-            print(f"--- example query: dc.query('{table_config_path.name.replace('.json', '')}', {', '.join(example_query_fields)})")
+            print(f"--- example query:\n>>> dc.query('{table_config_path.name.replace('.json', '')}', {', '.join(example_query_fields)})")
 
         # 3. other methods::
-        print('\n')
-        print('other methods:')
-        print('---', 'dc.table_names')
-        print('---', 'dc.show_schema(\'table name\')')
-
+        #print('\n')
+        print('\nother methods:')
+        print('>>>', 'dc.table_names')
+        print('>>>', 'dc.show_schema(\'table name\')')
 
 
 
