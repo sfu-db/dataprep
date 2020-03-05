@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from jinja2 import Environment
-from jinja2 import Template
+from jinja2 import Environment, Template, StrictUndefined
 from requests import Request, Response, Session
 
 from ..errors import UnreachableError
@@ -64,7 +63,7 @@ class Connector:
 
         self.vars = kwargs
         self.auth_params = auth_params or {}
-        self.jenv = Environment()
+        self.jenv = Environment(undefined=StrictUndefined)
         self.config_path = config_path
 
 
@@ -184,13 +183,13 @@ class Connector:
         print('>>>', 'dc.show_schema(\'table name\')')
 
 
-
     @property
     def table_names(self) -> List[str]:
         """
         Return all the table names contained in this database.
         """
         return list(self.impdb.tables.keys())
+
 
     def show_schema(self, table_name: str) -> pd.DataFrame:
         print('table:', table_name)
