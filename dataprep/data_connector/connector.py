@@ -216,12 +216,12 @@ class Connector:
         table_config_content = self.impdb.tables[table_name].config
         schema = table_config_content["response"]["schema"]
         new_schema_dict: Dict[str, List[Any]] = {}
-        c = 0
+        count = 0
         new_schema_dict["column_name"] = []
         new_schema_dict["data_type"] = []
         for k in schema.keys():
             new_schema_dict["column_name"].append(k)
             new_schema_dict["data_type"].append(schema[k]["type"])
-            c += 1
+            count += 1
             # print("attribute name:", k, ", data type:", schema[k]['type'])
         return pd.DataFrame.from_dict(new_schema_dict)
