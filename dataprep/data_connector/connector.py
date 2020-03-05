@@ -151,7 +151,7 @@ class Connector:
 
         return itable.from_response(resp)
 
-    def info(self):
+    def info(self) -> None:
         # show tables available for connection
         print(
             len(self.table_names),
@@ -202,7 +202,7 @@ class Connector:
         print("table:", table_name)
         table_config_content = self.impdb.tables[table_name].config
         schema = table_config_content["response"]["schema"]
-        new_schema_dict = {}
+        new_schema_dict: Dict[str, List[Any]] = {}
         c = 0
         new_schema_dict["column_name"] = []
         new_schema_dict["data_type"] = []
