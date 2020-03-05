@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from jinja2 import Environment
+from jinja2 import Template
 from requests import Request, Response, Session
 
 from ..errors import UnreachableError
@@ -64,7 +65,8 @@ class Connector:
         self.vars = kwargs
         self.auth_params = auth_params or {}
         self.jenv = Environment()
-        self.config_path = config_path.lstrip("file://")
+        self.config_path = config_path
+
 
     def _fetch(
         self,
@@ -153,45 +155,33 @@ class Connector:
 
 
     def info(self):
-        # 1. show tables available for connection
+        # show tables available for connection
         print(len(self.table_names), 'table(s) available in', Path(self.config_path).stem, ':\n') 
 
-        count = 0
-        path = Path(self.config_path)
-        for table_config_path in path.iterdir():
-            if not table_config_path.is_file():
-                # ignore configs that are not file
-                continue
-            if table_config_path.suffix != ".json":
-                # if non json file
-                continue
+        # create templates for showing table information
+        # 1. amndatory parameters for a query 
+        t_params = Template("--- requried parameters for quering:\n>>> {{params}}")
+        # 2. example query:
+        t_query = Template("--- example query:\n>>> dc.query('{{table}}', {{joined_query_fields}})")
 
-            if table_config_path.name.startswith("_"):
-                continue
-            count += 1
-            print(f"({count}). {table_config_path.name.replace('.json', '')} table: ")
-            # parse json and fetch required parameters
+        for t in self.impdb.tables.keys():
+            print(t, 'table:')
+            table_config_content = self.impdb.tables[t].config
             params_required = []
             example_query_fields = []
             c = 1
-            with open(table_config_path) as f:
-                table_config_content = jload(f)
-                for k in table_config_content['request']['params'].keys():
-                    if table_config_content['request']['params'][k] == True:
-                        params_required.append(k)
-                        example_query_fields.append(k + '=\'word' + str(c) + '\'')
-                        c += 1
-            print('---', 'requried parameters for quering:\n>>>', params_required)
+            for k in table_config_content['request']['params'].keys():
+                if table_config_content['request']['params'][k] == True:
+                    params_required.append(k)
+                    example_query_fields.append(k + '=\'word' + str(c) + '\'')
+                    c += 1
+            print(t_params.render(params=params_required))
+            print(t_query.render(table=t, joined_query_fields=', '.join(example_query_fields)))
 
-            # 2. example query:
-            print(f"--- example query:\n>>> dc.query('{table_config_path.name.replace('.json', '')}', {', '.join(example_query_fields)})")
-
-        # 3. other methods::
-        #print('\n')
+        # other methods in the connector class:
         print('\nother methods:')
         print('>>>', 'dc.table_names')
         print('>>>', 'dc.show_schema(\'table name\')')
-
 
 
 
@@ -203,42 +193,17 @@ class Connector:
         return list(self.impdb.tables.keys())
 
     def show_schema(self, table_name: str) -> pd.DataFrame:
-        # read config file
-        path = Path(self.config_path)
+        print('table:', table_name)
+        table_config_content = self.impdb.tables[table_name].config
+        schema = table_config_content['response']['schema']
+        new_schema_dict = {}
+        c = 0
+        new_schema_dict['column_name'] = []
+        new_schema_dict['data_type'] = []
+        for k in schema.keys():
+            new_schema_dict['column_name'].append(k)
+            new_schema_dict['data_type'].append(schema[k]['type'])
+            c += 1
+            #print("attribute name:", k, ", data type:", schema[k]['type'])
+        return pd.DataFrame.from_dict(new_schema_dict)
 
-        for table_config_path in path.iterdir():
-            if not table_config_path.is_file():
-                # ignore configs that are not file
-                continue
-            if table_config_path.suffix != ".json":
-                # if non json file
-                continue
-
-            if table_name != table_config_path.name.replace(".json", ''):
-                continue
-
-            print('table:', table_config_path.name.replace(".json", ''))
-            # parse json and fetch schemas
-            with open(table_config_path) as f:
-                table_config_content = jload(f)
-                schema = table_config_content['response']['schema']
-                new_schema_dict = {}
-                c = 0
-                new_schema_dict['column_name'] = []
-                new_schema_dict['data_type'] = []
-                for k in schema.keys():
-                    new_schema_dict['column_name'].append(k)
-                    new_schema_dict['data_type'].append(schema[k]['type'])
-                    c += 1
-                    #print("attribute name:", k, ", data type:", schema[k]['type'])
-                return pd.DataFrame.from_dict(new_schema_dict)
-
-    # def show_schema(self):
-    #     res = self._request({"term": "hotpot", "location": "vancouver"})
-    #     df = {}
-    #     if self.config["response"]["ctype"] == "application/json":
-    #         df = self._json(res)
-    #     elif self.config["response"]["ctype"] == "application/xml":
-    #         df = self._xml(res)
-    #     for col in pd.DataFrame(df).columns:
-    #         print(col)
