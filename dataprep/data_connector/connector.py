@@ -18,6 +18,7 @@ from .implicit_database import ImplicitDatabase, ImplicitTable
 from pathlib import Path
 from json import load as jload
 
+
 class Connector:
     """
     The main class of DataConnector.
@@ -65,7 +66,6 @@ class Connector:
         self.auth_params = auth_params or {}
         self.jenv = Environment(undefined=StrictUndefined)
         self.config_path = config_path
-
 
     def _fetch(
         self,
@@ -118,7 +118,6 @@ class Connector:
 
         return resp
 
-
     def query(
         self,
         table: str,
@@ -152,36 +151,45 @@ class Connector:
 
         return itable.from_response(resp)
 
-
     def info(self):
         # show tables available for connection
-        print(len(self.table_names), 'table(s) available in', Path(self.config_path).stem, ':\n') 
+        print(
+            len(self.table_names),
+            "table(s) available in",
+            Path(self.config_path).stem,
+            ":\n",
+        )
 
         # create templates for showing table information
-        # 1. amndatory parameters for a query 
+        # 1. amndatory parameters for a query
         t_params = Template("--- requried parameters for quering:\n>>> {{params}}")
         # 2. example query:
-        t_query = Template("--- example query:\n>>> dc.query('{{table}}', {{joined_query_fields}})")
+        t_query = Template(
+            "--- example query:\n>>> dc.query('{{table}}', {{joined_query_fields}})"
+        )
 
         for t in self.impdb.tables.keys():
-            print(t, 'table:')
+            print(t, "table:")
             table_config_content = self.impdb.tables[t].config
             params_required = []
             example_query_fields = []
             c = 1
-            for k in table_config_content['request']['params'].keys():
-                if table_config_content['request']['params'][k] == True:
+            for k in table_config_content["request"]["params"].keys():
+                if table_config_content["request"]["params"][k] == True:
                     params_required.append(k)
-                    example_query_fields.append(k + '=\'word' + str(c) + '\'')
+                    example_query_fields.append(k + "='word" + str(c) + "'")
                     c += 1
             print(t_params.render(params=params_required))
-            print(t_query.render(table=t, joined_query_fields=', '.join(example_query_fields)))
+            print(
+                t_query.render(
+                    table=t, joined_query_fields=", ".join(example_query_fields)
+                )
+            )
 
         # other methods in the connector class:
-        print('\nother methods:')
-        print('>>>', 'dc.table_names')
-        print('>>>', 'dc.show_schema(\'table name\')')
-
+        print("\nother methods:")
+        print(">>>", "dc.table_names")
+        print(">>>", "dc.show_schema('table name')")
 
     @property
     def table_names(self) -> List[str]:
@@ -190,19 +198,17 @@ class Connector:
         """
         return list(self.impdb.tables.keys())
 
-
     def show_schema(self, table_name: str) -> pd.DataFrame:
-        print('table:', table_name)
+        print("table:", table_name)
         table_config_content = self.impdb.tables[table_name].config
-        schema = table_config_content['response']['schema']
+        schema = table_config_content["response"]["schema"]
         new_schema_dict = {}
         c = 0
-        new_schema_dict['column_name'] = []
-        new_schema_dict['data_type'] = []
+        new_schema_dict["column_name"] = []
+        new_schema_dict["data_type"] = []
         for k in schema.keys():
-            new_schema_dict['column_name'].append(k)
-            new_schema_dict['data_type'].append(schema[k]['type'])
+            new_schema_dict["column_name"].append(k)
+            new_schema_dict["data_type"].append(schema[k]["type"])
             c += 1
-            #print("attribute name:", k, ", data type:", schema[k]['type'])
+            # print("attribute name:", k, ", data type:", schema[k]['type'])
         return pd.DataFrame.from_dict(new_schema_dict)
-
