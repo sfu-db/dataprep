@@ -15,9 +15,6 @@ from .config_manager import config_directory, ensure_config
 from .errors import RequestError
 from .implicit_database import ImplicitDatabase, ImplicitTable
 
-from pathlib import Path
-from json import load as jload
-
 
 class Connector:
     """
@@ -152,6 +149,10 @@ class Connector:
         return itable.from_response(resp)
 
     def info(self) -> None:
+        """
+        Show the information of a website and guide users how to issue queries
+        """
+
         # show tables available for connection
         print(
             len(self.table_names),
@@ -168,17 +169,17 @@ class Connector:
             "--- example query:\n>>> dc.query('{{table}}', {{joined_query_fields}})"
         )
 
-        for t in self.impdb.tables.keys():
-            print(t, "table:")
+        for cur_table in self.impdb.tables.keys():
+            print(cur_table, "table:")
             table_config_content = self.impdb.tables[t].config
             params_required = []
             example_query_fields = []
-            c = 1
+            count = 1
             for k in table_config_content["request"]["params"].keys():
-                if table_config_content["request"]["params"][k] == True:
+                if table_config_content["request"]["params"][k]:
                     params_required.append(k)
-                    example_query_fields.append(k + "='word" + str(c) + "'")
-                    c += 1
+                    example_query_fields.append(k + "='word" + str(count) + "'")
+                    count += 1
             print(t_params.render(params=params_required))
             print(
                 t_query.render(
@@ -199,6 +200,18 @@ class Connector:
         return list(self.impdb.tables.keys())
 
     def show_schema(self, table_name: str) -> pd.DataFrame:
+        """
+        Show the returned schema of a table
+
+        Parameters
+        ----------
+        table_name : str
+            The table name.
+
+        Returns
+        -------
+            pd.DataFrame
+        """
         print("table:", table_name)
         table_config_content = self.impdb.tables[table_name].config
         schema = table_config_content["response"]["schema"]
