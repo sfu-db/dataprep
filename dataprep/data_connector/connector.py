@@ -171,7 +171,7 @@ class Connector:
 
         for cur_table in self.impdb.tables.keys():
             print(cur_table, "table:")
-            table_config_content = self.impdb.tables[t].config
+            table_config_content = self.impdb.tables[cur_table].config
             params_required = []
             example_query_fields = []
             count = 1
@@ -183,7 +183,7 @@ class Connector:
             print(t_params.render(params=params_required))
             print(
                 t_query.render(
-                    table=t, joined_query_fields=", ".join(example_query_fields)
+                    table=cur_table, joined_query_fields=", ".join(example_query_fields)
                 )
             )
 
