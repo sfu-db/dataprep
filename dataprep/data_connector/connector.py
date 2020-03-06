@@ -155,7 +155,6 @@ class Connector:
         """
         return list(self.impdb.tables.keys())
 
-
     @property
     def info(self) -> None:
         """
@@ -192,8 +191,8 @@ class Connector:
                     count += 1
                 else:
                     params_optional.append(k)
-            print(t_params.render(option = "required", params=params_required))
-            print(t_params.render(option = "optional", params=params_optional))
+            print(t_params.render(option="required", params=params_required))
+            print(t_params.render(option="optional", params=params_optional))
             print(
                 t_query.render(
                     table=cur_table, joined_query_fields=", ".join(example_query_fields)
