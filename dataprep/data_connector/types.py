@@ -7,11 +7,7 @@ from time import time
 from typing import Any, Dict, Optional, cast
 
 import requests
-<<<<<<< HEAD
-from jinja2 import Environment
-=======
 from jinja2 import Environment, UndefinedError
->>>>>>> fadebc76cd9c011cafaff7b10f993e52cbcaa1ea
 
 from ..errors import UnreachableError
 
@@ -102,13 +98,10 @@ class Fields:
     def __init__(self, fields_config: Dict[str, Any]) -> None:
         self.fields = fields_config
 
-<<<<<<< HEAD
-    def populate(self, jenv: Environment, params: Dict[str, Any]) -> Dict[str, str]:
-=======
     def populate(  # pylint: disable=too-many-branches
         self, jenv: Environment, params: Dict[str, Any]
     ) -> Dict[str, str]:
->>>>>>> fadebc76cd9c011cafaff7b10f993e52cbcaa1ea
+
         """
         Populate a dict based on the fields definition and provided vars.
         """
