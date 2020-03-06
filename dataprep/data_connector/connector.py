@@ -40,7 +40,7 @@ class Connector:
         ----------
         config_path : str
             The path to the config. It can be hosted, e.g. "yelp", or from
-            local filesystem, e.g. "file://./yelp"
+            local filesystem, e.g. "./yelp"
         **kwargs : Dict[str, Any]
             Additional parameters
         """
