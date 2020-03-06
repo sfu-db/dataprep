@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from jinja2 import Environment
+from jinja2 import Environment, Template
 from requests import Request, Response, Session
 
 from ..errors import UnreachableError
@@ -62,6 +62,7 @@ class Connector:
         self.vars = kwargs
         self.auth_params = auth_params or {}
         self.jenv = Environment()
+        self.config_path = config_path
 
     def _fetch(
         self,
@@ -154,12 +155,52 @@ class Connector:
         """
         return list(self.impdb.tables.keys())
 
-    # def show_schema(self):
-    #     res = self._request({"term": "hotpot", "location": "vancouver"})
-    #     df = {}
-    #     if self.config["response"]["ctype"] == "application/json":
-    #         df = self._json(res)
-    #     elif self.config["response"]["ctype"] == "application/xml":
-    #         df = self._xml(res)
-    #     for col in pd.DataFrame(df).columns:
-    #         print(col)
+
+    @property
+    def info(self) -> None:
+        """
+        Show the information of a website and guide users how to issue queries
+        """
+
+        # show tables available for connection
+        print(
+            len(self.table_names),
+            "table(s) available in",
+            Path(self.config_path).stem,
+            ":\n",
+        )
+
+        # create templates for showing table information
+        # 1. amndatory parameters for a query
+        t_params = Template("--- {{option}} parameters for quering:\n>>> {{params}}")
+        # 2. example query:
+        t_query = Template(
+            "--- example query:\n>>> dc.query('{{table}}', {{joined_query_fields}})"
+        )
+
+        for cur_table in self.impdb.tables.keys():
+            print(cur_table, "table:")
+            table_config_content = self.impdb.tables[cur_table].config
+            params_required = []
+            params_optional = []
+            example_query_fields = []
+            count = 1
+            for k in table_config_content["request"]["params"].keys():
+                if table_config_content["request"]["params"][k]:
+                    params_required.append(k)
+                    example_query_fields.append(k + "='word" + str(count) + "'")
+                    count += 1
+                else:
+                    params_optional.append(k)
+            print(t_params.render(option = "required", params=params_required))
+            print(t_params.render(option = "optional", params=params_optional))
+            print(
+                t_query.render(
+                    table=cur_table, joined_query_fields=", ".join(example_query_fields)
+                )
+            )
+
+        # other methods in the connector class:
+        print("\nother methods:")
+        print(">>>", "dc.table_names")
+        print(">>>", "dc.show_schema('table name')")
