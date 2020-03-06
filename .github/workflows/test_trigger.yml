@@ -1,0 +1,18 @@
+on: pull_request
+name: Run Impacted Tests
+jobs:
+  test-job:
+    name: Test Job
+    runs-on: [self-hosted, macos-latest, ubuntu-latest]
+    steps:
+    - name: Find changed files
+      run: |
+        echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+
+     - name: echo changed files
+        run: |
+          echo ${{ steps.getfile.outputs.files }}
+    
+    
+ 
+   
