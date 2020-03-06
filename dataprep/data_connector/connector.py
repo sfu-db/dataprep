@@ -16,6 +16,24 @@ from .errors import RequestError
 from .implicit_database import ImplicitDatabase, ImplicitTable
 
 
+INFO_TEMPLATE = Template(
+    """{% for tb in tbs.keys() %}
+Table {{dbname}}.{{tb}}
+
+Parameters
+----------
+{% if tbs[tb].required_params %}{{", ".join(tbs[tb].required_params)}} required {% endif %}
+{% if tbs[tb].optional_params %}{{", ".join(tbs[tb].optional_params)}} optional {% endif %}
+
+Examples
+--------
+>>> dc.query({{", ".join(["\\\"{}\\\"".format(tb)] + tbs[tb].joined_query_fields)}})
+>>> dc.show_schema("{{tb}}")
+{% endfor %}
+"""
+)
+
+
 class Connector:
     """
     The main class of DataConnector.
@@ -160,45 +178,53 @@ class Connector:
         Show the information of a website and guide users how to issue queries
         """
 
-        # show tables available for connection
-        print(
-            len(self.table_names),
-            "table(s) available in",
-            Path(self.config_path).stem,
-            ":\n",
-        )
-
-        # create templates for showing table information
-        # 1. amndatory parameters for a query
-        t_params = Template("--- {{option}} parameters for quering:\n>>> {{params}}")
-        # 2. example query:
-        t_query = Template(
-            "--- example query:\n>>> dc.query('{{table}}', {{joined_query_fields}})"
-        )
-
+        # get info
+        tbs: Dict[str, Any] = {}
         for cur_table in self.impdb.tables.keys():
-            print(cur_table, "table:")
             table_config_content = self.impdb.tables[cur_table].config
             params_required = []
             params_optional = []
             example_query_fields = []
             count = 1
-            for k in table_config_content["request"]["params"].keys():
-                if table_config_content["request"]["params"][k]:
+            for k, val in table_config_content["request"]["params"].items():
+                if isinstance(val, bool) and val:
                     params_required.append(k)
-                    example_query_fields.append(k + "='word" + str(count) + "'")
+                    example_query_fields.append(f"""{k}="word{count}\"""")
                     count += 1
-                else:
+                elif isinstance(val, bool):
                     params_optional.append(k)
-            print(t_params.render(option="required", params=params_required))
-            print(t_params.render(option="optional", params=params_optional))
-            print(
-                t_query.render(
-                    table=cur_table, joined_query_fields=", ".join(example_query_fields)
-                )
-            )
+            tbs[cur_table] = {}
+            tbs[cur_table]["required_params"] = params_required
+            tbs[cur_table]["optional_params"] = params_optional
+            tbs[cur_table]["joined_query_fields"] = example_query_fields
 
-        # other methods in the connector class:
-        print("\nother methods:")
-        print(">>>", "dc.table_names")
-        print(">>>", "dc.show_schema('table name')")
+        # show table info
+        print(
+            INFO_TEMPLATE.render(
+                ntables=len(self.table_names), dbname=self.impdb.name, tbs=tbs
+            )
+        )
+
+    def show_schema(self, table_name: str) -> pd.DataFrame:
+        """
+        Show the returned schema of a table
+
+        Parameters
+        ----------
+        table_name : str
+            The table name.
+
+        Returns
+        -------
+            pd.DataFrame
+        """
+        print(f"table: {table_name}")
+        table_config_content = self.impdb.tables[table_name].config
+        schema = table_config_content["response"]["schema"]
+        new_schema_dict: Dict[str, List[Any]] = {}
+        new_schema_dict["column_name"] = []
+        new_schema_dict["data_type"] = []
+        for k in schema.keys():
+            new_schema_dict["column_name"].append(k)
+            new_schema_dict["data_type"].append(schema[k]["type"])
+        return pd.DataFrame.from_dict(new_schema_dict)
