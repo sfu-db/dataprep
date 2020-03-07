@@ -14,7 +14,7 @@ jobs:
         FILES=$(curl -s -X GET -G $URL | jq -r '.[] | .filename')
         echo $FILES
         chmod +x .github/runTests.sh
-        .github/runTests.sh $FILES
+        .github/runTests.sh "$FILES"
     
   
         
