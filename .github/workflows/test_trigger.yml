@@ -17,7 +17,7 @@ jobs:
     
     - name: Run impacted tests
       run: |
-        chmod +x ./scripts/runTests.sh
-        ./scripts/runTests.sh ${steps.changed_files.outputs.name}
+        chmod +x .github/runTests.sh
+        .github/runTests.sh ${steps.changed_files.outputs.name}
  
    
