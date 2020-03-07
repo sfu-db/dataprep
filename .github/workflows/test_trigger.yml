@@ -13,11 +13,10 @@ jobs:
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
         FILES=$(curl -s -X GET -G $URL | jq -r '.[] | .filename')
         echo "::set-output name=files::$FILES"
-      id: changed_files
-    
-    - name: Run impacted tests
-      run: |
         chmod +x .github/runTests.sh
-        .github/runTests.sh "dataprep/eda/x.py dataprep/eda/y.py"
+        .github/runTests.sh ${FILES}
+    
+  
+        
  
    
