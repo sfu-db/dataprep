@@ -1,8 +1,9 @@
+echo $PWD
 for file in $1
 do
         filename="$(basename -- $file)"
         extension="${filename##*.}"
-        if [ ${extension} == "py" ]
+        if [ ${extension} == "py" ] && [[ $filename != *"test"* ]]
         then
                 parentdir="$(basename "$(dirname "$file")")"
                 echo ${parentdir}
