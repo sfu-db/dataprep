@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6]
+        python-version: [3.7]
 
     steps:
     - name: Checkout
@@ -30,7 +30,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install poetry
+        pip install --user poetry==1.0.0b9
+        poetry config virtualenvs.in-project true
         poetry install
 
     - name: Run tests
