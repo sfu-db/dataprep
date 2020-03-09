@@ -2,6 +2,7 @@
 Module for auxiliary type detection functions
 """
 
+
 from enum import Enum, auto
 from typing import Any
 
