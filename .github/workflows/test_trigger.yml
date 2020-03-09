@@ -22,12 +22,16 @@ jobs:
     #     python -m pip install --upgrade pip
     #     pip install -r .github/requirements.txt
   
+    # - name: Install dependencies
+    #   with:
+    #     python_version: 3.8.0
+    #     poetry_version: 0.12.17
+    #     args: install
+
     - name: Install dependencies
-      uses: abatilo/actions-poetry@v1.5.0
-      with:
-        python_version: 3.8.0
-        poetry_version: 0.12.17
-        args: install
+      run: |
+        pip install poetry
+        poetry install
 
     - name: Run tests
       run: |
