@@ -14,3 +14,8 @@ do
                 python test_file_name
         fi
 done
+python ./dataprep/tests/eda/test.py
+python ./dataprep/tests/eda/test_plot.py
+python ./dataprep/tests/eda/test_plot_correlation.py
+python ./dataprep/tests/eda/test_plot_missing.py
+
