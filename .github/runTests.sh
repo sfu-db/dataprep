@@ -11,6 +11,6 @@ do
                 name="${filename%.*}"
                 test_file_name=$PWD/tests/${parentdir}/${name}_test.py
                 echo ${test_file_name}
-                python test_file_name
+                python $PWD/tests/eda/test.py
         fi
 done
