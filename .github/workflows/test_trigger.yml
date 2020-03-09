@@ -21,28 +21,13 @@ jobs:
     #   run: |
     #     python -m pip install --upgrade pip
     #     pip install -r .github/requirements.txt
-    
-    - name: Install Poetry
-      uses: dschep/install-poetry-action@v1.2
-
-    - name: Cache Poetry virtualenv
-      uses: actions/cache@v1
-      id: cache
+  
+    - name: Install dependencies
+      uses: abatilo/actions-poetry@v1.5.0
       with:
-        path: ~/.virtualenvs
-        key: poetry-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          poetry-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Set Poetry config
-      run: |
-        poetry config settings.virtualenvs.in-project false
-        poetry config settings.virtualenvs.path ~/.virtualenvs
-
-    - name: Install Dependencies
-      run: poetry install
-      if: steps.cache.outputs.cache-hit != 'true'
-
+        python_version: 3.8.0
+        poetry_version: 0.12.17
+        args: install
 
     - name: Run tests
       run: |
