@@ -16,6 +16,6 @@ do
 done
 poetry run python ./dataprep/tests/eda/test.py
 poetry run python ./dataprep/tests/eda/test_plot.py
-python ./dataprep/tests/eda/test_plot_correlation.py
-python ./dataprep/tests/eda/test_plot_missing.py
+poetry run python ./dataprep/tests/eda/test_plot_correlation.py
+poetry run python ./dataprep/tests/eda/test_plot_missing.py
 
