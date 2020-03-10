@@ -7,13 +7,31 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from jinja2 import Environment, StrictUndefined
+from jinja2 import Environment, StrictUndefined, Template
 from requests import Request, Response, Session
 
 from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
 from .errors import RequestError
 from .implicit_database import ImplicitDatabase, ImplicitTable
+
+
+INFO_TEMPLATE = Template(
+    """{% for tb in tbs.keys() %}
+Table {{dbname}}.{{tb}}
+
+Parameters
+----------
+{% if tbs[tb].required_params %}{{", ".join(tbs[tb].required_params)}} required {% endif %}
+{% if tbs[tb].optional_params %}{{", ".join(tbs[tb].optional_params)}} optional {% endif %}
+
+Examples
+--------
+>>> dc.query({{", ".join(["\\\"{}\\\"".format(tb)] + tbs[tb].joined_query_fields)}})
+>>> dc.show_schema("{{tb}}")
+{% endfor %}
+"""
+)
 
 
 class Connector:
@@ -154,12 +172,59 @@ class Connector:
         """
         return list(self.impdb.tables.keys())
 
-    # def show_schema(self):
-    #     res = self._request({"term": "hotpot", "location": "vancouver"})
-    #     df = {}
-    #     if self.config["response"]["ctype"] == "application/json":
-    #         df = self._json(res)
-    #     elif self.config["response"]["ctype"] == "application/xml":
-    #         df = self._xml(res)
-    #     for col in pd.DataFrame(df).columns:
-    #         print(col)
+    @property
+    def info(self) -> None:
+        """
+        Show the information of a website and guide users how to issue queries
+        """
+
+        # get info
+        tbs: Dict[str, Any] = {}
+        for cur_table in self.impdb.tables.keys():
+            table_config_content = self.impdb.tables[cur_table].config
+            params_required = []
+            params_optional = []
+            example_query_fields = []
+            count = 1
+            for k, val in table_config_content["request"]["params"].items():
+                if isinstance(val, bool) and val:
+                    params_required.append(k)
+                    example_query_fields.append(f"""{k}="word{count}\"""")
+                    count += 1
+                elif isinstance(val, bool):
+                    params_optional.append(k)
+            tbs[cur_table] = {}
+            tbs[cur_table]["required_params"] = params_required
+            tbs[cur_table]["optional_params"] = params_optional
+            tbs[cur_table]["joined_query_fields"] = example_query_fields
+
+        # show table info
+        print(
+            INFO_TEMPLATE.render(
+                ntables=len(self.table_names), dbname=self.impdb.name, tbs=tbs
+            )
+        )
+
+    def show_schema(self, table_name: str) -> pd.DataFrame:
+        """
+        Show the returned schema of a table
+
+        Parameters
+        ----------
+        table_name : str
+            The table name.
+
+        Returns
+        -------
+            pd.DataFrame
+        """
+        print(f"table: {table_name}")
+        table_config_content = self.impdb.tables[table_name].config
+        schema = table_config_content["response"]["schema"]
+        new_schema_dict: Dict[str, List[Any]] = {}
+        new_schema_dict["column_name"] = []
+        new_schema_dict["data_type"] = []
+        for k in schema.keys():
+            new_schema_dict["column_name"].append(k)
+            new_schema_dict["data_type"].append(schema[k]["type"])
+        return pd.DataFrame.from_dict(new_schema_dict)
