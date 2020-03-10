@@ -22,28 +22,28 @@ jobs:
     #     python -m pip install --upgrade pip
     #     pip install -r .github/requirements.txt
   
+    - name: Install dependencies
+      with:
+        python_version: 3.7.0
+        poetry_version: 1.0.3
+        args: install
+
+    # - name: Install poetry
+    #   run: |
+    #     pip install poetry
+    
+    # - name: Set up env
+    #   run: |
+    #     poetry config virtualenvs.in-project true
+    
     # - name: Install dependencies
-    #   with:
-    #     python_version: 3.8.0
-    #     poetry_version: 0.12.17
-    #     args: install
-
-    - name: Install dependencies
-      run: |
-        pip install poetry
+    #   run: |
+    #     poetry install
     
-    - name: Set up env
-      run: |
-        poetry config virtualenvs.in-project true
+    # - name: Use virtual env
+    #   run: |
+    #     poetry shell
     
-    - name: Install dependencies
-      run: |
-        poetry install
-    
-    - name: Use virtual env
-      run: |
-        poetry shell
-
     - name: Run tests
       run: |
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
