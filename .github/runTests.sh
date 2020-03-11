@@ -7,7 +7,7 @@ do
         if [ ${extension} == "py" ] && [[ $filename != *"test"* ]]
         then
                 parentdir="$(basename "$(dirname "$file")")"
-                echo ${parentdir}
+                echo parent_dir:${parentdir}
                 name="${filename%.*}"
                 test_file_name=./dataprep/tests/${parentdir}/${name}_test.py
                 echo ${test_file_name}
