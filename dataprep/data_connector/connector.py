@@ -2,7 +2,7 @@
 This module contains the Connector class.
 Every data fetching action should begin with instantiating this Connector class.
 """
-
+import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -55,17 +55,17 @@ class Connector:
     >>> dc = Connector("yelp", auth_params={"access_token":access_token})
     """
 
-    _impdb: ImplicitDatabase
-    _vars: Dict[str, Any]
-    _auth_params: Dict[str, Any]
-    _session: Session
-    _jenv: Environment
+    impdb: ImplicitDatabase
+    vars: Dict[str, Any]
+    _auth: Dict[str, Any]
+    session: Session
+    jenv: Environment
 
     def __init__(
         self,
         config_path: str,
-        auth_params: Optional[Dict[str, Any]] = None,
-        **kwargs: Any,
+        _auth: Optional[Dict[str, Any]] = None,
+        **kwargs: Dict[str, Any],
     ) -> None:
         self._session = Session()
         if (
@@ -79,16 +79,16 @@ class Connector:
             ensure_config(config_path)
             path = config_directory() / config_path
 
-        self._impdb = ImplicitDatabase(path)
-
-        self._vars = kwargs
-        self._auth_params = auth_params or {}
-        self._jenv = Environment(undefined=StrictUndefined)
+        self.vars = kwargs
+        self._auth = _auth or {}
+        self.jenv = Environment(undefined=StrictUndefined)
 
     def _fetch(
         self,
         table: ImplicitTable,
-        auth_params: Optional[Dict[str, Any]],
+        _auth: Optional[Dict[str, Any]],
+        _count: Optional[int],
+        _cursor: Optional[int],
         kwargs: Dict[str, Any],
     ) -> Response:
         method = table.method
@@ -98,17 +98,17 @@ class Connector:
             "params": {},
             "cookies": {},
         }
-
         merged_vars = {**self._vars, **kwargs}
-        if table.authorization is not None:
-            table.authorization.build(req_data, auth_params or self._auth_params)
 
+        if table.authorization is not None:
+            table.authorization.build(req_data, _auth or self._auth)
         for key in ["headers", "params", "cookies"]:
             if getattr(table, key) is not None:
                 instantiated_fields = getattr(table, key).populate(
                     self._jenv, merged_vars
                 )
                 req_data[key].update(**instantiated_fields)
+
         if table.body is not None:
             # TODO: do we support binary body?
             instantiated_fields = table.body.populate(self._jenv, merged_vars)
@@ -118,6 +118,30 @@ class Connector:
                 req_data["json"] = instantiated_fields
             else:
                 raise UnreachableError
+
+        if not table.pag_params:
+            resp: Response = self._session.send(  # type: ignore
+                Request(
+                    method=method,
+                    url=url,
+                    headers=req_data["headers"],
+                    params=req_data["params"],
+                    json=req_data.get("json"),
+                    data=req_data.get("data"),
+                    cookies=req_data["cookies"],
+                ).prepare()
+            )
+            return resp
+
+        pag_type = table.pag_params["type"]
+        count_key = table.pag_params["count_key"]
+        cursor_key = ""
+        if pag_type == "cursor":
+            cursor_key = table.pag_params["cursor_key"]
+        if pag_type == "limit":
+            cursor_key = table.pag_params["anchor_key"]
+        req_data["params"][count_key] = _count
+        req_data["params"][cursor_key] = _cursor
 
         resp: Response = self._session.send(  # type: ignore
             Request(
@@ -135,6 +159,92 @@ class Connector:
             raise RequestError(status_code=resp.status_code, message=resp.text)
 
         return resp
+
+    def query(
+        self,
+        table: str,
+        _auth: Optional[Dict[str, Any]] = None,
+        _count: Optional[int] = None,
+        **where: Dict[str, Any],
+    ) -> pd.DataFrame:
+        """
+        Query the API to get a table.
+
+        Parameters
+        ----------
+        table : str
+            The table name.
+        _auth : Optional[Dict[str, Any]] = None
+            The parameters for authentication. Usually the authentication parameters
+            should be defined when instantiating the Connector. In case some tables have different
+            authentication options, a different authentication parameter can be defined here.
+            This parameter will override the one from Connector if passed.
+        _count: Optional[int] = None
+            count of returned records.
+        **where: Any
+            The additional parameters required for the query.
+        """
+        assert table in self.impdb.tables, f"No such table {table} in {self.impdb.name}"
+
+        itable = self.impdb.tables[table]
+
+        if not itable.pag_params:
+            resp = self._fetch(
+                table=itable, _auth=_auth, _count=-1, _cursor=-1, kwargs=where
+            )
+            df = itable.from_response(resp)
+            return df
+
+        max_count = int(itable.pag_params["max_count"])
+        df = pd.DataFrame()
+        last_id = 0
+        pag_type = itable.pag_params["type"]
+
+        if _count is None:
+            _count = max_count
+            resp = self._fetch(
+                table=itable, _auth=_auth, _count=_count, _cursor=0, kwargs=where
+            )
+            df = itable.from_response(resp)
+
+        else:
+            cnt_to_fetch = 0
+            count = _count or 1
+            n_page = math.ceil(count / max_count)
+            remain = count % max_count
+            for i in range(n_page):
+                if i < n_page - 1:
+                    cnt_to_fetch = max_count
+                else:
+                    cnt_to_fetch = remain if remain > 0 else max_count
+                if pag_type == "cursor":
+                    resp = self._fetch(
+                        table=itable,
+                        _auth=_auth,
+                        _count=cnt_to_fetch,
+                        _cursor=last_id - 1,
+                        kwargs=where,
+                    )
+                elif pag_type == "limit":
+                    resp = self._fetch(
+                        table=itable,
+                        _auth=_auth,
+                        _count=cnt_to_fetch,
+                        _cursor=i * max_count,
+                        kwargs=where,
+                    )
+                else:
+                    raise NotImplementedError
+                df_ = itable.from_response(resp)
+                if pag_type == "cursor":
+                    last_id = int(df_[itable.pag_params["cursor_id"]][len(df_) - 1]) - 1
+                if i == 0:
+                    df = df_.copy()
+                else:
+                    df = pd.concat([df, df_], axis=0)
+            df.reset_index(drop=True, inplace=True)
+
+        return df
 
     @property
     def table_names(self) -> List[str]:
