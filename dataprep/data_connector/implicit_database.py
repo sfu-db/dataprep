@@ -172,7 +172,8 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
 
         root = etree.parse(StringIO(data))
         data_rows = root.xpath(self.table_path)
-        if self.orient == Orient.Records:
+
+        if self.orient.value == Orient.Records.value:
             for column_name, column_def in self.schema.items():
                 column_target = column_def.target
                 column_type = column_def.type
