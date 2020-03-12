@@ -54,6 +54,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     body_ctype: str
     body: Optional[Fields] = None
     cookies: Optional[Fields] = None
+    pag_params: Dict[str, str]
 
     # Response related
     ctype: str
@@ -67,7 +68,6 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         )  # This will throw errors if validate failed
         self.name = name
         self.config = config
-
         request_def = config["request"]
 
         self.method = request_def["method"]
@@ -84,6 +84,11 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
             else:
                 raise NotImplementedError
             self.authorization = Authorization(auth_type=auth_type, params=auth_params)
+
+        if "pagination" in request_def:
+            self.pag_params = request_def["pagination"]
+        else:
+            self.pag_params = {}
 
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
@@ -230,7 +235,6 @@ class ImplicitDatabase:
             if table_config_path.suffix != ".json":
                 # ifnote non json file
                 continue
-
             with open(table_config_path) as f:
                 table_config = jload(f)
 
