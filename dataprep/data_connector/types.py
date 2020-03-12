@@ -5,7 +5,7 @@ from base64 import b64encode
 from enum import Enum
 from time import time
 from typing import Any, Dict, Optional, cast
-
+from sys import stderr
 import requests
 from jinja2 import Environment, UndefinedError
 
@@ -146,7 +146,7 @@ class Fields:
 
                 if not (remove_if_empty and not str_value):
                     if to_key in ret:
-                        print(Warning(f"{key} conflicting with {to_key}"))
+                        print(f"Param {key} conflicting with {to_key}", file=stderr)
                     ret[to_key] = str_value
                     continue
         return ret
