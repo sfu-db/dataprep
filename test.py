@@ -44,7 +44,7 @@ if api == "spotify":
     
     dc = Connector("./DataConnectorConfigs/spotify", auth_params={"client_id": client_id, "client_secret": client_secret})
     
-    df = dc.query("track", q="盛夏")
+    df = dc.query("track", q="summer")
     
     print(df)
     
