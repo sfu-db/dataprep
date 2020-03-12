@@ -11,6 +11,7 @@ from bokeh.plotting import Figure
 
 from .compute import compute_correlation
 from .render import render_correlation
+from ..report import Report
 
 __all__ = ["render_correlation", "compute_correlation", "plot_correlation"]
 
@@ -22,7 +23,6 @@ def plot_correlation(
     *,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-    show_plot: bool = True,
 ) -> Figure:
     """
     This function is designed to calculate the correlation between columns
@@ -42,8 +42,6 @@ def plot_correlation(
         range of value
     k: int, optional
         choose top-k element
-    show_plot: bool
-        Whether to show the plot
 
     Returns
     ----------
@@ -79,6 +77,5 @@ def plot_correlation(
 
     intermediate = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
     figure = render_correlation(intermediate)
-    if show_plot:
-        show(figure)
-    return figure
+
+    return Report(figure)
