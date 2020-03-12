@@ -11,6 +11,7 @@ from bokeh.models import LayoutDOM
 
 from .compute import compute_missing
 from .render import render_missing
+from ..report import Report
 
 __all__ = ["render_missing", "compute_missing", "plot_missing"]
 
@@ -23,7 +24,6 @@ def plot_missing(
     bins: int = 30,
     ncols: int = 30,
     ndist_sample: int = 100,
-    show_plot: bool = True,
 ) -> LayoutDOM:
     """
     This function is designed to deal with missing values
@@ -44,8 +44,6 @@ def plot_missing(
         The number of rows in the figure
     ndist_sample: int
         The number of sample points
-    return_intermediate: bool
-        whether show intermediate results to users
 
     Returns
     ----------
@@ -74,6 +72,4 @@ def plot_missing(
     """
     itmdt = compute_missing(df, x, y, bins=bins, ncols=ncols, ndist_sample=ndist_sample)
     fig = render_missing(itmdt)
-    if show_plot:
-        show(fig)
-    return fig
+    return Report(fig)
