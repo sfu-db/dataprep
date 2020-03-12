@@ -67,8 +67,9 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         )  # This will throw errors if validate failed
         self.name = name
         self.config = config
-
         request_def = config["request"]
+        if config["request"]["paganition"]["type"] == 'limit':
+            count_key = config["request"]["paganition"]["count_key"]
 
         self.method = request_def["method"]
         self.url = request_def["url"]
@@ -87,6 +88,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
 
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
+                
                 setattr(self, key, Fields(request_def[key]))
         if "body" in request_def:
             body_def = request_def["body"]
@@ -232,8 +234,9 @@ class ImplicitDatabase:
 
             with open(table_config_path) as f:
                 table_config = jload(f)
-
+                self.config = table_config
             table = ImplicitTable(table_config_path.stem, table_config)
             if table.name in self.tables:
                 raise RuntimeError(f"Duplicated table name {table.name}")
             self.tables[table.name] = table
+        
