@@ -54,9 +54,11 @@ release version:
   done
 
   git add pyproject.toml
+
   semantic-release version --{{version}}
+  
   echo "Creating release draft"
-  semantic-release changelog | sed "1iv${to_version}\n" | hub release create -F - "v${to_version}"
+  semantic-release changelog | sed "1iv${to_version}\n" | hub release create -d -a "dist/dataprep-${to_version}-py3-none-any.whl" -a "dist/dataprep-${to_version}.tar.gz" -F - "v${to_version}"
 
 
 @ensure-git-clean:
