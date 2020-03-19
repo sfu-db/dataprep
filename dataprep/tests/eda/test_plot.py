@@ -34,12 +34,12 @@ def simpledf() -> dd.DataFrame:
 
 
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, simpledf.columns[0], show_plot=False)
+    plot(simpledf, simpledf.columns[0])
 
 
 def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, simpledf.columns[-1], show_plot=False)
+    plot(simpledf, simpledf.columns[-1])
 
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, show_plot=False)
+    plot(simpledf)
