@@ -47,10 +47,6 @@ mypy = "~0.740"
 black = "19.10b0"
 sphinx = "~2.2"
 
-[build-system]
-requires = ["poetry>=1"]
-build-backend = "poetry.masonry.api"
-
 [tool.black]
 line-length = 88
 target-version = ['py36', 'py37']
@@ -66,3 +62,16 @@ exclude = '''
     )/
 )
 '''
+
+[tool.semantic_release]
+version_variable = "dataprep/__init__.py:__version__"
+version_source = "tag"
+commit_subject = "v{version}"
+commit_message = "Bump to v{version}"
+commit_author = "Weiyuan Wu <youngw@sfu.ca>"
+branch = "develop"
+commit_version_number = true
+
+[build-system]
+requires = ["poetry>=1"]
+build-backend = "poetry.masonry.api"
