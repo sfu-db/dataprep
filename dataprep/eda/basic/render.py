@@ -121,7 +121,7 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
             continue
         mod_exp = int(after) % 3
         factor = 1 if mod_exp == 0 else 10 if mod_exp == 1 else 100
-        value = float(before) * factor
+        value = np.round(float(before) * factor, len(str(before)))
         value = int(value) if value.is_integer() else value
         if abs(tick) >= 1e12:
             formatted_ticks.append(str(value) + "T")

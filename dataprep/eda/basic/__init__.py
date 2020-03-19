@@ -11,6 +11,7 @@ from bokeh.plotting import Figure
 
 from .compute import compute
 from .render import render
+from ..report import Report
 
 
 def plot(
@@ -27,7 +28,6 @@ def plot(
     value_range: Optional[Tuple[float, float]] = None,
     yscale: str = "linear",
     tile_size: Optional[float] = None,
-    show_plot: bool = True,
 ) -> Figure:
     """Generates plots for exploratory data analysis.
 
@@ -86,8 +86,6 @@ def plot(
     tile_size : Optional[float] = None
         Size of the tile for the hexbin plot. Measured from the middle
         of a hexagon to its left or right corner.
-    show_plot: bool, default True
-        Whether or not to show the plot.
 
     Returns
     -------
@@ -118,6 +116,5 @@ def plot(
         value_range=value_range,
     )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
-    if show_plot:
-        show(figure)
-    return figure
+
+    return Report(figure)
