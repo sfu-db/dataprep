@@ -71,7 +71,7 @@ release version:
   
   echo "Creating release commit"
   git add pyproject.toml
-  git commit -a -m "v${to_version}"
+  semantic-release version --{{version}}
   
   echo "Merge release/v${to_version} to master & develop"
   git checkout master
