@@ -25,7 +25,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../dataprep.html" accesskey="U">dataprep</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -48,6 +49,7 @@
 
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute_missing</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render_missing</span>
+<span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_missing&quot;</span><span class="p">,</span> <span class="s2">&quot;compute_missing&quot;</span><span class="p">,</span> <span class="s2">&quot;plot_missing&quot;</span><span class="p">]</span>
 
@@ -60,7 +62,6 @@
     <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">ndist_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
-    <span class="n">show_plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LayoutDOM</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is designed to deal with missing values</span>
@@ -81,8 +82,6 @@
 <span class="sd">        The number of rows in the figure</span>
 <span class="sd">    ndist_sample: int</span>
 <span class="sd">        The number of sample points</span>
-<span class="sd">    return_intermediate: bool</span>
-<span class="sd">        whether show intermediate results to users</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    ----------</span>
@@ -111,9 +110,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">ndist_sample</span><span class="o">=</span><span class="n">ndist_sample</span><span class="p">)</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
-        <span class="n">show</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fig</span></div>
+    <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -145,7 +142,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../dataprep.html" >dataprep</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

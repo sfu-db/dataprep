@@ -84,6 +84,12 @@ the Connector class.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The main class of DataConnector.</p>
 <dl class="method">
+<dt id="dataprep.data_connector.connector.Connector.info">
+<em class="property">property </em><code class="sig-name descname">info</code><a class="headerlink" href="#dataprep.data_connector.connector.Connector.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the information of a website and guide users how to issue queries</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="dataprep.data_connector.connector.Connector.query">
 <code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param">table: str, auth_params: Optional[Dict[str, Any]] = None, **where: Dict[str, Any]</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.connector.Connector.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the API to get a table.</p>
@@ -96,6 +102,19 @@ authentication options, a different authentication parameter can be defined here
 This parameter will override the one from Connector if passed.</p>
 </dd>
 <dt><a href="#id1"><span class="problematic" id="id2">**</span></a>where: Dict[str, Any]</dt><dd><p>The additional parameters required for the query.</p>
+</dd>
+</dl>
+<blockquote>
+<div><p>pd.DataFrame</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataprep.data_connector.connector.Connector.show_schema">
+<code class="sig-name descname">show_schema</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.show_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.connector.Connector.show_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the returned schema of a table</p>
+<dl class="simple">
+<dt>table_name<span class="classifier">str</span></dt><dd><p>The table name.</p>
 </dd>
 </dl>
 <blockquote>
