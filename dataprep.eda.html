@@ -232,7 +232,7 @@ not from the distribution of <cite>arr</cite>’s elems.</p>
 Data preparation module</p>
 <dl class="function">
 <dt id="dataprep.eda.plot_correlation">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation.html#plot_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation.html#plot_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to calculate the correlation between columns
 There are three functions: plot_correlation(df), plot_correlation(df, x)
 plot_correlation(df, x, y)
@@ -247,8 +247,6 @@ There are also some parameters such as k and value_range to satisfy your require
 <dt>value_range: list[float], optional</dt><dd><p>range of value</p>
 </dd>
 <dt>k: int, optional</dt><dd><p>choose top-k element</p>
-</dd>
-<dt>show_plot: bool</dt><dd><p>Whether to show the plot</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -379,7 +377,7 @@ otherwise =&gt; error</p>
 
 <dl class="function">
 <dt id="dataprep.eda.plot_missing">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 30, ncols: int = 30, ndist_sample: int = 100, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 30, ncols: int = 30, ndist_sample: int = 100</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
@@ -395,8 +393,6 @@ plot_missing(df, x, y)</p>
 <dt>bins: int</dt><dd><p>The number of rows in the figure</p>
 </dd>
 <dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
-</dd>
-<dt>return_intermediate: bool</dt><dd><p>whether show intermediate results to users</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -425,7 +421,7 @@ otherwise =&gt; error</p>
 
 <dl class="function">
 <dt id="dataprep.eda.plot">
-<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 10, ngroups: int = 10, largest: bool = True, nsubgroups: int = 5, bandwidth: float = 1.5, sample_size: int = 1000, value_range: Optional[Tuple[float, float]] = None, yscale: str = 'linear', tile_size: Optional[float] = None, show_plot: bool = True</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/basic.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 10, ngroups: int = 10, largest: bool = True, nsubgroups: int = 5, bandwidth: float = 1.5, sample_size: int = 1000, value_range: Optional[Tuple[float, float]] = None, yscale: str = 'linear', tile_size: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/basic.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates plots for exploratory data analysis.</p>
 <p>If x and y are unspecified, the distribution of
 each coloumn is plotted. A histogram is plotted if the
@@ -477,8 +473,6 @@ Applies when column x is specified and column y is unspecified.</p>
 </dd>
 <dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
 of a hexagon to its left or right corner.</p>
-</dd>
-<dt>show_plot: bool, default True</dt><dd><p>Whether or not to show the plot.</p>
 </dd>
 </dl>
 <dl class="simple">
