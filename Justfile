@@ -80,8 +80,6 @@ release version:
   git checkout develop
   git merge "release/v${to_version}"
 
-  git tag "v${to_version}"
-
   echo "Push branch and tag to remote"
   git push origin master
   git push origin develop
