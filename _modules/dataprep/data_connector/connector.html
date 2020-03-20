@@ -25,8 +25,7 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../dataprep.html" accesskey="U">dataprep</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -45,31 +44,13 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span>
 <span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Session</span>
 
 <span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">config_directory</span><span class="p">,</span> <span class="n">ensure_config</span>
 <span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">RequestError</span>
 <span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span><span class="p">,</span> <span class="n">ImplicitTable</span>
-
-
-<span class="n">INFO_TEMPLATE</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
-    <span class="sd">&quot;&quot;&quot;{% for tb in tbs.keys() %}</span>
-<span class="sd">Table {{dbname}}.{{tb}}</span>
-
-<span class="sd">Parameters</span>
-<span class="sd">----------</span>
-<span class="sd">{% if tbs[tb].required_params %}{{&quot;, &quot;.join(tbs[tb].required_params)}} required {% endif %}</span>
-<span class="sd">{% if tbs[tb].optional_params %}{{&quot;, &quot;.join(tbs[tb].optional_params)}} optional {% endif %}</span>
-
-<span class="sd">Examples</span>
-<span class="sd">--------</span>
-<span class="sd">&gt;&gt;&gt; dc.query({{&quot;, &quot;.join([&quot;\\\&quot;{}\\\&quot;&quot;.format(tb)] + tbs[tb].joined_query_fields)}})</span>
-<span class="sd">&gt;&gt;&gt; dc.show_schema(&quot;{{tb}}&quot;)</span>
-<span class="sd">{% endfor %}</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
 
 
 <div class="viewcode-block" id="Connector"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.connector.Connector">[docs]</a><span class="k">class</span> <span class="nc">Connector</span><span class="p">:</span>
@@ -208,64 +189,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return all the table names contained in this database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Show the information of a website and guide users how to issue queries</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># get info</span>
-        <span class="n">tbs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">cur_table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">table_config_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
-            <span class="n">params_required</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">params_optional</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">example_query_fields</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">table_config_content</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="p">:</span>
-                    <span class="n">params_required</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                    <span class="n">example_query_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{k}</span><span class="s2">=&quot;word</span><span class="si">{count}</span><span class="se">\&quot;</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-                    <span class="n">params_optional</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;required_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_required</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;optional_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_optional</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;joined_query_fields&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">example_query_fields</span>
-
-        <span class="c1"># show table info</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="n">INFO_TEMPLATE</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
-                <span class="n">ntables</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_names</span><span class="p">),</span> <span class="n">dbname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tbs</span><span class="o">=</span><span class="n">tbs</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="Connector.show_schema"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.connector.Connector.show_schema">[docs]</a>    <span class="k">def</span> <span class="nf">show_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Show the returned schema of a table</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        table_name : str</span>
-<span class="sd">            The table name.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            pd.DataFrame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;table: </span><span class="si">{table_name}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">table_config_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
-        <span class="n">schema</span> <span class="o">=</span> <span class="n">table_config_content</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">][</span><span class="s2">&quot;schema&quot;</span><span class="p">]</span>
-        <span class="n">new_schema_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">new_schema_dict</span><span class="p">)</span></div></div>
+    <span class="c1"># def show_schema(self):</span>
+    <span class="c1">#     res = self._request({&quot;term&quot;: &quot;hotpot&quot;, &quot;location&quot;: &quot;vancouver&quot;})</span>
+    <span class="c1">#     df = {}</span>
+    <span class="c1">#     if self.config[&quot;response&quot;][&quot;ctype&quot;] == &quot;application/json&quot;:</span>
+    <span class="c1">#         df = self._json(res)</span>
+    <span class="c1">#     elif self.config[&quot;response&quot;][&quot;ctype&quot;] == &quot;application/xml&quot;:</span>
+    <span class="c1">#         df = self._xml(res)</span>
+    <span class="c1">#     for col in pd.DataFrame(df).columns:</span>
+    <span class="c1">#         print(col)</span>
 </pre></div>
 
           </div>
@@ -297,8 +231,7 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../dataprep.html" >dataprep</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
