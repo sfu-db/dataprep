@@ -220,6 +220,7 @@ class ImplicitDatabase:
 
         self.name = path.name
         self.tables = {}
+        
 
         for table_config_path in path.iterdir():
             if not table_config_path.is_file():
@@ -231,7 +232,6 @@ class ImplicitDatabase:
             if table_config_path.suffix != ".json":
                 # ifnote non json file
                 continue
-
             with open(table_config_path) as f:
                 table_config = jload(f)
                 self.config = table_config

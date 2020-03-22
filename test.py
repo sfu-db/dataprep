@@ -11,10 +11,9 @@ from dataprep.data_connector import Connector
 
 apis = ["yelp","dblp","twitter","spotify"]
 
-api_id = 3
+api_id = 1
 
 api = apis[api_id]
-
 
 if api == "yelp":
     dc = Connector("./DataConnectorConfigs/yelp", auth_params={"access_token":"MBdBbgig-VEs1KjjtDq5DndLQFhKp0sjCj2FXUEuhPgEjniUm4CyCDYE-nO9TSKK8a3_jlIdsRHAJc9Fv7WXNeL8VITkZoDkBnJ7TPAWvKxey_Pcuyy6cWlGm3IzXnYx"})
@@ -25,7 +24,7 @@ if api == "yelp":
 
 if api == "dblp":
     dc = Connector("./DataConnectorConfigs/dblp")
-    df = dc.query("publication",q = "data_mining")
+    df = dc.query("publication",q = "author='Jian Pei'",returned_number = 100)
     print(df["title"])
 
 if api == "twitter":
@@ -34,9 +33,9 @@ if api == "twitter":
     
     dc = Connector("./DataConnectorConfigs/twitter", auth_params={"client_id": client_id, "client_secret": client_secret})
     
-    df = dc.query("tweets", q="machine learning",returned_number = 248)
+    df = dc.query("tweets", q="machine learning",returned_number = 500)
     
-    print(df["text"])
+    print(df)
 
 if api == "spotify":
     client_id = '9f2b33cbc59c4fb3aac9aabdbd5b8d00'
@@ -44,8 +43,7 @@ if api == "spotify":
     
     dc = Connector("./DataConnectorConfigs/spotify", auth_params={"client_id": client_id, "client_secret": client_secret})
     
-    df = dc.query("track", q="summer")
+    df = dc.query("track", q="罗大佑",returned_number = 500)
     
     print(df)
-    
     

@@ -81,9 +81,11 @@ class Connector:
         }
         
         merged_vars = {**self.vars, **kwargs}
+        
         count_key = self.impdb.config["request"]["paganition"]["count_key"]
         if "returned_number" in merged_vars:
             merged_vars[count_key] = merged_vars.pop("returned_number")
+        
         if table.authorization is not None:
             table.authorization.build(req_data, auth_params or self.auth_params)
         for key in ["headers", "params", "cookies"]:
@@ -92,8 +94,7 @@ class Connector:
                     self.jenv, merged_vars
                 )
                 req_data[key].update(**instantiated_fields)
-                #print(instantiated_fields)
-                #print(req_data)
+
         if table.body is not None:
             # TODO: do we support binary body?
             instantiated_fields = table.body.populate(self.jenv, merged_vars)
@@ -104,10 +105,6 @@ class Connector:
             else:
                 raise UnreachableError
         
-        #req_data["params"] = {'term': 'ramen', 'location': 'vancouver','limit':10,'offset':0}
-        #req_data["params"] = {'q': 'jian pei','h':1000}
-        #req_data["params"] = {'q': 'dwight howard',"max_id":1238115890744512514 - 1}
-        #req_data["params"] = {'q': '罗大佑',"limit":10}
         resp: Response = self.session.send(  # type: ignore
             Request(
                 method=method,
@@ -157,67 +154,41 @@ class Connector:
         max_count = self.impdb.config["request"]["paganition"]["max_count"]
         df = []
         
-        if self.impdb.config["request"]["paganition"]["type"] == 'limit':
-            if "returned_number" not in where:
-                where["returned_number"] = max_count
-                resp = self._fetch(itable, auth_params, where)
-                df = itable.from_response(resp)
-            else:
-                n_page = math.ceil(where["returned_number"]/max_count)
-                remain = where["returned_number"]%max_count
-                for i in range(n_page):
-                    if i<n_page - 1:
-                        where["returned_number"] = max_count
-                    else:
-                        if remain != 0:
-                            where["returned_number"] = remain
-                        else:
-                            where["returned_number"] = max_count
-                    where[self.impdb.config["request"]["paganition"]["anchor_key"]] = 0 + i*max_count
-                        
-                    resp = self._fetch(itable, auth_params, where)
-                    df_ = itable.from_response(resp)
-                    if i == 0:
-                        df = df_.copy()
-                    else:
-                        df = pd.concat([df,df_], axis=0)
-                df.reset_index(drop=True, inplace=True)
-                            
-                #resp = self._fetch(itable, auth_params, where)
-                
-        
-                #return itable.from_response(resp)
+        pag_type = self.impdb.config["request"]["paganition"]["type"]
+
+
+        if "returned_number" not in where:
+            where["returned_number"] = max_count
+            resp = self._fetch(itable, auth_params, where)
+            df = itable.from_response(resp)
             
-        if self.impdb.config["request"]["paganition"]["type"] == 'cursor':
-            if "returned_number" not in where:
-                where["returned_number"] = max_count
-                resp = self._fetch(itable, auth_params, where)
-                df = itable.from_response(resp)
-            else:
-                n_page = math.ceil(where["returned_number"]/max_count)
-                remain = where["returned_number"]%max_count
+        else:
+            n_page = math.ceil(where["returned_number"]/max_count)
+            remain = where["returned_number"]%max_count
+            if pag_type == 'cursor':
                 last_id = 0
-                for i in range(n_page):
-                    if i<n_page - 1:
+            for i in range(n_page):
+                if i<n_page - 1:
+                    where["returned_number"] = max_count
+                else:
+                    if remain != 0:
+                        where["returned_number"] = remain
+                    else:
                         where["returned_number"] = max_count
-                    else:
-                        if remain != 0:
-                            where["returned_number"] = remain
-                        else:
-                            where["returned_number"] = max_count
-                    if i>0:
-                        where[self.impdb.config["request"]["paganition"]["cursor_key"]] = last_id - 1
-                        
-                    resp = self._fetch(itable, auth_params, where)
-                    df_ = itable.from_response(resp)
+                if pag_type == 'cursor' and i>0:
+                    where[self.impdb.config["request"]["paganition"]["cursor_key"]] = last_id - 1
+                if pag_type == 'limit':
+                    where[self.impdb.config["request"]["paganition"]["anchor_key"]] = 0 + i*max_count
+                    
+                resp = self._fetch(itable, auth_params, where)
+                df_ = itable.from_response(resp)
+                if pag_type == 'cursor':
                     last_id = int(df_[self.impdb.config["request"]["paganition"]["cursor_id"]][len(df_)-1]) - 1
-                    if i == 0:
-                        df = df_.copy()
-                    else:
-                        df = pd.concat([df,df_], axis=0)
-                df.reset_index(drop=True, inplace=True)
-                
-                
+                if i == 0:
+                    df = df_.copy()
+                else:
+                    df = pd.concat([df,df_], axis=0)
+            df.reset_index(drop=True, inplace=True) 
         
         return df
 
