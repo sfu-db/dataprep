@@ -68,7 +68,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         self.name = name
         self.config = config
         request_def = config["request"]
-        if config["request"]["paganition"]["type"] == 'limit':
+        if config["request"]["paganition"]["type"] == "limit":
             count_key = config["request"]["paganition"]["count_key"]
 
         self.method = request_def["method"]
@@ -88,7 +88,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
 
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
-                
+
                 setattr(self, key, Fields(request_def[key]))
         if "body" in request_def:
             body_def = request_def["body"]
@@ -220,7 +220,6 @@ class ImplicitDatabase:
 
         self.name = path.name
         self.tables = {}
-        
 
         for table_config_path in path.iterdir():
             if not table_config_path.is_file():
@@ -239,4 +238,3 @@ class ImplicitDatabase:
             if table.name in self.tables:
                 raise RuntimeError(f"Duplicated table name {table.name}")
             self.tables[table.name] = table
-        
