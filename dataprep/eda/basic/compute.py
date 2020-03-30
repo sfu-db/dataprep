@@ -365,7 +365,7 @@ def calc_box(
         if is_numerical(df[x].dtype) and is_numerical(df[y].dtype):
             minv, maxv, cnt = dask.compute(df[x].min(), df[x].max(), df[x].nunique())
             if cnt < bins:
-                bins = cnt - 1
+                bins = cnt
             endpts = np.linspace(minv, maxv, num=bins + 1)
             # calculate a box plot over each bin
             df = dd.concat(
@@ -383,6 +383,10 @@ def calc_box(
                 ],
                 axis=1,
             ).compute()
+            endpts_df = pd.DataFrame(
+                [endpts[:-1], endpts[1:]], ["lb", "ub"], df.columns
+            )
+            df = pd.concat([df, endpts_df], axis=0)
         else:
             df, grp_cnt_stats, largest_grps = _calc_groups(df, ngroups, largest)
             # calculate a box plot over each group

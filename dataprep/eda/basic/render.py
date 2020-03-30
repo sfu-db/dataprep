@@ -1,7 +1,7 @@
 """
     This module implements the visualization for the
     plot(df) function
-"""
+"""  # pylint: disable=too-many-lines
 from math import pi
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -47,9 +47,9 @@ def tweak_figure(
     fig.axis.major_label_text_font_size = "9pt"
     fig.xaxis.major_label_orientation = pi / 3
     fig.title.text_font_size = "10pt"
-    if ptype in ["bar", "pie", "hist", "kde", "qq", "box", "hex", "heatmap"]:
+    fig.axis.minor_tick_line_color = "white"
+    if ptype in ["bar", "pie", "hist", "kde", "qq", "heatmap"]:
         fig.grid.grid_line_color = None
-        fig.axis.minor_tick_line_color = None
     if ptype in ["bar", "hist"] and not show_yaxis:
         fig.yaxis.major_label_text_font_size = "0pt"
         fig.yaxis.major_tick_line_color = None
@@ -89,30 +89,10 @@ def _make_title(grp_cnt_stats: Dict[str, int], x: str, y: str) -> str:
     return f"{y} by {x}"
 
 
-def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
+def _format_ticks(ticks: List[float]) -> List[str]:
     """
-    Format the x axis for histograms
-    """  # pylint: disable=too-many-locals
-    num_x_ticks = 5
-    # divisor for 5 ticks (5 results in ticks that are too close together)
-    divisor = 4.5
-    # interval
-    gap = (maxv - minv) / divisor
-    # get exponent from scientific notation
-    _, after = f"{gap:.0e}".split("e")
-    # round to this amount
-    round_to = -1 * int(after)
-    # round the first x tick
-    minv = np.round(minv, round_to)
-    # round value between ticks
-    gap = np.round(gap, round_to)
-
-    # make the tick values
-    ticks = [minv + i * gap for i in range(num_x_ticks)]
-    ticks = np.round(ticks, round_to)
-    ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
-    fig.xaxis.ticker = ticks
-
+    Format the tick values
+    """
     formatted_ticks = []
     for tick in ticks:  # format the tick values
         before, after = f"{tick:e}".split("e")
@@ -132,11 +112,48 @@ def _format_xaxis(fig: Figure, minv: int, maxv: int) -> None:
         elif abs(tick) >= 1e4:
             formatted_ticks.append(str(value) + "K")
 
-    fig.xaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
-    fig.xaxis.major_label_text_font_size = "10pt"
-    fig.xaxis.major_label_standoff = 7
-    fig.xaxis.major_label_orientation = 0
-    fig.axis.major_tick_line_color = None
+    return formatted_ticks
+
+
+def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
+    """
+    Format the axis ticks
+    """  # pylint: disable=too-many-locals
+    # divisor for 5 ticks (5 results in ticks that are too close together)
+    divisor = 4.5
+    # interval
+    gap = (maxv - minv) / divisor
+    # get exponent from scientific notation
+    _, after = f"{gap:.0e}".split("e")
+    # round to this amount
+    round_to = -1 * int(after)
+    # round the first x tick
+    minv = np.round(minv, round_to)
+    # round value between ticks
+    gap = np.round(gap, round_to)
+
+    # make the tick values
+    ticks = [float(minv)]
+    while max(ticks) + gap < maxv:
+        ticks.append(max(ticks) + gap)
+    ticks = np.round(ticks, round_to)
+    ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
+    formatted_ticks = _format_ticks(ticks)
+
+    if axis == "x":
+        fig.xgrid.ticker = ticks
+        fig.xaxis.ticker = ticks
+        fig.xaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
+        fig.xaxis.major_label_text_font_size = "10pt"
+        fig.xaxis.major_label_standoff = 7
+        fig.xaxis.major_label_orientation = 0
+        fig.xaxis.major_tick_line_color = None
+    elif axis == "y":
+        fig.ygrid.ticker = ticks
+        fig.yaxis.ticker = ticks
+        fig.yaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
+        fig.yaxis.major_label_text_font_size = "10pt"
+        fig.yaxis.major_label_standoff = 5
 
 
 def bar_viz(
@@ -174,6 +191,8 @@ def bar_viz(
     if total_grps > len(df):
         fig.xaxis.axis_label = f"Top {len(df)} of {total_grps} {col}"
         fig.xaxis.axis_label_standoff = 0
+    if show_yaxis and yscale == "linear":
+        _format_axis(fig, 0, df["cnt"].max(), "y")
     return fig
 
 
@@ -244,11 +263,12 @@ def hist_viz(
         tools=[],
         y_axis_type=yscale,
     )
+    bottom = 0 if yscale == "linear" or df.empty else df["freq"].min() / 2
     fig.quad(
         source=df,
         left="left",
         right="right",
-        bottom=0.01,
+        bottom=bottom,
         alpha=0.5,
         top="freq",
         fill_color="#6baed6",
@@ -258,9 +278,9 @@ def hist_viz(
     tweak_figure(fig, "hist", show_yaxis)
     fig.yaxis.axis_label = "Frequency"
     if not df.empty:
-        minv = df.iloc[0]["left"]
-        maxv = df.iloc[-1]["right"]
-        _format_xaxis(fig, minv, maxv)
+        _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
+    if show_yaxis and yscale == "linear":
+        _format_axis(fig, 0, df["freq"].max(), "y")
 
     return fig
 
@@ -286,11 +306,12 @@ def hist_kde_viz(
         toolbar_location=None,
         y_axis_type=yscale,
     )
+    bottom = 0 if yscale == "linear" or df.empty else df["freq"].min() / 2
     hist = fig.quad(
         source=df,
         left="left",
         right="right",
-        bottom=0,
+        bottom=bottom,
         alpha=0.5,
         top="freq",
         fill_color="#6baed6",
@@ -306,9 +327,9 @@ def hist_kde_viz(
     fig.add_tools(hover_dist)
     tweak_figure(fig, "kde")
     fig.yaxis.axis_label = "Density"
-    minv = df.iloc[0]["left"]
-    maxv = df.iloc[-1]["right"]
-    _format_xaxis(fig, minv, maxv)
+    _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
+    if yscale == "linear":
+        _format_axis(fig, 0, df["freq"].max(), "y")
     return Panel(child=fig, title="KDE plot")
 
 
@@ -334,15 +355,13 @@ def qqnorm_viz(
     fig.circle(
         x=theory_qs, y=actual_qs, size=3, color=PALETTE[0],
     )
-    all_values = np.concatenate((theory_qs, actual_qs))
-    fig.line(
-        x=[np.min(all_values), np.max(all_values)],
-        y=[np.min(all_values), np.max(all_values)],
-        color="red",
-    )
+    vals = np.concatenate((theory_qs, actual_qs))
+    fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color="red")
     tweak_figure(fig, "qq")
     fig.xaxis.axis_label = "Normal Quantiles"
     fig.yaxis.axis_label = f"Quantiles of {col}"
+    _format_axis(fig, vals.min(), vals.max(), "x")
+    _format_axis(fig, vals.min(), vals.max(), "y")
     return Panel(child=fig, title="QQ normal plot")
 
 
@@ -359,21 +378,24 @@ def box_viz(
     """
     Render a box plot visualization
     """
-    # pylint: disable=too-many-arguments,too-many-locals
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-statements
     if y is None:
+        width = 0.7
         title = f"{x}"
     else:
         if grp_cnt_stats is None:
+            width = 0.93
             title = f"{y} by {x}"
-        elif grp_cnt_stats["x_ttl"] > grp_cnt_stats["x_show"]:
-            title = "{} by (top {} out of {}) {}".format(
-                y, grp_cnt_stats["x_show"], grp_cnt_stats["x_ttl"], x
-            )
         else:
-            title = f"{y} by {x}"
-    if grp_cnt_stats is not None:
-        if grp_cnt_stats["x_show"] > 10:
-            plot_width = 28 * grp_cnt_stats["x_show"]
+            width = 0.7
+            if grp_cnt_stats["x_ttl"] > grp_cnt_stats["x_show"]:
+                title = "{} by (top {} out of {}) {}".format(
+                    y, grp_cnt_stats["x_show"], grp_cnt_stats["x_ttl"], x
+                )
+            else:
+                title = f"{y} by {x}"
+    if len(df) > 10:
+        plot_width = 39 * len(df)
     fig = figure(
         tools="",
         x_range=list(df["grp"]),
@@ -390,7 +412,7 @@ def box_viz(
     )
     ubox = fig.vbar(
         x="grp",
-        width=0.7,
+        width=width,
         top="q3",
         bottom="q2",
         fill_color=PALETTE[0],
@@ -399,7 +421,7 @@ def box_viz(
     )
     lbox = fig.vbar(
         x="grp",
-        width=0.7,
+        width=width,
         top="q2",
         bottom="q1",
         fill_color=PALETTE[0],
@@ -415,16 +437,19 @@ def box_viz(
             outx, outy, size=3, line_color="black", color=PALETTE[6], fill_alpha=0.6
         )
         fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
+    tooltips = [
+        ("Upper Whisker", "@uw"),
+        ("Upper Quartile", "@q3"),
+        ("Median", "@q2"),
+        ("Lower Quartile", "@q1"),
+        ("Lower Whisker", "@lw"),
+    ]
+    if grp_cnt_stats is None and y is not None:
+        tooltips.insert(0, ("Bin", "@grp"))
     fig.add_tools(
         HoverTool(
             renderers=[upw, utail, ubox, lbox, ltail, loww],
-            tooltips=[
-                ("Upper Whisker", "@uw"),
-                ("Upper Quartile", "@q3"),
-                ("Median", "@q2"),
-                ("Lower Quartile", "@q1"),
-                ("Lower Whisker", "@lw"),
-            ],
+            tooltips=tooltips,
             point_policy="follow_mouse",
         )
     )
@@ -434,6 +459,39 @@ def box_viz(
         fig.xaxis.major_label_text_font_size = "0pt"
     fig.xaxis.axis_label = x if y is not None else None
     fig.yaxis.axis_label = x if y is None else y
+
+    minw = min(outy) if outy else np.nan
+    maxw = max(outy) if outy else np.nan
+    _format_axis(fig, min(df["lw"].min(), minw), max(df["uw"].max(), maxw), "y")
+
+    if grp_cnt_stats is None and y is not None:  # format categorical axis tick values
+        endpts = list(df["lb"]) + [df.iloc[len(df) - 1]["ub"]]
+        # start by rounding to the length of the largest possible number
+        round_to = -len(str(max([abs(ept) for ept in endpts])).split(",")[0])
+        ticks = np.round(endpts, round_to)
+        nticks = len(df) // 5 + 1
+        show_ticks = [ticks[i] for i in range(len(ticks)) if i % nticks == 0]
+        while len(set(show_ticks)) != len(show_ticks):  # round until show ticks unique
+            round_to += 1
+            ticks = np.round(endpts, round_to)
+            show_ticks = [ticks[i] for i in range(len(ticks)) if i % nticks == 0]
+        # format the ticks
+        ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
+        ticks = _format_ticks(ticks)
+        fig.xaxis.ticker = list(range(len(df) + 1))
+        fig.xaxis.formatter = FuncTickFormatter(  # overide bokeh ticks
+            args={"vals": ticks, "mod": nticks},
+            code="""
+                if (index % mod == 0) return vals[index];
+                return "";
+            """,
+        )
+        fig.min_border_right = 20
+        fig.xaxis.major_label_text_font_size = "10pt"
+        fig.xaxis.major_label_standoff = 7
+        fig.xaxis.major_label_orientation = 0
+        fig.xaxis.major_tick_line_color = None
+        fig.xaxis.major_label_text_align = "center"
 
     return Panel(child=fig, title="box plot")
 
@@ -466,6 +524,8 @@ def line_viz(
     )
 
     plot_dict = dict()
+    xmin, xmax = np.Inf, -np.Inf
+    ymin, ymax = np.Inf, -np.Inf
     for grp, colour in zip(grps, palette):
         ticks = [
             (data[grp][1][i] + data[grp][1][i + 1]) / 2
@@ -488,11 +548,17 @@ def line_viz(
                 mode="mouse",
             )
         )
+        xmin, xmax = min(xmin, data[grp][1].min()), max(xmax, data[grp][1].max())
+        ymin, ymax = min(ymin, data[grp][0].min()), max(ymax, data[grp][0].max())
+
     legend = Legend(items=[(x, [plot_dict[x]]) for x in plot_dict])
     tweak_figure(fig)
     fig.add_layout(legend, "right")
     fig.yaxis.axis_label = "Frequency"
     fig.xaxis.axis_label = y
+    _format_axis(fig, xmin, xmax, "x")
+    if yscale == "linear":
+        _format_axis(fig, ymin, ymax, "y")
 
     return Panel(child=fig, title="line chart")
 
@@ -518,6 +584,8 @@ def scatter_viz(
     tweak_figure(fig)
     fig.xaxis.axis_label = x
     fig.yaxis.axis_label = y
+    _format_axis(fig, df[x].min(), df[x].max(), "x")
+    _format_axis(fig, df[y].min(), df[y].max(), "y")
     return Panel(child=fig, title="scatter plot")
 
 
@@ -580,8 +648,8 @@ def hexbin_viz(
     color_bar.label_standoff = 8
     fig.add_layout(color_bar, "right")
     tweak_figure(fig, "hex")
-    fig.xaxis.ticker = list(np.linspace(xmin, xmax, 10))
-    fig.yaxis.ticker = list(np.linspace(ymin, ymax, 10))
+    _format_axis(fig, xmin, xmax, "x")
+    _format_axis(fig, ymin, ymax, "y")
     fig.xaxis.axis_label = x
     fig.yaxis.axis_label = y
 
@@ -624,6 +692,7 @@ def nested_viz(
     tweak_figure(fig, "nested")
     fig.yaxis.axis_label = "Count"
     fig.xaxis.major_label_orientation = pi / 2
+    _format_axis(fig, 0, df["cnt"].max(), "y")
     return Panel(child=fig, title="nested bar chart")
 
 
