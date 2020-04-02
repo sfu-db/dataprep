@@ -13,7 +13,7 @@ Welcome to dataprep's documentation!
    plot
    plot_correlation
    plot_missing
-
+   data_connector
 
 Indices and tables
 ==================
