@@ -4,6 +4,7 @@
 """
 from typing import Optional, Tuple, Union, List
 
+import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
@@ -35,6 +36,7 @@ def histogram(
             minimum, maximum = range
         else:
             minimum, maximum = srs.min(axis=0), srs.max(axis=0)
+        minimum, maximum = dask.compute(minimum, maximum)
 
         assert (
             bins is not None
