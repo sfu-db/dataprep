@@ -1,15 +1,13 @@
-==============================================================
+=============================================================
 `plot_correlation`: analyzing the correlation between columns
-==============================================================
+=============================================================
 
 .. toctree::
    :maxdepth: 2
 
-   plot_missing
-
  
 Overview
-===============
+========
 
 The goal of `plot_correlation` is to analyze the correlation between columns. It provides the following functionalities:
 
@@ -45,11 +43,12 @@ In the following, we use several examples to demonstrate the functionalities.
 
 
 Loading dataset
-=======================
+===============
 We support two types of dataframe: pandas dataframe and dask dataframe. Here we load the well known `wine quality` dataset into a pandas dataframe and use it to demonstrate our functionality::
 
     import pandas as pd
-    df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv", sep = ";")
+    df = pd.read_csv("https://www.openml.org/data/get_csv/4965268/wine-quality-red.arff")
+
 
 Plotting correlation matrix via `plot_correlation(df)`
 ======================================================
@@ -59,9 +58,10 @@ After getting a dataset, we could plot the correlation matrix of all columns by 
     from dataprep.eda import plot_correlation
     plot_correlation(df)
 
-.. image:: images/plot_correlation/df.png
-   :align: center
-   :scale: 100 
+
+.. raw:: html
+
+   <iframe src="../_static/images/plot_correlation/df.html" height="550" width="100%"></iframe>
 
 
 Finding the most correlated columns via `plot_correlation(df, x)`
@@ -71,10 +71,9 @@ After getting the correlation matrix, user may zoom into a column and explore ho
     
     plot_correlation(df, "alcohol")
 
-.. image:: images/plot_correlation/df_num.png
-   :align: center
-   :scale: 100 
+.. raw:: html
 
+   <iframe src="../_static/images/plot_correlation/df_num.html" height="550" width="100%"></iframe>
 
 
 Exploring the correlation between two columns via `plot_correlation(df, x, y)`
@@ -84,37 +83,38 @@ Furthermore, we provide `plot_correlation(df, x, y)` to allow user analyze the c
 
     plot_correlation(df, "alcohol", "pH")
 
-.. image:: images/plot_correlation/df_num_num.png
-  :align: center
-  :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot_correlation/df_num_num.html" height="550" width="100%"></iframe>
   
 
 Besides, when user passes the parameter k, it could identify the k points that have the largest impact on the correlation value. The impact means that after removing the k points, the correlation value will increase most (positive influence) or decrease most (negative influence). The following shows an example::
 
     plot_correlation(df, "alcohol", "pH", k = 2)
 
-.. image:: images/plot_correlation/df_num_num_k.png
-  :align: center
-  :scale: 100
+.. raw:: html
+
+   <iframe src="../_static/images/plot_correlation/df_num_num_k.html" height="550" width="100%"></iframe>
 
 
 Filtering the result by top-k and value range filter
-=====================================================
+====================================================
 
 We provide two types of filters to filter the result: top-k and value range. They could be applied to `plot_correlation(df)` and `plot_correlation(df, x)` by passing parameter `k` and `value_range`. After applying top-k filter, only the top-k correlation values will be shown. For value range filter, only the the correlation value in a given range will be shown.
 
 The following shows an example of applying top-k filter in `plot_correlation(df)`::
 
-    plot(df, k = 3)
+    plot_correlation(df, k = 3)
 
-.. image:: images/plot_correlation/df_k.png
-  :align: center
-  :scale: 100
+.. raw:: html
+
+   <iframe src="../_static/images/plot_correlation/df_k.html" height="550" width="100%"></iframe>
+
 
 The following shows an example of applying value range filter in `plot_correlation(df, x)`::
 
     plot_correlation(df, "alcohol", value_range=[0.1, 1])
 
-.. image:: images/plot_correlation/df_num_valueRange.png
-  :align: center
-  :scale: 100
+.. raw:: html
+
+   <iframe src="../_static/images/plot_correlation/df_num_valueRange.html" height="550" width="100%"></iframe>

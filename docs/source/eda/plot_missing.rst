@@ -1,14 +1,12 @@
-=======================================================
+======================================================
 `plot_missing`: analyzing the impact of missing values
-=======================================================
+======================================================
 
 .. toctree::
    :maxdepth: 2
 
-   
-
 Overview
-===============
+========
 
 The goal of `plot_missing` is to analyze the impact of missing values. The impact means the change of characteristics (e.g., histogram for numerical column or bar chart for categorical column) of the dataset before and after removing the rows with missing values. `plot_missing` mainly provides the following functionalities:
 
@@ -19,7 +17,7 @@ The goal of `plot_missing` is to analyze the impact of missing values. The impac
 In the following, we use several examples to demonstrate the functionalities.
 
 Loading dataset
-=======================
+===============
 We support two types of dataframe: pandas dataframe and dask dataframe. Here we load the well known `tantic` dataset into a pandas dataframe and use it to demonstrate our functionality::
 
     import pandas as pd
@@ -33,26 +31,25 @@ Given a dataset, we could plot the position of missing values via plot_missing(d
     from dataprep.eda import plot_missing
     plot_missing(df)
 
-.. image:: images/plot_missing/df.png
-   :align: center
-   :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot_missing/df.html" height="550" width="100%"></iframe>
 
 
 The impact on basic characteristics of missing values in column x via `plot_missing(df, x)`
-============================================================================================
+===========================================================================================
 
 After we know the position of the missing value, we could further analyze the impact of missing values. We provide `plot_missing(df, x)` to analyze the impact of missing values in column x. The impact means the characteristics of dataset before and after removing the missing values. Here, we consider two types of characteristics: the histogram for numerical column and the bar chart for categorical column. When calling `plot_missing(df, x)`, user could see the difference of histogram for numerical columns and the bar chart for categorical column, before and after removing the missing values of column x. The following shows an example::
     
     plot_missing(df, "age")
 
-.. image:: images/plot_missing/df_x.png
-   :align: center
-   :scale: 100
+.. raw:: html
 
+   <iframe src="../_static/images/plot_missing/df_x.html" height="550" width="100%"></iframe>
 
 
 The impact on more characteristics of missing values in column x to column y via `plot_missing(df, x, y)`
-==========================================================================================================
+=========================================================================================================
 
 `plot_missing(df, x)` only considers two types of characteristics, i.e., histogram and bar chart, for all columns. If user wants to zoom into a specific column and analyze the impact on more characteristics, she/he could call `plot_missing(df, x, y)`. `plot_missing(df, x, y)` plots the impact of the missing values in x column on y column. The output plot is different when y is numerical column or categorical column. 
 
@@ -60,14 +57,14 @@ When y is numerical column, `plot_missing(df, x, y)` shows the impact on histogr
 
     plot_missing(df, "age", "fare")
 
-.. image:: images/plot_missing/df_x_num.png
-  :align: center
-  :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot_missing/df_x_num.html" height="550" width="100%"></iframe>
 
 When y is categorical column, `plot_missing(df, x, y)` shows the impact on bar chart. The following shows an example:: 
 
     plot_missing(df, "age", "sex")
 
-.. image:: images/plot_missing/df_x_cat.png
-  :align: center
-  :scale: 100
+.. raw:: html
+
+   <iframe src="../_static/images/plot_missing/df_x_cat.html" height="550" width="100%"></iframe>
