@@ -53,6 +53,9 @@ jobs:
     docker:
       - image: circleci/python:3.7.2
     steps:
+      - run:
+          name: Pandoc Installation
+          command: curl -L https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb -o /tmp/pandoc.deb && sudo dpkg -i /tmp/pandoc.deb
       - *step_add_path
       - *step_install_pipenv
       - *step_inproject_venv

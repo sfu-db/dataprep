@@ -5,9 +5,6 @@ An introduction to exploratory data analysis with `dataprep.eda`
 .. toctree::
    :maxdepth: 2
 
-   plot
-
-
 .. topic:: Section contents
 
     In this section, we introduce how to do exploratory data analysis throughout `dataprep.eda` and give serval
@@ -44,12 +41,13 @@ In the following, we show an example of `plot(df)`, which plots the histogram fo
   df = pd.read_csv("https://www.openml.org/data/get_csv/1595261/phpMawTba", na_values = [' ?'])
   plot(df)
 
-.. image:: images/introduction/plot.png
-   :align: center
-   :scale: 100
+.. raw:: html
+
+   <iframe src="../_static/images/introduction/plot.html" height="550" width="100%" frameborder="0"></iframe>
+
 
 Analyzing correlation via `plot_correlation`
----------------------------------------------
+--------------------------------------------
 To analyze the correlation between columns, we provide `plot_correlation`. Its main functionalities could be summarized as follows:
 
 1. `plot_correlation(df)`: plot the correlation matrix of all columns.
@@ -61,12 +59,13 @@ In the following, we show an example of `plot_correlation(df)`, which plots the 
 
   from dataprep.eda import plot_correlation
   import pandas as pd
-  df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv", sep = ";")
+  df = pd.read_csv("https://www.openml.org/data/get_csv/4965268/wine-quality-red.arff")
   plot_correlation(df)
 
-.. image:: images/introduction/plot_correlation.png
-   :align: center
-   :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/introduction/plot_correlation.html" height="550" width="100%"></iframe>
+
 
 Analyzing missing values via `plot_missing`
 -------------------------------------------
@@ -83,6 +82,6 @@ In the following, we show an example of `plot_missing(df)`, which shows the posi
   df = pd.read_csv("https://www.openml.org/data/get_csv/16826755/phpMYEkMl", na_values = ['?'])
   plot_missing(df)
 
-.. image:: images/introduction/plot_missing.png
-   :align: center
-   :scale: 100
+.. raw:: html
+
+   <iframe src="../_static/images/introduction/plot_missing.html" height="550" width="100%"></iframe>
