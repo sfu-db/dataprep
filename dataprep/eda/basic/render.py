@@ -321,7 +321,9 @@ def hist_kde_viz(
         tooltips=[("Bin", "@intervals"), ("Density", "@freq")],
         mode="vline",
     )
-    line = fig.line(pts_rng, pdf, line_color="#9467bd", line_width=2, alpha=0.5)
+    line = fig.line(  # pylint: disable=too-many-function-args
+        pts_rng, pdf, line_color="#9467bd", line_width=2, alpha=0.5
+    )
     hover_dist = HoverTool(renderers=[line], tooltips=[("x", "@x"), ("y", "@y")])
     fig.add_tools(hover_hist)
     fig.add_tools(hover_dist)
@@ -433,7 +435,7 @@ def box_viz(
     )
     upw = fig.segment(x0="x0", y0="uw", x1="x1", y1="uw", line_color="black", source=df)
     if outx:
-        circ = fig.circle(
+        circ = fig.circle(  # pylint: disable=too-many-function-args
             outx, outy, size=3, line_color="black", color=PALETTE[6], fill_alpha=0.6
         )
         fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
@@ -572,7 +574,7 @@ def scatter_viz(
     # pylint: disable=too-many-arguments
     title = f"{y} by {x}" if len(df) < spl_sz else f"{y} by {x} (sample size {spl_sz})"
     tooltips = [("(x,y)", f"(@{x}, @{y})")]
-    fig = figure(
+    fig = figure(  # pylint: disable=too-many-function-args
         tools="hover",
         title=title,
         toolbar_location=None,
@@ -580,7 +582,9 @@ def scatter_viz(
         plot_width=plot_width,
         plot_height=plot_height,
     )
-    fig.circle(x, y, color=PALETTE[0], size=4, name="points", source=df)
+    fig.circle(  # pylint: disable=too-many-function-args
+        x, y, color=PALETTE[0], size=4, name="points", source=df
+    )
     tweak_figure(fig)
     fig.xaxis.axis_label = x
     fig.yaxis.axis_label = y

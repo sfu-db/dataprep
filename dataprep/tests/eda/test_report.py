@@ -2,13 +2,15 @@
     module for testing plot(df, x, y) function.
 """
 import logging
+from datetime import datetime as DateTime
+from tempfile import TemporaryDirectory
 
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import pytest
 
-from ...eda import plot, plot_missing, plot_correlation
+from ...eda import plot, plot_correlation, plot_missing
 from ...eda.utils import to_dask
 
 LOGGER = logging.getLogger(__name__)
@@ -30,7 +32,7 @@ def simpledf() -> dd.DataFrame:
             df,
             pd.Series(
                 np.random.choice(
-                    [pd.datetime(6, 4, 1), pd.to_datetime("today")], 1000, replace=True
+                    [DateTime(6, 4, 1), pd.to_datetime("today")], 1000, replace=True
                 )
             ),
         ],
@@ -50,17 +52,20 @@ def simpledf() -> dd.DataFrame:
 
 def test_plot_report(simpledf: dd.DataFrame) -> None:
     report = plot(simpledf)
-    report.save(filename="plot_report.html")
+    with TemporaryDirectory() as dname:
+        report.save(filename=f"{dname}/plot_report.html")
     report._repr_html_()
 
 
 def test_plot_correlation_report(simpledf: dd.DataFrame) -> None:
     report = plot_correlation(simpledf)
-    report.save(filename="plot_correlation_report.html")
+    with TemporaryDirectory() as dname:
+        report.save(filename=f"{dname}/plot_correlation_report.html")
     report._repr_html_()
 
 
 def test_plot_missing_report(simpledf: dd.DataFrame) -> None:
     report = plot_missing(simpledf)
-    report.save(filename="plot_missing_report.html")
+    with TemporaryDirectory() as dname:
+        report.save(filename=f"{dname}/plot_missing_report.html")
     report._repr_html_()

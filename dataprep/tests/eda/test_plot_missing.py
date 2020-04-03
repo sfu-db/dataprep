@@ -1,10 +1,6 @@
 """
     This module for testing plot_missing(df, x, y) function.
 """
-import random
-from time import time
-from typing import Any
-
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
