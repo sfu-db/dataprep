@@ -677,6 +677,30 @@ tests = ["flake8", "parameterized", "pytest", "scipy", "nbsmoke (>=0.2.0)", "pyt
 
 [[package]]
 category = "main"
+description = "A high level app and dashboarding solution for Python."
+name = "panel"
+optional = false
+python-versions = ">=3.6"
+version = "0.9.4"
+
+[package.dependencies]
+bokeh = ">=2.0.0"
+markdown = "*"
+param = ">=1.9.3"
+pyct = ">=0.4.4"
+pyviz-comms = ">=0.7.4"
+tqdm = "*"
+
+[package.extras]
+all = ["altair", "codecov", "datashader", "django", "flake8", "holoviews (>=1.13.2)", "hvplot", "jupyter-bokeh", "lxml", "matplotlib", "nbsite (>=0.6.1)", "nbsmoke (>=0.2.0)", "notebook (>=5.4)", "parameterized", "phantomjs", "pillow", "plotly", "pytest", "pytest-cov", "pyvista", "scikit-learn", "scipy", "selenium", "sphinx-holoviz-theme", "streamz", "vega-datasets", "vtk"]
+build = ["param (>=1.9.2)", "pyct (>=0.4.4)", "setuptools (>=30.3.0)", "bokeh (>=2.0.0)", "pyviz-comms (>=0.6.0)", "nodejs (>=9.11.1)"]
+doc = ["notebook (>=5.4)", "holoviews (>=1.13.2)", "matplotlib", "pillow", "plotly", "nbsite (>=0.6.1)", "sphinx-holoviz-theme", "selenium", "phantomjs", "lxml"]
+examples = ["hvplot", "plotly", "altair", "streamz", "vega-datasets", "vtk", "scikit-learn", "datashader", "jupyter-bokeh", "django", "pyvista"]
+recommended = ["notebook (>=5.4)", "holoviews (>=1.13.2)", "matplotlib", "pillow", "plotly"]
+tests = ["flake8", "parameterized", "pytest", "scipy", "nbsmoke (>=0.2.0)", "pytest-cov", "codecov"]
+
+[[package]]
+category = "main"
 description = "Declarative Python programming using Parameters."
 name = "param"
 optional = false
