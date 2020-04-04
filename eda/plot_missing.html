@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>plot_missing: analyzing the impact of missing values &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dataprep.data_connector: fetching data from popular websites with a simplified API" href="../data_connector.html" />
+    <link rel="prev" title="plot_correlation: analyzing the correlation between columns" href="plot_correlation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../data_connector.html" title="dataprep.data_connector: fetching data from popular websites with a simplified API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plot_correlation.html" title="plot_correlation: analyzing the correlation between columns"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="plot-missing-analyzing-the-impact-of-missing-values">
+<h1><cite>plot_missing</cite>: analyzing the impact of missing values<a class="headerlink" href="#plot-missing-analyzing-the-impact-of-missing-values" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The goal of <cite>plot_missing</cite> is to analyze the impact of missing values. The impact means the change of characteristics (e.g., histogram for numerical column or bar chart for categorical column) of the dataset before and after removing the rows with missing values. <cite>plot_missing</cite> mainly provides the following functionalities:</p>
+<ol class="arabic simple">
+<li><p><cite>plot_missing(df)</cite>: plot the position of missing values.</p></li>
+<li><p><cite>plot_missing(df, x)</cite>: plot the impact on basic characteristics (histogram and bar chart) of missing values in column x to all other columns.</p></li>
+<li><p><cite>plot_missing(df, x, y)</cite>: zoom into column y, and plot the impact on more characteristics of missing values in column x to column y.</p></li>
+</ol>
+<p>In the following, we use several examples to demonstrate the functionalities.</p>
+</div>
+<div class="section" id="loading-dataset">
+<h2>Loading dataset<a class="headerlink" href="#loading-dataset" title="Permalink to this headline">¶</a></h2>
+<p>We support two types of dataframe: pandas dataframe and dask dataframe. Here we load the well known <cite>tantic</cite> dataset into a pandas dataframe and use it to demonstrate our functionality:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://www.openml.org/data/get_csv/16826755/phpMYEkMl&quot;</span><span class="p">,</span> <span class="n">na_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;?&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plotting-the-position-of-missing-values-via-plot-missing-df">
+<h2>Plotting the position of missing values via <cite>plot_missing(df)</cite><a class="headerlink" href="#plotting-the-position-of-missing-values-via-plot-missing-df" title="Permalink to this headline">¶</a></h2>
+<p>Given a dataset, we could plot the position of missing values via plot_missing(df). The dataset is divided into bins, and we use colored bin to represent the number of missing values. The more the missing value is in a bin, the deeper the bin color is. By default, we show 50 columns and each column is divided into 100 bins. We will also show the percentage of missing values for each column in the label. The following is an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot_missing</span>
+<span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot_missing/df.html" height="550" width="100%"></iframe></div>
+<div class="section" id="the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x">
+<h2>The impact on basic characteristics of missing values in column x via <cite>plot_missing(df, x)</cite><a class="headerlink" href="#the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x" title="Permalink to this headline">¶</a></h2>
+<p>After we know the position of the missing value, we could further analyze the impact of missing values. We provide <cite>plot_missing(df, x)</cite> to analyze the impact of missing values in column x. The impact means the characteristics of dataset before and after removing the missing values. Here, we consider two types of characteristics: the histogram for numerical column and the bar chart for categorical column. When calling <cite>plot_missing(df, x)</cite>, user could see the difference of histogram for numerical columns and the bar chart for categorical column, before and after removing the missing values of column x. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot_missing/df_x.html" height="550" width="100%"></iframe></div>
+<div class="section" id="the-impact-on-more-characteristics-of-missing-values-in-column-x-to-column-y-via-plot-missing-df-x-y">
+<h2>The impact on more characteristics of missing values in column x to column y via <cite>plot_missing(df, x, y)</cite><a class="headerlink" href="#the-impact-on-more-characteristics-of-missing-values-in-column-x-to-column-y-via-plot-missing-df-x-y" title="Permalink to this headline">¶</a></h2>
+<p><cite>plot_missing(df, x)</cite> only considers two types of characteristics, i.e., histogram and bar chart, for all columns. If user wants to zoom into a specific column and analyze the impact on more characteristics, she/he could call <cite>plot_missing(df, x, y)</cite>. <cite>plot_missing(df, x, y)</cite> plots the impact of the missing values in x column on y column. The output plot is different when y is numerical column or categorical column.</p>
+<p>When y is numerical column, <cite>plot_missing(df, x, y)</cite> shows the impact on histogram, pdf, cdf, and box plot. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;fare&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot_missing/df_x_num.html" height="550" width="100%"></iframe><p>When y is categorical column, <cite>plot_missing(df, x, y)</cite> shows the impact on bar chart. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;sex&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot_missing/df_x_cat.html" height="550" width="100%"></iframe></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><cite>plot_missing</cite>: analyzing the impact of missing values</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#loading-dataset">Loading dataset</a></li>
+<li><a class="reference internal" href="#plotting-the-position-of-missing-values-via-plot-missing-df">Plotting the position of missing values via <cite>plot_missing(df)</cite></a></li>
+<li><a class="reference internal" href="#the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x">The impact on basic characteristics of missing values in column x via <cite>plot_missing(df, x)</cite></a></li>
+<li><a class="reference internal" href="#the-impact-on-more-characteristics-of-missing-values-in-column-x-to-column-y-via-plot-missing-df-x-y">The impact on more characteristics of missing values in column x to column y via <cite>plot_missing(df, x, y)</cite></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="plot_correlation.html"
+                        title="previous chapter"><cite>plot_correlation</cite>: analyzing the correlation between columns</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../data_connector.html"
+                        title="next chapter">dataprep.data_connector: fetching data from popular websites with a simplified API</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/eda/plot_missing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../data_connector.html" title="dataprep.data_connector: fetching data from popular websites with a simplified API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="plot_correlation.html" title="plot_correlation: analyzing the correlation between columns"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

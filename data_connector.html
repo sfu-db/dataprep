@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dataprep.data_connector: fetching data from popular websites with a simplified API &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="EDA Case Study: Titanic" href="case_study/titanic.html" />
+    <link rel="prev" title="plot_missing: analyzing the impact of missing values" href="eda/plot_missing.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="case_study/titanic.html" title="EDA Case Study: Titanic"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="eda/plot_missing.html" title="plot_missing: analyzing the impact of missing values"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dataprep-data-connector-fetching-data-from-popular-websites-with-a-simplified-api">
+<h1>dataprep.data_connector: fetching data from popular websites with a simplified API<a class="headerlink" href="#dataprep-data-connector-fetching-data-from-popular-websites-with-a-simplified-api" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>data_connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set.
+The goal is to help the users skip the complex API configuration.
+We illustrate how to use data_connector library with Yelp.</p>
+</div>
+<div class="section" id="initializing-a-connector-class-for-a-website">
+<h2>Initializing a connector class for a website<a class="headerlink" href="#initializing-a-connector-class-for-a-website" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to initialize a Connector class with the configuration file location and access token specified (<a class="reference external" href="https://www.yelp.com/developers/documentation/v3/authentication">How to get access token?</a>).
+Available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.
+To initialize a data_connector:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.data_connector</span> <span class="kn">import</span> <span class="n">Connector</span>
+<span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="s2">&quot;./DataConnectorConfigs/yelp&quot;</span><span class="p">,</span> <span class="n">auth_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="n">access_token</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getting-the-guidline-of-the-connector-with-connector-info">
+<h2>Getting the guidline of the connector with <cite>Connector.info</cite><a class="headerlink" href="#getting-the-guidline-of-the-connector-with-connector-info" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Connector’s info method gives information and guideline of using the connector. In the example below, the response shows three things.</div>
+<div class="line-block">
+<div class="line">a. There is one table in Yelp, i.e. Yelp.businesses.</div>
+<div class="line">b. To query this table, the term and location parameters are required and the longitute and latitude parameters are optional (see Connector.query() section).</div>
+<div class="line">c. The examples of calling the methods in the Connector class.</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/info.png"><img alt="_images/info.png" class="align-center" src="_images/info.png" style="width: 496px; height: 215px;" /></a>
+</div>
+<div class="section" id="understand-web-data-with-connector-show-schema">
+<h2>Understand web data with <cite>Connector.show_schema()</cite><a class="headerlink" href="#understand-web-data-with-connector-show-schema" title="Permalink to this headline">¶</a></h2>
+<p>show_schema(table name) returns the schema of the webdata to be returned in a dataframe.
+There are two columns in the response.
+The first column is the column name and the second is the datatype.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s1">&#39;businesses&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/show_schema.png"><img alt="_images/show_schema.png" class="align-center" src="_images/show_schema.png" style="width: 208px; height: 458px;" /></a>
+</div>
+<div class="section" id="getting-web-data-with-connector-query">
+<h2>Getting web data with <cite>Connector.query()</cite><a class="headerlink" href="#getting-web-data-with-connector-query" title="Permalink to this headline">¶</a></h2>
+<p>the <cite>query()</cite> method downloads the website data.
+The parameters should meet the requriement in <cite>Connector.info</cite>
+Usually the raw data is returned in JSON or xml format.
+data_connector re-format the data in pandas dataframe for the convenience of downstream operations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;businesses&#39;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;korean&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;seattle&quot;</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/query.png"><img alt="_images/query.png" class="align-center" src="_images/query.png" style="width: 870px; height: 491px;" /></a>
+</div>
+<div class="section" id="advanced-writing-your-own-data-connector-configuration-file">
+<h2>Advanced: writing your own data_connector configuration file<a class="headerlink" href="#advanced-writing-your-own-data-connector-configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>A configuration file defines the infomation neccessary to fetch data from a website, e.g. the request url; the API authorization type; the parameters needed from the uses(API key, search keyword, etc.); the returned data’s schema.
+All the information are reusable.
+To write a configuration file for the your own needs or modify an existing one, please refer to <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dataprep.data_connector: fetching data from popular websites with a simplified API</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#initializing-a-connector-class-for-a-website">Initializing a connector class for a website</a></li>
+<li><a class="reference internal" href="#getting-the-guidline-of-the-connector-with-connector-info">Getting the guidline of the connector with <cite>Connector.info</cite></a></li>
+<li><a class="reference internal" href="#understand-web-data-with-connector-show-schema">Understand web data with <cite>Connector.show_schema()</cite></a></li>
+<li><a class="reference internal" href="#getting-web-data-with-connector-query">Getting web data with <cite>Connector.query()</cite></a></li>
+<li><a class="reference internal" href="#advanced-writing-your-own-data-connector-configuration-file">Advanced: writing your own data_connector configuration file</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="eda/plot_missing.html"
+                        title="previous chapter"><cite>plot_missing</cite>: analyzing the impact of missing values</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="case_study/titanic.html"
+                        title="next chapter">EDA Case Study: Titanic</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/data_connector.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="case_study/titanic.html" title="EDA Case Study: Titanic"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="eda/plot_missing.html" title="plot_missing: analyzing the impact of missing values"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

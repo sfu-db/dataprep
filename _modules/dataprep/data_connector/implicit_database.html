@@ -7,11 +7,12 @@
     <title>dataprep.data_connector.implicit_database &#8212; dataprep 0.0.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
@@ -189,7 +190,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="p">(</span>
                             <span class="n">column_type</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span>
-                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{column_name}</span><span class="s2">: </span><span class="si">{maybe_cell_value}</span><span class="s2"> is not </span><span class="si">{column_type}</span><span class="s2">&quot;</span>
+                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">maybe_cell_value</span><span class="si">}</span><span class="s2"> is not </span><span class="si">{</span><span class="n">column_type</span><span class="si">}</span><span class="s2">&quot;</span>
                         <span class="n">col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maybe_cell_value</span><span class="p">)</span>
 
                 <span class="n">table_data</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
@@ -231,7 +232,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="p">(</span>
                             <span class="n">column_type</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span>
-                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{column_name}</span><span class="s2">: </span><span class="si">{maybe_cell_value}</span><span class="s2"> is not </span><span class="si">{column_type}</span><span class="s2">&quot;</span>
+                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">maybe_cell_value</span><span class="si">}</span><span class="s2"> is not </span><span class="si">{</span><span class="n">column_type</span><span class="si">}</span><span class="s2">&quot;</span>
                         <span class="n">col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maybe_cell_value</span><span class="p">)</span>
 
                 <span class="n">table_data</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
@@ -273,7 +274,7 @@
 
             <span class="n">table</span> <span class="o">=</span> <span class="n">ImplicitTable</span><span class="p">(</span><span class="n">table_config_path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">table_config</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicated table name </span><span class="si">{table.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicated table name </span><span class="si">{</span><span class="n">table</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span></div>
 </pre></div>
 
@@ -291,7 +292,7 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -311,7 +312,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>

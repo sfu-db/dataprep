@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>plot: analyzing basic characteristics of dataset &#8212; dataprep 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="plot_correlation: analyzing the correlation between columns" href="plot_correlation.html" />
+    <link rel="prev" title="An introduction to exploratory data analysis with dataprep.eda" href="introduction.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plot_correlation.html" title="plot_correlation: analyzing the correlation between columns"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="An introduction to exploratory data analysis with dataprep.eda"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="plot-analyzing-basic-characteristics-of-dataset">
+<h1><cite>plot</cite>: analyzing basic characteristics of dataset<a class="headerlink" href="#plot-analyzing-basic-characteristics-of-dataset" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The goal of <cite>plot</cite> is to explore basic characteristics of the dataset. It can generate different plots to reveal different characteristics of interested columns. It mainly provides the following functionalities:</p>
+<ol class="arabic simple">
+<li><p>plot(df): plot basic characteristics (the histogram and the bar chart) for all columns.</p></li>
+<li><p>plot(df, x): zoom into column x and plot more refined characteristics.</p></li>
+<li><p>plot(df, x, y): zoom into column x and column y, and plot more refined characteristics to explore their relationship.</p></li>
+</ol>
+<p>The generated plots of <cite>plot</cite> function are different for numerical column and categorical column. The following table summarizes the output plots for different setting of x and y.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 7%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td></td>
+<td><p><strong>plot(df,x,y)</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>x</strong></p></td>
+<td><p><strong>y</strong></p></td>
+<td><p><strong>output plots</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>None</p></td>
+<td><p>None</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Histogram">histgram</a> or <a class="reference external" href="https://www.wikiwand.com/en/Bar_chart">bar chart</a> for each column</p></td>
+</tr>
+<tr class="row-even"><td><p>Numerical</p></td>
+<td><p>None</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Histogram">histgram</a>, <a class="reference external" href="https://www.wikiwand.com/en/Kernel_density_estimation">kde plot</a>, <a class="reference external" href="https://www.wikiwand.com/en/Box_plot">box plot</a>, <a class="reference external" href="https://www.wikiwand.com/en/Q%E2%80%93Q_plot">qq-norm plot</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Categorical</p></td>
+<td><p>None</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Bar_chart">bar chart</a>, <a class="reference external" href="https://www.wikiwand.com/en/Pie_chart">pie chart</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Numerical</p></td>
+<td><p>Numerical</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Scatter_plot">scatter plot</a>, <a class="reference external" href="https://www.data-to-viz.com/graph/hexbinmap.html">hexbin plot</a>, <a class="reference external" href="https://www.wikiwand.com/en/Box_plot">box plot</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Numerical</p></td>
+<td><p>Categorical</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Box_plot">box plot</a>, <a class="reference external" href="https://www.wikiwand.com/en/Line_chart">line plot</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Categorical</p></td>
+<td><p>Numerical</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Box_plot">box plot</a>, <a class="reference external" href="https://www.wikiwand.com/en/Line_chart">line plot</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Categorical</p></td>
+<td><p>Categorical</p></td>
+<td><p><a class="reference external" href="https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked">nested bar chart</a>, <a class="reference external" href="https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked">stacked bar chart</a>, <a class="reference external" href="https://www.wikiwand.com/en/Heat_map">heat map</a></p></td>
+</tr>
+</tbody>
+</table>
+<p>Next, we use several examples to demonstrate the functionalities.</p>
+</div>
+<div class="section" id="loading-dataset">
+<h2>Loading dataset<a class="headerlink" href="#loading-dataset" title="Permalink to this headline">¶</a></h2>
+<p>We support two types of dataframe: pandas dataframe and dask dataframe. Here we load the well known <cite>adult</cite> dataset into a pandas dataframe and use it to demonstrate our functionality:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://www.openml.org/data/get_csv/1595261/phpMawTba&quot;</span><span class="p">,</span> <span class="n">na_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; ?&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="basic-exploration-for-all-columns-via-plot-df">
+<h2>Basic exploration for all columns via <cite>plot(df)</cite><a class="headerlink" href="#basic-exploration-for-all-columns-via-plot-df" title="Permalink to this headline">¶</a></h2>
+<p>After getting a dataset, we could do a rough exploration by calling <cite>plot(df)</cite>. It will plot a histogram for each numeric column and a bar chart for each categorical column. The shown bin number (of histogram) and shown category number (of categorical column) are both customizable. Besides, if a column contains missing values, it ignores them when generating the plot but shows the percentage of missing values in the title. The following shows an example of <cite>plot(df)</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot/plot_df.html" height="520" width="100%"></iframe></div>
+<div class="section" id="zooming-into-a-column-via-plot-df-x">
+<h2>Zooming into a column via <cite>plot(df, x)</cite><a class="headerlink" href="#zooming-into-a-column-via-plot-df-x" title="Permalink to this headline">¶</a></h2>
+<p>After we get the basic information of the dataset, we could zoom into an interested column to explore it more by calling <cite>plot(df, x)</cite>, where x is the interested column.  The output is of <cite>plot(df, x)</cite> is different for numerical column and categorical column.</p>
+<p>When x is a numeric column, it plots the histogram, kde plot, box plot and qq-norm plot. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot/plot_df_age.html" height="450" width="100%"></iframe><p>When x is a categorical column, it plots bar chart and pie chart. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;education&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot/plot_df_education.html" height="450" width="100%"></iframe></div>
+<div class="section" id="zooming-into-two-columns-via-plot-df-x-y">
+<h2>Zooming into two columns via <cite>plot(df, x, y)</cite><a class="headerlink" href="#zooming-into-two-columns-via-plot-df-x-y" title="Permalink to this headline">¶</a></h2>
+<p>Furthermore, we provide <cite>plot(df, x, y)</cite> to explore the relationship between interested columns x and y. The output is based on the column types of x and y.</p>
+<p>When x and y are both numerical columns, it plots <a class="reference external" href="https://www.wikiwand.com/en/Scatter_plot">scatter plot</a>, <a class="reference external" href="https://www.data-to-viz.com/graph/hexbinmap.html">hexbin plot</a> and <a class="reference external" href="https://www.wikiwand.com/en/Box_plot">box plot</a>. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;hours-per-week&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot/plot_df_age_hours.html" height="450" width="100%"></iframe><p>When x and y are both categorical columns, it plots <a class="reference external" href="https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked">nested bar chart</a>, <a class="reference external" href="https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked">stacked bar chart</a> and <a class="reference external" href="https://www.wikiwand.com/en/Heat_map">heat map</a> . The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;education&quot;</span><span class="p">,</span> <span class="s2">&quot;marital-status&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot/plot_df_education_marital.html" height="400" width="100%"></iframe><p>When one of x and y is a numerical column and the other is categorical column, it plots <a class="reference external" href="https://www.wikiwand.com/en/Box_plot">box plot</a> and <a class="reference external" href="https://www.wikiwand.com/en/Line_chart">line plot</a>. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;education&quot;</span><span class="p">)</span>
+<span class="c1"># or plot(df, &quot;education&quot;, &quot;age&quot;)</span>
+</pre></div>
+</div>
+<iframe src="../_static/images/plot/plot_df_education_age.html" height="450" width="100%"></iframe></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><cite>plot</cite>: analyzing basic characteristics of dataset</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#loading-dataset">Loading dataset</a></li>
+<li><a class="reference internal" href="#basic-exploration-for-all-columns-via-plot-df">Basic exploration for all columns via <cite>plot(df)</cite></a></li>
+<li><a class="reference internal" href="#zooming-into-a-column-via-plot-df-x">Zooming into a column via <cite>plot(df, x)</cite></a></li>
+<li><a class="reference internal" href="#zooming-into-two-columns-via-plot-df-x-y">Zooming into two columns via <cite>plot(df, x, y)</cite></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="previous chapter">An introduction to exploratory data analysis with <cite>dataprep.eda</cite></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plot_correlation.html"
+                        title="next chapter"><cite>plot_correlation</cite>: analyzing the correlation between columns</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/eda/plot.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plot_correlation.html" title="plot_correlation: analyzing the correlation between columns"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="An introduction to exploratory data analysis with dataprep.eda"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
