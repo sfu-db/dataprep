@@ -36,7 +36,7 @@ Getting the guidline of the connector with `Connector.info`
 
     dc.info
 
-.. image:: images/data_connector/info.png
+.. image:: _static/images/data_connector/info.png
 	:align: center
    	:width: 496
    	:height: 215
@@ -54,7 +54,7 @@ The first column is the column name and the second is the datatype.
     dc.show_schema('businesses')
 
 
-.. image:: images/data_connector/show_schema.png
+.. image:: _static/images/data_connector/show_schema.png
    :align: center
    :width: 208
    :height: 458 
@@ -72,7 +72,7 @@ data_connector re-format the data in pandas dataframe for the convenience of dow
     df = dc.query('businesses', term="korean", location="seattle")
     df
 
-.. image:: images/data_connector/query.png
+.. image:: _static/images/data_connector/query.png
    :align: center
    :width: 870
    :height: 491
