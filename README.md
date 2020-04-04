@@ -1,17 +1,12 @@
-# DataPrep ![Build Status]
+# Dataprep ![Build Status]
 [Documentation] | [Mail List & Forum] 
 
-Dataprep is a collection of functions that 
-helps you accomplish tasks before you build a predictive model.
-
-
-## Implementation Status
+Dataprep let you prepare your data using a single library with a few lines of code.
 
 Currently, you can use `dataprep` to:
 * Collect data from common data sources (through `dataprep.data_connector`)
 * Do your exploratory data analysis (through `dataprep.eda`)
-* ...
-
+* ...more modules are coming
 
 ## Installation
 
@@ -19,26 +14,9 @@ Currently, you can use `dataprep` to:
 pip install dataprep
 ```
 
-`dataprep` is in its alpha stage now, so please manually specific the version number.
-
-
 ## Examples & Usages
 
-More detailed examples can be found at the [examples] folder.
-
-### Data Connector
-
-You can download Yelp business search result into a pandas DataFrame, 
-using two lines of code, without taking deep looking into the Yelp documentation!
-
-```python
-from dataprep.data_connector import Connector
-
-dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
-df = dc.query("businesses", term="ramen", location="vancouver")
-```
-![DataConnectorResult]
-
+Detailed examples can be found in the [examples] folder.
 
 ### EDA
 
@@ -93,25 +71,37 @@ plot_missing(df, x="some_column_name")
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
 
+### Data Connector
+
+You can download Yelp business search result into a pandas DataFrame, 
+using two lines of code, without taking deep looking into the Yelp documentation!
+
+```python
+from dataprep.data_connector import Connector
+
+dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
+df = dc.query("businesses", term="ramen", location="vancouver")
+```
+![DataConnectorResult]
+
+
 ## Contribution
-Dataprep is in its very early stage. Any contribution including:
+
+Dataprep is in its early stage. Any contribution including:
 * Filing an issue
 * Providing use cases
-* Write down your user experience
-* Submit a PR
+* Writing down your user experience
+* Submitting a PR
 * ...
 
 are greatly appreciated!
 
-If you want to make code contribution to dataprep, be sure to read the [contribution guidelines].
-
-
-
+Please take a look at our [wiki] for development documentations!
 
 
 [Build Status]: https://img.shields.io/circleci/build/github/sfu-db/dataprep/master?style=flat-square&token=f68e38757f5c98771f46d1c7e700f285a0b9784d
 [Documentation]: https://sfu-db.github.io/dataprep/
 [Mail list & Forum]: https://groups.google.com/forum/#!forum/dataprep
-[contribution guidelines]: https://github.com/sfu-db/dataprep/blob/master/CONTRIBUTING.md
+[wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
 [DataConnectorResult]: https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png
