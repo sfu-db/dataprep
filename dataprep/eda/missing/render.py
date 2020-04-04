@@ -175,19 +175,27 @@ def render_boxwhisker(df: pd.DataFrame, plot_width: int, plot_height: int) -> Fi
     )
 
     # stems
-    fig.segment("label", "q3", "label", "upper", source=df, line_color="black")
-    fig.segment("label", "q1", "label", "lower", source=df, line_color="black")
+    fig.segment(  # pylint: disable=too-many-function-args
+        "label", "q3", "label", "upper", source=df, line_color="black"
+    )
+    fig.segment(  # pylint: disable=too-many-function-args
+        "label", "q1", "label", "lower", source=df, line_color="black"
+    )
 
     # boxes
-    fig.vbar(
+    fig.vbar(  # pylint: disable=too-many-function-args
         "label", 0.7, "q2", "q3", source=df, fill_color=PALETTE[0], line_color="black",
     )
-    fig.vbar(
+    fig.vbar(  # pylint: disable=too-many-function-args
         "label", 0.7, "q2", "q1", source=df, fill_color=PALETTE[0], line_color="black",
     )
     # whiskers (almost-0 height rects simpler than segments)
-    fig.rect("label", "lower", 0.2, 0.01, source=df, line_color="black")
-    fig.rect("label", "upper", 0.2, 0.01, source=df, line_color="black")
+    fig.rect(  # pylint: disable=too-many-function-args
+        "label", "lower", 0.2, 0.01, source=df, line_color="black"
+    )
+    fig.rect(  # pylint: disable=too-many-function-args
+        "label", "upper", 0.2, 0.01, source=df, line_color="black"
+    )
 
     # # outliers
     # if not out.empty:

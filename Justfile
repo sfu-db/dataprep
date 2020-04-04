@@ -12,7 +12,7 @@ ci-black:
 format:
   poetry run black dataprep
 
-typeck: ci-pytype ci-mypy
+typeck: ci-mypy
 
 test:
   poetry run pytest dataprep
@@ -22,9 +22,6 @@ testf +ARGS="dataprep":
 
 lint:
   poetry run pylint dataprep
-
-ci-pytype:
-  poetry run pytype dataprep
 
 ci-mypy:
   poetry run mypy dataprep

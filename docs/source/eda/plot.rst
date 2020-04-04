@@ -1,16 +1,13 @@
 
-===================================================
+==================================================
 `plot`: analyzing basic characteristics of dataset 
-===================================================
+==================================================
 
 .. toctree::
    :maxdepth: 2
 
-   plot_correlation
-
-
 Overview
-===============
+========
 
 The goal of `plot` is to explore basic characteristics of the dataset. It can generate different plots to reveal different characteristics of interested columns. It mainly provides the following functionalities:
 
@@ -45,7 +42,7 @@ Next, we use several examples to demonstrate the functionalities.
 
 
 Loading dataset
-=======================
+===============
 We support two types of dataframe: pandas dataframe and dask dataframe. Here we load the well known `adult` dataset into a pandas dataframe and use it to demonstrate our functionality::
 
     import pandas as pd
@@ -59,12 +56,14 @@ After getting a dataset, we could do a rough exploration by calling `plot(df)`. 
     from dataprep.eda import plot
     plot(df)
 
-.. image:: images/plot/plot_df.png
-   :align: center
-   :scale: 100
+
+.. raw:: html
+
+   <iframe src="../_static/images/plot/plot_df.html" height="520" width="100%"></iframe>
+
 
 Zooming into a column via `plot(df, x)`
-==========================================
+=======================================
 
 After we get the basic information of the dataset, we could zoom into an interested column to explore it more by calling `plot(df, x)`, where x is the interested column.  The output is of `plot(df, x)` is different for numerical column and categorical column.
 
@@ -72,17 +71,18 @@ When x is a numeric column, it plots the histogram, kde plot, box plot and qq-no
     
     plot(df, "age")
 
-.. image:: images/plot/plot_df_age.png
-   :align: center
-   :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot/plot_df_age.html" height="450" width="100%"></iframe>
+
 
 When x is a categorical column, it plots bar chart and pie chart. The following shows an example::
 
     plot(df, "education")
 
-.. image:: images/plot/plot_df_education.png
-   :align: center
-   :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot/plot_df_education.html" height="450" width="100%"></iframe>
 
 
 Zooming into two columns via `plot(df, x, y)`
@@ -92,26 +92,27 @@ Furthermore, we provide `plot(df, x, y)` to explore the relationship between int
 
 When x and y are both numerical columns, it plots `scatter plot  <https://www.wikiwand.com/en/Scatter_plot>`_, `hexbin plot <https://www.data-to-viz.com/graph/hexbinmap.html>`_ and `box plot  <https://www.wikiwand.com/en/Box_plot>`_. The following shows an example::
 
-    plot(df, "age", "hoursperweek")
+    plot(df, "age", "hours-per-week")
 
-.. image:: images/plot/plot_df_age_hours.png
-  :align: center
-  :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot/plot_df_age_hours.html" height="450" width="100%"></iframe>
   
 
 When x and y are both categorical columns, it plots `nested bar chart <https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked>`_, `stacked bar chart <https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked>`_ and `heat map <https://www.wikiwand.com/en/Heat_map>`_ . The following shows an example::
 
     plot(df, "education", "marital-status")
 
-.. image:: images/plot/plot_df_education_marital.png
-  :align: center
-  :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot/plot_df_education_marital.html" height="400" width="100%"></iframe>
+
 
 When one of x and y is a numerical column and the other is categorical column, it plots `box plot  <https://www.wikiwand.com/en/Box_plot>`_ and `line plot <https://www.wikiwand.com/en/Line_chart>`_. The following shows an example::
 
     plot(df, "age", "education")
     # or plot(df, "education", "age")
 
-.. image:: images/plot/plot_df_education_age.png
-  :align: center
-  :scale: 100 
+.. raw:: html
+
+   <iframe src="../_static/images/plot/plot_df_education_age.html" height="450" width="100%"></iframe>
