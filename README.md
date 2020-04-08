@@ -16,7 +16,12 @@ pip install dataprep
 
 ## Examples & Usages
 
-Detailed examples can be found in the [examples] folder.
+The following examples can give you an impression of what dataprep can do:
+
+* [Documentation: Data Connector](https://sfu-db.github.io/dataprep/data_connector.html)
+* [Documentation: EDA](https://sfu-db.github.io/dataprep/eda/introduction.html)
+* [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/case_study/titanic.html)
+* [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/case_study/house_price.html)
 
 ### EDA
 
@@ -29,19 +34,19 @@ tasks with a single function call.
 
 * Want to understand the distributions for each DataFrame column? Use `plot`.
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-basic-characteristics-via-plot"><img src="assets/plot(df).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-basic-characteristics-via-plot"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot(df).png"/></a></center>
 
 * Want to understand the correlation between columns? Use `plot_correlation`.
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-correlation-via-plot-correlation"><img src="assets/plot_correlation(df).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-correlation-via-plot-correlation"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_correlation(df).png"/></a></center>
 
 * Or, if you want to understand the impact of the missing values for each column, use `plot_missing`.
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#plotting-the-position-of-missing-values-via-plot-missing-df"><img src="assets/plot_missing(df).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#plotting-the-position-of-missing-values-via-plot-missing-df"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_missing(df).png"/></a></center>
 
 * You can drill down to get more information by given `plot`, `plot_correlation` and `plot_missing` a column name. E.g. for `plot_missing`:
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x"><img src="assets/plot_missing(df,x).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_missing(df,x).png"/></a></center>
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
 
@@ -56,7 +61,7 @@ from dataprep.data_connector import Connector
 dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
 df = dc.query("businesses", term="korean", location="seattle")
 ```
-<center><a href="https://sfu-db.github.io/dataprep/data_connector.html#getting-web-data-with-connector-query"><img src="assets/data_connector.png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/data_connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png"/></a></center>
 
 
 ## Contribution
