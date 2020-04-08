@@ -13,13 +13,14 @@ from ..errors import UnreachableError
 
 
 class AuthorizationType(Enum):
-    """
-    Enum class defines the supported authorization methods
-    in this library.
+    """Enum class defines the supported authorization methods in this library.
 
-    Bearer: requires 'access_token' presented in user params
-    OAuth2: requires 'client_id' and 'client_secret' in user params
-            for 'ClientCredentials' grant type
+    Note
+    ----
+
+    * Bearer: requires 'access_token' presented in user params
+    * OAuth2: requires 'client_id' and 'client_secret' in user params for
+      'ClientCredentials' grant type
     """
 
     Bearer = "Bearer"
@@ -27,8 +28,7 @@ class AuthorizationType(Enum):
 
 
 class Authorization:
-    """
-    Class carries the authorization type and
+    """Class carries the authorization type and
     the corresponding parameter.
     """
 
@@ -42,8 +42,7 @@ class Authorization:
         self.storage = {}
 
     def build(self, req_data: Dict[str, Any], params: Dict[str, Any]) -> None:
-        """
-        Populate some required fields to the request data.
+        """Populate some required fields to the request data.
         Complex logic may also happens in this function (e.g. start a server to do OAuth).
         """
         if self.auth_type == AuthorizationType.Bearer:  # pylint: disable=no-member
@@ -88,8 +87,7 @@ class Authorization:
 
 
 class Fields:
-    """
-    A data structure that stores the fields information (e.g. headers, cookies, ...).
+    """A data structure that stores the fields information (e.g. headers, cookies, ...).
     This class is useful to populate concrete fields data with required variables provided.
     """
 
@@ -101,8 +99,7 @@ class Fields:
     def populate(  # pylint: disable=too-many-branches
         self, jenv: Environment, params: Dict[str, Any]
     ) -> Dict[str, str]:
-        """
-        Populate a dict based on the fields definition and provided vars.
+        """Populate a dict based on the fields definition and provided vars.
         """
         ret: Dict[str, str] = {}
 
@@ -153,12 +150,13 @@ class Fields:
 
 
 class Orient(Enum):
-    """
-    Different types of table orientations
+    """Different types of table orientations
     ref: (https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_json.html).
     Currently, DataConnector supports two different types of orientaions:
-        1. Split, which is column store.
-        2. Records, which is row store.
+
+    1. Split, which is column store.
+    2. Records, which is row store.
+
     Details can be found in the pandas page.
     """
 

@@ -1,5 +1,8 @@
-"""Docstring
-    Data preparation module
+"""
+dataprep
+========
+
+Dataprep let you prepare your data using a single library with a few lines of code.
 """
 import logging
 

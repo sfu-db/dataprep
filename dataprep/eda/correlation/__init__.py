@@ -50,7 +50,7 @@ def plot_correlation(
         An intermediate representation for the plots of different columns in the data_frame.
 
     Examples
-    ----------
+    --------
     >>> from dataprep.eda.correlation.computation import plot_correlation
     >>> import pandas as pd
     >>> df = pd.read_csv("suicide-rate.csv")
@@ -63,8 +63,8 @@ def plot_correlation(
     >>> plot_correlation(df, x_name="population", y_name="suicides_no")
     >>> plot_correlation(df, x_name="population", y_name="suicides", k=5)
 
-    Notes
-    ----------
+    Note
+    ----
     match (x_name, y_name, k)
         case (None, None, None) => heatmap
         case (Some, None, Some) => Top K columns for (pearson, spearman, kendall)

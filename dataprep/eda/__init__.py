@@ -1,5 +1,6 @@
-"""Docstring
-    Data preparation module
+"""
+dataprep.eda
+============
 """
 import tempfile
 
