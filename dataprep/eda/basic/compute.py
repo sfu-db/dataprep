@@ -1,6 +1,8 @@
 """
-    This module implements the intermediates computation
-    for plot(df) function.
+Compute ``plot(df)``
+====================
+
+This module implements the intermediates computation for plot(df) function.
 """
 from sys import stderr
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
@@ -34,7 +36,7 @@ def compute(
     value_range: Optional[Tuple[float, float]] = None,
 ) -> Intermediate:
     """
-    Parameters:
+    Parameters
     ----------
     df : Union[pd.DataFrame, dd.DataFrame]
         Dataframe from which plots are to be generated.

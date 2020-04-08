@@ -285,5 +285,7 @@ def render_correlation(
         )
     elif itmdt.visual_type == "correlation_scatter":
         visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
-    # TODO Can we raise an exception here? Otherwise, visual_elem will be used before assigned
+    else:
+        raise NotImplementedError(f"Unknown visual type {itmdt.visual_type}")
+
     return visual_elem

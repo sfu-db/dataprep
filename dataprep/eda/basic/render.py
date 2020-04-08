@@ -1,6 +1,8 @@
 """
-    This module implements the visualization for the
-    plot(df) function
+Render ``plot(df)``
+===================
+
+This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from math import pi
 from typing import Any, Dict, List, Optional, Tuple

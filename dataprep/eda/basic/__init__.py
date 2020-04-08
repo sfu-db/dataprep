@@ -1,5 +1,8 @@
 """
-    This module implements the plot(df) function.
+plot(df)
+========
+
+This module implements the plot(df) function.
 """
 
 from typing import Optional, Tuple, Union
@@ -51,7 +54,7 @@ def plot(
     contain categorical vales, a nested bar chart, stacked bar chart, and
     heat map are plotted.
 
-    Parameters:
+    Parameters
     ----------
     df : Union[pd.DataFrame, dd.DataFrame]
         Dataframe from which plots are to be generated

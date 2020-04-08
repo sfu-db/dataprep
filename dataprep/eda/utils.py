@@ -1,5 +1,4 @@
-"""
-    This module implements the utils function.
+"""Miscellaneous functions
 """
 import logging
 import random
