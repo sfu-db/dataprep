@@ -49,6 +49,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "nbsphinx",
+    "sphinx_autodoc_typehints",
 ]
 
 # Napoleon settings
