@@ -20,7 +20,10 @@ GIT_REF_URL = "https://api.github.com/repos/sfu-db/DataConnectorConfigs/git/refs
 
 def config_directory() -> Path:
     """
-    Returns the config directory path
+    Returns
+    -------
+        Path
+            Returns the config directory path
     """
     tmp = gettempdir()
     return Path(tmp) / "dataprep" / "data_connector"
@@ -29,6 +32,10 @@ def config_directory() -> Path:
 def ensure_config(impdb: str) -> bool:
     """
     Ensure the config for `impdb` is downloaded
+
+    Returns
+    -------
+        bool
     """
     path = config_directory()
     obsolete = is_obsolete(impdb)
@@ -44,6 +51,10 @@ def is_obsolete(impdb: str) -> bool:
     """
     Test if the implicit db config files are obsolete
     and need to be re-downloaded.
+
+    Returns
+    -------
+        bool
     """
     path = config_directory()
     if not (path / impdb).exists():
