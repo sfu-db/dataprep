@@ -39,8 +39,8 @@ class SchemaField(NamedTuple):
 
 class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     """
-    ImplicitTable abstracts the request and the response to a Restful API, so that the remote API
-    can be treated as a database table.
+    ImplicitTable class abstracts the request and the response to a Restful API,
+    so that the remote API can be treated as a database table.
     """
 
     name: str
