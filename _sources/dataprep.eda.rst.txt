@@ -14,14 +14,6 @@ Subpackages
 Submodules
 ----------
 
-dataprep.eda.dtypes module
---------------------------
-
-.. automodule:: dataprep.eda.dtypes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 dataprep.eda.intermediate module
 --------------------------------
 
@@ -38,10 +30,10 @@ dataprep.eda.palette module
    :undoc-members:
    :show-inheritance:
 
-dataprep.eda.utils module
--------------------------
+dataprep.eda.report module
+--------------------------
 
-.. automodule:: dataprep.eda.utils
+.. automodule:: dataprep.eda.report
    :members:
    :undoc-members:
    :show-inheritance:

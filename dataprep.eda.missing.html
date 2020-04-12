@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.missing package &#8212; dataprep 0.0.1 documentation</title>
+    <title>dataprep.eda.missing package &#8212; dataprep 0.2.3 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="dataprep.eda.correlation.html" title="dataprep.eda.correlation package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="dataprep.eda.html" accesskey="U">dataprep.eda package</a> &#187;</li> 
       </ul>
@@ -59,25 +59,26 @@ calculating intermediate part</p>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
-<dl class="simple">
-<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pd_data_frame</strong> (<em>pd.DataFrame</em>) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>x_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>y_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of columns in the figure</p></li>
+<li><p><strong>bins</strong> (<em>int</em>) – The number of rows in the figure</p></li>
+<li><p><strong>ndist_sample</strong> (<em>int</em>) – The number of sample points</p></li>
+</ul>
 </dd>
-<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
-</dd>
-<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
-</dd>
-<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
@@ -85,6 +86,7 @@ An intermediate representation for the plots of different columns in the data_fr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,
@@ -124,25 +126,26 @@ visualization part.</p>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
-<dl class="simple">
-<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pd_data_frame</strong> (<em>pd.DataFrame</em>) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>x_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>y_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of columns in the figure</p></li>
+<li><p><strong>bins</strong> (<em>int</em>) – The number of rows in the figure</p></li>
+<li><p><strong>ndist_sample</strong> (<em>int</em>) – The number of sample points</p></li>
+</ul>
 </dd>
-<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
-</dd>
-<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
-</dd>
-<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
@@ -150,6 +153,7 @@ An intermediate representation for the plots of different columns in the data_fr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,
@@ -168,25 +172,26 @@ otherwise =&gt; error</p>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
-<dl class="simple">
-<dt>df: Union[pd.DataFrame, dd.DataFrame]</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>dd.DataFrame</em><em>]</em>) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>x_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>y_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of columns in the figure</p></li>
+<li><p><strong>bins</strong> (<em>int</em>) – The number of rows in the figure</p></li>
+<li><p><strong>ndist_sample</strong> (<em>int</em>) – The number of sample points</p></li>
+</ul>
 </dd>
-<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
-</dd>
-<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
-</dd>
-<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
@@ -194,6 +199,7 @@ An intermediate representation for the plots of different columns in the data_fr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,
@@ -268,13 +274,13 @@ otherwise =&gt; error</p>
         <li class="right" >
           <a href="dataprep.eda.correlation.html" title="dataprep.eda.correlation package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="dataprep.eda.html" >dataprep.eda package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, SFU Database System Lab.
+        &#169; Copyright 2020, SFU Database System Lab.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>

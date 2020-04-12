@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.data_connector.types &#8212; dataprep 0.0.1 documentation</title>
+    <title>dataprep.data_connector.types &#8212; dataprep 0.2.3 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,13 +51,14 @@
 
 
 <div class="viewcode-block" id="AuthorizationType"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.AuthorizationType">[docs]</a><span class="k">class</span> <span class="nc">AuthorizationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enum class defines the supported authorization methods</span>
-<span class="sd">    in this library.</span>
+    <span class="sd">&quot;&quot;&quot;Enum class defines the supported authorization methods in this library.</span>
 
-<span class="sd">    Bearer: requires &#39;access_token&#39; presented in user params</span>
-<span class="sd">    OAuth2: requires &#39;client_id&#39; and &#39;client_secret&#39; in user params</span>
-<span class="sd">            for &#39;ClientCredentials&#39; grant type</span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    * Bearer: requires &#39;access_token&#39; presented in user params</span>
+<span class="sd">    * OAuth2: requires &#39;client_id&#39; and &#39;client_secret&#39; in user params for</span>
+<span class="sd">      &#39;ClientCredentials&#39; grant type</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">Bearer</span> <span class="o">=</span> <span class="s2">&quot;Bearer&quot;</span>
@@ -65,8 +66,7 @@
 
 
 <div class="viewcode-block" id="Authorization"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Authorization">[docs]</a><span class="k">class</span> <span class="nc">Authorization</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class carries the authorization type and</span>
+    <span class="sd">&quot;&quot;&quot;Class carries the authorization type and</span>
 <span class="sd">    the corresponding parameter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -80,8 +80,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="Authorization.build"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Authorization.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Populate some required fields to the request data.</span>
+        <span class="sd">&quot;&quot;&quot;Populate some required fields to the request data.</span>
 <span class="sd">        Complex logic may also happens in this function (e.g. start a server to do OAuth).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthorizationType</span><span class="o">.</span><span class="n">Bearer</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
@@ -126,8 +125,7 @@
 
 
 <div class="viewcode-block" id="Fields"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Fields">[docs]</a><span class="k">class</span> <span class="nc">Fields</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A data structure that stores the fields information (e.g. headers, cookies, ...).</span>
+    <span class="sd">&quot;&quot;&quot;A data structure that stores the fields information (e.g. headers, cookies, ...).</span>
 <span class="sd">    This class is useful to populate concrete fields data with required variables provided.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -139,8 +137,7 @@
 <div class="viewcode-block" id="Fields.populate"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Fields.populate">[docs]</a>    <span class="k">def</span> <span class="nf">populate</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">jenv</span><span class="p">:</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Populate a dict based on the fields definition and provided vars.</span>
+        <span class="sd">&quot;&quot;&quot;Populate a dict based on the fields definition and provided vars.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -191,12 +188,13 @@
 
 
 <div class="viewcode-block" id="Orient"><a class="viewcode-back" href="../../../dataprep.data_connector.html#dataprep.data_connector.types.Orient">[docs]</a><span class="k">class</span> <span class="nc">Orient</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Different types of table orientations</span>
+    <span class="sd">&quot;&quot;&quot;Different types of table orientations</span>
 <span class="sd">    ref: (https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_json.html).</span>
 <span class="sd">    Currently, DataConnector supports two different types of orientaions:</span>
-<span class="sd">        1. Split, which is column store.</span>
-<span class="sd">        2. Records, which is row store.</span>
+
+<span class="sd">    1. Split, which is column store.</span>
+<span class="sd">    2. Records, which is row store.</span>
+
 <span class="sd">    Details can be found in the pandas page.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -232,12 +230,12 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, SFU Database System Lab.
+        &#169; Copyright 2020, SFU Database System Lab.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>

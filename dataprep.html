@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dataprep package &#8212; dataprep 0.0.1 documentation</title>
+    <title>dataprep package &#8212; dataprep 0.2.3 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="case_study/house_price.html" title="EDA Case Study: House Price"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -63,9 +63,18 @@
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dataprep.eda.basic.html">dataprep.eda.basic package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="dataprep.eda.basic.html#compute-plot-df">Compute <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="dataprep.eda.basic.html#render-plot-df">Render <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic">Module contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="dataprep.eda.basic.html#plot-df">plot(df)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dataprep.eda.correlation.html">dataprep.eda.correlation package</a><ul>
@@ -91,11 +100,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.dtypes">dataprep.eda.dtypes module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.intermediate">dataprep.eda.intermediate module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.palette">dataprep.eda.palette module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.utils">dataprep.eda.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda.report">dataprep.eda.report module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.html#module-dataprep.eda">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dataprep.eda.html#dataprep-eda">dataprep.eda</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -124,8 +135,10 @@
 </div>
 <div class="section" id="module-dataprep">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep" title="Permalink to this headline">¶</a></h2>
-<p>Docstring
-Data preparation module</p>
+<div class="section" id="dataprep">
+<h3>dataprep<a class="headerlink" href="#dataprep" title="Permalink to this headline">¶</a></h3>
+<p>Dataprep let you prepare your data using a single library with a few lines of code.</p>
+</div>
 </div>
 </div>
 
@@ -141,7 +154,10 @@ Data preparation module</p>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-dataprep.errors">dataprep.errors module</a></li>
-<li><a class="reference internal" href="#module-dataprep">Module contents</a></li>
+<li><a class="reference internal" href="#module-dataprep">Module contents</a><ul>
+<li><a class="reference internal" href="#dataprep">dataprep</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -188,11 +204,11 @@ Data preparation module</p>
         <li class="right" >
           <a href="case_study/house_price.html" title="EDA Case Study: House Price"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, SFU Database System Lab.
+        &#169; Copyright 2020, SFU Database System Lab.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>

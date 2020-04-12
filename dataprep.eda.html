@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda package &#8212; dataprep 0.0.1 documentation</title>
+    <title>dataprep.eda package &#8212; dataprep 0.2.3 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="dataprep.data_connector.html" title="dataprep.data_connector package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" accesskey="U">dataprep package</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,9 +51,18 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.basic.html">dataprep.eda.basic package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dataprep.eda.basic.html#compute-plot-df">Compute <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dataprep.eda.basic.html#render-plot-df">Render <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.eda.basic.html#module-dataprep.eda.basic">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dataprep.eda.basic.html#plot-df">plot(df)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataprep.eda.correlation.html">dataprep.eda.correlation package</a><ul>
@@ -81,45 +90,6 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-dataprep.eda.dtypes">
-<span id="dataprep-eda-dtypes-module"></span><h2>dataprep.eda.dtypes module<a class="headerlink" href="#module-dataprep.eda.dtypes" title="Permalink to this headline">¶</a></h2>
-<p>Module for auxiliary type detection functions</p>
-<dl class="class">
-<dt id="dataprep.eda.dtypes.DType">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">DType</code><a class="reference internal" href="_modules/dataprep/eda/dtypes.html#DType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.DType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Possible dtypes for a column, currently we only support categorical and numerical dtypes.</p>
-<dl class="attribute">
-<dt id="dataprep.eda.dtypes.DType.Categorical">
-<code class="sig-name descname">Categorical</code><em class="property"> = 1</em><a class="headerlink" href="#dataprep.eda.dtypes.DType.Categorical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.eda.dtypes.DType.Numerical">
-<code class="sig-name descname">Numerical</code><em class="property"> = 2</em><a class="headerlink" href="#dataprep.eda.dtypes.DType.Numerical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.dtypes.is_categorical">
-<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_categorical</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/eda/dtypes.html#is_categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_categorical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a type, return if that type is a categorical type</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.dtypes.is_numerical">
-<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_numerical</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/eda/dtypes.html#is_numerical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_numerical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a type, return if that type is a numerical type</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.dtypes.is_pandas_categorical">
-<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_pandas_categorical</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/eda/dtypes.html#is_pandas_categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_pandas_categorical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Detect if a dtype is categorical and from pandas.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-dataprep.eda.intermediate">
 <span id="dataprep-eda-intermediate-module"></span><h2>dataprep.eda.intermediate module<a class="headerlink" href="#module-dataprep.eda.intermediate" title="Permalink to this headline">¶</a></h2>
@@ -166,95 +136,32 @@ This is immutable</p>
 <span id="dataprep-eda-palette-module"></span><h2>dataprep.eda.palette module<a class="headerlink" href="#module-dataprep.eda.palette" title="Permalink to this headline">¶</a></h2>
 <p>This file defines palettes used for EDA.</p>
 </div>
-<div class="section" id="module-dataprep.eda.utils">
-<span id="dataprep-eda-utils-module"></span><h2>dataprep.eda.utils module<a class="headerlink" href="#module-dataprep.eda.utils" title="Permalink to this headline">¶</a></h2>
-<p>This module implements the utils function.</p>
+<div class="section" id="module-dataprep.eda.report">
+<span id="dataprep-eda-report-module"></span><h2>dataprep.eda.report module<a class="headerlink" href="#module-dataprep.eda.report" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the Report class.</p>
 <dl class="class">
-<dt id="dataprep.eda.utils.DataType">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">DataType</code><a class="reference internal" href="_modules/dataprep/eda/utils.html#DataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.DataType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Enumeration for storing the different types of data possible in a column</p>
-<dl class="attribute">
-<dt id="dataprep.eda.utils.DataType.TYPE_CAT">
-<code class="sig-name descname">TYPE_CAT</code><em class="property"> = 2</em><a class="headerlink" href="#dataprep.eda.utils.DataType.TYPE_CAT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.eda.utils.DataType.TYPE_NUM">
-<code class="sig-name descname">TYPE_NUM</code><em class="property"> = 1</em><a class="headerlink" href="#dataprep.eda.utils.DataType.TYPE_NUM" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="dataprep.eda.report.Report">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.report.</code><code class="sig-name descname">Report</code><span class="sig-paren">(</span><em class="sig-param">to_render: bokeh.models.layouts.LayoutDOM</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/report.html#Report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class creates a customized Report object for the plot* functions</p>
+<dl class="method">
+<dt id="dataprep.eda.report.Report.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/dataprep/eda/report.html#Report.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save function</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="dataprep.eda.utils.DataType.TYPE_UNSUP">
-<code class="sig-name descname">TYPE_UNSUP</code><em class="property"> = 3</em><a class="headerlink" href="#dataprep.eda.utils.DataType.TYPE_UNSUP" title="Permalink to this definition">¶</a></dt>
+<dt id="dataprep.eda.report.Report.to_render">
+<code class="sig-name descname">to_render</code><em class="property">: LayoutDOM</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.eda.report.Report.to_render" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.cut_long_name">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">cut_long_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">max_len: int = 12</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/eda/utils.html#cut_long_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.cut_long_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>If the name is longer than <cite>max_len</cite>,
-cut it to <cite>max_len</cite> length and append “…”</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.fuse_missing_perc">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">fuse_missing_perc</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">perc: float</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/eda/utils.html#fuse_missing_perc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.fuse_missing_perc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append (x.y%) to the name if <cite>perc</cite> is not 0</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.get_type">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">get_type</code><span class="sig-paren">(</span><em class="sig-param">data: dask.dataframe.core.Series</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.utils.DataType<a class="reference internal" href="_modules/dataprep/eda/utils.html#get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.get_type" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Returns the type of the input data.</dt><dd><p>Identified types are according to the DataType Enumeration.</p>
-</dd>
-</dl>
-<p>The data for which the type needs to be identified.</p>
-<p>str representing the type of the data.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.is_notebook">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">is_notebook</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/dataprep/eda/utils.html#is_notebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.is_notebook" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>whether it is running in jupyter notebook</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.rand_str">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">rand_str</code><span class="sig-paren">(</span><em class="sig-param">str_length: int = 20</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/eda/utils.html#rand_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.rand_str" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a random string</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.relocate_legend">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">relocate_legend</code><span class="sig-paren">(</span><em class="sig-param">fig: bokeh.plotting.figure.Figure</em>, <em class="sig-param">loc: str</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/utils.html#relocate_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.relocate_legend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Relocate legend(s) from center to <cite>loc</cite></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.sample_n">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">sample_n</code><span class="sig-paren">(</span><em class="sig-param">arr: numpy.ndarray</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/dataprep/eda/utils.html#sample_n"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.sample_n" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sample n values uniformly from the range of the <cite>arr</cite>,
-not from the distribution of <cite>arr</cite>’s elems.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.eda.utils.to_dask">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">to_dask</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame]</em><span class="sig-paren">)</span> &#x2192; dask.dataframe.core.DataFrame<a class="reference internal" href="_modules/dataprep/eda/utils.html#to_dask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.to_dask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a dataframe to a dask dataframe.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-dataprep.eda">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda" title="Permalink to this headline">¶</a></h2>
-<p>Docstring
-Data preparation module</p>
+<div class="section" id="dataprep-eda">
+<h3>dataprep.eda<a class="headerlink" href="#dataprep-eda" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="dataprep.eda.plot_correlation">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">plot_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation.html#plot_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.plot_correlation" title="Permalink to this definition">¶</a></dt>
@@ -262,23 +169,25 @@ Data preparation module</p>
 There are three functions: plot_correlation(df), plot_correlation(df, x)
 plot_correlation(df, x, y)
 There are also some parameters such as k and value_range to satisfy your requirement</p>
-<dl class="simple">
-<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pd_data_frame</strong> (<em>pd.DataFrame</em>) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>x_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>y_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>value_range</strong> (<em>list</em><em>[</em><em>float</em><em>]</em><em>, </em><em>optional</em>) – range of value</p></li>
+<li><p><strong>k</strong> (<em>int</em><em>, </em><em>optional</em>) – choose top-k element</p></li>
+</ul>
 </dd>
-<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>value_range: list[float], optional</dt><dd><p>range of value</p>
-</dd>
-<dt>k: int, optional</dt><dd><p>choose top-k element</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.correlation.computation</span> <span class="kn">import</span> <span class="n">plot_correlation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
@@ -292,6 +201,8 @@ An intermediate representation for the plots of different columns in the data_fr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;population&quot;</span><span class="p">,</span> <span class="n">y_name</span><span class="o">=</span><span class="s2">&quot;suicides&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <dl class="simple">
 <dt>match (x_name, y_name, k)</dt><dd><p>case (None, None, None) =&gt; heatmap
 case (Some, None, Some) =&gt; Top K columns for (pearson, spearman, kendall)
@@ -301,24 +212,31 @@ otherwise =&gt; error</p>
 </dl>
 <p>This function only supports numerical or categorical data,
 and it is better to drop None, Nan and Null value before using it</p>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="dataprep.eda.compute_correlation">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute_correlation</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/correlation/compute.html#compute_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute_correlation" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>The pandas dataframe for which plots are calculated for each column.</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – The pandas dataframe for which plots are calculated for each column.</p></li>
+<li><p><strong>x</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – A valid column name of the dataframe</p></li>
+<li><p><strong>y</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – A valid column name of the dataframe</p></li>
+<li><p><strong>value_range</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>] </em><em>= None</em>) – If the correlation value is out of the range, don’t show it.</p></li>
+<li><p><strong>k</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Choose top-k element</p></li>
+</ul>
 </dd>
-<dt>x<span class="classifier">Optional[str]</span></dt><dd><p>A valid column name of the dataframe</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
 </dd>
-<dt>y<span class="classifier">Optional[str]</span></dt><dd><p>A valid column name of the dataframe</p>
-</dd>
-<dt>value_range<span class="classifier">Optional[Tuple[float, float]] = None</span></dt><dd><p>If the correlation value is out of the range, don’t show it.</p>
-</dd>
-<dt>k<span class="classifier">Optional[int]</span></dt><dd><p>Choose top-k element</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate">Intermediate</a></p>
 </dd>
 </dl>
-<p>Intermediate</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <dl class="simple">
 <dt>match (x, y, k)</dt><dd><p>case (None, None, _) =&gt; heatmap
 case (Some, None, _) =&gt; Top K columns for (pearson, spearman, kendall)
@@ -326,26 +244,28 @@ case (Some, Some, _) =&gt; Scatter with regression line with/without top k outli
 otherwise =&gt; error</p>
 </dd>
 </dl>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="dataprep.eda.render_correlation">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">render_correlation</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">plot_width: int = 500</em>, <em class="sig-param">plot_height: int = 500</em>, <em class="sig-param">palette: Optional[Sequence[str]] = None</em><span class="sig-paren">)</span> &#x2192; bokeh.plotting.figure.Figure<a class="reference internal" href="_modules/dataprep/eda/correlation/render.html#render_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.render_correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a correlation plot</p>
-<p>itmdt : Intermediate
-plot_width : int = 400</p>
-<blockquote>
-<div><p>The width of the plot</p>
-</div></blockquote>
-<dl class="simple">
-<dt>plot_height<span class="classifier">int = 300</span></dt><dd><p>The height of the plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>itmdt</strong> (<a class="reference internal" href="#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate"><em>Intermediate</em></a>) – </p></li>
+<li><p><strong>plot_width</strong> (<em>int = 400</em>) – The width of the plot</p></li>
+<li><p><strong>plot_height</strong> (<em>int = 300</em>) – The height of the plot</p></li>
+<li><p><strong>palette</strong> (<em>Union</em><em>[</em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>, </em><em>str</em><em>] </em><em>= None</em>) – The palette to use. By default (None),
+the palette will be automatically chosen based on different visualization types.</p></li>
+</ul>
 </dd>
-<dt>palette<span class="classifier">Union[Sequence[str], str] = None</span></dt><dd><p>The palette to use. By default (None),
-the palette will be automatically chosen based on different visualization types.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The bokeh Figure instance.</p>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Figure</dt><dd><p>The bokeh Figure instance.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Figure</p>
 </dd>
 </dl>
 </dd></dl>
@@ -356,25 +276,26 @@ the palette will be automatically chosen based on different visualization types.
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
-<dl class="simple">
-<dt>pd_data_frame: pd.DataFrame</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pd_data_frame</strong> (<em>pd.DataFrame</em>) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>x_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>y_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of columns in the figure</p></li>
+<li><p><strong>bins</strong> (<em>int</em>) – The number of rows in the figure</p></li>
+<li><p><strong>ndist_sample</strong> (<em>int</em>) – The number of sample points</p></li>
+</ul>
 </dd>
-<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
-</dd>
-<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
-</dd>
-<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
@@ -382,6 +303,7 @@ An intermediate representation for the plots of different columns in the data_fr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,
@@ -406,25 +328,26 @@ otherwise =&gt; error</p>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
-<dl class="simple">
-<dt>df: Union[pd.DataFrame, dd.DataFrame]</dt><dd><p>the pandas data_frame for which plots are calculated for each column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>dd.DataFrame</em><em>]</em>) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>x_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>y_name</strong> (<em>str</em><em>, </em><em>optional</em>) – a valid column name of the data frame</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of columns in the figure</p></li>
+<li><p><strong>bins</strong> (<em>int</em>) – The number of rows in the figure</p></li>
+<li><p><strong>ndist_sample</strong> (<em>int</em>) – The number of sample points</p></li>
+</ul>
 </dd>
-<dt>x_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>y_name: str, optional</dt><dd><p>a valid column name of the data frame</p>
-</dd>
-<dt>ncols: int, optional</dt><dd><p>The number of columns in the figure</p>
-</dd>
-<dt>bins: int</dt><dd><p>The number of rows in the figure</p>
-</dd>
-<dt>ndist_sample: int</dt><dd><p>The number of sample points</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda.missing.computation</span> <span class="kn">import</span> <span class="n">plot_missing</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;suicide-rate.csv&quot;</span><span class="p">)</span>
@@ -432,6 +355,7 @@ An intermediate representation for the plots of different columns in the data_fr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plot_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;HDI_for_year&quot;</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
 <dl class="simple">
 <dt>match (x_name, y_name)</dt><dd><p>case (Some, Some) =&gt; histogram for numerical column,
 bars for categorical column, qq-plot, box-plot, jitter plot,
@@ -465,46 +389,41 @@ contain categorical values and the other contains numerical values,
 a box plot and multi-line histogram are plotted. If x and y
 contain categorical vales, a nested bar chart, stacked bar chart, and
 heat map are plotted.</p>
-<dl class="simple">
-<dt>df<span class="classifier">Union[pd.DataFrame, dd.DataFrame]</span></dt><dd><p>Dataframe from which plots are to be generated</p>
-</dd>
-<dt>x<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>y<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>bins<span class="classifier">int, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
-the number of equal-width bins to use when grouping.</p>
-</dd>
-<dt>ngroups<span class="classifier">int, default 10</span></dt><dd><p>When grouping over a categorical column, it defines the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>dd.DataFrame</em><em>]</em>) – Dataframe from which plots are to be generated</p></li>
+<li><p><strong>x</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>y</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>default 10</em>) – For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p></li>
+<li><p><strong>ngroups</strong> (<em>int</em><em>, </em><em>default 10</em>) – When grouping over a categorical column, it defines the
 number of groups to show in the plot. Ie, the number of
-bars to show in a bar chart.</p>
-</dd>
-<dt>largest<span class="classifier">bool, default True</span></dt><dd><p>If true, when grouping over a categorical column, the groups
+bars to show in a bar chart.</p></li>
+<li><p><strong>largest</strong> (<em>bool</em><em>, </em><em>default True</em>) – If true, when grouping over a categorical column, the groups
 with the largest count will be output. If false, the groups
-with the smallest count will be output.</p>
-</dd>
-<dt>nsubgroups<span class="classifier">int</span></dt><dd><p>If x and y are categorical columns, ngroups refers to
+with the smallest count will be output.</p></li>
+<li><p><strong>nsubgroups</strong> (<em>int</em>) – If x and y are categorical columns, ngroups refers to
 how many groups to show from column x, and nsubgroups refers to
-how many subgroups to show from column y in each group in column x.</p>
+how many subgroups to show from column y in each group in column x.</p></li>
+<li><p><strong>bandwidth</strong> (<em>float</em><em>, </em><em>default 1.5</em>) – Bandwidth for the kernel density estimation.</p></li>
+<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>default 1000</em>) – Sample size for the scatter plot.</p></li>
+<li><p><strong>value_range</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p></li>
+<li><p><strong>yscale</strong> (<em>str</em><em>, </em><em>default &quot;linear&quot;</em>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
+<li><p><strong>tile_size</strong> (<em>Optional</em><em>[</em><em>float</em><em>] </em><em>= None</em>) – Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p></li>
+</ul>
 </dd>
-<dt>bandwidth<span class="classifier">float, default 1.5</span></dt><dd><p>Bandwidth for the kernel density estimation.</p>
-</dd>
-<dt>sample_size<span class="classifier">int, default 1000</span></dt><dd><p>Sample size for the scatter plot.</p>
-</dd>
-<dt>value_range<span class="classifier">(float, float), optional, default None</span></dt><dd><p>The lower and upper bounds on the range of a numerical column.
-Applies when column x is specified and column y is unspecified.</p>
-</dd>
-<dt>yscale: str, default “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
-</dd>
-<dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
-of a hexagon to its left or right corner.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
@@ -518,68 +437,66 @@ An intermediate representation for the plots of different columns in the data_fr
 <dl class="function">
 <dt id="dataprep.eda.compute">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 10, ngroups: int = 10, largest: bool = True, nsubgroups: int = 5, bandwidth: float = 1.5, sample_size: int = 1000, value_range: Optional[Tuple[float, float]] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/basic/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.compute" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>df<span class="classifier">Union[pd.DataFrame, dd.DataFrame]</span></dt><dd><p>Dataframe from which plots are to be generated.</p>
-</dd>
-<dt>x<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>y<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>bins<span class="classifier">int, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
-the number of equal-width bins to use when grouping.</p>
-</dd>
-<dt>ngroups<span class="classifier">int, default 10</span></dt><dd><p>When grouping over a categorical column, it defines the
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>dd.DataFrame</em><em>]</em>) – Dataframe from which plots are to be generated.</p></li>
+<li><p><strong>x</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>y</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>default 10</em>) – For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p></li>
+<li><p><strong>ngroups</strong> (<em>int</em><em>, </em><em>default 10</em>) – When grouping over a categorical column, it defines the
 number of groups to show in the plot. Ie, the number of
-bars to show in a bar chart.</p>
-</dd>
-<dt>largest<span class="classifier">bool, default True</span></dt><dd><p>If true, when grouping over a categorical column, the groups
+bars to show in a bar chart.</p></li>
+<li><p><strong>largest</strong> (<em>bool</em><em>, </em><em>default True</em>) – If true, when grouping over a categorical column, the groups
 with the largest count will be output. If false, the groups
-with the smallest count will be output.</p>
-</dd>
-<dt>nsubgroups<span class="classifier">int</span></dt><dd><p>If x and y are categorical columns, ngroups refers to
+with the smallest count will be output.</p></li>
+<li><p><strong>nsubgroups</strong> (<em>int</em>) – If x and y are categorical columns, ngroups refers to
 how many groups to show from column x, and nsubgroups refers to
-how many subgroups to show from column y in each group in column x.</p>
+how many subgroups to show from column y in each group in column x.</p></li>
+<li><p><strong>bandwidth</strong> (<em>float</em><em>, </em><em>default 1.5</em>) – Bandwidth for the kernel density estimation.</p></li>
+<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>default 1000</em>) – Sample size for the scatter plot.</p></li>
+<li><p><strong>value_range</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p></li>
+</ul>
 </dd>
-<dt>bandwidth<span class="classifier">float, default 1.5</span></dt><dd><p>Bandwidth for the kernel density estimation.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
 </dd>
-<dt>sample_size<span class="classifier">int, default 1000</span></dt><dd><p>Sample size for the scatter plot.</p>
-</dd>
-<dt>value_range<span class="classifier">(float, float), optional, default None</span></dt><dd><p>The lower and upper bounds on the range of a numerical column.
-Applies when column x is specified and column y is unspecified.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate">Intermediate</a></p>
 </dd>
 </dl>
-<p>Intermediate</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="dataprep.eda.render">
 <code class="sig-prename descclassname">dataprep.eda.</code><code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">yscale: str = 'linear'</em>, <em class="sig-param">tile_size: Optional[float] = None</em>, <em class="sig-param">plot_width_small: int = 324</em>, <em class="sig-param">plot_height_small: int = 300</em>, <em class="sig-param">plot_width_large: int = 450</em>, <em class="sig-param">plot_height_large: int = 400</em>, <em class="sig-param">plot_width_wide: int = 972</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/basic/render.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a basic plot</p>
-<dl class="simple">
-<dt>itmdt<span class="classifier">Intermediate</span></dt><dd><p>The Intermediate containing results from the compute function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>itmdt</strong> (<a class="reference internal" href="#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate"><em>Intermediate</em></a>) – The Intermediate containing results from the compute function.</p></li>
+<li><p><strong>yscale</strong> (<em>str = &quot;linear&quot;</em>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
+<li><p><strong>tile_size</strong> (<em>Optional</em><em>[</em><em>float</em><em>] </em><em>= None</em>) – Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p></li>
+<li><p><strong>plot_width_small</strong> (<em>int = 324</em><em>,</em>) – The width of the small plots</p></li>
+<li><p><strong>plot_height_small</strong> (<em>int = 300</em><em>,</em>) – The height of the small plots</p></li>
+<li><p><strong>plot_width_large</strong> (<em>int = 972</em><em>,</em>) – The width of the large plots</p></li>
+<li><p><strong>plot_height_large</strong> (<em>int = 400</em><em>,</em>) – The height of the large plots</p></li>
+<li><p><strong>plot_width_large</strong> – The width of the wide plots</p></li>
+</ul>
 </dd>
-<dt>yscale: str = “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A bokeh layout domain.</p>
 </dd>
-<dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
-of a hexagon to its left or right corner.</p>
-</dd>
-<dt>plot_width_small<span class="classifier">int = 324,</span></dt><dd><p>The width of the small plots</p>
-</dd>
-<dt>plot_height_small: int = 300,</dt><dd><p>The height of the small plots</p>
-</dd>
-<dt>plot_width_large<span class="classifier">int = 450,</span></dt><dd><p>The width of the large plots</p>
-</dd>
-<dt>plot_height_large: int = 400,</dt><dd><p>The height of the large plots</p>
-</dd>
-<dt>plot_width_large<span class="classifier">int = 972,</span></dt><dd><p>The width of the wide plots</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>LayoutDOM</dt><dd><p>A bokeh layout domain.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>LayoutDOM</p>
 </dd>
 </dl>
 </dd></dl>
 
+</div>
 </div>
 </div>
 
@@ -594,11 +511,13 @@ of a hexagon to its left or right corner.</p>
 <li><a class="reference internal" href="#">dataprep.eda package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda.dtypes">dataprep.eda.dtypes module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda.intermediate">dataprep.eda.intermediate module</a></li>
 <li><a class="reference internal" href="#module-dataprep.eda.palette">dataprep.eda.palette module</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda.utils">dataprep.eda.utils module</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda">Module contents</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.report">dataprep.eda.report module</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda">Module contents</a><ul>
+<li><a class="reference internal" href="#dataprep-eda">dataprep.eda</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -645,12 +564,12 @@ of a hexagon to its left or right corner.</p>
         <li class="right" >
           <a href="dataprep.data_connector.html" title="dataprep.data_connector package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, SFU Database System Lab.
+        &#169; Copyright 2020, SFU Database System Lab.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>

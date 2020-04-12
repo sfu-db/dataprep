@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic package &#8212; dataprep 0.0.1 documentation</title>
+    <title>dataprep.eda.basic package &#8212; dataprep 0.2.3 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="dataprep.eda.html" title="dataprep.eda package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="dataprep.eda.html" accesskey="U">dataprep.eda package</a> &#187;</li> 
       </ul>
@@ -51,81 +51,84 @@
 </div>
 <div class="section" id="module-dataprep.eda.basic.compute">
 <span id="dataprep-eda-basic-compute-module"></span><h2>dataprep.eda.basic.compute module<a class="headerlink" href="#module-dataprep.eda.basic.compute" title="Permalink to this headline">¶</a></h2>
-<p>This module implements the intermediates computation
-for plot(df) function.</p>
+<div class="section" id="compute-plot-df">
+<h3>Compute <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code><a class="headerlink" href="#compute-plot-df" title="Permalink to this headline">¶</a></h3>
+<p>This module implements the intermediates computation for plot(df) function.</p>
 <dl class="function">
 <dt id="dataprep.eda.basic.compute.compute">
 <code class="sig-prename descclassname">dataprep.eda.basic.compute.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param">df: Union[pandas.core.frame.DataFrame, dask.dataframe.core.DataFrame], x: Optional[str] = None, y: Optional[str] = None, *, bins: int = 10, ngroups: int = 10, largest: bool = True, nsubgroups: int = 5, bandwidth: float = 1.5, sample_size: int = 1000, value_range: Optional[Tuple[float, float]] = None</em><span class="sig-paren">)</span> &#x2192; dataprep.eda.intermediate.Intermediate<a class="reference internal" href="_modules/dataprep/eda/basic/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.compute.compute" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>df<span class="classifier">Union[pd.DataFrame, dd.DataFrame]</span></dt><dd><p>Dataframe from which plots are to be generated.</p>
-</dd>
-<dt>x<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>y<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>bins<span class="classifier">int, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
-the number of equal-width bins to use when grouping.</p>
-</dd>
-<dt>ngroups<span class="classifier">int, default 10</span></dt><dd><p>When grouping over a categorical column, it defines the
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>dd.DataFrame</em><em>]</em>) – Dataframe from which plots are to be generated.</p></li>
+<li><p><strong>x</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>y</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>default 10</em>) – For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p></li>
+<li><p><strong>ngroups</strong> (<em>int</em><em>, </em><em>default 10</em>) – When grouping over a categorical column, it defines the
 number of groups to show in the plot. Ie, the number of
-bars to show in a bar chart.</p>
-</dd>
-<dt>largest<span class="classifier">bool, default True</span></dt><dd><p>If true, when grouping over a categorical column, the groups
+bars to show in a bar chart.</p></li>
+<li><p><strong>largest</strong> (<em>bool</em><em>, </em><em>default True</em>) – If true, when grouping over a categorical column, the groups
 with the largest count will be output. If false, the groups
-with the smallest count will be output.</p>
-</dd>
-<dt>nsubgroups<span class="classifier">int</span></dt><dd><p>If x and y are categorical columns, ngroups refers to
+with the smallest count will be output.</p></li>
+<li><p><strong>nsubgroups</strong> (<em>int</em>) – If x and y are categorical columns, ngroups refers to
 how many groups to show from column x, and nsubgroups refers to
-how many subgroups to show from column y in each group in column x.</p>
+how many subgroups to show from column y in each group in column x.</p></li>
+<li><p><strong>bandwidth</strong> (<em>float</em><em>, </em><em>default 1.5</em>) – Bandwidth for the kernel density estimation.</p></li>
+<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>default 1000</em>) – Sample size for the scatter plot.</p></li>
+<li><p><strong>value_range</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p></li>
+</ul>
 </dd>
-<dt>bandwidth<span class="classifier">float, default 1.5</span></dt><dd><p>Bandwidth for the kernel density estimation.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
 </dd>
-<dt>sample_size<span class="classifier">int, default 1000</span></dt><dd><p>Sample size for the scatter plot.</p>
-</dd>
-<dt>value_range<span class="classifier">(float, float), optional, default None</span></dt><dd><p>The lower and upper bounds on the range of a numerical column.
-Applies when column x is specified and column y is unspecified.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="dataprep.eda.html#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate">Intermediate</a></p>
 </dd>
 </dl>
-<p>Intermediate</p>
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="module-dataprep.eda.basic.render">
 <span id="dataprep-eda-basic-render-module"></span><h2>dataprep.eda.basic.render module<a class="headerlink" href="#module-dataprep.eda.basic.render" title="Permalink to this headline">¶</a></h2>
-<p>This module implements the visualization for the
-plot(df) function</p>
+<div class="section" id="render-plot-df">
+<h3>Render <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code><a class="headerlink" href="#render-plot-df" title="Permalink to this headline">¶</a></h3>
+<p>This module implements the visualization for the plot(df) function.</p>
 <dl class="function">
 <dt id="dataprep.eda.basic.render.render">
 <code class="sig-prename descclassname">dataprep.eda.basic.render.</code><code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">itmdt: dataprep.eda.intermediate.Intermediate</em>, <em class="sig-param">yscale: str = 'linear'</em>, <em class="sig-param">tile_size: Optional[float] = None</em>, <em class="sig-param">plot_width_small: int = 324</em>, <em class="sig-param">plot_height_small: int = 300</em>, <em class="sig-param">plot_width_large: int = 450</em>, <em class="sig-param">plot_height_large: int = 400</em>, <em class="sig-param">plot_width_wide: int = 972</em><span class="sig-paren">)</span> &#x2192; bokeh.models.layouts.LayoutDOM<a class="reference internal" href="_modules/dataprep/eda/basic/render.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.render.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a basic plot</p>
-<dl class="simple">
-<dt>itmdt<span class="classifier">Intermediate</span></dt><dd><p>The Intermediate containing results from the compute function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>itmdt</strong> (<a class="reference internal" href="dataprep.eda.html#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate"><em>Intermediate</em></a>) – The Intermediate containing results from the compute function.</p></li>
+<li><p><strong>yscale</strong> (<em>str = &quot;linear&quot;</em>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
+<li><p><strong>tile_size</strong> (<em>Optional</em><em>[</em><em>float</em><em>] </em><em>= None</em>) – Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p></li>
+<li><p><strong>plot_width_small</strong> (<em>int = 324</em><em>,</em>) – The width of the small plots</p></li>
+<li><p><strong>plot_height_small</strong> (<em>int = 300</em><em>,</em>) – The height of the small plots</p></li>
+<li><p><strong>plot_width_large</strong> (<em>int = 972</em><em>,</em>) – The width of the large plots</p></li>
+<li><p><strong>plot_height_large</strong> (<em>int = 400</em><em>,</em>) – The height of the large plots</p></li>
+<li><p><strong>plot_width_large</strong> – The width of the wide plots</p></li>
+</ul>
 </dd>
-<dt>yscale: str = “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A bokeh layout domain.</p>
 </dd>
-<dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
-of a hexagon to its left or right corner.</p>
-</dd>
-<dt>plot_width_small<span class="classifier">int = 324,</span></dt><dd><p>The width of the small plots</p>
-</dd>
-<dt>plot_height_small: int = 300,</dt><dd><p>The height of the small plots</p>
-</dd>
-<dt>plot_width_large<span class="classifier">int = 450,</span></dt><dd><p>The width of the large plots</p>
-</dd>
-<dt>plot_height_large: int = 400,</dt><dd><p>The height of the large plots</p>
-</dd>
-<dt>plot_width_large<span class="classifier">int = 972,</span></dt><dd><p>The width of the wide plots</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>LayoutDOM</dt><dd><p>A bokeh layout domain.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>LayoutDOM</p>
 </dd>
 </dl>
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="module-dataprep.eda.basic">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.eda.basic" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="plot-df">
+<h3>plot(df)<a class="headerlink" href="#plot-df" title="Permalink to this headline">¶</a></h3>
 <p>This module implements the plot(df) function.</p>
 <dl class="function">
 <dt id="dataprep.eda.basic.plot">
@@ -148,46 +151,41 @@ contain categorical values and the other contains numerical values,
 a box plot and multi-line histogram are plotted. If x and y
 contain categorical vales, a nested bar chart, stacked bar chart, and
 heat map are plotted.</p>
-<dl class="simple">
-<dt>df<span class="classifier">Union[pd.DataFrame, dd.DataFrame]</span></dt><dd><p>Dataframe from which plots are to be generated</p>
-</dd>
-<dt>x<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>y<span class="classifier">str, optional, default None</span></dt><dd><p>A valid column name from the dataframe.</p>
-</dd>
-<dt>bins<span class="classifier">int, default 10</span></dt><dd><p>For a histogram or box plot with numerical x axis, it defines
-the number of equal-width bins to use when grouping.</p>
-</dd>
-<dt>ngroups<span class="classifier">int, default 10</span></dt><dd><p>When grouping over a categorical column, it defines the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>dd.DataFrame</em><em>]</em>) – Dataframe from which plots are to be generated</p></li>
+<li><p><strong>x</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>y</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – A valid column name from the dataframe.</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>default 10</em>) – For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p></li>
+<li><p><strong>ngroups</strong> (<em>int</em><em>, </em><em>default 10</em>) – When grouping over a categorical column, it defines the
 number of groups to show in the plot. Ie, the number of
-bars to show in a bar chart.</p>
-</dd>
-<dt>largest<span class="classifier">bool, default True</span></dt><dd><p>If true, when grouping over a categorical column, the groups
+bars to show in a bar chart.</p></li>
+<li><p><strong>largest</strong> (<em>bool</em><em>, </em><em>default True</em>) – If true, when grouping over a categorical column, the groups
 with the largest count will be output. If false, the groups
-with the smallest count will be output.</p>
-</dd>
-<dt>nsubgroups<span class="classifier">int</span></dt><dd><p>If x and y are categorical columns, ngroups refers to
+with the smallest count will be output.</p></li>
+<li><p><strong>nsubgroups</strong> (<em>int</em>) – If x and y are categorical columns, ngroups refers to
 how many groups to show from column x, and nsubgroups refers to
-how many subgroups to show from column y in each group in column x.</p>
+how many subgroups to show from column y in each group in column x.</p></li>
+<li><p><strong>bandwidth</strong> (<em>float</em><em>, </em><em>default 1.5</em>) – Bandwidth for the kernel density estimation.</p></li>
+<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>default 1000</em>) – Sample size for the scatter plot.</p></li>
+<li><p><strong>value_range</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p></li>
+<li><p><strong>yscale</strong> (<em>str</em><em>, </em><em>default &quot;linear&quot;</em>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
+<li><p><strong>tile_size</strong> (<em>Optional</em><em>[</em><em>float</em><em>] </em><em>= None</em>) – Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p></li>
+</ul>
 </dd>
-<dt>bandwidth<span class="classifier">float, default 1.5</span></dt><dd><p>Bandwidth for the kernel density estimation.</p>
-</dd>
-<dt>sample_size<span class="classifier">int, default 1000</span></dt><dd><p>Sample size for the scatter plot.</p>
-</dd>
-<dt>value_range<span class="classifier">(float, float), optional, default None</span></dt><dd><p>The lower and upper bounds on the range of a numerical column.
-Applies when column x is specified and column y is unspecified.</p>
-</dd>
-<dt>yscale: str, default “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
-</dd>
-<dt>tile_size<span class="classifier">Optional[float] = None</span></dt><dd><p>Size of the tile for the hexbin plot. Measured from the middle
-of a hexagon to its left or right corner.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>An object of figure or</dt><dd><p>An object of figure and
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An object of figure and
 An intermediate representation for the plots of different columns in the data_frame.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>An object of figure or</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
@@ -198,6 +196,7 @@ An intermediate representation for the plots of different columns in the data_fr
 </div>
 </dd></dl>
 
+</div>
 </div>
 </div>
 
@@ -211,9 +210,18 @@ An intermediate representation for the plots of different columns in the data_fr
   <ul>
 <li><a class="reference internal" href="#">dataprep.eda.basic package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a></li>
-<li><a class="reference internal" href="#module-dataprep.eda.basic">Module contents</a></li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic.compute">dataprep.eda.basic.compute module</a><ul>
+<li><a class="reference internal" href="#compute-plot-df">Compute <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic.render">dataprep.eda.basic.render module</a><ul>
+<li><a class="reference internal" href="#render-plot-df">Render <code class="docutils literal notranslate"><span class="pre">plot(df)</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dataprep.eda.basic">Module contents</a><ul>
+<li><a class="reference internal" href="#plot-df">plot(df)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -260,13 +268,13 @@ An intermediate representation for the plots of different columns in the data_fr
         <li class="right" >
           <a href="dataprep.eda.html" title="dataprep.eda package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="dataprep.eda.html" >dataprep.eda package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, SFU Database System Lab.
+        &#169; Copyright 2020, SFU Database System Lab.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
