@@ -37,19 +37,29 @@ Examples
 class Connector:
     """
     This is the main class of data_connector component.
-    A class should be initialized as the following.
+    Initialize Connector class as the example code.
+
+    Parameters
+    ----------
+    config_path
+        The path to the config. It can be hosted, e.g. "yelp", or from
+        local filesystem, e.g. "./yelp"
+    auth_params
+        The parameter for authentication, e.g. OAuth2
+    kwargs
+        Additional parameters
 
     Example
-    --------
+    -------
     >>> from dataprep.data_connector import Connector
     >>> dc = Connector("./DataConnectorConfigs/yelp", auth_params={"access_token":access_token})
     """
 
-    # impdb: ImplicitDatabase
-    # vars: Dict[str, Any]
-    # auth_params: Dict[str, Any]
-    # session: Session
-    # jenv: Environment
+    _impdb: ImplicitDatabase
+    _vars: Dict[str, Any]
+    _auth_params: Dict[str, Any]
+    _session: Session
+    _jenv: Environment
 
     def __init__(
         self,
@@ -57,19 +67,7 @@ class Connector:
         auth_params: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize Connector class
-
-        Parameters
-        ----------
-        config_path : str
-            The path to the config. It can be hosted, e.g. "yelp", or from
-            local filesystem, e.g. "./yelp"
-        **kwargs : Dict[str, Any]
-            Additional parameters
-        """
-
-        self.session = Session()
+        self._session = Session()
         if (
             config_path.startswith(".")
             or config_path.startswith("/")
@@ -81,11 +79,11 @@ class Connector:
             ensure_config(config_path)
             path = config_directory() / config_path
 
-        self.impdb = ImplicitDatabase(path)
+        self._impdb = ImplicitDatabase(path)
 
-        self.vars = kwargs
-        self.auth_params = auth_params or {}
-        self.jenv = Environment(undefined=StrictUndefined)
+        self._vars = kwargs
+        self._auth_params = auth_params or {}
+        self._jenv = Environment(undefined=StrictUndefined)
 
     def _fetch(
         self,
@@ -101,19 +99,19 @@ class Connector:
             "cookies": {},
         }
 
-        merged_vars = {**self.vars, **kwargs}
+        merged_vars = {**self._vars, **kwargs}
         if table.authorization is not None:
-            table.authorization.build(req_data, auth_params or self.auth_params)
+            table.authorization.build(req_data, auth_params or self._auth_params)
 
         for key in ["headers", "params", "cookies"]:
             if getattr(table, key) is not None:
                 instantiated_fields = getattr(table, key).populate(
-                    self.jenv, merged_vars
+                    self._jenv, merged_vars
                 )
                 req_data[key].update(**instantiated_fields)
         if table.body is not None:
             # TODO: do we support binary body?
-            instantiated_fields = table.body.populate(self.jenv, merged_vars)
+            instantiated_fields = table.body.populate(self._jenv, merged_vars)
             if table.body_ctype == "application/x-www-form-urlencoded":
                 req_data["data"] = instantiated_fields
             elif table.body_ctype == "application/json":
@@ -121,7 +119,7 @@ class Connector:
             else:
                 raise UnreachableError
 
-        resp: Response = self.session.send(  # type: ignore
+        resp: Response = self._session.send(  # type: ignore
             Request(
                 method=method,
                 url=url,
@@ -147,9 +145,8 @@ class Connector:
         ----
         We abstract each website as a database containing several tables.
         For example in Spotify, we have artist and album table.
-
         """
-        return list(self.impdb.tables.keys())
+        return list(self._impdb.tables.keys())
 
     @property
     def info(self) -> None:
@@ -159,8 +156,8 @@ class Connector:
 
         # get info
         tbs: Dict[str, Any] = {}
-        for cur_table in self.impdb.tables:
-            table_config_content = self.impdb.tables[cur_table].config
+        for cur_table in self._impdb.tables:
+            table_config_content = self._impdb.tables[cur_table].config
             params_required = []
             params_optional = []
             example_query_fields = []
@@ -180,7 +177,7 @@ class Connector:
         # show table info
         print(
             INFO_TEMPLATE.render(
-                ntables=len(self.table_names), dbname=self.impdb.name, tbs=tbs
+                ntables=len(self.table_names), dbname=self._impdb.name, tbs=tbs
             )
         )
 
@@ -191,22 +188,21 @@ class Connector:
 
         Parameters
         ----------
-        table_name : str
+        table_name
             The table name.
 
         Returns
         -------
-            pd.DataFrame
-                The returned data's schema.
+        pd.DataFrame
+            The returned data's schema.
 
         Note
         ----
         The schema is defined in the configuration file.
         The user can either use the default one or change it by editing the configuration file.
-
         """
         print(f"table: {table_name}")
-        table_config_content = self.impdb.tables[table_name].config
+        table_config_content = self._impdb.tables[table_name].config
         schema = table_config_content["response"]["schema"]
         new_schema_dict: Dict[str, List[Any]] = {}
         new_schema_dict["column_name"] = []
@@ -217,28 +213,25 @@ class Connector:
         return pd.DataFrame.from_dict(new_schema_dict)
 
     def query(
-        self,
-        table: str,
-        auth_params: Optional[Dict[str, Any]] = None,
-        **where: Dict[str, Any],
+        self, table: str, auth_params: Optional[Dict[str, Any]] = None, **where: Any,
     ) -> pd.DataFrame:
         """
         Use this method to query the API and get the returned table.
 
         Example
-        --------
+        -------
         >>> df = dc.query('businesses', term="korean", location="vancouver)
-        
+
         Parameters
         ----------
-        table : str
+        table
             The table name.
-        auth_params : Optional[Dict[str, Any]] = None
+        auth_params
             The parameters for authentication. Usually the authentication parameters
             should be defined when instantiating the Connector. In case some tables have different
             authentication options, a different authentication parameter can be defined here.
             This parameter will override the one from Connector if passed.
-        **where: Dict[str, Any]
+        where
             The additional parameters required for the query.
 
         Returns
@@ -246,9 +239,11 @@ class Connector:
             pd.DataFrame
                 A DataFrame that contains the data returned by the website API.
         """
-        assert table in self.impdb.tables, f"No such table {table} in {self.impdb.name}"
+        assert (
+            table in self._impdb.tables
+        ), f"No such table {table} in {self._impdb.name}"
 
-        itable = self.impdb.tables[table]
+        itable = self._impdb.tables[table]
 
         resp = self._fetch(itable, auth_params, where)
 
