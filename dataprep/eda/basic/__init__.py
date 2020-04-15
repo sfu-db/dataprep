@@ -1,7 +1,4 @@
 """
-plot(df)
-========
-
 This module implements the plot(df) function.
 """
 
@@ -10,11 +7,12 @@ from typing import Optional, Tuple, Union
 import dask.dataframe as dd
 import pandas as pd
 from bokeh.io import show
-from bokeh.plotting import Figure
 
 from .compute import compute
 from .render import render
 from ..report import Report
+
+__all__ = ["plot", "compute", "render"]
 
 
 def plot(
@@ -34,7 +32,7 @@ def plot(
     value_range: Optional[Tuple[float, float]] = None,
     yscale: str = "linear",
     tile_size: Optional[float] = None,
-) -> Figure:
+) -> Report:
     """Generates plots for exploratory data analysis.
 
     If no columns are specified, the distribution of
@@ -109,7 +107,7 @@ def plot(
     value_range: Optional[Tuple[float, float]], default None
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
-    yscale: str, default "linear"
+    yscale
         The scale to show on the y axis. Can be "linear" or "log".
     tile_size: Optional[float], default None
         Size of the tile for the hexbin plot. Measured from the middle

@@ -1,5 +1,5 @@
 build-docs:
-  poetry run sphinx-build -M html docs/source docs/build
+  poetry run sphinx-build -b html docs/source docs/build
 
 gen-apidocs:
   poetry run sphinx-apidoc --ext-doctest --ext-autodoc --ext-mathjax -f -o docs/source dataprep

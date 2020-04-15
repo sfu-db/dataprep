@@ -1,7 +1,4 @@
 """
-Compute ``plot(df)``
-====================
-
 This module implements the intermediates computation for plot(df) function.
 """
 from sys import stderr
