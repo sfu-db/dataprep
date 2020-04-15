@@ -45,28 +45,16 @@ def compute_correlation(
     """
     Parameters
     ----------
-    df : pd.DataFrame
+    df
         The pandas dataframe for which plots are calculated for each column.
-    x : Optional[str]
+    x
         A valid column name of the dataframe
-    y : Optional[str]
+    y
         A valid column name of the dataframe
-    value_range : Optional[Tuple[float, float]] = None
+    value_range
         If the correlation value is out of the range, don't show it.
-    k : Optional[int]
+    k
         Choose top-k element
-
-    Returns
-    -------
-    Intermediate
-
-    Note
-    ----
-    match (x, y, k)
-        case (None, None, _) => heatmap
-        case (Some, None, _) => Top K columns for (pearson, spearman, kendall)
-        case (Some, Some, _) => Scatter with regression line with/without top k outliers
-        otherwise => error
     """
     # pylint: disable=too-many-locals,too-many-statements,too-many-branches
 

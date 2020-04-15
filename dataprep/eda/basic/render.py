@@ -1,7 +1,4 @@
 """
-Render ``plot(df)``
-===================
-
 This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from math import pi
@@ -1286,21 +1283,23 @@ def render(
     Parameters
     ----------
     itmdt
-        The Intermediate containing results from the compute function
+        The Intermediate containing results from the compute function.
     yscale: str, default "linear"
         The scale to show on the y axis. Can be "linear" or "log".
-    tile_size: Optional[float], default None
-        Size of the tile for the hexbin plot; measured from the middle
+    tile_size
+        Size of the tile for the hexbin plot. Measured from the middle
         of a hexagon to its left or right corner.
-    plot_width_sml: int, default 324,
+    plot_width_small: int, default 324
         The width of the small plots
-    plot_height_sml: int, default 300,
+    plot_height_small: int, default 300
         The height of the small plots
-    plot_width_lrg: int, default 450,
+    plot_width_large: int, default 450
         The width of the large plots
-    plot_height_lrg: int, default 400,
+    plot_height_large: int, default 400
         The height of the large plots
-    plot_width_lrg: int, default 972,
+    plot_width_large: int, default 972
+        The width of the large plots
+    plot_width_wide: int, default 972
         The width of the wide plots
     """
     # pylint: disable=too-many-arguments

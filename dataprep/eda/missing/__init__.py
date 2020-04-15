@@ -7,7 +7,6 @@ from typing import Optional, Union
 import dask.dataframe as dd
 import pandas as pd
 from bokeh.io import show
-from bokeh.models import LayoutDOM
 
 from .compute import compute_missing
 from .render import render_missing
@@ -24,7 +23,7 @@ def plot_missing(
     bins: int = 30,
     ncols: int = 30,
     ndist_sample: int = 100,
-) -> LayoutDOM:
+) -> Report:
     """
     This function is designed to deal with missing values
     There are three functions: plot_missing(df), plot_missing(df, x)
@@ -32,24 +31,18 @@ def plot_missing(
 
     Parameters
     ----------
-    df: Union[pd.DataFrame, dd.DataFrame]
+    df
         the pandas data_frame for which plots are calculated for each column
-    x_name: str, optional
+    x
         a valid column name of the data frame
-    y_name: str, optional
+    y
         a valid column name of the data frame
-    ncols: int, optional
+    ncols
         The number of columns in the figure
-    bins: int
+    bins
         The number of rows in the figure
-    ndist_sample: int
+    ndist_sample
         The number of sample points
-
-    Returns
-    ----------
-    An object of figure or
-        An object of figure and
-        An intermediate representation for the plots of different columns in the data_frame.
 
     Examples
     ----------
@@ -58,17 +51,6 @@ def plot_missing(
     >>> df = pd.read_csv("suicide-rate.csv")
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
-
-    Notes
-    ----------
-    match (x_name, y_name)
-        case (Some, Some) => histogram for numerical column,
-        bars for categorical column, qq-plot, box-plot, jitter plot,
-        CDF, PDF
-        case (Some, None) => histogram for numerical column and
-        bars for categorical column
-        case (None, None) => heatmap
-        otherwise => error
     """
     itmdt = compute_missing(df, x, y, bins=bins, ncols=ncols, ndist_sample=ndist_sample)
     fig = render_missing(itmdt)

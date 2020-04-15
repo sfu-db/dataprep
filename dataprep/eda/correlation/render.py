@@ -26,6 +26,50 @@ from ..palette import BIPALETTE, BRG
 
 __all__ = ["render_correlation"]
 
+
+def render_correlation(
+    itmdt: Intermediate,
+    plot_width: int = 500,
+    plot_height: int = 500,
+    palette: Optional[Sequence[str]] = None,
+) -> Figure:
+    """
+    Render a correlation plot
+
+    Parameters
+    ----------
+    itmdt
+    plot_width
+        The width of the plot
+    plot_height
+        The height of the plot
+    palette
+        The palette to use. By default (None),
+        the palette will be automatically chosen based on different visualization types.
+
+    Returns
+    -------
+    Figure
+        The bokeh Figure instance.
+    """
+    if itmdt.visual_type is None:
+        visual_elem = Figure()
+    elif itmdt.visual_type == "correlation_heatmaps":
+        visual_elem = render_correlation_heatmaps(
+            itmdt, plot_width, plot_height, palette or BIPALETTE
+        )
+    elif itmdt.visual_type == "correlation_single_heatmaps":
+        visual_elem = render_correlation_single_heatmaps(
+            itmdt, plot_width, plot_height, palette or BIPALETTE
+        )
+    elif itmdt.visual_type == "correlation_scatter":
+        visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+    else:
+        raise NotImplementedError(f"Unknown visual type {itmdt.visual_type}")
+
+    return visual_elem
+
+
 # def _vis_cross_table(intermediate: Intermediate, params: Dict[str, Any]) -> Figure:
 #     """
 #     :param intermediate: An object to encapsulate the
@@ -252,46 +296,3 @@ def render_scatter(
 
         fig.add_layout(legend, place="right")
     return fig
-
-
-def render_correlation(
-    itmdt: Intermediate,
-    plot_width: int = 500,
-    plot_height: int = 500,
-    palette: Optional[Sequence[str]] = None,
-) -> Figure:
-    """
-    Render a correlation plot
-
-    Parameters
-    ----------
-    itmdt : Intermediate
-    plot_width : int = 400
-        The width of the plot
-    plot_height : int = 300
-        The height of the plot
-    palette : Union[Sequence[str], str] = None
-        The palette to use. By default (None),
-        the palette will be automatically chosen based on different visualization types.
-
-    Returns
-    -------
-    Figure
-        The bokeh Figure instance.
-    """
-    if itmdt.visual_type is None:
-        visual_elem = Figure()
-    elif itmdt.visual_type == "correlation_heatmaps":
-        visual_elem = render_correlation_heatmaps(
-            itmdt, plot_width, plot_height, palette or BIPALETTE
-        )
-    elif itmdt.visual_type == "correlation_single_heatmaps":
-        visual_elem = render_correlation_single_heatmaps(
-            itmdt, plot_width, plot_height, palette or BIPALETTE
-        )
-    elif itmdt.visual_type == "correlation_scatter":
-        visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
-    else:
-        raise NotImplementedError(f"Unknown visual type {itmdt.visual_type}")
-
-    return visual_elem
