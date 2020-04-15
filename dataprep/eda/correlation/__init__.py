@@ -7,7 +7,6 @@ from typing import Any, List, Optional, Tuple, Union
 import dask.dataframe as dd
 import pandas as pd
 from bokeh.io import show
-from bokeh.plotting import Figure
 
 from .compute import compute_correlation
 from .render import render_correlation
@@ -23,7 +22,7 @@ def plot_correlation(
     *,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
-) -> Figure:
+) -> Report:
     """
     This function is designed to calculate the correlation between columns
     There are three functions: plot_correlation(df), plot_correlation(df, x)
@@ -32,22 +31,16 @@ def plot_correlation(
 
     Parameters
     ----------
-    pd_data_frame: pd.DataFrame
-        the pandas data_frame for which plots are calculated for each column
-    x_name: str, optional
-        a valid column name of the data frame
-    y_name: str, optional
-        a valid column name of the data frame
-    value_range: list[float], optional
-        range of value
-    k: int, optional
-        choose top-k element
-
-    Returns
-    ----------
-    An object of figure or
-        An object of figure and
-        An intermediate representation for the plots of different columns in the data_frame.
+    df
+        The pandas data_frame for which plots are calculated for each column
+    x
+        A valid column name of the data frame
+    y
+        A valid column name of the data frame
+    value_range
+        Range of value
+    k
+        Choose top-k element
 
     Examples
     --------
@@ -65,12 +58,6 @@ def plot_correlation(
 
     Note
     ----
-    match (x_name, y_name, k)
-        case (None, None, None) => heatmap
-        case (Some, None, Some) => Top K columns for (pearson, spearman, kendall)
-        case (Some, Some, _) => Scatter with regression line with/without top k outliers
-        otherwise => error
-
     This function only supports numerical or categorical data,
     and it is better to drop None, Nan and Null value before using it
     """
