@@ -52,6 +52,7 @@ extensions = [
     "sphinx_autodoc_typehints",
 ]
 
+autodoc_typehints = "description"
 # Napoleon settings
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
@@ -66,6 +67,12 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 napoleon_use_keyword = True
 napoleon_custom_sections = None
+
+# autodoc_default_options = {
+#     "members": True,
+#     "member-order": "bysource",
+#     "special-members": "__init__",
+# }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
