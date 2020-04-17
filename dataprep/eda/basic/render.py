@@ -729,7 +729,7 @@ def stacked_viz(
     subgrps = list(df.columns)[:-1]
     palette = Pastel1[9] * (len(subgrps) // len(Pastel1) + 1)
     if "Others" in subgrps:
-        colours = palette[0 : len(subgrps) - 1] + ["#636363"]
+        colours = palette[0 : len(subgrps) - 1] + ("#636363",)
     else:
         colours = palette[0 : len(subgrps)]
 
