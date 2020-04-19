@@ -12,9 +12,12 @@ CATEGORICAL_NUMPY_DTYPES = [np.bool, np.object]
 CATEGORICAL_PANDAS_DTYPES = [pd.CategoricalDtype, pd.PeriodDtype]
 CATEGORICAL_DTYPES = CATEGORICAL_NUMPY_DTYPES + CATEGORICAL_PANDAS_DTYPES
 
-NUMERICAL_NUMPY_DTYPES = [np.number, np.datetime64]
-NUMERICAL_PANDAS_DTYPES = [pd.DatetimeTZDtype]
-NUMERICAL_DTYPES = NUMERICAL_NUMPY_DTYPES + NUMERICAL_PANDAS_DTYPES
+NUMERICAL_NUMPY_DTYPES = [np.number]
+NUMERICAL_DTYPES = NUMERICAL_NUMPY_DTYPES
+
+DATETIME_NUMPY_DTYPES = [np.datetime64]
+DATETIME_PANDAS_DTYPES = [pd.DatetimeTZDtype]
+DATETIME_DTYPES = DATETIME_NUMPY_DTYPES + DATETIME_PANDAS_DTYPES
 
 
 class DType(Enum):
@@ -24,6 +27,7 @@ class DType(Enum):
 
     Categorical = auto()
     Numerical = auto()
+    DateTime = auto()
 
 
 def is_categorical(dtype: Any) -> bool:
@@ -31,7 +35,7 @@ def is_categorical(dtype: Any) -> bool:
     Given a type, return if that type is a categorical type
     """
 
-    if is_numerical(dtype):
+    if is_numerical(dtype) or is_datetime(dtype):
         return False
 
     if isinstance(dtype, np.dtype):
@@ -46,11 +50,19 @@ def is_numerical(dtype: Any) -> bool:
     """
     Given a type, return if that type is a numerical type
     """
+    dtype = dtype.type
+    return any(issubclass(dtype, c) for c in NUMERICAL_NUMPY_DTYPES)
+
+
+def is_datetime(dtype: Any) -> bool:
+    """
+    Given a type, return if that type is a datetime type
+    """
     if isinstance(dtype, np.dtype):
         dtype = dtype.type
-        return any(issubclass(dtype, c) for c in NUMERICAL_NUMPY_DTYPES)
+        return any(issubclass(dtype, c) for c in DATETIME_NUMPY_DTYPES)
     else:
-        return any(isinstance(dtype, c) for c in NUMERICAL_PANDAS_DTYPES)
+        return any(isinstance(dtype, c) for c in DATETIME_PANDAS_DTYPES)
 
 
 def is_pandas_categorical(dtype: Any) -> bool:
