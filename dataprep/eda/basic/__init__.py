@@ -21,11 +21,14 @@ def plot(
     df: Union[pd.DataFrame, dd.DataFrame],
     x: Optional[str] = None,
     y: Optional[str] = None,
+    z: Optional[str] = None,
     *,
     bins: int = 10,
     ngroups: int = 10,
     largest: bool = True,
     nsubgroups: int = 5,
+    timeunit: str = "auto",
+    agg: str = "mean",
     bandwidth: float = 1.5,
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
@@ -34,67 +37,83 @@ def plot(
 ) -> Figure:
     """Generates plots for exploratory data analysis.
 
-    If x and y are unspecified, the distribution of
+    If no columns are specified, the distribution of
     each coloumn is plotted. A histogram is plotted if the
-    column contains numerical values, and a bar chart is plotted
-    if the column contains categorical values.
+    column contains numerical values, a bar chart is plotted
+    if the column contains categorical values, a line chart is
+    plotted if the column is of type datetime.
 
-    If x is specified and y is unspecified, the
+    If one column (x) is specified, the
     distribution of x is plotted in various ways. If x
     contains categorical values, a bar chart and pie chart are
     plotted. If x contains numerical values, a histogram,
     kernel density estimate plot, box plot, and qq plot are plotted.
+    If x contains datetime values, a line chart is plotted.
 
-    If x and y are specified, plots depicting
+    If two columns (x and y) are specified, plots depicting
     the relationship between the variables will be displayed. If
     x and y contain numerical values, a scatter plot, hexbin
     plot, and binned box plot are plotted. If one of x and y
     contain categorical values and the other contains numerical values,
-    a box plot and multi-line histogram are plotted. If x and y
+    a box plot and multiline histogram are plotted. If x and y
     contain categorical vales, a nested bar chart, stacked bar chart, and
-    heat map are plotted.
+    heat map are plotted. If one of x and y contains datetime values
+    and the other contains numerical values, a line chart and a box plot
+    are shown. If one of x and y contains datetime values and the other
+    contains categorical values, a multiline chart and a stacked box plot
+    are shown.
+
+    If x, y, and z are specified, they must be one each of type datetime,
+    numerical, and categorical. A multiline chart containing an aggregate
+    on the numerical column grouped by the categorical column over time is
+    plotted.
+
 
     Parameters
     ----------
-    df : Union[pd.DataFrame, dd.DataFrame]
+    df
         Dataframe from which plots are to be generated
-    x : str, optional, default None
-        A valid column name from the dataframe.
-    y : str, optional, default None
-        A valid column name from the dataframe.
-    bins : int, default 10
+    x: Optional[str], default None
+        A valid column name from the dataframe
+    y: Optional[str], default None
+        A valid column name from the dataframe
+    z: Optional[str], default None
+        A valid column name from the dataframe
+    bins: int, default 10
         For a histogram or box plot with numerical x axis, it defines
         the number of equal-width bins to use when grouping.
-    ngroups : int, default 10
+    ngroups: int, default 10
         When grouping over a categorical column, it defines the
         number of groups to show in the plot. Ie, the number of
         bars to show in a bar chart.
-    largest : bool, default True
+    largest: bool, default True
         If true, when grouping over a categorical column, the groups
         with the largest count will be output. If false, the groups
         with the smallest count will be output.
-    nsubgroups : int
+    nsubgroups: int, default 5
         If x and y are categorical columns, ngroups refers to
         how many groups to show from column x, and nsubgroups refers to
         how many subgroups to show from column y in each group in column x.
-    bandwidth : float, default 1.5
-        Bandwidth for the kernel density estimation.
-    sample_size : int, default 1000
-        Sample size for the scatter plot.
-    value_range : (float, float), optional, default None
+    timeunit: str, default "auto"
+        Defines the time unit to group values over for a datetime column.
+        It can be "year", "quarter", "month", "week", "day", "hour",
+        "minute", or "second". With default value "auto", it will use the
+        time unit such that the resulting number of groups is closest to 15.
+    agg: str, default "mean"
+        Specify the aggregate to use when aggregating over a numerical
+        column
+    bandwidth: float, default 1.5
+        Bandwidth for the kernel density estimation
+    sample_size: int, default 1000
+        Sample size for the scatter plot
+    value_range: Optional[Tuple[float, float]], default None
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
     yscale: str, default "linear"
         The scale to show on the y axis. Can be "linear" or "log".
-    tile_size : Optional[float] = None
+    tile_size: Optional[float], default None
         Size of the tile for the hexbin plot. Measured from the middle
         of a hexagon to its left or right corner.
-
-    Returns
-    -------
-    An object of figure or
-        An object of figure and
-        An intermediate representation for the plots of different columns in the data_frame.
 
     Examples
     --------
@@ -105,15 +124,19 @@ def plot(
     >>> plot(iris, "petal_length", bins=20, value_range=(1,5))
     >>> plot(iris, "petal_width", "species")
     """
+    # pylint: disable=too-many-locals
 
     intermediate = compute(
         df,
         x=x,
         y=y,
+        z=z,
         bins=bins,
         ngroups=ngroups,
         largest=largest,
         nsubgroups=nsubgroups,
+        timeunit=timeunit.lower(),
+        agg=agg,
         bandwidth=bandwidth,
         sample_size=sample_size,
         value_range=value_range,
