@@ -21,8 +21,19 @@ def simpledf() -> dd.DataFrame:
     df = pd.concat(
         [df, pd.Series(np.random.choice(["a", "b", "c"], 1000, replace=True))], axis=1
     )
-
-    df.columns = ["a", "b", "c", "d"]
+    df = pd.concat(
+        [
+            df,
+            pd.Series(
+                np.random.choice(
+                    ["2020/03/29", "2020/01/10", "2019/11/21"], 1000, replace=True
+                )
+            ),
+        ],
+        axis=1,
+    )
+    df.columns = ["a", "b", "c", "d", "e"]
+    df["e"] = pd.to_datetime(df["e"])
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
@@ -43,3 +54,11 @@ def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
     plot(simpledf)
+
+
+def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
+    plot(simpledf, simpledf.columns[-2], simpledf.columns[-1])
+
+
+def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
+    plot(simpledf, simpledf.columns[0], simpledf.columns[-1])
