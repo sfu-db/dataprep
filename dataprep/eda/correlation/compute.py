@@ -3,9 +3,10 @@
     for plot_correlation(df) function.
 """
 import sys
+import warnings
 from enum import Enum, auto
 from operator import itruediv
-from typing import Dict, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import dask
 import dask.array as da
@@ -27,6 +28,7 @@ class CorrelationMethod(Enum):
     Supported correlation methods
     """
 
+    Phik = auto()
     Pearson = auto()
     Spearman = auto()
     KendallTau = auto()
@@ -68,6 +70,7 @@ def compute_correlation(
     """
     # pylint: disable=too-many-locals,too-many-statements,too-many-branches
 
+    df_org = df
     df = to_dask(df)
     df.columns = [str(e) for e in df.columns]  # convert column names to string
 
@@ -76,42 +79,73 @@ def compute_correlation(
             k is None
         ), "value_range and k cannot be present in both"
 
-        df = df.select_dtypes(NUMERICAL_DTYPES)
+        df_num = df.select_dtypes(NUMERICAL_DTYPES)
+
         if len(df.columns) == 0:
             return Intermediate(visual_type=None)
 
-        data = df.to_dask_array()
+        data_num = df_num.to_dask_array()
         # TODO Can we remove this? Without the computing, data has unknown rows so da.cov will fail.
-        data.compute_chunk_sizes()
+        data_num.compute_chunk_sizes()
 
-        cordx, cordy, corrs = correlation_nxn(data)
-        cordx, cordy = dd.from_dask_array(cordx), dd.from_dask_array(cordy)
-        columns = df.columns
+        cordx_num, cordy_num, corrs_num = numerical_correlation_nxn(data_num)
+        cordx_num, cordy_num = (
+            dd.from_dask_array(cordx_num),
+            dd.from_dask_array(cordy_num),
+        )
+        columns_num = df_num.columns
+        cordx_phik, cordy_phik, corrs_phik, columns_phik = phik_correlation_nxn(df_org)
+        cordx_phik, cordy_phik = (
+            dd.from_dask_array(cordx_phik),
+            dd.from_dask_array(cordy_phik),
+        )
 
         dfs = {}
-        for method, corr in corrs.items():
-            df = dd.concat([cordx, cordy, dd.from_dask_array(corr)], axis=1)
-            df.columns = ["x", "y", "correlation"]
-            df = df[df["y"] > df["x"]]  # Retain only lower triangle (w/o diag)
 
-            if k is not None:
-                thresh = df["correlation"].abs().nlargest(k).compute().iloc[-1]
-                df = df[(df["correlation"] >= thresh) | (df["correlation"] <= -thresh)]
-            elif value_range is not None:
-                mask = (value_range[0] <= df["correlation"]) & (
-                    df["correlation"] <= value_range[1]
-                )
-                df = df[mask]
+        corrs_list = [
+            (cordx_phik, cordy_phik, corrs_phik),
+            (cordx_num, cordy_num, corrs_num),
+        ]
 
-            # Translate int x,y coordinates to categorical labels
-            # Hint the return type of the function to dask through param "meta"
-            df["x"] = df["x"].apply(lambda e: columns[e], meta=("x", np.object))
-            df["y"] = df["y"].apply(lambda e: columns[e], meta=("y", np.object))
-            dfs[method.name] = df.compute()
+        for (cordx, cordy, corrs,) in corrs_list:
+            for method, corr in corrs.items():
+                df = dd.concat([cordx, cordy, dd.from_dask_array(corr)], axis=1)
+                df.columns = ["x", "y", "correlation"]
+                df = df[df["y"] > df["x"]]  # Retain only lower triangle (w/o diag)
+
+                if k is not None:
+                    thresh = df["correlation"].abs().nlargest(k).compute().iloc[-1]
+                    df = df[
+                        (df["correlation"] >= thresh) | (df["correlation"] <= -thresh)
+                    ]
+                elif value_range is not None:
+                    mask = (value_range[0] <= df["correlation"]) & (
+                        df["correlation"] <= value_range[1]
+                    )
+                    df = df[mask]
+
+                # Translate int x,y coordinates to categorical labels
+                # Hint the return type of the function to dask through param "meta"
+                if method.name == "Phik":
+                    df["x"] = df["x"].apply(
+                        lambda e: columns_phik[e], meta=("x", np.object)
+                    )
+                    df["y"] = df["y"].apply(
+                        lambda e: columns_phik[e], meta=("y", np.object)
+                    )
+                else:
+                    df["x"] = df["x"].apply(
+                        lambda e: columns_num[e], meta=("x", np.object)
+                    )
+                    df["y"] = df["y"].apply(
+                        lambda e: columns_num[e], meta=("y", np.object)
+                    )
+                dfs[method.name] = df.compute()
 
         return Intermediate(
             data=dfs,
-            axis_range=list(columns.unique()),
+            axis_range=list(columns_num.unique()),
+            axis_range_org=columns_phik,
             visual_type="correlation_heatmaps",
         )
     elif x is not None and y is None:
@@ -124,23 +158,40 @@ def compute_correlation(
         xarr = df[x].to_dask_array().compute_chunk_sizes()
         data = df[columns].to_dask_array().compute_chunk_sizes()
 
-        funcs = [pearson_1xn, spearman_1xn, kendall_tau_1xn]
+        funcs = [phik_1xn, pearson_1xn, spearman_1xn, kendall_tau_1xn]
 
         dfs = {}
         for meth, func in zip(CorrelationMethod, funcs):
-            indices, corrs = func(xarr, data, value_range=value_range, k=k)
-            if len(indices) == 0:
-                print(
-                    f"Correlation for {meth.name} is empty, try to broaden the value_range.",
-                    file=sys.stderr,
+            if meth.name == "Phik":
+                selcols, (indices, corrs) = func(
+                    df_org, x, value_range=value_range, k=k
                 )
-            df = pd.DataFrame(
-                {
-                    "x": np.full(len(indices), x),
-                    "y": columns[indices],
-                    "correlation": corrs,
-                }
-            )
+                if len(indices) == 0:
+                    print(
+                        f"Correlation for {meth.name} is empty, try to broaden the value_range.",
+                        file=sys.stderr,
+                    )
+                df = pd.DataFrame(
+                    {
+                        "x": np.full(len(indices), x),
+                        "y": selcols[indices],
+                        "correlation": corrs,
+                    }
+                )
+            else:
+                indices, corrs = func(xarr, data, value_range=value_range, k=k)
+                if len(indices) == 0:
+                    print(
+                        f"Correlation for {meth.name} is empty, try to broaden the value_range.",
+                        file=sys.stderr,
+                    )
+                df = pd.DataFrame(
+                    {
+                        "x": np.full(len(indices), x),
+                        "y": columns[indices],
+                        "correlation": corrs,
+                    }
+                )
             dfs[meth.name] = df
 
         return Intermediate(data=dfs, visual_type="correlation_single_heatmaps")
@@ -256,11 +307,11 @@ def pearson_influence(xarr: da.Array, yarr: da.Array) -> da.Array:
     return da.map_blocks(itruediv, numerator, denominator, dtype=numerator.dtype)
 
 
-def correlation_nxn(
+def numerical_correlation_nxn(
     data: da.Array, columns: Optional[Sequence[str]] = None
 ) -> Tuple[da.Array, da.Array, Dict[CorrelationMethod, da.Array]]:
     """
-    Calculation of a n x n correlation matrix for n columns
+    Calculation of a n x n numerical correlation matrix for n columns
     """
     _, ncols = data.shape
     cordx, cordy = da.meshgrid(range(ncols), range(ncols))
@@ -278,6 +329,60 @@ def correlation_nxn(
         cordy = da.from_array(columns[cordy.compute()], chunks=1)
 
     return cordx, cordy, corrs
+
+
+def phik_correlation_nxn(
+    df: pd.DataFrame, columns: Optional[Sequence[str]] = None
+) -> Tuple[da.Array, da.Array, Dict[CorrelationMethod, da.Array], List[str]]:
+    """
+    Calcualation of a n x n phik correlation matrix of n columns
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # Phi_k does not filter non-numerical with high cardinality
+        selcols = []
+        intcols = []
+        for col in df.columns.tolist():
+            try:
+                tmp = (
+                    df[col]
+                    .value_counts(dropna=False)
+                    .reset_index()
+                    .dropna()
+                    .set_index("index")
+                    .iloc[:, 0]
+                )
+                if tmp.index.inferred_type == "mixed":
+                    continue
+
+                if pd.api.types.is_numeric_dtype(df[col]):
+                    intcols.append(col)
+                    selcols.append(col)
+                elif df[col].nunique() <= 100:
+                    # pandas-profiling config[categorical_maximum_correlation_distinct] = 100
+                    selcols.append(col)
+            except (TypeError, ValueError):
+                continue
+
+        if len(selcols) > 1:
+            corr = df[selcols].phik_matrix(interval_cols=intcols).values
+        else:
+            raise ValueError("The length of selcols should be larger than one")
+
+        ncols = len(selcols)
+        cordx, cordy = da.meshgrid(range(ncols), range(ncols))
+        cordx, cordy = cordy.ravel(), cordx.ravel()
+
+        corrs = {
+            CorrelationMethod.Phik: da.from_array(corr).ravel(),
+        }
+
+        if columns is not None:
+            # The number of columns usually is not too large
+            cordx = da.from_array(columns[cordx.compute()], chunks=1)
+            cordy = da.from_array(columns[cordy.compute()], chunks=1)
+
+        return cordx, cordy, corrs, selcols
 
 
 def pearson_nxn(data: da.Array) -> da.Array:
@@ -350,6 +455,57 @@ def kendall_tau_nxn(data: da.Array) -> da.Array:
     corrmat = da.from_array(corrmat2)
 
     return corrmat
+
+
+def phik_1xn(
+    df: pd.DataFrame,
+    x: str,
+    value_range: Optional[Tuple[float, float]] = None,
+    k: Optional[int] = None,
+) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    """
+    Parameters
+    ----------
+    df : pd.DataFrame
+    x : str
+    value_range : Optional[Tuple[float, float]] = None
+    k : Optional[int] = None
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # Phi_k does not filter non-numerical with high cardinality
+        selcols = []
+        intcols = []
+        for col in df.columns.tolist():
+            try:
+                tmp = (
+                    df[col]
+                    .value_counts(dropna=False)
+                    .reset_index()
+                    .dropna()
+                    .set_index("index")
+                    .iloc[:, 0]
+                )
+                if tmp.index.inferred_type == "mixed":
+                    continue
+
+                if pd.api.types.is_numeric_dtype(df[col]):
+                    intcols.append(col)
+                    selcols.append(col)
+                elif df[col].nunique() <= 100:
+                    # pandas-profiling config[categorical_maximum_correlation_distinct] = 100
+                    selcols.append(col)
+            except (TypeError, ValueError):
+                continue
+
+        if len(selcols) > 1:
+            corrs = df[selcols].phik_matrix(interval_cols=intcols).values
+            corrs = np.delete(corrs[selcols.index(x), :], selcols.index(x))
+            selcols = np.delete(selcols, selcols.index(x))
+        else:
+            raise ValueError("The length of selcols should be larger than one")
+
+        return np.array(selcols), corr_filter(corrs, value_range, k)
 
 
 def pearson_1xn(

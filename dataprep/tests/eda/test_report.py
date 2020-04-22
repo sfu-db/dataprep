@@ -45,9 +45,7 @@ def simpledf() -> dd.DataFrame:
     np.random.shuffle(idx)
     df.iloc[idx[:500], 0] = None
 
-    ddf = to_dask(df)
-
-    return ddf
+    return df
 
 
 def test_plot_report(simpledf: dd.DataFrame) -> None:

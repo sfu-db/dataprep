@@ -1,6 +1,7 @@
 """
     module for testing plot_corr(df, x, y) function.
 """
+import phik
 import random
 from time import time
 
@@ -24,10 +25,9 @@ from ...eda.utils import to_dask
 
 @pytest.fixture(scope="module")  # type: ignore
 def simpledf() -> dd.DataFrame:
-    df = pd.DataFrame(np.random.rand(100, 3), columns=["a", "b", "c"])
-    df = pd.concat([df, pd.Series(["a"] * 100)], axis=1)
-    df.columns = ["a", "b", "c", "d"]
-    df = to_dask(df)
+    df = pd.DataFrame(np.random.rand(100, 4), columns=["a", "b", "c", "d"])
+    df = pd.concat([df, pd.Series(["a"] * 100), pd.Series(["b"] * 100)], axis=1)
+    df.columns = ["a", "b", "c", "d", "e", "f"]
 
     return df
 

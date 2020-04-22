@@ -74,9 +74,11 @@ def render_correlation_heatmaps(
     """
     Render correlation heatmaps in to tabs
     """
+    # pylint: disable=too-many-locals
     tabs: List[Panel] = []
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
     axis_range = itmdt["axis_range"]
+    axis_range_org = itmdt["axis_range_org"]
 
     for method, df in itmdt["data"].items():
         # in case of numerical column names
@@ -85,8 +87,12 @@ def render_correlation_heatmaps(
         df["y"] = df["y"].apply(str)
 
         mapper, color_bar = create_color_mapper(palette)
-        x_range = FactorRange(*axis_range)
-        y_range = FactorRange(*reversed(axis_range))
+        if method != "Phik":
+            x_range = FactorRange(*axis_range)
+            y_range = FactorRange(*reversed(axis_range))
+        else:
+            x_range = FactorRange(*axis_range_org)
+            y_range = FactorRange(*reversed(axis_range_org))
         fig = Figure(
             x_range=x_range,
             y_range=y_range,
