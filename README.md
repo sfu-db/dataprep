@@ -1,4 +1,4 @@
-# Dataprep [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/) [![License]](LICENSE) [![Codecov]](https://codecov.io/gh/sfu-db/dataprep) ![Build Status] [![Downloads]](https://pepy.tech/project/dataprep) [![Chat]](https://discord.gg/FXsK2P)
+# Dataprep [![License]](LICENSE) [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/)  [![Downloads]](https://pepy.tech/project/dataprep) [![Codecov]](https://codecov.io/gh/sfu-db/dataprep) ![Build Status]  [![Chat]](https://discord.gg/FXsK2P)
 [Documentation] | [Mail List & Forum] 
 
 Dataprep let you prepare your data using a single library with a few lines of code.
