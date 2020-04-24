@@ -1,4 +1,4 @@
-# Dataprep ![Build Status]
+# Dataprep [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/) [![License]](LICENSE) ![Build Status] [![Downloads]](https://pypi.org/project/dataprep/) [![Chat]](https://discord.gg/FXsK2P)
 [Documentation] | [Mail List & Forum] 
 
 Dataprep let you prepare your data using a single library with a few lines of code.
@@ -83,3 +83,8 @@ Please take a look at our [wiki] for development documentations!
 [Mail list & Forum]: https://groups.google.com/forum/#!forum/dataprep
 [wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
+[Chat]: https://img.shields.io/discord/702765817154109472?style=flat-square
+[License]: https://img.shields.io/pypi/l/dataprep?style=flat-square
+[Downloads]: https://img.shields.io/pypi/dm/dataprep?style=flat-square
+[Python Version]: https://img.shields.io/pypi/pyversions/dataprep?style=flat-square
+[Version]: https://img.shields.io/pypi/v/dataprep?style=flat-square
