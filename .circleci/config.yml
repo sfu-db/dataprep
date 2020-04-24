@@ -45,10 +45,13 @@ jobs:
           command: poetry run mypy dataprep
       - run:
           name: Test the project
-          command: poetry run pytest dataprep
+          command: poetry run pytest --cov=dataprep
       - run:
           name: Style check the project
           command: poetry run pylint dataprep
+      - run:
+          name: Update coverage data to codecov
+          command: poetry run codecov 
   docs-build:
     docker:
       - image: circleci/python:3.7.2
