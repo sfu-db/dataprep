@@ -1,4 +1,7 @@
-# Dataprep [![License]](LICENSE) [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/)  [![Downloads]](https://pepy.tech/project/dataprep) [![Codecov]](https://codecov.io/gh/sfu-db/dataprep) ![Build Status]  [![Chat]](https://discord.gg/FXsK2P)
+# Dataprep
+
+[![License]](LICENSE) [![Doc Badge]](https://sfu-db.github.io/dataprep/) [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/)  [![Downloads]](https://pepy.tech/project/dataprep) [![Codecov]](https://codecov.io/gh/sfu-db/dataprep) ![Build Status]  [![Chat]](https://discord.gg/FXsK2P) 
+
 [Documentation] | [Mail List & Forum] 
 
 Dataprep let you prepare your data using a single library with a few lines of code.
@@ -64,16 +67,17 @@ df = dc.query("businesses", term="korean", location="seattle")
 <center><a href="https://sfu-db.github.io/dataprep/data_connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png"/></a></center>
 
 
-## Contribution
+## Contribute
 
-Dataprep is in its early stage. Any contribution including:
-* Filing an issue
-* Providing use cases
-* Writing down your user experience
-* Submitting a PR
-* ...
+There are many ways to contribute to Dataprep.
 
-are greatly appreciated!
+* Submit bugs and help us verify fixes as they are checked in.
+* Review the source code changes.
+* Engage with other Dataprep users and developers on StackOverflow.
+* Help each other in the [Dataprep Community Discord](https://discord.gg/FXsK2P) and [Mail list & Forum].
+* [![Twitter]](https://twitter.com/sfu_db)
+* Contribute bug fixes.
+* Providing use cases and writing down your user experience.
 
 Please take a look at our [wiki] for development documentations!
 
@@ -89,3 +93,5 @@ Please take a look at our [wiki] for development documentations!
 [Python Version]: https://img.shields.io/pypi/pyversions/dataprep?style=flat-square
 [Version]: https://img.shields.io/pypi/v/dataprep?style=flat-square
 [Codecov]: https://img.shields.io/codecov/c/github/sfu-db/dataprep?style=flat-square
+[Twitter]: https://img.shields.io/twitter/follow/sfu_db?style=social
+[Doc Badge]: https://img.shields.io/badge/dynamic/json?color=blue&label=docs&prefix=v&query=%24.info.version&url=https%3A%2F%2Fpypi.org%2Fpypi%2Fdataprep%2Fjson&style=flat-square
