@@ -52,7 +52,7 @@ class Connector:
     Example
     -------
     >>> from dataprep.data_connector import Connector
-    >>> dc = Connector("./DataConnectorConfigs/yelp", auth_params={"access_token":access_token})
+    >>> dc = Connector("yelp", auth_params={"access_token":access_token})
     """
 
     _impdb: ImplicitDatabase
@@ -148,7 +148,6 @@ class Connector:
         """
         return list(self._impdb.tables.keys())
 
-    @property
     def info(self) -> None:
         """
         Show the basic information and provide guidance for users to issue queries.
