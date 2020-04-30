@@ -46,7 +46,6 @@ def compute(
     nsubgroups: int = 5,
     timeunit: str = "auto",
     agg: str = "mean",
-    bandwidth: float = 1.5,
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
 ) -> Intermediate:
@@ -83,8 +82,6 @@ def compute(
         time unit such that the resulting number of groups is closest to 15.
     agg: str, default "mean"
         Specify the aggregate to use when aggregating over a numeric column
-    bandwidth: float, default 1.5
-        Bandwidth for the kernel density estimation
     sample_size: int, default 1000
         Sample size for the scatter plot
     value_range: Optional[Tuple[float, float]], default None
@@ -138,7 +135,7 @@ def compute(
             # histogram
             histdata = dask.compute(dask.delayed(calc_hist)(df[col], bins))
             # kde plot
-            kdedata = calc_hist_kde(df[col].dropna().values, bins, bandwidth)
+            kdedata = calc_hist_kde(df[col].dropna().values, bins)
             # box plot
             boxdata = calc_box(df[[col]].dropna(), bins)
             return Intermediate(
@@ -166,11 +163,12 @@ def compute(
             and is_categorical(ydtype)
         ):
             x, y = (x, y) if is_categorical(xdtype) else (y, x)
+            df = df[[x, y]].dropna()
             df[x] = df[x].apply(str, meta=(x, str))
             # box plot per group
-            boxdata = calc_box(df[[x, y]].dropna(), bins, ngroups, largest)
+            boxdata = calc_box(df, bins, ngroups, largest)
             # histogram per group
-            hisdata = calc_hist_by_group(df[[x, y]].dropna(), bins, ngroups, largest)
+            hisdata = calc_hist_by_group(df, bins, ngroups, largest)
             return Intermediate(
                 x=x,
                 y=y,
@@ -185,11 +183,12 @@ def compute(
             and is_datetime(ydtype)
         ):
             x, y = (x, y) if is_datetime(xdtype) else (y, x)
+            df = df[[x, y]].dropna()
             dtnum: List[Any] = []
             # line chart
-            dtnum.append(dask.delayed(calc_line_dt)(df[[x, y]].dropna(), timeunit, agg))
+            dtnum.append(dask.delayed(calc_line_dt)(df, timeunit, agg))
             # box plot
-            dtnum.append(dask.delayed(calc_box_dt)(df[[x, y]].dropna(), timeunit))
+            dtnum.append(dask.delayed(calc_box_dt)(df, timeunit))
             dtnum = dask.compute(*dtnum)
             return Intermediate(
                 x=x,
@@ -205,20 +204,17 @@ def compute(
             and is_datetime(ydtype)
         ):
             x, y = (x, y) if is_datetime(xdtype) else (y, x)
+            df = df[[x, y]].dropna()
             df[y] = df[y].apply(str, meta=(y, str))
             dtcat: List[Any] = []
             # line chart
             dtcat.append(
                 dask.delayed(calc_line_dt)(
-                    df[[x, y]].dropna(), timeunit, ngroups=ngroups, largest=largest
+                    df, timeunit, ngroups=ngroups, largest=largest
                 )
             )
             # stacked bar chart
-            dtcat.append(
-                dask.delayed(calc_stacked_dt)(
-                    df[[x, y]].dropna(), timeunit, ngroups, largest
-                )
-            )
+            dtcat.append(dask.delayed(calc_stacked_dt)(df, timeunit, ngroups, largest))
             dtcat = dask.compute(*dtcat)
             return Intermediate(
                 x=x,
@@ -228,14 +224,15 @@ def compute(
                 visual_type="dt_and_cat_cols",
             )
         elif is_categorical(xdtype) and is_categorical(ydtype):
+            df = df[[x, y]].dropna()
             df[x] = df[x].apply(str, meta=(x, str))
             df[y] = df[y].apply(str, meta=(y, str))
             # nested bar chart
-            nesteddata = calc_nested(df[[x, y]].dropna(), ngroups, nsubgroups)
+            nesteddata = calc_nested(df, ngroups, nsubgroups)
             # stacked bar chart
-            stackdata = calc_stacked(df[[x, y]].dropna(), ngroups, nsubgroups)
+            stackdata = calc_stacked(df, ngroups, nsubgroups)
             # heat map
-            heatmapdata = calc_heatmap(df[[x, y]].dropna(), ngroups, nsubgroups)
+            heatmapdata = calc_heatmap(df, ngroups, nsubgroups)
             return Intermediate(
                 x=x,
                 y=y,
@@ -245,12 +242,13 @@ def compute(
                 visual_type="two_cat_cols",
             )
         elif is_numerical(xdtype) and is_numerical(ydtype):
+            df = df[[x, y]].dropna()
             # scatter plot
-            scatdata = calc_scatter(df[[x, y]].dropna(), sample_size)
+            scatdata = calc_scatter(df, sample_size)
             # hexbin plot
-            hexbindata = df[[x, y]].dropna().compute()
+            hexbindata = df.compute()
             # box plot
-            boxdata = calc_box(df[[x, y]].dropna(), bins)
+            boxdata = calc_box(df, bins)
             return Intermediate(
                 x=x,
                 y=y,
@@ -281,12 +279,12 @@ def compute(
             and is_numerical(df[y].dtype)
             and is_categorical(df[z].dtype)
         ), "x, y, and z must be one each of type datetime, numerical, and categorical"
+        df = df[[x, y, z]].dropna()
+        df[z] = df[z].apply(str, meta=(z, str))
 
         # line chart
         data = dask.compute(
-            dask.delayed(calc_line_dt)(
-                df[[x, y, z]].dropna(), timeunit, agg, ngroups, largest
-            )
+            dask.delayed(calc_line_dt)(df, timeunit, agg, ngroups, largest)
         )
         return Intermediate(
             x=x, y=y, z=z, agg=agg, data=data[0], visual_type="dt_cat_num_cols",
@@ -537,7 +535,7 @@ def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
 
 
 def calc_hist_kde(
-    data: da.Array, bins: int, bandwidth: float
+    data: da.Array, bins: int,
 ) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
     """
     Calculate a density histogram and its corresponding kernel density
@@ -549,8 +547,6 @@ def calc_hist_kde(
         One numerical column over which to compute the histogram and kde
     bins
         Number of bins to use in the histogram
-    bandwidth
-        Bandwidth for the kde
 
     Returns
     -------
@@ -571,7 +567,7 @@ def calc_hist_kde(
         }
     )
     pts_rng = np.linspace(minv, maxv, 1000)
-    pdf = gaussian_kde(data.compute(), bw_method=bandwidth)(pts_rng)
+    pdf = gaussian_kde(data.compute())(pts_rng)
     return hist_df, pts_rng, pdf
 
 
@@ -702,9 +698,9 @@ def calc_hist_by_group(
 
     # create a histogram for each group
     groups = df.groupby([df.columns[0]])
+    minv, maxv = dask.compute(df[df.columns[1]].min(), df[df.columns[1]].max())
     for grp in largest_grps:
         grp_srs = groups.get_group(grp)[df.columns[1]]
-        minv, maxv = dask.compute(grp_srs.min(), grp_srs.max())
         hist_arr, bins_arr = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
         intervals = _format_bin_intervals(bins_arr)
         hist_lst.append((hist_arr, bins_arr, intervals))
@@ -939,7 +935,8 @@ def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
     Auxillary function to format bin intervals in a histogram
     """
     bins_arr = np.round(bins_arr, 3)
-    intervals = [f"[{bins_arr[i]},{bins_arr[i+1]})" for i in range(len(bins_arr) - 2)]
+    bins_arr = [int(val) if val.is_integer() else val for val in bins_arr]
+    intervals = [f"[{bins_arr[i]}, {bins_arr[i+1]})" for i in range(len(bins_arr) - 2)]
     intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
     return intervals
 
@@ -947,7 +944,7 @@ def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
 def _get_timeunit(min_time: pd.Timestamp, max_time: pd.Timestamp, dflt: int) -> str:
     """
     Auxillary function to find an appropriate time unit. Will find the
-    time unit such that the number of time units are closest to 100.
+    time unit such that the number of time units are closest to dflt.
     """
     dt_secs = {
         "year": 60 * 60 * 24 * 365,
@@ -961,16 +958,12 @@ def _get_timeunit(min_time: pd.Timestamp, max_time: pd.Timestamp, dflt: int) -> 
     }
 
     time_rng_secs = (max_time - min_time).total_seconds()
-    prev_bin_cnt = 0
+    prev_bin_cnt, prev_unit = 0, "year"
     for unit, secs_in_unit in dt_secs.items():
         cur_bin_cnt = time_rng_secs / secs_in_unit
-        if unit == "year":
-            if cur_bin_cnt > dflt:
-                timeunit = unit
-                break
-        else:
-            if abs(prev_bin_cnt - dflt) < abs(cur_bin_cnt - dflt):
-                break
-            prev_bin_cnt = cur_bin_cnt
-            timeunit = unit
-    return timeunit
+        if abs(prev_bin_cnt - dflt) < abs(cur_bin_cnt - dflt):
+            return prev_unit
+        prev_bin_cnt = cur_bin_cnt
+        prev_unit = unit
+
+    return prev_unit
