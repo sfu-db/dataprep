@@ -1,13 +1,9 @@
 """Miscellaneous functions
 """
 import logging
-import random
-import string
-from enum import Enum
 from math import ceil
 from typing import Any, Union
 
-import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
@@ -15,47 +11,6 @@ from bokeh.models import Legend
 from bokeh.plotting import Figure
 
 LOGGER = logging.getLogger(__name__)
-
-# TODO: Remove old stuffs
-class DataType(Enum):
-    """
-        Enumeration for storing the different types of data possible in a column
-    """
-
-    TYPE_NUM = 1
-    TYPE_CAT = 2
-    TYPE_UNSUP = 3
-
-
-def get_type(data: dd.Series) -> DataType:
-    """ Returns the type of the input data.
-        Identified types are according to the DataType Enumeration.
-
-    Parameter
-    __________
-    The data for which the type needs to be identified.
-
-    Returns
-    __________
-    str representing the type of the data.
-    """
-    col_type = DataType.TYPE_UNSUP
-    try:
-        if pd.api.types.is_bool_dtype(data):
-            col_type = DataType.TYPE_CAT
-        elif (
-            pd.api.types.is_numeric_dtype(data)
-            and dask.compute(data.dropna().unique().size) == 2
-        ):
-            col_type = DataType.TYPE_CAT
-        elif pd.api.types.is_numeric_dtype(data):
-            col_type = DataType.TYPE_NUM
-        else:
-            col_type = DataType.TYPE_CAT
-    except NotImplementedError as error:  # TO-DO
-        LOGGER.info("Type cannot be determined due to : %s", error)
-
-    return col_type
 
 
 def is_notebook() -> Any:
@@ -74,14 +29,6 @@ def is_notebook() -> Any:
         return False
     except (NameError, ImportError):
         return False
-
-
-def rand_str(str_length: int = 20) -> str:
-    """
-    Generate a random string
-    """
-    letters = string.ascii_lowercase
-    return "".join(random.choice(letters) for _ in range(str_length))
 
 
 def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
