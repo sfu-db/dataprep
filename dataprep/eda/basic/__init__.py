@@ -27,7 +27,6 @@ def plot(
     nsubgroups: int = 5,
     timeunit: str = "auto",
     agg: str = "mean",
-    bandwidth: float = 1.5,
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
     yscale: str = "linear",
@@ -100,8 +99,6 @@ def plot(
     agg: str, default "mean"
         Specify the aggregate to use when aggregating over a numerical
         column
-    bandwidth: float, default 1.5
-        Bandwidth for the kernel density estimation
     sample_size: int, default 1000
         Sample size for the scatter plot
     value_range: Optional[Tuple[float, float]], default None
@@ -135,7 +132,6 @@ def plot(
         nsubgroups=nsubgroups,
         timeunit=timeunit.lower(),
         agg=agg,
-        bandwidth=bandwidth,
         sample_size=sample_size,
         value_range=value_range,
     )

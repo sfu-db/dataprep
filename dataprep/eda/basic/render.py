@@ -287,8 +287,10 @@ def hist_viz(
     fig.yaxis.axis_label = "Frequency"
     if not df.empty:
         _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
-    if show_yticks and yscale == "linear":
-        _format_axis(fig, 0, df["freq"].max(), "y")
+    if show_yticks:
+        fig.xaxis.axis_label = col
+        if yscale == "linear":
+            _format_axis(fig, 0, df["freq"].max(), "y")
 
     return fig
 
@@ -337,6 +339,7 @@ def hist_kde_viz(
     fig.add_tools(hover_dist)
     tweak_figure(fig, "kde")
     fig.yaxis.axis_label = "Density"
+    fig.xaxis.axis_label = col
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if yscale == "linear":
         _format_axis(fig, 0, df["freq"].max(), "y")
@@ -545,7 +548,7 @@ def line_viz(
                 renderers=[plot_dict[grp_name]],
                 tooltips=[
                     (f"{x}", f"{grp}"),
-                    ("frequency", "@y"),
+                    ("Frequency", "@y"),
                     (f"{y} bin", "@intervals"),
                 ],
                 mode="mouse",
@@ -709,6 +712,7 @@ def stacked_viz(
     plot_width: int,
     plot_height: int,
     timeunit: Optional[str] = None,
+    max_lbl_len: int = 15,
 ) -> Panel:
     """
     Render a stacked bar chart
@@ -730,23 +734,21 @@ def stacked_viz(
         plot_width=plot_width,
         plot_height=plot_height,
     )
-    subgrps = list(df.columns)
-    palette = Pastel1[9] * (len(subgrps) // len(Pastel1) + 1)
-    if "Others" in subgrps:
-        colours = palette[0 : len(subgrps) - 1] + ("#636363",)
+    grps = list(df.columns)
+    palette = Pastel1[9] * (len(grps) // len(Pastel1) + 1)
+    if "Others" in grps:
+        colours = palette[0 : len(grps) - 1] + ("#636363",)
     else:
-        colours = palette[0 : len(subgrps)]
+        colours = palette[0 : len(grps)]
     source = ColumnDataSource(data=df)
     renderers = fig.vbar_stack(
-        stackers=subgrps,
-        x="index",
-        width=0.9,
-        source=source,
-        line_width=1,
-        color=colours,
+        stackers=grps, x="index", width=0.9, source=source, line_width=1, color=colours,
     )
-
-    legend_it = [(subgrp, [rend]) for subgrp, rend in zip(subgrps, renderers)]
+    grps = [
+        (grp[: (max_lbl_len - 1)] + "...") if len(grp) > max_lbl_len else grp
+        for grp in grps
+    ]
+    legend_it = [(grp, [rend]) for grp, rend in zip(grps, renderers)]
     legend = Legend(items=legend_it)
     legend.label_text_font_size = "8pt"
     fig.add_layout(legend, "right")
