@@ -55,11 +55,11 @@ class Connector:
     >>> dc = Connector("yelp", auth_params={"access_token":access_token})
     """
 
-    impdb: ImplicitDatabase
-    vars: Dict[str, Any]
+    _impdb: ImplicitDatabase
+    _vars: Dict[str, Any]
     _auth: Dict[str, Any]
-    session: Session
-    jenv: Environment
+    _session: Session
+    _jenv: Environment
 
     def __init__(
         self,
@@ -79,9 +79,11 @@ class Connector:
             ensure_config(config_path)
             path = config_directory() / config_path
 
-        self.vars = kwargs
+        self._impdb = ImplicitDatabase(path)
+
+        self._vars = kwargs
         self._auth = _auth or {}
-        self.jenv = Environment(undefined=StrictUndefined)
+        self._jenv = Environment(undefined=StrictUndefined)
 
     def _fetch(
         self,
@@ -119,29 +121,30 @@ class Connector:
             else:
                 raise UnreachableError
 
-        if not table.pag_params:
-            resp: Response = self._session.send(  # type: ignore
-                Request(
-                    method=method,
-                    url=url,
-                    headers=req_data["headers"],
-                    params=req_data["params"],
-                    json=req_data.get("json"),
-                    data=req_data.get("data"),
-                    cookies=req_data["cookies"],
-                ).prepare()
-            )
-            return resp
+        if table.pag_params is not None:
+            if table.pag_params.type == "null":
+                resp: Response = self._session.send(  # type: ignore
+                    Request(
+                        method=method,
+                        url=url,
+                        headers=req_data["headers"],
+                        params=req_data["params"],
+                        json=req_data.get("json"),
+                        data=req_data.get("data"),
+                        cookies=req_data["cookies"],
+                    ).prepare()
+                )
+                return resp
 
-        pag_type = table.pag_params["type"]
-        count_key = table.pag_params["count_key"]
-        cursor_key = ""
-        if pag_type == "cursor":
-            cursor_key = table.pag_params["cursor_key"]
-        if pag_type == "limit":
-            cursor_key = table.pag_params["anchor_key"]
-        req_data["params"][count_key] = _count
-        req_data["params"][cursor_key] = _cursor
+            pag_type = table.pag_params.type
+            count_key = table.pag_params.count_key
+            cursor_key = ""
+            if pag_type == "cursor":
+                cursor_key = table.pag_params.cursor_key
+            if pag_type == "limit":
+                cursor_key = table.pag_params.anchor_key
+            req_data["params"][count_key] = _count
+            req_data["params"][cursor_key] = _cursor
 
         resp: Response = self._session.send(  # type: ignore
             Request(
@@ -165,11 +168,10 @@ class Connector:
         table: str,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
-        **where: Dict[str, Any],
+        **where: Any,
     ) -> pd.DataFrame:
         """
         Query the API to get a table.
-
         Parameters
         ----------
         table : str
@@ -184,65 +186,68 @@ class Connector:
         **where: Any
             The additional parameters required for the query.
         """
-        assert table in self.impdb.tables, f"No such table {table} in {self.impdb.name}"
+        assert (
+            table in self._impdb.tables
+        ), f"No such table {table} in {self._impdb.name}"
 
-        itable = self.impdb.tables[table]
+        itable = self._impdb.tables[table]
 
-        if not itable.pag_params:
-            resp = self._fetch(
-                table=itable, _auth=_auth, _count=-1, _cursor=-1, kwargs=where
-            )
-            df = itable.from_response(resp)
-            return df
+        if itable.pag_params is not None:
+            if itable.pag_params.type == "null":
+                resp = self._fetch(
+                    table=itable, _auth=_auth, _count=-1, _cursor=-1, kwargs=where
+                )
+                df = itable.from_response(resp)
+                return df
 
-        max_count = int(itable.pag_params["max_count"])
-        df = pd.DataFrame()
-        last_id = 0
-        pag_type = itable.pag_params["type"]
+            max_count = int(itable.pag_params.max_count)
+            df = pd.DataFrame()
+            last_id = 0
+            pag_type = itable.pag_params.type
 
-        if _count is None:
-            _count = max_count
-            resp = self._fetch(
-                table=itable, _auth=_auth, _count=_count, _cursor=0, kwargs=where
-            )
-            df = itable.from_response(resp)
+            if _count is None:
+                _count = max_count
+                resp = self._fetch(
+                    table=itable, _auth=_auth, _count=_count, _cursor=0, kwargs=where
+                )
+                df = itable.from_response(resp)
 
-        else:
-            cnt_to_fetch = 0
-            count = _count or 1
-            n_page = math.ceil(count / max_count)
-            remain = count % max_count
-            for i in range(n_page):
-                if i < n_page - 1:
-                    cnt_to_fetch = max_count
-                else:
-                    cnt_to_fetch = remain if remain > 0 else max_count
-                if pag_type == "cursor":
-                    resp = self._fetch(
-                        table=itable,
-                        _auth=_auth,
-                        _count=cnt_to_fetch,
-                        _cursor=last_id - 1,
-                        kwargs=where,
-                    )
-                elif pag_type == "limit":
-                    resp = self._fetch(
-                        table=itable,
-                        _auth=_auth,
-                        _count=cnt_to_fetch,
-                        _cursor=i * max_count,
-                        kwargs=where,
-                    )
-                else:
-                    raise NotImplementedError
-                df_ = itable.from_response(resp)
-                if pag_type == "cursor":
-                    last_id = int(df_[itable.pag_params["cursor_id"]][len(df_) - 1]) - 1
-                if i == 0:
-                    df = df_.copy()
-                else:
-                    df = pd.concat([df, df_], axis=0)
-            df.reset_index(drop=True, inplace=True)
+            else:
+                cnt_to_fetch = 0
+                count = _count or 1
+                n_page = math.ceil(count / max_count)
+                remain = count % max_count
+                for i in range(n_page):
+                    remain = remain if remain > 0 else max_count
+                    cnt_to_fetch = max_count if i < n_page - 1 else remain
+                    if pag_type == "cursor":
+                        resp = self._fetch(
+                            table=itable,
+                            _auth=_auth,
+                            _count=cnt_to_fetch,
+                            _cursor=last_id - 1,
+                            kwargs=where,
+                        )
+                    elif pag_type == "limit":
+                        resp = self._fetch(
+                            table=itable,
+                            _auth=_auth,
+                            _count=cnt_to_fetch,
+                            _cursor=i * max_count,
+                            kwargs=where,
+                        )
+                    else:
+                        raise NotImplementedError
+                    df_ = itable.from_response(resp)
+                    if pag_type == "cursor":
+                        last_id = (
+                            int(df_[itable.pag_params.cursor_id][len(df_) - 1]) - 1
+                        )
+                    if i == 0:
+                        df = df_.copy()
+                    else:
+                        df = pd.concat([df, df_], axis=0)
+                df.reset_index(drop=True, inplace=True)
 
         return df
 
@@ -250,7 +255,6 @@ class Connector:
     def table_names(self) -> List[str]:
         """
         Return all the names of the available tables in a list.
-
         Note
         ----
         We abstract each website as a database containing several tables.
@@ -294,17 +298,14 @@ class Connector:
         """
         This method shows the schema of the table that will be returned,
         so that the user knows what information to expect.
-
         Parameters
         ----------
         table_name
             The table name.
-
         Returns
         -------
         pd.DataFrame
             The returned data's schema.
-
         Note
         ----
         The schema is defined in the configuration file.
@@ -320,40 +321,3 @@ class Connector:
             new_schema_dict["column_name"].append(k)
             new_schema_dict["data_type"].append(schema[k]["type"])
         return pd.DataFrame.from_dict(new_schema_dict)
-
-    def query(
-        self, table: str, auth_params: Optional[Dict[str, Any]] = None, **where: Any,
-    ) -> pd.DataFrame:
-        """
-        Use this method to query the API and get the returned table.
-
-        Example
-        -------
-        >>> df = dc.query('businesses', term="korean", location="vancouver)
-
-        Parameters
-        ----------
-        table
-            The table name.
-        auth_params
-            The parameters for authentication. Usually the authentication parameters
-            should be defined when instantiating the Connector. In case some tables have different
-            authentication options, a different authentication parameter can be defined here.
-            This parameter will override the one from Connector if passed.
-        where
-            The additional parameters required for the query.
-
-        Returns
-        -------
-            pd.DataFrame
-                A DataFrame that contains the data returned by the website API.
-        """
-        assert (
-            table in self._impdb.tables
-        ), f"No such table {table} in {self._impdb.name}"
-
-        itable = self._impdb.tables[table]
-
-        resp = self._fetch(itable, auth_params, where)
-
-        return itable.from_response(resp)

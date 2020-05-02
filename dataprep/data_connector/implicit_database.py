@@ -37,6 +37,19 @@ class SchemaField(NamedTuple):
     description: Optional[str]
 
 
+class Pagination:
+    """
+    Schema of Pagination field
+    """
+
+    type: str
+    anchor_key: str
+    count_key: str
+    cursor_id: str
+    cursor_key: str
+    max_count: str
+
+
 class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     """
     ImplicitTable class abstracts the request and the response to a Restful API,
@@ -54,7 +67,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     body_ctype: str
     body: Optional[Fields] = None
     cookies: Optional[Fields] = None
-    pag_params: Dict[str, str]
+    pag_params: Optional[Pagination]
 
     # Response related
     ctype: str
@@ -86,9 +99,32 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
             self.authorization = Authorization(auth_type=auth_type, params=auth_params)
 
         if "pagination" in request_def:
-            self.pag_params = request_def["pagination"]
+            self.pag_params = Pagination()
+            self.pag_params.type = request_def["pagination"]["type"]
+            self.pag_params.max_count = request_def["pagination"]["max_count"]
+            self.pag_params.count_key = (
+                request_def["pagination"]["count_key"]
+                if "count_key" in request_def["pagination"]
+                else ""
+            )
+            self.pag_params.anchor_key = (
+                request_def["pagination"]["anchor_key"]
+                if "anchor_key" in request_def["pagination"]
+                else ""
+            )
+            self.pag_params.cursor_id = (
+                request_def["pagination"]["cursor_id"]
+                if "cursor_id" in request_def["pagination"]
+                else ""
+            )
+            self.pag_params.cursor_key = (
+                request_def["pagination"]["cursor_key"]
+                if "cursor_key" in request_def["pagination"]
+                else ""
+            )
         else:
-            self.pag_params = {}
+            self.pag_params = Pagination()
+            self.pag_params.type = "null"
 
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
