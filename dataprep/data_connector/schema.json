@@ -64,11 +64,31 @@
                 "pagination": {
                     "$id": "#/properties/request/properties/pagination",
                     "type":"object",
-                    "anchor_key":"string",
-                    "count_key":"string",
-                    "cursor_id":"string",
-                    "cursor_key":"string",
-                    "max_count":"string"
+                    "properties": {
+                        "type":  { "type": "string" },
+                        "max_count": { "type": "string" },
+                        "anchor_key":{
+                            "type": "string",
+                            "optional": true
+                        },
+                        "count_key":{
+                            "type": "string",
+                            "optional": true
+                        },
+                        "cursor_id":{
+                            "type": "string",
+                            "optional": true
+                        },
+                        "cursor_key":{
+                            "type": "string",
+                            "optional": true
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "max_count"
+                    ],
+                    "additionalProperties": false
                 },
                 "body": {
                     "$id": "#/properties/request/properties/body",
