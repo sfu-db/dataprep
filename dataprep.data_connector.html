@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.data_connector package &#8212; dataprep 0.2.4 documentation</title>
+    <title>dataprep.data_connector package &#8212; dataprep 0.2.5 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -25,15 +25,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="dataprep.eda.html" title="dataprep.eda package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="dataprep.html" title="dataprep package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" accesskey="U">dataprep package</a> &#187;</li> 
       </ul>
     </div>  
@@ -45,92 +42,60 @@
             
   <div class="section" id="dataprep-data-connector-package">
 <h1>dataprep.data_connector package<a class="headerlink" href="#dataprep-data-connector-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-dataprep.data_connector.config_manager">
-<span id="dataprep-data-connector-config-manager-module"></span><h2>dataprep.data_connector.config_manager module<a class="headerlink" href="#module-dataprep.data_connector.config_manager" title="Permalink to this headline">¶</a></h2>
-<p>Functions for config downloading and maintaining</p>
-<dl class="function">
-<dt id="dataprep.data_connector.config_manager.config_directory">
-<code class="sig-prename descclassname">dataprep.data_connector.config_manager.</code><code class="sig-name descname">config_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="_modules/dataprep/data_connector/config_manager.html#config_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.config_manager.config_directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the config directory path</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.data_connector.config_manager.download_config">
-<code class="sig-prename descclassname">dataprep.data_connector.config_manager.</code><code class="sig-name descname">download_config</code><span class="sig-paren">(</span><em class="sig-param">impdb: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/dataprep/data_connector/config_manager.html#download_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.config_manager.download_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download the config from Github into the temp directory.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.data_connector.config_manager.ensure_config">
-<code class="sig-prename descclassname">dataprep.data_connector.config_manager.</code><code class="sig-name descname">ensure_config</code><span class="sig-paren">(</span><em class="sig-param">impdb: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/data_connector/config_manager.html#ensure_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.config_manager.ensure_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensure the config for <cite>impdb</cite> is downloaded</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.data_connector.config_manager.get_git_master_hash">
-<code class="sig-prename descclassname">dataprep.data_connector.config_manager.</code><code class="sig-name descname">get_git_master_hash</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/dataprep/data_connector/config_manager.html#get_git_master_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.config_manager.get_git_master_hash" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get current config files repo’s hash</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="dataprep.data_connector.config_manager.is_obsolete">
-<code class="sig-prename descclassname">dataprep.data_connector.config_manager.</code><code class="sig-name descname">is_obsolete</code><span class="sig-paren">(</span><em class="sig-param">impdb: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/dataprep/data_connector/config_manager.html#is_obsolete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.config_manager.is_obsolete" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test if the implicit db config files are obsolete
-and need to be re-downloaded.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-dataprep.data_connector.connector">
-<span id="dataprep-data-connector-connector-module"></span><h2>dataprep.data_connector.connector module<a class="headerlink" href="#module-dataprep.data_connector.connector" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the Connector class,
-where every data fetching should begin with instantiating
-the Connector class.</p>
-<dl class="class">
-<dt id="dataprep.data_connector.connector.Connector">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.connector.</code><code class="sig-name descname">Connector</code><span class="sig-paren">(</span><em class="sig-param">config_path: str, auth_params: Optional[Dict[str, Any]] = None, **kwargs: Dict[str, Any]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.connector.Connector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The main class of DataConnector.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.connector.Connector.auth_params">
-<code class="sig-name descname">auth_params</code><em class="property">: Dict[str, Any]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.connector.Connector.auth_params" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.connector.Connector.impdb">
-<code class="sig-name descname">impdb</code><em class="property">: ImplicitDatabase</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.connector.Connector.impdb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.connector.Connector.info">
-<em class="property">property </em><code class="sig-name descname">info</code><a class="headerlink" href="#dataprep.data_connector.connector.Connector.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Show the information of a website and guide users how to issue queries</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.connector.Connector.jenv">
-<code class="sig-name descname">jenv</code><em class="property">: Environment</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.connector.Connector.jenv" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.connector.Connector.query">
-<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param">table: str, auth_params: Optional[Dict[str, Any]] = None, **where: Dict[str, Any]</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.connector.Connector.query" title="Permalink to this definition">¶</a></dt>
-<dd><p>Query the API to get a table.</p>
+<div class="section" id="connector">
+<h2>Connector<a class="headerlink" href="#connector" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="dataprep.data_connector.Connector">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.</code><code class="sig-name descname">Connector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_path</span></em>, <em class="sig-param"><span class="n">auth_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the main class of data_connector component.
+Initialize Connector class as the example code.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>table</strong> (<em>str</em>) – The table name.</p></li>
-<li><p><strong>auth_params</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>= None</em>) – The parameters for authentication. Usually the authentication parameters
+<li><p><strong>config_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The path to the config. It can be hosted, e.g. “yelp”, or from
+local filesystem, e.g. “./yelp”</p></li>
+<li><p><strong>auth_params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – The parameter for authentication, e.g. OAuth2</p></li>
+<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Additional parameters</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.data_connector</span> <span class="kn">import</span> <span class="n">Connector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="s2">&quot;yelp&quot;</span><span class="p">,</span> <span class="n">auth_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="n">access_token</span><span class="p">})</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="dataprep.data_connector.Connector.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the basic information and provide guidance for users to issue queries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.data_connector.Connector.query">
+<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">auth_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">where</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this method to query the API and get the returned table.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;businesses&#39;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;korean&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;vancouver)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The table name.</p></li>
+<li><p><strong>auth_params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – The parameters for authentication. Usually the authentication parameters
 should be defined when instantiating the Connector. In case some tables have different
 authentication options, a different authentication parameter can be defined here.
 This parameter will override the one from Connector if passed.</p></li>
-<li><p><strong>**where</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – The additional parameters required for the query.</p></li>
+<li><p><strong>where</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – The additional parameters required for the query.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>A DataFrame that contains the data returned by the website API.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
@@ -138,318 +103,47 @@ This parameter will override the one from Connector if passed.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="dataprep.data_connector.connector.Connector.session">
-<code class="sig-name descname">session</code><em class="property">: Session</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.connector.Connector.session" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.connector.Connector.show_schema">
-<code class="sig-name descname">show_schema</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.show_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.connector.Connector.show_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Show the returned schema of a table</p>
+<dl class="py method">
+<dt id="dataprep.data_connector.Connector.show_schema">
+<code class="sig-name descname">show_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.show_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector.show_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method shows the schema of the table that will be returned,
+so that the user knows what information to expect.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>table_name</strong> (<em>str</em>) – The table name.</p>
+<dd class="field-odd"><p><strong>table_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The table name.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>The returned data’s schema.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.connector.Connector.table_names">
-<em class="property">property </em><code class="sig-name descname">table_names</code><a class="headerlink" href="#dataprep.data_connector.connector.Connector.table_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the table names contained in this database.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.connector.Connector.vars">
-<code class="sig-name descname">vars</code><em class="property">: Dict[str, Any]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.connector.Connector.vars" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-dataprep.data_connector.errors">
-<span id="dataprep-data-connector-errors-module"></span><h2>dataprep.data_connector.errors module<a class="headerlink" href="#module-dataprep.data_connector.errors" title="Permalink to this headline">¶</a></h2>
-<p>Module defines errors used in this library.</p>
-<dl class="exception">
-<dt id="dataprep.data_connector.errors.RequestError">
-<em class="property">exception </em><code class="sig-prename descclassname">dataprep.data_connector.errors.</code><code class="sig-name descname">RequestError</code><span class="sig-paren">(</span><em class="sig-param">status_code: int</em>, <em class="sig-param">message: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/errors.html#RequestError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.errors.RequestError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="dataprep.html#dataprep.errors.DataprepError" title="dataprep.errors.DataprepError"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.errors.DataprepError</span></code></a></p>
-<p>A error indicating the status code of the API response
-is not 200.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.errors.RequestError.message">
-<code class="sig-name descname">message</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.errors.RequestError.message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.errors.RequestError.status_code">
-<code class="sig-name descname">status_code</code><em class="property">: int</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.errors.RequestError.status_code" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-dataprep.data_connector.implicit_database">
-<span id="dataprep-data-connector-implicit-database-module"></span><h2>dataprep.data_connector.implicit_database module<a class="headerlink" href="#module-dataprep.data_connector.implicit_database" title="Permalink to this headline">¶</a></h2>
-<p>Module defines ImplicitDatabase and ImplicitTable,
-where ImplicitDatabase is a conceptual model describes
-a website and ImplicitTable describes an API endpoint.</p>
-<dl class="class">
-<dt id="dataprep.data_connector.implicit_database.ImplicitDatabase">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.implicit_database.</code><code class="sig-name descname">ImplicitDatabase</code><span class="sig-paren">(</span><em class="sig-param">config_path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/implicit_database.html#ImplicitDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitDatabase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A website that provides data can be treat as a database, represented
-as ImplicitDatabase in DataConnector.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitDatabase.name">
-<code class="sig-name descname">name</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitDatabase.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitDatabase.tables">
-<code class="sig-name descname">tables</code><em class="property">: Dict[str, ImplicitTable]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitDatabase.tables" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.implicit_database.</code><code class="sig-name descname">ImplicitTable</code><span class="sig-paren">(</span><em class="sig-param">name: str, config: Dict[str, Any]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/implicit_database.html#ImplicitTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>ImplicitTable abstracts the request and the response to a Restful API, so that the remote API
-can be treated as a database table.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.authorization">
-<code class="sig-name descname">authorization</code><em class="property">: Optional[dataprep.data_connector.types.Authorization]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.authorization" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.body">
-<code class="sig-name descname">body</code><em class="property">: Optional[dataprep.data_connector.types.Fields]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.body" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.body_ctype">
-<code class="sig-name descname">body_ctype</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.body_ctype" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.config">
-<code class="sig-name descname">config</code><em class="property">: Dict[str, Any]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.cookies">
-<code class="sig-name descname">cookies</code><em class="property">: Optional[dataprep.data_connector.types.Fields]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.cookies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.ctype">
-<code class="sig-name descname">ctype</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.ctype" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.from_json">
-<code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param">data: str</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[Any]]<a class="reference internal" href="_modules/dataprep/data_connector/implicit_database.html#ImplicitTable.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.from_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create rows from json string.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.from_response">
-<code class="sig-name descname">from_response</code><span class="sig-paren">(</span><em class="sig-param">resp: requests.models.Response</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/dataprep/data_connector/implicit_database.html#ImplicitTable.from_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.from_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a dataframe from a http response.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.from_xml">
-<code class="sig-name descname">from_xml</code><span class="sig-paren">(</span><em class="sig-param">data: str</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[Any]]<a class="reference internal" href="_modules/dataprep/data_connector/implicit_database.html#ImplicitTable.from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.from_xml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create rows from xml string.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.headers">
-<code class="sig-name descname">headers</code><em class="property">: Optional[dataprep.data_connector.types.Fields]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.headers" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.method">
-<code class="sig-name descname">method</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.method" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.name">
-<code class="sig-name descname">name</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.orient">
-<code class="sig-name descname">orient</code><em class="property">: Orient</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.orient" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.params">
-<code class="sig-name descname">params</code><em class="property">: Optional[dataprep.data_connector.types.Fields]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.params" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.schema">
-<code class="sig-name descname">schema</code><em class="property">: Dict[str, SchemaField]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.schema" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.table_path">
-<code class="sig-name descname">table_path</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.table_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.implicit_database.ImplicitTable.url">
-<code class="sig-name descname">url</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.implicit_database.ImplicitTable.url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="dataprep.data_connector.implicit_database.SchemaField">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.implicit_database.</code><code class="sig-name descname">SchemaField</code><a class="reference internal" href="_modules/dataprep/data_connector/implicit_database.html#SchemaField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.implicit_database.SchemaField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
-<p>Schema of one table field</p>
-<dl class="method">
-<dt id="dataprep.data_connector.implicit_database.SchemaField.description">
-<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#dataprep.data_connector.implicit_database.SchemaField.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.implicit_database.SchemaField.target">
-<em class="property">property </em><code class="sig-name descname">target</code><a class="headerlink" href="#dataprep.data_connector.implicit_database.SchemaField.target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.implicit_database.SchemaField.type">
-<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#dataprep.data_connector.implicit_database.SchemaField.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-dataprep.data_connector.schema">
-<span id="dataprep-data-connector-schema-module"></span><h2>dataprep.data_connector.schema module<a class="headerlink" href="#module-dataprep.data_connector.schema" title="Permalink to this headline">¶</a></h2>
-<p>Module contains the loaded config schema.</p>
-</div>
-<div class="section" id="module-dataprep.data_connector.types">
-<span id="dataprep-data-connector-types-module"></span><h2>dataprep.data_connector.types module<a class="headerlink" href="#module-dataprep.data_connector.types" title="Permalink to this headline">¶</a></h2>
-<p>Defines useful types in this library.</p>
-<dl class="class">
-<dt id="dataprep.data_connector.types.Authorization">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.types.</code><code class="sig-name descname">Authorization</code><span class="sig-paren">(</span><em class="sig-param">auth_type: dataprep.data_connector.types.AuthorizationType, params: Dict[str, str]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/types.html#Authorization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.types.Authorization" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class carries the authorization type and
-the corresponding parameter.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.Authorization.auth_type">
-<code class="sig-name descname">auth_type</code><em class="property">: AuthorizationType</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.types.Authorization.auth_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.types.Authorization.build">
-<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param">req_data: Dict[str, Any], params: Dict[str, Any]</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/dataprep/data_connector/types.html#Authorization.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.types.Authorization.build" title="Permalink to this definition">¶</a></dt>
-<dd><p>Populate some required fields to the request data.
-Complex logic may also happens in this function (e.g. start a server to do OAuth).</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.Authorization.params">
-<code class="sig-name descname">params</code><em class="property">: Dict[str, str]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.types.Authorization.params" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.Authorization.storage">
-<code class="sig-name descname">storage</code><em class="property">: Dict[str, Any]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.types.Authorization.storage" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="dataprep.data_connector.types.AuthorizationType">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.types.</code><code class="sig-name descname">AuthorizationType</code><a class="reference internal" href="_modules/dataprep/data_connector/types.html#AuthorizationType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.types.AuthorizationType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Enum class defines the supported authorization methods in this library.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<ul class="simple">
-<li><p>Bearer: requires ‘access_token’ presented in user params</p></li>
-<li><p>OAuth2: requires ‘client_id’ and ‘client_secret’ in user params for
-‘ClientCredentials’ grant type</p></li>
-</ul>
+<p>The schema is defined in the configuration file.
+The user can either use the default one or change it by editing the configuration file.</p>
 </div>
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.AuthorizationType.Bearer">
-<code class="sig-name descname">Bearer</code><em class="property"> = 'Bearer'</em><a class="headerlink" href="#dataprep.data_connector.types.AuthorizationType.Bearer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.AuthorizationType.OAuth2">
-<code class="sig-name descname">OAuth2</code><em class="property"> = 'OAuth2'</em><a class="headerlink" href="#dataprep.data_connector.types.AuthorizationType.OAuth2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
-<dl class="class">
-<dt id="dataprep.data_connector.types.Fields">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.types.</code><code class="sig-name descname">Fields</code><span class="sig-paren">(</span><em class="sig-param">fields_config: Dict[str, Any]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/types.html#Fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.types.Fields" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A data structure that stores the fields information (e.g. headers, cookies, …).
-This class is useful to populate concrete fields data with required variables provided.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.Fields.fields">
-<code class="sig-name descname">fields</code><em class="property">: Dict[str, Any]</em><em class="property"> = None</em><a class="headerlink" href="#dataprep.data_connector.types.Fields.fields" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="dataprep.data_connector.types.Fields.populate">
-<code class="sig-name descname">populate</code><span class="sig-paren">(</span><em class="sig-param">jenv: jinja2.environment.Environment, params: Dict[str, Any]</em><span class="sig-paren">)</span> &#x2192; Dict[str, str]<a class="reference internal" href="_modules/dataprep/data_connector/types.html#Fields.populate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.types.Fields.populate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Populate a dict based on the fields definition and provided vars.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="dataprep.data_connector.types.Orient">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.types.</code><code class="sig-name descname">Orient</code><a class="reference internal" href="_modules/dataprep/data_connector/types.html#Orient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.types.Orient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Different types of table orientations
-ref: (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_json.html">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_json.html</a>).
-Currently, DataConnector supports two different types of orientaions:</p>
-<ol class="arabic simple">
-<li><p>Split, which is column store.</p></li>
-<li><p>Records, which is row store.</p></li>
-</ol>
-<p>Details can be found in the pandas page.</p>
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.Orient.Records">
-<code class="sig-name descname">Records</code><em class="property"> = 'records'</em><a class="headerlink" href="#dataprep.data_connector.types.Orient.Records" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dataprep.data_connector.types.Orient.Split">
-<code class="sig-name descname">Split</code><em class="property"> = 'split'</em><a class="headerlink" href="#dataprep.data_connector.types.Orient.Split" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<dl class="py method">
+<dt id="dataprep.data_connector.Connector.table_names">
+<em class="property">property </em><code class="sig-name descname">table_names</code><a class="headerlink" href="#dataprep.data_connector.Connector.table_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the names of the available tables in a list.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We abstract each website as a database containing several tables.
+For example in Spotify, we have artist and album table.</p>
 </div>
-<div class="section" id="module-dataprep.data_connector">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dataprep.data_connector" title="Permalink to this headline">¶</a></h2>
-<p>DataConnector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -462,14 +156,7 @@ Currently, DataConnector supports two different types of orientaions:</p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">dataprep.data_connector package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector.config_manager">dataprep.data_connector.config_manager module</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector.connector">dataprep.data_connector.connector module</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector.errors">dataprep.data_connector.errors module</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector.implicit_database">dataprep.data_connector.implicit_database module</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector.schema">dataprep.data_connector.schema module</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector.types">dataprep.data_connector.types module</a></li>
-<li><a class="reference internal" href="#module-dataprep.data_connector">Module contents</a></li>
+<li><a class="reference internal" href="#connector">Connector</a></li>
 </ul>
 </li>
 </ul>
@@ -508,21 +195,18 @@ Currently, DataConnector supports two different types of orientaions:</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="dataprep.eda.html" title="dataprep.eda package"
              >next</a> |</li>
         <li class="right" >
           <a href="dataprep.html" title="dataprep package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
     </div>
   </body>
 </html>

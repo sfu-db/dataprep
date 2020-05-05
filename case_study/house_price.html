@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>EDA Case Study: House Price &#8212; dataprep 0.2.4 documentation</title>
+    <title>EDA Case Study: House Price &#8212; dataprep 0.2.5 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -25,15 +25,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="../dataprep.html" title="dataprep package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="titanic.html" title="EDA Case Study: Titanic"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.5 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -281,17 +278,17 @@ variables.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>from dataprep.eda import plot
-from dataprep.eda import plot_correlation
-from dataprep.eda import plot_missing
+<span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot_correlation</span>
+<span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">plot_missing</span>
 
-import pandas as pd
-import numpy as np
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set(style=&quot;whitegrid&quot;, color_codes=True)
-sns.set(font_scale=1)
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">,</span> <span class="n">color_codes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">font_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -599,8 +596,8 @@ var element = document.currentScript.previousSibling.previousSibling;
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>houses = pd.read_csv(&quot;house-prices/train.csv&quot;)
-houses.head()
+<span></span><span class="n">houses</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;house-prices/train.csv&quot;</span><span class="p">)</span>
+<span class="n">houses</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -781,8 +778,8 @@ houses.head()
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>houses_test = pd.read_csv(&quot;house-prices/test.csv&quot;)
-houses_test.head()
+<span></span><span class="n">houses_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;house-prices/test.csv&quot;</span><span class="p">)</span>
+<span class="n">houses_test</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -963,7 +960,7 @@ houses_test.head()
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>houses.shape
+<span></span><span class="n">houses</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
@@ -982,7 +979,7 @@ houses_test.head()
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>houses_test.shape
+<span></span><span class="n">houses_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
@@ -1003,7 +1000,7 @@ houses_test.head()
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1107,7 +1104,7 @@ distribution of the target value, we could get the information that the target v
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses, &quot;SalePrice&quot;)
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1203,7 +1200,7 @@ distribution of the target value, we could get the information that the target v
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses, &quot;SalePrice&quot;, value_range=[0.5, 1])
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1307,7 +1304,7 @@ distribution of the target value, we could get the information that the target v
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses)
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1410,9 +1407,9 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses[[&quot;SalePrice&quot;,&quot;OverallQual&quot;,&quot;GrLivArea&quot;,&quot;GarageCars&quot;,
-                  &quot;GarageArea&quot;,&quot;GarageYrBlt&quot;,&quot;TotalBsmtSF&quot;,&quot;1stFlrSF&quot;,&quot;FullBath&quot;,
-                  &quot;TotRmsAbvGrd&quot;,&quot;YearBuilt&quot;,&quot;YearRemodAdd&quot;]])
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">[[</span><span class="s2">&quot;SalePrice&quot;</span><span class="p">,</span><span class="s2">&quot;OverallQual&quot;</span><span class="p">,</span><span class="s2">&quot;GrLivArea&quot;</span><span class="p">,</span><span class="s2">&quot;GarageCars&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;GarageArea&quot;</span><span class="p">,</span><span class="s2">&quot;GarageYrBlt&quot;</span><span class="p">,</span><span class="s2">&quot;TotalBsmtSF&quot;</span><span class="p">,</span><span class="s2">&quot;1stFlrSF&quot;</span><span class="p">,</span><span class="s2">&quot;FullBath&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;TotRmsAbvGrd&quot;</span><span class="p">,</span><span class="s2">&quot;YearBuilt&quot;</span><span class="p">,</span><span class="s2">&quot;YearRemodAdd&quot;</span><span class="p">]])</span>
 </pre></div>
 </div>
 </div>
@@ -1515,7 +1512,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses, value_range=[0.5, 1])
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1611,7 +1608,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses, k=30)
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1745,7 +1742,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;SalePrice&quot;)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1844,7 +1841,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(houses, &quot;OverallQual&quot;, &quot;SalePrice&quot;)
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;OverallQual&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1940,7 +1937,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;OverallQual&quot;, &quot;SalePrice&quot;) # why not combine them together?
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;OverallQual&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span> <span class="c1"># why not combine them together?</span>
 </pre></div>
 </div>
 </div>
@@ -2036,7 +2033,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;GarageCars&quot;, &quot;SalePrice&quot;)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;GarageCars&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2132,7 +2129,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;Fireplaces&quot;, &quot;SalePrice&quot;)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;Fireplaces&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2228,7 +2225,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;GrLivArea&quot;, &quot;SalePrice&quot;)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;GrLivArea&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2324,7 +2321,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;TotalBsmtSF&quot;, &quot;SalePrice&quot;)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;TotalBsmtSF&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2420,7 +2417,7 @@ Heatmaps are great to detect this kind of situations and in problems dominated b
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(houses, &quot;YearBuilt&quot;, &quot;SalePrice&quot;)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;YearBuilt&quot;</span><span class="p">,</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2530,7 +2527,7 @@ We just analysed four variables, but there are many other that we should analyse
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_missing(houses)
+<span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">houses</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2626,9 +2623,9 @@ We just analysed four variables, but there are many other that we should analyse
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span># plot_missing(houses, &quot;BsmtQual&quot;)
-basement_cols=[&#39;BsmtQual&#39;,&#39;BsmtCond&#39;,&#39;BsmtExposure&#39;,&#39;BsmtFinType1&#39;,&#39;BsmtFinType2&#39;,&#39;BsmtFinSF1&#39;,&#39;BsmtFinSF2&#39;]
-houses[basement_cols][houses[&#39;BsmtQual&#39;].isnull()==True]
+<span></span><span class="c1"># plot_missing(houses, &quot;BsmtQual&quot;)</span>
+<span class="n">basement_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BsmtQual&#39;</span><span class="p">,</span><span class="s1">&#39;BsmtCond&#39;</span><span class="p">,</span><span class="s1">&#39;BsmtExposure&#39;</span><span class="p">,</span><span class="s1">&#39;BsmtFinType1&#39;</span><span class="p">,</span><span class="s1">&#39;BsmtFinType2&#39;</span><span class="p">,</span><span class="s1">&#39;BsmtFinSF1&#39;</span><span class="p">,</span><span class="s1">&#39;BsmtFinSF2&#39;</span><span class="p">]</span>
+<span class="n">houses</span><span class="p">[</span><span class="n">basement_cols</span><span class="p">][</span><span class="n">houses</span><span class="p">[</span><span class="s1">&#39;BsmtQual&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">==</span><span class="kc">True</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -3045,9 +3042,9 @@ houses[basement_cols][houses[&#39;BsmtQual&#39;].isnull()==True]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>for col in basement_cols:
-    if &#39;FinSF&#39;not in col:
-        houses[col] = houses[col].fillna(&#39;None&#39;)
+<span></span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">basement_cols</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s1">&#39;FinSF&#39;</span><span class="ow">not</span> <span class="ow">in</span> <span class="n">col</span><span class="p">:</span>
+        <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3056,9 +3053,9 @@ houses[basement_cols][houses[&#39;BsmtQual&#39;].isnull()==True]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span># plot_missing(houses, &quot;FireplaceQu&quot;)
-houses[&quot;FireplaceQu&quot;] = houses[&quot;FireplaceQu&quot;].fillna(&#39;None&#39;)
-pd.crosstab(houses.Fireplaces, houses.FireplaceQu)
+<span></span><span class="c1"># plot_missing(houses, &quot;FireplaceQu&quot;)</span>
+<span class="n">houses</span><span class="p">[</span><span class="s2">&quot;FireplaceQu&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">houses</span><span class="p">[</span><span class="s2">&quot;FireplaceQu&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">houses</span><span class="o">.</span><span class="n">Fireplaces</span><span class="p">,</span> <span class="n">houses</span><span class="o">.</span><span class="n">FireplaceQu</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3148,8 +3145,8 @@ pd.crosstab(houses.Fireplaces, houses.FireplaceQu)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>garage_cols=[&#39;GarageType&#39;,&#39;GarageQual&#39;,&#39;GarageCond&#39;,&#39;GarageYrBlt&#39;,&#39;GarageFinish&#39;,&#39;GarageCars&#39;,&#39;GarageArea&#39;]
-houses[garage_cols][houses[&#39;GarageType&#39;].isnull()==True]
+<span></span><span class="n">garage_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GarageType&#39;</span><span class="p">,</span><span class="s1">&#39;GarageQual&#39;</span><span class="p">,</span><span class="s1">&#39;GarageCond&#39;</span><span class="p">,</span><span class="s1">&#39;GarageYrBlt&#39;</span><span class="p">,</span><span class="s1">&#39;GarageFinish&#39;</span><span class="p">,</span><span class="s1">&#39;GarageCars&#39;</span><span class="p">,</span><span class="s1">&#39;GarageArea&#39;</span><span class="p">]</span>
+<span class="n">houses</span><span class="p">[</span><span class="n">garage_cols</span><span class="p">][</span><span class="n">houses</span><span class="p">[</span><span class="s1">&#39;GarageType&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">==</span><span class="kc">True</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -3307,11 +3304,11 @@ houses[garage_cols][houses[&#39;GarageType&#39;].isnull()==True]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>for col in garage_cols:
-    if houses[col].dtype==np.object:
-        houses[col] = houses[col].fillna(&#39;None&#39;)
-    else:
-        houses[col] = houses[col].fillna(0)
+<span></span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">garage_cols</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">object</span><span class="p">:</span>
+        <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">houses</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3378,20 +3375,17 @@ houses[garage_cols][houses[&#39;GarageType&#39;].isnull()==True]
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="../dataprep.html" title="dataprep package"
              >next</a> |</li>
         <li class="right" >
           <a href="titanic.html" title="EDA Case Study: Titanic"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.5 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
     </div>
   </body>
 </html>

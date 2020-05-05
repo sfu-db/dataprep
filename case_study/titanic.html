@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>EDA Case Study: Titanic &#8212; dataprep 0.2.4 documentation</title>
+    <title>EDA Case Study: Titanic &#8212; dataprep 0.2.5 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -25,15 +25,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="house_price.html" title="EDA Case Study: House Price"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../data_connector.html" title="dataprep.data_connector: fetching data from popular websites with a simplified API"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.5 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -279,10 +276,10 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>from dataprep.eda import *
-import pandas as pd
-train_df = pd.read_csv(&#39;titanic/train.csv&#39;)
-train_df
+<span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;titanic/train.csv&#39;</span><span class="p">)</span>
+<span class="n">train_df</span>
 </pre></div>
 </div>
 </div>
@@ -799,7 +796,7 @@ var element = document.currentScript.previousSibling.previousSibling;
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot(train_df)
+<span></span><span class="n">plot</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -898,10 +895,10 @@ Embarked(0.2%)</em>. 5. <strong>Label Balance</strong>: From the distribution of
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span># identify &#39;PassengerId&#39;,&#39;Survived&#39;, &#39;Pclass&#39; as categorical column and replot.
-for col in [&#39;Survived&#39;, &#39;Pclass&#39;]:
-    train_df[col] = train_df[col].astype(&quot;object&quot;)
-plot(train_df)
+<span></span><span class="c1"># identify &#39;PassengerId&#39;,&#39;Survived&#39;, &#39;Pclass&#39; as categorical column and replot.</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">,</span> <span class="s1">&#39;Pclass&#39;</span><span class="p">]:</span>
+    <span class="n">train_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1001,7 +998,7 @@ plot(train_df)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_missing(train_df)
+<span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1099,8 +1096,8 @@ correlation between two columns by calling <em>plot(df, x, y)</em>.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>for feature in [&#39;Age&#39;, &#39;Cabin&#39;, &#39;Embarked&#39;]:
-    plot(train_df, feature, &#39;Survived&#39;)
+<span></span><span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Cabin&#39;</span><span class="p">,</span> <span class="s1">&#39;Embarked&#39;</span><span class="p">]:</span>
+    <span class="n">plot</span><span class="p">(</span><span class="n">train_df</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1115,8 +1112,8 @@ correlation between two columns by calling <em>plot(df, x, y)</em>.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>for feature in [&#39;Pclass&#39;, &#39;Sex&#39;, &#39;Fare&#39;]:
-    plot(train_df, feature, &#39;Survived&#39;)
+<span></span><span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">,</span> <span class="s1">&#39;Fare&#39;</span><span class="p">]:</span>
+    <span class="n">plot</span><span class="p">(</span><span class="n">train_df</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1137,8 +1134,8 @@ correlation between two columns by calling <em>plot(df, x, y)</em>.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>for feature in [&#39;SibSp&#39;, &#39;Parch&#39;]:
-    plot(train_df, feature, &#39;Survived&#39;)
+<span></span><span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;SibSp&#39;</span><span class="p">,</span> <span class="s1">&#39;Parch&#39;</span><span class="p">]:</span>
+    <span class="n">plot</span><span class="p">(</span><span class="n">train_df</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1158,7 +1155,7 @@ correlation between two columns by calling <em>plot(df, x, y)</em>.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>plot_correlation(train_df)
+<span></span><span class="n">plot_correlation</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1312,20 +1309,17 @@ correlation between two columns by calling <em>plot(df, x, y)</em>.</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="house_price.html" title="EDA Case Study: House Price"
              >next</a> |</li>
         <li class="right" >
           <a href="../data_connector.html" title="dataprep.data_connector: fetching data from popular websites with a simplified API"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">dataprep 0.2.5 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
     </div>
   </body>
 </html>

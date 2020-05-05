@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.correlation.render &#8212; dataprep 0.2.4 documentation</title>
+    <title>dataprep.eda.correlation.render &#8212; dataprep 0.2.5 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -22,10 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../correlation.html" accesskey="U">dataprep.eda.correlation</a> &#187;</li> 
       </ul>
@@ -64,6 +61,50 @@
 <span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">BIPALETTE</span><span class="p">,</span> <span class="n">BRG</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_correlation&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="render_correlation"><a class="viewcode-back" href="../../../../dataprep.eda.html#dataprep.eda.correlation.render.render_correlation">[docs]</a><span class="k">def</span> <span class="nf">render_correlation</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
+    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a correlation plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    itmdt</span>
+<span class="sd">    plot_width</span>
+<span class="sd">        The width of the plot</span>
+<span class="sd">    plot_height</span>
+<span class="sd">        The height of the plot</span>
+<span class="sd">    palette</span>
+<span class="sd">        The palette to use. By default (None),</span>
+<span class="sd">        the palette will be automatically chosen based on different visualization types.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Figure</span>
+<span class="sd">        The bokeh Figure instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_heatmaps</span><span class="p">(</span>
+            <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BIPALETTE</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_single_heatmaps&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_single_heatmaps</span><span class="p">(</span>
+            <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BIPALETTE</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_scatter&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_scatter</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BRG</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown visual type </span><span class="si">{</span><span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">visual_elem</span></div>
+
 
 <span class="c1"># def _vis_cross_table(intermediate: Intermediate, params: Dict[str, Any]) -&gt; Figure:</span>
 <span class="c1">#     &quot;&quot;&quot;</span>
@@ -285,49 +326,6 @@
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="n">place</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fig</span>
-
-
-<div class="viewcode-block" id="render_correlation"><a class="viewcode-back" href="../../../../dataprep.eda.correlation.html#dataprep.eda.render_correlation">[docs]</a><span class="k">def</span> <span class="nf">render_correlation</span><span class="p">(</span>
-    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
-    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Render a correlation plot</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    itmdt : Intermediate</span>
-<span class="sd">    plot_width : int = 400</span>
-<span class="sd">        The width of the plot</span>
-<span class="sd">    plot_height : int = 300</span>
-<span class="sd">        The height of the plot</span>
-<span class="sd">    palette : Union[Sequence[str], str] = None</span>
-<span class="sd">        The palette to use. By default (None),</span>
-<span class="sd">        the palette will be automatically chosen based on different visualization types.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    Figure</span>
-<span class="sd">        The bokeh Figure instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_heatmaps</span><span class="p">(</span>
-            <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BIPALETTE</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_single_heatmaps&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_single_heatmaps</span><span class="p">(</span>
-            <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BIPALETTE</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_scatter&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_scatter</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">BRG</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown visual type </span><span class="si">{</span><span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">visual_elem</span></div>
 </pre></div>
 
           </div>
@@ -355,17 +353,14 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="../../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../correlation.html" >dataprep.eda.correlation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
     </div>
   </body>
 </html>

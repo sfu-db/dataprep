@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.missing &#8212; dataprep 0.2.4 documentation</title>
+    <title>dataprep.eda.missing &#8212; dataprep 0.2.5 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -22,10 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -45,7 +42,6 @@
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span>
-<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">LayoutDOM</span>
 
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute_missing</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render_missing</span>
@@ -54,7 +50,7 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_missing&quot;</span><span class="p">,</span> <span class="s2">&quot;compute_missing&quot;</span><span class="p">,</span> <span class="s2">&quot;plot_missing&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="plot_missing"><a class="viewcode-back" href="../../../dataprep.eda.missing.html#dataprep.eda.plot_missing">[docs]</a><span class="k">def</span> <span class="nf">plot_missing</span><span class="p">(</span>
+<div class="viewcode-block" id="plot_missing"><a class="viewcode-back" href="../../../dataprep.eda.html#dataprep.eda.missing.plot_missing">[docs]</a><span class="k">def</span> <span class="nf">plot_missing</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -62,7 +58,7 @@
     <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">ndist_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LayoutDOM</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is designed to deal with missing values</span>
 <span class="sd">    There are three functions: plot_missing(df), plot_missing(df, x)</span>
@@ -70,24 +66,18 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    df: Union[pd.DataFrame, dd.DataFrame]</span>
+<span class="sd">    df</span>
 <span class="sd">        the pandas data_frame for which plots are calculated for each column</span>
-<span class="sd">    x_name: str, optional</span>
+<span class="sd">    x</span>
 <span class="sd">        a valid column name of the data frame</span>
-<span class="sd">    y_name: str, optional</span>
+<span class="sd">    y</span>
 <span class="sd">        a valid column name of the data frame</span>
-<span class="sd">    ncols: int, optional</span>
+<span class="sd">    ncols</span>
 <span class="sd">        The number of columns in the figure</span>
-<span class="sd">    bins: int</span>
+<span class="sd">    bins</span>
 <span class="sd">        The number of rows in the figure</span>
-<span class="sd">    ndist_sample: int</span>
+<span class="sd">    ndist_sample</span>
 <span class="sd">        The number of sample points</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    ----------</span>
-<span class="sd">    An object of figure or</span>
-<span class="sd">        An object of figure and</span>
-<span class="sd">        An intermediate representation for the plots of different columns in the data_frame.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    ----------</span>
@@ -96,17 +86,6 @@
 <span class="sd">    &gt;&gt;&gt; df = pd.read_csv(&quot;suicide-rate.csv&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; plot_missing(df, &quot;HDI_for_year&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; plot_missing(df, &quot;HDI_for_year&quot;, &quot;population&quot;)</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    match (x_name, y_name)</span>
-<span class="sd">        case (Some, Some) =&gt; histogram for numerical column,</span>
-<span class="sd">        bars for categorical column, qq-plot, box-plot, jitter plot,</span>
-<span class="sd">        CDF, PDF</span>
-<span class="sd">        case (Some, None) =&gt; histogram for numerical column and</span>
-<span class="sd">        bars for categorical column</span>
-<span class="sd">        case (None, None) =&gt; heatmap</span>
-<span class="sd">        otherwise =&gt; error</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_missing</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">ndist_sample</span><span class="o">=</span><span class="n">ndist_sample</span><span class="p">)</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
@@ -138,16 +117,13 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
     </div>
   </body>
 </html>

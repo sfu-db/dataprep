@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic.render &#8212; dataprep 0.2.4 documentation</title>
+    <title>dataprep.eda.basic.render &#8212; dataprep 0.2.5 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -22,10 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li> 
       </ul>
@@ -38,9 +35,6 @@
             
   <h1>Source code for dataprep.eda.basic.render</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Render ``plot(df)``</span>
-<span class="sd">===================</span>
-
 <span class="sd">This module implements the visualization for the plot(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-lines</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
@@ -63,6 +57,7 @@
     <span class="n">LinearColorMapper</span><span class="p">,</span>
     <span class="n">ColorBar</span><span class="p">,</span>
     <span class="n">FactorRange</span><span class="p">,</span>
+    <span class="n">CustomJSHover</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span><span class="p">,</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">figure</span>
 <span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="kn">import</span> <span class="n">cumsum</span><span class="p">,</span> <span class="n">linear_cmap</span><span class="p">,</span> <span class="n">transform</span>
@@ -79,22 +74,25 @@
 <span class="k">def</span> <span class="nf">tweak_figure</span><span class="p">(</span>
     <span class="n">fig</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span>
     <span class="n">ptype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">show_yaxis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">show_yticks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">max_lbl_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set some common attributes for a figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9pt&quot;</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10pt&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
-    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;pie&quot;</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="s2">&quot;kde&quot;</span><span class="p">,</span> <span class="s2">&quot;qq&quot;</span><span class="p">,</span> <span class="s2">&quot;heatmap&quot;</span><span class="p">]:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">show_yaxis</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pie&quot;</span><span class="p">,</span> <span class="s2">&quot;qq&quot;</span><span class="p">,</span> <span class="s2">&quot;heatmap&quot;</span><span class="p">]:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;pie&quot;</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="s2">&quot;kde&quot;</span><span class="p">,</span> <span class="s2">&quot;qq&quot;</span><span class="p">,</span> <span class="s2">&quot;heatmap&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">]:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">show_yticks</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;0pt&quot;</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;nested&quot;</span><span class="p">,</span> <span class="s2">&quot;stacked&quot;</span><span class="p">,</span> <span class="s2">&quot;heatmap&quot;</span><span class="p">,</span> <span class="s2">&quot;box&quot;</span><span class="p">]:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">FuncTickFormatter</span><span class="p">(</span>
             <span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            if (tick.length &gt; </span><span class="si">%d</span><span class="s2">) return tick.substring(0, </span><span class="si">%d</span><span class="s2">-2) + &#39;...&#39;;</span>
@@ -102,31 +100,40 @@
 <span class="s2">        &quot;&quot;&quot;</span>
             <span class="o">%</span> <span class="p">(</span><span class="n">max_lbl_len</span><span class="p">,</span> <span class="n">max_lbl_len</span><span class="p">)</span>
         <span class="p">)</span>
+    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nested&quot;</span><span class="p">,</span> <span class="s2">&quot;stacked&quot;</span><span class="p">,</span> <span class="s2">&quot;box&quot;</span><span class="p">]:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nested&quot;</span><span class="p">,</span> <span class="s2">&quot;stacked&quot;</span><span class="p">]:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">x_range</span><span class="o">.</span><span class="n">range_padding</span> <span class="o">=</span> <span class="mf">0.03</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="s2">&quot;boxnum&quot;</span><span class="p">]:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">min_border_right</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">_make_title</span><span class="p">(</span><span class="n">grp_cnt_stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Format the title to notify the user of sampled output</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">x_ttl</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_ttl&quot;</span><span class="p">]</span>
-    <span class="n">x_show</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="s2">&quot;y_ttl&quot;</span> <span class="ow">in</span> <span class="n">grp_cnt_stats</span><span class="p">:</span>
-        <span class="n">y_ttl</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_ttl&quot;</span><span class="p">]</span>
-        <span class="n">y_show</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">x_ttl</span> <span class="o">&gt;</span> <span class="n">x_show</span> <span class="ow">and</span> <span class="n">y_ttl</span> <span class="o">&gt;</span> <span class="n">y_show</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;(top </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">) </span><span class="si">{}</span><span class="s2"> by (top </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">y_show</span><span class="p">,</span> <span class="n">y_ttl</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x_show</span><span class="p">,</span> <span class="n">x_ttl</span><span class="p">,</span> <span class="n">x</span>
+    <span class="n">x_ttl</span><span class="p">,</span> <span class="n">y_ttl</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_ttl&quot;</span> <span class="ow">in</span> <span class="n">grp_cnt_stats</span><span class="p">:</span>
+        <span class="n">x_ttl</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_ttl&quot;</span><span class="p">]</span>
+        <span class="n">x_shw</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">_ttl&quot;</span> <span class="ow">in</span> <span class="n">grp_cnt_stats</span><span class="p">:</span>
+        <span class="n">y_ttl</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">_ttl&quot;</span><span class="p">]</span>
+        <span class="n">y_shw</span> <span class="o">=</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">x_ttl</span> <span class="ow">and</span> <span class="n">y_ttl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x_ttl</span> <span class="o">&gt;</span> <span class="n">x_shw</span> <span class="ow">and</span> <span class="n">y_ttl</span> <span class="o">&gt;</span> <span class="n">y_shw</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;(top </span><span class="si">{</span><span class="n">y_shw</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">y_ttl</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by (top </span><span class="si">{</span><span class="n">x_shw</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">x_ttl</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">y_ttl</span> <span class="o">&gt;</span> <span class="n">y_show</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;(top </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">) </span><span class="si">{}</span><span class="s2"> by </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_show</span><span class="p">,</span> <span class="n">y_ttl</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">x_ttl</span> <span class="o">&gt;</span> <span class="n">x_show</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> by (top </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x_show</span><span class="p">,</span> <span class="n">x_ttl</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">x_ttl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x_ttl</span> <span class="o">&gt;</span> <span class="n">x_shw</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by (top </span><span class="si">{</span><span class="n">x_shw</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">x_ttl</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">y_ttl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y_ttl</span> <span class="o">&gt;</span> <span class="n">y_shw</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(top </span><span class="si">{</span><span class="n">y_shw</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">y_ttl</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
@@ -187,7 +194,7 @@
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_overrides</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ticks</span><span class="p">,</span> <span class="n">formatted_ticks</span><span class="p">))</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10pt&quot;</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">7</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># fig.xaxis.major_label_orientation = 0</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">ticker</span> <span class="o">=</span> <span class="n">ticks</span>
@@ -205,7 +212,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">show_yaxis</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">show_yticks</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render a bar chart</span>
@@ -213,7 +220,7 @@
     <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">miss_pct</span><span class="si">}</span><span class="s2">% missing)&quot;</span> <span class="k">if</span> <span class="n">miss_pct</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;@col&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">,</span> <span class="s2">&quot;@cnt&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Percent&quot;</span><span class="p">,</span> <span class="s2">&quot;@pct</span><span class="si">{0.2f}</span><span class="s2">%&quot;</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="n">show_yaxis</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">show_yticks</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
             <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
@@ -227,12 +234,12 @@
         <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="s2">&quot;cnt&quot;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">show_yaxis</span><span class="p">)</span>
+    <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">show_yticks</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Count&quot;</span>
     <span class="k">if</span> <span class="n">total_grps</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Top </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">total_grps</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label_standoff</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">show_yaxis</span> <span class="ow">and</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">show_yticks</span> <span class="ow">and</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
         <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fig</span>
 
@@ -284,18 +291,14 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">show_yaxis</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">show_yticks</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render a histogram</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">miss_pct</span><span class="si">}</span><span class="s2">% missing)&quot;</span> <span class="k">if</span> <span class="n">miss_pct</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s2">&quot;Bin&quot;</span><span class="p">,</span> <span class="s2">&quot;@intervals&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@freq&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;Percent&quot;</span><span class="p">,</span> <span class="s2">&quot;@pct</span><span class="si">{0.2f}</span><span class="s2">%&quot;</span><span class="p">),</span>
-    <span class="p">]</span>
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Bin&quot;</span><span class="p">,</span> <span class="s2">&quot;@intvls&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@freq&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Percent&quot;</span><span class="p">,</span> <span class="s2">&quot;@pct</span><span class="si">{0.2f}</span><span class="s2">%&quot;</span><span class="p">)]</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
         <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
@@ -316,12 +319,14 @@
     <span class="p">)</span>
     <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;vline&quot;</span><span class="p">,)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
-    <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="n">show_yaxis</span><span class="p">)</span>
+    <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="n">show_yticks</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Frequency&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
         <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;left&quot;</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;right&quot;</span><span class="p">],</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_yaxis</span> <span class="ow">and</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
-        <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;freq&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_yticks</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">col</span>
+        <span class="k">if</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+            <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;freq&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span>
 
@@ -370,6 +375,7 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover_dist</span><span class="p">)</span>
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;kde&quot;</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Density&quot;</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">col</span>
     <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;left&quot;</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;right&quot;</span><span class="p">],</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
         <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;freq&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
@@ -417,26 +423,19 @@
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">grp_cnt_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Panel</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render a box plot visualization</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments,too-many-locals,too-many-statements</span>
-    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">y</span><span class="p">:</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="mf">0.7</span> <span class="k">if</span> <span class="n">grp_cnt_stats</span> <span class="k">else</span> <span class="mf">0.93</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">_make_title</span><span class="p">(</span><span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">grp_cnt_stats</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">width</span> <span class="o">=</span> <span class="mf">0.7</span>
         <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">grp_cnt_stats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">width</span> <span class="o">=</span> <span class="mf">0.93</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">width</span> <span class="o">=</span> <span class="mf">0.7</span>
-            <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_ttl&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]:</span>
-                <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> by (top </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">y</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">],</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_ttl&quot;</span><span class="p">],</span> <span class="n">x</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
         <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">39</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
@@ -488,7 +487,8 @@
         <span class="p">(</span><span class="s2">&quot;Lower Whisker&quot;</span><span class="p">,</span> <span class="s2">&quot;@lw&quot;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="k">if</span> <span class="n">grp_cnt_stats</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">tooltips</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Bin&quot;</span><span class="p">,</span> <span class="s2">&quot;@grp&quot;</span><span class="p">))</span>
+        <span class="n">lbl</span> <span class="o">=</span> <span class="n">timeunit</span> <span class="k">if</span> <span class="n">timeunit</span> <span class="k">else</span> <span class="s2">&quot;Bin&quot;</span>
+        <span class="n">tooltips</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">lbl</span><span class="p">,</span> <span class="s2">&quot;@grp&quot;</span><span class="p">))</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span>
         <span class="n">HoverTool</span><span class="p">(</span>
             <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">upw</span><span class="p">,</span> <span class="n">utail</span><span class="p">,</span> <span class="n">ubox</span><span class="p">,</span> <span class="n">lbox</span><span class="p">,</span> <span class="n">ltail</span><span class="p">,</span> <span class="n">loww</span><span class="p">],</span>
@@ -507,7 +507,7 @@
     <span class="n">maxw</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">outy</span><span class="p">)</span> <span class="k">if</span> <span class="n">outy</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">minw</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;uw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">maxw</span><span class="p">),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">grp_cnt_stats</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># format categorical axis tick values</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">grp_cnt_stats</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">timeunit</span><span class="p">:</span>  <span class="c1"># format categorical axis tick values</span>
         <span class="n">endpts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lb&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;ub&quot;</span><span class="p">]]</span>
         <span class="c1"># start by rounding to the length of the largest possible number</span>
         <span class="n">round_to</span> <span class="o">=</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">ept</span><span class="p">)</span> <span class="k">for</span> <span class="n">ept</span> <span class="ow">in</span> <span class="n">endpts</span><span class="p">]))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
@@ -529,12 +529,11 @@
 <span class="s2">                return &quot;&quot;;</span>
 <span class="s2">            &quot;&quot;&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">min_border_right</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;boxnum&quot;</span><span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10pt&quot;</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">7</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_align</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span>
+
+    <span class="k">if</span> <span class="n">timeunit</span> <span class="o">==</span> <span class="s2">&quot;Week of&quot;</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="s2">&quot;, the week of&quot;</span>
 
     <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;box plot&quot;</span><span class="p">)</span>
 
@@ -585,7 +584,7 @@
                 <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">plot_dict</span><span class="p">[</span><span class="n">grp_name</span><span class="p">]],</span>
                 <span class="n">tooltips</span><span class="o">=</span><span class="p">[</span>
                     <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@y&quot;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@y&quot;</span><span class="p">),</span>
                     <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> bin&quot;</span><span class="p">,</span> <span class="s2">&quot;@intervals&quot;</span><span class="p">),</span>
                 <span class="p">],</span>
                 <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;mouse&quot;</span><span class="p">,</span>
@@ -748,41 +747,88 @@
     <span class="n">grp_cnt_stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_lbl_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Panel</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render a stacked bar chart</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="c1"># pylint: disable=too-many-arguments,too-many-locals</span>
     <span class="n">title</span> <span class="o">=</span> <span class="n">_make_title</span><span class="p">(</span><span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
-        <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">timeunit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
     <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
-        <span class="n">x_range</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;grps&quot;</span><span class="p">],</span>
+        <span class="n">x_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
         <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
-        <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Group&quot;</span><span class="p">,</span> <span class="s2">&quot;@grps, $name&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Percentage&quot;</span><span class="p">,</span> <span class="s2">&quot;@$name</span><span class="si">{0.2f}</span><span class="s2">%&quot;</span><span class="p">),],</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">subgrps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">palette</span> <span class="o">=</span> <span class="n">Pastel1</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subgrps</span><span class="p">)</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pastel1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;Others&quot;</span> <span class="ow">in</span> <span class="n">subgrps</span><span class="p">:</span>
-        <span class="n">colours</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">subgrps</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;#636363&quot;</span><span class="p">,)</span>
+    <span class="n">grps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="n">Pastel1</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grps</span><span class="p">)</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pastel1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;Others&quot;</span> <span class="ow">in</span> <span class="n">grps</span><span class="p">:</span>
+        <span class="n">colours</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">grps</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;#636363&quot;</span><span class="p">,)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">colours</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">subgrps</span><span class="p">)]</span>
-
+        <span class="n">colours</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">grps</span><span class="p">)]</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
     <span class="n">renderers</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span>
-        <span class="n">stackers</span><span class="o">=</span><span class="n">subgrps</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;grps&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colours</span><span class="p">,</span>
+        <span class="n">stackers</span><span class="o">=</span><span class="n">grps</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colours</span><span class="p">,</span>
     <span class="p">)</span>
-
-    <span class="n">legend_it</span> <span class="o">=</span> <span class="p">[(</span><span class="n">subgrp</span><span class="p">,</span> <span class="p">[</span><span class="n">rend</span><span class="p">])</span> <span class="k">for</span> <span class="n">subgrp</span><span class="p">,</span> <span class="n">rend</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">subgrps</span><span class="p">,</span> <span class="n">renderers</span><span class="p">)]</span>
+    <span class="n">grps</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">grp</span><span class="p">[:</span> <span class="p">(</span><span class="n">max_lbl_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_lbl_len</span> <span class="k">else</span> <span class="n">grp</span>
+        <span class="k">for</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">grps</span>
+    <span class="p">]</span>
+    <span class="n">legend_it</span> <span class="o">=</span> <span class="p">[(</span><span class="n">grp</span><span class="p">,</span> <span class="p">[</span><span class="n">rend</span><span class="p">])</span> <span class="k">for</span> <span class="n">grp</span><span class="p">,</span> <span class="n">rend</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grps</span><span class="p">,</span> <span class="n">renderers</span><span class="p">)]</span>
     <span class="n">legend</span> <span class="o">=</span> <span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">legend_it</span><span class="p">)</span>
     <span class="n">legend</span><span class="o">.</span><span class="n">label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;8pt&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">timeunit</span><span class="p">:</span>
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Group&quot;</span><span class="p">,</span> <span class="s2">&quot;@index, $name&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Percentage&quot;</span><span class="p">,</span> <span class="s2">&quot;@$name</span><span class="si">{0.2f}</span><span class="s2">%&quot;</span><span class="p">)]</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">))</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Percent&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># below is for having percent and count in the tooltip</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">CustomJSHover</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">),</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            const columns = Object.keys(source.data)</span>
+<span class="s2">            const cur_bar = special_vars.data_x - 0.5</span>
+<span class="s2">            var ttl_bar = 0</span>
+<span class="s2">            for (let i = 0; i &lt; columns.length; i++) {</span>
+<span class="s2">                if (columns[i] != &#39;index&#39;){</span>
+<span class="s2">                    ttl_bar = ttl_bar + source.data[columns[i]][cur_bar]</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">            const cur_val = source.data[special_vars.name][cur_bar]</span>
+<span class="s2">            return (cur_val/ttl_bar * 100).toFixed(2)+&#39;%&#39;;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">rend</span> <span class="ow">in</span> <span class="n">renderers</span><span class="p">:</span>
+            <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span>
+                <span class="n">tooltips</span><span class="o">=</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;$name&quot;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">timeunit</span><span class="p">,</span> <span class="s2">&quot;@index&quot;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">,</span> <span class="s2">&quot;@$name&quot;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">&quot;Percent&quot;</span><span class="p">,</span> <span class="s2">&quot;@{</span><span class="si">%s</span><span class="s2">}</span><span class="si">{custom}</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rend</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">formatters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;@{</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">rend</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">formatter</span><span class="p">},</span>
+                <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">rend</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Count&quot;</span>
+        <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="n">timeunit</span> <span class="o">==</span> <span class="s2">&quot;Week of&quot;</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="s2">&quot;, the week of&quot;</span>
 
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;stacked&quot;</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Percent&quot;</span>
+
     <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;stacked bar chart&quot;</span><span class="p">)</span>
 
 
@@ -806,10 +852,10 @@
     <span class="n">mapper</span> <span class="o">=</span> <span class="n">LinearColorMapper</span><span class="p">(</span>
         <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
-        <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">*</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;x_show&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">70</span> <span class="o">+</span> <span class="mi">18</span> <span class="o">*</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="s2">&quot;y_show&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">*</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">70</span> <span class="o">+</span> <span class="mi">18</span> <span class="o">*</span> <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
         <span class="n">x_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])),</span>
         <span class="n">y_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])),</span>
@@ -857,6 +903,123 @@
     <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;heat map&quot;</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">dt_line_viz</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">show_yticks</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">miss_pct</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a line chart</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">if</span> <span class="n">miss_pct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">miss_pct</span><span class="si">}</span><span class="s2">% missing)&quot;</span> <span class="k">if</span> <span class="n">miss_pct</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="n">timeunit</span><span class="p">,</span> <span class="s2">&quot;@lbl&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@freq&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Percent&quot;</span><span class="p">,</span> <span class="s2">&quot;@pct%&quot;</span><span class="p">)]</span>
+        <span class="n">agg</span> <span class="o">=</span> <span class="s2">&quot;freq&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">agg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="n">timeunit</span><span class="p">,</span> <span class="s2">&quot;@lbl&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">agg</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
+        <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+        <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+        <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">y_axis_type</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span>
+        <span class="n">x_axis_type</span><span class="o">=</span><span class="s2">&quot;datetime&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+        <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">agg</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#7e9ac8&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;vline&quot;</span><span class="p">,)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+
+    <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">show_yticks</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_yticks</span> <span class="ow">and</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+        <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">agg</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">y</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;line chart&quot;</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Frequency&quot;</span>
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span> <span class="nf">dt_multiline_viz</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">grp_cnt_stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">max_lbl_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="n">z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">agg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Panel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render multi-line chart</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments,too-many-locals</span>
+    <span class="n">grps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="n">PALETTE</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grps</span><span class="p">)</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">PALETTE</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">_make_title</span><span class="p">(</span><span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">agg</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">_make_title</span><span class="p">(</span><span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2"> over </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">agg</span> <span class="o">=</span> <span class="s2">&quot;Frequency&quot;</span> <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">agg</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+        <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+        <span class="n">y_axis_type</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span>
+        <span class="n">x_axis_type</span><span class="o">=</span><span class="s2">&quot;datetime&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+    <span class="n">plot_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">grp</span><span class="p">,</span> <span class="n">colour</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grps</span><span class="p">,</span> <span class="n">palette</span><span class="p">):</span>
+        <span class="n">grp_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">grp</span><span class="p">[:</span> <span class="p">(</span><span class="n">max_lbl_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_lbl_len</span> <span class="k">else</span> <span class="n">grp</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">grp</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">grp</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;lbl&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">grp</span><span class="p">][</span><span class="mi">2</span><span class="p">]}</span>
+        <span class="p">)</span>
+        <span class="n">plot_dict</span><span class="p">[</span><span class="n">grp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mf">1.3</span>
+        <span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span>
+            <span class="n">HoverTool</span><span class="p">(</span>
+                <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">plot_dict</span><span class="p">[</span><span class="n">grp_name</span><span class="p">]],</span>
+                <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">agg</span><span class="p">,</span> <span class="s2">&quot;@y&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">timeunit</span><span class="p">,</span> <span class="s2">&quot;@lbl&quot;</span><span class="p">),],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;mouse&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">grp</span><span class="p">][</span><span class="mi">0</span><span class="p">])),</span> <span class="nb">max</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">grp</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">plot_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">plot_dict</span><span class="p">])</span>
+    <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">&quot;hide&quot;</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">agg</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">z</span> <span class="k">else</span> <span class="s2">&quot;Frequency&quot;</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">if</span> <span class="n">yscale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+        <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;line chart&quot;</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">render_basic</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Box</span><span class="p">:</span>
@@ -882,10 +1045,16 @@
             <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">data</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">hist_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">DType</span><span class="o">.</span><span class="n">DateTime</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">dt_line_viz</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">miss_pct</span>
+            <span class="p">)</span>
+            <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gridplot</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">figs</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,)</span>
 
 
-<span class="k">def</span> <span class="nf">render_basic_x_cat</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">render_cat</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -909,7 +1078,7 @@
     <span class="k">return</span> <span class="n">tabs</span>
 
 
-<span class="k">def</span> <span class="nf">render_basic_x_num</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">render_num</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -931,7 +1100,23 @@
     <span class="k">return</span> <span class="n">tabs</span>
 
 
-<span class="k">def</span> <span class="nf">render_cat_and_num_cols</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">render_dt</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render plots from plot(df, x) when x is a numerical column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">dt_line_viz</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">miss_pct</span>
+    <span class="p">)</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;line chart&quot;</span><span class="p">))</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabs</span>
+
+
+<span class="k">def</span> <span class="nf">render_cat_num</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -968,7 +1153,7 @@
     <span class="k">return</span> <span class="n">tabs</span>
 
 
-<span class="k">def</span> <span class="nf">render_two_num_cols</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">render_two_num</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1006,9 +1191,7 @@
     <span class="k">return</span> <span class="n">tabs</span>
 
 
-<span class="k">def</span> <span class="nf">render_two_cat_cols</span><span class="p">(</span>
-    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">render_two_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x and y are categorical columns</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1029,14 +1212,107 @@
     <span class="k">return</span> <span class="n">tabs</span>
 
 
-<div class="viewcode-block" id="render"><a class="viewcode-back" href="../../../../dataprep.eda.basic.html#dataprep.eda.render">[docs]</a><span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">render_dt_num</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render plots from plot(df, x, y) when x is dt and y is num</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">linedf</span><span class="p">,</span> <span class="n">timeunit</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;linedata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">dt_line_viz</span><span class="p">(</span>
+            <span class="n">linedf</span><span class="p">,</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+            <span class="n">timeunit</span><span class="p">,</span>
+            <span class="n">yscale</span><span class="p">,</span>
+            <span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">boxdf</span><span class="p">,</span> <span class="n">outx</span><span class="p">,</span> <span class="n">outy</span><span class="p">,</span> <span class="n">timeunit</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;boxdata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">box_viz</span><span class="p">(</span>
+            <span class="n">boxdf</span><span class="p">,</span>
+            <span class="n">outx</span><span class="p">,</span>
+            <span class="n">outy</span><span class="p">,</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+            <span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+            <span class="n">timeunit</span><span class="o">=</span><span class="n">timeunit</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabs</span>
+
+
+<span class="k">def</span> <span class="nf">render_dt_cat</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render plots from plot(df, x, y) when x is dt and y is num</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">timeunit</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;linedata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">dt_multiline_viz</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+            <span class="n">timeunit</span><span class="p">,</span>
+            <span class="n">yscale</span><span class="p">,</span>
+            <span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">grp_cnt_stats</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">timeunit</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;stackdata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">stacked_viz</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">timeunit</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabs</span>
+
+
+<span class="k">def</span> <span class="nf">render_dt_num_cat</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render plots from plot(df, x, y) when x is dt and y is num</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">timeunit</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">dt_multiline_viz</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+            <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+            <span class="n">timeunit</span><span class="p">,</span>
+            <span class="n">yscale</span><span class="p">,</span>
+            <span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">grp_cnt_stats</span><span class="p">,</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">],</span>
+            <span class="n">agg</span><span class="o">=</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;agg&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabs</span>
+
+
+<div class="viewcode-block" id="render"><a class="viewcode-back" href="../../../../dataprep.eda.html#dataprep.eda.basic.render.render">[docs]</a><span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">plot_width_small</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">324</span><span class="p">,</span>
-    <span class="n">plot_height_small</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
-    <span class="n">plot_width_large</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">450</span><span class="p">,</span>
-    <span class="n">plot_height_large</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
+    <span class="n">plot_width_sml</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">324</span><span class="p">,</span>
+    <span class="n">plot_height_sml</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="n">plot_width_lrg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">450</span><span class="p">,</span>
+    <span class="n">plot_height_lrg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
     <span class="n">plot_width_wide</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">972</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LayoutDOM</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1044,50 +1320,47 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    itmdt : Intermediate</span>
+<span class="sd">    itmdt</span>
 <span class="sd">        The Intermediate containing results from the compute function.</span>
-<span class="sd">    yscale: str = &quot;linear&quot;</span>
+<span class="sd">    yscale: str, default &quot;linear&quot;</span>
 <span class="sd">        The scale to show on the y axis. Can be &quot;linear&quot; or &quot;log&quot;.</span>
-<span class="sd">    tile_size : Optional[float] = None</span>
+<span class="sd">    tile_size</span>
 <span class="sd">        Size of the tile for the hexbin plot. Measured from the middle</span>
 <span class="sd">        of a hexagon to its left or right corner.</span>
-<span class="sd">    plot_width_small : int = 324,</span>
+<span class="sd">    plot_width_small: int, default 324</span>
 <span class="sd">        The width of the small plots</span>
-<span class="sd">    plot_height_small: int = 300,</span>
+<span class="sd">    plot_height_small: int, default 300</span>
 <span class="sd">        The height of the small plots</span>
-<span class="sd">    plot_width_large : int = 450,</span>
+<span class="sd">    plot_width_large: int, default 450</span>
 <span class="sd">        The width of the large plots</span>
-<span class="sd">    plot_height_large: int = 400,</span>
+<span class="sd">    plot_height_large: int, default 400</span>
 <span class="sd">        The height of the large plots</span>
-<span class="sd">    plot_width_large : int = 972,</span>
+<span class="sd">    plot_width_large: int, default 972</span>
+<span class="sd">        The width of the large plots</span>
+<span class="sd">    plot_width_wide: int, default 972</span>
 <span class="sd">        The width of the wide plots</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    LayoutDOM</span>
-<span class="sd">        A bokeh layout domain.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;basic_grid&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_basic</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_small</span><span class="p">,</span> <span class="n">plot_height_small</span><span class="p">)</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_basic</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_sml</span><span class="p">,</span> <span class="n">plot_height_sml</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;categorical_column&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_basic_x_cat</span><span class="p">(</span>
-            <span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_large</span><span class="p">,</span> <span class="n">plot_height_large</span>
-        <span class="p">)</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;numerical_column&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_basic_x_num</span><span class="p">(</span>
-            <span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_large</span><span class="p">,</span> <span class="n">plot_height_large</span>
-        <span class="p">)</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_num</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;datetime_column&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_dt</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;cat_and_num_cols&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_cat_and_num_cols</span><span class="p">(</span>
-            <span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_large</span><span class="p">,</span> <span class="n">plot_height_large</span>
-        <span class="p">)</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_cat_num</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;two_num_cols&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_two_num_cols</span><span class="p">(</span>
-            <span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width_large</span><span class="p">,</span> <span class="n">plot_height_large</span><span class="p">,</span> <span class="n">tile_size</span>
-        <span class="p">)</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_two_num</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">,</span> <span class="n">tile_size</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;two_cat_cols&quot;</span><span class="p">:</span>
-        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_two_cat_cols</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width_wide</span><span class="p">,</span> <span class="n">plot_height_small</span><span class="p">)</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_two_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width_wide</span><span class="p">,</span> <span class="n">plot_height_sml</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;dt_and_num_cols&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_dt_num</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;dt_and_cat_cols&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_dt_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_wide</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;dt_cat_num_cols&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_dt_num_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_wide</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">visual_elem</span></div>
 </pre></div>
 
@@ -1116,17 +1389,14 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="../../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
     </div>
   </body>
 </html>

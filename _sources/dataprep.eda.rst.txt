@@ -1,48 +1,21 @@
 dataprep.eda package
 ====================
 
-Subpackages
------------
+.. .. automodule:: dataprep.eda
+..    :noindex:
 
-.. toctree::
+Plot* functions
+---------------
+.. autofunction:: dataprep.eda.basic.plot
+.. autofunction:: dataprep.eda.correlation.plot_correlation
+.. autofunction:: dataprep.eda.missing.plot_missing
 
-   dataprep.eda.basic
-   dataprep.eda.correlation
-   dataprep.eda.missing
-   dataprep.eda.outlier
-
-Submodules
-----------
-
-dataprep.eda.intermediate module
---------------------------------
-
-.. automodule:: dataprep.eda.intermediate
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dataprep.eda.palette module
----------------------------
-
-.. automodule:: dataprep.eda.palette
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dataprep.eda.report module
---------------------------
-
-.. automodule:: dataprep.eda.report
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Module contents
+Other functions
 ---------------
 
-.. automodule:: dataprep.eda
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. autofunction:: dataprep.eda.basic.compute.compute
+.. autofunction:: dataprep.eda.basic.render.render
+.. autofunction:: dataprep.eda.correlation.compute.compute_correlation
+.. autofunction:: dataprep.eda.correlation.render.render_correlation
+.. autofunction:: dataprep.eda.missing.compute.compute_missing
+.. autofunction:: dataprep.eda.missing.render.render_missing
