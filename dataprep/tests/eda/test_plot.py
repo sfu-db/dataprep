@@ -32,7 +32,8 @@ def simpledf() -> dd.DataFrame:
         ],
         axis=1,
     )
-    df.columns = ["a", "b", "c", "d", "e"]
+    df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
+    df.columns = ["a", "b", "c", "d", "e", "f"]
     df["e"] = pd.to_datetime(df["e"])
 
     idx = np.arange(1000)
@@ -45,11 +46,11 @@ def simpledf() -> dd.DataFrame:
 
 
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, simpledf.columns[0])
+    plot(simpledf, "a")
 
 
 def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, simpledf.columns[-1])
+    plot(simpledf, "e")
 
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
@@ -57,8 +58,12 @@ def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
 
 
 def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, simpledf.columns[-2], simpledf.columns[-1])
+    plot(simpledf, "d", "e")
 
 
 def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, simpledf.columns[0], simpledf.columns[-1])
+    plot(simpledf, "a", "e")
+
+
+def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
+    plot(simpledf, "f")
