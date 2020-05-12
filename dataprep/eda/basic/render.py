@@ -1053,11 +1053,17 @@ def render_num(
     fig = hist_viz(df, miss_pct, itmdt["col"], yscale, plot_width, plot_height, True)
     tabs.append(Panel(child=fig, title="histogram"))
     df, pts_rng, pdf = itmdt["kdedata"]
-    tabs.append(
-        hist_kde_viz(df, pts_rng, pdf, itmdt["col"], yscale, plot_width, plot_height)
-    )
+    if np.any(pdf):
+        tabs.append(
+            hist_kde_viz(
+                df, pts_rng, pdf, itmdt["col"], yscale, plot_width, plot_height
+            )
+        )
     actual_qs, theory_qs = itmdt["qqdata"]
-    tabs.append(qqnorm_viz(actual_qs, theory_qs, itmdt["col"], plot_width, plot_height))
+    if np.any(theory_qs[~np.isnan(theory_qs)]):
+        tabs.append(
+            qqnorm_viz(actual_qs, theory_qs, itmdt["col"], plot_width, plot_height)
+        )
     df, outx, outy, _ = itmdt["boxdata"]
     tabs.append(box_viz(df, outx, outy, itmdt["col"], plot_width, plot_height))
     tabs = Tabs(tabs=tabs)
