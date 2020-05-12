@@ -567,7 +567,10 @@ def calc_hist_kde(
         }
     )
     pts_rng = np.linspace(minv, maxv, 1000)
-    pdf = gaussian_kde(data.compute())(pts_rng)
+    if minv == maxv:
+        pdf = np.zeros(1000, dtype=np.float64)
+    else:
+        pdf = gaussian_kde(data.compute())(pts_rng)
     return hist_df, pts_rng, pdf
 
 
