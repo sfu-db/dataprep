@@ -85,7 +85,6 @@ def missing_spectrum(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
     ncols = len(cols)
     nrows = len(df)
     chunk_size = len(df) // num_bins
-
     data = df.isnull().to_dask_array()
     data.compute_chunk_sizes()
     data = data.rechunk((chunk_size, None))
