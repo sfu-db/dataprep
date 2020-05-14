@@ -79,6 +79,8 @@ def cut_long_name(name: str, max_len: int = 12) -> str:
     If the name is longer than `max_len`,
     cut it to `max_len` length and append "..."
     """
+    # Bug 136 Fixed
+    name = str(name)
     if len(name) <= max_len:
         return name
     return f"{name[:max_len]}..."
