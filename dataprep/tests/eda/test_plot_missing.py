@@ -20,7 +20,7 @@ def simpledf() -> dd.DataFrame:
     )
 
     df.columns = ["a", "b", "c", "d"]
-
+    df["a"] = df["a"].astype("object")
     idx = np.arange(1000)
     np.random.shuffle(idx)
     df.iloc[idx[:500], 0] = None
@@ -52,6 +52,11 @@ def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
 
 def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
     itmdt = compute_missing(simpledf, x="a", y="d")
+    render_missing(itmdt)
+
+
+def test_column_change_type(simpledf: dd.DataFrame) -> None:
+    itmdt = compute_missing(simpledf, x="b")
     render_missing(itmdt)
 
 
