@@ -132,6 +132,10 @@ def render_hist(
 
     if is_categorical(df["x"].dtype):
         radius = 0.99
+
+        # Inputs of FactorRange() have to be sequence of strings,
+        # object only contains numbers can cause errors.(Issue#98).
+        df["x"] = df["x"].astype("str")
         x_range = FactorRange(*df["x"].unique())
     else:
         radius = df["x"][1] - df["x"][0]
