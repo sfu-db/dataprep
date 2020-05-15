@@ -8,6 +8,7 @@ from tempfile import NamedTemporaryFile
 from bokeh.io import save
 from bokeh.models import LayoutDOM
 from bokeh.resources import CDN
+from IPython.display import HTML, display
 
 
 class Report:
@@ -41,3 +42,9 @@ class Report:
 
         # embed into report template created by us here
         return output_html
+
+    def render(self) -> None:
+        """
+        Render the report. This is useful when calling plot in a for loop.
+        """
+        display(HTML(self._repr_html_()))
