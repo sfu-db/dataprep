@@ -43,7 +43,7 @@ class Report:
         # embed into report template created by us here
         return output_html
 
-    def render(self) -> None:
+    def show(self) -> None:
         """
         Render the report. This is useful when calling plot in a for loop.
         """
