@@ -123,6 +123,7 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
     cols = [col for col in df.columns if col != x]
 
     hists = {}
+    hists_restore_dtype = {}
 
     for col in cols:
         range = None  # pylint: disable=redefined-builtin
@@ -133,13 +134,27 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
             histogram(df[col], bins=bins, return_edges=True, range=range)
             for df in [df0, df1]
         ]
-    (hists,) = dd.compute(hists)
+
+        # In some cases(Issue#98), dd.compute() can change the features dtypes and cause error.
+        # So we need to restore features dtypes after dd.compute().
+        centers_dtypes = (hists[col][0][1].dtype, hists[col][1][1].dtype)
+        (hists,) = dd.compute(hists)
+        dict_value = []
+
+        # Here we do not reassign to the "hists" variable as
+        # dd.compute() can change variables' types and cause error to mypy test in CircleCI .
+        # Instead, we assign to a new variable hists_restore_dtype.
+        for i in [0, 1]:
+            intermediate = list(hists[col][i])
+            intermediate[1] = intermediate[1].astype(centers_dtypes[i])
+            dict_value.append(tuple(intermediate))
+        hists_restore_dtype[col] = dict_value
 
     dfs = {}
 
     meta = ColumnsMetadata()
 
-    for col, hists_ in hists.items():
+    for col, hists_ in hists_restore_dtype.items():
         counts, xs, *edges = zip(*hists_)
 
         labels = np.repeat(LABELS, [len(x) for x in xs])
