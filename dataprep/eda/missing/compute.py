@@ -13,8 +13,15 @@ from scipy.stats import rv_histogram
 
 from ...errors import UnreachableError
 from ..utils import to_dask
+from ..dtypes import (
+    is_dtype,
+    detect_dtype,
+    is_pandas_categorical,
+    Continuous,
+    Nominal,
+    DTypeDef,
+)
 from ..intermediate import Intermediate, ColumnsMetadata
-from ..dtypes import is_categorical, is_numerical, is_pandas_categorical
 
 __all__ = ["compute_missing"]
 
@@ -26,12 +33,13 @@ def histogram(
     bins: Optional[int] = None,
     return_edges: bool = True,
     range: Optional[Tuple[int, int]] = None,  # pylint: disable=redefined-builtin
+    dtype: Optional[DTypeDef] = None,
 ) -> Union[Tuple[da.Array, da.Array], Tuple[da.Array, da.Array, da.Array]]:
     """
     Calculate histogram for both numerical and categorical
     """
 
-    if is_numerical(srs.dtype):
+    if is_dtype(detect_dtype(srs, dtype), Continuous()):
         if range is not None:
             minimum, maximum = range
         else:
@@ -50,7 +58,7 @@ def histogram(
         if not return_edges:
             return counts, centers
         return counts, centers, edges
-    elif is_categorical(srs.dtype):
+    elif is_dtype(detect_dtype(srs, dtype), Nominal()):
         value_counts = srs.value_counts()
         counts = value_counts.to_dask_array()
 
@@ -112,7 +120,7 @@ def missing_spectrum(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
 
 
 def missing_impact_1vn(  # pylint: disable=too-many-locals
-    df: dd.DataFrame, x: str, bins: int
+    df: dd.DataFrame, x: str, bins: int, dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """
     Calculate the distribution change on other columns when
@@ -127,11 +135,11 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
 
     for col in cols:
         range = None  # pylint: disable=redefined-builtin
-        if is_numerical(df0[col].dtype):
+        if is_dtype(detect_dtype(df0[col], dtype), Continuous()):
             range = (df0[col].min(axis=0), df0[col].max(axis=0))
 
         hists[col] = [
-            histogram(df[col], bins=bins, return_edges=True, range=range)
+            histogram(df[col], dtype=dtype, bins=bins, return_edges=True, range=range)
             for df in [df0, df1]
         ]
 
@@ -180,23 +188,28 @@ def missing_impact_1vn(  # pylint: disable=too-many-locals
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
-        if len(counts[0]) > bins and is_categorical(df0[col].dtype):
+        if len(counts[0]) > bins and is_dtype(detect_dtype(df0[col], dtype), Nominal()):
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[:bins]]
             df = df[df["x"].isin(selected_xs)]
             meta[col, "partial"] = (bins, len(counts[0]))
         else:
             meta[col, "partial"] = (len(counts[0]), len(counts[0]))
-
-        meta[col, "dtype"] = df0[col].dtype
+        meta[col, "dtype"] = detect_dtype(df0[col], dtype)
         dfs[col] = df
 
     return Intermediate(data=dfs, x=x, meta=meta, visual_type="missing_impact_1vn")
 
 
 def missing_impact_1v1(  # pylint: disable=too-many-locals
-    df: dd.DataFrame, x: str, y: str, bins: int, ndist_sample: int
+    df: dd.DataFrame,
+    x: str,
+    y: str,
+    bins: int,
+    ndist_sample: int,
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
+    # pylint: disable=too-many-arguments
     """
     Calculate the distribution change on another column y when
     the missing values in x is dropped.
@@ -208,13 +221,16 @@ def missing_impact_1v1(  # pylint: disable=too-many-locals
     srs0, srs1 = df0[y], df1[y]
     minimum, maximum = srs0.min(), srs0.max()
 
-    hists = [histogram(srs, bins=bins, return_edges=True) for srs in [srs0, srs1]]
+    hists = [
+        histogram(srs, dtype=dtype, bins=bins, return_edges=True)
+        for srs in [srs0, srs1]
+    ]
     hists = da.compute(*hists)
 
     meta = ColumnsMetadata()
-    meta["y", "dtype"] = df[y].dtype
+    meta["y", "dtype"] = detect_dtype(df[y], dtype)
 
-    if is_numerical(df[y].dtype):
+    if is_dtype(detect_dtype(df[y], dtype), Continuous()):
         dists = [rv_histogram((hist[0], hist[2])) for hist in hists]  # type: ignore
         xs = np.linspace(minimum, maximum, ndist_sample)
 
@@ -311,6 +327,7 @@ def compute_missing(
     bins: int = 30,
     ncols: int = 30,
     ndist_sample: int = 100,
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """
     This function is designed to deal with missing values
@@ -331,7 +348,11 @@ def compute_missing(
         The number of rows in the figure
     ndist_sample
         The number of sample points
-
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     Examples
     ----------
     >>> from dataprep.eda.missing.computation import plot_missing
@@ -347,8 +368,10 @@ def compute_missing(
     if x is None and y is not None:
         raise ValueError("x cannot be None while y has value")
     elif x is not None and y is None:
-        return missing_impact_1vn(df, x=x, bins=bins)
+        return missing_impact_1vn(df, dtype=dtype, x=x, bins=bins)
     elif x is not None and y is not None:
-        return missing_impact_1v1(df, x=x, y=y, bins=bins, ndist_sample=ndist_sample)
+        return missing_impact_1v1(
+            df, dtype=dtype, x=x, y=y, bins=bins, ndist_sample=ndist_sample
+        )
     else:
         return missing_spectrum(df, bins=bins, ncols=ncols)

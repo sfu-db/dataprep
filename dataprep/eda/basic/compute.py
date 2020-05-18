@@ -12,7 +12,15 @@ import pandas as pd
 from scipy.stats import gaussian_kde, norm, kurtosis, skew, median_absolute_deviation
 
 from ...errors import UnreachableError
-from ..dtypes import DType, is_categorical, is_numerical, is_datetime
+from ..dtypes import (
+    is_dtype,
+    detect_dtype,
+    DType,
+    Nominal,
+    Continuous,
+    DateTime,
+    DTypeDef,
+)
 from ..intermediate import Intermediate
 from ..utils import to_dask
 
@@ -48,6 +56,7 @@ def compute(
     agg: str = "mean",
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """
     Parameters
@@ -87,37 +96,57 @@ def compute(
     value_range: Optional[Tuple[float, float]], default None
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
 
     df = to_dask(df)
 
     if not any((x, y, z)):
-        return compute_overview(df, bins, ngroups, largest, timeunit)
+        return compute_overview(df, bins, ngroups, largest, timeunit, dtype)
 
     if sum(v is None for v in (x, y, z)) == 2:
         col: str = cast(str, x or y or z)
         return compute_univariate(
-            df, col, bins, ngroups, largest, timeunit, value_range
+            df, col, bins, ngroups, largest, timeunit, value_range, dtype
         )
 
     if sum(v is None for v in (x, y, z)) == 1:
         x, y = (v for v in (x, y, z) if v is not None)
         return compute_bivariate(
-            df, x, y, bins, ngroups, largest, nsubgroups, timeunit, agg, sample_size
+            df,
+            x,
+            y,
+            bins,
+            ngroups,
+            largest,
+            nsubgroups,
+            timeunit,
+            agg,
+            sample_size,
+            dtype,
         )
 
     if x is not None and y is not None and z is not None:
-        return compute_trivariate(df, x, y, z, ngroups, largest, timeunit, agg)
+        return compute_trivariate(df, x, y, z, ngroups, largest, timeunit, agg, dtype)
 
     return Intermediate()
 
 
 def compute_overview(
-    df: dd.DataFrame, bins: int, ngroups: int, largest: bool, timeunit: str
+    df: dd.DataFrame,
+    bins: int,
+    ngroups: int,
+    largest: bool,
+    timeunit: str,
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
+    # pylint: disable=too-many-arguments
     """
     Compute functions for plot(df)
-
     Parameters
     ----------
     df
@@ -138,26 +167,31 @@ def compute_overview(
         It can be "year", "quarter", "month", "week", "day", "hour",
         "minute", "second". With default value "auto", it will use the
         time unit such that the resulting number of groups is closest to 15.
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
 
     datas: List[Any] = []
     counter = {"Categorical": 0, "Numerical": 0, "Datetime": 0}
     col_names_dtypes: List[Tuple[str, DType]] = []
     for column in df.columns:
-        if is_categorical(df[column].dtype):
+        column_dtype = detect_dtype(df[column], dtype)
+        if is_dtype(column_dtype, Nominal()):
             # bar chart
             datas.append(dask.delayed(calc_bar_pie)(df[column], ngroups, largest))
-            col_names_dtypes.append((column, DType.Categorical))
+            col_names_dtypes.append((column, Nominal()))
             counter["Categorical"] += 1
-        elif is_numerical(df[column].dtype):
+        elif is_dtype(column_dtype, Continuous()):
             # histogram
             datas.append(dask.delayed(calc_hist)(df[column], bins))
-            col_names_dtypes.append((column, DType.Numerical))
+            col_names_dtypes.append((column, Continuous()))
             counter["Numerical"] += 1
-        elif is_datetime(df[column].dtype):
-            # line chart
+        elif is_dtype(column_dtype, DateTime()):
             datas.append(dask.delayed(calc_line_dt)(df[[column]], timeunit))
-            col_names_dtypes.append((column, DType.DateTime))
+            col_names_dtypes.append((column, DateTime()))
             counter["Datetime"] += 1
         else:
             raise UnreachableError
@@ -175,10 +209,10 @@ def compute_univariate(
     largest: bool,
     timeunit: str,
     value_range: Optional[Tuple[float, float]],
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """
     Compute functions for plot(df, x)
-
     Parameters
     ----------
     df
@@ -204,10 +238,16 @@ def compute_univariate(
     value_range
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-locals, too-many-arguments
 
-    if is_categorical(df[x].dtype):
+    col_dtype = detect_dtype(df[x], dtype)
+    if is_dtype(col_dtype, Nominal()):
         # data for bar and pie charts
         data_cat: List[Any] = []
         data_cat.append(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
@@ -217,7 +257,7 @@ def compute_univariate(
         return Intermediate(
             col=x, data=data, statsdata=statsdata_cat, visual_type="categorical_column",
         )
-    elif is_numerical(df[x].dtype):
+    elif is_dtype(col_dtype, Continuous()):
         if value_range is not None:
             if (
                 (value_range[0] <= np.nanmax(df[x]))
@@ -233,7 +273,7 @@ def compute_univariate(
         # kde plot
         kdedata = calc_hist_kde(df[x].dropna().values, bins)
         # box plot
-        boxdata = calc_box(df[[x]].dropna(), bins, qqdata[0])
+        boxdata = calc_box(df[[x]].dropna(), bins, dtype=dtype)
         # histogram
         data_num.append(dask.delayed(calc_hist)(df[x], bins))
         # stats
@@ -257,7 +297,7 @@ def compute_univariate(
             statsdata=statsdata_num,
             visual_type="numerical_column",
         )
-    elif is_datetime(df[x].dtype):
+    elif is_dtype(col_dtype, DateTime()):
         data_dt: List[Any] = []
         # line chart
         data_dt.append(dask.delayed(calc_line_dt)(df[[x]], timeunit))
@@ -282,10 +322,10 @@ def compute_bivariate(
     timeunit: str,
     agg: str,
     sample_size: int,
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """
     Compute functions for plot(df, x, y)
-
     Parameters
     ----------
     df
@@ -318,33 +358,39 @@ def compute_bivariate(
         Specify the aggregate to use when aggregating over a numeric column
     sample_size
         Sample size for the scatter plot
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-arguments,too-many-locals
 
-    xdtype, ydtype = df[x].dtype, df[y].dtype
+    xtype = detect_dtype(df[x], dtype)
+    ytype = detect_dtype(df[y], dtype)
     if (
-        is_categorical(xdtype)
-        and is_numerical(ydtype)
-        or is_numerical(xdtype)
-        and is_categorical(ydtype)
+        is_dtype(xtype, Nominal())
+        and is_dtype(ytype, Continuous())
+        or is_dtype(xtype, Continuous())
+        and is_dtype(ytype, Nominal())
     ):
-        x, y = (x, y) if is_categorical(xdtype) else (y, x)
+        x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
         df = df[[x, y]].dropna()
         df[x] = df[x].apply(str, meta=(x, str))
         # box plot per group
-        boxdata = calc_box(df, bins, ngroups, largest)
+        boxdata = calc_box(df, bins, ngroups, largest, dtype)
         # histogram per group
         hisdata = calc_hist_by_group(df, bins, ngroups, largest)
         return Intermediate(
             x=x, y=y, boxdata=boxdata, histdata=hisdata, visual_type="cat_and_num_cols",
         )
     elif (
-        is_datetime(xdtype)
-        and is_numerical(ydtype)
-        or is_numerical(xdtype)
-        and is_datetime(ydtype)
+        is_dtype(xtype, DateTime())
+        and is_dtype(ytype, Continuous())
+        or is_dtype(xtype, Continuous())
+        and is_dtype(ytype, DateTime())
     ):
-        x, y = (x, y) if is_datetime(xdtype) else (y, x)
+        x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
         df = df[[x, y]].dropna()
         dtnum: List[Any] = []
         # line chart
@@ -360,12 +406,12 @@ def compute_bivariate(
             visual_type="dt_and_num_cols",
         )
     elif (
-        is_datetime(xdtype)
-        and is_categorical(ydtype)
-        or is_categorical(xdtype)
-        and is_datetime(ydtype)
+        is_dtype(xtype, DateTime())
+        and is_dtype(ytype, Nominal())
+        or is_dtype(xtype, Nominal())
+        and is_dtype(ytype, DateTime())
     ):
-        x, y = (x, y) if is_datetime(xdtype) else (y, x)
+        x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
         df = df[[x, y]].dropna()
         df[y] = df[y].apply(str, meta=(y, str))
         dtcat: List[Any] = []
@@ -383,7 +429,7 @@ def compute_bivariate(
             stackdata=dtcat[1],
             visual_type="dt_and_cat_cols",
         )
-    elif is_categorical(xdtype) and is_categorical(ydtype):
+    elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
         df = df[[x, y]].dropna()
         df[x] = df[x].apply(str, meta=(x, str))
         df[y] = df[y].apply(str, meta=(y, str))
@@ -401,7 +447,7 @@ def compute_bivariate(
             heatmapdata=heatmapdata,
             visual_type="two_cat_cols",
         )
-    elif is_numerical(xdtype) and is_numerical(ydtype):
+    elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
         df = df[[x, y]].dropna()
         # scatter plot
         scatdata = calc_scatter(df, sample_size)
@@ -431,10 +477,10 @@ def compute_trivariate(
     largest: bool,
     timeunit: str,
     agg: str,
+    dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """
     Compute functions for plot(df, x, y, z)
-
     Parameters
     ----------
     df
@@ -463,25 +509,52 @@ def compute_trivariate(
         time unit such that the resulting number of groups is closest to 15.
     agg
         Specify the aggregate to use when aggregating over a numeric column
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-arguments
 
-    xdtype, ydtype, zdtype = df[x].dtype, df[y].dtype, df[z].dtype
+    xtype = detect_dtype(df[x], dtype)
+    ytype = detect_dtype(df[y], dtype)
+    ztype = detect_dtype(df[z], dtype)
 
-    if is_datetime(xdtype) and is_categorical(ydtype) and is_numerical(zdtype):
+    if (
+        is_dtype(xtype, DateTime())
+        and is_dtype(ytype, Nominal())
+        and is_dtype(ztype, Continuous())
+    ):
         y, z = z, y
-    elif is_numerical(xdtype) and is_datetime(ydtype) and is_categorical(zdtype):
+    elif (
+        is_dtype(xtype, Continuous())
+        and is_dtype(ytype, DateTime())
+        and is_dtype(ztype, Nominal())
+    ):
         x, y = y, x
-    elif is_numerical(xdtype) and is_categorical(ydtype) and is_datetime(zdtype):
+    elif (
+        is_dtype(xtype, Continuous())
+        and is_dtype(ytype, Nominal())
+        and is_dtype(ztype, DateTime())
+    ):
         x, y, z = z, x, y
-    elif is_categorical(xdtype) and is_datetime(ydtype) and is_numerical(zdtype):
+    elif (
+        is_dtype(xtype, Nominal())
+        and is_dtype(ytype, DateTime())
+        and is_dtype(ztype, Continuous())
+    ):
         x, y, z = y, z, x
-    elif is_categorical(xdtype) and is_numerical(ydtype) and is_datetime(zdtype):
+    elif (
+        is_dtype(xtype, Nominal())
+        and is_dtype(ytype, Continuous())
+        and is_dtype(ztype, DateTime())
+    ):
         x, z = z, x
     assert (
-        is_datetime(df[x].dtype)
-        and is_numerical(df[y].dtype)
-        and is_categorical(df[z].dtype)
+        is_dtype(xtype, DateTime())
+        and is_dtype(ytype, Continuous())
+        and is_dtype(ztype, Nominal())
     ), "x, y, and z must be one each of type datetime, numerical, and categorical"
     df = df[[x, y, z]].dropna()
     df[z] = df[z].apply(str, meta=(z, str))
@@ -513,7 +586,6 @@ def calc_line_dt(
     by the time groups. If df contains a datetime, categorical, and numerical column,
     it will compute the aggregate of the numerical column for values in the categorical
     column grouped by time.
-
     Parameters
     ----------
     df
@@ -586,7 +658,6 @@ def calc_box_dt(
 ) -> Tuple[pd.DataFrame, List[str], List[float], str]:
     """
     Calculate a box plot with date on the x axis.
-
     Parameters
     ----------
     df
@@ -619,7 +690,6 @@ def calc_stacked_dt(
 ) -> Tuple[pd.DataFrame, Dict[str, int], str]:
     """
     Calculate a stacked bar chart with date on the x axis
-
     Parameters
     ----------
     df
@@ -664,7 +734,6 @@ def calc_bar_pie(
 ) -> Tuple[pd.DataFrame, int, float]:
     """
     Calculates the group counts given a series.
-
     Parameters
     ----------
     srs
@@ -674,7 +743,6 @@ def calc_bar_pie(
     largest
         If true, show the groups with the largest count,
         else show the groups with the smallest count
-
     Returns
     -------
     Tuple[pd.DataFrame, float]
@@ -703,14 +771,12 @@ def calc_bar_pie(
 def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
     """
     Calculate a histogram over a given series.
-
     Parameters
     ----------
     srs
         One numerical column over which to compute the histogram
     bins
         Number of bins to use in the histogram
-
     Returns
     -------
     Tuple[pd.DataFrame, float]:
@@ -740,14 +806,12 @@ def calc_hist_kde(
     """
     Calculate a density histogram and its corresponding kernel density
     estimate over a given series. The kernel is guassian.
-
     Parameters
     ----------
     data
         One numerical column over which to compute the histogram and kde
     bins
         Number of bins to use in the histogram
-
     Returns
     -------
     Tuple[pd.DataFrame, np.ndarray, np.ndarray]
@@ -777,12 +841,10 @@ def calc_hist_kde(
 def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray, float, float]:
     """
     Calculate QQ plot given a series.
-
     Parameters
     ----------
     srs
         One numerical column from which to compute the quantiles
-
     Returns
     -------
     Tuple[np.ndarray, np.ndarray]
@@ -795,14 +857,17 @@ def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray, float, float]:
 
 
 def calc_box(
-    df: dd.DataFrame, bins: int, ngroups: int = 10, largest: bool = True,
+    df: dd.DataFrame,
+    bins: int,
+    ngroups: int = 10,
+    largest: bool = True,
+    dtype: Optional[DTypeDef] = None,
 ) -> Tuple[pd.DataFrame, List[str], List[float], Optional[Dict[str, int]]]:
     """
     Compute a box plot over either
         1) the values in one column
         2) the values corresponding to groups in another column
         3) the values corresponding to binning another column
-
     Parameters
     ----------
     df
@@ -813,7 +878,11 @@ def calc_box(
         Number of groups to show if df has a categorical and numerical column
     largest
         When calculating a box plot per group, select the largest or smallest groups
-
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     Returns
     -------
     Tuple[pd.DataFrame, List[str], List[float], Dict[str, int]]
@@ -829,7 +898,9 @@ def calc_box(
         df = _calc_box_stats(df[x], x)
     else:
         y = df.columns[1]
-        if is_numerical(df[x].dtype) and is_numerical(df[y].dtype):
+        if is_dtype(detect_dtype(df[x], dtype), Continuous()) and is_dtype(
+            detect_dtype(df[y], dtype), Continuous()
+        ):
             minv, maxv, cnt = dask.compute(df[x].min(), df[x].max(), df[x].nunique())
             bins = cnt if cnt < bins else bins
             endpts = np.linspace(minv, maxv, num=bins + 1)
@@ -838,12 +909,12 @@ def calc_box(
                 [
                     _calc_box_stats(
                         df[(df[x] >= endpts[i]) & (df[x] < endpts[i + 1])][y],
-                        f"[{endpts[i]},{endpts[i+1]})",
+                        f"[{endpts[i]},{endpts[i + 1]})",
                     )
                     if i != len(endpts) - 2
                     else _calc_box_stats(
                         df[(df[x] >= endpts[i]) & (df[x] <= endpts[i + 1])][y],
-                        f"[{endpts[i]},{endpts[i+1]}]",
+                        f"[{endpts[i]},{endpts[i + 1]}]",
                     )
                     for i in range(len(endpts) - 1)
                 ],
@@ -875,7 +946,6 @@ def calc_hist_by_group(
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Compute a histogram over the values corresponding to the groups in another column
-
     Parameters
     ----------
     df
@@ -886,7 +956,6 @@ def calc_hist_by_group(
         Number of groups to show from the categorical column
     largest
         Select the largest or smallest groups
-
     Returns
     -------
     Tuple[pd.DataFrame, Dict[str, int]]
@@ -919,14 +988,12 @@ def calc_hist_by_group(
 def calc_scatter(df: dd.DataFrame, sample_size: int) -> pd.DataFrame:
     """
     Extracts the points to use in a scatter plot
-
     Parameters
     ----------
     df
         Dataframe with two numerical columns
     sample_size
         the number of points to randomly sample in the scatter plot
-
     Returns
     -------
     pd.DataFrame
@@ -942,7 +1009,6 @@ def calc_nested(
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a nested bar chart of the counts of two columns
-
     Parameters
     ----------
     df
@@ -951,7 +1017,6 @@ def calc_nested(
         Number of groups to show from the first column
     nsubgroups
         Number of subgroups (from the second column) to show in each group
-
     Returns
     -------
     Tuple[pd.DataFrame, Dict[str, int]]
@@ -986,7 +1051,6 @@ def calc_stacked(
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a stacked bar chart of the counts of two columns
-
     Parameters
     ----------
     df
@@ -995,7 +1059,6 @@ def calc_stacked(
         number of groups to show from the first column
     nsubgroups
         number of subgroups (from the second column) to show in each group
-
     Returns
     -------
     Tuple[pd.DataFrame, Dict[str, int]]
@@ -1027,7 +1090,6 @@ def calc_heatmap(
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     """
     Calculate a heatmap of the counts of two columns
-
     Parameters
     ----------
     df
@@ -1036,7 +1098,6 @@ def calc_heatmap(
         Number of groups to show from the first column
     nsubgroups
         Number of subgroups (from the second column) to show in each group
-
     Returns
     -------
     Tuple[pd.DataFrame, Dict[str, int]]
@@ -1068,12 +1129,10 @@ def calc_stats_num(
 ) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
     """
     Calculate stats from a numerical column
-
     Parameters
     ----------
     srs
         a numerical column
-
     Returns
     -------
     Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]
@@ -1131,12 +1190,10 @@ def calc_stats_num(
 def calc_stats_cat(srs: dd.Series) -> Dict[str, str]:
     """
     Calculate stats from a categorical column
-
     Parameters
     ----------
     srs
         a categorical column
-
     Returns
     -------
     Dict[str, str]
@@ -1159,12 +1216,10 @@ def calc_stats_cat(srs: dd.Series) -> Dict[str, str]:
 def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
     """
     Calculate stats from a datetime column
-
     Parameters
     ----------
     srs
         a datetime column
-
     Returns
     -------
     Dict[str, str]
@@ -1305,7 +1360,9 @@ def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
     """
     bins_arr = np.round(bins_arr, 3)
     bins_arr = [int(val) if val.is_integer() else val for val in bins_arr]
-    intervals = [f"[{bins_arr[i]}, {bins_arr[i+1]})" for i in range(len(bins_arr) - 2)]
+    intervals = [
+        f"[{bins_arr[i]}, {bins_arr[i + 1]})" for i in range(len(bins_arr) - 2)
+    ]
     intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
     return intervals
 

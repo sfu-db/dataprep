@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...eda import plot_missing
+from ...eda.dtypes import Numerical
 from ...eda.missing import compute_missing, render_missing
 from ...eda.utils import to_dask
 
@@ -20,7 +20,6 @@ def simpledf() -> dd.DataFrame:
     )
 
     df.columns = ["a", "b", "c", "d"]
-    df["a"] = df["a"].astype("object")
     idx = np.arange(1000)
     np.random.shuffle(idx)
     df.iloc[idx[:500], 0] = None
@@ -55,8 +54,8 @@ def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
     render_missing(itmdt)
 
 
-def test_column_change_type(simpledf: dd.DataFrame) -> None:
-    itmdt = compute_missing(simpledf, x="b")
+def test_specify_column_type(simpledf: dd.DataFrame) -> None:
+    itmdt = compute_missing(simpledf, x="b", dtype={"a": Numerical()})
     render_missing(itmdt)
 
 

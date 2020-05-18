@@ -25,7 +25,7 @@ from bokeh.palettes import Category10, Greys256  # type: ignore
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
-from ..dtypes import is_categorical, is_numerical
+from ..dtypes import is_dtype, Nominal, Continuous
 from ..intermediate import Intermediate, ColumnMetadata
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
@@ -38,7 +38,7 @@ __all__ = ["render_missing"]
 
 
 def render_missing(
-    itmdt: Intermediate, plot_width: int = 500, plot_height: int = 500
+    itmdt: Intermediate, plot_width: int = 500, plot_height: int = 500,
 ) -> LayoutDOM:
     """
     @Jinglin write here
@@ -105,12 +105,12 @@ def render_dist(
 
 
 def render_hist(
-    df: pd.DataFrame, x: str, meta: ColumnMetadata, plot_width: int, plot_height: int
+    df: pd.DataFrame, x: str, meta: ColumnMetadata, plot_width: int, plot_height: int,
 ) -> Figure:
     """
     Render a histogram
     """
-    if is_categorical(meta["dtype"]):
+    if is_dtype(meta["dtype"], Nominal()):
         tooltips = [
             (x, "@x"),
             ("Count", "@count"),
@@ -130,7 +130,7 @@ def render_hist(
 
     cmapper = CategoricalColorMapper(palette=Category10[3], factors=LABELS)
 
-    if is_categorical(df["x"].dtype):
+    if is_dtype(meta["dtype"], Nominal()):
         radius = 0.99
 
         # Inputs of FactorRange() have to be sequence of strings,
@@ -303,7 +303,7 @@ def render_missing_spectrum(
 
 
 def render_missing_impact_1vn(
-    itmdt: Intermediate, plot_width: int, plot_height: int
+    itmdt: Intermediate, plot_width: int, plot_height: int,
 ) -> Tabs:
     """
     Render the plot from `plot_missing(df, "x")`
@@ -331,7 +331,7 @@ def render_missing_impact_1vn(
 
 
 def render_missing_impact_1v1(
-    itmdt: Intermediate, plot_width: int, plot_height: int
+    itmdt: Intermediate, plot_width: int, plot_height: int,
 ) -> Union[Tabs, Figure]:
     """
     Render the plot from `plot_missing(df, "x", "y")`
@@ -339,7 +339,7 @@ def render_missing_impact_1v1(
     x, y = itmdt["x"], itmdt["y"]
     meta = itmdt["meta"]
 
-    if is_numerical(meta["dtype"]):
+    if is_dtype(meta["dtype"], Continuous()):
         panels = []
 
         fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height)
