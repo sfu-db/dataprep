@@ -2,7 +2,7 @@
 This module implements the plot(df) function.
 """
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Dict
 
 import dask.dataframe as dd
 import pandas as pd
@@ -11,6 +11,7 @@ from bokeh.io import show
 from .compute import compute
 from .render import render
 from ..report import Report
+from ..dtypes import DTypeDef
 
 __all__ = ["plot", "compute", "render"]
 
@@ -31,6 +32,7 @@ def plot(
     value_range: Optional[Tuple[float, float]] = None,
     yscale: str = "linear",
     tile_size: Optional[float] = None,
+    dtype: Optional[DTypeDef] = None,
 ) -> Report:
     """Generates plots for exploratory data analysis.
 
@@ -109,6 +111,11 @@ def plot(
     tile_size: Optional[float], default None
         Size of the tile for the hexbin plot. Measured from the middle
         of a hexagon to its left or right corner.
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
 
     Examples
     --------
@@ -119,7 +126,7 @@ def plot(
     >>> plot(iris, "petal_length", bins=20, value_range=(1,5))
     >>> plot(iris, "petal_width", "species")
     """
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,line-too-long
 
     intermediate = compute(
         df,
@@ -134,6 +141,7 @@ def plot(
         agg=agg,
         sample_size=sample_size,
         value_range=value_range,
+        dtype=dtype,
     )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
 

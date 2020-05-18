@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 
 from ...eda import plot
+from ...eda.dtypes import Nominal
 from ...eda.utils import to_dask
 
 LOGGER = logging.getLogger(__name__)
@@ -67,3 +68,8 @@ def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
 
 def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "f")
+
+
+def test_specify_column_type(simpledf: dd.DataFrame) -> None:
+    plot(simpledf, dtype={"a": Nominal()})
+    plot(simpledf, dtype=Nominal())
