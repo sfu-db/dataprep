@@ -3,7 +3,7 @@ from datetime import timedelta as TimeDelta
 
 import pandas as pd
 
-from ...eda.dtypes import is_categorical, is_numerical
+from ...eda.dtypes import is_nominal, is_continuous
 
 
 def test_dtypes() -> None:
@@ -11,7 +11,7 @@ def test_dtypes() -> None:
     df["C"] = df["C"].astype("category")
 
     for col in df.columns:
-        assert is_categorical(df[col].dtype)
+        assert is_nominal(df[col].dtype)
 
     df = pd.DataFrame(
         data=[[complex(3, 1), 1, 1.1, TimeDelta(1), DateTime.now(),]],
@@ -19,4 +19,4 @@ def test_dtypes() -> None:
     )
 
     for col in df.columns:
-        assert is_numerical(df[col].dtype)
+        assert is_continuous(df[col].dtype)
