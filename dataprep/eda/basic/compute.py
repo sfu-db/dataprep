@@ -9,7 +9,7 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from scipy.stats import gaussian_kde, norm
+from scipy.stats import gaussian_kde, norm, kurtosis, skew, median_absolute_deviation
 
 from ...errors import UnreachableError
 from ..dtypes import DType, is_categorical, is_numerical, is_datetime
@@ -200,12 +200,18 @@ def compute_univariate(
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
     """
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals, too-many-arguments
 
     if is_categorical(df[x].dtype):
         # data for bar and pie charts
-        data = dask.compute(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
-        return Intermediate(col=x, data=data[0], visual_type="categorical_column")
+        data_cat: List[Any] = []
+        data_cat.append(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
+        # stats
+        data_cat.append(dask.delayed(calc_stats_cat)(df[x]))
+        data, statsdata_cat = dask.compute(*data_cat)
+        return Intermediate(
+            col=x, data=data, statsdata=statsdata_cat, visual_type="categorical_column",
+        )
     elif is_numerical(df[x].dtype):
         if value_range is not None:
             if (
@@ -216,26 +222,46 @@ def compute_univariate(
                 df = df[df[x].between(value_range[0], value_range[1])]
             else:
                 print("Invalid range of values for this column", file=stderr)
+        data_num: List[Any] = []
         # qq plot
         qqdata = calc_qqnorm(df[x].dropna())
-        # histogram
-        histdata = dask.compute(dask.delayed(calc_hist)(df[x], bins))
         # kde plot
         kdedata = calc_hist_kde(df[x].dropna().values, bins)
         # box plot
-        boxdata = calc_box(df[[x]].dropna(), bins)
+        boxdata = calc_box(df[[x]].dropna(), bins, qqdata[0])
+        # histogram
+        data_num.append(dask.delayed(calc_hist)(df[x], bins))
+        # stats
+        data_num.append(
+            dask.delayed(calc_stats_num)(
+                df[x],
+                mean=qqdata[2],
+                std=qqdata[3],
+                min=kdedata[3],
+                max=kdedata[4],
+                quantile=qqdata[0],
+            )
+        )
+        histdata, statsdata_num = dask.compute(*data_num)
         return Intermediate(
             col=x,
-            histdata=histdata[0],
+            histdata=histdata,
             kdedata=kdedata,
             qqdata=qqdata,
             boxdata=boxdata,
+            statsdata=statsdata_num,
             visual_type="numerical_column",
         )
     elif is_datetime(df[x].dtype):
+        data_dt: List[Any] = []
         # line chart
-        data = dask.compute(dask.delayed(calc_line_dt)(df[[x]], timeunit))
-        return Intermediate(col=x, data=data[0], visual_type="datetime_column")
+        data_dt.append(dask.delayed(calc_line_dt)(df[[x]], timeunit))
+        # stats
+        data_dt.append(dask.delayed(calc_stats_dt)(df[x]))
+        data, statsdata_dt = dask.compute(*data_dt)
+        return Intermediate(
+            col=x, data=data, statsdata=statsdata_dt, visual_type="datetime_column",
+        )
     else:
         raise UnreachableError
 
@@ -705,7 +731,7 @@ def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
 
 def calc_hist_kde(
     data: da.Array, bins: int,
-) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray, float, float]:
     """
     Calculate a density histogram and its corresponding kernel density
     estimate over a given series. The kernel is guassian.
@@ -740,10 +766,10 @@ def calc_hist_kde(
         pdf = np.zeros(1000, dtype=np.float64)
     else:
         pdf = gaussian_kde(data.compute())(pts_rng)
-    return hist_df, pts_rng, pdf
+    return hist_df, pts_rng, pdf, minv, maxv
 
 
-def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray]:
+def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray, float, float]:
     """
     Calculate QQ plot given a series.
 
@@ -760,11 +786,11 @@ def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray]:
     q_range = np.linspace(0.01, 0.99, 100)
     actual_qs, mean, std = dask.compute(srs.quantile(q_range), srs.mean(), srs.std())
     theory_qs = np.sort(np.asarray(norm.ppf(q_range, mean, std)))
-    return actual_qs, theory_qs
+    return actual_qs, theory_qs, mean, std
 
 
 def calc_box(
-    df: dd.DataFrame, bins: int, ngroups: int = 10, largest: bool = True
+    df: dd.DataFrame, bins: int, ngroups: int = 10, largest: bool = True,
 ) -> Tuple[pd.DataFrame, List[str], List[float], Optional[Dict[str, int]]]:
     """
     Compute a box plot over either
@@ -1032,6 +1058,129 @@ def calc_heatmap(
     return df_res, grp_cnt_stats
 
 
+def calc_stats_num(
+    srs: dd.Series, **kwargs: Any,
+) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
+    """
+    Calculate stats from a numerical column
+
+    Parameters
+    ----------
+    srs
+        a numerical column
+
+    Returns
+    -------
+    Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]
+        Dictionaries that contain Overview, Quantiles and Descriptives
+    """
+    size = len(srs)  # include nan
+    count = srs.count()  # exclude nan
+    uniq_count = srs.nunique()
+    inf_count = ((srs == np.inf) | (srs == -np.inf)).sum()
+    non_zero_count = np.count_nonzero(srs)
+    overview_dict = {
+        "Distinct Count": uniq_count,
+        "Unique (%)": uniq_count / count,
+        "Missing": size - count,
+        "Missing (%)": 1 - (count / size),
+        "Infinite": inf_count,
+        "Infinite (%)": inf_count / size,
+        "Mean": kwargs["mean"],
+        "Minimum": kwargs["min"],
+        "Maximum": kwargs["max"],
+        "Zeros": size - non_zero_count,
+        "Zeros (%)": 1 - non_zero_count / size,
+        "Memory Size": srs.memory_usage(),
+    }
+    quantiles_dict = {
+        "Minimum": kwargs["min"],
+        "5-th Percentile": kwargs["quantile"].iloc[5],
+        "Q1": kwargs["quantile"].iloc[25],
+        "Median": kwargs["quantile"].iloc[50],
+        "Q3": kwargs["quantile"].iloc[75],
+        "95-th Percentile": kwargs["quantile"].iloc[95],
+        "Maximum": kwargs["max"],
+        "Range": kwargs["max"] - kwargs["min"],
+        "IQR": kwargs["quantile"].iloc[75] - kwargs["quantile"].iloc[25],
+    }
+    descriptives_dict = {
+        "Standard Deviation": kwargs["std"],
+        "Coefficient of Variation": kwargs["std"] / kwargs["mean"],
+        "Kurtosis": float(kurtosis(srs, nan_policy="omit")),
+        "Mean": kwargs["mean"],
+        "Median Absolute Deviation": float(
+            median_absolute_deviation(srs, nan_policy="omit")
+        ),
+        "Skewness": float(skew(srs, nan_policy="omit")),
+        "Sum": kwargs["mean"] * count,
+        "Variance": kwargs["std"] ** 2,
+    }
+    return (
+        {k: _format_values(k, v) for k, v in overview_dict.items()},
+        {k: _format_values(k, v) for k, v in quantiles_dict.items()},
+        {k: _format_values(k, v) for k, v in descriptives_dict.items()},
+    )
+
+
+def calc_stats_cat(srs: dd.Series) -> Dict[str, str]:
+    """
+    Calculate stats from a categorical column
+
+    Parameters
+    ----------
+    srs
+        a categorical column
+
+    Returns
+    -------
+    Dict[str, str]
+        Dictionary that contains Overview
+    """
+    size = len(srs)  # include nan
+    count = srs.count()  # exclude nan
+    uniq_count = srs.nunique()
+    overview_dict = {
+        "Distinct Count": uniq_count,
+        "Unique (%)": uniq_count / count,
+        "Missing": size - count,
+        "Missing (%)": 1 - (count / size),
+        "Memory Size": srs.memory_usage(),
+    }
+
+    return {k: _format_values(k, v) for k, v in overview_dict.items()}
+
+
+def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
+    """
+    Calculate stats from a datetime column
+
+    Parameters
+    ----------
+    srs
+        a datetime column
+
+    Returns
+    -------
+    Dict[str, str]
+        Dictionary that contains Overview
+    """
+    size = len(srs)  # include nan
+    count = srs.count()  # exclude nan
+    uniq_count = srs.nunique()
+    overview_dict = {
+        "Distinct Count": uniq_count,
+        "Unique (%)": uniq_count / count,
+        "Missing": size - count,
+        "Missing (%)": 1 - (count / size),
+        "Memory Size": srs.memory_usage(),
+        "Minimum": srs.min(),
+        "Maximum": srs.max(),
+    }
+
+    return {k: _format_values(k, v) for k, v in overview_dict.items()}
+
+
 def _calc_box_stats(grp_srs: dd.Series, grp: str, dlyd: bool = False) -> pd.DataFrame:
     """
     Auxiliary function to calculate the Tukey box plot statistics
@@ -1139,3 +1288,38 @@ def _get_timeunit(min_time: pd.Timestamp, max_time: pd.Timestamp, dflt: int) -> 
         prev_unit = unit
 
     return prev_unit
+
+
+def _format_values(key: str, value: Any) -> str:
+    if not isinstance(value, (int, float)):
+        # if value is a time
+        return str(value)
+    if "Memory" in key:
+        # for memory usage
+        ind = 0
+        unit = dict(enumerate(["B", "KB", "MB", "GB", "TB"], 0))
+        while value > 1024:
+            value /= 1024
+            ind += 1
+        return f"{value:.1f} {unit[ind]}"
+
+    if (value * 10) % 10 == 0:
+        # if value is int but in a float form with 0 at last digit
+        value = int(value)
+        if abs(value) >= 1000000:
+            return f"{value:.5g}"
+    elif abs(value) >= 1000000 or abs(value) < 0.001:
+        value = f"{value:.5g}"
+    elif abs(value) >= 1:
+        # eliminate trailing zeros
+        pre_value = float(f"{value:.4f}")
+        value = int(pre_value) if (pre_value * 10) % 10 == 0 else pre_value
+    elif 0.001 <= abs(value) < 1:
+        value = f"{value:.4g}"
+    else:
+        value = str(value)
+
+    if "%" in key:
+        # for percentage, only use digits before notation sign for extreme small number
+        value = f"{float(value):.1%}"
+    return str(value)
