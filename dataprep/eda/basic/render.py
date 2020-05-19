@@ -22,6 +22,7 @@ from bokeh.models import (
     ColorBar,
     FactorRange,
     CustomJSHover,
+    Div,
 )
 from bokeh.plotting import Figure, gridplot, figure
 from bokeh.transform import cumsum, linear_cmap, transform
@@ -166,6 +167,47 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
         fig.yaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
         fig.yaxis.major_label_text_font_size = "10pt"
         fig.yaxis.major_label_standoff = 5
+
+
+def _create_table_row(key: str, value: str, highlight: bool = False) -> str:
+    """
+    Create table row for stats panel
+    """
+    template_stats_data = """
+    <tr style="border-bottom: 1px solid;">
+        <th style="text-align: left">{key}</th>
+        <td style="text-align: left">{value}</td>
+    </tr>
+    """
+    template_stats_data_red = """
+    <tr style="color: #f00; border-bottom: 1px solid;">
+        <th style="text-align: left">{key}</th>
+        <td style="text-align: left">{value}</td>\
+    </tr>
+    """
+    return (
+        template_stats_data_red.format(key=key, value=value)
+        if highlight
+        else template_stats_data.format(key=key, value=value)
+    )
+
+
+def _sci_notation_superscript(value: str) -> str:
+    """
+    Strip off character e in scientific notation to a superscript tag
+    """
+    if "e+" in value:
+        raw_string = f"{float(value):.4e}"
+        e_loc = raw_string.find("e")
+        sign = raw_string[e_loc + 1]
+        exp = (
+            f"<sup>{raw_string[e_loc + 2 :]}</sup>"
+            if sign == "+"
+            else f"<sup>-{raw_string[e_loc + 2 :]}</sup>"
+        )
+        raw_string = raw_string.replace("e", "x10")
+        value = raw_string[: e_loc + 3] + exp
+    return value
 
 
 def bar_viz(
@@ -984,6 +1026,135 @@ def dt_multiline_viz(
     return Panel(child=fig, title="line chart")
 
 
+def stats_viz_num(
+    data: Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]],
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
+    """
+    Render statistics panel for numerical data
+    """
+    ov_content = ""
+    qs_content = (
+        '<h4 style="text-align:center; margin:1em auto 0.2em;">Quantile Statistics</h4>'
+    )
+    ds_content = '<h4 style="text-align:center; margin:1em auto 0.2em;">Descriptive Statistics</h4>'
+    for key, value in data[0].items():
+        value = _sci_notation_superscript(value)
+        if "Distinct" in key and float(value) > 50:
+            ov_content += _create_table_row(key, value, True)
+        elif "Unique" in key and float(value.replace("%", "")) == 100:
+            ov_content += _create_table_row(key, value, True)
+        elif (
+            any(x in key for x in ["Missing", "Zeros", "Infinite"])
+            and float(value.replace("%", "")) != 0
+        ):
+            ov_content += _create_table_row(key, value, True)
+        else:
+            ov_content += _create_table_row(key, value)
+    for key, value in data[1].items():
+        value = _sci_notation_superscript(value)
+        qs_content += _create_table_row(key, value)
+    for key, value in data[2].items():
+        value = _sci_notation_superscript(value)
+        if "Skewness" in key and float(value) > 20:
+            ds_content += _create_table_row(key, value, True)
+        else:
+            ds_content += _create_table_row(key, value)
+
+    ov_content = f"""
+    <h4 style="text-align: center; margin:0 auto 0.2em;">Overview</h4>
+    <div style="columns: 2">
+    <table style="width: 100%; table-layout: auto; font-size:11px;">
+        <tbody>{ov_content}</tbody>
+    </table>
+    </div>
+    """
+    qs_content = f"""
+    <div style="flex: 50%; margin-right: 6px;">
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
+            <tbody>{qs_content}</tbody>
+        </table>
+    </div>
+    """
+    ds_content = f"""
+    <div style="flex: 50%; margin-right: 6px;">
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
+            <tbody>{ds_content}</tbody>
+        </table>
+    </div>
+    """
+    container = (
+        f'{ov_content}<div style="display: flex;">{qs_content}{ds_content}</div>'
+    )
+
+    div = Div(
+        text=container,
+        width=plot_width,
+        height=plot_height + 20,
+        style={"width": "100%"},
+    )
+    return Panel(child=div, title="stats")
+
+
+def stats_viz_cat(data: Dict[str, str], plot_width: int, plot_height: int) -> Panel:
+    """
+    Render statistics panel for categorical data
+    """
+    ov_content = ""
+    for key, value in data.items():
+        value = _sci_notation_superscript(value)
+        if "Distinct" in key and float(value) > 50:
+            ov_content += _create_table_row(key, value, True)
+        elif "Unique" in key and float(value.replace("%", "")) == 100:
+            ov_content += _create_table_row(key, value, True)
+        elif "Missing" in key and float(value.replace("%", "")) != 0:
+            ov_content += _create_table_row(key, value, True)
+        else:
+            ov_content += _create_table_row(key, value)
+    ov_content = f"""
+    <h3 style="text-align: center;">Overview</h3>
+    <div">
+        <table style="width: 100%; table-layout: auto;">
+            <tbody>{ov_content}</tbody>
+        </table>
+    </div>
+    """
+    div = Div(
+        text=ov_content, width=plot_width, height=plot_height, style={"width": "100%"}
+    )
+    return Panel(child=div, title="stats")
+
+
+def stats_viz_dt(data: Dict[str, str], plot_width: int, plot_height: int) -> Panel:
+    """
+    Render statistics panel for datetime data
+    """
+    ov_content = ""
+    for key, value in data.items():
+        value = _sci_notation_superscript(value)
+        if "Distinct" in key and float(value) > 50:
+            ov_content += _create_table_row(key, value, True)
+        elif "Unique" in key and float(value.replace("%", "")) == 100:
+            ov_content += _create_table_row(key, value, True)
+        elif "Missing" in key and float(value.replace("%", "")) != 0:
+            ov_content += _create_table_row(key, value, True)
+        else:
+            ov_content += _create_table_row(key, value)
+    ov_content = f"""
+    <h3 style="text-align: center;">Overview</h3>
+    <div">
+        <table style="width: 100%; table-layout: auto;">
+            <tbody>{ov_content}</tbody>
+        </table>
+    </div>
+    """
+    div = Div(
+        text=ov_content, width=plot_width, height=plot_height, style={"width": "100%"}
+    )
+    return Panel(child=div, title="stats")
+
+
 def render_basic(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
 ) -> Box:
@@ -1025,6 +1196,8 @@ def render_cat(
     Render plots from plot(df, x) when x is a categorical column
     """
     tabs: List[Panel] = []
+    osd = itmdt["statsdata"]
+    tabs.append(stats_viz_cat(osd, plot_width, plot_height))
     df, total_grps, miss_pct = itmdt["data"]
     fig = bar_viz(
         df[:-1],
@@ -1047,25 +1220,28 @@ def render_num(
 ) -> Tabs:
     """
     Render plots from plot(df, x) when x is a numerical column
-    """
+    """  # pylint: disable=too-many-locals
     tabs: List[Panel] = []
+    osd, qsd, dsd = itmdt["statsdata"]
+    tabs.append(stats_viz_num((osd, qsd, dsd), plot_width, plot_height))
     df, miss_pct = itmdt["histdata"]
     fig = hist_viz(df, miss_pct, itmdt["col"], yscale, plot_width, plot_height, True)
     tabs.append(Panel(child=fig, title="histogram"))
-    df, pts_rng, pdf = itmdt["kdedata"]
+    df, pts_rng, pdf, _, _ = itmdt["kdedata"]
     if np.any(pdf):
         tabs.append(
             hist_kde_viz(
                 df, pts_rng, pdf, itmdt["col"], yscale, plot_width, plot_height
             )
         )
-    actual_qs, theory_qs = itmdt["qqdata"]
+    actual_qs, theory_qs, _, _ = itmdt["qqdata"]
     if np.any(theory_qs[~np.isnan(theory_qs)]):
         tabs.append(
             qqnorm_viz(actual_qs, theory_qs, itmdt["col"], plot_width, plot_height)
         )
     df, outx, outy, _ = itmdt["boxdata"]
     tabs.append(box_viz(df, outx, outy, itmdt["col"], plot_width, plot_height))
+
     tabs = Tabs(tabs=tabs)
     return tabs
 
@@ -1077,6 +1253,8 @@ def render_dt(
     Render plots from plot(df, x) when x is a numerical column
     """
     tabs: List[Panel] = []
+    osd = itmdt["statsdata"]
+    tabs.append(stats_viz_dt(osd, plot_width, plot_height))
     df, timeunit, miss_pct = itmdt["data"]
     fig = dt_line_viz(
         df, itmdt["col"], timeunit, yscale, plot_width, plot_height, True, miss_pct
