@@ -1,6 +1,6 @@
 """
 This module implements the intermediates computation for plot(df) function.
-"""
+"""  # pylint: disable=too-many-lines
 from sys import stderr
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
@@ -88,209 +88,378 @@ def compute(
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
     """
-    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-return-statements,too-many-statements
-    # pylint: disable=no-else-return
 
     df = to_dask(df)
 
     if not any((x, y, z)):
-        datas: List[Any] = []
-        col_names_dtypes: List[Tuple[str, DType]] = []
-        for column in df.columns:
-            if is_categorical(df[column].dtype):
-                # bar chart
-                datas.append(dask.delayed(calc_bar_pie)(df[column], ngroups, largest))
-                col_names_dtypes.append((column, DType.Categorical))
-            elif is_numerical(df[column].dtype):
-                # histogram
-                datas.append(dask.delayed(calc_hist)(df[column], bins))
-                col_names_dtypes.append((column, DType.Numerical))
-            elif is_datetime(df[column].dtype):
-                datas.append(dask.delayed(calc_line_dt)(df[[column]], timeunit))
-                col_names_dtypes.append((column, DType.DateTime))
-            else:
-                raise UnreachableError
-        datas = dask.compute(*datas)
-        data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas)]
-        return Intermediate(data=data, visual_type="basic_grid")
+        return compute_overview(df, bins, ngroups, largest, timeunit)
 
-    elif sum(v is None for v in (x, y, z)) == 2:
+    if sum(v is None for v in (x, y, z)) == 2:
         col: str = cast(str, x or y or z)
-        if is_categorical(df[col].dtype):
-            # data for bar and pie charts
-            data = dask.compute(dask.delayed(calc_bar_pie)(df[col], ngroups, largest))
-            return Intermediate(col=col, data=data[0], visual_type="categorical_column")
-        elif is_numerical(df[col].dtype):
-            if value_range is not None:
-                if (
-                    (value_range[0] <= np.nanmax(df[x]))
-                    and (value_range[1] >= np.nanmin(df[x]))
-                    and (value_range[0] < value_range[1])
-                ):
-                    df = df[df[col].between(value_range[0], value_range[1])]
-                else:
-                    print("Invalid range of values for this column", file=stderr)
-            # qq plot
-            qqdata = calc_qqnorm(df[col].dropna())
-            # histogram
-            histdata = dask.compute(dask.delayed(calc_hist)(df[col], bins))
-            # kde plot
-            kdedata = calc_hist_kde(df[col].dropna().values, bins)
-            # box plot
-            boxdata = calc_box(df[[col]].dropna(), bins)
-            return Intermediate(
-                col=col,
-                histdata=histdata[0],
-                kdedata=kdedata,
-                qqdata=qqdata,
-                boxdata=boxdata,
-                visual_type="numerical_column",
-            )
-        elif is_datetime(df[col].dtype):
-            # line chart
-            data = dask.compute(dask.delayed(calc_line_dt)(df[[col]], timeunit))
-            return Intermediate(col=col, data=data[0], visual_type="datetime_column")
-        else:
-            raise UnreachableError
+        return compute_univariate(
+            df, col, bins, ngroups, largest, timeunit, value_range
+        )
 
     if sum(v is None for v in (x, y, z)) == 1:
         x, y = (v for v in (x, y, z) if v is not None)
-        xdtype, ydtype = df[x].dtype, df[y].dtype
-        if (
-            is_categorical(xdtype)
-            and is_numerical(ydtype)
-            or is_numerical(xdtype)
-            and is_categorical(ydtype)
-        ):
-            x, y = (x, y) if is_categorical(xdtype) else (y, x)
-            df = df[[x, y]].dropna()
-            df[x] = df[x].apply(str, meta=(x, str))
-            # box plot per group
-            boxdata = calc_box(df, bins, ngroups, largest)
-            # histogram per group
-            hisdata = calc_hist_by_group(df, bins, ngroups, largest)
-            return Intermediate(
-                x=x,
-                y=y,
-                boxdata=boxdata,
-                histdata=hisdata,
-                visual_type="cat_and_num_cols",
-            )
-        elif (
-            is_datetime(xdtype)
-            and is_numerical(ydtype)
-            or is_numerical(xdtype)
-            and is_datetime(ydtype)
-        ):
-            x, y = (x, y) if is_datetime(xdtype) else (y, x)
-            df = df[[x, y]].dropna()
-            dtnum: List[Any] = []
-            # line chart
-            dtnum.append(dask.delayed(calc_line_dt)(df, timeunit, agg))
-            # box plot
-            dtnum.append(dask.delayed(calc_box_dt)(df, timeunit))
-            dtnum = dask.compute(*dtnum)
-            return Intermediate(
-                x=x,
-                y=y,
-                linedata=dtnum[0],
-                boxdata=dtnum[1],
-                visual_type="dt_and_num_cols",
-            )
-        elif (
-            is_datetime(xdtype)
-            and is_categorical(ydtype)
-            or is_categorical(xdtype)
-            and is_datetime(ydtype)
-        ):
-            x, y = (x, y) if is_datetime(xdtype) else (y, x)
-            df = df[[x, y]].dropna()
-            df[y] = df[y].apply(str, meta=(y, str))
-            dtcat: List[Any] = []
-            # line chart
-            dtcat.append(
-                dask.delayed(calc_line_dt)(
-                    df, timeunit, ngroups=ngroups, largest=largest
-                )
-            )
-            # stacked bar chart
-            dtcat.append(dask.delayed(calc_stacked_dt)(df, timeunit, ngroups, largest))
-            dtcat = dask.compute(*dtcat)
-            return Intermediate(
-                x=x,
-                y=y,
-                linedata=dtcat[0],
-                stackdata=dtcat[1],
-                visual_type="dt_and_cat_cols",
-            )
-        elif is_categorical(xdtype) and is_categorical(ydtype):
-            df = df[[x, y]].dropna()
-            df[x] = df[x].apply(str, meta=(x, str))
-            df[y] = df[y].apply(str, meta=(y, str))
-            # nested bar chart
-            nesteddata = calc_nested(df, ngroups, nsubgroups)
-            # stacked bar chart
-            stackdata = calc_stacked(df, ngroups, nsubgroups)
-            # heat map
-            heatmapdata = calc_heatmap(df, ngroups, nsubgroups)
-            return Intermediate(
-                x=x,
-                y=y,
-                nesteddata=nesteddata,
-                stackdata=stackdata,
-                heatmapdata=heatmapdata,
-                visual_type="two_cat_cols",
-            )
-        elif is_numerical(xdtype) and is_numerical(ydtype):
-            df = df[[x, y]].dropna()
-            # scatter plot
-            scatdata = calc_scatter(df, sample_size)
-            # hexbin plot
-            hexbindata = df.compute()
-            # box plot
-            boxdata = calc_box(df, bins)
-            return Intermediate(
-                x=x,
-                y=y,
-                scatdata=scatdata,
-                boxdata=boxdata,
-                hexbindata=hexbindata,
-                spl_sz=sample_size,
-                visual_type="two_num_cols",
-            )
-        else:
-            raise UnreachableError
-
-    elif all((x, y, z)):
-        xdtype, ydtype, zdtype = df[x].dtype, df[y].dtype, df[z].dtype
-
-        if is_datetime(xdtype) and is_categorical(ydtype) and is_numerical(zdtype):
-            y, z = z, y
-        elif is_numerical(xdtype) and is_datetime(ydtype) and is_categorical(zdtype):
-            x, y = y, x
-        elif is_numerical(xdtype) and is_categorical(ydtype) and is_datetime(zdtype):
-            x, y, z = z, x, y
-        elif is_categorical(xdtype) and is_datetime(ydtype) and is_numerical(zdtype):
-            x, y, z = y, z, x
-        elif is_categorical(xdtype) and is_numerical(ydtype) and is_datetime(zdtype):
-            x, z = z, x
-        assert (
-            is_datetime(df[x].dtype)
-            and is_numerical(df[y].dtype)
-            and is_categorical(df[z].dtype)
-        ), "x, y, and z must be one each of type datetime, numerical, and categorical"
-        df = df[[x, y, z]].dropna()
-        df[z] = df[z].apply(str, meta=(z, str))
-
-        # line chart
-        data = dask.compute(
-            dask.delayed(calc_line_dt)(df, timeunit, agg, ngroups, largest)
+        return compute_bivariate(
+            df, x, y, bins, ngroups, largest, nsubgroups, timeunit, agg, sample_size
         )
-        return Intermediate(
-            x=x, y=y, z=z, agg=agg, data=data[0], visual_type="dt_cat_num_cols",
-        )
+
+    if x is not None and y is not None and z is not None:
+        return compute_trivariate(df, x, y, z, ngroups, largest, timeunit, agg)
 
     return Intermediate()
+
+
+def compute_overview(
+    df: dd.DataFrame, bins: int, ngroups: int, largest: bool, timeunit: str
+) -> Intermediate:
+    """
+    Compute functions for plot(df)
+
+    Parameters
+    ----------
+    df
+        Dataframe from which plots are to be generated
+    bins
+        For a histogram or box plot with numerical x axis, it defines
+        the number of equal-width bins to use when grouping.
+    ngroups
+        When grouping over a categorical column, it defines the
+        number of groups to show in the plot. Ie, the number of
+        bars to show in a bar chart.
+    largest
+        If true, when grouping over a categorical column, the groups
+        with the largest count will be output. If false, the groups
+        with the smallest count will be output.
+    timeunit
+        Defines the time unit to group values over for a datetime column.
+        It can be "year", "quarter", "month", "week", "day", "hour",
+        "minute", "second". With default value "auto", it will use the
+        time unit such that the resulting number of groups is closest to 15.
+    """
+
+    datas: List[Any] = []
+    col_names_dtypes: List[Tuple[str, DType]] = []
+    for column in df.columns:
+        if is_categorical(df[column].dtype):
+            # bar chart
+            datas.append(dask.delayed(calc_bar_pie)(df[column], ngroups, largest))
+            col_names_dtypes.append((column, DType.Categorical))
+        elif is_numerical(df[column].dtype):
+            # histogram
+            datas.append(dask.delayed(calc_hist)(df[column], bins))
+            col_names_dtypes.append((column, DType.Numerical))
+        elif is_datetime(df[column].dtype):
+            # line chart
+            datas.append(dask.delayed(calc_line_dt)(df[[column]], timeunit))
+            col_names_dtypes.append((column, DType.DateTime))
+        else:
+            raise UnreachableError
+    datas = dask.compute(*datas)
+    data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas)]
+    return Intermediate(data=data, visual_type="basic_grid")
+
+
+def compute_univariate(
+    df: dd.DataFrame,
+    x: str,
+    bins: int,
+    ngroups: int,
+    largest: bool,
+    timeunit: str,
+    value_range: Optional[Tuple[float, float]],
+) -> Intermediate:
+    """
+    Compute functions for plot(df, x)
+
+    Parameters
+    ----------
+    df
+        Dataframe from which plots are to be generated
+    x
+        A valid column name from the dataframe
+    bins
+        For a histogram or box plot with numerical x axis, it defines
+        the number of equal-width bins to use when grouping.
+    ngroups
+        When grouping over a categorical column, it defines the
+        number of groups to show in the plot. Ie, the number of
+        bars to show in a bar chart.
+    largest
+        If true, when grouping over a categorical column, the groups
+        with the largest count will be output. If false, the groups
+        with the smallest count will be output.
+    timeunit
+        Defines the time unit to group values over for a datetime column.
+        It can be "year", "quarter", "month", "week", "day", "hour",
+        "minute", "second". With default value "auto", it will use the
+        time unit such that the resulting number of groups is closest to 15.
+    value_range
+        The lower and upper bounds on the range of a numerical column.
+        Applies when column x is specified and column y is unspecified.
+    """
+    # pylint: disable=too-many-arguments
+
+    if is_categorical(df[x].dtype):
+        # data for bar and pie charts
+        data = dask.compute(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
+        return Intermediate(col=x, data=data[0], visual_type="categorical_column")
+    elif is_numerical(df[x].dtype):
+        if value_range is not None:
+            if (
+                (value_range[0] <= np.nanmax(df[x]))
+                and (value_range[1] >= np.nanmin(df[x]))
+                and (value_range[0] < value_range[1])
+            ):
+                df = df[df[x].between(value_range[0], value_range[1])]
+            else:
+                print("Invalid range of values for this column", file=stderr)
+        # qq plot
+        qqdata = calc_qqnorm(df[x].dropna())
+        # histogram
+        histdata = dask.compute(dask.delayed(calc_hist)(df[x], bins))
+        # kde plot
+        kdedata = calc_hist_kde(df[x].dropna().values, bins)
+        # box plot
+        boxdata = calc_box(df[[x]].dropna(), bins)
+        return Intermediate(
+            col=x,
+            histdata=histdata[0],
+            kdedata=kdedata,
+            qqdata=qqdata,
+            boxdata=boxdata,
+            visual_type="numerical_column",
+        )
+    elif is_datetime(df[x].dtype):
+        # line chart
+        data = dask.compute(dask.delayed(calc_line_dt)(df[[x]], timeunit))
+        return Intermediate(col=x, data=data[0], visual_type="datetime_column")
+    else:
+        raise UnreachableError
+
+
+def compute_bivariate(
+    df: dd.DataFrame,
+    x: str,
+    y: str,
+    bins: int,
+    ngroups: int,
+    largest: bool,
+    nsubgroups: int,
+    timeunit: str,
+    agg: str,
+    sample_size: int,
+) -> Intermediate:
+    """
+    Compute functions for plot(df, x, y)
+
+    Parameters
+    ----------
+    df
+        Dataframe from which plots are to be generated
+    x
+        A valid column name from the dataframe
+    y
+        A valid column name from the dataframe
+    bins
+        For a histogram or box plot with numerical x axis, it defines
+        the number of equal-width bins to use when grouping.
+    ngroups
+        When grouping over a categorical column, it defines the
+        number of groups to show in the plot. Ie, the number of
+        bars to show in a bar chart.
+    largest
+        If true, when grouping over a categorical column, the groups
+        with the largest count will be output. If false, the groups
+        with the smallest count will be output.
+    nsubgroups
+        If x and y are categorical columns, ngroups refers to
+        how many groups to show from column x, and nsubgroups refers to
+        how many subgroups to show from column y in each group in column x.
+    timeunit
+        Defines the time unit to group values over for a datetime column.
+        It can be "year", "quarter", "month", "week", "day", "hour",
+        "minute", "second". With default value "auto", it will use the
+        time unit such that the resulting number of groups is closest to 15.
+    agg
+        Specify the aggregate to use when aggregating over a numeric column
+    sample_size
+        Sample size for the scatter plot
+    """
+    # pylint: disable=too-many-arguments,too-many-locals
+
+    xdtype, ydtype = df[x].dtype, df[y].dtype
+    if (
+        is_categorical(xdtype)
+        and is_numerical(ydtype)
+        or is_numerical(xdtype)
+        and is_categorical(ydtype)
+    ):
+        x, y = (x, y) if is_categorical(xdtype) else (y, x)
+        df = df[[x, y]].dropna()
+        df[x] = df[x].apply(str, meta=(x, str))
+        # box plot per group
+        boxdata = calc_box(df, bins, ngroups, largest)
+        # histogram per group
+        hisdata = calc_hist_by_group(df, bins, ngroups, largest)
+        return Intermediate(
+            x=x, y=y, boxdata=boxdata, histdata=hisdata, visual_type="cat_and_num_cols",
+        )
+    elif (
+        is_datetime(xdtype)
+        and is_numerical(ydtype)
+        or is_numerical(xdtype)
+        and is_datetime(ydtype)
+    ):
+        x, y = (x, y) if is_datetime(xdtype) else (y, x)
+        df = df[[x, y]].dropna()
+        dtnum: List[Any] = []
+        # line chart
+        dtnum.append(dask.delayed(calc_line_dt)(df, timeunit, agg))
+        # box plot
+        dtnum.append(dask.delayed(calc_box_dt)(df, timeunit))
+        dtnum = dask.compute(*dtnum)
+        return Intermediate(
+            x=x,
+            y=y,
+            linedata=dtnum[0],
+            boxdata=dtnum[1],
+            visual_type="dt_and_num_cols",
+        )
+    elif (
+        is_datetime(xdtype)
+        and is_categorical(ydtype)
+        or is_categorical(xdtype)
+        and is_datetime(ydtype)
+    ):
+        x, y = (x, y) if is_datetime(xdtype) else (y, x)
+        df = df[[x, y]].dropna()
+        df[y] = df[y].apply(str, meta=(y, str))
+        dtcat: List[Any] = []
+        # line chart
+        dtcat.append(
+            dask.delayed(calc_line_dt)(df, timeunit, ngroups=ngroups, largest=largest)
+        )
+        # stacked bar chart
+        dtcat.append(dask.delayed(calc_stacked_dt)(df, timeunit, ngroups, largest))
+        dtcat = dask.compute(*dtcat)
+        return Intermediate(
+            x=x,
+            y=y,
+            linedata=dtcat[0],
+            stackdata=dtcat[1],
+            visual_type="dt_and_cat_cols",
+        )
+    elif is_categorical(xdtype) and is_categorical(ydtype):
+        df = df[[x, y]].dropna()
+        df[x] = df[x].apply(str, meta=(x, str))
+        df[y] = df[y].apply(str, meta=(y, str))
+        # nested bar chart
+        nesteddata = calc_nested(df, ngroups, nsubgroups)
+        # stacked bar chart
+        stackdata = calc_stacked(df, ngroups, nsubgroups)
+        # heat map
+        heatmapdata = calc_heatmap(df, ngroups, nsubgroups)
+        return Intermediate(
+            x=x,
+            y=y,
+            nesteddata=nesteddata,
+            stackdata=stackdata,
+            heatmapdata=heatmapdata,
+            visual_type="two_cat_cols",
+        )
+    elif is_numerical(xdtype) and is_numerical(ydtype):
+        df = df[[x, y]].dropna()
+        # scatter plot
+        scatdata = calc_scatter(df, sample_size)
+        # hexbin plot
+        hexbindata = df.compute()
+        # box plot
+        boxdata = calc_box(df, bins)
+        return Intermediate(
+            x=x,
+            y=y,
+            scatdata=scatdata,
+            boxdata=boxdata,
+            hexbindata=hexbindata,
+            spl_sz=sample_size,
+            visual_type="two_num_cols",
+        )
+    else:
+        raise UnreachableError
+
+
+def compute_trivariate(
+    df: dd.DataFrame,
+    x: str,
+    y: str,
+    z: str,
+    ngroups: int,
+    largest: bool,
+    timeunit: str,
+    agg: str,
+) -> Intermediate:
+    """
+    Compute functions for plot(df, x, y, z)
+
+    Parameters
+    ----------
+    df
+        Dataframe from which plots are to be generated
+    x
+        A valid column name from the dataframe
+    y
+        A valid column name from the dataframe
+    z
+        A valid column name from the dataframe
+    bins
+        For a histogram or box plot with numerical x axis, it defines
+        the number of equal-width bins to use when grouping.
+    ngroups
+        When grouping over a categorical column, it defines the
+        number of groups to show in the plot. Ie, the number of
+        bars to show in a bar chart.
+    largest
+        If true, when grouping over a categorical column, the groups
+        with the largest count will be output. If false, the groups
+        with the smallest count will be output.
+    timeunit
+        Defines the time unit to group values over for a datetime column.
+        It can be "year", "quarter", "month", "week", "day", "hour",
+        "minute", "second". With default value "auto", it will use the
+        time unit such that the resulting number of groups is closest to 15.
+    agg
+        Specify the aggregate to use when aggregating over a numeric column
+    """
+    # pylint: disable=too-many-arguments
+
+    xdtype, ydtype, zdtype = df[x].dtype, df[y].dtype, df[z].dtype
+
+    if is_datetime(xdtype) and is_categorical(ydtype) and is_numerical(zdtype):
+        y, z = z, y
+    elif is_numerical(xdtype) and is_datetime(ydtype) and is_categorical(zdtype):
+        x, y = y, x
+    elif is_numerical(xdtype) and is_categorical(ydtype) and is_datetime(zdtype):
+        x, y, z = z, x, y
+    elif is_categorical(xdtype) and is_datetime(ydtype) and is_numerical(zdtype):
+        x, y, z = y, z, x
+    elif is_categorical(xdtype) and is_numerical(ydtype) and is_datetime(zdtype):
+        x, z = z, x
+    assert (
+        is_datetime(df[x].dtype)
+        and is_numerical(df[y].dtype)
+        and is_categorical(df[z].dtype)
+    ), "x, y, and z must be one each of type datetime, numerical, and categorical"
+    df = df[[x, y, z]].dropna()
+    df[z] = df[z].apply(str, meta=(z, str))
+
+    # line chart
+    data = dask.compute(dask.delayed(calc_line_dt)(df, timeunit, agg, ngroups, largest))
+    return Intermediate(
+        x=x, y=y, z=z, agg=agg, data=data[0], visual_type="dt_cat_num_cols",
+    )
 
 
 def calc_line_dt(
