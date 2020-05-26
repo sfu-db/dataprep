@@ -141,25 +141,30 @@ def compute_overview(
     """
 
     datas: List[Any] = []
+    counter = {"Categorical": 0, "Numerical": 0, "Datetime": 0}
     col_names_dtypes: List[Tuple[str, DType]] = []
     for column in df.columns:
         if is_categorical(df[column].dtype):
             # bar chart
             datas.append(dask.delayed(calc_bar_pie)(df[column], ngroups, largest))
             col_names_dtypes.append((column, DType.Categorical))
+            counter["Categorical"] += 1
         elif is_numerical(df[column].dtype):
             # histogram
             datas.append(dask.delayed(calc_hist)(df[column], bins))
             col_names_dtypes.append((column, DType.Numerical))
+            counter["Numerical"] += 1
         elif is_datetime(df[column].dtype):
             # line chart
             datas.append(dask.delayed(calc_line_dt)(df[[column]], timeunit))
             col_names_dtypes.append((column, DType.DateTime))
+            counter["Datetime"] += 1
         else:
             raise UnreachableError
+    datas.append(dask.delayed(calc_stats)(df, counter))
     datas = dask.compute(*datas)
-    data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas)]
-    return Intermediate(data=data, visual_type="basic_grid")
+    data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas[:-1])]
+    return Intermediate(data=data, statsdata=datas[-1], visual_type="basic_grid")
 
 
 def compute_univariate(
@@ -1179,6 +1184,49 @@ def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
     }
 
     return {k: _format_values(k, v) for k, v in overview_dict.items()}
+
+
+def calc_stats(
+    df: dd.DataFrame, counter: Dict[str, int]
+) -> Tuple[Dict[str, str], Dict[str, int]]:
+    """
+    Calculate stats from a DataFrame
+
+    Parameters
+    ----------
+    df
+        a DataFrame
+    counter
+        a dictionary that contains count for each type
+    Returns
+    -------
+    Tuple[Dict[str, str], Dict[str, int]]
+        Dictionary that contains Overview and Variable Types
+    """
+    dim = df.shape
+    total_cell = dim[0] * dim[1]
+    nonan_cell = df.count().sum()
+    memory_usage = float(df.memory_usage().sum())
+    try:  # for unhashable data types
+        dup_rows = len(df.drop_duplicates())
+    except TypeError:
+        df = df.astype(str)
+        dup_rows = len(df.drop_duplicates())
+    overview_dict = {
+        "Number of Variables": dim[1],
+        "Number of Observations": dim[0],
+        "Missing Cells": float(total_cell - nonan_cell),
+        "Missing Cells (%)": 1 - (nonan_cell / total_cell),
+        "Duplicate Rows": dim[0] - dup_rows,
+        "Duplicate Rows (%)": 1 - (dup_rows / dim[0]),
+        "Total Size in Memory": memory_usage,
+        "Average Record Size in Memory": memory_usage / dim[0],
+    }
+
+    return (
+        {k: _format_values(k, v) for k, v in overview_dict.items()},
+        counter,
+    )
 
 
 def _calc_box_stats(grp_srs: dd.Series, grp: str, dlyd: bool = False) -> pd.DataFrame:
