@@ -32,3 +32,20 @@ class RequestError(DataprepError):
 
     def __str__(self) -> str:
         return f"RequestError: status={self.status_code}, message={self.message}"
+
+
+class UniversalParameterOverridden(Exception):
+    """
+    The parameter is overrided by the universal parameter
+    """
+
+    param: str
+    uparam: str
+
+    def __init__(self, param: str, uparam: str) -> None:
+        super().__init__()
+        self.param = param
+        self.uparam = uparam
+
+    def __str__(self) -> str:
+        return f"the parameter {self.param} is overridden by {self.uparam}"
