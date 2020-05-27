@@ -12,9 +12,8 @@ from requests import Request, Response, Session
 
 from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
-from .errors import RequestError
+from .errors import RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
-
 
 INFO_TEMPLATE = Template(
     """{% for tb in tbs.keys() %}
@@ -85,14 +84,19 @@ class Connector:
         self._auth = _auth or {}
         self._jenv = Environment(undefined=StrictUndefined)
 
-    def _fetch(
+    def _fetch(  # pylint: disable=too-many-locals,too-many-branches
         self,
         table: ImplicitTable,
-        _auth: Optional[Dict[str, Any]],
-        _count: Optional[int],
-        _cursor: Optional[int],
+        *,
+        _count: Optional[int] = None,
+        _cursor: Optional[int] = None,
+        _auth: Optional[Dict[str, Any]] = None,
         kwargs: Dict[str, Any],
     ) -> Response:
+        assert (_count is None) == (
+            _cursor is None
+        ), "_cursor and _count should both be None or not None"
+
         method = table.method
         url = table.url
         req_data: Dict[str, Dict[str, Any]] = {
@@ -104,6 +108,7 @@ class Connector:
 
         if table.authorization is not None:
             table.authorization.build(req_data, _auth or self._auth)
+
         for key in ["headers", "params", "cookies"]:
             if getattr(table, key) is not None:
                 instantiated_fields = getattr(table, key).populate(
@@ -121,29 +126,24 @@ class Connector:
             else:
                 raise UnreachableError
 
-        if table.pag_params is not None:
-            if table.pag_params.type == "null":
-                resp: Response = self._session.send(  # type: ignore
-                    Request(
-                        method=method,
-                        url=url,
-                        headers=req_data["headers"],
-                        params=req_data["params"],
-                        json=req_data.get("json"),
-                        data=req_data.get("data"),
-                        cookies=req_data["cookies"],
-                    ).prepare()
-                )
-                return resp
-
+        if table.pag_params is not None and _count is not None:
             pag_type = table.pag_params.type
             count_key = table.pag_params.count_key
-            cursor_key = ""
             if pag_type == "cursor":
+                assert table.pag_params.cursor_key is not None
                 cursor_key = table.pag_params.cursor_key
-            if pag_type == "limit":
+            elif pag_type == "limit":
+                assert table.pag_params.anchor_key is not None
                 cursor_key = table.pag_params.anchor_key
+            else:
+                raise UnreachableError()
+
+            if count_key in req_data["params"]:
+                raise UniversalParameterOverridden(count_key, "_count")
             req_data["params"][count_key] = _count
+
+            if cursor_key in req_data["params"]:
+                raise UniversalParameterOverridden(cursor_key, "_cursor")
             req_data["params"][cursor_key] = _cursor
 
         resp: Response = self._session.send(  # type: ignore
@@ -163,7 +163,7 @@ class Connector:
 
         return resp
 
-    def query(
+    def query(  # pylint: disable=too-many-locals
         self,
         table: str,
         _auth: Optional[Dict[str, Any]] = None,
@@ -192,62 +192,61 @@ class Connector:
 
         itable = self._impdb.tables[table]
 
-        if itable.pag_params is not None:
-            if itable.pag_params.type == "null":
-                resp = self._fetch(
-                    table=itable, _auth=_auth, _count=-1, _cursor=-1, kwargs=where
-                )
-                df = itable.from_response(resp)
-                return df
+        if itable.pag_params is None:
+            resp = self._fetch(table=itable, _auth=_auth, kwargs=where)
+            df = itable.from_response(resp)
+            return df
 
-            max_count = int(itable.pag_params.max_count)
-            df = pd.DataFrame()
-            last_id = 0
-            pag_type = itable.pag_params.type
+        # Pagination is not None
+        max_count = itable.pag_params.max_count
+        dfs = []
+        last_id = 0
+        pag_type = itable.pag_params.type
 
-            if _count is None:
-                _count = max_count
-                resp = self._fetch(
-                    table=itable, _auth=_auth, _count=_count, _cursor=0, kwargs=where
-                )
-                df = itable.from_response(resp)
+        if _count is None:
+            # User doesn't specify _count
+            resp = self._fetch(table=itable, _auth=_auth, kwargs=where)
+            df = itable.from_response(resp)
+        else:
+            cnt_to_fetch = 0
+            count = _count or 1
+            n_page = math.ceil(count / max_count)
+            remain = count % max_count
+            for i in range(n_page):
+                remain = remain if remain > 0 else max_count
+                cnt_to_fetch = max_count if i < n_page - 1 else remain
 
-            else:
-                cnt_to_fetch = 0
-                count = _count or 1
-                n_page = math.ceil(count / max_count)
-                remain = count % max_count
-                for i in range(n_page):
-                    remain = remain if remain > 0 else max_count
-                    cnt_to_fetch = max_count if i < n_page - 1 else remain
-                    if pag_type == "cursor":
-                        resp = self._fetch(
-                            table=itable,
-                            _auth=_auth,
-                            _count=cnt_to_fetch,
-                            _cursor=last_id - 1,
-                            kwargs=where,
-                        )
-                    elif pag_type == "limit":
-                        resp = self._fetch(
-                            table=itable,
-                            _auth=_auth,
-                            _count=cnt_to_fetch,
-                            _cursor=i * max_count,
-                            kwargs=where,
-                        )
-                    else:
-                        raise NotImplementedError
-                    df_ = itable.from_response(resp)
-                    if pag_type == "cursor":
-                        last_id = (
-                            int(df_[itable.pag_params.cursor_id][len(df_) - 1]) - 1
-                        )
-                    if i == 0:
-                        df = df_.copy()
-                    else:
-                        df = pd.concat([df, df_], axis=0)
-                df.reset_index(drop=True, inplace=True)
+                if pag_type == "cursor":
+                    resp = self._fetch(
+                        table=itable,
+                        _auth=_auth,
+                        _count=cnt_to_fetch,
+                        _cursor=last_id - 1,
+                        kwargs=where,
+                    )
+                elif pag_type == "limit":
+                    resp = self._fetch(
+                        table=itable,
+                        _auth=_auth,
+                        _count=cnt_to_fetch,
+                        _cursor=i * max_count,
+                        kwargs=where,
+                    )
+                else:
+                    raise NotImplementedError
+                df_ = itable.from_response(resp)
+
+                if len(df_) == 0:
+                    # The API returns empty for this page, maybe we've reached the end
+                    break
+
+                if pag_type == "cursor":
+                    last_id = int(df_[itable.pag_params.cursor_id][len(df_) - 1]) - 1
+
+                dfs.append(df_)
+
+            df = pd.concat(dfs, axis=0)
+            df.reset_index(drop=True, inplace=True)
 
         return df
 

@@ -17,4 +17,8 @@ def test_data_connector() -> None:
 
     df = dc.query("businesses", _count=120, term="ramen", location="vancouver")
 
-    assert len(df) > 0
+    assert len(df) == 120
+
+    df = dc.query("businesses", _count=10000, term="ramen", location="vancouver")
+
+    assert len(df) < 1000

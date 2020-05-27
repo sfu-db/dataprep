@@ -43,11 +43,20 @@ class Pagination:
     """
 
     type: str
-    anchor_key: str
     count_key: str
-    cursor_id: str
-    cursor_key: str
-    max_count: str
+    max_count: int
+    anchor_key: Optional[str]
+    cursor_id: Optional[str]
+    cursor_key: Optional[str]
+
+    def __init__(self, pdef: Dict[str, Any]) -> None:
+
+        self.type = pdef["type"]
+        self.max_count = pdef["max_count"]
+        self.count_key = pdef["count_key"]
+        self.anchor_key = pdef.get("anchor_key")
+        self.cursor_id = pdef.get("cursor_id")
+        self.cursor_key = pdef.get("cursor_key")
 
 
 class ImplicitTable:  # pylint: disable=too-many-instance-attributes
@@ -67,7 +76,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     body_ctype: str
     body: Optional[Fields] = None
     cookies: Optional[Fields] = None
-    pag_params: Optional[Pagination]
+    pag_params: Optional[Pagination] = None
 
     # Response related
     ctype: str
@@ -81,6 +90,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         )  # This will throw errors if validate failed
         self.name = name
         self.config = config
+
         request_def = config["request"]
 
         self.method = request_def["method"]
@@ -99,36 +109,12 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
             self.authorization = Authorization(auth_type=auth_type, params=auth_params)
 
         if "pagination" in request_def:
-            self.pag_params = Pagination()
-            self.pag_params.type = request_def["pagination"]["type"]
-            self.pag_params.max_count = request_def["pagination"]["max_count"]
-            self.pag_params.count_key = (
-                request_def["pagination"]["count_key"]
-                if "count_key" in request_def["pagination"]
-                else ""
-            )
-            self.pag_params.anchor_key = (
-                request_def["pagination"]["anchor_key"]
-                if "anchor_key" in request_def["pagination"]
-                else ""
-            )
-            self.pag_params.cursor_id = (
-                request_def["pagination"]["cursor_id"]
-                if "cursor_id" in request_def["pagination"]
-                else ""
-            )
-            self.pag_params.cursor_key = (
-                request_def["pagination"]["cursor_key"]
-                if "cursor_key" in request_def["pagination"]
-                else ""
-            )
-        else:
-            self.pag_params = Pagination()
-            self.pag_params.type = "null"
+            self.pag_params = Pagination(request_def["pagination"])
 
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
                 setattr(self, key, Fields(request_def[key]))
+
         if "body" in request_def:
             body_def = request_def["body"]
             self.body_ctype = body_def["ctype"]
@@ -271,6 +257,7 @@ class ImplicitDatabase:
             if table_config_path.suffix != ".json":
                 # ifnote non json file
                 continue
+
             with open(table_config_path) as f:
                 table_config = jload(f)
 
