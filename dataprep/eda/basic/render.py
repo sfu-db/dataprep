@@ -2,7 +2,7 @@
 This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from math import pi
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -23,11 +23,15 @@ from bokeh.models import (
     FactorRange,
     CustomJSHover,
     Div,
+    CustomJS,
+    Button,
 )
+from bokeh.layouts import column
 from bokeh.plotting import Figure, gridplot, figure
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
 from bokeh.palettes import viridis, Pastel1  # pylint: disable=E0611 # type: ignore
+from bokeh.events import ButtonClick
 
 from ..intermediate import Intermediate
 from ..dtypes import DType
@@ -169,7 +173,7 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
         fig.yaxis.major_label_standoff = 5
 
 
-def _create_table_row(key: str, value: str, highlight: bool = False) -> str:
+def _create_table_row(key: str, value: Union[str, int], highlight: bool = False) -> str:
     """
     Create table row for stats panel
     """
@@ -1026,8 +1030,52 @@ def dt_multiline_viz(
     return Panel(child=fig, title="line chart")
 
 
+def stats_viz(
+    data: Tuple[Dict[str, str], Dict[str, int]], plot_width: int, plot_height: int
+) -> Div:
+    """
+    Render statistics information for grid plots
+    """
+    ov_content = '<h3 style="text-align:center;">Dataset Statistics</h3>'
+    type_content = '<h3 style="text-align:center;">Variable Types</h3>'
+    for key, value in data[0].items():
+        value = _sci_notation_superscript(value)
+        ov_content += _create_table_row(key, value)
+    for key, value in data[1].items():  # type: ignore
+        type_content += _create_table_row(key, value) if value > 0 else ""  # type: ignore
+
+    ov_content = f"""
+    <div style="flex: 50%; margin-right: 6px;">
+        <table style="width: 100%; table-layout: auto;">
+            <tbody>{ov_content}</tbody>
+        </table>
+    </div>
+    """
+    type_content = f"""
+    <div style="flex: 50%; margin-right: 6px;">
+        <table style="width: 100%; table-layout: auto;">
+            <tbody>{type_content}</tbody>
+        </table>
+    </div>
+    """
+    container = f"""
+    <div style="display: flex;">
+        {ov_content}
+        {type_content}
+    </div>
+    <hr>
+    """
+    return Div(
+        text=container,
+        width=plot_width * 3,
+        height=plot_height - 20,
+        style={"width": "100%"},
+        visible=False,
+    )
+
+
 def stats_viz_num(
-    data: Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]],
+    data: Tuple[Dict[str, str], Dict[str, str], Dict[str, str]],
     plot_width: int,
     plot_height: int,
 ) -> Panel:
@@ -1159,8 +1207,8 @@ def render_basic(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
 ) -> Box:
     """
-    Render plots from plot(df)
-    """
+    Render plots and dataset stats from plot(df)
+    """  # pylint: disable=too-many-locals
     figs = list()
     for col, dtype, data in itmdt["data"]:
         if dtype == DType.Categorical:
@@ -1186,7 +1234,31 @@ def render_basic(
                 df, col, timeunit, yscale, plot_width, plot_height, False, miss_pct
             )
             figs.append(fig)
-    return gridplot(children=figs, sizing_mode=None, toolbar_location=None, ncols=3,)
+
+    stats_section = stats_viz(
+        itmdt["statsdata"], plot_width=plot_width, plot_height=plot_height
+    )
+    plot_section = gridplot(
+        children=figs, sizing_mode=None, toolbar_location=None, ncols=3,
+    )
+
+    button = Button(
+        label="Show Stats Info", width=plot_width * 3, button_type="primary"
+    )
+    button.js_on_event(
+        ButtonClick,
+        CustomJS(
+            args={"button": button, "div": stats_section},
+            code="""
+        let buttonLabel = button.label
+        let isDivVisible = div.visible
+        div.visible = isDivVisible ? false : true
+        button.label = (buttonLabel === 'Hide Stats Info') ? 'Show Stats Info' : 'Hide Stats Info'
+    """,
+        ),
+    )
+
+    return column(button, stats_section, plot_section)
 
 
 def render_cat(
