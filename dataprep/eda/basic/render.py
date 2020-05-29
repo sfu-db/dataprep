@@ -34,7 +34,7 @@ from bokeh.palettes import viridis, Pastel1  # pylint: disable=E0611 # type: ign
 from bokeh.events import ButtonClick
 
 from ..intermediate import Intermediate
-from ..dtypes import DType
+from ..dtypes import is_dtype, Nominal, Continuous, DateTime
 from ..palette import PALETTE, BIPALETTE
 
 __all__ = ["render"]
@@ -1211,7 +1211,7 @@ def render_basic(
     """  # pylint: disable=too-many-locals
     figs = list()
     for col, dtype, data in itmdt["data"]:
-        if dtype == DType.Categorical:
+        if is_dtype(dtype, Nominal()):
             df, total_grps, miss_pct = data
             fig = bar_viz(
                 df[:-1],
@@ -1224,11 +1224,11 @@ def render_basic(
                 False,
             )
             figs.append(fig)
-        elif dtype == DType.Numerical:
+        elif is_dtype(dtype, Continuous()):
             df, miss_pct = data
             fig = hist_viz(df, miss_pct, col, yscale, plot_width, plot_height, False)
             figs.append(fig)
-        elif dtype == DType.DateTime:
+        elif is_dtype(dtype, DateTime()):
             df, timeunit, miss_pct = data
             fig = dt_line_viz(
                 df, col, timeunit, yscale, plot_width, plot_height, False, miss_pct
