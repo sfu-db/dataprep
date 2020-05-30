@@ -1,15 +1,18 @@
-# Dataprep
+<div align="center"><img width="100%" src="https://i.imgur.com/bNSVrGm.png"/></div>
+
+-----------------
 
 [![License]](LICENSE) [![Doc Badge]](https://sfu-db.github.io/dataprep/) [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/)  [![Downloads]](https://pepy.tech/project/dataprep) [![Codecov]](https://codecov.io/gh/sfu-db/dataprep) ![Build Status]  [![Chat]](https://discord.gg/xwbkFNk) 
 
-[Documentation] | [Mail List & Forum] 
-
-Dataprep let you prepare your data using a single library with a few lines of code.
+Dataprep lets you prepare your data using a single library with a few lines of code.
 
 Currently, you can use `dataprep` to:
 * Collect data from common data sources (through `dataprep.data_connector`)
 * Do your exploratory data analysis (through `dataprep.eda`)
 * ...more modules are coming
+
+
+[Documentation] | [Mail List & Forum] 
 
 ## Installation
 
