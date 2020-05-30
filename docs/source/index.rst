@@ -22,6 +22,9 @@ Data Connector
    :maxdepth: 2
 
    data_connector
+   DC_DBLP_tut
+   DC_Yelp_tut
+   DC_Spotify_tut
 
 Case Study
 ----------
