@@ -61,6 +61,39 @@
                 "params": {
                     "$ref": "#/definitions/fields"
                 },
+                "pagination": {
+                    "$id": "#/properties/request/properties/pagination",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        },
+                        "max_count": {
+                            "type": "integer"
+                        },
+                        "anchor_key": {
+                            "type": "string",
+                            "optional": true
+                        },
+                        "count_key": {
+                            "type": "string"
+                        },
+                        "cursor_id": {
+                            "type": "string",
+                            "optional": true
+                        },
+                        "cursor_key": {
+                            "type": "string",
+                            "optional": true
+                        }
+                    },
+                    "required": [
+                        "count_key",
+                        "type",
+                        "max_count"
+                    ],
+                    "additionalProperties": false
+                },
                 "body": {
                     "$id": "#/properties/request/properties/body",
                     "type": "object",

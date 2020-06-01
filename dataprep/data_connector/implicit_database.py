@@ -37,6 +37,28 @@ class SchemaField(NamedTuple):
     description: Optional[str]
 
 
+class Pagination:
+    """
+    Schema of Pagination field
+    """
+
+    type: str
+    count_key: str
+    max_count: int
+    anchor_key: Optional[str]
+    cursor_id: Optional[str]
+    cursor_key: Optional[str]
+
+    def __init__(self, pdef: Dict[str, Any]) -> None:
+
+        self.type = pdef["type"]
+        self.max_count = pdef["max_count"]
+        self.count_key = pdef["count_key"]
+        self.anchor_key = pdef.get("anchor_key")
+        self.cursor_id = pdef.get("cursor_id")
+        self.cursor_key = pdef.get("cursor_key")
+
+
 class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     """
     ImplicitTable class abstracts the request and the response to a Restful API,
@@ -54,6 +76,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     body_ctype: str
     body: Optional[Fields] = None
     cookies: Optional[Fields] = None
+    pag_params: Optional[Pagination] = None
 
     # Response related
     ctype: str
@@ -85,9 +108,13 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
                 raise NotImplementedError
             self.authorization = Authorization(auth_type=auth_type, params=auth_params)
 
+        if "pagination" in request_def:
+            self.pag_params = Pagination(request_def["pagination"])
+
         for key in ["headers", "params", "cookies"]:
             if key in request_def:
                 setattr(self, key, Fields(request_def[key]))
+
         if "body" in request_def:
             body_def = request_def["body"]
             self.body_ctype = body_def["ctype"]
