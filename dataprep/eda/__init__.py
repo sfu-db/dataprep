@@ -8,6 +8,7 @@ from bokeh.io import output_file, output_notebook
 from .basic import compute, plot, render
 from .correlation import compute_correlation, plot_correlation, render_correlation
 from .missing import compute_missing, plot_missing, render_missing
+from .create_report import create_report
 from .utils import is_notebook
 from .dtypes import (
     DType,
@@ -40,6 +41,7 @@ __all__ = [
     "Discrete",
     "DateTime",
     "Text",
+    "create_report",
 ]
 
 

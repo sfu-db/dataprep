@@ -1,0 +1,107 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> {{ context.title }} </title>
+  {% include 'scripts.html' %}
+  {% include 'styles.html' %}
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="#"><span>{{ context.title }}</span></a>
+    <a href="#overview">Overview</a>
+    <div class="subnav" onclick="hideDropdown(this)">
+      <a href="#variables">Variables ≡</a>
+      <div class="subcontent">
+        {% for var in context.components.variables.keys() %}
+        <a href="#{{ var }}">{{ var }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <a href="#interactions">Interactions</a>
+    <a href="#correlations">Correlations</a>
+    <a href="#missing-values">Missing Values</a>
+  </nav>
+
+  <div class="container-main">
+    <div>
+      <a class="id-anchor" id="overview"></a>
+      <h1>Overview</h1>
+    </div>
+    <section class="section">
+      <div class="section-start">
+        {% include 'overview.html' %}
+      </div>
+    </section>
+
+    <div>
+      <a class="id-anchor" id="variables"></a>
+      <h1>Variables</h1>
+    </div>
+    <section class="section">
+      {% include 'variables.html' %}
+    </section>
+
+    <div>
+      <a class="id-anchor" id="interactions"></a>
+      <h1>Interactions</h1>
+    </div>
+    {% if context.components.has_interaction %}
+    <section class="section">
+      {% include 'interactions.html' %}
+    </section>
+    {% else %}
+    <section class="section">
+      <div>
+        <h1 class="no-render-title">No Interactive Correlation Found</h1>
+      </div>
+    </section>
+    {% endif %}
+
+    <div>
+      <a class="id-anchor" id="correlations"></a>
+      <h1>Correlations</h1>
+    </div>
+    {% if context.components.has_correlation %}
+    <section class="section">
+      {% include 'correlation.html' %}
+    </section>
+    {% else %}
+    <section class="section">
+      <div>
+        <h1 class="no-render-title">No Correlation Found</h1>
+      </div>
+    </section>
+    {% endif %}
+
+    <div>
+      <a class="id-anchor" id="missing-values"></a>
+      <h1>Missing Values</h1>
+    </div>
+    {% if context.components.has_missing %}
+    <section class="section">
+      {% include 'missing.html' %}
+    </section>
+    {% else %}
+    <section class="section">
+      <div>
+        <h1 class="no-render-title">No Missing Value Found</h1>
+      </div>
+    </section>
+    {% endif %}
+
+  </div>
+
+  {% if context.components.has_interaction and context.components.interactions[0] != 0%}
+  {{ context.components.interactions[0] }}
+  {% endif %}
+  
+  <footer class="footer">
+    <p>Report generated with <a href="https://github.com/sfu-db/dataprep">DataPrep</a></p>
+  </footer>
+
+</body>
+
+</html>

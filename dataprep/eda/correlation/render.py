@@ -6,16 +6,20 @@ import math
 from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
+from bokeh.layouts import column, row
 from bokeh.models import (
     BasicTicker,
     CategoricalColorMapper,
     ColorBar,
+    ColumnDataSource,
+    CustomJS,
     FactorRange,
     HoverTool,
     Legend,
     LegendItem,
     LinearColorMapper,
     PrintfTickFormatter,
+    Select,
 )
 from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
@@ -64,6 +68,8 @@ def render_correlation(
         )
     elif itmdt.visual_type == "correlation_scatter":
         visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+    elif itmdt.visual_type == "correlation_crossfilter":
+        visual_elem = render_crossfilter(itmdt, plot_width, plot_height)
     else:
         raise NotImplementedError(f"Unknown visual type {itmdt.visual_type}")
 
@@ -156,7 +162,6 @@ def render_correlation_heatmaps(
         )
 
         fig.add_layout(color_bar, "right")
-
         tab = Panel(child=fig, title=method)
         tabs.append(tab)
 
@@ -246,7 +251,7 @@ def render_scatter(
         plot_width=plot_width,
         plot_height=plot_height,
         toolbar_location=None,
-        title=Title(text="Scatter Plot & Regression", align="center"),
+        title=Title(text="Scatter Plot & Regression Line", align="center"),
         tools=[],
         x_axis_label=xcol,
         y_axis_label=ycol,
@@ -265,7 +270,6 @@ def render_scatter(
     line_x = np.asarray([df.iloc[:, 0].min(), df.iloc[:, 0].max()])
     line_y = coeff_a * line_x + coeff_b
     fig.line(x=line_x, y=line_y, line_width=3)
-
     # Not adding the tooltips before because we only want to apply tooltip to the scatter
     hover = HoverTool(tooltips=tooltips, renderers=[scatter])
     fig.add_tools(hover)
@@ -289,4 +293,105 @@ def render_scatter(
         )
 
         fig.add_layout(legend, place="right")
+    return fig
+
+
+######### Interactions for report #########
+def render_crossfilter(
+    itmdt: Intermediate, plot_width: int, plot_height: int
+) -> column:
+    """
+    Render crossfilter scatter plot with a regression line.
+    """
+
+    # pylint: disable=too-many-locals, too-many-function-args
+    source_scatter = ColumnDataSource(itmdt["data"])
+    source_coeffs = ColumnDataSource(itmdt["coeffs"])
+    source_xy_value = ColumnDataSource(
+        {"x": [itmdt["data"].columns[0]], "y": [itmdt["data"].columns[0]]}
+    )
+    var_list = list(itmdt["data"].columns)[0:-2]
+
+    xcol = source_xy_value.data["x"][0]
+    ycol = source_xy_value.data["y"][0]
+
+    tooltips = [("X-Axis: ", "@__x__"), ("Y-Axis: ", "@__y__")]
+
+    fig = Figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        toolbar_location=None,
+        title=Title(text="Scatter Plot & Regression Line", align="center"),
+        tools=[],
+        x_axis_label=xcol,
+        y_axis_label=ycol,
+    )
+    scatter = fig.scatter("__x__", "__y__", source=source_scatter)
+    fig.line("__x__", "__y__", source=source_coeffs, line_width=3)
+
+    # Not adding the tooltips before because we only want to apply tooltip to the scatter
+    hover = HoverTool(tooltips=tooltips, renderers=[scatter])
+    fig.add_tools(hover)
+
+    x_select = Select(title="X-Axis", value=xcol, options=var_list, width=150)
+    y_select = Select(title="Y-Axis", value=ycol, options=var_list, width=150)
+
+    x_select.js_on_change(
+        "value",
+        CustomJS(
+            args=dict(
+                scatter=source_scatter,
+                coeffs=source_coeffs,
+                xy_value=source_xy_value,
+                x_axis=fig.xaxis[0],
+            ),
+            code="""
+        let currentSelect = this.value;
+        let xyValueData = xy_value.data;
+        let scatterData = scatter.data;
+        let coeffsData = coeffs.data;
+
+        xyValueData['x'][0] = currentSelect;
+        scatterData['__x__'] = scatterData[currentSelect];
+        coeffsData['__x__'] = coeffsData[`${currentSelect}${xyValueData['y'][0]}x`];
+        coeffsData['__y__'] = coeffsData[`${currentSelect}${xyValueData['y'][0]}y`];
+
+        x_axis.axis_label = currentSelect;
+        scatter.change.emit();
+        coeffs.change.emit();
+        xy_value.change.emit();
+        """,
+        ),
+    )
+    y_select.js_on_change(
+        "value",
+        CustomJS(
+            args=dict(
+                scatter=source_scatter,
+                coeffs=source_coeffs,
+                xy_value=source_xy_value,
+                y_axis=fig.yaxis[0],
+            ),
+            code="""
+        let currentSelect = this.value;
+        let xyValueData = xy_value.data;
+        let scatterData = scatter.data;
+        let coeffsData = coeffs.data;
+
+        xyValueData['y'][0] = currentSelect;
+        scatterData['__y__'] = scatterData[currentSelect];
+        coeffsData['__x__'] = coeffsData[`${xyValueData['x'][0]}${currentSelect}x`];
+        coeffsData['__y__'] = coeffsData[`${xyValueData['x'][0]}${currentSelect}y`];
+
+        y_axis.axis_label = currentSelect;
+        scatter.change.emit();
+        coeffs.change.emit();
+        xy_value.change.emit();
+        """,
+        ),
+    )
+
+    fig = column(
+        row(x_select, y_select, align="center"), fig, sizing_mode="stretch_width"
+    )
     return fig
