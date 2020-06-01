@@ -204,16 +204,9 @@ def _sci_notation_superscript(value: str) -> str:
     Strip off character e in scientific notation to a superscript tag
     """
     if "e+" in value:
-        raw_string = f"{float(value):.4e}"
-        e_loc = raw_string.find("e")
-        sign = raw_string[e_loc + 1]
-        exp = (
-            f"<sup>{raw_string[e_loc + 2 :]}</sup>"
-            if sign == "+"
-            else f"<sup>-{raw_string[e_loc + 2 :]}</sup>"
-        )
-        raw_string = raw_string.replace("e", "x10")
-        value = raw_string[: e_loc + 3] + exp
+        value = value.replace("e+", "×10<sup>") + "</sup>"
+    elif "e-" in value:
+        value = value.replace("e", "×10<sup>") + "</sup>"
     return value
 
 
@@ -364,7 +357,7 @@ def pie_viz(
     tweak_figure(fig, "pie")
     fig.axis.major_label_text_font_size = "0pt"
     fig.axis.major_tick_line_color = None
-    return Panel(child=row(fig), title="pie chart")
+    return Panel(child=row(fig), title="Pie Chart")
 
 
 def hist_viz(
@@ -494,7 +487,7 @@ def qqnorm_viz(
     fig.yaxis.axis_label = f"Quantiles of {col}"
     _format_axis(fig, vals.min(), vals.max(), "x")
     _format_axis(fig, vals.min(), vals.max(), "y")
-    return Panel(child=fig, title="QQ normal plot")
+    return Panel(child=fig, title="QQ Normal Plot")
 
 
 def box_viz(
@@ -618,7 +611,7 @@ def box_viz(
     if timeunit == "Week of":
         fig.xaxis.axis_label = x + ", the week of"
 
-    return Panel(child=fig, title="box plot")
+    return Panel(child=fig, title="Box Plot")
 
 
 def line_viz(
@@ -685,7 +678,7 @@ def line_viz(
     if yscale == "linear":
         _format_axis(fig, ymin, ymax, "y")
 
-    return Panel(child=fig, title="line chart")
+    return Panel(child=fig, title="Line Chart")
 
 
 def scatter_viz(
@@ -713,7 +706,7 @@ def scatter_viz(
     fig.yaxis.axis_label = y
     _format_axis(fig, df[x].min(), df[x].max(), "x")
     _format_axis(fig, df[y].min(), df[y].max(), "y")
-    return Panel(child=fig, title="scatter plot")
+    return Panel(child=fig, title="Scatter Plot")
 
 
 def hexbin_viz(
@@ -780,7 +773,7 @@ def hexbin_viz(
     fig.xaxis.axis_label = x
     fig.yaxis.axis_label = y
 
-    return Panel(child=fig, title="hexbin plot")
+    return Panel(child=fig, title="Hexbin Plot")
 
 
 def nested_viz(
@@ -820,7 +813,7 @@ def nested_viz(
     fig.yaxis.axis_label = "Count"
     fig.xaxis.major_label_orientation = pi / 2
     _format_axis(fig, 0, df["cnt"].max(), "y")
-    return Panel(child=fig, title="nested bar chart")
+    return Panel(child=fig, title="Nested Bar Chart")
 
 
 def stacked_viz(
@@ -912,7 +905,7 @@ def stacked_viz(
 
     tweak_figure(fig, "stacked")
 
-    return Panel(child=fig, title="stacked bar chart")
+    return Panel(child=fig, title="Stacked Bar Chart")
 
 
 def heatmap_viz(
@@ -983,7 +976,7 @@ def heatmap_viz(
     """
         % (max_lbl_len, max_lbl_len)
     )
-    return Panel(child=fig, title="heat map")
+    return Panel(child=fig, title="Heat Map")
 
 
 def dt_line_viz(
@@ -1031,7 +1024,7 @@ def dt_line_viz(
     if y:
         fig.yaxis.axis_label = f"{df.columns[1]} of {y}"
         fig.xaxis.axis_label = x
-        return Panel(child=fig, title="line chart")
+        return Panel(child=fig, title="Line Chart")
 
     fig.yaxis.axis_label = "Frequency"
     return fig
@@ -1100,7 +1093,7 @@ def dt_multiline_viz(
     if yscale == "linear":
         _format_axis(fig, ymin, ymax, "y")
 
-    return Panel(child=fig, title="line chart")
+    return Panel(child=fig, title="Line Chart")
 
 
 def stats_viz(
@@ -1115,7 +1108,7 @@ def stats_viz(
         value = _sci_notation_superscript(value)
         ov_content += _create_table_row(key, value)
     for key, value in data[1].items():  # type: ignore
-        type_content += _create_table_row(key, value) if value > 0 else ""  # type: ignore
+        type_content += _create_table_row(key, value)
 
     ov_content = f"""
     <div style="flex: 50%; margin-right: 6px;">
@@ -1136,7 +1129,6 @@ def stats_viz(
         {ov_content}
         {type_content}
     </div>
-    <hr>
     """
     return Div(
         text=container,
@@ -1215,7 +1207,7 @@ def stats_viz_num(
         height=plot_height + 20,
         style={"width": "100%"},
     )
-    return Panel(child=div, title="stats")
+    return Panel(child=div, title="Stats")
 
 
 def stats_viz_cat(
@@ -1288,15 +1280,17 @@ def stats_viz_cat(
     div = Div(
         text=container, width=plot_width, height=plot_height, style={"width": "100%"}
     )
-    return Panel(child=div, title="stats")
+    return Panel(child=div, title="Stats")
 
 
-def stats_viz_dt(data: Dict[str, str], plot_width: int, plot_height: int) -> Panel:
+def stats_viz_dt(
+    data: Tuple[Dict[str, str]], plot_width: int, plot_height: int
+) -> Panel:
     """
     Render statistics panel for datetime data
     """
     ov_content = ""
-    for key, value in data.items():
+    for key, value in data[0].items():
         value = _sci_notation_superscript(value)
         if "Distinct" in key and float(value) > 50:
             ov_content += _create_table_row(key, value, True)
@@ -1317,11 +1311,11 @@ def stats_viz_dt(data: Dict[str, str], plot_width: int, plot_height: int) -> Pan
     div = Div(
         text=ov_content, width=plot_width, height=plot_height, style={"width": "100%"}
     )
-    return Panel(child=div, title="stats")
+    return Panel(child=div, title="Stats")
 
 
 def render_basic(
-    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
 ) -> Box:
     """
     Render plots and dataset stats from plot(df)
@@ -1367,10 +1361,10 @@ def render_basic(
         CustomJS(
             args={"button": button, "div": stats_section},
             code="""
-        let buttonLabel = button.label
-        let isDivVisible = div.visible
-        div.visible = isDivVisible ? false : true
-        button.label = (buttonLabel === 'Hide Stats Info') ? 'Show Stats Info' : 'Hide Stats Info'
+        let buttonLabel = button.label;
+        let isDivVisible = div.visible;
+        div.visible = isDivVisible ? false : true;
+        button.label = (buttonLabel === 'Show Stats Info') ? 'Hide Stats Info' : 'Show Stats Info';
     """,
         ),
     )
@@ -1398,26 +1392,26 @@ def render_cat(
         plot_height,
         True,
     )
-    tabs.append(Panel(child=row(fig), title="bar chart"))
+    tabs.append(Panel(child=row(fig), title="Bar Chart"))
     tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
     freq_tuple = itmdt["word_cloud"]
     if freq_tuple[0] != 0:
         word_cloud = wordcloud_viz(freq_tuple, plot_width, plot_height)
-        tabs.append(Panel(child=row(word_cloud), title="word cloud"))
+        tabs.append(Panel(child=row(word_cloud), title="Word Cloud"))
         wordfreq = wordfreq_viz(freq_tuple, plot_width, plot_height, True)
-        tabs.append(Panel(child=row(wordfreq), title="words frequency"))
+        tabs.append(Panel(child=row(wordfreq), title="Word Frequencies"))
     df, miss_pct = itmdt["length_dist"]
     length_dist = hist_viz(
         df, miss_pct, "length", yscale, plot_width, plot_height, True
     )
-    tabs.append(Panel(child=row(length_dist), title="length"))
+    tabs.append(Panel(child=row(length_dist), title="Word Length"))
     tabs = Tabs(tabs=tabs)
 
     return tabs
 
 
 def render_num(
-    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
 ) -> Tabs:
     """
     Render plots from plot(df, x) when x is a numerical column
@@ -1427,7 +1421,7 @@ def render_num(
     tabs.append(stats_viz_num((osd, qsd, dsd), plot_width, plot_height))
     df, miss_pct = itmdt["histdata"]
     fig = hist_viz(df, miss_pct, itmdt["col"], yscale, plot_width, plot_height, True)
-    tabs.append(Panel(child=fig, title="histogram"))
+    tabs.append(Panel(child=fig, title="Histogram"))
     df, pts_rng, pdf, _, _ = itmdt["kdedata"]
     if np.any(pdf):
         tabs.append(
@@ -1448,7 +1442,7 @@ def render_num(
 
 
 def render_dt(
-    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
 ) -> Tabs:
     """
     Render plots from plot(df, x) when x is a numerical column
@@ -1460,7 +1454,8 @@ def render_dt(
     fig = dt_line_viz(
         df, itmdt["col"], timeunit, yscale, plot_width, plot_height, True, miss_pct
     )
-    tabs.append(Panel(child=fig, title="line chart"))
+    tabs.append(Panel(child=fig, title="Line Chart"))
+
     tabs = Tabs(tabs=tabs)
     return tabs
 

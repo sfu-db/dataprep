@@ -480,7 +480,6 @@ def render_missing_spectrum(
         line_color=None,
     )
     fig.add_layout(color_bar, "right")
-
     return fig
 
 

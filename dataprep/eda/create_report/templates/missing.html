@@ -1,0 +1,13 @@
+<div class="missing-container">
+    {% for div in context.components.missing[1] %}
+    {% if div.error %}
+    {% with error_message = div.error %}
+    {% include 'error.html' %}
+    {% endwith %}
+    {% else %}
+    <div class="miss-plot">
+        {{ div }}
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
