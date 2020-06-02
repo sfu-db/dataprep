@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic.render &#8212; dataprep 0.2.5 documentation</title>
+    <title>dataprep.eda.basic.render &#8212; dataprep 0.2.6 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -22,7 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li> 
       </ul>
@@ -38,7 +38,7 @@
 <span class="sd">This module implements the visualization for the plot(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-lines</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -58,14 +58,19 @@
     <span class="n">ColorBar</span><span class="p">,</span>
     <span class="n">FactorRange</span><span class="p">,</span>
     <span class="n">CustomJSHover</span><span class="p">,</span>
+    <span class="n">Div</span><span class="p">,</span>
+    <span class="n">CustomJS</span><span class="p">,</span>
+    <span class="n">Button</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">column</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span><span class="p">,</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">figure</span>
 <span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="kn">import</span> <span class="n">cumsum</span><span class="p">,</span> <span class="n">linear_cmap</span><span class="p">,</span> <span class="n">transform</span>
 <span class="kn">from</span> <span class="nn">bokeh.util.hex</span> <span class="kn">import</span> <span class="n">hexbin</span>
 <span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">viridis</span><span class="p">,</span> <span class="n">Pastel1</span>  <span class="c1"># pylint: disable=E0611 # type: ignore</span>
+<span class="kn">from</span> <span class="nn">bokeh.events</span> <span class="kn">import</span> <span class="n">ButtonClick</span>
 
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DType</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">is_dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">,</span> <span class="n">DateTime</span>
 <span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">PALETTE</span><span class="p">,</span> <span class="n">BIPALETTE</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render&quot;</span><span class="p">]</span>
@@ -202,6 +207,47 @@
         <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_overrides</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ticks</span><span class="p">,</span> <span class="n">formatted_ticks</span><span class="p">))</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10pt&quot;</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">5</span>
+
+
+<span class="k">def</span> <span class="nf">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">highlight</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create table row for stats panel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">template_stats_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;tr style=&quot;border-bottom: 1px solid;&quot;&gt;</span>
+<span class="s2">        &lt;th style=&quot;text-align: left&quot;&gt;</span><span class="si">{key}</span><span class="s2">&lt;/th&gt;</span>
+<span class="s2">        &lt;td style=&quot;text-align: left&quot;&gt;</span><span class="si">{value}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">    &lt;/tr&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">template_stats_data_red</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;tr style=&quot;color: #f00; border-bottom: 1px solid;&quot;&gt;</span>
+<span class="s2">        &lt;th style=&quot;text-align: left&quot;&gt;</span><span class="si">{key}</span><span class="s2">&lt;/th&gt;</span>
+<span class="s2">        &lt;td style=&quot;text-align: left&quot;&gt;</span><span class="si">{value}</span><span class="s2">&lt;/td&gt;</span><span class="se">\</span>
+<span class="s2">    &lt;/tr&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">template_stats_data_red</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">highlight</span>
+        <span class="k">else</span> <span class="n">template_stats_data</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Strip off character e in scientific notation to a superscript tag</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;e+&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">raw_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">e_loc</span> <span class="o">=</span> <span class="n">raw_string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;e&quot;</span><span class="p">)</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="n">raw_string</span><span class="p">[</span><span class="n">e_loc</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&lt;sup&gt;</span><span class="si">{</span><span class="n">raw_string</span><span class="p">[</span><span class="n">e_loc</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]</span><span class="si">}</span><span class="s2">&lt;/sup&gt;&quot;</span>
+            <span class="k">if</span> <span class="n">sign</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;&lt;sup&gt;-</span><span class="si">{</span><span class="n">raw_string</span><span class="p">[</span><span class="n">e_loc</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]</span><span class="si">}</span><span class="s2">&lt;/sup&gt;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">raw_string</span> <span class="o">=</span> <span class="n">raw_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;x10&quot;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">raw_string</span><span class="p">[:</span> <span class="n">e_loc</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">exp</span>
+    <span class="k">return</span> <span class="n">value</span>
 
 
 <span class="k">def</span> <span class="nf">bar_viz</span><span class="p">(</span>
@@ -1020,15 +1066,188 @@
     <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;line chart&quot;</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">stats_viz</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Div</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render statistics information for grid plots</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="s1">&#39;&lt;h3 style=&quot;text-align:center;&quot;&gt;Dataset Statistics&lt;/h3&gt;&#39;</span>
+    <span class="n">type_content</span> <span class="o">=</span> <span class="s1">&#39;&lt;h3 style=&quot;text-align:center;&quot;&gt;Variable Types&lt;/h3&gt;&#39;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  <span class="c1"># type: ignore</span>
+        <span class="n">type_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># type: ignore</span>
+
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;div style=&quot;flex: 50%; margin-right: 6px;&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">type_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;div style=&quot;flex: 50%; margin-right: 6px;&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">type_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">container</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;div style=&quot;display: flex;&quot;&gt;</span>
+<span class="s2">        </span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">        </span><span class="si">{</span><span class="n">type_content</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &lt;hr&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Div</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">plot_height</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">},</span>
+        <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">stats_viz_num</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Panel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render statistics panel for numerical data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">qs_content</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;&lt;h4 style=&quot;text-align:center; margin:1em auto 0.2em;&quot;&gt;Quantile Statistics&lt;/h4&gt;&#39;</span>
+    <span class="p">)</span>
+    <span class="n">ds_content</span> <span class="o">=</span> <span class="s1">&#39;&lt;h4 style=&quot;text-align:center; margin:1em auto 0.2em;&quot;&gt;Descriptive Statistics&lt;/h4&gt;&#39;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;Distinct&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;Unique&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">key</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Missing&quot;</span><span class="p">,</span> <span class="s2">&quot;Zeros&quot;</span><span class="p">,</span> <span class="s2">&quot;Infinite&quot;</span><span class="p">])</span>
+            <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">qs_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;Skewness&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">ds_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;h4 style=&quot;text-align: center; margin:0 auto 0.2em;&quot;&gt;Overview&lt;/h4&gt;</span>
+<span class="s2">    &lt;div style=&quot;columns: 2&quot;&gt;</span>
+<span class="s2">    &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
+<span class="s2">        &lt;tbody&gt;</span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">    &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">qs_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;div style=&quot;flex: 50%; margin-right: 6px;&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">qs_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">ds_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;div style=&quot;flex: 50%; margin-right: 6px;&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">ds_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">container</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s1">&lt;div style=&quot;display: flex;&quot;&gt;</span><span class="si">{</span><span class="n">qs_content</span><span class="si">}{</span><span class="n">ds_content</span><span class="si">}</span><span class="s1">&lt;/div&gt;&#39;</span>
+    <span class="p">)</span>
+
+    <span class="n">div</span> <span class="o">=</span> <span class="n">Div</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">plot_height</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;stats&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">stats_viz_cat</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Panel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render statistics panel for categorical data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;Distinct&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;Unique&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;Missing&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;h3 style=&quot;text-align: center;&quot;&gt;Overview&lt;/h3&gt;</span>
+<span class="s2">    &lt;div&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">div</span> <span class="o">=</span> <span class="n">Div</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">ov_content</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;stats&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">stats_viz_dt</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Panel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render statistics panel for datetime data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_sci_notation_superscript</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;Distinct&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;Unique&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;Missing&quot;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ov_content</span> <span class="o">+=</span> <span class="n">_create_table_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">ov_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;h3 style=&quot;text-align: center;&quot;&gt;Overview&lt;/h3&gt;</span>
+<span class="s2">    &lt;div&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">div</span> <span class="o">=</span> <span class="n">Div</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">ov_content</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;stats&quot;</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">render_basic</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Box</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Render plots from plot(df)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Render plots and dataset stats from plot(df)</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-locals</span>
     <span class="n">figs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">DType</span><span class="o">.</span><span class="n">Categorical</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()):</span>
             <span class="n">df</span><span class="p">,</span> <span class="n">total_grps</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">data</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">bar_viz</span><span class="p">(</span>
                 <span class="n">df</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
@@ -1041,17 +1260,41 @@
                 <span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">DType</span><span class="o">.</span><span class="n">Numerical</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
             <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">data</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">hist_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">DType</span><span class="o">.</span><span class="n">DateTime</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()):</span>
             <span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">data</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">dt_line_viz</span><span class="p">(</span>
                 <span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">miss_pct</span>
             <span class="p">)</span>
             <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">gridplot</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">figs</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,)</span>
+
+    <span class="n">stats_section</span> <span class="o">=</span> <span class="n">stats_viz</span><span class="p">(</span>
+        <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;statsdata&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span>
+    <span class="p">)</span>
+    <span class="n">plot_section</span> <span class="o">=</span> <span class="n">gridplot</span><span class="p">(</span>
+        <span class="n">children</span><span class="o">=</span><span class="n">figs</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Show Stats Info&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span>
+    <span class="p">)</span>
+    <span class="n">button</span><span class="o">.</span><span class="n">js_on_event</span><span class="p">(</span>
+        <span class="n">ButtonClick</span><span class="p">,</span>
+        <span class="n">CustomJS</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;button&quot;</span><span class="p">:</span> <span class="n">button</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">:</span> <span class="n">stats_section</span><span class="p">},</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        let buttonLabel = button.label</span>
+<span class="s2">        let isDivVisible = div.visible</span>
+<span class="s2">        div.visible = isDivVisible ? false : true</span>
+<span class="s2">        button.label = (buttonLabel === &#39;Hide Stats Info&#39;) ? &#39;Show Stats Info&#39; : &#39;Hide Stats Info&#39;</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">column</span><span class="p">(</span><span class="n">button</span><span class="p">,</span> <span class="n">stats_section</span><span class="p">,</span> <span class="n">plot_section</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">render_cat</span><span class="p">(</span>
@@ -1061,6 +1304,8 @@
 <span class="sd">    Render plots from plot(df, x) when x is a categorical column</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">osd</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;statsdata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats_viz_cat</span><span class="p">(</span><span class="n">osd</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">total_grps</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">bar_viz</span><span class="p">(</span>
         <span class="n">df</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
@@ -1083,19 +1328,28 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x) when x is a numerical column</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-locals</span>
     <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">osd</span><span class="p">,</span> <span class="n">qsd</span><span class="p">,</span> <span class="n">dsd</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;statsdata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats_viz_num</span><span class="p">((</span><span class="n">osd</span><span class="p">,</span> <span class="n">qsd</span><span class="p">,</span> <span class="n">dsd</span><span class="p">),</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;histdata&quot;</span><span class="p">]</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">hist_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;histogram&quot;</span><span class="p">))</span>
-    <span class="n">df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;kdedata&quot;</span><span class="p">]</span>
-    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-        <span class="n">hist_kde_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;qqdata&quot;</span><span class="p">]</span>
-    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qqnorm_viz</span><span class="p">(</span><span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;kdedata&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">pdf</span><span class="p">):</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">hist_kde_viz</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;qqdata&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">theory_qs</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">theory_qs</span><span class="p">)]):</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">qqnorm_viz</span><span class="p">(</span><span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="p">)</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">outx</span><span class="p">,</span> <span class="n">outy</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;boxdata&quot;</span><span class="p">]</span>
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">box_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outx</span><span class="p">,</span> <span class="n">outy</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
+
     <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tabs</span>
 
@@ -1107,6 +1361,8 @@
 <span class="sd">    Render plots from plot(df, x) when x is a numerical column</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">osd</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;statsdata&quot;</span><span class="p">]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats_viz_dt</span><span class="p">(</span><span class="n">osd</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">dt_line_viz</span><span class="p">(</span>
         <span class="n">df</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">miss_pct</span>
@@ -1389,7 +1645,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li> 
       </ul>

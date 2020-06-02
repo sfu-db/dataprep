@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.data_connector package &#8212; dataprep 0.2.5 documentation</title>
+    <title>dataprep.data_connector package &#8212; dataprep 0.2.6 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="dataprep.html" title="dataprep package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" accesskey="U">dataprep package</a> &#187;</li> 
       </ul>
     </div>  
@@ -46,7 +46,7 @@
 <h2>Connector<a class="headerlink" href="#connector" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="dataprep.data_connector.Connector">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.</code><code class="sig-name descname">Connector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_path</span></em>, <em class="sig-param"><span class="n">auth_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.data_connector.</code><code class="sig-name descname">Connector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_path</span></em>, <em class="sig-param"><span class="n">_auth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the main class of data_connector component.
 Initialize Connector class as the example code.</p>
 <dl class="field-list simple">
@@ -54,8 +54,8 @@ Initialize Connector class as the example code.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The path to the config. It can be hosted, e.g. “yelp”, or from
 local filesystem, e.g. “./yelp”</p></li>
-<li><p><strong>auth_params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – The parameter for authentication, e.g. OAuth2</p></li>
-<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – Additional parameters</p></li>
+<li><p><strong>auth_params</strong> – The parameter for authentication, e.g. OAuth2</p></li>
+<li><p><strong>kwargs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – Additional parameters</p></li>
 </ul>
 </dd>
 </dl>
@@ -77,28 +77,30 @@ local filesystem, e.g. “./yelp”</p></li>
 
 <dl class="py method">
 <dt id="dataprep.data_connector.Connector.query">
-<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">auth_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">where</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector.query" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use this method to query the API and get the returned table.</p>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;businesses&#39;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;korean&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;vancouver)</span>
-</pre></div>
-</div>
+<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">_auth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">_count</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">where</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the API to get a table.
+:type table: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param table: The table name.
+:type table: str
+:type _auth: <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]
+:param _auth: The parameters for authentication. Usually the authentication parameters</p>
+<blockquote>
+<div><p>should be defined when instantiating the Connector. In case some tables have different
+authentication options, a different authentication parameter can be defined here.
+This parameter will override the one from Connector if passed.</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>table</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The table name.</p></li>
-<li><p><strong>auth_params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – The parameters for authentication. Usually the authentication parameters
-should be defined when instantiating the Connector. In case some tables have different
-authentication options, a different authentication parameter can be defined here.
-This parameter will override the one from Connector if passed.</p></li>
-<li><p><strong>where</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – The additional parameters required for the query.</p></li>
+<li><p><strong>_count</strong> (<em>Optional</em><em>[</em><em>int</em><em>] </em><em>= None</em>) – count of returned records.</p></li>
+<li><p><strong>**where</strong> (<em>Any</em>) – The additional parameters required for the query.</p></li>
+<li><p><strong>table</strong> (<em>str</em>) – </p></li>
+<li><p><strong>_auth</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>= None</em>) – </p></li>
+<li><p><strong>where</strong> (<em>Any</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A DataFrame that contains the data returned by the website API.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -107,16 +109,18 @@ This parameter will override the one from Connector if passed.</p></li>
 <dt id="dataprep.data_connector.Connector.show_schema">
 <code class="sig-name descname">show_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/data_connector/connector.html#Connector.show_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.data_connector.Connector.show_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method shows the schema of the table that will be returned,
-so that the user knows what information to expect.</p>
+so that the user knows what information to expect.
+:type table_name: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param table_name: The table name.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The returned data’s schema.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>table_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The table name.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The returned data’s schema.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
+<dd class="field-odd"><p><strong>table_name</strong> (<em>str</em>) – </p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -129,11 +133,11 @@ The user can either use the default one or change it by editing the configuratio
 <dl class="py method">
 <dt id="dataprep.data_connector.Connector.table_names">
 <em class="property">property </em><code class="sig-name descname">table_names</code><a class="headerlink" href="#dataprep.data_connector.Connector.table_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the names of the available tables in a list.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We abstract each website as a database containing several tables.
-For example in Spotify, we have artist and album table.</p>
+<dd><p>Return all the names of the available tables in a list.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">We</span> <span class="n">abstract</span> <span class="n">each</span> <span class="n">website</span> <span class="k">as</span> <span class="n">a</span> <span class="n">database</span> <span class="n">containing</span> <span class="n">several</span> <span class="n">tables</span><span class="o">.</span>
+<span class="n">For</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">Spotify</span><span class="p">,</span> <span class="n">we</span> <span class="n">have</span> <span class="n">artist</span> <span class="ow">and</span> <span class="n">album</span> <span class="n">table</span><span class="o">.</span>
+</pre></div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -200,7 +204,7 @@ For example in Spotify, we have artist and album table.</p>
         <li class="right" >
           <a href="dataprep.html" title="dataprep package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li> 
       </ul>
     </div>

@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda package &#8212; dataprep 0.2.5 documentation</title>
+    <title>dataprep.eda package &#8212; dataprep 0.2.6 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="dataprep.data_connector.html" title="dataprep.data_connector package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" accesskey="U">dataprep package</a> &#187;</li> 
       </ul>
     </div>  
@@ -42,7 +42,7 @@
 <h2>Plot* functions<a class="headerlink" href="#plot-functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="dataprep.eda.basic.plot">
-<code class="sig-prename descclassname">dataprep.eda.basic.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yscale</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">tile_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.basic.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yscale</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">tile_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates plots for exploratory data analysis.</p>
 <p>If no columns are specified, the distribution of
 each coloumn is plotted. A histogram is plotted if the
@@ -101,6 +101,10 @@ Applies when column x is specified and column y is unspecified.</p></li>
 <li><p><strong>yscale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
 <li><p><strong>tile_size</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em><em>, </em><em>default None</em>) – Size of the tile for the hexbin plot. Measured from the middle
 of a hexagon to its left or right corner.</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em> or </em><em>DType</em><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
+E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
+dtype = {“a”: Continuous(), “b”: “nominal”}
+or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -136,6 +140,7 @@ of a hexagon to its left or right corner.</p></li>
 <li><p><strong>float</strong><strong>]</strong><strong>] </strong><strong>value_range</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>float</em><em>,</em>) – </p></li>
 <li><p><strong>yscale</strong> (<em>str</em>) – </p></li>
 <li><p><strong>tile_size</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>Union</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>str</strong><strong>]</strong><strong>]</strong><strong>, </strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>None</strong><strong>] </strong><strong>dtype</strong> (<em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -199,7 +204,7 @@ and it is better to drop None, Nan and Null value before using it</p>
 
 <dl class="py function">
 <dt id="dataprep.eda.missing.plot_missing">
-<code class="sig-prename descclassname">dataprep.eda.missing.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ncols</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ndist_sample</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.plot_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.missing.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ncols</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ndist_sample</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.plot_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
@@ -212,6 +217,11 @@ plot_missing(df, x, y)</p>
 <li><p><strong>ncols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of columns in the figure</p></li>
 <li><p><strong>bins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rows in the figure</p></li>
 <li><p><strong>ndist_sample</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of sample points</p></li>
+<li><p><strong>wdtype</strong> (<em>str</em><em> or </em><em>DType</em><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
+E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
+dtype = {“a”: Continuous(), “b”: “nominal”}
+or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
+<li><p><strong>Union</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>str</strong><strong>]</strong><strong>]</strong><strong>, </strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>None</strong><strong>] </strong><strong>dtype</strong> (<em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -238,6 +248,7 @@ plot_missing(df, x, y)</p>
 <li><p><strong>bins</strong> (<em>int</em>) – </p></li>
 <li><p><strong>ncols</strong> (<em>int</em>) – </p></li>
 <li><p><strong>ndist_sample</strong> (<em>int</em>) – </p></li>
+<li><p><strong>Union</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>str</strong><strong>]</strong><strong>]</strong><strong>, </strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>None</strong><strong>] </strong><strong>dtype</strong> (<em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -248,7 +259,7 @@ plot_missing(df, x, y)</p>
 <h2>Other functions<a class="headerlink" href="#other-functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="dataprep.eda.basic.compute.compute">
-<code class="sig-prename descclassname">dataprep.eda.basic.compute.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.compute.compute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.basic.compute.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/basic/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.basic.compute.compute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -275,6 +286,10 @@ time unit such that the resulting number of groups is closest to 15.</p></li>
 <li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>default 1000</em>) – Sample size for the scatter plot</p></li>
 <li><p><strong>value_range</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>]</em><em>, </em><em>default None</em>) – The lower and upper bounds on the range of a numerical column.
 Applies when column x is specified and column y is unspecified.</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em> or </em><em>DType</em><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
+E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
+dtype = {“a”: Continuous(), “b”: “nominal”}
+or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -356,7 +371,7 @@ the palette will be automatically chosen based on different visualization types.
 
 <dl class="py function">
 <dt id="dataprep.eda.missing.compute.compute_missing">
-<code class="sig-prename descclassname">dataprep.eda.missing.compute.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ncols</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ndist_sample</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.compute.compute_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.missing.compute.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ncols</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">ndist_sample</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.compute.compute_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
@@ -369,6 +384,10 @@ plot_missing(df, x, y)</p>
 <li><p><strong>ncols</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of columns in the figure</p></li>
 <li><p><strong>bins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rows in the figure</p></li>
 <li><p><strong>ndist_sample</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of sample points</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em> or </em><em>DType</em><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
+E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
+dtype = {“a”: Continuous(), “b”: “nominal”}
+or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -395,6 +414,7 @@ plot_missing(df, x, y)</p>
 <li><p><strong>bins</strong> (<em>int</em>) – </p></li>
 <li><p><strong>ncols</strong> (<em>int</em>) – </p></li>
 <li><p><strong>ndist_sample</strong> (<em>int</em>) – </p></li>
+<li><p><strong>Union</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>str</strong><strong>]</strong><strong>]</strong><strong>, </strong><strong>dataprep.eda.dtypes.DType</strong><strong>, </strong><strong>Type</strong><strong>[</strong><strong>dataprep.eda.dtypes.DType</strong><strong>]</strong><strong>, </strong><strong>None</strong><strong>] </strong><strong>dtype</strong> (<em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>,</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -469,7 +489,7 @@ plot_missing(df, x, y)</p>
         <li class="right" >
           <a href="dataprep.data_connector.html" title="dataprep.data_connector package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="dataprep.html" >dataprep package</a> &#187;</li> 
       </ul>
     </div>

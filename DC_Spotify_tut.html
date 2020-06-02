@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tutorial - Data Connector for Spotify &#8212; dataprep 0.2.6 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="EDA Case Study: Titanic" href="case_study/titanic.html" />
+    <link rel="prev" title="Tutorial - Data Connector for Yelp" href="DC_Yelp_tut.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="case_study/titanic.html" title="EDA Case Study: Titanic"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DC_Yelp_tut.html" title="Tutorial - Data Connector for Yelp"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorial-data-connector-for-spotify">
+<h1>Tutorial - Data Connector for Spotify<a class="headerlink" href="#tutorial-data-connector-for-spotify" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>data_connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. The goal is to help the users skip the complex API configuration. In this tutorial, we illustrate how to use data_connector library with Spotify.</p>
+</div>
+<div class="section" id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<p>If you haven’t installed dataprep, run command pip install dataprep or execute the following cell.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!pip install dataprep
+</pre></div>
+</div>
+</div>
+<div class="section" id="obtaining-access-token-from-spotify">
+<h2>Obtaining access token from Spotify<a class="headerlink" href="#obtaining-access-token-from-spotify" title="Permalink to this headline">¶</a></h2>
+<p>To connect to Spotify, you need to generate a token. This token is a unique identifier of an application requesting access to the Spotify’s API. Once an application creates the token, it will act as your credential when making an API request.
+To receive an access token the user needs to create a server side application from Spotify. You can create a token by following the <a class="reference external" href="https://developer.spotify.com/documentation/web-api/">Spotify document</a>, or through the comprehensive guide below.</p>
+<p>Start by setting up a Spotify Developer account.</p>
+<a class="reference internal image-reference" href="_images/Spotify_authentication.png"><img alt="_images/Spotify_authentication.png" class="align-center" src="_images/Spotify_authentication.png" style="width: 700px; height: 470px;" /></a>
+<p>Once an account is created, click the “Dashboard” link and register a new application. Name and describe the application as you want.</p>
+<a class="reference internal image-reference" href="_images/Spotify_dashboard.png"><img alt="_images/Spotify_dashboard.png" class="align-center" src="_images/Spotify_dashboard.png" style="width: 600px; height: 400px;" /></a>
+<p>Proceed to <a class="reference external" href="https://developer.spotify.com/documentation/web-api/">Spotify’s GitHub account</a> and download/clone the Authentication Flow example app code.
+If the clone was successful, a new sub-directory appears on your local drive in the directory where you cloned your repository.</p>
+<a class="reference internal image-reference" href="_images/Spotify_git_page.png"><img alt="_images/Spotify_git_page.png" class="align-center" src="_images/Spotify_git_page.png" style="width: 650px; height: 400px;" /></a>
+<p>Download and install <a class="reference external" href="https://nodejs.org/en/">Node.js</a>, if you have not done so already.</p>
+<a class="reference internal image-reference" href="_images/Node_js.png"><img alt="_images/Node_js.png" class="align-center" src="_images/Node_js.png" style="width: 650px; height: 400px;" /></a>
+<div class="section" id="providing-the-credentials">
+<h3>Providing the Credentials<a class="headerlink" href="#providing-the-credentials" title="Permalink to this headline">¶</a></h3>
+<p>In the web-api-auth-examples folder, navigator to the authorization_code folder and there is a file called apps.js.</p>
+<a class="reference internal image-reference" href="_images/App_find.png"><img alt="_images/App_find.png" class="align-center" src="_images/App_find.png" style="width: 650px; height: 330px;" /></a>
+<p>Open apps.js with your favourite editor. In the file, it contains a section for client ID, client secret, and redirect URI. Insert the information available in the “white out” section. This is the call that starts the process of authenticating to user and gets the user’s authorization to access data.</p>
+<a class="reference internal image-reference" href="_images/App.js_config.png"><img alt="_images/App.js_config.png" class="align-center" src="_images/App.js_config.png" style="width: 650px; height: 100px;" /></a>
+<p>The client ID and client Secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.</p>
+<a class="reference internal image-reference" href="_images/ID_and_secret.png"><img alt="_images/ID_and_secret.png" class="align-center" src="_images/ID_and_secret.png" style="width: 600px; height: 350px;" /></a>
+<p>Go back to the application dashboard and click the edit settings which can be found on the top right. In this section, insert the http link in the redirect_uri, “<a class="reference external" href="http://localhost:8888/callback">http://localhost:8888/callback</a>”. The redirect URI will safely send the user back to their application once Spotify has authorized the app. Copy and store the access token in a safe area.</p>
+<a class="reference internal image-reference" href="_images/URI_.png"><img alt="_images/URI_.png" class="align-center" src="_images/URI_.png" style="width: 300px; height: 400px;" /></a>
+</div>
+<div class="section" id="running-the-application">
+<h3>Running the Application<a class="headerlink" href="#running-the-application" title="Permalink to this headline">¶</a></h3>
+<p>Start the server by running the following command in the terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">node</span> <span class="n">app</span><span class="o">.</span><span class="n">js</span>
+</pre></div>
+</div>
+<p>Open a browser and visit the project home page again. Now that the server is running, you can use the following URL: <a class="reference external" href="http://localhost:8888">http://localhost:8888</a>.</p>
+<a class="reference internal image-reference" href="_images/Spotify_server.png"><img alt="_images/Spotify_server.png" class="align-center" src="_images/Spotify_server.png" style="width: 800px; height: 400px;" /></a>
+<p>When you click on the log in link, it will send you back to your redirect URI. You should see your Spotify account information as well as your access token and refresh token.</p>
+<a class="reference internal image-reference" href="_static/images/tutorial/SFU_spotify.png"><img alt="_static/images/tutorial/SFU_spotify.png" class="align-center" src="_static/images/tutorial/SFU_spotify.png" style="width: 800px; height: 400px;" /></a>
+</div>
+</div>
+<div class="section" id="download-and-store-the-configuration-files-in-dataprep">
+<h2>Download and store the configuration files in dataprep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
+<p>The configuration files are used to configure the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
+<p>Store the configuration file in the dataprep folder.</p>
+<a class="reference internal image-reference" href="_images/Config_destination.png"><img alt="_images/Config_destination.png" class="align-center" src="_images/Config_destination.png" style="width: 500px; height: 120px;" /></a>
+</div>
+<div class="section" id="initialize-data-connector">
+<h2>Initialize data_connector<a class="headerlink" href="#initialize-data-connector" title="Permalink to this headline">¶</a></h2>
+<p>To initialize the data_connector, run the following code below. Copy and paste the Spotify <strong>access_token</strong>, <strong>client_id</strong>, and <strong>client_secret</strong> in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>from dataprep.data_connector import Connector
+client_id = “insert_client_id”
+client_secret = “insert_client_secret”
+access_token = ““insert_token_key”
+dc = Connector(&quot;./DataConnectorConfigs/spotify&quot;, auth_params={&quot;client_id&quot;:client_id,
+                                                       &quot;client_secret&quot;:access_token,
+                                                       &quot;access_token&quot;:access_token})
+</pre></div>
+</div>
+</div>
+<div class="section" id="functionalities">
+<h2>Functionalities<a class="headerlink" href="#functionalities" title="Permalink to this headline">¶</a></h2>
+<p>Data connector has several functions you can perform to gain insight on the data downloaded from Spotify.</p>
+<div class="section" id="connector-info">
+<h3>Connector.info<a class="headerlink" href="#connector-info" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.</div>
+</div>
+<div class="line-block">
+<div class="line">a. Table - The table(s) being accessed.</div>
+<div class="line">b. Parameters - Identifies which parameters can be used to call the method.</div>
+<div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_spotify_info.png"><img alt="_images/dc_spotify_info.png" class="align-center" src="_images/dc_spotify_info.png" style="width: 385px; height: 540px;" /></a>
+</div>
+<div class="section" id="connector-show-schema">
+<h3>Connector.show_schema<a class="headerlink" href="#connector-show-schema" title="Permalink to this headline">¶</a></h3>
+<p>The show_schema method returns the website data in a Dataframe format. There are two columns in the response. The first column is the column name and the second is the datatype.
+As an example, lets see what is in the artist table.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_spotify_show_schema.png"><img alt="_images/dc_spotify_show_schema.png" class="align-center" src="_images/dc_spotify_show_schema.png" style="width: 285px; height: 320px;" /></a>
+</div>
+<div class="section" id="connector-query">
+<h3>Connector.query<a class="headerlink" href="#connector-query" title="Permalink to this headline">¶</a></h3>
+<p>The query method downloads the website data and displays it in a Dataframe. The parameters must meet the requirements as indicated in connector.info for the operation to run.</p>
+<p>When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.</p>
+<p>As an example, let’s try to get the data from the “artist” table, providing the query search for “pop”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;pop&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_spotify_query.png"><img alt="_images/dc_spotify_query.png" class="align-center" src="_images/dc_spotify_query.png" style="width: 1000px; height: 460px;" /></a>
+<p>From query results, you can see how easy it is to download the artist data from Spotify into a pandas Dataframe.
+Now that you have an understanding of how data connector operates, you can easily accomplish the task with two lines of code.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="that-s-all-for-now">
+<h2>That’s all for now.<a class="headerlink" href="#that-s-all-for-now" title="Permalink to this headline">¶</a></h2>
+<p>Please visit the other tutorials that are available if you are interested in setting up a data connector.
+If you are interested in creating other data connectors, please visit this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">link</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial - Data Connector for Spotify</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#preprocessing">Preprocessing</a></li>
+<li><a class="reference internal" href="#obtaining-access-token-from-spotify">Obtaining access token from Spotify</a><ul>
+<li><a class="reference internal" href="#providing-the-credentials">Providing the Credentials</a></li>
+<li><a class="reference internal" href="#running-the-application">Running the Application</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#download-and-store-the-configuration-files-in-dataprep">Download and store the configuration files in dataprep</a></li>
+<li><a class="reference internal" href="#initialize-data-connector">Initialize data_connector</a></li>
+<li><a class="reference internal" href="#functionalities">Functionalities</a><ul>
+<li><a class="reference internal" href="#connector-info">Connector.info</a></li>
+<li><a class="reference internal" href="#connector-show-schema">Connector.show_schema</a></li>
+<li><a class="reference internal" href="#connector-query">Connector.query</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#that-s-all-for-now">That’s all for now.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DC_Yelp_tut.html"
+                        title="previous chapter">Tutorial - Data Connector for Yelp</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="case_study/titanic.html"
+                        title="next chapter">EDA Case Study: Titanic</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/DC_Spotify_tut.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="case_study/titanic.html" title="EDA Case Study: Titanic"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DC_Yelp_tut.html" title="Tutorial - Data Connector for Yelp"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, SFU Database System Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

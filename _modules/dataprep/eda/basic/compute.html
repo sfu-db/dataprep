@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic.compute &#8212; dataprep 0.2.5 documentation</title>
+    <title>dataprep.eda.basic.compute &#8212; dataprep 0.2.6 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -22,7 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li> 
       </ul>
@@ -36,7 +36,7 @@
   <h1>Source code for dataprep.eda.basic.compute</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module implements the intermediates computation for plot(df) function.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-lines</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
@@ -45,10 +45,18 @@
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span><span class="p">,</span> <span class="n">norm</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">kurtosis</span><span class="p">,</span> <span class="n">skew</span><span class="p">,</span> <span class="n">median_absolute_deviation</span>
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DType</span><span class="p">,</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">is_numerical</span><span class="p">,</span> <span class="n">is_datetime</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">is_dtype</span><span class="p">,</span>
+    <span class="n">detect_dtype</span><span class="p">,</span>
+    <span class="n">DType</span><span class="p">,</span>
+    <span class="n">Nominal</span><span class="p">,</span>
+    <span class="n">Continuous</span><span class="p">,</span>
+    <span class="n">DateTime</span><span class="p">,</span>
+    <span class="n">DTypeDef</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
 
@@ -84,6 +92,7 @@
     <span class="n">agg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
     <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
@@ -123,210 +132,474 @@
 <span class="sd">    value_range: Optional[Tuple[float, float]], default None</span>
 <span class="sd">        The lower and upper bounds on the range of a numerical column.</span>
 <span class="sd">        Applies when column x is specified and column y is unspecified.</span>
+<span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
+<span class="sd">        Specify Data Types for designated column or all columns.</span>
+<span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
+<span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
+<span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-return-statements,too-many-statements</span>
-    <span class="c1"># pylint: disable=no-else-return</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)):</span>
-        <span class="n">datas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">col_names_dtypes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DType</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-                <span class="c1"># bar chart</span>
-                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_bar_pie</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
-                <span class="n">col_names_dtypes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">Categorical</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-                <span class="c1"># histogram</span>
-                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_hist</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">bins</span><span class="p">))</span>
-                <span class="n">col_names_dtypes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">Numerical</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">[[</span><span class="n">column</span><span class="p">]],</span> <span class="n">timeunit</span><span class="p">))</span>
-                <span class="n">col_names_dtypes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DType</span><span class="o">.</span><span class="n">DateTime</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">UnreachableError</span>
-        <span class="n">datas</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">datas</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">col</span><span class="p">,</span> <span class="n">dtp</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">dtp</span><span class="p">),</span> <span class="n">dat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">col_names_dtypes</span><span class="p">,</span> <span class="n">datas</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;basic_grid&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compute_overview</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
-    <span class="k">elif</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">or</span> <span class="n">z</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-            <span class="c1"># data for bar and pie charts</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_bar_pie</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
-                    <span class="ow">and</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
-                    <span class="ow">and</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                <span class="p">):</span>
-                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid range of values for this column&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">stderr</span><span class="p">)</span>
-            <span class="c1"># qq plot</span>
-            <span class="n">qqdata</span> <span class="o">=</span> <span class="n">calc_qqnorm</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
-            <span class="c1"># histogram</span>
-            <span class="n">histdata</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_hist</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">bins</span><span class="p">))</span>
-            <span class="c1"># kde plot</span>
-            <span class="n">kdedata</span> <span class="o">=</span> <span class="n">calc_hist_kde</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
-            <span class="c1"># box plot</span>
-            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
-                <span class="n">histdata</span><span class="o">=</span><span class="n">histdata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">kdedata</span><span class="o">=</span><span class="n">kdedata</span><span class="p">,</span>
-                <span class="n">qqdata</span><span class="o">=</span><span class="n">qqdata</span><span class="p">,</span>
-                <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
-                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-            <span class="c1"># line chart</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">[[</span><span class="n">col</span><span class="p">]],</span> <span class="n">timeunit</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;datetime_column&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnreachableError</span>
+        <span class="k">return</span> <span class="n">compute_univariate</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">value_range</span><span class="p">,</span> <span class="n">dtype</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">xdtype</span><span class="p">,</span> <span class="n">ydtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
-            <span class="c1"># box plot per group</span>
-            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
-            <span class="c1"># histogram per group</span>
-            <span class="n">hisdata</span> <span class="o">=</span> <span class="n">calc_hist_by_group</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-                <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
-                <span class="n">histdata</span><span class="o">=</span><span class="n">hisdata</span><span class="p">,</span>
-                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;cat_and_num_cols&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span>
-            <span class="n">is_datetime</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="n">dtnum</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="c1"># line chart</span>
-            <span class="n">dtnum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">agg</span><span class="p">))</span>
-            <span class="c1"># box plot</span>
-            <span class="n">dtnum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_box_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">))</span>
-            <span class="n">dtnum</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">dtnum</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-                <span class="n">linedata</span><span class="o">=</span><span class="n">dtnum</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">boxdata</span><span class="o">=</span><span class="n">dtnum</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;dt_and_num_cols&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span>
-            <span class="n">is_datetime</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
-            <span class="n">dtcat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="c1"># line chart</span>
-            <span class="n">dtcat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span>
-                    <span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">ngroups</span><span class="o">=</span><span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="o">=</span><span class="n">largest</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-            <span class="c1"># stacked bar chart</span>
-            <span class="n">dtcat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stacked_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
-            <span class="n">dtcat</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">dtcat</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-                <span class="n">linedata</span><span class="o">=</span><span class="n">dtcat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">stackdata</span><span class="o">=</span><span class="n">dtcat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;dt_and_cat_cols&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
-            <span class="c1"># nested bar chart</span>
-            <span class="n">nesteddata</span> <span class="o">=</span> <span class="n">calc_nested</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
-            <span class="c1"># stacked bar chart</span>
-            <span class="n">stackdata</span> <span class="o">=</span> <span class="n">calc_stacked</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
-            <span class="c1"># heat map</span>
-            <span class="n">heatmapdata</span> <span class="o">=</span> <span class="n">calc_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-                <span class="n">nesteddata</span><span class="o">=</span><span class="n">nesteddata</span><span class="p">,</span>
-                <span class="n">stackdata</span><span class="o">=</span><span class="n">stackdata</span><span class="p">,</span>
-                <span class="n">heatmapdata</span><span class="o">=</span><span class="n">heatmapdata</span><span class="p">,</span>
-                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;two_cat_cols&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">):</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="c1"># scatter plot</span>
-            <span class="n">scatdata</span> <span class="o">=</span> <span class="n">calc_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">)</span>
-            <span class="c1"># hexbin plot</span>
-            <span class="n">hexbindata</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-            <span class="c1"># box plot</span>
-            <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-                <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-                <span class="n">scatdata</span><span class="o">=</span><span class="n">scatdata</span><span class="p">,</span>
-                <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
-                <span class="n">hexbindata</span><span class="o">=</span><span class="n">hexbindata</span><span class="p">,</span>
-                <span class="n">spl_sz</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
-                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;two_num_cols&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnreachableError</span>
-
-    <span class="k">elif</span> <span class="nb">all</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)):</span>
-        <span class="n">xdtype</span><span class="p">,</span> <span class="n">ydtype</span><span class="p">,</span> <span class="n">zdtype</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
-
-        <span class="k">if</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">zdtype</span><span class="p">):</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span>
-        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">zdtype</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
-        <span class="k">elif</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">zdtype</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
-        <span class="k">elif</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">zdtype</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span>
-        <span class="k">elif</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">xdtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">ydtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">zdtype</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">is_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="p">),</span> <span class="s2">&quot;x, y, and z must be one each of type datetime, numerical, and categorical&quot;</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-        <span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
-
-        <span class="c1"># line chart</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
-            <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">agg</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compute_bivariate</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">bins</span><span class="p">,</span>
+            <span class="n">ngroups</span><span class="p">,</span>
+            <span class="n">largest</span><span class="p">,</span>
+            <span class="n">nsubgroups</span><span class="p">,</span>
+            <span class="n">timeunit</span><span class="p">,</span>
+            <span class="n">agg</span><span class="p">,</span>
+            <span class="n">sample_size</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;dt_cat_num_cols&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">compute_trivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">agg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Intermediate</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">compute_overview</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute functions for plot(df)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        Dataframe from which plots are to be generated</span>
+<span class="sd">    bins</span>
+<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
+<span class="sd">        the number of equal-width bins to use when grouping.</span>
+<span class="sd">    ngroups</span>
+<span class="sd">        When grouping over a categorical column, it defines the</span>
+<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
+<span class="sd">        bars to show in a bar chart.</span>
+<span class="sd">    largest</span>
+<span class="sd">        If true, when grouping over a categorical column, the groups</span>
+<span class="sd">        with the largest count will be output. If false, the groups</span>
+<span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    timeunit</span>
+<span class="sd">        Defines the time unit to group values over for a datetime column.</span>
+<span class="sd">        It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;,</span>
+<span class="sd">        &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the</span>
+<span class="sd">        time unit such that the resulting number of groups is closest to 15.</span>
+<span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
+<span class="sd">        Specify Data Types for designated column or all columns.</span>
+<span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
+<span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
+<span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">datas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Categorical&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Numerical&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Datetime&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="n">col_names_dtypes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DType</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">column_dtype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">column_dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()):</span>
+            <span class="c1"># bar chart</span>
+            <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_bar_pie</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
+            <span class="n">col_names_dtypes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()))</span>
+            <span class="n">counter</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">column_dtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
+            <span class="c1"># histogram</span>
+            <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_hist</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">bins</span><span class="p">))</span>
+            <span class="n">col_names_dtypes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()))</span>
+            <span class="n">counter</span><span class="p">[</span><span class="s2">&quot;Numerical&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">column_dtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()):</span>
+            <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">[[</span><span class="n">column</span><span class="p">]],</span> <span class="n">timeunit</span><span class="p">))</span>
+            <span class="n">col_names_dtypes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()))</span>
+            <span class="n">counter</span><span class="p">[</span><span class="s2">&quot;Datetime&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnreachableError</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stats</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">counter</span><span class="p">))</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">datas</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">col</span><span class="p">,</span> <span class="n">dtp</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">dtp</span><span class="p">),</span> <span class="n">dat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">col_names_dtypes</span><span class="p">,</span> <span class="n">datas</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">statsdata</span><span class="o">=</span><span class="n">datas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;basic_grid&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">compute_univariate</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute functions for plot(df, x)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        Dataframe from which plots are to be generated</span>
+<span class="sd">    x</span>
+<span class="sd">        A valid column name from the dataframe</span>
+<span class="sd">    bins</span>
+<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
+<span class="sd">        the number of equal-width bins to use when grouping.</span>
+<span class="sd">    ngroups</span>
+<span class="sd">        When grouping over a categorical column, it defines the</span>
+<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
+<span class="sd">        bars to show in a bar chart.</span>
+<span class="sd">    largest</span>
+<span class="sd">        If true, when grouping over a categorical column, the groups</span>
+<span class="sd">        with the largest count will be output. If false, the groups</span>
+<span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    timeunit</span>
+<span class="sd">        Defines the time unit to group values over for a datetime column.</span>
+<span class="sd">        It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;,</span>
+<span class="sd">        &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the</span>
+<span class="sd">        time unit such that the resulting number of groups is closest to 15.</span>
+<span class="sd">    value_range</span>
+<span class="sd">        The lower and upper bounds on the range of a numerical column.</span>
+<span class="sd">        Applies when column x is specified and column y is unspecified.</span>
+<span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
+<span class="sd">        Specify Data Types for designated column or all columns.</span>
+<span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
+<span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
+<span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-locals, too-many-arguments</span>
+
+    <span class="n">col_dtype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()):</span>
+        <span class="c1"># data for bar and pie charts</span>
+        <span class="n">data_cat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">data_cat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_bar_pie</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
+        <span class="c1"># stats</span>
+        <span class="n">data_cat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stats_cat</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">statsdata_cat</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">data_cat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">col</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">statsdata</span><span class="o">=</span><span class="n">statsdata_cat</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid range of values for this column&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">data_num</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># qq plot</span>
+        <span class="n">qqdata</span> <span class="o">=</span> <span class="n">calc_qqnorm</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+        <span class="c1"># kde plot</span>
+        <span class="n">kdedata</span> <span class="o">=</span> <span class="n">calc_hist_kde</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+        <span class="c1"># box plot</span>
+        <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="c1"># histogram</span>
+        <span class="n">data_num</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_hist</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">bins</span><span class="p">))</span>
+        <span class="c1"># stats</span>
+        <span class="n">data_num</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stats_num</span><span class="p">)(</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span>
+                <span class="n">mean</span><span class="o">=</span><span class="n">qqdata</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">std</span><span class="o">=</span><span class="n">qqdata</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="nb">min</span><span class="o">=</span><span class="n">kdedata</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="nb">max</span><span class="o">=</span><span class="n">kdedata</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                <span class="n">quantile</span><span class="o">=</span><span class="n">qqdata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">histdata</span><span class="p">,</span> <span class="n">statsdata_num</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">data_num</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">col</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">histdata</span><span class="o">=</span><span class="n">histdata</span><span class="p">,</span>
+            <span class="n">kdedata</span><span class="o">=</span><span class="n">kdedata</span><span class="p">,</span>
+            <span class="n">qqdata</span><span class="o">=</span><span class="n">qqdata</span><span class="p">,</span>
+            <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
+            <span class="n">statsdata</span><span class="o">=</span><span class="n">statsdata_num</span><span class="p">,</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()):</span>
+        <span class="n">data_dt</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># line chart</span>
+        <span class="n">data_dt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">]],</span> <span class="n">timeunit</span><span class="p">))</span>
+        <span class="c1"># stats</span>
+        <span class="n">data_dt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stats_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">statsdata_dt</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">data_dt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">col</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">statsdata</span><span class="o">=</span><span class="n">statsdata_dt</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;datetime_column&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UnreachableError</span>
+
+
+<span class="k">def</span> <span class="nf">compute_bivariate</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">agg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute functions for plot(df, x, y)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        Dataframe from which plots are to be generated</span>
+<span class="sd">    x</span>
+<span class="sd">        A valid column name from the dataframe</span>
+<span class="sd">    y</span>
+<span class="sd">        A valid column name from the dataframe</span>
+<span class="sd">    bins</span>
+<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
+<span class="sd">        the number of equal-width bins to use when grouping.</span>
+<span class="sd">    ngroups</span>
+<span class="sd">        When grouping over a categorical column, it defines the</span>
+<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
+<span class="sd">        bars to show in a bar chart.</span>
+<span class="sd">    largest</span>
+<span class="sd">        If true, when grouping over a categorical column, the groups</span>
+<span class="sd">        with the largest count will be output. If false, the groups</span>
+<span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    nsubgroups</span>
+<span class="sd">        If x and y are categorical columns, ngroups refers to</span>
+<span class="sd">        how many groups to show from column x, and nsubgroups refers to</span>
+<span class="sd">        how many subgroups to show from column y in each group in column x.</span>
+<span class="sd">    timeunit</span>
+<span class="sd">        Defines the time unit to group values over for a datetime column.</span>
+<span class="sd">        It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;,</span>
+<span class="sd">        &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the</span>
+<span class="sd">        time unit such that the resulting number of groups is closest to 15.</span>
+<span class="sd">    agg</span>
+<span class="sd">        Specify the aggregate to use when aggregating over a numeric column</span>
+<span class="sd">    sample_size</span>
+<span class="sd">        Sample size for the scatter plot</span>
+<span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
+<span class="sd">        Specify Data Types for designated column or all columns.</span>
+<span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
+<span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
+<span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments,too-many-locals</span>
+
+    <span class="n">xtype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ytype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">or</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+        <span class="c1"># box plot per group</span>
+        <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="c1"># histogram per group</span>
+        <span class="n">hisdata</span> <span class="o">=</span> <span class="n">calc_hist_by_group</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span> <span class="n">histdata</span><span class="o">=</span><span class="n">hisdata</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;cat_and_num_cols&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">or</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">dtnum</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># line chart</span>
+        <span class="n">dtnum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">agg</span><span class="p">))</span>
+        <span class="c1"># box plot</span>
+        <span class="n">dtnum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_box_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">))</span>
+        <span class="n">dtnum</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">dtnum</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">linedata</span><span class="o">=</span><span class="n">dtnum</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">boxdata</span><span class="o">=</span><span class="n">dtnum</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;dt_and_num_cols&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">or</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span> <span class="k">else</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+        <span class="n">dtcat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># line chart</span>
+        <span class="n">dtcat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">ngroups</span><span class="o">=</span><span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="o">=</span><span class="n">largest</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># stacked bar chart</span>
+        <span class="n">dtcat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stacked_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
+        <span class="n">dtcat</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">dtcat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">linedata</span><span class="o">=</span><span class="n">dtcat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">stackdata</span><span class="o">=</span><span class="n">dtcat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;dt_and_cat_cols&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span> <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+        <span class="c1"># nested bar chart</span>
+        <span class="n">nesteddata</span> <span class="o">=</span> <span class="n">calc_nested</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
+        <span class="c1"># stacked bar chart</span>
+        <span class="n">stackdata</span> <span class="o">=</span> <span class="n">calc_stacked</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
+        <span class="c1"># heat map</span>
+        <span class="n">heatmapdata</span> <span class="o">=</span> <span class="n">calc_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">nesteddata</span><span class="o">=</span><span class="n">nesteddata</span><span class="p">,</span>
+            <span class="n">stackdata</span><span class="o">=</span><span class="n">stackdata</span><span class="p">,</span>
+            <span class="n">heatmapdata</span><span class="o">=</span><span class="n">heatmapdata</span><span class="p">,</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;two_cat_cols&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span> <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="c1"># scatter plot</span>
+        <span class="n">scatdata</span> <span class="o">=</span> <span class="n">calc_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">)</span>
+        <span class="c1"># hexbin plot</span>
+        <span class="n">hexbindata</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="c1"># box plot</span>
+        <span class="n">boxdata</span> <span class="o">=</span> <span class="n">calc_box</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">scatdata</span><span class="o">=</span><span class="n">scatdata</span><span class="p">,</span>
+            <span class="n">boxdata</span><span class="o">=</span><span class="n">boxdata</span><span class="p">,</span>
+            <span class="n">hexbindata</span><span class="o">=</span><span class="n">hexbindata</span><span class="p">,</span>
+            <span class="n">spl_sz</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;two_num_cols&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UnreachableError</span>
+
+
+<span class="k">def</span> <span class="nf">compute_trivariate</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">z</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">agg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute functions for plot(df, x, y, z)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        Dataframe from which plots are to be generated</span>
+<span class="sd">    x</span>
+<span class="sd">        A valid column name from the dataframe</span>
+<span class="sd">    y</span>
+<span class="sd">        A valid column name from the dataframe</span>
+<span class="sd">    z</span>
+<span class="sd">        A valid column name from the dataframe</span>
+<span class="sd">    bins</span>
+<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
+<span class="sd">        the number of equal-width bins to use when grouping.</span>
+<span class="sd">    ngroups</span>
+<span class="sd">        When grouping over a categorical column, it defines the</span>
+<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
+<span class="sd">        bars to show in a bar chart.</span>
+<span class="sd">    largest</span>
+<span class="sd">        If true, when grouping over a categorical column, the groups</span>
+<span class="sd">        with the largest count will be output. If false, the groups</span>
+<span class="sd">        with the smallest count will be output.</span>
+<span class="sd">    timeunit</span>
+<span class="sd">        Defines the time unit to group values over for a datetime column.</span>
+<span class="sd">        It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;,</span>
+<span class="sd">        &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the</span>
+<span class="sd">        time unit such that the resulting number of groups is closest to 15.</span>
+<span class="sd">    agg</span>
+<span class="sd">        Specify the aggregate to use when aggregating over a numeric column</span>
+<span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
+<span class="sd">        Specify Data Types for designated column or all columns.</span>
+<span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
+<span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
+<span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+
+    <span class="n">xtype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ytype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ztype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ztype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ztype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ztype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ztype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ztype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+    <span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">is_dtype</span><span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ytype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">ztype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">())</span>
+    <span class="p">),</span> <span class="s2">&quot;x, y, and z must be one each of type datetime, numerical, and categorical&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">z</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+
+    <span class="c1"># line chart</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">agg</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;dt_cat_num_cols&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">calc_line_dt</span><span class="p">(</span>
@@ -349,7 +622,6 @@
 <span class="sd">    by the time groups. If df contains a datetime, categorical, and numerical column,</span>
 <span class="sd">    it will compute the aggregate of the numerical column for values in the categorical</span>
 <span class="sd">    column grouped by time.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -422,7 +694,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a box plot with date on the x axis.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -455,7 +726,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a stacked bar chart with date on the x axis</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -500,7 +770,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the group counts given a series.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    srs</span>
@@ -510,7 +779,6 @@
 <span class="sd">    largest</span>
 <span class="sd">        If true, show the groups with the largest count,</span>
 <span class="sd">        else show the groups with the smallest count</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, float]</span>
@@ -539,14 +807,12 @@
 <span class="k">def</span> <span class="nf">calc_hist</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a histogram over a given series.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    srs</span>
 <span class="sd">        One numerical column over which to compute the histogram</span>
 <span class="sd">    bins</span>
 <span class="sd">        Number of bins to use in the histogram</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, float]:</span>
@@ -572,18 +838,16 @@
 
 <span class="k">def</span> <span class="nf">calc_hist_kde</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a density histogram and its corresponding kernel density</span>
 <span class="sd">    estimate over a given series. The kernel is guassian.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data</span>
 <span class="sd">        One numerical column over which to compute the histogram and kde</span>
 <span class="sd">    bins</span>
 <span class="sd">        Number of bins to use in the histogram</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, np.ndarray, np.ndarray]</span>
@@ -603,19 +867,20 @@
         <span class="p">}</span>
     <span class="p">)</span>
     <span class="n">pts_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-    <span class="n">pdf</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">())(</span><span class="n">pts_rng</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">hist_df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span>
+    <span class="k">if</span> <span class="n">minv</span> <span class="o">==</span> <span class="n">maxv</span><span class="p">:</span>
+        <span class="n">pdf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pdf</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">())(</span><span class="n">pts_rng</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hist_df</span><span class="p">,</span> <span class="n">pts_rng</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span>
 
 
-<span class="k">def</span> <span class="nf">calc_qqnorm</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">calc_qqnorm</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate QQ plot given a series.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    srs</span>
 <span class="sd">        One numerical column from which to compute the quantiles</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[np.ndarray, np.ndarray]</span>
@@ -624,18 +889,21 @@
     <span class="n">q_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
     <span class="n">actual_qs</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">srs</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q_range</span><span class="p">),</span> <span class="n">srs</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">srs</span><span class="o">.</span><span class="n">std</span><span class="p">())</span>
     <span class="n">theory_qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">q_range</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)))</span>
-    <span class="k">return</span> <span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span>
+    <span class="k">return</span> <span class="n">actual_qs</span><span class="p">,</span> <span class="n">theory_qs</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span>
 
 
 <span class="k">def</span> <span class="nf">calc_box</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a box plot over either</span>
 <span class="sd">        1) the values in one column</span>
 <span class="sd">        2) the values corresponding to groups in another column</span>
 <span class="sd">        3) the values corresponding to binning another column</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -646,7 +914,11 @@
 <span class="sd">        Number of groups to show if df has a categorical and numerical column</span>
 <span class="sd">    largest</span>
 <span class="sd">        When calculating a box plot per group, select the largest or smallest groups</span>
-
+<span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
+<span class="sd">        Specify Data Types for designated column or all columns.</span>
+<span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
+<span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
+<span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, List[str], List[float], Dict[str, int]]</span>
@@ -662,7 +934,9 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">_calc_box_stats</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_numerical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">dtype</span><span class="p">),</span> <span class="n">Continuous</span><span class="p">())</span> <span class="ow">and</span> <span class="n">is_dtype</span><span class="p">(</span>
+            <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">],</span> <span class="n">dtype</span><span class="p">),</span> <span class="n">Continuous</span><span class="p">()</span>
+        <span class="p">):</span>
             <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">cnt</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">())</span>
             <span class="n">bins</span> <span class="o">=</span> <span class="n">cnt</span> <span class="k">if</span> <span class="n">cnt</span> <span class="o">&lt;</span> <span class="n">bins</span> <span class="k">else</span> <span class="n">bins</span>
             <span class="n">endpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -671,12 +945,12 @@
                 <span class="p">[</span>
                     <span class="n">_calc_box_stats</span><span class="p">(</span>
                         <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])][</span><span class="n">y</span><span class="p">],</span>
-                        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">endpts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
                     <span class="k">else</span> <span class="n">_calc_box_stats</span><span class="p">(</span>
                         <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">endpts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])][</span><span class="n">y</span><span class="p">],</span>
-                        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">endpts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endpts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="p">],</span>
@@ -708,7 +982,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a histogram over the values corresponding to the groups in another column</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -719,7 +992,6 @@
 <span class="sd">        Number of groups to show from the categorical column</span>
 <span class="sd">    largest</span>
 <span class="sd">        Select the largest or smallest groups</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
@@ -752,14 +1024,12 @@
 <span class="k">def</span> <span class="nf">calc_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts the points to use in a scatter plot</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
 <span class="sd">        Dataframe with two numerical columns</span>
 <span class="sd">    sample_size</span>
 <span class="sd">        the number of points to randomly sample in the scatter plot</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pd.DataFrame</span>
@@ -775,7 +1045,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a nested bar chart of the counts of two columns</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -784,7 +1053,6 @@
 <span class="sd">        Number of groups to show from the first column</span>
 <span class="sd">    nsubgroups</span>
 <span class="sd">        Number of subgroups (from the second column) to show in each group</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
@@ -819,7 +1087,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a stacked bar chart of the counts of two columns</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -828,7 +1095,6 @@
 <span class="sd">        number of groups to show from the first column</span>
 <span class="sd">    nsubgroups</span>
 <span class="sd">        number of subgroups (from the second column) to show in each group</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
@@ -860,7 +1126,6 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a heatmap of the counts of two columns</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
@@ -869,7 +1134,6 @@
 <span class="sd">        Number of groups to show from the first column</span>
 <span class="sd">    nsubgroups</span>
 <span class="sd">        Number of subgroups (from the second column) to show in each group</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Tuple[pd.DataFrame, Dict[str, int]]</span>
@@ -894,6 +1158,166 @@
     <span class="n">grp_cnt_stats</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">_shw&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">largest_subgrps</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df_res</span><span class="p">,</span> <span class="n">grp_cnt_stats</span>
+
+
+<span class="k">def</span> <span class="nf">calc_stats_num</span><span class="p">(</span>
+    <span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate stats from a numerical column</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    srs</span>
+<span class="sd">        a numerical column</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]</span>
+<span class="sd">        Dictionaries that contain Overview, Quantiles and Descriptives</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span>  <span class="c1"># include nan</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>  <span class="c1"># exclude nan</span>
+    <span class="n">uniq_count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+    <span class="n">inf_count</span> <span class="o">=</span> <span class="p">((</span><span class="n">srs</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">srs</span> <span class="o">==</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">non_zero_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span>
+    <span class="n">overview_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Distinct Count&quot;</span><span class="p">:</span> <span class="n">uniq_count</span><span class="p">,</span>
+        <span class="s2">&quot;Unique (%)&quot;</span><span class="p">:</span> <span class="n">uniq_count</span> <span class="o">/</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">size</span> <span class="o">-</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Missing (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;Infinite&quot;</span><span class="p">:</span> <span class="n">inf_count</span><span class="p">,</span>
+        <span class="s2">&quot;Infinite (%)&quot;</span><span class="p">:</span> <span class="n">inf_count</span> <span class="o">/</span> <span class="n">size</span><span class="p">,</span>
+        <span class="s2">&quot;Mean&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Zeros&quot;</span><span class="p">:</span> <span class="n">size</span> <span class="o">-</span> <span class="n">non_zero_count</span><span class="p">,</span>
+        <span class="s2">&quot;Zeros (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">non_zero_count</span> <span class="o">/</span> <span class="n">size</span><span class="p">,</span>
+        <span class="s2">&quot;Memory Size&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="n">quantiles_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;5-th Percentile&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+        <span class="s2">&quot;Q1&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">25</span><span class="p">],</span>
+        <span class="s2">&quot;Median&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">50</span><span class="p">],</span>
+        <span class="s2">&quot;Q3&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">75</span><span class="p">],</span>
+        <span class="s2">&quot;95-th Percentile&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">95</span><span class="p">],</span>
+        <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Range&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;IQR&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">75</span><span class="p">]</span> <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">25</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">descriptives_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Standard Deviation&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Coefficient of Variation&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Kurtosis&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">kurtosis</span><span class="p">(</span><span class="n">srs</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s2">&quot;omit&quot;</span><span class="p">)),</span>
+        <span class="s2">&quot;Mean&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;Median Absolute Deviation&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="n">median_absolute_deviation</span><span class="p">(</span><span class="n">srs</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s2">&quot;omit&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;Skewness&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">skew</span><span class="p">(</span><span class="n">srs</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s2">&quot;omit&quot;</span><span class="p">)),</span>
+        <span class="s2">&quot;Sum&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Variance&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">quantiles_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">descriptives_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">calc_stats_cat</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate stats from a categorical column</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    srs</span>
+<span class="sd">        a categorical column</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[str, str]</span>
+<span class="sd">        Dictionary that contains Overview</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span>  <span class="c1"># include nan</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>  <span class="c1"># exclude nan</span>
+    <span class="n">uniq_count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+    <span class="n">overview_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Distinct Count&quot;</span><span class="p">:</span> <span class="n">uniq_count</span><span class="p">,</span>
+        <span class="s2">&quot;Unique (%)&quot;</span><span class="p">:</span> <span class="n">uniq_count</span> <span class="o">/</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">size</span> <span class="o">-</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Missing (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;Memory Size&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<span class="k">def</span> <span class="nf">calc_stats_dt</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate stats from a datetime column</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    srs</span>
+<span class="sd">        a datetime column</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[str, str]</span>
+<span class="sd">        Dictionary that contains Overview</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span>  <span class="c1"># include nan</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>  <span class="c1"># exclude nan</span>
+    <span class="n">uniq_count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+    <span class="n">overview_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Distinct Count&quot;</span><span class="p">:</span> <span class="n">uniq_count</span><span class="p">,</span>
+        <span class="s2">&quot;Unique (%)&quot;</span><span class="p">:</span> <span class="n">uniq_count</span> <span class="o">/</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">size</span> <span class="o">-</span> <span class="n">count</span><span class="p">,</span>
+        <span class="s2">&quot;Missing (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;Memory Size&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(),</span>
+        <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+        <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<span class="k">def</span> <span class="nf">calc_stats</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">counter</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate stats from a DataFrame</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        a DataFrame</span>
+<span class="sd">    counter</span>
+<span class="sd">        a dictionary that contains count for each type</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[Dict[str, str], Dict[str, int]]</span>
+<span class="sd">        Dictionary that contains Overview and Variable Types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">total_cell</span> <span class="o">=</span> <span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">nonan_cell</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">memory_usage</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># for unhashable data types</span>
+        <span class="n">dup_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">dup_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
+    <span class="n">overview_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Number of Variables&quot;</span><span class="p">:</span> <span class="n">dim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;Number of Observations&quot;</span><span class="p">:</span> <span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;Missing Cells&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_cell</span> <span class="o">-</span> <span class="n">nonan_cell</span><span class="p">),</span>
+        <span class="s2">&quot;Missing Cells (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">nonan_cell</span> <span class="o">/</span> <span class="n">total_cell</span><span class="p">),</span>
+        <span class="s2">&quot;Duplicate Rows&quot;</span><span class="p">:</span> <span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">dup_rows</span><span class="p">,</span>
+        <span class="s2">&quot;Duplicate Rows (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">dup_rows</span> <span class="o">/</span> <span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="s2">&quot;Total Size in Memory&quot;</span><span class="p">:</span> <span class="n">memory_usage</span><span class="p">,</span>
+        <span class="s2">&quot;Average Record Size in Memory&quot;</span><span class="p">:</span> <span class="n">memory_usage</span> <span class="o">/</span> <span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="n">counter</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_calc_box_stats</span><span class="p">(</span><span class="n">grp_srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">grp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dlyd</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -972,7 +1396,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">bins_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">bins_arr</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">bins_arr</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">val</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">bins_arr</span><span class="p">]</span>
-    <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">bins_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bins_arr</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins_arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">bins_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bins_arr</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins_arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">]</span>
     <span class="n">intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">bins_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">bins_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">intervals</span>
 
@@ -1003,6 +1429,41 @@
         <span class="n">prev_unit</span> <span class="o">=</span> <span class="n">unit</span>
 
     <span class="k">return</span> <span class="n">prev_unit</span>
+
+
+<span class="k">def</span> <span class="nf">_format_values</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="c1"># if value is a time</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;Memory&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+        <span class="c1"># for memory usage</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;KB&quot;</span><span class="p">,</span> <span class="s2">&quot;MB&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;TB&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">while</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">1024</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">/=</span> <span class="mi">1024</span>
+            <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># if value is int but in a float form with 0 at last digit</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1000000</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.5g</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1000000</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.5g</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># eliminate trailing zeros</span>
+        <span class="n">pre_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pre_value</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">pre_value</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">pre_value</span>
+    <span class="k">elif</span> <span class="mf">0.001</span> <span class="o">&lt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;%&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+        <span class="c1"># for percentage, only use digits before notation sign for extreme small number</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -1030,7 +1491,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li> 
       </ul>
