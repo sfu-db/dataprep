@@ -36,6 +36,14 @@ release version:
   #! /usr/bin/env bash
 
   # Sanity checks
+
+  arr=(major minor patch)
+
+  if [[ " ${arr[*]} " != *" {{version}} "* ]]; then
+    echo "version must be one of 'major', 'minor', 'patch', got '{{version}}'";
+    exit 1;
+  fi
+
   if [ ! -z "$(git status --porcelain)" ]; then echo "Git tree is not clean, commit first"; exit 1; fi
 
   if [ ! -z "$(git rev-parse --verify release)" ]; then echo "delete the existing release branch before new release"; exit 1; fi
@@ -52,7 +60,7 @@ release version:
   from_version=$(echo "${vstring}" | sed -nr "s/^Bumping version from ([0-9]+\.[0-9]+\.[0-9]+) to ([0-9]+\.[0-9]+\.[0-9]+)$/\1/p")
   to_version=$(echo "${vstring}" | sed -nr "s/^Bumping version from ([0-9]+\.[0-9]+\.[0-9]+) to ([0-9]+\.[0-9]+\.[0-9]+)$/\2/p")
 
-  git checkout pyproject.toml # clear up
+  git checkout pyproject.toml # clean up
 
   echo "Releasing from ${from_version} to ${to_version}?"
   select yn in "Yes" "No"; do
