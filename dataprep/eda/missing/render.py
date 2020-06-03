@@ -4,6 +4,7 @@
 """
 import math
 from typing import Tuple, Union
+from typing import List, Optional, Sequence  # Issue#168 Start
 
 import pandas as pd
 from bokeh.models import (
@@ -18,6 +19,7 @@ from bokeh.models import (
     Range1d,
     Tabs,
     Title,
+    PrintfTickFormatter,  # Issue#168 Start
 )
 
 # pylint: disable=no-name-in-module
@@ -31,6 +33,10 @@ from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
 from ..palette import PALETTE
 
+from ..palette import BIPALETTE
+
+# import seaborn as sns
+
 # pylint: enable=no-name-in-module
 
 
@@ -38,17 +44,28 @@ __all__ = ["render_missing"]
 
 
 def render_missing(
-    itmdt: Intermediate, plot_width: int = 500, plot_height: int = 500,
+    itmdt: Intermediate,
+    plot_width: int = 500,
+    plot_height: int = 500,
+    palette: Optional[Sequence[str]] = None,
 ) -> LayoutDOM:
     """
     @Jinglin write here
     """
+    print("render_missing")
     if itmdt.visual_type == "missing_spectrum":
         return render_missing_spectrum(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "missing_impact_1vn":
         return render_missing_impact_1vn(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "missing_impact_1v1":
         return render_missing_impact_1v1(itmdt, plot_width, plot_height)
+    # Issue#168 Start
+    elif itmdt.visual_type == "missing_spectrum_heatmap":
+        print("missing_spectrum_heatmap")
+        return render_missing_heatmap(
+            itmdt, plot_width, plot_height, palette or BIPALETTE
+        )
+    # Issue#168 End
     else:
         raise UnreachableError
 
@@ -240,6 +257,103 @@ def create_color_mapper() -> Tuple[LinearColorMapper, ColorBar]:
     return mapper, colorbar
 
 
+# Issue#168 Start
+def create_color_mapper_heatmap(
+    palette: Sequence[str],
+) -> Tuple[LinearColorMapper, ColorBar]:
+    """
+    Create a color mapper and a colorbar for heatmap
+    """
+    mapper = LinearColorMapper(palette=palette, low=-1, high=1)
+    colorbar = ColorBar(
+        color_mapper=mapper,
+        major_label_text_font_size="8pt",
+        ticker=BasicTicker(),
+        formatter=PrintfTickFormatter(format="%.2f"),
+        label_standoff=6,
+        border_line_color=None,
+        location=(0, 0),
+    )
+    return mapper, colorbar
+
+
+def render_missing_heatmap(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+) -> Tabs:
+    """
+    Render correlation heatmaps in to tabs
+    """
+    tabs: List[Panel] = []
+    fig1 = render_missing_spectrum(itmdt, plot_width, plot_height)
+    pan1 = Panel(child=fig1, title="spectrum")
+    tabs.append(pan1)
+    fig2 = render_heatmaps_tab(itmdt, plot_width, plot_height, palette)
+    pan2 = Panel(child=fig2, title="heatmap")
+    tabs.append(pan2)
+
+    tabs = Tabs(tabs=tabs)
+    return tabs
+
+
+def render_heatmaps_tab(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+) -> Figure:
+    """
+    Render missing heatmaps in to tabs
+    """
+    tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
+    axis_range = itmdt["axis_range"]
+    mask = itmdt["mask"]
+    df = itmdt["data_heatmap"]
+    df = df.copy()
+    # Reformatting
+    print("df_1:", df)
+    print("mask:", mask)
+    df = mask * df
+    print("df_2:", df)
+    df = df.unstack().reset_index(name="correlation")
+    df = df.rename(columns={"level_0": "x", "level_1": "y"})
+    ### The next line make the df becomes empty dataframe
+    df = df[df["x"] != df["y"]]
+    # in case of numerical column names
+    df["x"] = df["x"].apply(str)
+    df["y"] = df["y"].apply(str)
+    mapper, color_bar = create_color_mapper_heatmap(palette)
+    x_range = FactorRange(*axis_range)
+    y_range = FactorRange(*reversed(axis_range))
+    fig = Figure(
+        x_range=x_range,
+        y_range=y_range,
+        plot_width=plot_width,
+        plot_height=plot_height,
+        x_axis_location="below",
+        tools="hover",
+        toolbar_location=None,
+        tooltips=tooltips,
+        background_fill_color="#fafafa",
+    )
+
+    tweak_figure(fig)
+    print("df_3:", df)
+
+    fig.rect(
+        x="x",
+        y="y",
+        width=1,
+        height=1,
+        source=df,
+        fill_color={"field": "correlation", "transform": mapper},
+        line_color=None,
+    )
+
+    fig.add_layout(color_bar, "right")
+
+    return fig
+
+
+# Issue#168 End
+
+
 def render_missing_spectrum(
     itmdt: Intermediate, plot_width: int, plot_height: int
 ) -> Figure:
@@ -247,9 +361,7 @@ def render_missing_spectrum(
     Render the missing specturm
     """
     mapper, color_bar = create_color_mapper()
-
     df = itmdt["data"].copy()
-
     df["column_with_perc"] = df["column"].apply(
         lambda c: fuse_missing_perc(cut_long_name(c), itmdt["missing_percent"][c])
     )

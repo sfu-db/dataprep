@@ -22,6 +22,7 @@ from ..dtypes import (
     DTypeDef,
 )
 from ..intermediate import Intermediate, ColumnsMetadata
+from ..utils import nullity_filter, nullity_sort  # Issue#168
 
 __all__ = ["compute_missing"]
 
@@ -115,8 +116,83 @@ def missing_spectrum(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
         }
     )
     return Intermediate(
-        data=df, missing_percent=missing_percent, visual_type="missing_spectrum"
+        data=df, missing_percent=missing_percent, visual_type="missing_spectrum",
     )
+
+
+def missing_spectrum_tabs(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
+    """
+    Calculate a heatmap visualization of nullity correlation in the given DataFrame
+    """
+    # pylint: disable=too-many-locals
+    ### Song: if you output the df here,
+    ### You would find that the size of df is not different from the df you output in the line 159
+    ### print(df.shape) here
+    ### You could find that the variable df is the original dataframe.
+    df1 = df.compute()
+
+    num_bins = min(bins, len(df) - 1)
+
+    df = df.iloc[:, :ncols]
+    cols = df.columns[:ncols]
+    ncols = len(cols)
+    nrows = len(df)
+    chunk_size = len(df) // num_bins
+    data = df.isnull().to_dask_array()
+    data.compute_chunk_sizes()
+    data = data.rechunk((chunk_size, None))
+
+    (notnull_counts,) = dd.compute(data.sum(axis=0) / data.shape[0])
+    missing_percent = {col: notnull_counts[idx] for idx, col in enumerate(cols)}
+
+    missing_percs = data.map_blocks(missing_perc_blockwise, dtype=float).compute()
+    locs0 = np.arange(len(missing_percs)) * chunk_size
+    locs1 = np.minimum(locs0 + chunk_size, nrows)
+    locs_middle = locs0 + chunk_size / 2
+
+    ### Song: The reason is that variable has been re-defined.
+    df = pd.DataFrame(
+        {
+            "column": np.repeat(cols.values, len(missing_percs)),
+            "location": np.tile(locs_middle, ncols),
+            "missing_rate": missing_percs.T.ravel(),
+            "loc_start": np.tile(locs0, ncols),
+            "loc_end": np.tile(locs1, ncols),
+        }
+    )
+
+    ### The following three steps maybe right, but you are based on the modified variable df.
+    # Calculation for correlation matrix of missing values
+    # Step1: Apply filters and sorts
+    df1 = nullity_filter(df1, None, 0, 0)
+    df1 = nullity_sort(df1, None, axis="rows")
+
+    # Remove completely filled or completely empty variables.
+    df1 = df1.iloc[
+        :, [i for i, n in enumerate(np.var(df1.isnull(), axis="rows")) if n > 0]
+    ]
+
+    # Create and mask the correlation matrix.
+    corr_mat = df1.isnull().corr()
+    print(corr_mat)
+    mask = np.zeros_like(corr_mat)
+    print(mask)
+    # mask[np.triu_indices_from(mask)] = True
+    mask[np.tril(np.ones(corr_mat.shape)).astype(np.bool)] = True
+    print(mask)
+    heatmap_axis = list(corr_mat.columns)
+
+    return Intermediate(
+        data=df,
+        data_heatmap=corr_mat,
+        mask=mask,
+        missing_percent=missing_percent,
+        axis_range=heatmap_axis,
+        visual_type="missing_spectrum_heatmap",
+    )
+
+
+# Issue#168 End
 
 
 def missing_impact_1vn(  # pylint: disable=too-many-locals
@@ -361,7 +437,6 @@ def compute_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
-
     df = to_dask(df)
 
     # pylint: disable=no-else-raise
@@ -374,4 +449,5 @@ def compute_missing(
             df, dtype=dtype, x=x, y=y, bins=bins, ndist_sample=ndist_sample
         )
     else:
-        return missing_spectrum(df, bins=bins, ncols=ncols)
+        # return missing_spectrum(df, bins=bins, ncols=ncols)
+        return missing_spectrum_tabs(df, bins=bins, ncols=ncols)
