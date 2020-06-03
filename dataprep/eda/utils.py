@@ -94,3 +94,65 @@ def fuse_missing_perc(name: str, perc: float) -> str:
         return name
 
     return f"{name} ({perc:.1%})"
+
+
+# Issue#168 Start
+
+
+def nullity_filter(df, filter_type=None, p_cut_off=0, n_cut_off=0):
+    """
+    Filters a DataFrame according to its nullity
+    """
+
+    if filter_type == "top":
+        if p_cut_off:
+            df = df.iloc[
+                :, [c >= p_cut_off for c in df.count(axis="rows").values / len(df)]
+            ]
+        if n_cut_off:
+            df = df.iloc[
+                :, np.sort(np.argsort(df.count(axis="rows").values)[-n_cut_off:])
+            ]
+    elif filter_type == "bottom":
+        if p_cut_off:
+            df = df.iloc[
+                :, [c <= p_cut_off for c in df.count(axis="rows").values / len(df)]
+            ]
+        if n_cut_off:
+            df = df.iloc[
+                :, np.sort(np.argsort(df.count(axis="rows").values)[:n_cut_off])
+            ]
+    return df
+
+
+def nullity_sort(df, sort=None, axis="columns"):
+    """
+    Sorts a DataFrame according to its nullity, in either ascending or descending order.
+
+    :param df: The DataFrame object being sorted.
+    :param sort: The sorting method: either "ascending", "descending", or None (default).
+    :return: The nullity-sorted DataFrame.
+    """
+    if sort is None:
+        return df
+    elif sort not in ["ascending", "descending"]:
+        raise ValueError(
+            'The "sort" parameter must be set to "ascending" or "descending".'
+        )
+
+    if axis not in ["rows", "columns"]:
+        raise ValueError('The "axis" parameter must be set to "rows" or "columns".')
+
+    if axis == "columns":
+        if sort == "ascending":
+            return df.iloc[np.argsort(df.count(axis="columns").values), :]
+        elif sort == "descending":
+            return df.iloc[np.flipud(np.argsort(df.count(axis="columns").values)), :]
+    elif axis == "rows":
+        if sort == "ascending":
+            return df.iloc[:, np.argsort(df.count(axis="rows").values)]
+        elif sort == "descending":
+            return df.iloc[:, np.flipud(np.argsort(df.count(axis="rows").values))]
+
+
+# Issue#168 End
