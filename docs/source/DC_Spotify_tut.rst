@@ -75,7 +75,7 @@ Open apps.js with your favourite editor. In the file, it contains a section for 
    	:width: 650
    	:height: 100
 
-The client ID and client secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.
+The client ID and client Secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.
 
 .. image:: _static/images/tutorial/ID_and_secret.png
 	:align: center
@@ -147,7 +147,7 @@ Below the configuration file are stored with dataprep.
     
 Initialize data_connector
 =============================
-To initialize the data_connector, run the following code below. Copy and paste your Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
+To initialize the data_connector, run the following code below. Copy and paste the Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
 
 ::
 
@@ -235,9 +235,10 @@ Now that you have an understanding of how data connector operates, you can easil
 
 Pagination
 ===================
-| Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
-|  
-| To use pagination, you need to include **_count** in your query.
+| Pagination is another feature available in the config files. The pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
+| 
+| To use pagination, you need to include **_count** in your query. The **_count** parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.
+|
 
 ::
 
@@ -246,7 +247,7 @@ Pagination
 .. image:: _static/images/tutorial/dc_spotify_query_pag.png
 	:align: center
    	:width: 1000
-   	:height: 490
+   	:height: 500
     
 Pagination does not concurrently work with the **limit** parameter in a query, you need to select either **limit** or **_count**. If you select **_count**, it bypasses the initial restriction set by Spotify's **limit** parameter.  
 
