@@ -163,9 +163,10 @@ Now that you have an understanding of how data connector operates, you can easil
 
 Pagination
 ===================
-| Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
+| Pagination is another feature available in the config files. The pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
 | 
-| To use pagination, you need to include **_count** in your query.
+| To use pagination, you need to include **_count** in your query. The **_count** parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.
+|
 
 ::
 
@@ -176,7 +177,7 @@ Pagination
    	:width: 1000
    	:height: 500
     
-Pagination does not concurrently work with the **limit** parameter in a query, you need to select either **limit** or **_count**. If you select **_count**, it bypasses the initial restriction set by Yelp's **limit** parameter.  
+Pagination does not concurrently work with the **limit** parameter in a query, you need to select either **limit** or **_count**.  
 
 
 That's all for now.
