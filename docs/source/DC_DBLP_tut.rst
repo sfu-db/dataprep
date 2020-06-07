@@ -111,7 +111,7 @@ As an example, lets see what is in the publication table.
 .. image:: _static/images/tutorial/dc_dblp_show_schema.png
 	:align: center
    	:width: 212
-   	:height: 303
+   	:height: 295
     
 Connector.query
 ------------------
@@ -140,7 +140,7 @@ Now that you have an understanding of how data connector operates, you can easil
 
 Pagination
 ===================
-| Pagination is another feature available in the config files. The pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
+| Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
 | 
 | To use pagination, you need to include **_count** in your query. The **_count** parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.
 |
@@ -160,7 +160,7 @@ All publications of one specific author
 =========================================================
 | In the query, **q** is a generic search parameter that find author profiles, conferences, journals, or individual publications in the database. As a parameter, **q** is not great when trying to find specific authors and their work. To solve for this issue, you can query the authors first and last name. 
 | 
-| To fetch all publications of one specific author, you need to include **first_name="______", last_name="______"** in your query.
+| To fetch all publications of one specific author, you need to include **first_name="______"**, **last_name="______"** in your query.
 
 ::
 
