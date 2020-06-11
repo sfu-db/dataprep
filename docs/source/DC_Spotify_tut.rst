@@ -75,7 +75,7 @@ Open apps.js with your favourite editor. In the file, it contains a section for 
    	:width: 650
    	:height: 100
 
-The client ID and client Secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.
+The client ID and client secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.
 
 .. image:: _static/images/tutorial/ID_and_secret.png
 	:align: center
@@ -106,36 +106,57 @@ Open a browser and visit the project home page again. Now that the server is run
 
 When you click on the log in link, it will send you back to your redirect URI. You should see your Spotify account information as well as your access token and refresh token.
 
-.. image:: _static/images/tutorial/SFU_spotify.png
+.. image:: _static/images/tutorial/SFU_Spotify.png
 	:align: center
    	:width: 800
    	:height: 400
 
 Download and store the configuration files in dataprep
 ======================================================
-
-The configuration files are used to configure the parameters and initial setup for the API. The available configuration files can be manually downloaded here: `Configuration Files
+The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_ or automatically downloaded at usage. 
 
-Store the configuration file in the dataprep folder. 
+
+
+To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files. 
+When you decided on a location, enter the command ``git clone https://github.com/sfu-db/DataConnectorConfigs.git``. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder. 
+
+
+From here you can proceed with the next steps.
+
+.. image:: _static/images/tutorial/dc_git.png
+	:align: center
+   	:width: 1000
+   	:height: 500
+
+
+.. image:: _static/images/tutorial/dc_git_clone.png
+	:align: center
+   	:width: 725
+   	:height: 125
+
+
+Below the configuration file are stored with dataprep. 
 
 .. image:: _static/images/tutorial/Config_destination.png
 	:align: center
-   	:width: 500
-   	:height: 120
+   	:width: 586
+   	:height: 132
+
+
     
 Initialize data_connector
 =============================
-To initialize the data_connector, run the following code below. Copy and paste the Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
+To initialize the data_connector, run the following code below. Copy and paste your Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
 
 ::
 
     from dataprep.data_connector import Connector
     client_id = “insert_client_id”
     client_secret = “insert_client_secret”
-    access_token = ““insert_token_key”
-    dc = Connector("./DataConnectorConfigs/spotify", auth_params={"client_id":client_id, 
-                                                           "client_secret":access_token, 
+    access_token = “insert_token_key”
+    dc = Connector("./DataConnectorConfigs/spotify", _auth={"client_id":client_id, 
+                                                           "client_secret":client_secret, 
                                                            "access_token":access_token})
     
 Functionalities
@@ -145,7 +166,7 @@ Data connector has several functions you can perform to gain insight on the data
 Connector.info
 ------------------
 | The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.
-
+|
 | 	a. Table - The table(s) being accessed.
 | 	b. Parameters - Identifies which parameters can be used to call the method. 
 | 	c. Examples - Shows how you can call the methods in the Connector class.
@@ -156,8 +177,21 @@ Connector.info
 
 .. image:: _static/images/tutorial/dc_spotify_info.png
 	:align: center
-   	:width: 385
-   	:height: 540
+   	:width: 285
+   	:height: 405
+
+Parameters
+**********************
+| A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp's business query can either be required or optional. The required parameter is **q** while the optional parameters are **limit** and **offset**. The parameters are described below.
+|
+| 	a. **q** - Required - Search term, for example "Beyonce". 
+| 	b. **limit** - Optional -  It is the maximum number of results to return. By default, it will return 20. Maximum is 50.
+| 	c. **offset** - Optional - Offset allows you to specify the ranking number of the first item on the page. By default, it will return 0. Maximum is 2,000.
+
+There are additional parameters to query with Spotify. If you are interested in reading up the other available parameters and setting up your own config files, please read this `Spotify link
+<https://developer.spotify.com/documentation/web-api/reference/search/search/>`_ and this `Configuration Files link
+<https://github.com/sfu-db/DataConnectorConfigs>`_.
+
 
 Connector.show_schema
 ---------------------------
@@ -179,11 +213,11 @@ The query method downloads the website data and displays it in a Dataframe. The 
 
 When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.
 
-As an example, let's try to get the data from the "artist" table, providing the query search for "pop".
+As an example, let's try to get the data from the "artist" table, providing the query search for the artist "beyonce".
 
 ::
 
-    dc.query("artist", q="pop")
+    dc.query("artist", q="beyonce")
     
 .. image:: _static/images/tutorial/dc_spotify_query.png
 	:align: center
@@ -197,6 +231,26 @@ Now that you have an understanding of how data connector operates, you can easil
 
     dc = Connector(...)
     dc.query(...)
+
+
+Pagination
+===================
+| Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return. 
+|
+| To use pagination, you need to include **_count** in your query. The **_count** parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.
+|
+
+::
+
+    dc.query("artist", q="twice", _count=200)
+
+.. image:: _static/images/tutorial/dc_spotify_query_pag.png
+	:align: center
+   	:width: 1000
+   	:height: 490    
+    
+Pagination does not concurrently work with the **limit** parameter in a query, you need to select either **limit** or **_count**. If you select **_count**, it bypasses the initial restriction set by Spotify's **limit** parameter.  
+
     
 That's all for now.
 ===================
