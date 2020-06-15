@@ -33,6 +33,10 @@ def plot(
     yscale: str = "linear",
     tile_size: Optional[float] = None,
     dtype: Optional[DTypeDef] = None,
+    top_words: Optional[int] = 30,
+    stopword: Optional[bool] = True,
+    lemmatize: Optional[bool] = False,
+    stem: Optional[bool] = False,
 ) -> Report:
     """Generates plots for exploratory data analysis.
 
@@ -116,7 +120,18 @@ def plot(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
-
+    top_words: int, default 30
+        Specify the amount of words to show in the wordcloud and
+        word frequency bar chart
+    stopword: bool, default True
+        Eliminate the stopwords in the text data for plotting wordcloud and
+        word frequency bar chart
+    lemmatize: bool, default False
+        Lemmatize the words in the text data for plotting wordcloud and
+        word frequency bar chart
+    stem: bool, default False
+        Apply Potter Stem on the text data for plotting wordcloud and
+        word frequency bar chart
     Examples
     --------
     >>> import pandas as pd
@@ -142,6 +157,10 @@ def plot(
         sample_size=sample_size,
         value_range=value_range,
         dtype=dtype,
+        top_words=top_words,
+        stopword=stopword,
+        lemmatize=lemmatize,
+        stem=stem,
     )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
 
