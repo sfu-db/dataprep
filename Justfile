@@ -81,16 +81,16 @@ release version:
   git add pyproject.toml
   semantic-release version --{{version}}
   
-  echo "Merge release/v${to_version} to master & develop"
-  git checkout master
-  git merge "release/v${to_version}"
+  # echo "Merge release/v${to_version} to master & develop"
+  # git checkout master
+  # git merge "release/v${to_version}"
 
-  git checkout develop
-  git merge "release/v${to_version}"
+  # git checkout develop
+  # git merge "release/v${to_version}"
 
   echo "Push branch and tag to remote"
-  git push origin master
-  git push origin develop
+  git push origin "release/v${to_version}":master
+  git push origin "release/v${to_version}":develop
   git push origin "release/v${to_version}"
   git push origin "v${to_version}"
 
