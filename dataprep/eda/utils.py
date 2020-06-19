@@ -2,8 +2,7 @@
 """
 import logging
 from math import ceil
-from typing import Any, Union
-
+from typing import Any, Union, Optional
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
@@ -96,12 +95,38 @@ def fuse_missing_perc(name: str, perc: float) -> str:
     return f"{name} ({perc:.1%})"
 
 
-# Issue#168 Start
-
-
-def nullity_filter(df, filter_type=None, p_cut_off=0, n_cut_off=0):
+def nullity_filter(
+    df: pd.DataFrame,
+    filter_type: Optional[str] = None,
+    p_cut_off: int = 0,
+    n_cut_off: int = 0,
+) -> pd.DataFrame:
     """
-    Filters a DataFrame according to its nullity
+    This function is designed to filters a DataFrame according to its nullity,
+    using some combination of 'top' and 'bottom' numerical
+    and percentage values.
+    Percentages and numerical thresholds can be specified simultaneously
+	Parameters
+    ----------
+    df
+	 The DataFrame whose columns are being filtered.
+	filter
+	 The orientation of the filter being applied to the DataFrame.
+     One of, "top", "bottom", or None (default).
+     The filter will simply return the DataFrame if you leave the filter
+     argument unspecified or as None.
+    p
+	 A completeness ratio cut-off.
+     If non-zero the filter will limit the DataFrame to columns with at least p
+     completeness.Input should be in the range [0, 1].
+    n
+	 A numerical cut-off. If non-zero no more than this number of columns will be returned.
+    return
+	 The nullity-filtered `DataFrame`.
+	Examples
+    ----------
+	to get a DataFrame with columns of at least 75% completeness but with no more than 5 columns
+	>>> nullity_filter(df, filter='top', p=.75, n=5)
     """
 
     if filter_type == "top":
@@ -125,34 +150,41 @@ def nullity_filter(df, filter_type=None, p_cut_off=0, n_cut_off=0):
     return df
 
 
-def nullity_sort(df, sort=None, axis="columns"):
+def nullity_sort(
+    df: pd.DataFrame, sort: Optional[str] = None, axis: str = "columns"
+) -> pd.DataFrame:
     """
-    Sorts a DataFrame according to its nullity, in either ascending or descending order.
-
-    :param df: The DataFrame object being sorted.
-    :param sort: The sorting method: either "ascending", "descending", or None (default).
-    :return: The nullity-sorted DataFrame.
+    This function is designed to Sorts a DataFrame according to its nullity,
+    in either ascending or descending order.
+	Parameters
+    ----------
+    df
+	    the pandas data_frame object being sorted.
+    sort
+		the sorting method: either "ascending", "descending", or None (default).
+    return
+		the nullity-sorted DataFrame.
     """
     if sort is None:
         return df
-    elif sort not in ["ascending", "descending"]:
-        raise ValueError(
-            'The "sort" parameter must be set to "ascending" or "descending".'
-        )
-
-    if axis not in ["rows", "columns"]:
-        raise ValueError('The "axis" parameter must be set to "rows" or "columns".')
 
     if axis == "columns":
         if sort == "ascending":
             return df.iloc[np.argsort(df.count(axis="columns").values), :]
         elif sort == "descending":
             return df.iloc[np.flipud(np.argsort(df.count(axis="columns").values)), :]
+        else:
+            raise ValueError(
+                'The "sort" parameter must be set to "ascending" or "descending".'
+            )
     elif axis == "rows":
         if sort == "ascending":
             return df.iloc[:, np.argsort(df.count(axis="rows").values)]
         elif sort == "descending":
             return df.iloc[:, np.flipud(np.argsort(df.count(axis="rows").values))]
-
-
-# Issue#168 End
+        else:
+            raise ValueError(
+                'The "sort" parameter must be set to "ascending" or "descending".'
+            )
+    else:
+        raise ValueError('The "axis" parameter must be set to "rows" or "columns".')

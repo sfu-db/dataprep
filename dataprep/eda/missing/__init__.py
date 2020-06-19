@@ -59,7 +59,6 @@ def plot_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
-    print("Step-1")
     itmdt = compute_missing(
         df, x, y, dtype=dtype, bins=bins, ncols=ncols, ndist_sample=ndist_sample
     )

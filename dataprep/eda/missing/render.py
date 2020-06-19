@@ -4,7 +4,8 @@
 """
 import math
 from typing import Tuple, Union
-from typing import List, Optional, Sequence  # Issue#168 Start
+from typing import List, Optional, Sequence
+import numpy as np
 
 import pandas as pd
 from bokeh.models import (
@@ -19,7 +20,8 @@ from bokeh.models import (
     Range1d,
     Tabs,
     Title,
-    PrintfTickFormatter,  # Issue#168 Start
+    PrintfTickFormatter,
+    ColumnDataSource,
 )
 
 # pylint: disable=no-name-in-module
@@ -32,10 +34,8 @@ from ..intermediate import Intermediate, ColumnMetadata
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
 from ..palette import PALETTE
-
 from ..palette import BIPALETTE
 
-# import seaborn as sns
 
 # pylint: enable=no-name-in-module
 
@@ -52,20 +52,17 @@ def render_missing(
     """
     @Jinglin write here
     """
-    print("render_missing")
     if itmdt.visual_type == "missing_spectrum":
         return render_missing_spectrum(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "missing_impact_1vn":
         return render_missing_impact_1vn(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "missing_impact_1v1":
         return render_missing_impact_1v1(itmdt, plot_width, plot_height)
-    # Issue#168 Start
     elif itmdt.visual_type == "missing_spectrum_heatmap":
-        print("missing_spectrum_heatmap")
         return render_missing_heatmap(
             itmdt, plot_width, plot_height, palette or BIPALETTE
         )
-    # Issue#168 End
+
     else:
         raise UnreachableError
 
@@ -257,7 +254,6 @@ def create_color_mapper() -> Tuple[LinearColorMapper, ColorBar]:
     return mapper, colorbar
 
 
-# Issue#168 Start
 def create_color_mapper_heatmap(
     palette: Sequence[str],
 ) -> Tuple[LinearColorMapper, ColorBar]:
@@ -284,12 +280,15 @@ def render_missing_heatmap(
     Render correlation heatmaps in to tabs
     """
     tabs: List[Panel] = []
-    fig1 = render_missing_spectrum(itmdt, plot_width, plot_height)
-    pan1 = Panel(child=fig1, title="spectrum")
-    tabs.append(pan1)
-    fig2 = render_heatmaps_tab(itmdt, plot_width, plot_height, palette)
-    pan2 = Panel(child=fig2, title="heatmap")
-    tabs.append(pan2)
+    fig_barchart = render_bar_viz(itmdt, "linear", plot_width, plot_height, False)
+    pan_barchart = Panel(child=fig_barchart, title="Barchart")
+    tabs.append(pan_barchart)
+    fig_spectrum = render_missing_spectrum(itmdt, plot_width, plot_height)
+    pan_spectrum = Panel(child=fig_spectrum, title="Spectrum")
+    tabs.append(pan_spectrum)
+    fig_heatmap = render_heatmaps_tab(itmdt, plot_width, plot_height, palette)
+    pan_heatmap = Panel(child=fig_heatmap, title="Heatmap")
+    tabs.append(pan_heatmap)
 
     tabs = Tabs(tabs=tabs)
     return tabs
@@ -303,18 +302,14 @@ def render_heatmaps_tab(
     """
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
     axis_range = itmdt["axis_range"]
-    mask = itmdt["mask"]
     df = itmdt["data_heatmap"]
-    df = df.copy()
-    # Reformatting
-    print("df_1:", df)
-    print("mask:", mask)
-    df = mask * df
-    print("df_2:", df)
+    df = df.where(
+        np.triu(np.ones(df.shape)).astype(np.bool)  # pylint: disable=no-member
+    ).T
     df = df.unstack().reset_index(name="correlation")
     df = df.rename(columns={"level_0": "x", "level_1": "y"})
-    ### The next line make the df becomes empty dataframe
     df = df[df["x"] != df["y"]]
+    df = df.dropna()
     # in case of numerical column names
     df["x"] = df["x"].apply(str)
     df["y"] = df["y"].apply(str)
@@ -334,8 +329,8 @@ def render_heatmaps_tab(
     )
 
     tweak_figure(fig)
-    print("df_3:", df)
-
+    fig.grid.grid_line_color = None
+    fig.axis.axis_line_color = None
     fig.rect(
         x="x",
         y="y",
@@ -351,7 +346,63 @@ def render_heatmaps_tab(
     return fig
 
 
-# Issue#168 End
+def render_bar_viz(
+    itmdt: Intermediate,
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
+    show_yticks: bool,
+) -> Figure:
+    """
+    Render a bar chart
+    """
+    # pylint: disable=too-many-arguments
+    length = itmdt["len_data"]
+    df = itmdt["data_barchart"]
+    df = df.copy()
+    df = df.reset_index()
+    df.columns = ["col", "values"]
+    df["val_per"] = df["values"] * length
+    df["missing"] = length - df["val_per"]
+    stack_present = df["val_per"].tolist()
+    stack_missing = df["missing"].tolist()
+    source = ColumnDataSource(df)
+    features = source.data["col"].tolist()
+
+    colors = [PALETTE[0], PALETTE[2]]
+    value_type = ["present", "missing"]
+    data = {"features": features, "present": stack_present, "missing": stack_missing}
+
+    if show_yticks:
+        if len(df) > 10:
+            plot_width = 28 * len(df)
+
+    fig = Figure(
+        x_range=features,
+        plot_width=plot_width,
+        plot_height=plot_height,
+        y_axis_type=yscale,
+        toolbar_location=None,
+        tooltips="$name @features: @$name",
+        tools="hover",
+    )
+
+    fig.vbar_stack(
+        value_type,
+        x="features",
+        width=0.9,
+        color=colors,
+        source=data,
+        legend_label=value_type,
+    )
+
+    fig.legend.location = "top_right"
+    fig.y_range.start = 0
+    fig.x_range.range_padding = 0.1
+    tweak_figure(fig)
+    fig.yaxis.axis_label = "Total Count"
+    relocate_legend(fig, "right")
+    return fig
 
 
 def render_missing_spectrum(
@@ -389,7 +440,7 @@ def render_missing_spectrum(
             y_range=y_range,
             plot_width=plot_width,
             plot_height=plot_height,
-            x_axis_location="above",
+            x_axis_location="below",
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
@@ -408,7 +459,6 @@ def render_missing_spectrum(
         fill_color={"field": "missing_rate", "transform": mapper},
         line_color=None,
     )
-
     fig.add_layout(color_bar, "right")
 
     return fig
