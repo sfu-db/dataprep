@@ -4,14 +4,20 @@ This module implements the intermediates computation for plot(df) function.
 from sys import stderr
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
+import copy
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 from scipy.stats import gaussian_kde, norm, kurtosis, skew, median_absolute_deviation
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk import FreqDist
+
 
 from ...errors import UnreachableError
+from ...assets import english_stopwords
 from ..dtypes import (
     is_dtype,
     detect_dtype,
@@ -57,6 +63,10 @@ def compute(
     sample_size: int = 1000,
     value_range: Optional[Tuple[float, float]] = None,
     dtype: Optional[DTypeDef] = None,
+    top_words: Optional[int] = 30,
+    stopword: Optional[bool] = True,
+    lemmatize: Optional[bool] = False,
+    stem: Optional[bool] = False,
 ) -> Intermediate:
     """
     Parameters
@@ -101,7 +111,19 @@ def compute(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
-    """
+    top_words: int, default 30
+        Specify the amount of words to show in the wordcloud and
+        word frequency bar chart
+    stopword: bool, default True
+        Eliminate the stopwords in the text data for plotting wordcloud and
+        word frequency bar chart
+    lemmatize: bool, default False
+        Lemmatize the words in the text data for plotting wordcloud and
+        word frequency bar chart
+    stem: bool, default False
+        Apply Potter Stem on the text data for plotting wordcloud and
+        word frequency bar chart
+    """  # pylint: disable=too-many-locals
 
     df = to_dask(df)
 
@@ -111,7 +133,18 @@ def compute(
     if sum(v is None for v in (x, y, z)) == 2:
         col: str = cast(str, x or y or z)
         return compute_univariate(
-            df, col, bins, ngroups, largest, timeunit, value_range, dtype
+            df,
+            col,
+            bins,
+            ngroups,
+            largest,
+            timeunit,
+            value_range,
+            dtype,
+            top_words,
+            stopword,
+            lemmatize,
+            stem,
         )
 
     if sum(v is None for v in (x, y, z)) == 1:
@@ -208,8 +241,12 @@ def compute_univariate(
     ngroups: int,
     largest: bool,
     timeunit: str,
-    value_range: Optional[Tuple[float, float]],
+    value_range: Optional[Tuple[float, float]] = None,
     dtype: Optional[DTypeDef] = None,
+    top_words: Optional[int] = 30,
+    stopword: Optional[bool] = True,
+    lemmatize: Optional[bool] = False,
+    stem: Optional[bool] = False,
 ) -> Intermediate:
     """
     Compute functions for plot(df, x)
@@ -243,6 +280,18 @@ def compute_univariate(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+    top_words: int, default 30
+        Specify the amount of words to show in the wordcloud and
+        word frequency bar chart
+    stopword: bool, default True
+        Eliminate the stopwords in the text data for plotting wordcloud and
+        word frequency bar chart
+    lemmatize: bool, default False
+        Lemmatize the words in the text data for plotting wordcloud and
+        word frequency bar chart
+    stem: bool, default False
+        Apply Potter Stem on the text data for plotting wordcloud and
+        word frequency bar chart
     """
     # pylint: disable=too-many-locals, too-many-arguments
 
@@ -254,8 +303,18 @@ def compute_univariate(
         # stats
         data_cat.append(dask.delayed(calc_stats_cat)(df[x]))
         data, statsdata_cat = dask.compute(*data_cat)
+
+        # wordcloud and word frequencies
+        word_cloud = cal_word_freq(df, x, top_words, stopword, lemmatize, stem)
+        # length_distribution
+        length_dist = cal_length_dist(df, x, bins)
         return Intermediate(
-            col=x, data=data, statsdata=statsdata_cat, visual_type="categorical_column",
+            col=x,
+            data=data,
+            statsdata=statsdata_cat,
+            word_cloud=word_cloud,
+            length_dist=length_dist,
+            visual_type="categorical_column",
         )
     elif is_dtype(col_dtype, Continuous()):
         if value_range is not None:
@@ -768,6 +827,85 @@ def calc_bar_pie(
     return df, len(grp_srs), miss_pct
 
 
+def tokenize_text(df: dd.DataFrame, x: str) -> dd.DataFrame:
+    """
+    tokenize the text column and only keep the words
+    """
+
+    def tokenize(text: str) -> Any:
+        text = text.lower()
+        tokenizer = RegexpTokenizer(r"\w+")
+        tokens = tokenizer.tokenize(text)
+        return tokens
+
+    df[x] = df[x].astype(str)
+    df["clean_text"] = df[x].apply(tokenize)
+    return df
+
+
+def clean_text(
+    freqdist: Dict[str, int],
+    non_single_word: int,
+    top_words: Optional[int] = 30,
+    stopword: Optional[bool] = True,
+    lemmatize: Optional[bool] = False,
+    stem: Optional[bool] = False,
+) -> Dict[Any, Any]:
+    """
+    clean the frequency dictionary by stopwords, lemmatization and stemming
+    """  # pylint: disable=too-many-arguments
+    freq_copy = copy.deepcopy(freqdist)
+    lemmatizer = WordNetLemmatizer()
+    porter = PorterStemmer()
+    for key in freq_copy.keys():
+        if stopword and non_single_word >= top_words:  # type: ignore
+            if key in english_stopwords.english_stopwords or len(key) <= 2:
+                del freqdist[key]
+        if lemmatize:
+            if lemmatizer.lemmatize(key) != key:
+                freqdist[lemmatizer.lemmatize(key)] = freqdist[key]
+                del freqdist[key]
+        if stem:
+            if porter.stem(key) != key:
+                freqdist[porter.stem(key)] = freqdist[key]
+                del freqdist[key]
+    return freqdist
+
+
+def cal_word_freq(
+    df: dd.DataFrame,
+    x: str,
+    top_words: Optional[int] = 30,
+    stopword: Optional[bool] = True,
+    lemmatize: Optional[bool] = False,
+    stem: Optional[bool] = False,
+) -> Tuple[int, List[Tuple[str, int]]]:
+    """
+    Tokenize and clean the text column and calculate the top frequency words and total frequency
+    """
+    # pylint: disable=too-many-locals, too-many-arguments
+    df = df.map_partitions(tokenize_text, x)
+    df = dd.compute(df)
+    non_single_word = ((df[0][x].str.len()) > 1).sum()
+    freq = FreqDist([a for b in df[0]["clean_text"] for a in b])
+    freq = clean_text(freq, non_single_word, top_words, stopword, lemmatize, stem)
+    total_freq = sum(freq.values())
+    if len(freq) < 30:
+        top_words = len(freq)
+    top_freq = freq.most_common(top_words)
+
+    return total_freq, top_freq
+
+
+def cal_length_dist(df: dd.DataFrame, x: str, bins: int) -> Tuple[pd.DataFrame, float]:
+    """
+    calculate the length histogram for text column
+    """
+    length = dd.compute(df[x].str.len())[0]
+    df, miss_pct = calc_hist(length, bins)
+    return df, miss_pct
+
+
 def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
     """
     Calculate a histogram over a given series.
@@ -1187,7 +1325,9 @@ def calc_stats_num(
     )
 
 
-def calc_stats_cat(srs: dd.Series) -> Dict[str, str]:
+def calc_stats_cat(
+    srs: dd.Series,
+) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str], Dict[str, str]]:
     """
     Calculate stats from a categorical column
     Parameters
@@ -1199,6 +1339,7 @@ def calc_stats_cat(srs: dd.Series) -> Dict[str, str]:
     Dict[str, str]
         Dictionary that contains Overview
     """
+    # overview stats
     size = len(srs)  # include nan
     count = srs.count()  # exclude nan
     uniq_count = srs.nunique()
@@ -1209,8 +1350,58 @@ def calc_stats_cat(srs: dd.Series) -> Dict[str, str]:
         "Missing (%)": 1 - (count / size),
         "Memory Size": srs.memory_usage(),
     }
+    srs = srs.astype("str")
+    # length stats
+    length = srs.str.len()
+    length_dict = {
+        "mean": length.mean(),
+        "median": length.median(),
+        "minimum": length.min(),
+        "maximum": length.max(),
+    }
+    # quantile stats
+    max_lbl_len = 13
+    quantile_dict = {}
+    for label, centile in zip(
+        (
+            "Minimum",
+            "5-th Percentile",
+            "Q1",
+            "Median",
+            "Q3",
+            "95-th Percentile",
+            "Maximum",
+        ),
+        (0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
+    ):
+        if round(len(srs) * centile) == 0:
+            element = srs[round(len(srs) * centile)]
+            if len(element) > max_lbl_len:
+                quantile_dict[label] = element[0 : max_lbl_len - 2] + "..."
+            else:
+                quantile_dict[label] = element
+        else:
+            element = srs[round(len(srs) * centile) - 1]
+            if len(element) > max_lbl_len:
+                quantile_dict[label] = element[0 : max_lbl_len - 2] + "..."
+            else:
+                quantile_dict[label] = element
 
-    return {k: _format_values(k, v) for k, v in overview_dict.items()}
+    # letter stats
+    letter_dict = {
+        "count": srs.str.count(r"[a-zA-Z]").sum(),
+        "Lowercase Letter": srs.str.count(r"[a-z]").sum(),
+        "Space Separator": srs.str.count(r"[ ]").sum(),
+        "Uppercase Letter": srs.str.count(r"[A-Z]").sum(),
+        "Dash Punctuation": srs.str.count(r"[-]").sum(),
+        "Decimal Number": srs.str.count(r"[0-9]").sum(),
+    }
+    return (
+        {k: _format_values(k, v) for k, v in overview_dict.items()},
+        {k: _format_values(k, v) for k, v in length_dict.items()},
+        quantile_dict,
+        {k: _format_values(k, v) for k, v in letter_dict.items()},
+    )
 
 
 def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:

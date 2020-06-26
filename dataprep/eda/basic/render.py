@@ -3,6 +3,9 @@ This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from math import pi
 from typing import Any, Dict, List, Optional, Tuple, Union
+from pathlib import Path
+from wordcloud import WordCloud
+from PIL import Image
 
 import numpy as np
 import pandas as pd
@@ -26,7 +29,7 @@ from bokeh.models import (
     CustomJS,
     Button,
 )
-from bokeh.layouts import column
+from bokeh.layouts import column, row
 from bokeh.plotting import Figure, gridplot, figure
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
@@ -214,6 +217,73 @@ def _sci_notation_superscript(value: str) -> str:
     return value
 
 
+def wordcloud_viz(
+    freq_tuple: Tuple[int, List[Tuple[str, int]]], plot_width: int, plot_height: int,
+) -> Figure:
+    """
+    Visualize the wordcloud
+    Parameters
+    ----------
+    freq_tuple
+        Tuple contains total frequency of words and frequency dict
+    """  # pylint: disable=unsubscriptable-object
+    ellipse_mask = np.array(
+        Image.open(f"{Path(__file__).parent.parent.parent}/assets/ellipse.jpg")
+    )
+    wordcloud = WordCloud(
+        background_color="white", mask=ellipse_mask, width=800, height=400
+    )
+    top_freq = freq_tuple[1]
+    wordcloud.generate_from_frequencies(dict(top_freq))
+    wcimg = wordcloud.to_array().astype(np.uint8)
+    alpha = np.full([*wcimg.shape[:2], 1], 255, dtype=np.uint8)
+    wcimg = np.concatenate([wcimg, alpha], axis=2)[::-1, :]
+
+    fig = figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        title="WordCloud",
+        x_range=(0, 1),
+        y_range=(0, 1),
+        toolbar_location=None,
+    )
+    fig.image_rgba(image=[wcimg], x=0, y=0, dh=1, dw=1)
+
+    fig.axis.visible = False
+    fig.grid.visible = False
+    return fig
+
+
+def wordfreq_viz(
+    freq_tuple: Tuple[int, List[Tuple[str, int]]],
+    plot_width: int,
+    plot_height: int,
+    show_yticks: bool,
+) -> Figure:
+    """
+    Visualize the word frequency bar chart
+    """
+    top_freq = freq_tuple[1]
+    total_freq = freq_tuple[0]
+    words = list(list(zip(*top_freq))[0])
+    counts = list(list(zip(*top_freq))[1])
+    freq_percent = [round((i / total_freq) * 100, 2) for i in counts]
+    wordcloud_dict = dict(word=words, cnt=counts, pct=freq_percent)
+    tooltips = [("word", "@word"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    fig = figure(
+        x_range=list(wordcloud_dict["word"]),
+        plot_width=plot_width,
+        plot_height=plot_height,
+        title="Words Frequency",
+        toolbar_location=None,
+        tools="hover",
+        tooltips=tooltips,
+    )
+    fig.vbar(x="word", top="cnt", width=0.9, source=wordcloud_dict)
+    tweak_figure(fig, "bar", show_yticks)
+    return fig
+
+
 def bar_viz(
     df: pd.DataFrame,
     total_grps: int,
@@ -275,6 +345,7 @@ def pie_viz(
     df["colour"] = color_list[0 : len(df)]
     if df.iloc[-1]["cnt"] == 0:  # no "Others" group
         df = df[:-1]
+    df["col"] = df["col"].map(lambda x: x[0:13] + "..." if len(x) > 13 else x)
     pie = fig.wedge(
         x=0,
         y=1,
@@ -291,7 +362,7 @@ def pie_viz(
     tweak_figure(fig, "pie")
     fig.axis.major_label_text_font_size = "0pt"
     fig.axis.major_tick_line_color = None
-    return Panel(child=fig, title="pie chart")
+    return Panel(child=row(fig), title="pie chart")
 
 
 def hist_viz(
@@ -1145,12 +1216,20 @@ def stats_viz_num(
     return Panel(child=div, title="stats")
 
 
-def stats_viz_cat(data: Dict[str, str], plot_width: int, plot_height: int) -> Panel:
+def stats_viz_cat(
+    data: Tuple[Dict[str, str], Dict[str, str], Dict[str, str], Dict[str, str]],
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
     """
     Render statistics panel for categorical data
     """
+    # pylint: disable=line-too-long
     ov_content = ""
-    for key, value in data.items():
+    lens_content = ""
+    qs_content = ""
+    ls_content = ""
+    for key, value in data[0].items():
         value = _sci_notation_superscript(value)
         if "Distinct" in key and float(value) > 50:
             ov_content += _create_table_row(key, value, True)
@@ -1160,16 +1239,51 @@ def stats_viz_cat(data: Dict[str, str], plot_width: int, plot_height: int) -> Pa
             ov_content += _create_table_row(key, value, True)
         else:
             ov_content += _create_table_row(key, value)
+    for key, value in data[1].items():
+        lens_content += _create_table_row(key, value)
+    for key, value in data[2].items():
+        qs_content += _create_table_row(key, value)
+    for key, value in data[3].items():
+        ls_content += _create_table_row(key, value)
+
     ov_content = f"""
-    <h3 style="text-align: center;">Overview</h3>
-    <div">
+    <div style="grid-area: a;">
+        <h3 style="text-align: center;">Overview</h3>
         <table style="width: 100%; table-layout: auto;">
             <tbody>{ov_content}</tbody>
         </table>
     </div>
     """
+    lens_content = f"""
+    <div style="grid-area: b;">
+        <h3 style="text-align: center;">Length</h3>
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
+            <tbody>{lens_content}</tbody>
+        </table>
+    </div>
+    """
+    qs_content = f"""
+    <div style="grid-area: c;">
+        <h3 style="text-align: center;margin-top: -10px;">Quantile Statistics</h3>
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
+            <tbody>{qs_content}</tbody>
+        </table>
+    </div>
+    """
+    ls_content = f"""
+    <div style="grid-area: d;">
+        <h3 style="text-align: center;margin-top: -10px;">Letter</h3>
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
+            <tbody>{ls_content}</tbody>
+        </table>
+    </div>
+    """
+    container = f"""<div style="display: grid;grid-template-columns: 1fr 1fr;grid-template-rows: 1fr 1fr;gap: 1px 1px;
+                grid-template-areas:\'a b\' \'c d\';">
+                {ov_content}{lens_content}{qs_content}{ls_content}</div>"""
+
     div = Div(
-        text=ov_content, width=plot_width, height=plot_height, style={"width": "100%"}
+        text=container, width=plot_width, height=plot_height, style={"width": "100%"}
     )
     return Panel(child=div, title="stats")
 
@@ -1281,8 +1395,18 @@ def render_cat(
         plot_height,
         True,
     )
-    tabs.append(Panel(child=fig, title="bar chart"))
+    tabs.append(Panel(child=row(fig), title="bar chart"))
     tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
+    freq_tuple = itmdt["word_cloud"]
+    word_cloud = wordcloud_viz(freq_tuple, plot_width, plot_height)
+    tabs.append(Panel(child=row(word_cloud), title="word cloud"))
+    wordfreq = wordfreq_viz(freq_tuple, plot_width, plot_height, True)
+    tabs.append(Panel(child=row(wordfreq), title="words frequency"))
+    df, miss_pct = itmdt["length_dist"]
+    length_dist = hist_viz(
+        df, miss_pct, "length", yscale, plot_width, plot_height, True
+    )
+    tabs.append(Panel(child=row(length_dist), title="length"))
     tabs = Tabs(tabs=tabs)
     return tabs
 
