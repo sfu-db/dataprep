@@ -39,7 +39,7 @@ __all__ = [
     "Continuous",
     "Discrete",
     "DateTime",
-    "Text" "",
+    "Text",
 ]
 
 
