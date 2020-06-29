@@ -1,4 +1,4 @@
-<div align="center"><img width="100%" src="https://i.imgur.com/bNSVrGm.png"/></div>
+<div align="center"><img width="100%" src="https://github.com/sfu-db/dataprep/raw/develop/assets/logo.png"/></div>
 
 -----------------
 
@@ -40,19 +40,19 @@ tasks with a single function call.
 
 * Want to understand the distributions for each DataFrame column? Use `plot`.
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-basic-characteristics-via-plot"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot(df).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-basic-characteristics-via-plot"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot(df).png"/></a></center>
 
 * Want to understand the correlation between columns? Use `plot_correlation`.
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-correlation-via-plot-correlation"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_correlation(df).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/introduction.html#analyzing-correlation-via-plot-correlation"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot_correlation(df).png"/></a></center>
 
 * Or, if you want to understand the impact of the missing values for each column, use `plot_missing`.
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#plotting-the-position-of-missing-values-via-plot-missing-df"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_missing(df).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#plotting-the-position-of-missing-values-via-plot-missing-df"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot_missing(df).png"/></a></center>
 
 * You can drill down to get more information by given `plot`, `plot_correlation` and `plot_missing` a column name. E.g. for `plot_missing`:
 
-<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/plot_missing(df,x).png"/></a></center>
+<center><a href="https://sfu-db.github.io/dataprep/eda/plot_missing.html#the-impact-on-basic-characteristics-of-missing-values-in-column-x-via-plot-missing-df-x"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot_missing(df,x).png"/></a></center>
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
 
@@ -60,15 +60,12 @@ Don't forget to checkout the [examples] folder for detailed demonstration!
 
 You can download Yelp business search result into a pandas DataFrame, 
 using two lines of code, without taking deep looking into the Yelp documentation!
+Moreover, Data Connector will automatically do the pagination for you so that 
+you can specify the desire count of the returned results without even considering the count-per-request restriction from the API.
 
-```python
-from dataprep.data_connector import Connector
+<center><a href="https://sfu-db.github.io/dataprep/data_connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/data_connector.png"/></a></center>
 
-dc = Connector("yelp", auth_params={"access_token":"<Your yelp access token>"})
-df = dc.query("businesses", term="korean", location="seattle")
-```
-<center><a href="https://sfu-db.github.io/dataprep/data_connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/master/assets/data_connector.png"/></a></center>
-
+_The code requests 120 records even though Yelp restricts you can only fetch 50 per request._
 
 ## Contribute
 
