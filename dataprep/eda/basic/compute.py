@@ -297,13 +297,17 @@ def compute_univariate(
 
     col_dtype = detect_dtype(df[x], dtype)
     if is_dtype(col_dtype, Nominal()):
-        # data for bar and pie charts
         data_cat: List[Any] = []
-        data_cat.append(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
+        # reset index for calculating quantile stats
+        df = df.reset_index()
         # stats
         data_cat.append(dask.delayed(calc_stats_cat)(df[x]))
-        data, statsdata_cat = dask.compute(*data_cat)
-
+        # drop nan and empty spaces for plots
+        df[x].replace("", np.nan)
+        df = df.dropna(subset=[x])
+        # data for bar and pie charts
+        data_cat.append(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
+        statsdata_cat, data = dask.compute(*data_cat)
         # wordcloud and word frequencies
         word_cloud = cal_word_freq(df, x, top_words, stopword, lemmatize, stem)
         # length_distribution
@@ -858,7 +862,7 @@ def clean_text(
     lemmatizer = WordNetLemmatizer()
     porter = PorterStemmer()
     for key in freq_copy.keys():
-        if stopword and non_single_word >= top_words:  # type: ignore
+        if stopword and non_single_word > top_words:  # type: ignore
             if key in english_stopwords.english_stopwords or len(key) <= 2:
                 del freqdist[key]
         if lemmatize:
@@ -1351,28 +1355,12 @@ def calc_stats_cat(
         "Memory Size": srs.memory_usage(),
     }
     srs = srs.astype("str")
-    # length stats
-    length = srs.str.len()
-    length_dict = {
-        "mean": length.mean(),
-        "median": length.median(),
-        "minimum": length.min(),
-        "maximum": length.max(),
-    }
     # quantile stats
-    max_lbl_len = 13
+    max_lbl_len = 25
     quantile_dict = {}
     for label, centile in zip(
-        (
-            "Minimum",
-            "5-th Percentile",
-            "Q1",
-            "Median",
-            "Q3",
-            "95-th Percentile",
-            "Maximum",
-        ),
-        (0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
+        ("1st Row", "25% Row", "50% Row", "75% Row", "Last Row",),
+        (0, 0.25, 0.5, 0.75, 1),
     ):
         if round(len(srs) * centile) == 0:
             element = srs[round(len(srs) * centile)]
@@ -1387,9 +1375,19 @@ def calc_stats_cat(
             else:
                 quantile_dict[label] = element
 
+    srs = srs.dropna()
+    # length stats
+    length = srs.str.len()
+    length_dict = {
+        "Mean": length.mean(),
+        "Standard Deviation": length.std(),
+        "Median": length.median(),
+        "Minimum": length.min(),
+        "Maximum": length.max(),
+    }
     # letter stats
     letter_dict = {
-        "count": srs.str.count(r"[a-zA-Z]").sum(),
+        "Count": srs.str.count(r"[a-zA-Z]").sum(),
         "Lowercase Letter": srs.str.count(r"[a-z]").sum(),
         "Space Separator": srs.str.count(r"[ ]").sum(),
         "Uppercase Letter": srs.str.count(r"[A-Z]").sum(),

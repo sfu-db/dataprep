@@ -2,43 +2,43 @@
 This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from math import pi
-from typing import Any, Dict, List, Optional, Tuple, Union
 from pathlib import Path
-from wordcloud import WordCloud
-from PIL import Image
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from bokeh.events import ButtonClick
+from bokeh.layouts import column, row
 from bokeh.models import (
-    Box,
-    FuncTickFormatter,
-    PrintfTickFormatter,
     BasicTicker,
+    Box,
+    Button,
+    ColorBar,
+    ColumnDataSource,
+    CustomJS,
+    CustomJSHover,
+    Div,
+    FactorRange,
+    FuncTickFormatter,
     HoverTool,
     LayoutDOM,
     Legend,
     LegendItem,
-    Panel,
-    Tabs,
-    ColumnDataSource,
     LinearColorMapper,
-    ColorBar,
-    FactorRange,
-    CustomJSHover,
-    Div,
-    CustomJS,
-    Button,
+    Panel,
+    PrintfTickFormatter,
+    Tabs,
 )
-from bokeh.layouts import column, row
-from bokeh.plotting import Figure, gridplot, figure
+from bokeh.palettes import Pastel1, viridis  # pylint: disable=E0611 # type: ignore
+from bokeh.plotting import Figure, figure, gridplot
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
-from bokeh.palettes import viridis, Pastel1  # pylint: disable=E0611 # type: ignore
-from bokeh.events import ButtonClick
+from PIL import Image
+from wordcloud import WordCloud
 
+from ..dtypes import Continuous, DateTime, Nominal, is_dtype
 from ..intermediate import Intermediate
-from ..dtypes import is_dtype, Nominal, Continuous, DateTime
-from ..palette import PALETTE, BIPALETTE
+from ..palette import BIPALETTE, PALETTE
 
 __all__ = ["render"]
 
@@ -343,9 +343,11 @@ def pie_viz(
     )
     color_list = PALETTE * (len(df) // len(PALETTE) + 1)
     df["colour"] = color_list[0 : len(df)]
-    if df.iloc[-1]["cnt"] == 0:  # no "Others" group
-        df = df[:-1]
     df["col"] = df["col"].map(lambda x: x[0:13] + "..." if len(x) > 13 else x)
+
+    if df.iloc[-1]["cnt"] == 0:  # no "Others" group
+        df = df.iloc[:-1]
+
     pie = fig.wedge(
         x=0,
         y=1,
@@ -1249,38 +1251,39 @@ def stats_viz_cat(
     ov_content = f"""
     <div style="grid-area: a;">
         <h3 style="text-align: center;">Overview</h3>
-        <table style="width: 100%; table-layout: auto;">
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
             <tbody>{ov_content}</tbody>
         </table>
     </div>
     """
-    lens_content = f"""
-    <div style="grid-area: b;">
-        <h3 style="text-align: center;">Length</h3>
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{lens_content}</tbody>
-        </table>
-    </div>
-    """
     qs_content = f"""
-    <div style="grid-area: c;">
-        <h3 style="text-align: center;margin-top: -10px;">Quantile Statistics</h3>
+    <div style="grid-area: b;">
+        <h3 style="text-align: center;">Sample</h3>
         <table style="width: 100%; table-layout: auto; font-size:11px;">
             <tbody>{qs_content}</tbody>
         </table>
     </div>
     """
     ls_content = f"""
-    <div style="grid-area: d;">
-        <h3 style="text-align: center;margin-top: -10px;">Letter</h3>
+    <div style="grid-area: c;">
+        <h3 style="text-align: center;">Letter</h3>
         <table style="width: 100%; table-layout: auto; font-size:11px;">
             <tbody>{ls_content}</tbody>
         </table>
     </div>
     """
+    lens_content = f"""
+    <div style="grid-area: d;">
+        <h3 style="text-align: center;">Length</h3>
+        <table style="width: 100%; table-layout: auto; font-size:11px;">
+            <tbody>{lens_content}</tbody>
+        </table>
+    </div>
+    """
+
     container = f"""<div style="display: grid;grid-template-columns: 1fr 1fr;grid-template-rows: 1fr 1fr;gap: 1px 1px;
                 grid-template-areas:\'a b\' \'c d\';">
-                {ov_content}{lens_content}{qs_content}{ls_content}</div>"""
+                {ov_content}{qs_content}{ls_content}{lens_content}</div>"""
 
     div = Div(
         text=container, width=plot_width, height=plot_height, style={"width": "100%"}
@@ -1398,16 +1401,18 @@ def render_cat(
     tabs.append(Panel(child=row(fig), title="bar chart"))
     tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
     freq_tuple = itmdt["word_cloud"]
-    word_cloud = wordcloud_viz(freq_tuple, plot_width, plot_height)
-    tabs.append(Panel(child=row(word_cloud), title="word cloud"))
-    wordfreq = wordfreq_viz(freq_tuple, plot_width, plot_height, True)
-    tabs.append(Panel(child=row(wordfreq), title="words frequency"))
+    if freq_tuple[0] != 0:
+        word_cloud = wordcloud_viz(freq_tuple, plot_width, plot_height)
+        tabs.append(Panel(child=row(word_cloud), title="word cloud"))
+        wordfreq = wordfreq_viz(freq_tuple, plot_width, plot_height, True)
+        tabs.append(Panel(child=row(wordfreq), title="words frequency"))
     df, miss_pct = itmdt["length_dist"]
     length_dist = hist_viz(
         df, miss_pct, "length", yscale, plot_width, plot_height, True
     )
     tabs.append(Panel(child=row(length_dist), title="length"))
     tabs = Tabs(tabs=tabs)
+
     return tabs
 
 
@@ -1705,4 +1710,5 @@ def render(
         visual_elem = render_dt_cat(itmdt, yscale, plot_width_wide, plot_height_lrg)
     elif itmdt.visual_type == "dt_cat_num_cols":
         visual_elem = render_dt_num_cat(itmdt, yscale, plot_width_wide, plot_height_lrg)
+
     return visual_elem
