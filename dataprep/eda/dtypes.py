@@ -1,9 +1,8 @@
 """
 In this module lives the type tree.
 """
-
-
-from typing import Any, Dict, Optional, Union, Type
+from collections import defaultdict
+from typing import Any, DefaultDict, Dict, Optional, Union, Type
 
 
 import numpy as np
@@ -279,3 +278,24 @@ def drop_null(
         return df
 
     raise ValueError("Input should be a Pandas/Dask Dataframe or Series")
+
+
+def get_dtype_cnts(
+    df: dd.DataFrame,
+    dtype: Union[Dict[str, Union[DType, Type[DType], str]], DType, Type[DType], None],
+) -> Dict[str, int]:
+    """
+    Get the count of each dtype in a dataframe
+    """
+    dtype_cnts: DefaultDict[str, int] = defaultdict(int)
+    for col in df.columns:
+        col_dtype = detect_dtype(df[col], dtype)
+        if is_dtype(col_dtype, Nominal()):
+            dtype_cnts["Categorical"] += 1
+        elif is_dtype(col_dtype, Continuous()):
+            dtype_cnts["Numerical"] += 1
+        elif is_dtype(col_dtype, DateTime()):
+            dtype_cnts["DateTime"] += 1
+        else:
+            raise NotImplementedError
+    return dtype_cnts
