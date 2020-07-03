@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Tutorial - Data Connector for Spotify &#8212; dataprep 0.2.6 documentation</title>
+    <title>Tutorial - Data Connector for Spotify &#8212; dataprep 0.2.7 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="DC_Yelp_tut.html" title="Tutorial - Data Connector for Yelp"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -73,7 +73,7 @@ If the clone was successful, a new sub-directory appears on your local drive in 
 <a class="reference internal image-reference" href="_images/App_find.png"><img alt="_images/App_find.png" class="align-center" src="_images/App_find.png" style="width: 650px; height: 330px;" /></a>
 <p>Open apps.js with your favourite editor. In the file, it contains a section for client ID, client secret, and redirect URI. Insert the information available in the “white out” section. This is the call that starts the process of authenticating to user and gets the user’s authorization to access data.</p>
 <a class="reference internal image-reference" href="_images/App.js_config.png"><img alt="_images/App.js_config.png" class="align-center" src="_images/App.js_config.png" style="width: 650px; height: 100px;" /></a>
-<p>The client ID and client Secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.</p>
+<p>The client ID and client secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.</p>
 <a class="reference internal image-reference" href="_images/ID_and_secret.png"><img alt="_images/ID_and_secret.png" class="align-center" src="_images/ID_and_secret.png" style="width: 600px; height: 350px;" /></a>
 <p>Go back to the application dashboard and click the edit settings which can be found on the top right. In this section, insert the http link in the redirect_uri, “<a class="reference external" href="http://localhost:8888/callback">http://localhost:8888/callback</a>”. The redirect URI will safely send the user back to their application once Spotify has authorized the app. Copy and store the access token in a safe area.</p>
 <a class="reference internal image-reference" href="_images/URI_.png"><img alt="_images/URI_.png" class="align-center" src="_images/URI_.png" style="width: 300px; height: 400px;" /></a>
@@ -87,24 +87,29 @@ If the clone was successful, a new sub-directory appears on your local drive in 
 <p>Open a browser and visit the project home page again. Now that the server is running, you can use the following URL: <a class="reference external" href="http://localhost:8888">http://localhost:8888</a>.</p>
 <a class="reference internal image-reference" href="_images/Spotify_server.png"><img alt="_images/Spotify_server.png" class="align-center" src="_images/Spotify_server.png" style="width: 800px; height: 400px;" /></a>
 <p>When you click on the log in link, it will send you back to your redirect URI. You should see your Spotify account information as well as your access token and refresh token.</p>
-<a class="reference internal image-reference" href="_static/images/tutorial/SFU_spotify.png"><img alt="_static/images/tutorial/SFU_spotify.png" class="align-center" src="_static/images/tutorial/SFU_spotify.png" style="width: 800px; height: 400px;" /></a>
+<a class="reference internal image-reference" href="_images/SFU_Spotify.png"><img alt="_images/SFU_Spotify.png" class="align-center" src="_images/SFU_Spotify.png" style="width: 800px; height: 400px;" /></a>
 </div>
 </div>
 <div class="section" id="download-and-store-the-configuration-files-in-dataprep">
 <h2>Download and store the configuration files in dataprep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
-<p>The configuration files are used to configure the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
-<p>Store the configuration file in the dataprep folder.</p>
-<a class="reference internal image-reference" href="_images/Config_destination.png"><img alt="_images/Config_destination.png" class="align-center" src="_images/Config_destination.png" style="width: 500px; height: 120px;" /></a>
+<p>The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
+<p>To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files.
+When you decided on a location, enter the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/sfu-db/DataConnectorConfigs.git</span></code>. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder.</p>
+<p>From here you can proceed with the next steps.</p>
+<a class="reference internal image-reference" href="_images/dc_git.png"><img alt="_images/dc_git.png" class="align-center" src="_images/dc_git.png" style="width: 1000px; height: 500px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_git_clone.png"><img alt="_images/dc_git_clone.png" class="align-center" src="_images/dc_git_clone.png" style="width: 725px; height: 125px;" /></a>
+<p>Below the configuration file are stored with dataprep.</p>
+<a class="reference internal image-reference" href="_images/Config_destination.png"><img alt="_images/Config_destination.png" class="align-center" src="_images/Config_destination.png" style="width: 586px; height: 132px;" /></a>
 </div>
 <div class="section" id="initialize-data-connector">
 <h2>Initialize data_connector<a class="headerlink" href="#initialize-data-connector" title="Permalink to this headline">¶</a></h2>
-<p>To initialize the data_connector, run the following code below. Copy and paste the Spotify <strong>access_token</strong>, <strong>client_id</strong>, and <strong>client_secret</strong> in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.</p>
+<p>To initialize the data_connector, run the following code below. Copy and paste your Spotify <strong>access_token</strong>, <strong>client_id</strong>, and <strong>client_secret</strong> in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>from dataprep.data_connector import Connector
 client_id = “insert_client_id”
 client_secret = “insert_client_secret”
-access_token = ““insert_token_key”
-dc = Connector(&quot;./DataConnectorConfigs/spotify&quot;, auth_params={&quot;client_id&quot;:client_id,
-                                                       &quot;client_secret&quot;:access_token,
+access_token = “insert_token_key”
+dc = Connector(&quot;./DataConnectorConfigs/spotify&quot;, _auth={&quot;client_id&quot;:client_id,
+                                                       &quot;client_secret&quot;:client_secret,
                                                        &quot;access_token&quot;:access_token})
 </pre></div>
 </div>
@@ -116,16 +121,30 @@ dc = Connector(&quot;./DataConnectorConfigs/spotify&quot;, auth_params={&quot;cl
 <h3>Connector.info<a class="headerlink" href="#connector-info" title="Permalink to this headline">¶</a></h3>
 <div class="line-block">
 <div class="line">The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.</div>
-</div>
+<div class="line"><br /></div>
 <div class="line-block">
 <div class="line">a. Table - The table(s) being accessed.</div>
 <div class="line">b. Parameters - Identifies which parameters can be used to call the method.</div>
 <div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
 </div>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/dc_spotify_info.png"><img alt="_images/dc_spotify_info.png" class="align-center" src="_images/dc_spotify_info.png" style="width: 385px; height: 540px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_spotify_info.png"><img alt="_images/dc_spotify_info.png" class="align-center" src="_images/dc_spotify_info.png" style="width: 285px; height: 405px;" /></a>
+<div class="section" id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp’s business query can either be required or optional. The required parameter is <strong>q</strong> while the optional parameters are <strong>limit</strong> and <strong>offset</strong>. The parameters are described below.</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">a. <strong>q</strong> - Required - Search term, for example “Beyonce”.</div>
+<div class="line">b. <strong>limit</strong> - Optional -  It is the maximum number of results to return. By default, it will return 20. Maximum is 50.</div>
+<div class="line">c. <strong>offset</strong> - Optional - Offset allows you to specify the ranking number of the first item on the page. By default, it will return 0. Maximum is 2,000.</div>
+</div>
+</div>
+<p>There are additional parameters to query with Spotify. If you are interested in reading up the other available parameters and setting up your own config files, please read this <a class="reference external" href="https://developer.spotify.com/documentation/web-api/reference/search/search/">Spotify link</a> and this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files link</a>.</p>
+</div>
 </div>
 <div class="section" id="connector-show-schema">
 <h3>Connector.show_schema<a class="headerlink" href="#connector-show-schema" title="Permalink to this headline">¶</a></h3>
@@ -140,8 +159,8 @@ As an example, lets see what is in the artist table.</p>
 <h3>Connector.query<a class="headerlink" href="#connector-query" title="Permalink to this headline">¶</a></h3>
 <p>The query method downloads the website data and displays it in a Dataframe. The parameters must meet the requirements as indicated in connector.info for the operation to run.</p>
 <p>When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.</p>
-<p>As an example, let’s try to get the data from the “artist” table, providing the query search for “pop”.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;pop&quot;</span><span class="p">)</span>
+<p>As an example, let’s try to get the data from the “artist” table, providing the query search for the artist “beyonce”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;beyonce&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/dc_spotify_query.png"><img alt="_images/dc_spotify_query.png" class="align-center" src="_images/dc_spotify_query.png" style="width: 1000px; height: 460px;" /></a>
@@ -152,6 +171,20 @@ Now that you have an understanding of how data connector operates, you can easil
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return.</div>
+<div class="line"><br /></div>
+<div class="line">To use pagination, you need to include <strong>_count</strong> in your query. The <strong>_count</strong> parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.</div>
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;twice&quot;</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_spotify_query_pag.png"><img alt="_images/dc_spotify_query_pag.png" class="align-center" src="_images/dc_spotify_query_pag.png" style="width: 1000px; height: 490px;" /></a>
+<p>Pagination does not concurrently work with the <strong>limit</strong> parameter in a query, you need to select either <strong>limit</strong> or <strong>_count</strong>. If you select <strong>_count</strong>, it bypasses the initial restriction set by Spotify’s <strong>limit</strong> parameter.</p>
 </div>
 <div class="section" id="that-s-all-for-now">
 <h2>That’s all for now.<a class="headerlink" href="#that-s-all-for-now" title="Permalink to this headline">¶</a></h2>
@@ -179,11 +212,15 @@ If you are interested in creating other data connectors, please visit this <a cl
 <li><a class="reference internal" href="#download-and-store-the-configuration-files-in-dataprep">Download and store the configuration files in dataprep</a></li>
 <li><a class="reference internal" href="#initialize-data-connector">Initialize data_connector</a></li>
 <li><a class="reference internal" href="#functionalities">Functionalities</a><ul>
-<li><a class="reference internal" href="#connector-info">Connector.info</a></li>
+<li><a class="reference internal" href="#connector-info">Connector.info</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#connector-show-schema">Connector.show_schema</a></li>
 <li><a class="reference internal" href="#connector-query">Connector.query</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pagination">Pagination</a></li>
 <li><a class="reference internal" href="#that-s-all-for-now">That’s all for now.</a></li>
 </ul>
 </li>
@@ -228,7 +265,7 @@ If you are interested in creating other data connectors, please visit this <a cl
         <li class="right" >
           <a href="DC_Yelp_tut.html" title="Tutorial - Data Connector for Yelp"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

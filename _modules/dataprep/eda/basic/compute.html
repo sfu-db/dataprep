@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic.compute &#8212; dataprep 0.2.6 documentation</title>
+    <title>dataprep.eda.basic.compute &#8212; dataprep 0.2.7 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -22,7 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li> 
       </ul>
@@ -40,14 +40,20 @@
 <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">kurtosis</span><span class="p">,</span> <span class="n">skew</span><span class="p">,</span> <span class="n">median_absolute_deviation</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">RegexpTokenizer</span>
+<span class="kn">from</span> <span class="nn">nltk.stem</span> <span class="kn">import</span> <span class="n">PorterStemmer</span><span class="p">,</span> <span class="n">WordNetLemmatizer</span>
+<span class="kn">from</span> <span class="nn">nltk</span> <span class="kn">import</span> <span class="n">FreqDist</span>
+
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
+<span class="kn">from</span> <span class="nn">...assets</span> <span class="kn">import</span> <span class="n">english_stopwords</span>
 <span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_dtype</span><span class="p">,</span>
     <span class="n">detect_dtype</span><span class="p">,</span>
@@ -93,6 +99,10 @@
     <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">top_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">stopword</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">lemmatize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">stem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
@@ -137,7 +147,19 @@
 <span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    top_words: int, default 30</span>
+<span class="sd">        Specify the amount of words to show in the wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    stopword: bool, default True</span>
+<span class="sd">        Eliminate the stopwords in the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    lemmatize: bool, default False</span>
+<span class="sd">        Lemmatize the words in the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    stem: bool, default False</span>
+<span class="sd">        Apply Potter Stem on the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-locals</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
@@ -147,7 +169,18 @@
     <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">or</span> <span class="n">z</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">compute_univariate</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">value_range</span><span class="p">,</span> <span class="n">dtype</span>
+            <span class="n">df</span><span class="p">,</span>
+            <span class="n">col</span><span class="p">,</span>
+            <span class="n">bins</span><span class="p">,</span>
+            <span class="n">ngroups</span><span class="p">,</span>
+            <span class="n">largest</span><span class="p">,</span>
+            <span class="n">timeunit</span><span class="p">,</span>
+            <span class="n">value_range</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="p">,</span>
+            <span class="n">top_words</span><span class="p">,</span>
+            <span class="n">stopword</span><span class="p">,</span>
+            <span class="n">lemmatize</span><span class="p">,</span>
+            <span class="n">stem</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -244,8 +277,12 @@
     <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">top_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">stopword</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">lemmatize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">stem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute functions for plot(df, x)</span>
@@ -279,6 +316,18 @@
 <span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+<span class="sd">    top_words: int, default 30</span>
+<span class="sd">        Specify the amount of words to show in the wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    stopword: bool, default True</span>
+<span class="sd">        Eliminate the stopwords in the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    lemmatize: bool, default False</span>
+<span class="sd">        Lemmatize the words in the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    stem: bool, default False</span>
+<span class="sd">        Apply Potter Stem on the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-locals, too-many-arguments</span>
 
@@ -290,8 +339,18 @@
         <span class="c1"># stats</span>
         <span class="n">data_cat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">calc_stats_cat</span><span class="p">)(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">statsdata_cat</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">data_cat</span><span class="p">)</span>
+
+        <span class="c1"># wordcloud and word frequencies</span>
+        <span class="n">word_cloud</span> <span class="o">=</span> <span class="n">cal_word_freq</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">top_words</span><span class="p">,</span> <span class="n">stopword</span><span class="p">,</span> <span class="n">lemmatize</span><span class="p">,</span> <span class="n">stem</span><span class="p">)</span>
+        <span class="c1"># length_distribution</span>
+        <span class="n">length_dist</span> <span class="o">=</span> <span class="n">cal_length_dist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-            <span class="n">col</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">statsdata</span><span class="o">=</span><span class="n">statsdata_cat</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">statsdata</span><span class="o">=</span><span class="n">statsdata_cat</span><span class="p">,</span>
+            <span class="n">word_cloud</span><span class="o">=</span><span class="n">word_cloud</span><span class="p">,</span>
+            <span class="n">length_dist</span><span class="o">=</span><span class="n">length_dist</span><span class="p">,</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
         <span class="k">if</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -804,6 +863,85 @@
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">grp_srs</span><span class="p">),</span> <span class="n">miss_pct</span>
 
 
+<span class="k">def</span> <span class="nf">tokenize_text</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    tokenize the text column and only keep the words</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">RegexpTokenizer</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\w+&quot;</span><span class="p">)</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tokens</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">tokenize</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span>
+    <span class="n">freqdist</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">non_single_word</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">top_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">stopword</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">lemmatize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">stem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    clean the frequency dictionary by stopwords, lemmatization and stemming</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="n">freq_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">freqdist</span><span class="p">)</span>
+    <span class="n">lemmatizer</span> <span class="o">=</span> <span class="n">WordNetLemmatizer</span><span class="p">()</span>
+    <span class="n">porter</span> <span class="o">=</span> <span class="n">PorterStemmer</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">freq_copy</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">stopword</span> <span class="ow">and</span> <span class="n">non_single_word</span> <span class="o">&gt;=</span> <span class="n">top_words</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">english_stopwords</span><span class="o">.</span><span class="n">english_stopwords</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">freqdist</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lemmatize</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lemmatizer</span><span class="o">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
+                <span class="n">freqdist</span><span class="p">[</span><span class="n">lemmatizer</span><span class="o">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">freqdist</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">freqdist</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">stem</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">porter</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
+                <span class="n">freqdist</span><span class="p">[</span><span class="n">porter</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">freqdist</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">freqdist</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">freqdist</span>
+
+
+<span class="k">def</span> <span class="nf">cal_word_freq</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">top_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">stopword</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">lemmatize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">stem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tokenize and clean the text column and calculate the top frequency words and total frequency</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-locals, too-many-arguments</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span><span class="n">tokenize_text</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">non_single_word</span> <span class="o">=</span> <span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">FreqDist</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;clean_text&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">non_single_word</span><span class="p">,</span> <span class="n">top_words</span><span class="p">,</span> <span class="n">stopword</span><span class="p">,</span> <span class="n">lemmatize</span><span class="p">,</span> <span class="n">stem</span><span class="p">)</span>
+    <span class="n">total_freq</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="n">top_words</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+    <span class="n">top_freq</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">top_words</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">total_freq</span><span class="p">,</span> <span class="n">top_freq</span>
+
+
+<span class="k">def</span> <span class="nf">cal_length_dist</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calculate the length histogram for text column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">calc_hist</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span>
+
+
 <span class="k">def</span> <span class="nf">calc_hist</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a histogram over a given series.</span>
@@ -1223,7 +1361,9 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">calc_stats_cat</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">calc_stats_cat</span><span class="p">(</span>
+    <span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate stats from a categorical column</span>
 <span class="sd">    Parameters</span>
@@ -1235,6 +1375,7 @@
 <span class="sd">    Dict[str, str]</span>
 <span class="sd">        Dictionary that contains Overview</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># overview stats</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span>  <span class="c1"># include nan</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>  <span class="c1"># exclude nan</span>
     <span class="n">uniq_count</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
@@ -1245,8 +1386,58 @@
         <span class="s2">&quot;Missing (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">size</span><span class="p">),</span>
         <span class="s2">&quot;Memory Size&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(),</span>
     <span class="p">}</span>
+    <span class="n">srs</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
+    <span class="c1"># length stats</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span>
+    <span class="n">length_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">length</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">length</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span>
+        <span class="s2">&quot;minimum&quot;</span><span class="p">:</span> <span class="n">length</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+        <span class="s2">&quot;maximum&quot;</span><span class="p">:</span> <span class="n">length</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="c1"># quantile stats</span>
+    <span class="n">max_lbl_len</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">quantile_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">centile</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;Minimum&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;5-th Percentile&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Q1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Median&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Q3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;95-th Percentile&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Maximum&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="n">centile</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">element</span> <span class="o">=</span> <span class="n">srs</span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="n">centile</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_lbl_len</span><span class="p">:</span>
+                <span class="n">quantile_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="n">max_lbl_len</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">quantile_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">element</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">element</span> <span class="o">=</span> <span class="n">srs</span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span> <span class="o">*</span> <span class="n">centile</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_lbl_len</span><span class="p">:</span>
+                <span class="n">quantile_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="n">max_lbl_len</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">quantile_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">element</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="c1"># letter stats</span>
+    <span class="n">letter_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-zA-Z]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="s2">&quot;Lowercase Letter&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-z]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="s2">&quot;Space Separator&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ ]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="s2">&quot;Uppercase Letter&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[A-Z]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="s2">&quot;Dash Punctuation&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[-]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="s2">&quot;Decimal Number&quot;</span><span class="p">:</span> <span class="n">srs</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[0-9]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">length_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="n">quantile_dict</span><span class="p">,</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">letter_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">calc_stats_dt</span><span class="p">(</span><span class="n">srs</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
@@ -1491,7 +1682,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li> 
       </ul>

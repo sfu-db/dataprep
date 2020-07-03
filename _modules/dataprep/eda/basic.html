@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic &#8212; dataprep 0.2.6 documentation</title>
+    <title>dataprep.eda.basic &#8212; dataprep 0.2.7 documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -22,7 +22,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -68,6 +68,10 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">top_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">stopword</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">lemmatize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">stem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Generates plots for exploratory data analysis.</span>
 
@@ -151,7 +155,18 @@
 <span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
-
+<span class="sd">    top_words: int, default 30</span>
+<span class="sd">        Specify the amount of words to show in the wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    stopword: bool, default True</span>
+<span class="sd">        Eliminate the stopwords in the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    lemmatize: bool, default False</span>
+<span class="sd">        Lemmatize the words in the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
+<span class="sd">    stem: bool, default False</span>
+<span class="sd">        Apply Potter Stem on the text data for plotting wordcloud and</span>
+<span class="sd">        word frequency bar chart</span>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
@@ -177,6 +192,10 @@
         <span class="n">sample_size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
         <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="n">top_words</span><span class="o">=</span><span class="n">top_words</span><span class="p">,</span>
+        <span class="n">stopword</span><span class="o">=</span><span class="n">stopword</span><span class="p">,</span>
+        <span class="n">lemmatize</span><span class="o">=</span><span class="n">lemmatize</span><span class="p">,</span>
+        <span class="n">stem</span><span class="o">=</span><span class="n">stem</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">)</span>
 
@@ -208,7 +227,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">dataprep 0.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

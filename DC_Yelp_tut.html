@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Tutorial - Data Connector for Yelp &#8212; dataprep 0.2.6 documentation</title>
+    <title>Tutorial - Data Connector for Yelp &#8212; dataprep 0.2.7 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="DC_DBLP_tut.html" title="Tutorial - Data Connector for DBLP"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -69,7 +69,12 @@ visiting the <a class="reference external" href="https://www.yelp.com/developers
 <div class="section" id="download-and-store-the-configuration-files-in-dataprep">
 <h2>Download and store the configuration files in dataprep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
 <p>The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
-<p>Store the configuration file in the dataprep folder.</p>
+<p>To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files.
+When you decided on a location, enter the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/sfu-db/DataConnectorConfigs.git</span></code>. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder.</p>
+<p>From here you can proceed with the next steps.</p>
+<a class="reference internal image-reference" href="_images/dc_git.png"><img alt="_images/dc_git.png" class="align-center" src="_images/dc_git.png" style="width: 1000px; height: 500px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_git_clone.png"><img alt="_images/dc_git_clone.png" class="align-center" src="_images/dc_git_clone.png" style="width: 725px; height: 125px;" /></a>
+<p>Below the configuration file are stored with dataprep.</p>
 <a class="reference internal image-reference" href="_images/Config_destination.png"><img alt="_images/Config_destination.png" class="align-center" src="_images/Config_destination.png" style="width: 586px; height: 132px;" /></a>
 </div>
 <div class="section" id="initialize-data-connector">
@@ -77,7 +82,7 @@ visiting the <a class="reference external" href="https://www.yelp.com/developers
 <p>To initialize run the following code. Copy and paste the Yelp API key into the <strong>access_token</strong> variable and ensure the connector path is correct. Once you have that running, you can use the built in functions available in connector.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>from dataprep.data_connector import Connector
 access_token = “insert_token_key”
-dc = Connector(&quot;./DataConnectorConfigs/yelp&quot;, auth_params={&quot;access_token&quot;:access_token})
+dc = Connector(&quot;./DataConnectorConfigs/yelp&quot;, _auth={&quot;access_token&quot;:access_token})
 </pre></div>
 </div>
 </div>
@@ -88,16 +93,32 @@ dc = Connector(&quot;./DataConnectorConfigs/yelp&quot;, auth_params={&quot;acces
 <h3>Connector.info<a class="headerlink" href="#connector-info" title="Permalink to this headline">¶</a></h3>
 <div class="line-block">
 <div class="line">The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.</div>
-</div>
+<div class="line"><br /></div>
 <div class="line-block">
 <div class="line">a. Table - The table(s) being accessed.</div>
 <div class="line">b. Parameters - Identifies which parameters can be used to call the method.</div>
 <div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
 </div>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/dc_show.png"><img alt="_images/dc_show.png" class="align-center" src="_images/dc_show.png" style="width: 400px; height: 165px;" /></a>
+<div class="section" id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp’s business query can either be required or optional. The required parameters are <strong>term</strong> and <strong>location</strong> while the optional parameters are <strong>latitude</strong>, <strong>longitude</strong> and <strong>limit</strong>. The parameters are described below.</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">a. <strong>term</strong> - Required - Search term, for example “food” or “restaurants”. The term may also be business names, such as “Starbucks”.</div>
+<div class="line">b. <strong>location</strong> - Required - Maximum number of search results (hits) to return.</div>
+<div class="line">c. <strong>latitude</strong> - Optional - Latitude of the location you want to search nearby.</div>
+<div class="line">d. <strong>longitude</strong> - Optional - Longitude of the location you want to search nearby.</div>
+<div class="line">e. <strong>limit</strong> - Number of business results to return. By default, it will return 20. Maximum is 50.</div>
+</div>
+</div>
+<p>There are additional parameters to query with Yelp. If you are interested in reading up the other available parameters and setting up your own config files, please read this <a class="reference external" href="https://www.yelp.ca/developers/documentation/v3/business_search3">Yelp link</a> and this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files link</a>.</p>
+</div>
 </div>
 <div class="section" id="connector-show-schema">
 <h3>Connector.show_schema<a class="headerlink" href="#connector-show-schema" title="Permalink to this headline">¶</a></h3>
@@ -113,10 +134,10 @@ As an example, lets see what is in the publication table.</p>
 <p>The query method downloads the website data. The parameters must meet the requirements as indicated in connector.info for the operation to run.</p>
 <p>When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.</p>
 <p>As an example, let’s try to get the data from the “business” table, providing the term “city” and location “seattle”.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;businesses&quot;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;seattle&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;businesses&quot;</span><span class="p">,</span> <span class="n">term</span> <span class="o">=</span> <span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;seattle&quot;</span><span class="p">,</span> <span class="n">limit</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/dc_query.png"><img alt="_images/dc_query.png" class="align-center" src="_images/dc_query.png" style="width: 1000px; height: 460px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_yelp_query.png"><img alt="_images/dc_yelp_query.png" class="align-center" src="_images/dc_yelp_query.png" style="width: 1000px; height: 460px;" /></a>
 <p>From query results, you can see how easy it is to download the restaurant data from Yelp into a pandas Dataframe.
 Now that you have an understanding of how data connector operates, you can easily accomplish the task with two lines of code.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -124,6 +145,20 @@ Now that you have an understanding of how data connector operates, you can easil
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return.</div>
+<div class="line"><br /></div>
+<div class="line">To use pagination, you need to include <strong>_count</strong> in your query. The <strong>_count</strong> parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.</div>
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;business&quot;</span><span class="p">,</span> <span class="n">term</span> <span class="o">=</span> <span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;seattle&quot;</span><span class="p">,</span>  <span class="n">_count</span> <span class="o">=</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_yelp_query_pag.png"><img alt="_images/dc_yelp_query_pag.png" class="align-center" src="_images/dc_yelp_query_pag.png" style="width: 1000px; height: 500px;" /></a>
+<p>Pagination does not concurrently work with the <strong>limit</strong> parameter in a query, you need to select either <strong>limit</strong> or <strong>_count</strong>.</p>
 </div>
 <div class="section" id="that-s-all-for-now">
 <h2>That’s all for now.<a class="headerlink" href="#that-s-all-for-now" title="Permalink to this headline">¶</a></h2>
@@ -147,11 +182,15 @@ If you are interested in writing your own configuration file or modify an existi
 <li><a class="reference internal" href="#download-and-store-the-configuration-files-in-dataprep">Download and store the configuration files in dataprep</a></li>
 <li><a class="reference internal" href="#initialize-data-connector">Initialize data_connector</a></li>
 <li><a class="reference internal" href="#functionalities">Functionalities</a><ul>
-<li><a class="reference internal" href="#connector-info">Connector.info</a></li>
+<li><a class="reference internal" href="#connector-info">Connector.info</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#connector-show-schema">Connector.show_schema</a></li>
 <li><a class="reference internal" href="#connector-query">Connector.query</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pagination">Pagination</a></li>
 <li><a class="reference internal" href="#that-s-all-for-now">That’s all for now.</a></li>
 </ul>
 </li>
@@ -196,7 +235,7 @@ If you are interested in writing your own configuration file or modify an existi
         <li class="right" >
           <a href="DC_DBLP_tut.html" title="Tutorial - Data Connector for DBLP"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Tutorial - Data Connector for DBLP &#8212; dataprep 0.2.6 documentation</title>
+    <title>Tutorial - Data Connector for DBLP &#8212; dataprep 0.2.7 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="data_connector.html" title="dataprep.data_connector: fetching data from popular websites with a simplified API"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -58,15 +58,17 @@ The goal is to help the users skip the complex API configuration. In this tutori
 <div class="section" id="download-and-store-the-configuration-files-in-dataprep">
 <h2>Download and store the configuration files in dataprep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
 <p>The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
-<p>Store the configuration file in the dataprep folder.</p>
+<p>To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files.
+When you decided on a location, enter the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/sfu-db/DataConnectorConfigs.git</span></code>. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder.</p>
+<p>From here you can proceed with the next steps.</p>
+<a class="reference internal image-reference" href="_images/dc_git.png"><img alt="_images/dc_git.png" class="align-center" src="_images/dc_git.png" style="width: 1000px; height: 500px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_git_clone.png"><img alt="_images/dc_git_clone.png" class="align-center" src="_images/dc_git_clone.png" style="width: 725px; height: 125px;" /></a>
+<p>Below the configuration file are stored with dataprep.</p>
 <a class="reference internal image-reference" href="_images/Config_destination.png"><img alt="_images/Config_destination.png" class="align-center" src="_images/Config_destination.png" style="width: 586px; height: 132px;" /></a>
 </div>
 <div class="section" id="initialize-data-connector">
 <h2>Initialize data_connector<a class="headerlink" href="#initialize-data-connector" title="Permalink to this headline">¶</a></h2>
 <p>To initialize, run the following code.</p>
-<ul class="simple">
-<li><p>Unlike Yelp and Spotify, tokens and client information are not needed.</p></li>
-</ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.data_connector</span> <span class="kn">import</span> <span class="n">Connector</span>
 <span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="s2">&quot;./DataConnectorConfigs/DBLP&quot;</span><span class="p">)</span>
 </pre></div>
@@ -79,6 +81,7 @@ The goal is to help the users skip the complex API configuration. In this tutori
 <h3>Connector.info<a class="headerlink" href="#connector-info" title="Permalink to this headline">¶</a></h3>
 <div class="line-block">
 <div class="line">The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.</div>
+<div class="line"><br /></div>
 <div class="line-block">
 <div class="line">a. Table - The table(s) being accessed.</div>
 <div class="line">b. Parameters - Identifies which parameters can be used to call the method. For DBLP, there is no required <strong>parameter</strong>.</div>
@@ -88,7 +91,20 @@ The goal is to help the users skip the complex API configuration. In this tutori
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/dc_dblp_info.png"><img alt="_images/dc_dblp_info.png" class="align-center" src="_images/dc_dblp_info.png" style="width: 260px; height: 175px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_dblp_info.png"><img alt="_images/dc_dblp_info.png" class="align-center" src="_images/dc_dblp_info.png" style="width: 300px; height: 200px;" /></a>
+<div class="section" id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">A parameter is a piece of information you supply to a query right as you run it. The parameters for DBLP are <strong>q</strong>, <strong>h</strong>, and <strong>f</strong>, and they are described below.</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">a. <strong>q</strong> - Optional - The query string to search for find author profiles, conferences, journals, or individual publications in the database.</div>
+<div class="line">b. <strong>h</strong> - Optional - Maximum number of search results (hits) to return.</div>
+<div class="line">c. <strong>f</strong> - Optional - The first hit in the numbered sequence of search results (starting with 0) to return. In combination with the h parameter, this parameter can be used for pagination of search results.</div>
+</div>
+</div>
+<p>There are additional parameters to query with DBLP. If you are interested in reading up the other available parameters and setting up your own config files, please read this <a class="reference external" href="https://dblp.uni-trier.de/faq/13501473">DBLP link</a> and this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files link</a>.</p>
+</div>
 </div>
 <div class="section" id="connector-show-schema">
 <h3>Connector.show_schema<a class="headerlink" href="#connector-show-schema" title="Permalink to this headline">¶</a></h3>
@@ -97,7 +113,7 @@ As an example, lets see what is in the publication table.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/dc_dblp_show_schema.png"><img alt="_images/dc_dblp_show_schema.png" class="align-center" src="_images/dc_dblp_show_schema.png" style="width: 267px; height: 303px;" /></a>
+<a class="reference internal image-reference" href="_images/dc_dblp_show_schema.png"><img alt="_images/dc_dblp_show_schema.png" class="align-center" src="_images/dc_dblp_show_schema.png" style="width: 212px; height: 295px;" /></a>
 </div>
 <div class="section" id="connector-query">
 <h3>Connector.query<a class="headerlink" href="#connector-query" title="Permalink to this headline">¶</a></h3>
@@ -115,6 +131,32 @@ Now that you have an understanding of how data connector operates, you can easil
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return.</div>
+<div class="line"><br /></div>
+<div class="line">To use pagination, you need to include <strong>_count</strong> in your query. The <strong>_count</strong> parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.</div>
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;lee&quot;</span><span class="p">,</span> <span class="n">_count</span> <span class="o">=</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_dblp_pagination.png"><img alt="_images/dc_dblp_pagination.png" class="align-center" src="_images/dc_dblp_pagination.png" style="width: 1000px; height: 500px;" /></a>
+<p>Pagination does not concurrently work with the <strong>h</strong> parameter in a query, you need to select either <strong>h</strong> or <strong>_count</strong>.</p>
+</div>
+<div class="section" id="all-publications-of-one-specific-author">
+<h2>All publications of one specific author<a class="headerlink" href="#all-publications-of-one-specific-author" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">In the query, <strong>q</strong> is a generic search parameter that find author profiles, conferences, journals, or individual publications in the database. As a parameter, <strong>q</strong> is not great when trying to find specific authors and their work. To solve for this issue, you can query the authors first and last name.</div>
+<div class="line"><br /></div>
+<div class="line">To fetch all publications of one specific author, you need to include <strong>first_name=”______”</strong>, <strong>last_name=”______”</strong> in your query.</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">first_name</span> <span class="o">=</span> <span class="s2">&quot;Jeff&quot;</span><span class="p">,</span> <span class="n">last_name</span> <span class="o">=</span> <span class="s2">&quot;Hawkins&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/dc_dblp_author.png"><img alt="_images/dc_dblp_author.png" class="align-center" src="_images/dc_dblp_author.png" style="width: 1000px; height: 500px;" /></a>
 </div>
 <div class="section" id="that-s-all-for-now">
 <h2>That’s all for now.<a class="headerlink" href="#that-s-all-for-now" title="Permalink to this headline">¶</a></h2>
@@ -137,11 +179,16 @@ If you are interested in writing your own configuration file or modify an existi
 <li><a class="reference internal" href="#download-and-store-the-configuration-files-in-dataprep">Download and store the configuration files in dataprep</a></li>
 <li><a class="reference internal" href="#initialize-data-connector">Initialize data_connector</a></li>
 <li><a class="reference internal" href="#functionalities">Functionalities</a><ul>
-<li><a class="reference internal" href="#connector-info">Connector.info</a></li>
+<li><a class="reference internal" href="#connector-info">Connector.info</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#connector-show-schema">Connector.show_schema</a></li>
 <li><a class="reference internal" href="#connector-query">Connector.query</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pagination">Pagination</a></li>
+<li><a class="reference internal" href="#all-publications-of-one-specific-author">All publications of one specific author</a></li>
 <li><a class="reference internal" href="#that-s-all-for-now">That’s all for now.</a></li>
 </ul>
 </li>
@@ -186,7 +233,7 @@ If you are interested in writing your own configuration file or modify an existi
         <li class="right" >
           <a href="data_connector.html" title="dataprep.data_connector: fetching data from popular websites with a simplified API"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">dataprep 0.2.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
