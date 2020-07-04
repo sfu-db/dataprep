@@ -1,6 +1,10 @@
 build-docs:
-  poetry run sphinx-build -b html docs/source docs/build
+  poetry run sphinx-build -M html docs/source docs/build
 
+publish-docs: build-docs
+  touch docs/build/html/.nojekyll
+  gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/build/html
+  
 gen-apidocs:
   poetry run sphinx-apidoc --ext-doctest --ext-autodoc --ext-mathjax -f -o docs/source dataprep
 
