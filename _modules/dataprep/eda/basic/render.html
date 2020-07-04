@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dataprep.eda.basic.render &#8212; dataprep 0.2.7 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dataprep.eda.basic.render &#8212; dataprep 0.2.8 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -22,9 +23,10 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../basic.html" accesskey="U">dataprep.eda.basic</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dataprep.eda.basic.render</a></li> 
       </ul>
     </div>  
 
@@ -38,43 +40,43 @@
 <span class="sd">This module implements the visualization for the plot(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-lines</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.events</span> <span class="kn">import</span> <span class="n">ButtonClick</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">column</span><span class="p">,</span> <span class="n">row</span>
 <span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Box</span><span class="p">,</span>
-    <span class="n">FuncTickFormatter</span><span class="p">,</span>
-    <span class="n">PrintfTickFormatter</span><span class="p">,</span>
     <span class="n">BasicTicker</span><span class="p">,</span>
+    <span class="n">Box</span><span class="p">,</span>
+    <span class="n">Button</span><span class="p">,</span>
+    <span class="n">ColorBar</span><span class="p">,</span>
+    <span class="n">ColumnDataSource</span><span class="p">,</span>
+    <span class="n">CustomJS</span><span class="p">,</span>
+    <span class="n">CustomJSHover</span><span class="p">,</span>
+    <span class="n">Div</span><span class="p">,</span>
+    <span class="n">FactorRange</span><span class="p">,</span>
+    <span class="n">FuncTickFormatter</span><span class="p">,</span>
     <span class="n">HoverTool</span><span class="p">,</span>
     <span class="n">LayoutDOM</span><span class="p">,</span>
     <span class="n">Legend</span><span class="p">,</span>
     <span class="n">LegendItem</span><span class="p">,</span>
-    <span class="n">Panel</span><span class="p">,</span>
-    <span class="n">Tabs</span><span class="p">,</span>
-    <span class="n">ColumnDataSource</span><span class="p">,</span>
     <span class="n">LinearColorMapper</span><span class="p">,</span>
-    <span class="n">ColorBar</span><span class="p">,</span>
-    <span class="n">FactorRange</span><span class="p">,</span>
-    <span class="n">CustomJSHover</span><span class="p">,</span>
-    <span class="n">Div</span><span class="p">,</span>
-    <span class="n">CustomJS</span><span class="p">,</span>
-    <span class="n">Button</span><span class="p">,</span>
+    <span class="n">Panel</span><span class="p">,</span>
+    <span class="n">PrintfTickFormatter</span><span class="p">,</span>
+    <span class="n">Tabs</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">column</span><span class="p">,</span> <span class="n">row</span>
-<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span><span class="p">,</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">Pastel1</span><span class="p">,</span> <span class="n">viridis</span>  <span class="c1"># pylint: disable=E0611 # type: ignore</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">gridplot</span>
 <span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="kn">import</span> <span class="n">cumsum</span><span class="p">,</span> <span class="n">linear_cmap</span><span class="p">,</span> <span class="n">transform</span>
 <span class="kn">from</span> <span class="nn">bokeh.util.hex</span> <span class="kn">import</span> <span class="n">hexbin</span>
-<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">viridis</span><span class="p">,</span> <span class="n">Pastel1</span>  <span class="c1"># pylint: disable=E0611 # type: ignore</span>
-<span class="kn">from</span> <span class="nn">bokeh.events</span> <span class="kn">import</span> <span class="n">ButtonClick</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span>
 
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">Continuous</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">,</span> <span class="n">is_dtype</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">is_dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">,</span> <span class="n">DateTime</span>
-<span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">PALETTE</span><span class="p">,</span> <span class="n">BIPALETTE</span>
+<span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">BIPALETTE</span><span class="p">,</span> <span class="n">PALETTE</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render&quot;</span><span class="p">]</span>
 
@@ -379,9 +381,11 @@
     <span class="p">)</span>
     <span class="n">color_list</span> <span class="o">=</span> <span class="n">PALETTE</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">PALETTE</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;colour&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color_list</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># no &quot;Others&quot; group</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">13</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;cnt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># no &quot;Others&quot; group</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
     <span class="n">pie</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">wedge</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -1285,38 +1289,39 @@
     <span class="n">ov_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    &lt;div style=&quot;grid-area: a;&quot;&gt;</span>
 <span class="s2">        &lt;h3 style=&quot;text-align: center;&quot;&gt;Overview&lt;/h3&gt;</span>
-<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto;&quot;&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
 <span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">ov_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
 <span class="s2">        &lt;/table&gt;</span>
 <span class="s2">    &lt;/div&gt;</span>
 <span class="s2">    &quot;&quot;&quot;</span>
-    <span class="n">lens_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    &lt;div style=&quot;grid-area: b;&quot;&gt;</span>
-<span class="s2">        &lt;h3 style=&quot;text-align: center;&quot;&gt;Length&lt;/h3&gt;</span>
-<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
-<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">lens_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
-<span class="s2">        &lt;/table&gt;</span>
-<span class="s2">    &lt;/div&gt;</span>
-<span class="s2">    &quot;&quot;&quot;</span>
     <span class="n">qs_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    &lt;div style=&quot;grid-area: c;&quot;&gt;</span>
-<span class="s2">        &lt;h3 style=&quot;text-align: center;margin-top: -10px;&quot;&gt;Quantile Statistics&lt;/h3&gt;</span>
+<span class="s2">    &lt;div style=&quot;grid-area: b;&quot;&gt;</span>
+<span class="s2">        &lt;h3 style=&quot;text-align: center;&quot;&gt;Sample&lt;/h3&gt;</span>
 <span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
 <span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">qs_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
 <span class="s2">        &lt;/table&gt;</span>
 <span class="s2">    &lt;/div&gt;</span>
 <span class="s2">    &quot;&quot;&quot;</span>
     <span class="n">ls_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    &lt;div style=&quot;grid-area: d;&quot;&gt;</span>
-<span class="s2">        &lt;h3 style=&quot;text-align: center;margin-top: -10px;&quot;&gt;Letter&lt;/h3&gt;</span>
+<span class="s2">    &lt;div style=&quot;grid-area: c;&quot;&gt;</span>
+<span class="s2">        &lt;h3 style=&quot;text-align: center;&quot;&gt;Letter&lt;/h3&gt;</span>
 <span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
 <span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">ls_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
 <span class="s2">        &lt;/table&gt;</span>
 <span class="s2">    &lt;/div&gt;</span>
 <span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">lens_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;div style=&quot;grid-area: d;&quot;&gt;</span>
+<span class="s2">        &lt;h3 style=&quot;text-align: center;&quot;&gt;Length&lt;/h3&gt;</span>
+<span class="s2">        &lt;table style=&quot;width: 100%; table-layout: auto; font-size:11px;&quot;&gt;</span>
+<span class="s2">            &lt;tbody&gt;</span><span class="si">{</span><span class="n">lens_content</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;</span>
+<span class="s2">        &lt;/table&gt;</span>
+<span class="s2">    &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
     <span class="n">container</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&quot;display: grid;grid-template-columns: 1fr 1fr;grid-template-rows: 1fr 1fr;gap: 1px 1px;</span>
 <span class="s2">                grid-template-areas:</span><span class="se">\&#39;</span><span class="s2">a b</span><span class="se">\&#39;</span><span class="s2"> </span><span class="se">\&#39;</span><span class="s2">c d</span><span class="se">\&#39;</span><span class="s2">;&quot;&gt;</span>
-<span class="s2">                </span><span class="si">{</span><span class="n">ov_content</span><span class="si">}{</span><span class="n">lens_content</span><span class="si">}{</span><span class="n">qs_content</span><span class="si">}{</span><span class="n">ls_content</span><span class="si">}</span><span class="s2">&lt;/div&gt;&quot;&quot;&quot;</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">ov_content</span><span class="si">}{</span><span class="n">qs_content</span><span class="si">}{</span><span class="n">ls_content</span><span class="si">}{</span><span class="n">lens_content</span><span class="si">}</span><span class="s2">&lt;/div&gt;&quot;&quot;&quot;</span>
 
     <span class="n">div</span> <span class="o">=</span> <span class="n">Div</span><span class="p">(</span>
         <span class="n">text</span><span class="o">=</span><span class="n">container</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">}</span>
@@ -1434,16 +1439,18 @@
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">fig</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;bar chart&quot;</span><span class="p">))</span>
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pie_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">],</span> <span class="n">miss_pct</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
     <span class="n">freq_tuple</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;word_cloud&quot;</span><span class="p">]</span>
-    <span class="n">word_cloud</span> <span class="o">=</span> <span class="n">wordcloud_viz</span><span class="p">(</span><span class="n">freq_tuple</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
-    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">word_cloud</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;word cloud&quot;</span><span class="p">))</span>
-    <span class="n">wordfreq</span> <span class="o">=</span> <span class="n">wordfreq_viz</span><span class="p">(</span><span class="n">freq_tuple</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-    <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">wordfreq</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;words frequency&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">freq_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">word_cloud</span> <span class="o">=</span> <span class="n">wordcloud_viz</span><span class="p">(</span><span class="n">freq_tuple</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">word_cloud</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;word cloud&quot;</span><span class="p">))</span>
+        <span class="n">wordfreq</span> <span class="o">=</span> <span class="n">wordfreq_viz</span><span class="p">(</span><span class="n">freq_tuple</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">wordfreq</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;words frequency&quot;</span><span class="p">))</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;length_dist&quot;</span><span class="p">]</span>
     <span class="n">length_dist</span> <span class="o">=</span> <span class="n">hist_viz</span><span class="p">(</span>
         <span class="n">df</span><span class="p">,</span> <span class="n">miss_pct</span><span class="p">,</span> <span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span>
     <span class="p">)</span>
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">length_dist</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">))</span>
     <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">tabs</span>
 
 
@@ -1685,7 +1692,7 @@
     <span class="k">return</span> <span class="n">tabs</span>
 
 
-<div class="viewcode-block" id="render"><a class="viewcode-back" href="../../../../dataprep.eda.html#dataprep.eda.basic.render.render">[docs]</a><span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
+<div class="viewcode-block" id="render"><a class="viewcode-back" href="../../../../dataprep.eda.html#dataprep.eda.basic.render">[docs]</a><span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1741,9 +1748,11 @@
         <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_dt_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_wide</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;dt_cat_num_cols&quot;</span><span class="p">:</span>
         <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_dt_num_cat</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">yscale</span><span class="p">,</span> <span class="n">plot_width_wide</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">visual_elem</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -1769,14 +1778,15 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../basic.html" >dataprep.eda.basic</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dataprep.eda.basic.render</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
     </div>
   </body>
 </html>
