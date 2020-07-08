@@ -2,10 +2,13 @@
     This module implements the Report class.
 """
 
+import sys
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from bokeh.io import save
+from bokeh.io.notebook import load_notebook
+from bokeh.embed.notebook import notebook_content
 from bokeh.models import LayoutDOM
 from bokeh.resources import CDN
 from IPython.display import HTML, display
@@ -53,6 +56,15 @@ class Report:
         )
 
     def _repr_html_(self) -> str:
+        """
+        Display itself inside a notebook
+        """
+        # Speical case inside Google Colab
+        if "google.colab" in sys.modules:
+            load_notebook(hide_banner=True)
+            script, div, _ = notebook_content(self.to_render)
+            return f"{div}<script>{script}</script>"
+
         # Windows forbids us open the file twice as the result bokeh cannot
         # write to the opened temporary file.
         with NamedTemporaryFile(suffix=".html", delete=False) as tmpf:
