@@ -19,11 +19,15 @@ class AuthorizationType(Enum):
     ----
 
     * Bearer: requires 'access_token' presented in user params
+        - added as an Auth Header
+    * QueryParam: requires 'access_token' presented in user params
+        - added as a query string parameter
     * OAuth2: requires 'client_id' and 'client_secret' in user params for
       'ClientCredentials' grant type
     """
 
     Bearer = "Bearer"
+    QueryParam = "QueryParam"
     OAuth2 = "OAuth2"
 
 
@@ -47,6 +51,8 @@ class Authorization:
         """
         if self.auth_type == AuthorizationType.Bearer:  # pylint: disable=no-member
             req_data["headers"]["Authorization"] = f"Bearer {params['access_token']}"
+        elif self.auth_type == AuthorizationType.QueryParam:
+            req_data["params"][self.params["keyParam"]] = params["access_token"]
         elif (
             self.auth_type == AuthorizationType.OAuth2
             and self.params["grantType"] == "ClientCredentials"

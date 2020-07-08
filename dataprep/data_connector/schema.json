@@ -239,6 +239,25 @@
                     "additionalProperties": false
                 },
                 {
+                    "type": "object",
+                    "required": [
+                        "type",
+                        "keyParam"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "QueryParam"
+                            ]
+                        },
+                        "keyParam": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
                     "type": "string",
                     "enum": [
                         "Bearer"
