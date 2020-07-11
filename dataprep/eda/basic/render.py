@@ -461,7 +461,7 @@ def hist_kde_viz(
     fig.xaxis.axis_label = col
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if yscale == "linear":
-        _format_axis(fig, 0, df["freq"].max(), "y")
+        _format_axis(fig, 0, max(df["freq"].max(), pdf.max()), "y")
     return Panel(child=fig, title="KDE plot")
 
 
