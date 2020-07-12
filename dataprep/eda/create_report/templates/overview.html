@@ -1,0 +1,24 @@
+<div class="ov-container">
+    <div class="tb-container">
+        <h3 class="tb-title">Dataset Statistics</h3>
+        <table>
+            {% for h, d in context.components.overview[0].items() %}
+            <tr>
+                <th>{{ h }}</th>
+                <td>{{ d }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="tb-container">
+        <h3 class="tb-title">Variable Types</h3>
+        <table>
+            {% for h, d in context.components.overview[1].items() %}
+            <tr>
+                <th>{{ h }}</th>
+                <td>{{ d }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
