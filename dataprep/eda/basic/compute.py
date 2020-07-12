@@ -307,11 +307,14 @@ def compute_univariate(
         df = df.dropna(subset=[x])
         # data for bar and pie charts
         data_cat.append(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
-        statsdata_cat, data = dask.compute(*data_cat)
+        # length_distribution
+        data_cat.append(dask.delayed(calc_hist)(df[x].str.len(), bins))
+
+        statsdata_cat, data, length_dist = dask.compute(*data_cat)
+
         # wordcloud and word frequencies
         word_cloud = cal_word_freq(df, x, top_words, stopword, lemmatize, stem)
-        # length_distribution
-        length_dist = cal_length_dist(df, x, bins)
+
         return Intermediate(
             col=x,
             data=data,
@@ -894,20 +897,11 @@ def cal_word_freq(
     freq = FreqDist([a for b in df[0]["clean_text"] for a in b])
     freq = clean_text(freq, non_single_word, top_words, stopword, lemmatize, stem)
     total_freq = sum(freq.values())
-    if len(freq) < 30:
+    if len(freq) < top_words:  # type: ignore
         top_words = len(freq)
     top_freq = freq.most_common(top_words)
 
     return total_freq, top_freq
-
-
-def cal_length_dist(df: dd.DataFrame, x: str, bins: int) -> Tuple[pd.DataFrame, float]:
-    """
-    calculate the length histogram for text column
-    """
-    length = dd.compute(df[x].str.len())[0]
-    df, miss_pct = calc_hist(length, bins)
-    return df, miss_pct
 
 
 def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
@@ -1346,7 +1340,11 @@ def calc_stats_cat(
     # overview stats
     size = len(srs)  # include nan
     count = srs.count()  # exclude nan
-    uniq_count = srs.nunique()
+    try:
+        uniq_count = srs.nunique()
+    except TypeError:
+        srs = srs.astype(str)
+        uniq_count = srs.nunique()
     overview_dict = {
         "Distinct Count": uniq_count,
         "Unique (%)": uniq_count / count,
@@ -1355,6 +1353,14 @@ def calc_stats_cat(
         "Memory Size": srs.memory_usage(),
     }
     srs = srs.astype("str")
+    # length stats
+    length = srs.str.len()
+    length_dict = {
+        "Mean": length.mean(),
+        "Median": length.median(),
+        "Minimum": length.min(),
+        "Maximum": length.max(),
+    }
     # quantile stats
     max_lbl_len = 25
     quantile_dict = {}
@@ -1402,7 +1408,7 @@ def calc_stats_cat(
     )
 
 
-def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
+def calc_stats_dt(srs: dd.Series) -> Tuple[Dict[str, str]]:
     """
     Calculate stats from a datetime column
     Parameters
@@ -1427,11 +1433,11 @@ def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
         "Maximum": srs.max(),
     }
 
-    return {k: _format_values(k, v) for k, v in overview_dict.items()}
+    return ({k: _format_values(k, v) for k, v in overview_dict.items()},)
 
 
 def calc_stats(
-    df: dd.DataFrame, counter: Dict[str, int]
+    df: Union[dd.DataFrame, pd.DataFrame], counter: Dict[str, int]
 ) -> Tuple[Dict[str, str], Dict[str, int]]:
     """
     Calculate stats from a DataFrame
@@ -1466,10 +1472,9 @@ def calc_stats(
         "Total Size in Memory": memory_usage,
         "Average Record Size in Memory": memory_usage / dim[0],
     }
-
     return (
         {k: _format_values(k, v) for k, v in overview_dict.items()},
-        counter,
+        {k: v for k, v in counter.items() if v != 0},
     )
 
 
@@ -1548,7 +1553,7 @@ def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
     Auxillary function to format bin intervals in a histogram
     """
     bins_arr = np.round(bins_arr, 3)
-    bins_arr = [int(val) if val.is_integer() else val for val in bins_arr]
+    bins_arr = [int(val) if float(val).is_integer() else val for val in bins_arr]
     intervals = [
         f"[{bins_arr[i]}, {bins_arr[i + 1]})" for i in range(len(bins_arr) - 2)
     ]

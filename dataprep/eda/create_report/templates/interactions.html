@@ -1,0 +1,9 @@
+<div class="interac-container">
+    {% if context.components.interactions[1].error %}
+    {% with error_message = context.components.interactions[1].error %}
+    {% include 'error.html' %}
+    {% endwith %}
+    {% else %}
+    {{ context.components.interactions[1] }}
+    {% endif %}
+</div>
