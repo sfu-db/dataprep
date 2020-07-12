@@ -14,7 +14,7 @@ EDA
    eda/introduction
    eda/plot
    eda/plot_correlation
-   eda/plot_missing
+   eda/plot_missing.ipynb
 
 Data Connector
 --------------
