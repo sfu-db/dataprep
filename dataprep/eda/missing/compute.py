@@ -22,7 +22,6 @@ from ..dtypes import (
     DTypeDef,
 )
 from ..intermediate import Intermediate, ColumnsMetadata
-from ..utils import nullity_filter, nullity_sort
 
 __all__ = ["compute_missing"]
 
@@ -37,7 +36,7 @@ def histogram(
     dtype: Optional[DTypeDef] = None,
 ) -> Union[Tuple[da.Array, da.Array], Tuple[da.Array, da.Array, da.Array]]:
     """
-    Calculate histogram for both numerical and categorical
+    Calculate "histogram" for both numerical and categorical
     """
 
     if is_dtype(detect_dtype(srs, dtype), Continuous()):
@@ -82,7 +81,9 @@ def missing_perc_blockwise(block: np.ndarray) -> np.ndarray:
     return block.sum(axis=0, keepdims=True) / len(block)
 
 
-def missing_spectrum(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
+def missing_spectrum(
+    df: dd.DataFrame, bins: int, ncols: int
+) -> Tuple[dd.DataFrame, dd.DataFrame]:
     """
     Calculate a missing spectrum for each column
     """
@@ -98,92 +99,63 @@ def missing_spectrum(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
     data.compute_chunk_sizes()
     data = data.rechunk((chunk_size, None))
 
-    (notnull_counts,) = dd.compute(data.sum(axis=0) / data.shape[0])
-    missing_percent = {col: notnull_counts[idx] for idx, col in enumerate(cols)}
+    notnull_counts = data.sum(axis=0) / data.shape[0]
+    total_missing_percs = {col: notnull_counts[idx] for idx, col in enumerate(cols)}
 
-    missing_percs = data.map_blocks(missing_perc_blockwise, dtype=float).compute()
-    locs0 = np.arange(len(missing_percs)) * chunk_size
-    locs1 = np.minimum(locs0 + chunk_size, nrows)
+    spectrum_missing_percs = data.map_blocks(
+        missing_perc_blockwise, chunks=(1, data.shape[1]), dtype=float
+    )
+    nsegments = len(spectrum_missing_percs)
+
+    locs0 = da.arange(nsegments) * chunk_size
+    locs1 = da.minimum(locs0 + chunk_size, nrows)
     locs_middle = locs0 + chunk_size / 2
 
-    df = pd.DataFrame(
-        {
-            "column": np.repeat(cols.values, len(missing_percs)),
-            "location": np.tile(locs_middle, ncols),
-            "missing_rate": missing_percs.T.ravel(),
-            "loc_start": np.tile(locs0, ncols),
-            "loc_end": np.tile(locs1, ncols),
-        }
-    )
-    return Intermediate(
-        data=df, missing_percent=missing_percent, visual_type="missing_spectrum",
+    df = dd.from_dask_array(
+        da.repeat(da.from_array(cols.values, (1,)), nsegments), columns=["column"],
     )
 
+    df = df.assign(
+        location=da.tile(locs_middle, ncols),
+        missing_rate=spectrum_missing_percs.T.ravel(),
+        loc_start=da.tile(locs0, ncols),
+        loc_end=da.tile(locs1, ncols),
+    )
 
-def missing_spectrum_tabs(df: dd.DataFrame, bins: int, ncols: int) -> Intermediate:
+    return df, total_missing_percs
+
+
+def missing_heatmap(df: dd.DataFrame) -> Optional[pd.DataFrame]:
     """
     Calculate a heatmap visualization of nullity correlation in the given DataFrame
     """
-    # pylint: disable=too-many-locals
-    df1 = df.compute()
-    df2 = df.compute()
-    length = len(df2)
-    num_bins = min(bins, len(df) - 1)
-
-    df = df.iloc[:, :ncols]
-    cols = df.columns[:ncols]
-    ncols = len(cols)
-    nrows = len(df)
-    chunk_size = len(df) // num_bins
-    data = df.isnull().to_dask_array()
-    data.compute_chunk_sizes()
-    data = data.rechunk((chunk_size, None))
-
-    (notnull_counts,) = dd.compute(data.sum(axis=0) / data.shape[0])
-    missing_percent = {col: notnull_counts[idx] for idx, col in enumerate(cols)}
-
-    missing_percs = data.map_blocks(missing_perc_blockwise, dtype=float).compute()
-    locs0 = np.arange(len(missing_percs)) * chunk_size
-    locs1 = np.minimum(locs0 + chunk_size, nrows)
-    locs_middle = locs0 + chunk_size / 2
-    df = pd.DataFrame(
-        {
-            "column": np.repeat(cols.values, len(missing_percs)),
-            "location": np.tile(locs_middle, ncols),
-            "missing_rate": missing_percs.T.ravel(),
-            "loc_start": np.tile(locs0, ncols),
-            "loc_end": np.tile(locs1, ncols),
-        }
-    )
-
-    # Calculation for correlation matrix of missing values
-    # Step1: Apply filters and sorts
-    df1 = nullity_filter(df1, None, 0, 0)
-    df1 = nullity_sort(df1, None, axis="rows")
 
     # Remove completely filled or completely empty variables.
-    df1 = df1.iloc[
-        :, [i for i, n in enumerate(np.var(df1.isnull(), axis="rows")) if n > 0]
-    ]
+    nonnulls = da.stack([df[col].isnull().sum() == 0 for col in df.columns])
+    allnulls = da.stack([df[col].isnull().sum() == len(df) for col in df.columns])
 
-    corr_mat = df1.isnull().corr()
-    heatmap_axis = list(corr_mat.columns)
+    sel = ~(nonnulls | allnulls)
 
-    # Computing the barchart for missing values
-    df2 = nullity_filter(df2, None, 0, 0)
-    df2 = nullity_sort(df2, None, axis="rows")
-    nullity_counts = len(df2) - df2.isnull().sum()
-    df_bar = (nullity_counts / len(df2)).to_frame()
+    cols = df.columns[sel.compute()]  # TODO: Can we remove the compute here?
+    if len(cols) == 0:
+        return None
 
-    return Intermediate(
-        data=df,
-        data_heatmap=corr_mat,
-        data_barchart=df_bar,
-        len_data=length,
-        missing_percent=missing_percent,
-        axis_range=heatmap_axis,
-        visual_type="missing_spectrum_heatmap",
-    )
+    corr_mat = df[cols].isnull().corr()
+    return corr_mat
+
+
+def missing_bars(df: dd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate a bar chart visualization of nullity correlation in the given DataFrame
+    """
+    nullity_counts = df.isnull().sum() / len(df)
+    non_nullity_counts = 1 - nullity_counts
+    df = nullity_counts.to_frame()
+    df = df.assign(notnull=non_nullity_counts)
+
+    df.columns = ["missing", "not missing"]
+
+    return df
 
 
 def missing_impact_1vn(  # pylint: disable=too-many-locals
@@ -420,8 +392,9 @@ def compute_missing(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+
     Examples
-    ----------
+    --------
     >>> from dataprep.eda.missing.computation import plot_missing
     >>> import pandas as pd
     >>> df = pd.read_csv("suicide-rate.csv")
@@ -440,5 +413,16 @@ def compute_missing(
             df, dtype=dtype, x=x, y=y, bins=bins, ndist_sample=ndist_sample
         )
     else:
-        # return missing_spectrum(df, bins=bins, ncols=ncols)
-        return missing_spectrum_tabs(df, bins=bins, ncols=ncols)
+        spectrum, total_missing, bars, heatmap = dd.compute(
+            *missing_spectrum(df, bins=bins, ncols=ncols),
+            missing_bars(df),
+            missing_heatmap(df),
+        )
+
+        return Intermediate(
+            data_total_missing=total_missing,
+            data_spectrum=spectrum,
+            data_bars=bars,
+            data_heatmap=heatmap,
+            visual_type="missing_impact",
+        )
