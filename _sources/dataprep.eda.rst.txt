@@ -13,8 +13,8 @@ Plot* functions
 Other functions
 ---------------
 
-.. autofunction:: dataprep.eda.basic.compute.compute
-.. autofunction:: dataprep.eda.basic.render.render
+.. autofunction:: dataprep.eda.basic.compute
+.. autofunction:: dataprep.eda.basic.render
 .. autofunction:: dataprep.eda.correlation.compute.compute_correlation
 .. autofunction:: dataprep.eda.correlation.render.render_correlation
 .. autofunction:: dataprep.eda.missing.compute.compute_missing

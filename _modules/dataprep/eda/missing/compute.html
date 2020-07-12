@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dataprep.eda.missing.compute &#8212; dataprep 0.2.8 documentation</title>
+    <title>dataprep.eda.missing.compute &#8212; dataprep 0.2.9 documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
@@ -23,7 +23,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../missing.html" accesskey="U">dataprep.eda.missing</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dataprep.eda.missing.compute</a></li> 
@@ -60,7 +60,6 @@
     <span class="n">DTypeDef</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">ColumnsMetadata</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">nullity_filter</span><span class="p">,</span> <span class="n">nullity_sort</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compute_missing&quot;</span><span class="p">]</span>
 
@@ -75,7 +74,7 @@
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate histogram for both numerical and categorical</span>
+<span class="sd">    Calculate &quot;histogram&quot; for both numerical and categorical</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">srs</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span> <span class="n">Continuous</span><span class="p">()):</span>
@@ -120,7 +119,9 @@
     <span class="k">return</span> <span class="n">block</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">missing_spectrum</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">missing_spectrum</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a missing spectrum for each column</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -136,92 +137,63 @@
     <span class="n">data</span><span class="o">.</span><span class="n">compute_chunk_sizes</span><span class="p">()</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rechunk</span><span class="p">((</span><span class="n">chunk_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
-    <span class="p">(</span><span class="n">notnull_counts</span><span class="p">,)</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">missing_percent</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">notnull_counts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cols</span><span class="p">)}</span>
+    <span class="n">notnull_counts</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">total_missing_percs</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">notnull_counts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cols</span><span class="p">)}</span>
 
-    <span class="n">missing_percs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span><span class="n">missing_perc_blockwise</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="n">locs0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_percs</span><span class="p">))</span> <span class="o">*</span> <span class="n">chunk_size</span>
-    <span class="n">locs1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">locs0</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">nrows</span><span class="p">)</span>
+    <span class="n">spectrum_missing_percs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span>
+        <span class="n">missing_perc_blockwise</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span>
+    <span class="p">)</span>
+    <span class="n">nsegments</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spectrum_missing_percs</span><span class="p">)</span>
+
+    <span class="n">locs0</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nsegments</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_size</span>
+    <span class="n">locs1</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">locs0</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">nrows</span><span class="p">)</span>
     <span class="n">locs_middle</span> <span class="o">=</span> <span class="n">locs0</span> <span class="o">+</span> <span class="n">chunk_size</span> <span class="o">/</span> <span class="mi">2</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_percs</span><span class="p">)),</span>
-            <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs_middle</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
-            <span class="s2">&quot;missing_rate&quot;</span><span class="p">:</span> <span class="n">missing_percs</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-            <span class="s2">&quot;loc_start&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs0</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
-            <span class="s2">&quot;loc_end&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs1</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">missing_percent</span><span class="o">=</span><span class="n">missing_percent</span><span class="p">,</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_spectrum&quot;</span><span class="p">,</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">from_dask_array</span><span class="p">(</span>
+        <span class="n">da</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)),</span> <span class="n">nsegments</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">],</span>
     <span class="p">)</span>
 
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="n">location</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs_middle</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
+        <span class="n">missing_rate</span><span class="o">=</span><span class="n">spectrum_missing_percs</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+        <span class="n">loc_start</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs0</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
+        <span class="n">loc_end</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs1</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
+    <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">missing_spectrum_tabs</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">total_missing_percs</span>
+
+
+<span class="k">def</span> <span class="nf">missing_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a heatmap visualization of nullity correlation in the given DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pylint: disable=too-many-locals</span>
-    <span class="n">df1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span>
-    <span class="n">num_bins</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">ncols</span><span class="p">]</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[:</span><span class="n">ncols</span><span class="p">]</span>
-    <span class="n">ncols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">chunk_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">//</span> <span class="n">num_bins</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">()</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">compute_chunk_sizes</span><span class="p">()</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rechunk</span><span class="p">((</span><span class="n">chunk_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-
-    <span class="p">(</span><span class="n">notnull_counts</span><span class="p">,)</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">missing_percent</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">notnull_counts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cols</span><span class="p">)}</span>
-
-    <span class="n">missing_percs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span><span class="n">missing_perc_blockwise</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="n">locs0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_percs</span><span class="p">))</span> <span class="o">*</span> <span class="n">chunk_size</span>
-    <span class="n">locs1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">locs0</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">nrows</span><span class="p">)</span>
-    <span class="n">locs_middle</span> <span class="o">=</span> <span class="n">locs0</span> <span class="o">+</span> <span class="n">chunk_size</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_percs</span><span class="p">)),</span>
-            <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs_middle</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
-            <span class="s2">&quot;missing_rate&quot;</span><span class="p">:</span> <span class="n">missing_percs</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-            <span class="s2">&quot;loc_start&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs0</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
-            <span class="s2">&quot;loc_end&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">locs1</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Calculation for correlation matrix of missing values</span>
-    <span class="c1"># Step1: Apply filters and sorts</span>
-    <span class="n">df1</span> <span class="o">=</span> <span class="n">nullity_filter</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">df1</span> <span class="o">=</span> <span class="n">nullity_sort</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;rows&quot;</span><span class="p">)</span>
 
     <span class="c1"># Remove completely filled or completely empty variables.</span>
-    <span class="n">df1</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span>
-        <span class="p">:,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">df1</span><span class="o">.</span><span class="n">isnull</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;rows&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="p">]</span>
+    <span class="n">nonnulls</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+    <span class="n">allnulls</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
 
-    <span class="n">corr_mat</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
-    <span class="n">heatmap_axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">corr_mat</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">nonnulls</span> <span class="o">|</span> <span class="n">allnulls</span><span class="p">)</span>
 
-    <span class="c1"># Computing the barchart for missing values</span>
-    <span class="n">df2</span> <span class="o">=</span> <span class="n">nullity_filter</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">df2</span> <span class="o">=</span> <span class="n">nullity_sort</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;rows&quot;</span><span class="p">)</span>
-    <span class="n">nullity_counts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span> <span class="o">-</span> <span class="n">df2</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">df_bar</span> <span class="o">=</span> <span class="p">(</span><span class="n">nullity_counts</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df2</span><span class="p">))</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">sel</span><span class="o">.</span><span class="n">compute</span><span class="p">()]</span>  <span class="c1"># TODO: Can we remove the compute here?</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-        <span class="n">data_heatmap</span><span class="o">=</span><span class="n">corr_mat</span><span class="p">,</span>
-        <span class="n">data_barchart</span><span class="o">=</span><span class="n">df_bar</span><span class="p">,</span>
-        <span class="n">len_data</span><span class="o">=</span><span class="n">length</span><span class="p">,</span>
-        <span class="n">missing_percent</span><span class="o">=</span><span class="n">missing_percent</span><span class="p">,</span>
-        <span class="n">axis_range</span><span class="o">=</span><span class="n">heatmap_axis</span><span class="p">,</span>
-        <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_spectrum_heatmap&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">corr_mat</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">corr_mat</span>
+
+
+<span class="k">def</span> <span class="nf">missing_bars</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a bar chart visualization of nullity correlation in the given DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nullity_counts</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">non_nullity_counts</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">nullity_counts</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">nullity_counts</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">notnull</span><span class="o">=</span><span class="n">non_nullity_counts</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">,</span> <span class="s2">&quot;not missing&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">df</span>
 
 
 <span class="k">def</span> <span class="nf">missing_impact_1vn</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals</span>
@@ -458,8 +430,9 @@
 <span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+
 <span class="sd">    Examples</span>
-<span class="sd">    ----------</span>
+<span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from dataprep.eda.missing.computation import plot_missing</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
 <span class="sd">    &gt;&gt;&gt; df = pd.read_csv(&quot;suicide-rate.csv&quot;)</span>
@@ -478,8 +451,19 @@
             <span class="n">df</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">ndist_sample</span><span class="o">=</span><span class="n">ndist_sample</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># return missing_spectrum(df, bins=bins, ncols=ncols)</span>
-        <span class="k">return</span> <span class="n">missing_spectrum_tabs</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">)</span></div>
+        <span class="n">spectrum</span><span class="p">,</span> <span class="n">total_missing</span><span class="p">,</span> <span class="n">bars</span><span class="p">,</span> <span class="n">heatmap</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">missing_spectrum</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">),</span>
+            <span class="n">missing_bars</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
+            <span class="n">missing_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">data_total_missing</span><span class="o">=</span><span class="n">total_missing</span><span class="p">,</span>
+            <span class="n">data_spectrum</span><span class="o">=</span><span class="n">spectrum</span><span class="p">,</span>
+            <span class="n">data_bars</span><span class="o">=</span><span class="n">bars</span><span class="p">,</span>
+            <span class="n">data_heatmap</span><span class="o">=</span><span class="n">heatmap</span><span class="p">,</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -508,7 +492,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">dataprep 0.2.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../missing.html" >dataprep.eda.missing</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dataprep.eda.missing.compute</a></li> 
@@ -516,7 +500,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, SFU Database System Lab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>
