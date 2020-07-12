@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 from ...eda.dtypes import Numerical
-from ...eda.missing import compute_missing, render_missing
+from ...eda.missing import compute_missing, render_missing, plot_missing
 from ...eda.utils import to_dask
 
 
@@ -62,3 +62,10 @@ def test_specify_column_type(simpledf: dd.DataFrame) -> None:
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
     compute_missing(simpledf, y="b")
+
+
+def test_no_missing() -> None:
+    import seaborn as sns
+
+    df = sns.load_dataset("iris")
+    plot_missing(df)
