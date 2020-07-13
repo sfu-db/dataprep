@@ -57,7 +57,7 @@ def format_basic(df: pd.DataFrame, comps: Dict[str, Any]) -> Dict[str, Any]:
         itmdt = compute_missing(df)
         pbar.set_description(desc="Computing Missing Values")
         pbar.update(1)
-        if any(itmdt["missing_percent"].values()):
+        if any(itmdt["data_total_missing"].values()):
             try:
                 comps["has_missing"] = True
                 rendered = render_missing(itmdt)
