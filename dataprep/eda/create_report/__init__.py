@@ -28,8 +28,18 @@ def create_report(
     ----------
     df
         The DataFrame for which data are calculated.
-    title
-        The title of the report.
+    title: Optional[str], default "DataPrep Report"
+        The title and the filename of the report.
+    mode: Optional[str], default "basic"
+        This controls what type of report to be generated.
+        Currently only the 'basic' is fully implemented.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from dataprep.eda import create_report
+    >>> iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
+    >>> create_report(iris)
     """
     context = {
         "cdn": CDN.render(),

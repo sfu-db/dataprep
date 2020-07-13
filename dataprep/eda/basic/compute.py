@@ -1306,7 +1306,9 @@ def calc_stats_num(
     }
     descriptives_dict = {
         "Standard Deviation": kwargs["std"],
-        "Coefficient of Variation": kwargs["std"] / kwargs["mean"],
+        "Coefficient of Variation": kwargs["std"] / kwargs["mean"]
+        if kwargs["mean"] != 0
+        else np.nan,
         "Kurtosis": float(kurtosis(srs, nan_policy="omit")),
         "Mean": kwargs["mean"],
         "Median Absolute Deviation": float(

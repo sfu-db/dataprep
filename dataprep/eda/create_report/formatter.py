@@ -27,6 +27,20 @@ else:
 def format_report(df: pd.DataFrame, mode: Optional[str]) -> Dict[str, Any]:
     """
     Format the data and figures needed by report
+
+    Parameters
+    ----------
+    df
+        The DataFrame for which data are calculated.
+    mode: Optional[str]
+        This controls what type of report to be generated.
+        Currently only the 'basic' is fully implemented.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary in which formatted data will be stored.
+        This variable acts like an API in passing data to the template engine.
     """
 
     comps: Dict[str, Any] = {}
@@ -36,6 +50,8 @@ def format_report(df: pd.DataFrame, mode: Optional[str]) -> Dict[str, Any]:
     #     comps = format_full(df, comps)
     # elif mode == "minimal":
     #     comps = format_mini(df, comps)
+    else:
+        raise ValueError
 
     return comps
 
@@ -43,6 +59,19 @@ def format_report(df: pd.DataFrame, mode: Optional[str]) -> Dict[str, Any]:
 def format_basic(df: pd.DataFrame, comps: Dict[str, Any]) -> Dict[str, Any]:
     """
     Format basic version.
+
+    Parameters
+    ----------
+    df
+        The DataFrame for which data are calculated.
+    comp:
+        A dictionary in which formatted data will be stored.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary in which formatted data is stored.
+        This variable acts like an API in passing data to the template engine.
     """
 
     # pylint: disable=too-many-locals, too-many-statements, broad-except, too-many-branches
