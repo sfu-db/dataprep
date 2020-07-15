@@ -23,6 +23,28 @@ DATETIME_NUMPY_DTYPES = [np.datetime64]
 DATETIME_PANDAS_DTYPES = [pd.DatetimeTZDtype]
 DATETIME_DTYPES = DATETIME_NUMPY_DTYPES + DATETIME_PANDAS_DTYPES
 
+NULL_VALUES = {
+    float("NaN"),
+    "#N/A",
+    "#N/A N/A",
+    "#NA",
+    "-1.#IND",
+    "-1.#QNAN",
+    "-NaN",
+    "-nan",
+    "1.#IND",
+    "1.#QNAN",
+    "<NA>",
+    "N/A",
+    "NA",
+    "NULL",
+    "NaN",
+    "n/a",
+    "nan",
+    "null",
+    "",
+}
+
 
 class DType:
     """
@@ -233,3 +255,27 @@ def is_pandas_categorical(dtype: Any) -> bool:
     Detect if a dtype is categorical and from pandas.
     """
     return any(isinstance(dtype, c) for c in CATEGORICAL_PANDAS_DTYPES)
+
+
+def drop_null(
+    var: Union[dd.Series, pd.DataFrame, dd.DataFrame]
+) -> Union[pd.Series, dd.Series, pd.DataFrame, dd.DataFrame]:
+    """
+    Drop the null values (specified in NULL_VALUES) from a series or DataFrame
+    """
+
+    if isinstance(var, (pd.Series, dd.Series)):
+        if is_datetime(var.dtype):
+            return var.dropna()
+        return var[~var.isin(NULL_VALUES)]
+
+    elif isinstance(var, (pd.DataFrame, dd.DataFrame)):
+        df = var
+        for values in df.columns:
+            if is_datetime(df[values].dtype):
+                df = df.dropna(subset=[values])
+            else:
+                df = df[~df[values].isin(NULL_VALUES)]
+        return df
+
+    raise ValueError("Input should be a Pandas/Dask Dataframe or Series")

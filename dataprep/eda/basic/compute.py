@@ -26,6 +26,7 @@ from ..dtypes import (
     Continuous,
     DateTime,
     DTypeDef,
+    drop_null,
 )
 from ..intermediate import Intermediate
 from ..utils import to_dask
@@ -334,12 +335,14 @@ def compute_univariate(
             else:
                 print("Invalid range of values for this column", file=stderr)
         data_num: List[Any] = []
+        df_x = drop_null(df[x])
+
         # qq plot
-        qqdata = calc_qqnorm(df[x].dropna())
+        qqdata = calc_qqnorm(df_x)
         # kde plot
-        kdedata = calc_hist_kde(df[x].dropna().values, bins)
+        kdedata = calc_hist_kde(df_x.values, bins)
         # box plot
-        boxdata = calc_box(df[[x]].dropna(), bins, dtype=dtype)
+        boxdata = calc_box(df_x.to_frame(), bins, dtype=dtype)
         # histogram
         data_num.append(dask.delayed(calc_hist)(df[x], bins))
         # stats
@@ -441,7 +444,7 @@ def compute_bivariate(
         and is_dtype(ytype, Nominal())
     ):
         x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
-        df = df[[x, y]].dropna()
+        df = drop_null(df[[x, y]])
         df[x] = df[x].apply(str, meta=(x, str))
         # box plot per group
         boxdata = calc_box(df, bins, ngroups, largest, dtype)
@@ -457,7 +460,7 @@ def compute_bivariate(
         and is_dtype(ytype, DateTime())
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
-        df = df[[x, y]].dropna()
+        df = drop_null(df[[x, y]])
         dtnum: List[Any] = []
         # line chart
         dtnum.append(dask.delayed(calc_line_dt)(df, timeunit, agg))
@@ -478,7 +481,7 @@ def compute_bivariate(
         and is_dtype(ytype, DateTime())
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
-        df = df[[x, y]].dropna()
+        df = drop_null(df[[x, y]])
         df[y] = df[y].apply(str, meta=(y, str))
         dtcat: List[Any] = []
         # line chart
@@ -496,7 +499,7 @@ def compute_bivariate(
             visual_type="dt_and_cat_cols",
         )
     elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
-        df = df[[x, y]].dropna()
+        df = drop_null(df[[x, y]])
         df[x] = df[x].apply(str, meta=(x, str))
         df[y] = df[y].apply(str, meta=(y, str))
         # nested bar chart
@@ -514,7 +517,7 @@ def compute_bivariate(
             visual_type="two_cat_cols",
         )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
-        df = df[[x, y]].dropna()
+        df = drop_null(df[[x, y]])
         # scatter plot
         scatdata = calc_scatter(df, sample_size)
         # hexbin plot
@@ -622,7 +625,7 @@ def compute_trivariate(
         and is_dtype(ytype, Continuous())
         and is_dtype(ztype, Nominal())
     ), "x, y, and z must be one each of type datetime, numerical, and categorical"
-    df = df[[x, y, z]].dropna()
+    df = drop_null(df[[x, y, z]])
     df[z] = df[z].apply(str, meta=(z, str))
 
     # line chart
@@ -707,7 +710,7 @@ def calc_line_dt(
     # single line charts
     if agg is None:  # frequency of datetime column
         miss_pct = round(df[x].isna().sum() / len(df) * 100, 1)
-        dfr = df.dropna().groupby(grouper).size().reset_index()
+        dfr = drop_null(df).groupby(grouper).size().reset_index()
         dfr.columns = [x, "freq"]
         dfr["pct"] = dfr["freq"] / len(df) * 100
     else:  # aggregate over a second column
@@ -919,7 +922,7 @@ def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
         The histogram in a dataframe and the percent of missing values
     """
     miss_pct = round(srs.isna().sum() / len(srs) * 100, 1)
-    data = srs.dropna().values
+    data = drop_null(srs).values
     if len(data) == 0:  # all values in column are missing
         return pd.DataFrame({"left": [], "right": [], "freq": []}), miss_pct
     hist_arr, bins_arr = np.histogram(data, range=[data.min(), data.max()], bins=bins)
@@ -1383,7 +1386,7 @@ def calc_stats_cat(
             else:
                 quantile_dict[label] = element
 
-    srs = srs.dropna()
+    srs = drop_null(srs)
     # length stats
     length = srs.str.len()
     length_dict = {
