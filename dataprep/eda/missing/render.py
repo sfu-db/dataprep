@@ -28,7 +28,7 @@ from bokeh.palettes import Category10, Greys256  # type: ignore
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
-from ..dtypes import is_dtype, Nominal, Continuous
+from ..dtypes import is_dtype, Nominal, Continuous, drop_null
 from ..intermediate import Intermediate, ColumnMetadata
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
@@ -327,7 +327,7 @@ def render_heatmaps(
             df = df.unstack().reset_index(name="correlation")
             df = df.rename(columns={"level_0": "x", "level_1": "y"})
             df = df[df["x"] != df["y"]]
-            df = df.dropna()
+            df = drop_null(df)
 
             # in case of numerical column names
             df["x"] = df["x"].apply(str)
