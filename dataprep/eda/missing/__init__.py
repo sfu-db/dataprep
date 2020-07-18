@@ -22,7 +22,6 @@ def plot_missing(
     y: Optional[str] = None,
     *,
     bins: int = 30,
-    ncols: int = 30,
     ndist_sample: int = 100,
     dtype: Optional[DTypeDef] = None,
 ) -> Report:
@@ -39,8 +38,6 @@ def plot_missing(
         a valid column name of the data frame
     y
         a valid column name of the data frame
-    ncols
-        The number of columns in the figure
     bins
         The number of rows in the figure
     ndist_sample
@@ -59,8 +56,6 @@ def plot_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
-    itmdt = compute_missing(
-        df, x, y, dtype=dtype, bins=bins, ncols=ncols, ndist_sample=ndist_sample
-    )
+    itmdt = compute_missing(df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample)
     fig = render_missing(itmdt)
     return Report(fig)
