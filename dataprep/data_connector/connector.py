@@ -172,18 +172,19 @@ class Connector:
     ) -> pd.DataFrame:
         """
         Query the API to get a table.
+
         Parameters
         ----------
-        table : str
+        table
             The table name.
-        _auth : Optional[Dict[str, Any]] = None
+        _auth: Optional[Dict[str, Any]] = None
             The parameters for authentication. Usually the authentication parameters
             should be defined when instantiating the Connector. In case some tables have different
             authentication options, a different authentication parameter can be defined here.
             This parameter will override the one from Connector if passed.
         _count: Optional[int] = None
             count of returned records.
-        **where: Any
+        **where
             The additional parameters required for the query.
         """
         assert (
