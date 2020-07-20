@@ -1,0 +1,65 @@
+{{ context.components[0] }}
+{{ context.resources }}
+
+<script>
+    setTimeout(init, 100);
+
+    function init() {
+        const tableRows = document.querySelectorAll('.tabledata tr');
+        highlightTableValue(tableRows, '#f00');
+        scientificNotationStrip(tableRows);
+    }
+
+    function switchPage(e) {
+        const pageTo = e.id.replace('switch', 'page');
+        const pageBox = document.getElementById(pageTo);
+        const pageBoxAll = document.getElementsByClassName('page-box');
+        for (let i of pageBoxAll) {
+            i.style.display = 'none';
+        }
+        for (let i of document.querySelectorAll('.page-switch li')) {
+            i.style.backgroundColor = 'white';
+        }
+        pageBox.style.display = 'block';
+        e.style.backgroundColor = '#5DADE2';
+    }
+
+    function highlightTableValue(element, color) {
+        for (let i of element) {
+            let thValue = i.firstElementChild.innerText;
+            let tbValue = i.lastElementChild.innerText;
+            if (thValue.includes('Distinct') && tbValue > 50) {
+                i.style.color = color;
+            } else if (thValue.includes('Unique') && tbValue.replace('%',
+                    '') == 100) {
+                i.style.color = color;
+            } else if (thValue.includes('Missing') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Zeros') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Infinite') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Skewness' && tbValue > 20)) {
+                i.style.color = color;
+            }
+        }
+    }
+
+    function scientificNotationStrip(element) {
+        for (let i of element) {
+            let tbValue = i.lastElementChild.innerHTML;
+            if (!isNaN(tbValue)) {
+                if (tbValue.includes('e+')) {
+                    let newValue = tbValue.replace('e+', '×10<sup>') + '</sup>';
+                    i.lastElementChild.innerHTML = newValue;
+                } else if (tbValue.includes('e-')) {
+                    let newValue = tbValue.replace('e', '×10<sup>') + '</sup>';
+                    i.lastElementChild.innerHTML = newValue;
+                }
+            }
+        }
+    }
+</script>
