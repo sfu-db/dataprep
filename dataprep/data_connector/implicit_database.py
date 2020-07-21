@@ -11,7 +11,7 @@ from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 import jsonschema
 import pandas as pd
-from jsonpath2 import Path as JPath
+from jsonpath_ng import parse as jparse
 from lxml import etree  # pytype: disable=import-error
 from requests import Response
 
@@ -148,24 +148,20 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         """
         data = jloads(data)
         table_data = {}
-        root = self.table_path
+        table_expr = jparse(self.table_path)
 
         if self.orient == Orient.Records:
-            data_rows = [
-                row_node.current_value for row_node in JPath.parse_str(root).match(data)
-            ]
+            data_rows = [match.value for match in table_expr.find(data)]
 
             for column_name, column_def in self.schema.items():
                 column_target = column_def.target
                 column_type = column_def.type
 
-                target_matcher = JPath.parse_str(column_target)
+                target_matcher = jparse(column_target)
 
                 col: List[Any] = []
                 for data_row in data_rows:
-                    maybe_cell_value = [
-                        m.current_value for m in target_matcher.match(data_row)
-                    ]
+                    maybe_cell_value = [m.value for m in target_matcher.find(data_row)]
 
                     if not maybe_cell_value:  # If no match
                         col.append(None)
