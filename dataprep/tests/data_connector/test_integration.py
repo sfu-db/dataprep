@@ -7,7 +7,7 @@ from ...data_connector import Connector
 
 
 @pytest.mark.skipif(
-    environ.get("DATAPREP_SKIP_CREDENTIAL_TESTS") == "1",
+    environ.get("DATAPREP_SKIP_CREDENTIAL_TESTS", "0") == "0",
     reason="Skip tests that requires credential",
 )
 def test_data_connector() -> None:
@@ -33,7 +33,7 @@ def test_data_connector() -> None:
 
 
 @pytest.mark.skipif(
-    environ.get("DATAPREP_SKIP_CREDENTIAL_TESTS") == "1",
+    environ.get("DATAPREP_SKIP_CREDENTIAL_TESTS", "0") == "0",
     reason="Skip tests that requires credential",
 )
 def test_query_params() -> None:
