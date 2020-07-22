@@ -3,6 +3,7 @@
 """
 
 import sys
+import webbrowser
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -13,6 +14,8 @@ from bokeh.models import LayoutDOM
 from bokeh.resources import CDN
 from IPython.display import HTML, display
 from jinja2 import Template
+
+from .utils import is_notebook
 
 INLINE_TEMPLATE = Template(
     """
@@ -97,4 +100,29 @@ class Report:
         """
         Render the report. This is useful when calling plot in a for loop.
         """
+
+        # if not call from notebook environment, ref to show_browser function.
+        if not is_notebook():
+            print(
+                "The report is not shown in a notebook environment,"
+                " please try 'show_browser' if you want to open it in browser",
+                file=sys.stderr,
+            )
+
         display(HTML(self._repr_html_()))
+
+    def show_browser(self) -> None:
+        """
+        Open the report in the browser. This is useful when plotting
+        from terminmal or when the fig is very large in notebook.
+        """
+
+        # set delete = False to avoid early delete when user open multiple plots.
+        with NamedTemporaryFile(suffix=".html", delete=False) as tmpf:
+            save(
+                self.to_render,
+                filename=tmpf.name,
+                resources=CDN,
+                title="DataPrep.EDA Report",
+            )
+            webbrowser.open_new_tab(f"file://{tmpf.name}")
