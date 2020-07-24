@@ -29,14 +29,14 @@ def plot(
     timeunit: str = "auto",
     agg: str = "mean",
     sample_size: int = 1000,
+    top_words: int = 30,
+    stopword: bool = True,
+    lemmatize: bool = False,
+    stem: bool = False,
     value_range: Optional[Tuple[float, float]] = None,
     yscale: str = "linear",
     tile_size: Optional[float] = None,
     dtype: Optional[DTypeDef] = None,
-    top_words: Optional[int] = 30,
-    stopword: Optional[bool] = True,
-    lemmatize: Optional[bool] = False,
-    stem: Optional[bool] = False,
 ) -> Report:
     """Generates plots for exploratory data analysis.
 
@@ -107,6 +107,18 @@ def plot(
         column
     sample_size: int, default 1000
         Sample size for the scatter plot
+    top_words: int, default 30
+        Specify the amount of words to show in the wordcloud and
+        word frequency bar chart
+    stopword: bool, default True
+        Eliminate the stopwords in the text data for plotting wordcloud and
+        word frequency bar chart
+    lemmatize: bool, default False
+        Lemmatize the words in the text data for plotting wordcloud and
+        word frequency bar chart
+    stem: bool, default False
+        Apply Potter Stem on the text data for plotting wordcloud and
+        word frequency bar chart
     value_range: Optional[Tuple[float, float]], default None
         The lower and upper bounds on the range of a numerical column.
         Applies when column x is specified and column y is unspecified.
@@ -120,18 +132,6 @@ def plot(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
-    top_words: int, default 30
-        Specify the amount of words to show in the wordcloud and
-        word frequency bar chart
-    stopword: bool, default True
-        Eliminate the stopwords in the text data for plotting wordcloud and
-        word frequency bar chart
-    lemmatize: bool, default False
-        Lemmatize the words in the text data for plotting wordcloud and
-        word frequency bar chart
-    stem: bool, default False
-        Apply Potter Stem on the text data for plotting wordcloud and
-        word frequency bar chart
     Examples
     --------
     >>> import pandas as pd
@@ -155,12 +155,12 @@ def plot(
         timeunit=timeunit.lower(),
         agg=agg,
         sample_size=sample_size,
-        value_range=value_range,
-        dtype=dtype,
         top_words=top_words,
         stopword=stopword,
         lemmatize=lemmatize,
         stem=stem,
+        value_range=value_range,
+        dtype=dtype,
     )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
 

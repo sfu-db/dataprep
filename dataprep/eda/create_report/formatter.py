@@ -10,8 +10,8 @@ from bokeh.embed import components
 from bokeh.models import Title
 from bokeh.plotting import Figure
 
-from ..basic import compute, render
-from ..basic.compute import calc_stats
+from ..distribution import compute, render
+from ..distribution.compute import calc_stats
 from ..correlation import compute_correlation, render_correlation
 from ..dtypes import Continuous, DateTime, Nominal, detect_dtype, is_dtype
 from ..intermediate import Intermediate
