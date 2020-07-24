@@ -104,7 +104,25 @@ release version:
   echo "Creating release draft"
   semantic-release changelog | sed "1iv${to_version}\n" | hub release create -d -a "dist/dataprep-${to_version}-py3-none-any.whl" -a "dist/dataprep-${to_version}.tar.gz" -F - "v${to_version}"
 
-  
+publish:
+  echo "Build artifacts"
+  poetry build
+
+  poetry publish
+
+conda-shell:
+  docker run -it --rm -v$PWD/conda.recipe:/recipe continuumio/anaconda3 bash
+
+build-conda:
+  echo "Build & Upload Conda Artifacts"
+  sudo rm -r dist/conda
+  docker run -it --rm -v$PWD/conda.recipe:/recipe:ro -v$PWD/dist/conda:/dist continuumio/anaconda3 conda build --output-folder /dist -c conda-forge /recipe/dataprep
+
+publish-conda:
+  docker run -it --rm -v$PWD/dist/conda:/dist continuumio/anaconda3 anaconda upload --force --user sfu-db /dist/noarch/dataprep-0.2.10a0-py_0.tar.bz2
+
+install-conda:
+  docker run -it --rm continuumio/anaconda3 bash -c "conda install -y -c conda-forge mamba && mamba install -y -c conda-forge -c sfu-db dataprep"
 
 
 @ensure-git-clean:

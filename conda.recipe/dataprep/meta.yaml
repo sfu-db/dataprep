@@ -1,0 +1,69 @@
+{% set name = "dataprep" %}
+{% set version = "0.2.10" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: e3046005bd827f998ead3f90ce02642ce91ff3a7fde041e3623fb05f92db7fb5
+
+build:
+  noarch: python
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  build:
+    - pip
+    - python
+    - poetry >=1
+  run:
+    - python
+    - bokeh >=2.0,<2.1
+    - dask >=2.13,<2.14
+    - pyyaml
+    - cloudpickle >=0.2.2
+    - distributed >=2.0
+    - fsspec >=0.6.0
+    - partd >=0.3.10
+    - toolz >=0.8.2
+    - holoviews >=1.13,<1.14
+    - jinja2 >=2.11,<2.12
+    - jsonpath-ng >=1.5.1,<2.0.0
+    - jsonschema >=3.2,<3.3
+    - lxml >=4.5,<4.6
+    - nltk >=3.5,<4.0
+    - numpy >=1.18,<1.19
+    - pandas >=1.0,<1.1
+    - pillow >=7.1.2,<8.0.0
+    - requests >=2.23,<2.24
+    - scipy >=1.4,<1.5
+    - tornado ==5.0.2
+    - tqdm >=4.47.0,<5.0.0
+    - wordcloud >=1.7.0,<2.0.0
+
+test:
+  imports:
+    - dataprep
+    - dataprep.assets
+    - dataprep.data_connector
+    - dataprep.eda
+    - dataprep.eda.basic
+    - dataprep.eda.correlation
+    - dataprep.eda.create_report
+    - dataprep.eda.missing
+
+about:
+  home: https://github.com/sfu-db/dataprep
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: "Dataprep: Data Preparation in Python"
+  doc_url: https://sfu-db.github.io/dataprep/
+  dev_url: https://github.com/sfu-db/dataprep
+
+extra:
+  recipe-maintainers:
+    - dovahcrow
