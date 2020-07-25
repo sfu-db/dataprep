@@ -82,7 +82,7 @@ There are many ways to contribute to Dataprep.
 * Submit bugs and help us verify fixes as they are checked in.
 * Review the source code changes.
 * Engage with other Dataprep users and developers on StackOverflow.
-* Help each other in the [Dataprep Community Discord](https://discord.gg/FXsK2P) and [Mail list & Forum].
+* Help each other in the [Dataprep Community Discord](https://discord.gg/xwbkFNk) and [Mail list & Forum].
 * [![Twitter]](https://twitter.com/sfu_db)
 * Contribute bug fixes.
 * Providing use cases and writing down your user experience.
