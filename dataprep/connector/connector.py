@@ -6,8 +6,9 @@ import math
 import sys
 from asyncio import as_completed
 from pathlib import Path
-from typing import Any, Awaitable, Dict, List, Optional, Union, cast
-
+from typing import Any, Awaitable, Dict, List, Optional, Union, Tuple
+from aiohttp.client_reqrep import ClientResponse
+from jsonpath_ng import parse as jparse
 import pandas as pd
 from aiohttp import ClientSession
 from jinja2 import Environment, StrictUndefined, Template, UndefinedError
@@ -16,7 +17,15 @@ from .config_manager import config_directory, ensure_config
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .ref import Ref
-from .schema import ConfigDef, FieldDefUnion
+from .schema import (
+    ConfigDef,
+    FieldDefUnion,
+    OffsetPaginationDef,
+    SeekPaginationDef,
+    PagePaginationDef,
+    TokenPaginationDef,
+    TokenLocation,
+)
 from .throttler import OrderedThrottler, ThrottleSession
 
 INFO_TEMPLATE = Template(
@@ -98,6 +107,7 @@ class Connector:
     async def query(  # pylint: disable=too-many-locals
         self,
         table: str,
+        *,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
         **where: Any,
@@ -199,7 +209,7 @@ class Connector:
             new_schema_dict["data_type"].append(schema[k].type)
         return pd.DataFrame.from_dict(new_schema_dict)
 
-    async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches
+    async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
         table: str,
         kwargs: Dict[str, Any],
@@ -239,7 +249,7 @@ class Connector:
             total = _count
             n_page = math.ceil(total / max_per_page)
 
-            if pagdef.type == "seek":
+            if isinstance(pagdef, SeekPaginationDef):
                 last_id = 0
                 dfs = []
                 # No way to parallelize for seek type
@@ -251,6 +261,7 @@ class Connector:
                         kwargs,
                         _client=client,
                         _throttler=throttler,
+                        _page=i,
                         _auth=_auth,
                         _limit=count,
                         _anchor=last_id - 1,
@@ -263,10 +274,36 @@ class Connector:
                         # The API returns empty for this page, maybe we've reached the end
                         break
 
-                    last_id = int(df[pagdef.seek_id][len(df) - 1]) - 1
+                    last_id = int(df.iloc[-1, df.columns.get_loc(pagdef.seek_id)]) - 1  # type: ignore
                     dfs.append(df)
+            elif isinstance(pagdef, TokenPaginationDef):
+                next_token = None
+                dfs = []
+                # No way to parallelize for seek type
+                for i in range(n_page):
+                    count = min(total - i * max_per_page, max_per_page)
+                    df, resp = await self._fetch(  # type: ignore
+                        itable,
+                        kwargs,
+                        _client=client,
+                        _throttler=throttler,
+                        _page=i,
+                        _auth=_auth,
+                        _limit=count,
+                        _anchor=next_token,
+                        _raw=True,
+                    )
 
-            elif pagdef.type in {"offset", "page"}:
+                    if pagdef.token_location == TokenLocation.Header:
+                        next_token = resp.headers[pagdef.token_accessor]
+                    elif pagdef.token_location == TokenLocation.Body:
+                        # only json body implemented
+                        token_expr = jparse(pagdef.token_accessor)
+                        (token_elem,) = token_expr.find(await resp.json())
+                        next_token = token_elem.value
+
+                    dfs.append(df)
+            elif isinstance(pagdef, (OffsetPaginationDef, PagePaginationDef)):
                 resps_coros = []
                 allowed_page = Ref(n_page)
                 for i in range(n_page):
@@ -314,11 +351,10 @@ class Connector:
         _page: int = 0,
         _allowed_page: Optional[Ref[int]] = None,
         _limit: Optional[int] = None,
-        _anchor: Optional[int] = None,
+        _anchor: Optional[Any] = None,
         _auth: Optional[Dict[str, Any]] = None,
-    ) -> Optional[pd.DataFrame]:
-        if (_limit is None) != (_anchor is None):
-            raise ValueError("_limit and _offset should both be None or not None")
+        _raw: bool = False,
+    ) -> Union[Optional[pd.DataFrame], Tuple[Optional[pd.DataFrame], ClientResponse]]:
 
         reqdef = table.config.request
         method = reqdef.method
@@ -353,17 +389,18 @@ class Connector:
 
         if reqdef.pagination is not None and _limit is not None:
             pagdef = reqdef.pagination
-            pag_type = pagdef.type
             limit_key = pagdef.limit_key
 
-            if pag_type == "seek":
-                anchor = cast(str, pagdef.seek_key)
-            elif pag_type == "offset":
-                anchor = cast(str, pagdef.offset_key)
-            elif pag_type == "page":
-                anchor = cast(str, pagdef.page_key)
+            if isinstance(pagdef, SeekPaginationDef):
+                anchor = pagdef.seek_key
+            elif isinstance(pagdef, OffsetPaginationDef):
+                anchor = pagdef.offset_key
+            elif isinstance(pagdef, PagePaginationDef):
+                anchor = pagdef.page_key
+            elif isinstance(pagdef, TokenPaginationDef):
+                anchor = pagdef.token_key
             else:
-                raise ValueError(f"Unknown pagination type {pag_type}.")
+                raise ValueError(f"Unknown pagination type {pagdef.type}.")
 
             if limit_key in req_data["params"]:
                 raise UniversalParameterOverridden(limit_key, "_limit")
@@ -371,7 +408,9 @@ class Connector:
 
             if anchor in req_data["params"]:
                 raise UniversalParameterOverridden(anchor, "_offset")
-            req_data["params"][anchor] = _anchor
+
+            if _anchor is not None:
+                req_data["params"][anchor] = _anchor
 
         await _throttler.acquire(_page)
 
@@ -396,7 +435,10 @@ class Connector:
 
             if len(df) == 0 and _allowed_page is not None and _page is not None:
                 _allowed_page.set(_page)
-                return None
+                df = None
+
+            if _raw:
+                return df, resp
             else:
                 return df
 
