@@ -2,7 +2,7 @@
 
 from typing import TypeVar, Generic
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 class Ref(Generic[T]):
@@ -16,7 +16,7 @@ class Ref(Generic[T]):
         self.val = val
 
     def __int__(self) -> int:
-        return int(self.val)
+        return int(self.val)  # type: ignore
 
     def __bool__(self) -> bool:
         return bool(self.val)

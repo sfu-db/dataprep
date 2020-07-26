@@ -23,6 +23,7 @@ _TYPE_MAPPING = {
     "string": str,
     "float": float,
     "boolean": bool,
+    "list": list,
 }
 
 
