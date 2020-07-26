@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataprep.data_connector.types &#8212; DataPrep 0.2.10 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link href="../../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/_modules/dataprep/data_connector/types.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <h1>Source code for dataprep.data_connector.types</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines useful types in this library.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">base64</span> <span class="kn">import</span> <span class="n">b64encode</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">UndefinedError</span>
+
+<span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
+
+
+<div class="viewcode-block" id="AuthorizationType"><a class="viewcode-back" href="../../../api_reference/dataprep.data_connector.html#dataprep.data_connector.types.AuthorizationType">[docs]</a><span class="k">class</span> <span class="nc">AuthorizationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Enum class defines the supported authorization methods in this library.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    * Bearer: requires &#39;access_token&#39; presented in user params</span>
+<span class="sd">        - added as an Auth Header</span>
+<span class="sd">    * QueryParam: requires &#39;access_token&#39; presented in user params</span>
+<span class="sd">        - added as a query string parameter</span>
+<span class="sd">    * OAuth2: requires &#39;client_id&#39; and &#39;client_secret&#39; in user params for</span>
+<span class="sd">      &#39;ClientCredentials&#39; grant type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Bearer</span> <span class="o">=</span> <span class="s2">&quot;Bearer&quot;</span>
+    <span class="n">QueryParam</span> <span class="o">=</span> <span class="s2">&quot;QueryParam&quot;</span>
+    <span class="n">OAuth2</span> <span class="o">=</span> <span class="s2">&quot;OAuth2&quot;</span></div>
+
+
+<div class="viewcode-block" id="Authorization"><a class="viewcode-back" href="../../../api_reference/dataprep.data_connector.html#dataprep.data_connector.types.Authorization">[docs]</a><span class="k">class</span> <span class="nc">Authorization</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class carries the authorization type and</span>
+<span class="sd">    the corresponding parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">auth_type</span><span class="p">:</span> <span class="n">AuthorizationType</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">storage</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auth_type</span><span class="p">:</span> <span class="n">AuthorizationType</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">=</span> <span class="n">auth_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Authorization.build"><a class="viewcode-back" href="../../../api_reference/dataprep.data_connector.html#dataprep.data_connector.types.Authorization.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Populate some required fields to the request data.</span>
+<span class="sd">        Complex logic may also happens in this function (e.g. start a server to do OAuth).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthorizationType</span><span class="o">.</span><span class="n">Bearer</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
+            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">][</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthorizationType</span><span class="o">.</span><span class="n">QueryParam</span><span class="p">:</span>
+            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;keyParam&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthorizationType</span><span class="o">.</span><span class="n">OAuth2</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;grantType&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ClientCredentials&quot;</span>
+        <span class="p">):</span>
+            <span class="c1"># TODO: Move OAuth to a separate authenticator</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="s2">&quot;access_token&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;expires_at&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">time</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="c1"># Not yet authorized</span>
+                <span class="n">ckey</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;client_id&quot;</span><span class="p">]</span>
+                <span class="n">csecret</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;client_secret&quot;</span><span class="p">]</span>
+                <span class="n">b64cred</span> <span class="o">=</span> <span class="n">b64encode</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ckey</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">csecret</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tokenServerUrl&quot;</span><span class="p">],</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Basic </span><span class="si">{</span><span class="n">b64cred</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="s2">&quot;client_credentials&quot;</span><span class="p">},</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+                <span class="k">assert</span> <span class="n">resp</span><span class="p">[</span><span class="s2">&quot;token_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;bearer&quot;</span>
+                <span class="n">access_token</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">access_token</span>
+                <span class="k">if</span> <span class="s2">&quot;expires_in&quot;</span> <span class="ow">in</span> <span class="n">resp</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">[</span><span class="s2">&quot;expires_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">resp</span><span class="p">[</span><span class="s2">&quot;expires_in&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">60</span>
+                    <span class="p">)</span>  <span class="c1"># 60 seconds grace period to avoid clock lag</span>
+
+            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">][</span>
+                <span class="s2">&quot;Authorization&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># TODO: handle auto refresh</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthorizationType</span><span class="o">.</span><span class="n">OAuth2</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;grantType&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AuthorizationCode&quot;</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="Fields"><a class="viewcode-back" href="../../../api_reference/dataprep.data_connector.html#dataprep.data_connector.types.Fields">[docs]</a><span class="k">class</span> <span class="nc">Fields</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A data structure that stores the fields information (e.g. headers, cookies, ...).</span>
+<span class="sd">    This class is useful to populate concrete fields data with required variables provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="n">fields_config</span>
+
+<div class="viewcode-block" id="Fields.populate"><a class="viewcode-back" href="../../../api_reference/dataprep.data_connector.html#dataprep.data_connector.types.Fields.populate">[docs]</a>    <span class="k">def</span> <span class="nf">populate</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">jenv</span><span class="p">:</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Populate a dict based on the fields definition and provided vars.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">def_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">from_key</span><span class="p">,</span> <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+                <span class="n">required</span> <span class="o">=</span> <span class="n">def_</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">required</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+                <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1"># is a template</span>
+                <span class="n">template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">def_</span>
+                <span class="n">tmplt</span> <span class="o">=</span> <span class="n">jenv</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">template</span><span class="p">))</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">tmplt</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;template&quot;</span><span class="p">)</span>
+                <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="n">def_</span><span class="p">[</span><span class="s2">&quot;removeIfEmpty&quot;</span><span class="p">]</span>
+                <span class="n">to_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;toKey&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">to_key</span>
+                <span class="n">from_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fromKey&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">from_key</span>
+
+                <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">required</span> <span class="o">=</span> <span class="n">def_</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">required</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmplt</span> <span class="o">=</span> <span class="n">jenv</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">tmplt</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">UndefinedError</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># This empty string will be removed if `remove_if_empty` is True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnreachableError</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">str_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">remove_if_empty</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">str_value</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">to_key</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Param </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> conflicting with </span><span class="si">{</span><span class="n">to_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">stderr</span><span class="p">)</span>
+                    <span class="n">ret</span><span class="p">[</span><span class="n">to_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">str_value</span>
+                    <span class="k">continue</span>
+        <span class="k">return</span> <span class="n">ret</span></div></div>
+
+
+<div class="viewcode-block" id="Orient"><a class="viewcode-back" href="../../../api_reference/dataprep.data_connector.html#dataprep.data_connector.types.Orient">[docs]</a><span class="k">class</span> <span class="nc">Orient</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Different types of table orientations</span>
+<span class="sd">    ref: (https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_json.html).</span>
+<span class="sd">    Currently, DataConnector supports two different types of orientaions:</span>
+
+<span class="sd">    1. Split, which is column store.</span>
+<span class="sd">    2. Records, which is row store.</span>
+
+<span class="sd">    Details can be found in the pandas page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Split</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span>
+    <span class="n">Records</span> <span class="o">=</span> <span class="s2">&quot;records&quot;</span></div>
+</pre></div>
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

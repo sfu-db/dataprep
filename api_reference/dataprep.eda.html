@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.2.10 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link href="../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dataprep.data_connector" href="dataprep.data_connector.html" />
+    <link rel="prev" title="dataprep.eda.create_report" href="dataprep.eda.create_report.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/api_reference/dataprep.eda.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.basic.html">dataprep.eda.basic</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.correlation.html">dataprep.eda.correlation</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.missing.html">dataprep.eda.missing</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.create_report.html">dataprep.eda.create_report</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="">dataprep.eda auxiliary modules</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.data_connector.html">dataprep.data_connector</a>
+              </li>
+            
+          
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.dtypes" class="nav-link">Data types</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.intermediate" class="nav-link">Intermediate</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.palette" class="nav-link">Palette</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.report" class="nav-link">Report</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.utils" class="nav-link">Utils</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="dataprep-eda-auxiliary-modules">
+<h1>dataprep.eda auxiliary modules<a class="headerlink" href="#dataprep-eda-auxiliary-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-dataprep.eda.dtypes">
+<span id="data-types"></span><span id="dtypes"></span><h2>Data types<a class="headerlink" href="#module-dataprep.eda.dtypes" title="Permalink to this headline">¶</a></h2>
+<p>In this module lives the type tree.</p>
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Categorical">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Categorical</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Categorical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.DType</span></code></a></p>
+<p>Type Categorical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Continuous">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Continuous</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Continuous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Continuous" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.Numerical" title="dataprep.eda.dtypes.Numerical"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.Numerical</span></code></a></p>
+<p>Type Continuous, Subtype of Numerical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.DType">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">DType</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#DType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.DType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Root of Type Tree</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.DateTime">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">DateTime</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#DateTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.DateTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.Numerical" title="dataprep.eda.dtypes.Numerical"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.Numerical</span></code></a></p>
+<p>Type DateTime, Subtype of Numerical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Discrete">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Discrete</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Discrete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Discrete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.Numerical" title="dataprep.eda.dtypes.Numerical"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.Numerical</span></code></a></p>
+<p>Type Discrete, Subtype of Numerical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Nominal">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Nominal</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Nominal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Nominal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.Categorical" title="dataprep.eda.dtypes.Categorical"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.Categorical</span></code></a></p>
+<p>Type Nominal, Subtype of Categorical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Numerical">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Numerical</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Numerical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Numerical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.DType</span></code></a></p>
+<p>Type Numerical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Ordinal">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Ordinal</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Ordinal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Ordinal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.Categorical" title="dataprep.eda.dtypes.Categorical"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.Categorical</span></code></a></p>
+<p>Type Ordinal, Subtype of Categorical</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.dtypes.Text">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">Text</code><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#Text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.Text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataprep.eda.dtypes.Nominal" title="dataprep.eda.dtypes.Nominal"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataprep.eda.dtypes.Nominal</span></code></a></p>
+<p>Type Text, Subtype of Nominal</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.detect_dtype">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">detect_dtype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">known_dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#detect_dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.detect_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a column, detect its type or transform its type according to users’ specification</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>col</strong> (<em>dask.datafram.Series</em>) – A dataframe column</p></li>
+<li><p><strong>known_dtype</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Union</em><em>[</em><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em>]</em><em>]</em><em>, </em><em>default None</em>) – A dictionary or single DType given by users to specify the types for designated columns or
+all columns. E.g.  known_dtype = {“a”: Continuous, “b”: “Nominal”} or
+known_dtype = {“a”: Continuous(), “b”: “nominal”} or
+known_dtype = Continuous() or known_dtype = “Continuous” or known_dtype = Continuous()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.detect_without_known">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">detect_without_known</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#detect_without_known"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.detect_without_known" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function detects dtypes of column when users didn’t specify.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.drop_null">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">drop_null</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">var</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#drop_null"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.drop_null" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop the null values (specified in NULL_VALUES) from a series or DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.is_continuous">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_continuous</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#is_continuous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_continuous" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a type, return if that type is a continuous type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.is_datetime">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_datetime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#is_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a type, return if that type is a datetime type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.is_dtype">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_dtype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype1</span></em>, <em class="sig-param"><span class="n">dtype2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#is_dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function detects if dtype2 is dtype1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.is_nominal">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_nominal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#is_nominal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_nominal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a type, return if that type is a nominal type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.is_pandas_categorical">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">is_pandas_categorical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#is_pandas_categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.is_pandas_categorical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect if a dtype is categorical and from pandas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.map_dtype">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">map_dtype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#map_dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.map_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently, we want to keep our Type System flattened.
+We will map Categorical() to Nominal() and Numerical() to Continuous()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.normalize_dtype">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">normalize_dtype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype_repr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#normalize_dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.normalize_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function normalizes a dtype repr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.intermediate">
+<span id="intermediate"></span><h2>Intermediate<a class="headerlink" href="#module-dataprep.eda.intermediate" title="Permalink to this headline">¶</a></h2>
+<p>Intermediate class</p>
+<dl class="py class">
+<dt id="dataprep.eda.intermediate.ColumnMetadata">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">ColumnMetadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#ColumnMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container for storing a single column’s metadata.
+This is immutable</p>
+<dl class="py attribute">
+<dt id="dataprep.eda.intermediate.ColumnMetadata.metadata">
+<code class="sig-name descname">metadata</code><em class="property">: pd.Series</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata.metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.intermediate.ColumnsMetadata">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">ColumnsMetadata</code><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#ColumnsMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container for storing each column’s metadata</p>
+<dl class="py attribute">
+<dt id="dataprep.eda.intermediate.ColumnsMetadata.metadata">
+<code class="sig-name descname">metadata</code><em class="property">: pd.DataFrame</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata.metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.intermediate.Intermediate">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">Intermediate</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#Intermediate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code></p>
+<p>This class contains intermediate results.</p>
+<dl class="py attribute">
+<dt id="dataprep.eda.intermediate.Intermediate.visual_type">
+<code class="sig-name descname">visual_type</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate.visual_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.palette">
+<span id="palette"></span><h2>Palette<a class="headerlink" href="#module-dataprep.eda.palette" title="Permalink to this headline">¶</a></h2>
+<p>This file defines palettes used for EDA.</p>
+</div>
+<div class="section" id="module-dataprep.eda.report">
+<span id="report"></span><h2>Report<a class="headerlink" href="#module-dataprep.eda.report" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the Report class.</p>
+<dl class="py class">
+<dt id="dataprep.eda.report.Report">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.report.</code><code class="sig-name descname">Report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_render</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class creates a customized Report object for the plot* functions and create_report function</p>
+<dl class="py method">
+<dt id="dataprep.eda.report.Report.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.report.Report.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the report. This is useful when calling plot in a for loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.report.Report.show_browser">
+<code class="sig-name descname">show_browser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report.show_browser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.show_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the report in the browser. This is useful when plotting
+from terminmal or when the fig is very large in notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.report.Report.to_render">
+<code class="sig-name descname">to_render</code><em class="property">: LayoutDOM</em><a class="headerlink" href="#dataprep.eda.report.Report.to_render" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-dataprep.eda.utils" title="Permalink to this headline">¶</a></h2>
+<p>Miscellaneous functions</p>
+<dl class="py function">
+<dt id="dataprep.eda.utils.cut_long_name">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">cut_long_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">max_len</span><span class="o">=</span><span class="default_value">12</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#cut_long_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.cut_long_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the name is longer than <cite>max_len</cite>,
+cut it to <cite>max_len</cite> length and append “…”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.utils.fuse_missing_perc">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">fuse_missing_perc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">perc</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#fuse_missing_perc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.fuse_missing_perc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append (x.y%) to the name if <cite>perc</cite> is not 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.utils.is_notebook">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">is_notebook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#is_notebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.is_notebook" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>whether it is running in jupyter notebook</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.utils.relocate_legend">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">relocate_legend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">loc</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#relocate_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.relocate_legend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relocate legend(s) from center to <cite>loc</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.utils.sample_n">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">sample_n</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#sample_n"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.sample_n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample n values uniformly from the range of the <cite>arr</cite>,
+not from the distribution of <cite>arr</cite>’s elems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.eda.utils.to_dask">
+<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">to_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#to_dask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.to_dask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dataframe to a dask dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

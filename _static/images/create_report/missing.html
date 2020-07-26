@@ -1,0 +1,1104 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> DataPrep Report </title>
+  
+<style>
+    .panel-widget-box {
+        	min-height: 20px;
+        	background-color: #f5f5f5;
+        	border: 1px solid #e3e3e3 !important;
+        	border-radius: 4px;
+        	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+        	box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+        	overflow-x: hidden;
+        	overflow-y: hidden;
+        }
+
+        .scrollable {
+          overflow: scroll;
+        }
+
+        progress {
+        	appearance: none;
+        	-moz-appearance: none;
+        	-webkit-appearance: none;
+
+        	border: none;
+        	height: 20px;
+        	background-color: whiteSmoke;
+        	border-radius: 3px;
+        	box-shadow: 0 2px 3px rgba(0,0,0,.5) inset;
+        	color: royalblue;
+        	position: relative;
+        	margin: 0 0 1.5em;
+        }
+
+        progress[value]::-webkit-progress-bar {
+        	background-color: whiteSmoke;
+        	border-radius: 3px;
+        	box-shadow: 0 2px 3px rgba(0,0,0,.5) inset;
+        }
+
+        progress[value]::-webkit-progress-value {
+        	position: relative;
+
+        	background-size: 35px 20px, 100% 100%, 100% 100%;
+        	border-radius:3px;
+        }
+
+        progress.active:not([value])::before {
+        	background-position: 10%;
+        	animation-name: stripes;
+        	animation-duration: 3s;
+        	animation-timing-function: linear;
+        	animation-iteration-count: infinite;
+        }
+
+        progress[value]::-moz-progress-bar {
+        	background-size: 35px 20px, 100% 100%, 100% 100%;
+        	border-radius:3px;
+        }
+
+        progress:not([value])::-moz-progress-bar {
+        	border-radius:3px;
+        	background:
+        	linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, 0.2) 33%, rgba(0, 0, 0, 0.2) 66%, transparent 66%) left/2.5em 1.5em;
+
+        }
+
+        progress.active:not([value])::-moz-progress-bar {
+        	background-position: 10%;
+        	animation-name: stripes;
+        	animation-duration: 3s;
+        	animation-timing-function: linear;
+        	animation-iteration-count: infinite;
+        }
+
+        progress.active:not([value])::-webkit-progress-bar {
+        	background-position: 10%;
+        	animation-name: stripes;
+        	animation-duration: 3s;
+        	animation-timing-function: linear;
+        	animation-iteration-count: infinite;
+        }
+
+        progress.primary[value]::-webkit-progress-value { background-color: #007bff; }
+        progress.primary:not([value])::before { background-color: #007bff; }
+        progress.primary:not([value])::-webkit-progress-bar { background-color: #007bff; }
+        progress.primary::-moz-progress-bar { background-color: #007bff; }
+
+        progress.secondary[value]::-webkit-progress-value { background-color: #6c757d; }
+        progress.secondary:not([value])::before { background-color: #6c757d; }
+        progress.secondary:not([value])::-webkit-progress-bar { background-color: #6c757d; }
+        progress.secondary::-moz-progress-bar { background-color: #6c757d; }
+
+        progress.success[value]::-webkit-progress-value { background-color: #28a745; }
+        progress.success:not([value])::before { background-color: #28a745; }
+        progress.success:not([value])::-webkit-progress-bar { background-color: #28a745; }
+        progress.success::-moz-progress-bar { background-color: #28a745; }
+
+        progress.danger[value]::-webkit-progress-value { background-color: #dc3545; }
+        progress.danger:not([value])::before { background-color: #dc3545; }
+        progress.danger:not([value])::-webkit-progress-bar { background-color: #dc3545; }
+        progress.danger::-moz-progress-bar { background-color: #dc3545; }
+
+        progress.warning[value]::-webkit-progress-value { background-color: #ffc107; }
+        progress.warning:not([value])::before { background-color: #ffc107; }
+        progress.warning:not([value])::-webkit-progress-bar { background-color: #ffc107; }
+        progress.warning::-moz-progress-bar { background-color: #ffc107; }
+
+        progress.info[value]::-webkit-progress-value { background-color: #17a2b8; }
+        progress.info:not([value])::before { background-color: #17a2b8; }
+        progress.info:not([value])::-webkit-progress-bar { background-color: #17a2b8; }
+        progress.info::-moz-progress-bar { background-color: #17a2b8; }
+
+        progress.light[value]::-webkit-progress-value { background-color: #f8f9fa; }
+        progress.light:not([value])::before { background-color: #f8f9fa; }
+        progress.light:not([value])::-webkit-progress-bar { background-color: #f8f9fa; }
+        progress.light::-moz-progress-bar { background-color: #f8f9fa; }
+
+        progress.dark[value]::-webkit-progress-value { background-color: #343a40; }
+        progress.dark:not([value])::-webkit-progress-bar { background-color: #343a40; }
+        progress.dark:not([value])::before { background-color: #343a40; }
+        progress.dark::-moz-progress-bar { background-color: #343a40; }
+
+        progress:not([value])::-webkit-progress-bar {
+        	border-radius: 3px;
+        	background:
+        	linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, 0.2) 33%, rgba(0, 0, 0, 0.2) 66%, transparent 66%) left/2.5em 1.5em;
+        }
+        progress:not([value])::before {
+        	content:" ";
+        	position:absolute;
+        	height: 20px;
+        	top:0;
+        	left:0;
+        	right:0;
+        	bottom:0;
+        	border-radius: 3px;
+        	background:
+        	linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, 0.2) 33%, rgba(0, 0, 0, 0.2) 66%, transparent 66%) left/2.5em 1.5em;
+        }
+
+        @keyframes stripes {
+          from {background-position: 0%}
+          to {background-position: 100%}
+        }
+
+</style>
+<style>
+    .codehilite .hll { background-color: #ffffcc }
+        .codehilite  { background: #f8f8f8; }
+        .codehilite .c { color: #408080; font-style: italic } /* Comment */
+        .codehilite .err { border: 1px solid #FF0000 } /* Error */
+        .codehilite .k { color: #008000; font-weight: bold } /* Keyword */
+        .codehilite .o { color: #666666 } /* Operator */
+        .codehilite .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+        .codehilite .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+        .codehilite .cp { color: #BC7A00 } /* Comment.Preproc */
+        .codehilite .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+        .codehilite .c1 { color: #408080; font-style: italic } /* Comment.Single */
+        .codehilite .cs { color: #408080; font-style: italic } /* Comment.Special */
+        .codehilite .gd { color: #A00000 } /* Generic.Deleted */
+        .codehilite .ge { font-style: italic } /* Generic.Emph */
+        .codehilite .gr { color: #FF0000 } /* Generic.Error */
+        .codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+        .codehilite .gi { color: #00A000 } /* Generic.Inserted */
+        .codehilite .go { color: #888888 } /* Generic.Output */
+        .codehilite .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+        .codehilite .gs { font-weight: bold } /* Generic.Strong */
+        .codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+        .codehilite .gt { color: #0044DD } /* Generic.Traceback */
+        .codehilite .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+        .codehilite .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+        .codehilite .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+        .codehilite .kp { color: #008000 } /* Keyword.Pseudo */
+        .codehilite .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+        .codehilite .kt { color: #B00040 } /* Keyword.Type */
+        .codehilite .m { color: #666666 } /* Literal.Number */
+        .codehilite .s { color: #BA2121 } /* Literal.String */
+        .codehilite .na { color: #7D9029 } /* Name.Attribute */
+        .codehilite .nb { color: #008000 } /* Name.Builtin */
+        .codehilite .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+        .codehilite .no { color: #880000 } /* Name.Constant */
+        .codehilite .nd { color: #AA22FF } /* Name.Decorator */
+        .codehilite .ni { color: #999999; font-weight: bold } /* Name.Entity */
+        .codehilite .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+        .codehilite .nf { color: #0000FF } /* Name.Function */
+        .codehilite .nl { color: #A0A000 } /* Name.Label */
+        .codehilite .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+        .codehilite .nt { color: #008000; font-weight: bold } /* Name.Tag */
+        .codehilite .nv { color: #19177C } /* Name.Variable */
+        .codehilite .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+        .codehilite .w { color: #bbbbbb } /* Text.Whitespace */
+        .codehilite .mb { color: #666666 } /* Literal.Number.Bin */
+        .codehilite .mf { color: #666666 } /* Literal.Number.Float */
+        .codehilite .mh { color: #666666 } /* Literal.Number.Hex */
+        .codehilite .mi { color: #666666 } /* Literal.Number.Integer */
+        .codehilite .mo { color: #666666 } /* Literal.Number.Oct */
+        .codehilite .sa { color: #BA2121 } /* Literal.String.Affix */
+        .codehilite .sb { color: #BA2121 } /* Literal.String.Backtick */
+        .codehilite .sc { color: #BA2121 } /* Literal.String.Char */
+        .codehilite .dl { color: #BA2121 } /* Literal.String.Delimiter */
+        .codehilite .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+        .codehilite .s2 { color: #BA2121 } /* Literal.String.Double */
+        .codehilite .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+        .codehilite .sh { color: #BA2121 } /* Literal.String.Heredoc */
+        .codehilite .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+        .codehilite .sx { color: #008000 } /* Literal.String.Other */
+        .codehilite .sr { color: #BB6688 } /* Literal.String.Regex */
+        .codehilite .s1 { color: #BA2121 } /* Literal.String.Single */
+        .codehilite .ss { color: #19177C } /* Literal.String.Symbol */
+        .codehilite .bp { color: #008000 } /* Name.Builtin.Pseudo */
+        .codehilite .fm { color: #0000FF } /* Name.Function.Magic */
+        .codehilite .vc { color: #19177C } /* Name.Variable.Class */
+        .codehilite .vg { color: #19177C } /* Name.Variable.Global */
+        .codehilite .vi { color: #19177C } /* Name.Variable.Instance */
+        .codehilite .vm { color: #19177C } /* Name.Variable.Magic */
+        .codehilite .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+        .markdown h1 { margin-block-start: 0.34em }
+        .markdown h2 { margin-block-start: 0.42em }
+        .markdown h3 { margin-block-start: 0.5em }
+        .markdown h4 { margin-block-start: 0.67em }
+        .markdown h5 { margin-block-start: 0.84em }
+        .markdown h6 { margin-block-start: 1.17em }
+        .markdown ul { padding-inline-start: 2em }
+        .markdown ol { padding-inline-start: 2em }
+        .markdown strong { font-weight: 600 }
+        .markdown a { color: -webkit-link }
+        .markdown a { color: -moz-hyperlinkText }
+
+</style>
+<style>
+    .json-formatter-row {
+          font-family: monospace;
+        }
+        .json-formatter-row,
+        .json-formatter-row a,
+        .json-formatter-row a:hover {
+          color: black;
+          text-decoration: none;
+        }
+        .json-formatter-row .json-formatter-row {
+          margin-left: 1rem;
+        }
+        .json-formatter-row .json-formatter-children.json-formatter-empty {
+          opacity: 0.5;
+          margin-left: 1rem;
+        }
+        .json-formatter-row .json-formatter-children.json-formatter-empty:after {
+          display: none;
+        }
+        .json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {
+          content: "No properties";
+        }
+        .json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {
+          content: "[]";
+        }
+        .json-formatter-row .json-formatter-string,
+        .json-formatter-row .json-formatter-stringifiable {
+          color: green;
+          white-space: pre;
+          word-wrap: break-word;
+        }
+        .json-formatter-row .json-formatter-number {
+          color: blue;
+        }
+        .json-formatter-row .json-formatter-boolean {
+          color: red;
+        }
+        .json-formatter-row .json-formatter-null {
+          color: #855A00;
+        }
+        .json-formatter-row .json-formatter-undefined {
+          color: #ca0b69;
+        }
+        .json-formatter-row .json-formatter-function {
+          color: #FF20ED;
+        }
+        .json-formatter-row .json-formatter-date {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        .json-formatter-row .json-formatter-url {
+          text-decoration: underline;
+          color: blue;
+          cursor: pointer;
+        }
+        .json-formatter-row .json-formatter-bracket {
+          color: blue;
+        }
+        .json-formatter-row .json-formatter-key {
+          color: #00008B;
+          padding-right: 0.2rem;
+        }
+        .json-formatter-row .json-formatter-toggler-link {
+          cursor: pointer;
+        }
+        .json-formatter-row .json-formatter-toggler {
+          line-height: 1.2rem;
+          font-size: 0.7rem;
+          vertical-align: middle;
+          opacity: 0.6;
+          cursor: pointer;
+          padding-right: 0.2rem;
+        }
+        .json-formatter-row .json-formatter-toggler:after {
+          display: inline-block;
+          transition: transform 100ms ease-in;
+          content: "\25BA";
+        }
+        .json-formatter-row > a > .json-formatter-preview-text {
+          opacity: 0;
+          transition: opacity 0.15s ease-in;
+          font-style: italic;
+        }
+        .json-formatter-row:hover > a > .json-formatter-preview-text {
+          opacity: 0.6;
+        }
+        .json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {
+          transform: rotate(90deg);
+        }
+        .json-formatter-row.json-formatter-open > .json-formatter-children:after {
+          display: inline-block;
+        }
+        .json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {
+          display: none;
+        }
+        .json-formatter-row.json-formatter-open.json-formatter-empty:after {
+          display: block;
+        }
+        .json-formatter-dark.json-formatter-row {
+          font-family: monospace;
+        }
+        .json-formatter-dark.json-formatter-row,
+        .json-formatter-dark.json-formatter-row a,
+        .json-formatter-dark.json-formatter-row a:hover {
+          color: white;
+          text-decoration: none;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-row {
+          margin-left: 1rem;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty {
+          opacity: 0.5;
+          margin-left: 1rem;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty:after {
+          display: none;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {
+          content: "No properties";
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {
+          content: "[]";
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-string,
+        .json-formatter-dark.json-formatter-row .json-formatter-stringifiable {
+          color: #31F031;
+          white-space: pre;
+          word-wrap: break-word;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-number {
+          color: #66C2FF;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-boolean {
+          color: #EC4242;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-null {
+          color: #EEC97D;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-undefined {
+          color: #ef8fbe;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-function {
+          color: #FD48CB;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-date {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-url {
+          text-decoration: underline;
+          color: #027BFF;
+          cursor: pointer;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-bracket {
+          color: #9494FF;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-key {
+          color: #23A0DB;
+          padding-right: 0.2rem;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-toggler-link {
+          cursor: pointer;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-toggler {
+          line-height: 1.2rem;
+          font-size: 0.7rem;
+          vertical-align: middle;
+          opacity: 0.6;
+          cursor: pointer;
+          padding-right: 0.2rem;
+        }
+        .json-formatter-dark.json-formatter-row .json-formatter-toggler:after {
+          display: inline-block;
+          transition: transform 100ms ease-in;
+          content: "\25BA";
+        }
+        .json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {
+          opacity: 0;
+          transition: opacity 0.15s ease-in;
+          font-style: italic;
+        }
+        .json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {
+          opacity: 0.6;
+        }
+        .json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {
+          transform: rotate(90deg);
+        }
+        .json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {
+          display: inline-block;
+        }
+        .json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {
+          display: none;
+        }
+        .json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {
+          display: block;
+        }
+
+</style>
+<style>
+    table.panel-df {
+            margin-left: auto;
+            margin-right: auto;
+            border: none;
+            border-collapse: collapse;
+            border-spacing: 0;
+            color: black;
+            font-size: 12px;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .panel-df tr, .panel-df th, .panel-df td {
+            text-align: right;
+            vertical-align: middle;
+            padding: 0.5em 0.5em !important;
+            line-height: normal;
+            white-space: normal;
+            max-width: none;
+            border: none;
+        }
+
+        .panel-df tbody {
+            display: table-row-group;
+            vertical-align: middle;
+            border-color: inherit;
+        }
+
+        .panel-df tbody tr:nth-child(odd) {
+            background: #f5f5f5;
+        }
+
+        .panel-df thead {
+            border-bottom: 1px solid black;
+            vertical-align: bottom;
+        }
+
+        .panel-df tr:hover {
+            background: lightblue !important;
+            cursor: pointer;
+        }
+
+</style>
+
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.1.1.min.js" integrity="sha384-kLr4fYcqcSpbuI95brIH3vnnYCquzzSxHPU6XGQCIkQRGJwhg0StNbj1eegrHs12" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.1.1.min.js" integrity="sha384-xIGPmVtaOm+z0BqfSOMn4lOR6ciex448GIKG4eE61LsAvmGj48XcMQZtKcE/UXZe" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.1.1.min.js" integrity="sha384-Dc9u1wF/0zApGIWoBbH77iWEHtdmkuYWG839Uzmv8y8yBLXebjO9ZnERsde5Ln/P" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-2.1.1.min.js" integrity="sha384-cT9JaBz7GiRXdENrJLZNSC6eMNF3nh3fa5fTF51Svp+ukxPdwcU5kGXGPBgDCa2j" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+
+
+
+<script type="text/javascript">
+    (function() {
+          var fn = function() {
+            Bokeh.safely(function() {
+              (function(root) {
+                function embed_document(root) {
+                  
+                var docs_json = '{&quot;dc600111-99b9-40fa-95e2-0596b7300a43&quot;:{&quot;roots&quot;:{&quot;references&quot;:[{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1341&quot;,&quot;type&quot;:&quot;CategoricalTicker&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1437&quot;,&quot;type&quot;:&quot;CategoricalTickFormatter&quot;},{&quot;attributes&quot;:{&quot;bottom&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1287&quot;}},&quot;fill_color&quot;:{&quot;value&quot;:&quot;#1f77b4&quot;},&quot;line_color&quot;:{&quot;value&quot;:&quot;#1f77b4&quot;},&quot;top&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1288&quot;}},&quot;width&quot;:{&quot;value&quot;:0.9},&quot;x&quot;:{&quot;field&quot;:&quot;cols&quot;}},&quot;id&quot;:&quot;1293&quot;,&quot;type&quot;:&quot;VBar&quot;},{&quot;attributes&quot;:{&quot;color_mapper&quot;:{&quot;id&quot;:&quot;1357&quot;},&quot;formatter&quot;:{&quot;id&quot;:&quot;1359&quot;},&quot;label_standoff&quot;:6,&quot;location&quot;:[0,0],&quot;major_label_text_font_size&quot;:&quot;8pt&quot;,&quot;ticker&quot;:{&quot;id&quot;:&quot;1358&quot;}},&quot;id&quot;:&quot;1360&quot;,&quot;type&quot;:&quot;ColorBar&quot;},{&quot;attributes&quot;:{&quot;data&quot;:{&quot;Missing&quot;:{&quot;__ndarray__&quot;:&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADULu893bck/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7XI38Y6zoPxiqEHJpY2I/&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[12]},&quot;Not Missing&quot;:{&quot;__ndarray__&quot;:&quot;AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA/AAAAAAAA8D8AAAAAAADwPzM9EQyipOk/AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA/AAAAAAAA8D8Uj8oNcE7NP1bvjZac7e8/&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[12]},&quot;cols&quot;:[&quot;PassengerId&quot;,&quot;Survived&quot;,&quot;Pclass&quot;,&quot;Name&quot;,&quot;Sex&quot;,&quot;Age&quot;,&quot;SibSp&quot;,&quot;Parch&quot;,&quot;Ticket&quot;,&quot;Fare&quot;,&quot;Cabin&quot;,&quot;Embarked&quot;]},&quot;selected&quot;:{&quot;id&quot;:&quot;1322&quot;},&quot;selection_policy&quot;:{&quot;id&quot;:&quot;1321&quot;}},&quot;id&quot;:&quot;1307&quot;,&quot;type&quot;:&quot;ColumnDataSource&quot;},{&quot;attributes&quot;:{&quot;fill_color&quot;:{&quot;field&quot;:&quot;correlation&quot;,&quot;transform&quot;:{&quot;id&quot;:&quot;1357&quot;}},&quot;height&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:1},&quot;line_color&quot;:{&quot;value&quot;:null},&quot;width&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:1},&quot;x&quot;:{&quot;field&quot;:&quot;x&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;y&quot;}},&quot;id&quot;:&quot;1383&quot;,&quot;type&quot;:&quot;Rect&quot;},{&quot;attributes&quot;:{&quot;source&quot;:{&quot;id&quot;:&quot;1350&quot;}},&quot;id&quot;:&quot;1355&quot;,&quot;type&quot;:&quot;CDSView&quot;},{&quot;attributes&quot;:{&quot;fields&quot;:[&quot;Not Missing&quot;]},&quot;id&quot;:&quot;1289&quot;,&quot;type&quot;:&quot;Stack&quot;},{&quot;attributes&quot;:{&quot;axis&quot;:{&quot;id&quot;:&quot;1375&quot;},&quot;dimension&quot;:1,&quot;grid_line_color&quot;:null,&quot;ticker&quot;:null},&quot;id&quot;:&quot;1377&quot;,&quot;type&quot;:&quot;Grid&quot;},{&quot;attributes&quot;:{&quot;bottom&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1289&quot;}},&quot;fill_alpha&quot;:{&quot;value&quot;:0.1},&quot;fill_color&quot;:{&quot;value&quot;:&quot;#ff7f0e&quot;},&quot;line_alpha&quot;:{&quot;value&quot;:0.1},&quot;line_color&quot;:{&quot;value&quot;:&quot;#ff7f0e&quot;},&quot;top&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1290&quot;}},&quot;width&quot;:{&quot;value&quot;:0.9},&quot;x&quot;:{&quot;field&quot;:&quot;cols&quot;}},&quot;id&quot;:&quot;1310&quot;,&quot;type&quot;:&quot;VBar&quot;},{&quot;attributes&quot;:{&quot;fill_alpha&quot;:{&quot;value&quot;:0.1},&quot;fill_color&quot;:{&quot;field&quot;:&quot;correlation&quot;,&quot;transform&quot;:{&quot;id&quot;:&quot;1357&quot;}},&quot;height&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:1},&quot;line_alpha&quot;:{&quot;value&quot;:0.1},&quot;line_color&quot;:{&quot;value&quot;:null},&quot;width&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:1},&quot;x&quot;:{&quot;field&quot;:&quot;x&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;y&quot;}},&quot;id&quot;:&quot;1384&quot;,&quot;type&quot;:&quot;Rect&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1275&quot;,&quot;type&quot;:&quot;LinearScale&quot;},{&quot;attributes&quot;:{&quot;factors&quot;:[&quot;Embarked&quot;,&quot;Cabin&quot;,&quot;Age&quot;]},&quot;id&quot;:&quot;1364&quot;,&quot;type&quot;:&quot;FactorRange&quot;},{&quot;attributes&quot;:{&quot;items&quot;:[{&quot;id&quot;:&quot;1306&quot;},{&quot;id&quot;:&quot;1323&quot;}]},&quot;id&quot;:&quot;1305&quot;,&quot;type&quot;:&quot;Legend&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1376&quot;,&quot;type&quot;:&quot;CategoricalTicker&quot;},{&quot;attributes&quot;:{&quot;data&quot;:{&quot;Missing&quot;:{&quot;__ndarray__&quot;:&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADULu893bck/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7XI38Y6zoPxiqEHJpY2I/&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[12]},&quot;Not Missing&quot;:{&quot;__ndarray__&quot;:&quot;AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA/AAAAAAAA8D8AAAAAAADwPzM9EQyipOk/AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA/AAAAAAAA8D8Uj8oNcE7NP1bvjZac7e8/&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[12]},&quot;cols&quot;:[&quot;PassengerId&quot;,&quot;Survived&quot;,&quot;Pclass&quot;,&quot;Name&quot;,&quot;Sex&quot;,&quot;Age&quot;,&quot;SibSp&quot;,&quot;Parch&quot;,&quot;Ticket&quot;,&quot;Fare&quot;,&quot;Cabin&quot;,&quot;Embarked&quot;]},&quot;selected&quot;:{&quot;id&quot;:&quot;1304&quot;},&quot;selection_policy&quot;:{&quot;id&quot;:&quot;1303&quot;}},&quot;id&quot;:&quot;1291&quot;,&quot;type&quot;:&quot;ColumnDataSource&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1322&quot;,&quot;type&quot;:&quot;Selection&quot;},{&quot;attributes&quot;:{&quot;callback&quot;:null,&quot;tooltips&quot;:&quot;@cols: @$name{1%} $name&quot;},&quot;id&quot;:&quot;1284&quot;,&quot;type&quot;:&quot;HoverTool&quot;},{&quot;attributes&quot;:{&quot;axis&quot;:{&quot;id&quot;:&quot;1277&quot;},&quot;ticker&quot;:null},&quot;id&quot;:&quot;1279&quot;,&quot;type&quot;:&quot;Grid&quot;},{&quot;attributes&quot;:{&quot;label&quot;:{&quot;value&quot;:&quot;Missing&quot;},&quot;renderers&quot;:[{&quot;id&quot;:&quot;1311&quot;}]},&quot;id&quot;:&quot;1323&quot;,&quot;type&quot;:&quot;LegendItem&quot;},{&quot;attributes&quot;:{&quot;callback&quot;:null,&quot;tooltips&quot;:[[&quot;x&quot;,&quot;@x&quot;],[&quot;y&quot;,&quot;@y&quot;],[&quot;correlation&quot;,&quot;@correlation{1.11}&quot;]]},&quot;id&quot;:&quot;1378&quot;,&quot;type&quot;:&quot;HoverTool&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1273&quot;,&quot;type&quot;:&quot;CategoricalScale&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1368&quot;,&quot;type&quot;:&quot;CategoricalScale&quot;},{&quot;attributes&quot;:{&quot;formatter&quot;:{&quot;id&quot;:&quot;1299&quot;},&quot;major_label_orientation&quot;:1.0471975511965976,&quot;major_label_standoff&quot;:0,&quot;major_label_text_font_size&quot;:&quot;9pt&quot;,&quot;major_tick_line_color&quot;:null,&quot;ticker&quot;:{&quot;id&quot;:&quot;1278&quot;}},&quot;id&quot;:&quot;1277&quot;,&quot;type&quot;:&quot;CategoricalAxis&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1304&quot;,&quot;type&quot;:&quot;Selection&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1278&quot;,&quot;type&quot;:&quot;CategoricalTicker&quot;},{&quot;attributes&quot;:{&quot;fields&quot;:[&quot;Not Missing&quot;,&quot;Missing&quot;]},&quot;id&quot;:&quot;1290&quot;,&quot;type&quot;:&quot;Stack&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1344&quot;,&quot;type&quot;:&quot;BasicTicker&quot;},{&quot;attributes&quot;:{&quot;source&quot;:{&quot;id&quot;:&quot;1291&quot;}},&quot;id&quot;:&quot;1296&quot;,&quot;type&quot;:&quot;CDSView&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1326&quot;,&quot;type&quot;:&quot;BasicTicker&quot;},{&quot;attributes&quot;:{&quot;axis_line_color&quot;:null,&quot;formatter&quot;:{&quot;id&quot;:&quot;1437&quot;},&quot;major_label_orientation&quot;:1.0471975511965976,&quot;major_label_standoff&quot;:0,&quot;major_label_text_font_size&quot;:&quot;9pt&quot;,&quot;major_tick_line_color&quot;:null,&quot;ticker&quot;:{&quot;id&quot;:&quot;1373&quot;}},&quot;id&quot;:&quot;1372&quot;,&quot;type&quot;:&quot;CategoricalAxis&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1439&quot;,&quot;type&quot;:&quot;CategoricalTickFormatter&quot;},{&quot;attributes&quot;:{&quot;active_drag&quot;:&quot;auto&quot;,&quot;active_inspect&quot;:&quot;auto&quot;,&quot;active_multi&quot;:null,&quot;active_scroll&quot;:&quot;auto&quot;,&quot;active_tap&quot;:&quot;auto&quot;,&quot;tools&quot;:[{&quot;id&quot;:&quot;1378&quot;}]},&quot;id&quot;:&quot;1379&quot;,&quot;type&quot;:&quot;Toolbar&quot;},{&quot;attributes&quot;:{&quot;label&quot;:{&quot;value&quot;:&quot;Not Missing&quot;},&quot;renderers&quot;:[{&quot;id&quot;:&quot;1295&quot;}]},&quot;id&quot;:&quot;1306&quot;,&quot;type&quot;:&quot;LegendItem&quot;},{&quot;attributes&quot;:{&quot;fill_color&quot;:{&quot;field&quot;:&quot;missing_rate&quot;,&quot;transform&quot;:{&quot;id&quot;:&quot;1325&quot;}},&quot;height&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:29.0},&quot;line_color&quot;:{&quot;value&quot;:null},&quot;line_width&quot;:{&quot;value&quot;:0},&quot;width&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:0.95},&quot;x&quot;:{&quot;field&quot;:&quot;column_with_perc&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;location&quot;}},&quot;id&quot;:&quot;1352&quot;,&quot;type&quot;:&quot;Rect&quot;},{&quot;attributes&quot;:{&quot;format&quot;:&quot;0 %&quot;},&quot;id&quot;:&quot;1327&quot;,&quot;type&quot;:&quot;NumeralTickFormatter&quot;},{&quot;attributes&quot;:{&quot;format&quot;:&quot;%.2f&quot;},&quot;id&quot;:&quot;1359&quot;,&quot;type&quot;:&quot;PrintfTickFormatter&quot;},{&quot;attributes&quot;:{&quot;high&quot;:1,&quot;low&quot;:-1,&quot;palette&quot;:[&quot;#053061&quot;,&quot;#063263&quot;,&quot;#073466&quot;,&quot;#083669&quot;,&quot;#09386c&quot;,&quot;#0a3a6f&quot;,&quot;#0b3c72&quot;,&quot;#0c3e75&quot;,&quot;#0d4078&quot;,&quot;#0e437b&quot;,&quot;#0f457e&quot;,&quot;#114781&quot;,&quot;#124984&quot;,&quot;#134b87&quot;,&quot;#144d8a&quot;,&quot;#154f8d&quot;,&quot;#165190&quot;,&quot;#175493&quot;,&quot;#185695&quot;,&quot;#195898&quot;,&quot;#1a5a9b&quot;,&quot;#1c5c9e&quot;,&quot;#1d5ea1&quot;,&quot;#1e60a4&quot;,&quot;#1f62a7&quot;,&quot;#2064aa&quot;,&quot;#2166ac&quot;,&quot;#2368ad&quot;,&quot;#246aae&quot;,&quot;#256caf&quot;,&quot;#276db0&quot;,&quot;#286fb0&quot;,&quot;#2971b1&quot;,&quot;#2b73b2&quot;,&quot;#2c75b3&quot;,&quot;#2d76b4&quot;,&quot;#2f78b5&quot;,&quot;#307ab6&quot;,&quot;#317cb7&quot;,&quot;#337db8&quot;,&quot;#347fb9&quot;,&quot;#3581b9&quot;,&quot;#3783ba&quot;,&quot;#3884bb&quot;,&quot;#3986bc&quot;,&quot;#3b88bd&quot;,&quot;#3c8abe&quot;,&quot;#3d8bbf&quot;,&quot;#3f8dc0&quot;,&quot;#408fc1&quot;,&quot;#4191c2&quot;,&quot;#4393c3&quot;,&quot;#4694c4&quot;,&quot;#4996c5&quot;,&quot;#4c98c6&quot;,&quot;#4f9ac7&quot;,&quot;#529cc8&quot;,&quot;#559ec9&quot;,&quot;#58a0ca&quot;,&quot;#5ba2cb&quot;,&quot;#5ea4cc&quot;,&quot;#61a6cd&quot;,&quot;#65a8ce&quot;,&quot;#68aacf&quot;,&quot;#6bacd0&quot;,&quot;#6eaed1&quot;,&quot;#71b0d2&quot;,&quot;#74b2d3&quot;,&quot;#77b4d5&quot;,&quot;#7ab6d6&quot;,&quot;#7db8d7&quot;,&quot;#80bad8&quot;,&quot;#84bcd9&quot;,&quot;#87beda&quot;,&quot;#8ac0db&quot;,&quot;#8dc2dc&quot;,&quot;#90c4dd&quot;,&quot;#93c5de&quot;,&quot;#95c6df&quot;,&quot;#98c8df&quot;,&quot;#9ac9e0&quot;,&quot;#9dcae1&quot;,&quot;#9fcbe1&quot;,&quot;#a2cde2&quot;,&quot;#a4cee3&quot;,&quot;#a7cfe4&quot;,&quot;#a9d0e4&quot;,&quot;#abd2e5&quot;,&quot;#aed3e6&quot;,&quot;#b0d4e6&quot;,&quot;#b3d5e7&quot;,&quot;#b5d7e8&quot;,&quot;#b8d8e8&quot;,&quot;#bad9e9&quot;,&quot;#bddaea&quot;,&quot;#bfdceb&quot;,&quot;#c2ddeb&quot;,&quot;#c4deec&quot;,&quot;#c7dfed&quot;,&quot;#c9e1ed&quot;,&quot;#cce2ee&quot;,&quot;#cee3ef&quot;,&quot;#d1e5f0&quot;,&quot;#d2e5f0&quot;,&quot;#d3e6f0&quot;,&quot;#d5e7f0&quot;,&quot;#d6e7f1&quot;,&quot;#d8e8f1&quot;,&quot;#d9e9f1&quot;,&quot;#dbe9f1&quot;,&quot;#dceaf2&quot;,&quot;#deebf2&quot;,&quot;#dfecf2&quot;,&quot;#e1ecf3&quot;,&quot;#e2edf3&quot;,&quot;#e4eef3&quot;,&quot;#e5eef3&quot;,&quot;#e7eff4&quot;,&quot;#e8f0f4&quot;,&quot;#eaf1f4&quot;,&quot;#ebf1f4&quot;,&quot;#edf2f5&quot;,&quot;#eef3f5&quot;,&quot;#f0f3f5&quot;,&quot;#f1f4f6&quot;,&quot;#f3f5f6&quot;,&quot;#f4f5f6&quot;,&quot;#f6f6f6&quot;,&quot;#f7f6f6&quot;,&quot;#f7f5f4&quot;,&quot;#f7f4f2&quot;,&quot;#f7f3f0&quot;,&quot;#f8f2ee&quot;,&quot;#f8f0ec&quot;,&quot;#f8efea&quot;,&quot;#f8eee8&quot;,&quot;#f9ede7&quot;,&quot;#f9ece5&quot;,&quot;#f9ebe3&quot;,&quot;#f9eae1&quot;,&quot;#f9e9df&quot;,&quot;#fae8dd&quot;,&quot;#fae7db&quot;,&quot;#fae5d9&quot;,&quot;#fae4d7&quot;,&quot;#fbe3d6&quot;,&quot;#fbe2d4&quot;,&quot;#fbe1d2&quot;,&quot;#fbe0d0&quot;,&quot;#fcdfce&quot;,&quot;#fcdecc&quot;,&quot;#fcddca&quot;,&quot;#fcdcc8&quot;,&quot;#fddbc7&quot;,&quot;#fcd8c4&quot;,&quot;#fcd6c1&quot;,&quot;#fbd4be&quot;,&quot;#fbd2bc&quot;,&quot;#fbd0b9&quot;,&quot;#faceb6&quot;,&quot;#faccb4&quot;,&quot;#facab1&quot;,&quot;#f9c7ae&quot;,&quot;#f9c5ab&quot;,&quot;#f9c3a9&quot;,&quot;#f8c1a6&quot;,&quot;#f8bfa3&quot;,&quot;#f8bda1&quot;,&quot;#f7bb9e&quot;,&quot;#f7b99b&quot;,&quot;#f7b698&quot;,&quot;#f6b496&quot;,&quot;#f6b293&quot;,&quot;#f5b090&quot;,&quot;#f5ae8e&quot;,&quot;#f5ac8b&quot;,&quot;#f4aa88&quot;,&quot;#f4a886&quot;,&quot;#f4a683&quot;,&quot;#f3a380&quot;,&quot;#f2a07e&quot;,&quot;#f19e7c&quot;,&quot;#ef9b7a&quot;,&quot;#ee9878&quot;,&quot;#ed9676&quot;,&quot;#ec9374&quot;,&quot;#eb9072&quot;,&quot;#ea8d70&quot;,&quot;#e88b6e&quot;,&quot;#e7886c&quot;,&quot;#e6856a&quot;,&quot;#e58368&quot;,&quot;#e48065&quot;,&quot;#e27d63&quot;,&quot;#e17b61&quot;,&quot;#e0785f&quot;,&quot;#df755d&quot;,&quot;#de725b&quot;,&quot;#dd7059&quot;,&quot;#db6d57&quot;,&quot;#da6a55&quot;,&quot;#d96853&quot;,&quot;#d86551&quot;,&quot;#d7624f&quot;,&quot;#d6604d&quot;,&quot;#d45d4b&quot;,&quot;#d35a4a&quot;,&quot;#d15749&quot;,&quot;#d05447&quot;,&quot;#ce5146&quot;,&quot;#cd4f44&quot;,&quot;#cc4c43&quot;,&quot;#ca4942&quot;,&quot;#c94641&quot;,&quot;#c7433f&quot;,&quot;#c6403e&quot;,&quot;#c53e3c&quot;,&quot;#c33b3b&quot;,&quot;#c2383a&quot;,&quot;#c03538&quot;,&quot;#bf3237&quot;,&quot;#be3036&quot;,&quot;#bc2d34&quot;,&quot;#bb2a33&quot;,&quot;#b92732&quot;,&quot;#b82431&quot;,&quot;#b6212f&quot;,&quot;#b51f2e&quot;,&quot;#b41c2d&quot;,&quot;#b2192b&quot;,&quot;#b0172a&quot;,&quot;#ad162a&quot;,&quot;#aa1529&quot;,&quot;#a71429&quot;,&quot;#a41328&quot;,&quot;#a11228&quot;,&quot;#9e1127&quot;,&quot;#9b1027&quot;,&quot;#991027&quot;,&quot;#960f26&quot;,&quot;#930e26&quot;,&quot;#900d25&quot;,&quot;#8d0c25&quot;,&quot;#8a0b24&quot;,&quot;#870a24&quot;,&quot;#840923&quot;,&quot;#810823&quot;,&quot;#7e0722&quot;,&quot;#7b0622&quot;,&quot;#780521&quot;,&quot;#750421&quot;,&quot;#720320&quot;,&quot;#6f0220&quot;,&quot;#6c011f&quot;,&quot;#69001f&quot;,&quot;#67001f&quot;]},&quot;id&quot;:&quot;1357&quot;,&quot;type&quot;:&quot;LinearColorMapper&quot;},{&quot;attributes&quot;:{&quot;background_fill_color&quot;:&quot;#fafafa&quot;,&quot;below&quot;:[{&quot;id&quot;:&quot;1372&quot;}],&quot;center&quot;:[{&quot;id&quot;:&quot;1374&quot;},{&quot;id&quot;:&quot;1377&quot;}],&quot;left&quot;:[{&quot;id&quot;:&quot;1375&quot;}],&quot;plot_height&quot;:500,&quot;plot_width&quot;:500,&quot;renderers&quot;:[{&quot;id&quot;:&quot;1385&quot;}],&quot;right&quot;:[{&quot;id&quot;:&quot;1360&quot;}],&quot;sizing_mode&quot;:&quot;stretch_width&quot;,&quot;title&quot;:{&quot;id&quot;:&quot;1393&quot;},&quot;toolbar&quot;:{&quot;id&quot;:&quot;1379&quot;},&quot;toolbar_location&quot;:null,&quot;x_range&quot;:{&quot;id&quot;:&quot;1363&quot;},&quot;x_scale&quot;:{&quot;id&quot;:&quot;1368&quot;},&quot;y_range&quot;:{&quot;id&quot;:&quot;1364&quot;},&quot;y_scale&quot;:{&quot;id&quot;:&quot;1370&quot;}},&quot;id&quot;:&quot;1365&quot;,&quot;subtype&quot;:&quot;Figure&quot;,&quot;type&quot;:&quot;Plot&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1336&quot;,&quot;type&quot;:&quot;CategoricalScale&quot;},{&quot;attributes&quot;:{&quot;data&quot;:{&quot;correlation&quot;:{&quot;__ndarray__&quot;:&quot;B5KkrDlywj/bEB3MuS6Yv8pYPIddSLa/&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[3]},&quot;index&quot;:[1,2,5],&quot;x&quot;:[&quot;Age&quot;,&quot;Age&quot;,&quot;Cabin&quot;],&quot;y&quot;:[&quot;Cabin&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;]},&quot;selected&quot;:{&quot;id&quot;:&quot;1442&quot;},&quot;selection_policy&quot;:{&quot;id&quot;:&quot;1441&quot;}},&quot;id&quot;:&quot;1381&quot;,&quot;type&quot;:&quot;ColumnDataSource&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1373&quot;,&quot;type&quot;:&quot;CategoricalTicker&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1338&quot;,&quot;type&quot;:&quot;LinearScale&quot;},{&quot;attributes&quot;:{&quot;end&quot;:0.0,&quot;start&quot;:899.0},&quot;id&quot;:&quot;1332&quot;,&quot;type&quot;:&quot;Range1d&quot;},{&quot;attributes&quot;:{&quot;below&quot;:[{&quot;id&quot;:&quot;1340&quot;}],&quot;center&quot;:[{&quot;id&quot;:&quot;1342&quot;},{&quot;id&quot;:&quot;1346&quot;}],&quot;left&quot;:[{&quot;id&quot;:&quot;1343&quot;}],&quot;plot_height&quot;:500,&quot;plot_width&quot;:500,&quot;renderers&quot;:[{&quot;id&quot;:&quot;1354&quot;}],&quot;right&quot;:[{&quot;id&quot;:&quot;1328&quot;}],&quot;sizing_mode&quot;:&quot;stretch_width&quot;,&quot;title&quot;:{&quot;id&quot;:&quot;1391&quot;},&quot;toolbar&quot;:{&quot;id&quot;:&quot;1348&quot;},&quot;toolbar_location&quot;:null,&quot;x_range&quot;:{&quot;id&quot;:&quot;1331&quot;},&quot;x_scale&quot;:{&quot;id&quot;:&quot;1336&quot;},&quot;y_range&quot;:{&quot;id&quot;:&quot;1332&quot;},&quot;y_scale&quot;:{&quot;id&quot;:&quot;1338&quot;}},&quot;id&quot;:&quot;1333&quot;,&quot;subtype&quot;:&quot;Figure&quot;,&quot;type&quot;:&quot;Plot&quot;},{&quot;attributes&quot;:{&quot;formatter&quot;:{&quot;id&quot;:&quot;1416&quot;},&quot;major_label_standoff&quot;:0,&quot;major_label_text_font_size&quot;:&quot;9pt&quot;,&quot;major_tick_line_color&quot;:null,&quot;ticker&quot;:{&quot;id&quot;:&quot;1344&quot;}},&quot;id&quot;:&quot;1343&quot;,&quot;type&quot;:&quot;LinearAxis&quot;},{&quot;attributes&quot;:{&quot;align&quot;:&quot;center&quot;,&quot;text&quot;:&quot;Spectrum&quot;,&quot;text_font_size&quot;:{&quot;value&quot;:&quot;20px&quot;}},&quot;id&quot;:&quot;1391&quot;,&quot;type&quot;:&quot;Title&quot;},{&quot;attributes&quot;:{&quot;fill_alpha&quot;:{&quot;value&quot;:0.1},&quot;fill_color&quot;:{&quot;field&quot;:&quot;missing_rate&quot;,&quot;transform&quot;:{&quot;id&quot;:&quot;1325&quot;}},&quot;height&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:29.0},&quot;line_alpha&quot;:{&quot;value&quot;:0.1},&quot;line_color&quot;:{&quot;value&quot;:null},&quot;line_width&quot;:{&quot;value&quot;:0},&quot;width&quot;:{&quot;units&quot;:&quot;data&quot;,&quot;value&quot;:0.95},&quot;x&quot;:{&quot;field&quot;:&quot;column_with_perc&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;location&quot;}},&quot;id&quot;:&quot;1353&quot;,&quot;type&quot;:&quot;Rect&quot;},{&quot;attributes&quot;:{&quot;axis&quot;:{&quot;id&quot;:&quot;1343&quot;},&quot;dimension&quot;:1,&quot;grid_line_color&quot;:null,&quot;ticker&quot;:null},&quot;id&quot;:&quot;1346&quot;,&quot;type&quot;:&quot;Grid&quot;},{&quot;attributes&quot;:{&quot;high&quot;:1,&quot;low&quot;:0,&quot;palette&quot;:[&quot;#ffffff&quot;,&quot;#fefefe&quot;,&quot;#fdfdfd&quot;,&quot;#fcfcfc&quot;,&quot;#fbfbfb&quot;,&quot;#fafafa&quot;,&quot;#f9f9f9&quot;,&quot;#f8f8f8&quot;,&quot;#f7f7f7&quot;,&quot;#f6f6f6&quot;,&quot;#f5f5f5&quot;,&quot;#f4f4f4&quot;,&quot;#f3f3f3&quot;,&quot;#f2f2f2&quot;,&quot;#f1f1f1&quot;,&quot;#f0f0f0&quot;,&quot;#efefef&quot;,&quot;#eeeeee&quot;,&quot;#ededed&quot;,&quot;#ececec&quot;,&quot;#ebebeb&quot;,&quot;#eaeaea&quot;,&quot;#e9e9e9&quot;,&quot;#e8e8e8&quot;,&quot;#e7e7e7&quot;,&quot;#e6e6e6&quot;,&quot;#e5e5e5&quot;,&quot;#e4e4e4&quot;,&quot;#e3e3e3&quot;,&quot;#e2e2e2&quot;,&quot;#e1e1e1&quot;,&quot;#e0e0e0&quot;,&quot;#dfdfdf&quot;,&quot;#dedede&quot;,&quot;#dddddd&quot;,&quot;#dcdcdc&quot;,&quot;#dbdbdb&quot;,&quot;#dadada&quot;,&quot;#d9d9d9&quot;,&quot;#d8d8d8&quot;,&quot;#d7d7d7&quot;,&quot;#d6d6d6&quot;,&quot;#d5d5d5&quot;,&quot;#d4d4d4&quot;,&quot;#d3d3d3&quot;,&quot;#d2d2d2&quot;,&quot;#d1d1d1&quot;,&quot;#d0d0d0&quot;,&quot;#cfcfcf&quot;,&quot;#cecece&quot;,&quot;#cdcdcd&quot;,&quot;#cccccc&quot;,&quot;#cbcbcb&quot;,&quot;#cacaca&quot;,&quot;#c9c9c9&quot;,&quot;#c8c8c8&quot;,&quot;#c7c7c7&quot;,&quot;#c6c6c6&quot;,&quot;#c5c5c5&quot;,&quot;#c4c4c4&quot;,&quot;#c3c3c3&quot;,&quot;#c2c2c2&quot;,&quot;#c1c1c1&quot;,&quot;#c0c0c0&quot;,&quot;#bfbfbf&quot;,&quot;#bebebe&quot;,&quot;#bdbdbd&quot;,&quot;#bcbcbc&quot;,&quot;#bbbbbb&quot;,&quot;#bababa&quot;,&quot;#b9b9b9&quot;,&quot;#b8b8b8&quot;,&quot;#b7b7b7&quot;,&quot;#b6b6b6&quot;,&quot;#b5b5b5&quot;,&quot;#b4b4b4&quot;,&quot;#b3b3b3&quot;,&quot;#b2b2b2&quot;,&quot;#b1b1b1&quot;,&quot;#b0b0b0&quot;,&quot;#afafaf&quot;,&quot;#aeaeae&quot;,&quot;#adadad&quot;,&quot;#acacac&quot;,&quot;#ababab&quot;,&quot;#aaaaaa&quot;,&quot;#a9a9a9&quot;,&quot;#a8a8a8&quot;,&quot;#a7a7a7&quot;,&quot;#a6a6a6&quot;,&quot;#a5a5a5&quot;,&quot;#a4a4a4&quot;,&quot;#a3a3a3&quot;,&quot;#a2a2a2&quot;,&quot;#a1a1a1&quot;,&quot;#a0a0a0&quot;,&quot;#9f9f9f&quot;,&quot;#9e9e9e&quot;,&quot;#9d9d9d&quot;,&quot;#9c9c9c&quot;,&quot;#9b9b9b&quot;,&quot;#9a9a9a&quot;,&quot;#999999&quot;,&quot;#989898&quot;,&quot;#979797&quot;,&quot;#969696&quot;,&quot;#959595&quot;,&quot;#949494&quot;,&quot;#939393&quot;,&quot;#929292&quot;,&quot;#919191&quot;,&quot;#909090&quot;,&quot;#8f8f8f&quot;,&quot;#8e8e8e&quot;,&quot;#8d8d8d&quot;,&quot;#8c8c8c&quot;,&quot;#8b8b8b&quot;,&quot;#8a8a8a&quot;,&quot;#898989&quot;,&quot;#888888&quot;,&quot;#878787&quot;,&quot;#868686&quot;,&quot;#858585&quot;,&quot;#848484&quot;,&quot;#838383&quot;,&quot;#828282&quot;,&quot;#818181&quot;,&quot;#808080&quot;,&quot;#7f7f7f&quot;,&quot;#7e7e7e&quot;,&quot;#7d7d7d&quot;,&quot;#7c7c7c&quot;,&quot;#7b7b7b&quot;,&quot;#7a7a7a&quot;,&quot;#797979&quot;,&quot;#787878&quot;,&quot;#777777&quot;,&quot;#767676&quot;,&quot;#757575&quot;,&quot;#747474&quot;,&quot;#737373&quot;,&quot;#727272&quot;,&quot;#717171&quot;,&quot;#707070&quot;,&quot;#6f6f6f&quot;,&quot;#6e6e6e&quot;,&quot;#6d6d6d&quot;,&quot;#6c6c6c&quot;,&quot;#6b6b6b&quot;,&quot;#6a6a6a&quot;,&quot;#696969&quot;,&quot;#686868&quot;,&quot;#676767&quot;,&quot;#666666&quot;,&quot;#656565&quot;,&quot;#646464&quot;,&quot;#636363&quot;,&quot;#626262&quot;,&quot;#616161&quot;,&quot;#606060&quot;,&quot;#5f5f5f&quot;,&quot;#5e5e5e&quot;,&quot;#5d5d5d&quot;,&quot;#5c5c5c&quot;,&quot;#5b5b5b&quot;,&quot;#5a5a5a&quot;,&quot;#595959&quot;,&quot;#585858&quot;,&quot;#575757&quot;,&quot;#565656&quot;,&quot;#555555&quot;,&quot;#545454&quot;,&quot;#535353&quot;,&quot;#525252&quot;,&quot;#515151&quot;,&quot;#505050&quot;,&quot;#4f4f4f&quot;,&quot;#4e4e4e&quot;,&quot;#4d4d4d&quot;,&quot;#4c4c4c&quot;,&quot;#4b4b4b&quot;,&quot;#4a4a4a&quot;,&quot;#494949&quot;,&quot;#484848&quot;,&quot;#474747&quot;,&quot;#464646&quot;,&quot;#454545&quot;,&quot;#444444&quot;,&quot;#434343&quot;,&quot;#424242&quot;,&quot;#414141&quot;,&quot;#404040&quot;,&quot;#3f3f3f&quot;,&quot;#3e3e3e&quot;,&quot;#3d3d3d&quot;,&quot;#3c3c3c&quot;,&quot;#3b3b3b&quot;,&quot;#3a3a3a&quot;,&quot;#393939&quot;,&quot;#383838&quot;,&quot;#373737&quot;,&quot;#363636&quot;,&quot;#353535&quot;,&quot;#343434&quot;,&quot;#333333&quot;,&quot;#323232&quot;,&quot;#313131&quot;,&quot;#303030&quot;,&quot;#2f2f2f&quot;,&quot;#2e2e2e&quot;,&quot;#2d2d2d&quot;,&quot;#2c2c2c&quot;,&quot;#2b2b2b&quot;,&quot;#2a2a2a&quot;,&quot;#292929&quot;,&quot;#282828&quot;,&quot;#272727&quot;,&quot;#262626&quot;,&quot;#252525&quot;,&quot;#242424&quot;,&quot;#232323&quot;,&quot;#222222&quot;,&quot;#212121&quot;,&quot;#202020&quot;,&quot;#1f1f1f&quot;,&quot;#1e1e1e&quot;,&quot;#1d1d1d&quot;,&quot;#1c1c1c&quot;,&quot;#1b1b1b&quot;,&quot;#1a1a1a&quot;,&quot;#191919&quot;,&quot;#181818&quot;,&quot;#171717&quot;,&quot;#161616&quot;,&quot;#151515&quot;,&quot;#141414&quot;,&quot;#131313&quot;,&quot;#121212&quot;,&quot;#111111&quot;,&quot;#101010&quot;,&quot;#0f0f0f&quot;,&quot;#0e0e0e&quot;,&quot;#0d0d0d&quot;,&quot;#0c0c0c&quot;,&quot;#0b0b0b&quot;,&quot;#0a0a0a&quot;,&quot;#090909&quot;,&quot;#080808&quot;,&quot;#070707&quot;,&quot;#060606&quot;,&quot;#050505&quot;,&quot;#040404&quot;,&quot;#030303&quot;,&quot;#020202&quot;,&quot;#010101&quot;,&quot;#000000&quot;]},&quot;id&quot;:&quot;1325&quot;,&quot;type&quot;:&quot;LinearColorMapper&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1271&quot;,&quot;type&quot;:&quot;Range1d&quot;},{&quot;attributes&quot;:{&quot;fields&quot;:[&quot;Not Missing&quot;]},&quot;id&quot;:&quot;1288&quot;,&quot;type&quot;:&quot;Stack&quot;},{&quot;attributes&quot;:{&quot;source&quot;:{&quot;id&quot;:&quot;1381&quot;}},&quot;id&quot;:&quot;1386&quot;,&quot;type&quot;:&quot;CDSView&quot;},{&quot;attributes&quot;:{&quot;align&quot;:&quot;center&quot;,&quot;text&quot;:&quot;Heatmap&quot;,&quot;text_font_size&quot;:{&quot;value&quot;:&quot;20px&quot;}},&quot;id&quot;:&quot;1393&quot;,&quot;type&quot;:&quot;Title&quot;},{&quot;attributes&quot;:{&quot;callback&quot;:null,&quot;tooltips&quot;:[[&quot;Column&quot;,&quot;@column&quot;],[&quot;Loc&quot;,&quot;@loc_start{1}~@loc_end{1}&quot;],[&quot;Missing%&quot;,&quot;@missing_rate{1%}&quot;]]},&quot;id&quot;:&quot;1347&quot;,&quot;type&quot;:&quot;HoverTool&quot;},{&quot;attributes&quot;:{&quot;axis_line_color&quot;:null,&quot;formatter&quot;:{&quot;id&quot;:&quot;1439&quot;},&quot;major_label_standoff&quot;:0,&quot;major_label_text_font_size&quot;:&quot;9pt&quot;,&quot;major_tick_line_color&quot;:null,&quot;ticker&quot;:{&quot;id&quot;:&quot;1376&quot;}},&quot;id&quot;:&quot;1375&quot;,&quot;type&quot;:&quot;CategoricalAxis&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1358&quot;,&quot;type&quot;:&quot;BasicTicker&quot;},{&quot;attributes&quot;:{&quot;factors&quot;:[&quot;PassengerId&quot;,&quot;Survived&quot;,&quot;Pclass&quot;,&quot;Name&quot;,&quot;Sex&quot;,&quot;Age&quot;,&quot;SibSp&quot;,&quot;Parch&quot;,&quot;Ticket&quot;,&quot;Fare&quot;,&quot;Cabin&quot;,&quot;Embarked&quot;]},&quot;id&quot;:&quot;1269&quot;,&quot;type&quot;:&quot;FactorRange&quot;},{&quot;attributes&quot;:{&quot;fields&quot;:[]},&quot;id&quot;:&quot;1287&quot;,&quot;type&quot;:&quot;Stack&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1321&quot;,&quot;type&quot;:&quot;UnionRenderers&quot;},{&quot;attributes&quot;:{&quot;below&quot;:[{&quot;id&quot;:&quot;1277&quot;}],&quot;center&quot;:[{&quot;id&quot;:&quot;1279&quot;},{&quot;id&quot;:&quot;1283&quot;}],&quot;left&quot;:[{&quot;id&quot;:&quot;1280&quot;}],&quot;plot_height&quot;:500,&quot;plot_width&quot;:500,&quot;renderers&quot;:[{&quot;id&quot;:&quot;1295&quot;},{&quot;id&quot;:&quot;1311&quot;}],&quot;right&quot;:[{&quot;id&quot;:&quot;1305&quot;}],&quot;sizing_mode&quot;:&quot;stretch_width&quot;,&quot;title&quot;:{&quot;id&quot;:&quot;1389&quot;},&quot;toolbar&quot;:{&quot;id&quot;:&quot;1285&quot;},&quot;toolbar_location&quot;:null,&quot;x_range&quot;:{&quot;id&quot;:&quot;1269&quot;},&quot;x_scale&quot;:{&quot;id&quot;:&quot;1273&quot;},&quot;y_range&quot;:{&quot;id&quot;:&quot;1271&quot;},&quot;y_scale&quot;:{&quot;id&quot;:&quot;1275&quot;}},&quot;id&quot;:&quot;1268&quot;,&quot;subtype&quot;:&quot;Figure&quot;,&quot;type&quot;:&quot;Plot&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1301&quot;,&quot;type&quot;:&quot;BasicTickFormatter&quot;},{&quot;attributes&quot;:{&quot;factors&quot;:[&quot;Age&quot;,&quot;Cabin&quot;,&quot;Embarked&quot;]},&quot;id&quot;:&quot;1363&quot;,&quot;type&quot;:&quot;FactorRange&quot;},{&quot;attributes&quot;:{&quot;active_drag&quot;:&quot;auto&quot;,&quot;active_inspect&quot;:&quot;auto&quot;,&quot;active_multi&quot;:null,&quot;active_scroll&quot;:&quot;auto&quot;,&quot;active_tap&quot;:&quot;auto&quot;,&quot;tools&quot;:[{&quot;id&quot;:&quot;1284&quot;}]},&quot;id&quot;:&quot;1285&quot;,&quot;type&quot;:&quot;Toolbar&quot;},{&quot;attributes&quot;:{&quot;color_mapper&quot;:{&quot;id&quot;:&quot;1325&quot;},&quot;formatter&quot;:{&quot;id&quot;:&quot;1327&quot;},&quot;label_standoff&quot;:10,&quot;location&quot;:[0,0],&quot;major_label_text_font_size&quot;:&quot;8pt&quot;,&quot;ticker&quot;:{&quot;id&quot;:&quot;1326&quot;}},&quot;id&quot;:&quot;1328&quot;,&quot;type&quot;:&quot;ColorBar&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1442&quot;,&quot;type&quot;:&quot;Selection&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1299&quot;,&quot;type&quot;:&quot;CategoricalTickFormatter&quot;},{&quot;attributes&quot;:{&quot;axis&quot;:{&quot;id&quot;:&quot;1340&quot;},&quot;grid_line_color&quot;:null,&quot;ticker&quot;:null},&quot;id&quot;:&quot;1342&quot;,&quot;type&quot;:&quot;Grid&quot;},{&quot;attributes&quot;:{&quot;data&quot;:{&quot;column&quot;:[&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;Age&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Cabin&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;,&quot;Embarked&quot;],&quot;column_with_perc&quot;:[&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;PassengerId&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Survived&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Pclass&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Name&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Sex&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;Age (19.9%)&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;SibSp&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Parch&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Ticket&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Fare&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Cabin (77.1%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;,&quot;Embarked (0.2%)&quot;],&quot;index&quot;:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371],&quot;loc_end&quot;:[29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,891],&quot;loc_start&quot;:[0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870,0,29,58,87,116,145,174,203,232,261,290,319,348,377,406,435,464,493,522,551,580,609,638,667,696,725,754,783,812,841,870],&quot;location&quot;:{&quot;__ndarray__&quot;:&quot;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&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[372]},&quot;missing_rate&quot;:{&quot;__ndarray__&quot;:&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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&quot;,&quot;dtype&quot;:&quot;float64&quot;,&quot;order&quot;:&quot;little&quot;,&quot;shape&quot;:[372]}},&quot;selected&quot;:{&quot;id&quot;:&quot;1419&quot;},&quot;selection_policy&quot;:{&quot;id&quot;:&quot;1418&quot;}},&quot;id&quot;:&quot;1350&quot;,&quot;type&quot;:&quot;ColumnDataSource&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1416&quot;,&quot;type&quot;:&quot;BasicTickFormatter&quot;},{&quot;attributes&quot;:{&quot;axis&quot;:{&quot;id&quot;:&quot;1372&quot;},&quot;grid_line_color&quot;:null,&quot;ticker&quot;:null},&quot;id&quot;:&quot;1374&quot;,&quot;type&quot;:&quot;Grid&quot;},{&quot;attributes&quot;:{&quot;data_source&quot;:{&quot;id&quot;:&quot;1307&quot;},&quot;glyph&quot;:{&quot;id&quot;:&quot;1309&quot;},&quot;hover_glyph&quot;:null,&quot;muted_glyph&quot;:null,&quot;name&quot;:&quot;Missing&quot;,&quot;nonselection_glyph&quot;:{&quot;id&quot;:&quot;1310&quot;},&quot;selection_glyph&quot;:null,&quot;view&quot;:{&quot;id&quot;:&quot;1312&quot;}},&quot;id&quot;:&quot;1311&quot;,&quot;type&quot;:&quot;GlyphRenderer&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1418&quot;,&quot;type&quot;:&quot;UnionRenderers&quot;},{&quot;attributes&quot;:{&quot;bottom&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1287&quot;}},&quot;fill_alpha&quot;:{&quot;value&quot;:0.1},&quot;fill_color&quot;:{&quot;value&quot;:&quot;#1f77b4&quot;},&quot;line_alpha&quot;:{&quot;value&quot;:0.1},&quot;line_color&quot;:{&quot;value&quot;:&quot;#1f77b4&quot;},&quot;top&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1288&quot;}},&quot;width&quot;:{&quot;value&quot;:0.9},&quot;x&quot;:{&quot;field&quot;:&quot;cols&quot;}},&quot;id&quot;:&quot;1294&quot;,&quot;type&quot;:&quot;VBar&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1281&quot;,&quot;type&quot;:&quot;BasicTicker&quot;},{&quot;attributes&quot;:{&quot;factors&quot;:[&quot;PassengerId&quot;,&quot;Survived&quot;,&quot;Pclass&quot;,&quot;Name&quot;,&quot;Sex&quot;,&quot;Age (19.9%)&quot;,&quot;SibSp&quot;,&quot;Parch&quot;,&quot;Ticket&quot;,&quot;Fare&quot;,&quot;Cabin (77.1%)&quot;,&quot;Embarked (0.2%)&quot;]},&quot;id&quot;:&quot;1331&quot;,&quot;type&quot;:&quot;FactorRange&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1441&quot;,&quot;type&quot;:&quot;UnionRenderers&quot;},{&quot;attributes&quot;:{&quot;axis&quot;:{&quot;id&quot;:&quot;1280&quot;},&quot;dimension&quot;:1,&quot;ticker&quot;:null},&quot;id&quot;:&quot;1283&quot;,&quot;type&quot;:&quot;Grid&quot;},{&quot;attributes&quot;:{&quot;active_drag&quot;:&quot;auto&quot;,&quot;active_inspect&quot;:&quot;auto&quot;,&quot;active_multi&quot;:null,&quot;active_scroll&quot;:&quot;auto&quot;,&quot;active_tap&quot;:&quot;auto&quot;,&quot;tools&quot;:[{&quot;id&quot;:&quot;1347&quot;}]},&quot;id&quot;:&quot;1348&quot;,&quot;type&quot;:&quot;Toolbar&quot;},{&quot;attributes&quot;:{&quot;axis_label&quot;:&quot;Total Count&quot;,&quot;formatter&quot;:{&quot;id&quot;:&quot;1301&quot;},&quot;major_label_standoff&quot;:0,&quot;major_label_text_font_size&quot;:&quot;9pt&quot;,&quot;major_tick_line_color&quot;:null,&quot;ticker&quot;:{&quot;id&quot;:&quot;1281&quot;}},&quot;id&quot;:&quot;1280&quot;,&quot;type&quot;:&quot;LinearAxis&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1303&quot;,&quot;type&quot;:&quot;UnionRenderers&quot;},{&quot;attributes&quot;:{&quot;data_source&quot;:{&quot;id&quot;:&quot;1350&quot;},&quot;glyph&quot;:{&quot;id&quot;:&quot;1352&quot;},&quot;hover_glyph&quot;:null,&quot;muted_glyph&quot;:null,&quot;nonselection_glyph&quot;:{&quot;id&quot;:&quot;1353&quot;},&quot;selection_glyph&quot;:null,&quot;view&quot;:{&quot;id&quot;:&quot;1355&quot;}},&quot;id&quot;:&quot;1354&quot;,&quot;type&quot;:&quot;GlyphRenderer&quot;},{&quot;attributes&quot;:{&quot;data_source&quot;:{&quot;id&quot;:&quot;1381&quot;},&quot;glyph&quot;:{&quot;id&quot;:&quot;1383&quot;},&quot;hover_glyph&quot;:null,&quot;muted_glyph&quot;:null,&quot;nonselection_glyph&quot;:{&quot;id&quot;:&quot;1384&quot;},&quot;selection_glyph&quot;:null,&quot;view&quot;:{&quot;id&quot;:&quot;1386&quot;}},&quot;id&quot;:&quot;1385&quot;,&quot;type&quot;:&quot;GlyphRenderer&quot;},{&quot;attributes&quot;:{&quot;align&quot;:&quot;center&quot;,&quot;text&quot;:&quot;Bar Chart&quot;,&quot;text_font_size&quot;:{&quot;value&quot;:&quot;20px&quot;}},&quot;id&quot;:&quot;1389&quot;,&quot;type&quot;:&quot;Title&quot;},{&quot;attributes&quot;:{&quot;formatter&quot;:{&quot;id&quot;:&quot;1414&quot;},&quot;major_label_orientation&quot;:1.0471975511965976,&quot;major_label_standoff&quot;:0,&quot;major_label_text_font_size&quot;:&quot;9pt&quot;,&quot;major_tick_line_color&quot;:null,&quot;ticker&quot;:{&quot;id&quot;:&quot;1341&quot;}},&quot;id&quot;:&quot;1340&quot;,&quot;type&quot;:&quot;CategoricalAxis&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1414&quot;,&quot;type&quot;:&quot;CategoricalTickFormatter&quot;},{&quot;attributes&quot;:{&quot;source&quot;:{&quot;id&quot;:&quot;1307&quot;}},&quot;id&quot;:&quot;1312&quot;,&quot;type&quot;:&quot;CDSView&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1370&quot;,&quot;type&quot;:&quot;CategoricalScale&quot;},{&quot;attributes&quot;:{&quot;data_source&quot;:{&quot;id&quot;:&quot;1291&quot;},&quot;glyph&quot;:{&quot;id&quot;:&quot;1293&quot;},&quot;hover_glyph&quot;:null,&quot;muted_glyph&quot;:null,&quot;name&quot;:&quot;Not Missing&quot;,&quot;nonselection_glyph&quot;:{&quot;id&quot;:&quot;1294&quot;},&quot;selection_glyph&quot;:null,&quot;view&quot;:{&quot;id&quot;:&quot;1296&quot;}},&quot;id&quot;:&quot;1295&quot;,&quot;type&quot;:&quot;GlyphRenderer&quot;},{&quot;attributes&quot;:{&quot;bottom&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1289&quot;}},&quot;fill_color&quot;:{&quot;value&quot;:&quot;#ff7f0e&quot;},&quot;line_color&quot;:{&quot;value&quot;:&quot;#ff7f0e&quot;},&quot;top&quot;:{&quot;expr&quot;:{&quot;id&quot;:&quot;1290&quot;}},&quot;width&quot;:{&quot;value&quot;:0.9},&quot;x&quot;:{&quot;field&quot;:&quot;cols&quot;}},&quot;id&quot;:&quot;1309&quot;,&quot;type&quot;:&quot;VBar&quot;},{&quot;attributes&quot;:{},&quot;id&quot;:&quot;1419&quot;,&quot;type&quot;:&quot;Selection&quot;}],&quot;root_ids&quot;:[&quot;1268&quot;,&quot;1333&quot;,&quot;1365&quot;]},&quot;title&quot;:&quot;Bokeh Application&quot;,&quot;version&quot;:&quot;2.1.1&quot;}}';
+                var render_items = [{"docid":"dc600111-99b9-40fa-95e2-0596b7300a43","root_ids":["1268","1333","1365"],"roots":{"1268":"622aeb45-89d9-44e9-93c8-4159a9f2ff0a","1333":"25ab3631-d386-422e-b1e9-b1700d452122","1365":"f6d23537-5665-4ee1-9e81-84cb6de1d796"}}];
+                root.Bokeh.embed.embed_items(docs_json, render_items);
+              
+                }
+                if (root.Bokeh !== undefined) {
+                  embed_document(root);
+                } else {
+                  var attempts = 0;
+                  var timer = setInterval(function(root) {
+                    if (root.Bokeh !== undefined) {
+                      clearInterval(timer);
+                      embed_document(root);
+                    } else {
+                      attempts++;
+                      if (attempts > 100) {
+                        clearInterval(timer);
+                        console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                      }
+                    }
+                  }, 10, root)
+                }
+              })(window);
+            });
+          };
+          if (document.readyState != "loading") fn();
+          else document.addEventListener("DOMContentLoaded", fn);
+        })();
+</script>
+
+
+<script>
+    window.onload = () => {
+        let tableRows = document.getElementsByTagName('tr');
+        hightlightTableValue(tableRows, '#f00');
+        scientificNotationStrip(tableRows);
+    }
+
+    function hightlightTableValue(element, color) {
+        for (let i of element) {
+            let thValue = i.firstElementChild.innerText;
+            let tbValue = i.lastElementChild.innerText;
+            if (thValue.includes('Distinct') && tbValue > 50) {
+                i.style.color = color;
+            } else if (thValue.includes('Unique') && tbValue.replace('%',
+                    '') == 100) {
+                i.style.color = color;
+            } else if (thValue.includes('Missing') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Zeros') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Infinite') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Skewness' && tbValue > 20)) {
+                i.style.color = color;
+            }
+        }
+    }
+
+    function scientificNotationStrip(element) {
+        for (let i of element) {
+            let tbValue = i.lastElementChild.innerHTML;
+            if (!isNaN(tbValue)) {
+                if (tbValue.includes('e+')) {
+                    let newValue = tbValue.replace('e+', '×10<sup>') + '</sup>';
+                    i.lastElementChild.innerHTML = newValue;
+                } else if (tbValue.includes('e-')) {
+                    let newValue = tbValue.replace('e', '×10<sup>') + '</sup>';
+                    i.lastElementChild.innerHTML = newValue;
+                }
+            }
+        }
+    }
+
+    function toggleDetails(e) {
+        const plotSection = e.parentNode.parentNode.nextElementSibling;
+        const displayStyle = window.getComputedStyle(plotSection).display;
+        plotSection.style.display = (displayStyle === 'none') ? 'block' : 'none';
+        e.innerText = (e.innerText === 'Show Details') ? 'Hide Details' : 'Show Details';
+    }
+
+    function showStats(e) {
+        e.style.backgroundColor = '#b5d6ea';
+        e.nextElementSibling.style.backgroundColor = 'white';
+        e.parentNode.nextElementSibling.style.display = 'flex';
+        e.parentNode.nextElementSibling.nextElementSibling.style.display = 'none';
+    }
+
+    function showPlots(e) {
+        e.style.backgroundColor = '#b5d6ea';
+        e.previousElementSibling.style.backgroundColor = 'white';
+        e.parentNode.nextElementSibling.style.display = 'none';
+        e.parentNode.nextElementSibling.nextElementSibling.style.display = 'flex';
+    }
+
+    function hideDropdown(e) {
+        if (typeof window.ontouchstart !== 'undefined') {
+            subContent = document.getElementsByClassName('subcontent')[0];
+            const displayStyle = window.getComputedStyle(subContent).display;
+            subContent.style.display = (displayStyle === 'none') ? 'block' : 'none';
+        }
+    }
+</script>
+  <style>
+    body {
+        font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    table {
+        border-collapse: collapse;
+        font-size: 13px;
+        table-layout: auto;
+        width: 100%;
+        color: #212f3c;
+    }
+
+    th,
+    td {
+        border-bottom: 1px solid #cccccc;
+        text-align: left;
+        padding: 0.5em 0.5em;
+    }
+
+    .id-anchor {
+        position: relative;
+        bottom: 70px;
+        display: block;
+        visibility: hidden;
+    }
+
+    .container-main {
+        margin-top: 110px;
+    }
+
+    .footer {
+        text-align: center;
+        font-family: monospace;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #17202a;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .navbar span {
+        font-weight: bold;
+        border: 1px solid #cccccc;
+        border-radius: 5px;
+        padding: 5px;
+    }
+
+    .navbar a {
+        flex: 0 1 auto;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+    }
+
+    .navbar a:hover {
+        background-color: #212f3c;
+    }
+
+    .subcontent {
+        display: none;
+        position: fixed;
+        top: 46px;
+        background-color: #17202a;
+        z-index: 1;
+        max-height: 400px;
+        overflow: scroll;
+    }
+
+    .subcontent a {
+        display: block;
+        float: none;
+        font-size: 13px;
+        text-align: left;
+        padding: 6px 16px;
+        min-width: 78px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .subnav {
+        overflow: hidden;
+        flex: 0 1 auto;
+        padding: 14px 10px;
+    }
+
+    .subnav:hover .subcontent {
+        display: block;
+    }
+
+    h1 {
+        width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    h2 {
+        font-size: 1em;
+        margin-bottom: 0;
+        max-width: 150px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    h2:hover {
+        overflow: visible;
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    h3 {
+        text-align: center;
+    }
+
+    h4 {
+        text-align: center;
+    }
+
+    .section {
+        padding: 1px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14),
+            0 1px 5px 0 rgba(0, 0, 0, .12),
+            0 3px 1px -2px rgba(0, 0, 0, .2);
+        margin-left: auto;
+        margin-right: auto;
+        width: 1200px;
+    }
+
+    .section-variable p {
+        font-family: monospace;
+        margin-top: 0;
+        font-size: 0.8em;
+    }
+
+    .section-variable {
+        border-bottom: 1px solid #BEB7B6;
+    }
+
+    .section-variable:last-child {
+        border-bottom: 0;
+    }
+
+    .ov-container {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .ov-container .tb-container {
+        flex: 0 1 50%;
+        margin: 10px;
+    }
+
+    .var-container {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        margin: 0 20px;
+    }
+
+    .var-container>.var-title {
+        flex: 1 1 10%;
+    }
+
+    .var-container>.tb-container {
+        flex: 2 1 600px;
+    }
+
+    .var-container>.var-ovplot {
+        flex: 1 1 20%;
+    }
+
+    .tb-container>.tb-numerical {
+        columns: 2;
+    }
+
+    .var-plot {
+        display: none;
+        margin-bottom: 10px;
+        animation: slide-down .3s ease-out;
+    }
+
+    @keyframes slide-down {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .vp-switch {
+        font-weight: 400;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .vp-switch label {
+        cursor: pointer;
+        border: 1px solid #b5d6ea;
+        text-align: center;
+        width: 100px;
+        padding: 5px 10px;
+    }
+
+    .vp-switch label:hover {
+        background-color: #e6e8ed;
+    }
+
+    .vp-switch label:first-of-type {
+        border-radius: 5px 0 0 5px;
+    }
+
+    .vp-switch label:last-of-type {
+        border-radius: 0 5px 5px 0;
+    }
+
+    .vp-switch input {
+        display: none;
+    }
+
+    .vp-table {
+        display: flex;
+        justify-content: space-around;
+        margin: 0 20px 20px 20px;
+    }
+
+    .vp-table>div {
+        flex: 0 1 40%;
+        margin: 10px;
+    }
+
+    .vp-plot-numerical {
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .vp-plot-categorical {
+        display: none;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .vp-plot-numerical>div {
+        flex: 0 1 30%;
+    }
+
+    .vp-plot-categorical>div {
+        flex: 0 1 20%;
+    }
+
+    .var-toggle {
+        background-color: white;
+        border: 1px solid #b5d6ea;
+        border-radius: 5px;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 12px;
+        width: 100px;
+    }
+
+    .var-toggle:hover {
+        background-color: #5DADE2;
+    }
+
+    .interac-container {
+        margin: 20px;
+    }
+
+    .interac-container>div>div>div>div>div label {
+        font-size: 14px !important;
+        font-family: monospace !important;
+        border: 0 !important;
+    }
+
+    .interac-container>div>div>div>div>div {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .interac-container>div>div>div>div>div select {
+        font-family: monospace !important;
+    }
+
+    .interac-container>div>div>div>div>div select:hover {
+        background-color: #b5d6ea;
+    }
+
+    .interac-buttons .selector-label:hover {
+        background-color: transparent;
+    }
+
+    .interac-container select {
+        border: 1px solid #b5d6ea;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .correlation-container {
+        display: flex;
+        flex-direction: column;
+        margin: 20px;
+    }
+
+    .correlation-container .corr-plot {
+        flex: 0 1 auto;
+    }
+
+    .missing-container {
+        margin: 20px;
+    }
+
+    .no-render-title {
+        font-family: monospace;
+        text-align: center;
+        color: darkgray;
+        font-weight: 100;
+    }
+
+    .error-message {
+        padding: 15px;
+        border: 1px solid crimson;
+    }
+
+    .error-message p{
+        text-align: center !important;
+        color: crimson !important;
+        font-family: monospace !important;
+        margin: unset !important;
+    }
+
+    @media screen and (max-width: 1024px) {
+        h1 {
+            width: 850px;
+        }
+
+        h2 {
+            max-width: 120px;
+        }
+
+        .section {
+            width: 780px;
+        }
+
+        .var-container>.var-title {
+            flex: 2 1 10%;
+        }
+
+        .var-container>.tb-container {
+            flex: 2 1 350px;
+        }
+
+        .vp-plot-categorical {
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+        }
+
+        .vp-plot-categorical>div {
+            flex: 0 1 35%;
+        }
+    }
+
+    @media screen and (max-width: 425px) {
+        .navbar a {
+            padding: 5px 5px;
+            font-size: 15px;
+        }
+
+        .container-main {
+            margin-top: 80px;
+        }
+
+        table {
+            font-size: 10px;
+        }
+
+        h1 {
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            max-width: unset;
+            overflow: unset;
+            white-space: unset;
+            text-overflow: unset;
+        }
+
+        h3 {
+            font-size: 15px;
+        }
+
+        h4 {
+            font-size: 13px;
+        }
+
+        .section {
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .section-variable p {
+            margin-left: auto;
+        }
+
+        .var-container {
+            display: block;
+        }
+
+        .var-title {
+            position: static;
+            top: auto;
+            text-align: center;
+        }
+
+        .var-ovplot {
+            margin-left: 10%;
+        }
+
+        .var-toggle {
+            font-size: 10px;
+            padding: 4px 5px;
+        }
+
+        .vp-switch {
+            font-size: 10px;
+        }
+
+        .vp-switch label {
+            width: 80px;
+            padding: 3px 0;
+        }
+
+        .vp-table {
+            margin: auto;
+        }
+
+        .vp-plot-numerical {
+            flex-direction: column;
+        }
+
+        .vp-plot-categorical {
+            flex-direction: column;
+        }
+
+        .no-render-title {
+            font-size: 18px;
+        }
+    }
+</style>
+</head>
+
+<body>
+  
+    
+    <section class="section">
+      <div class="missing-container">
+    
+    
+    <div class="miss-plot">
+        
+<div class="bk-root" id="622aeb45-89d9-44e9-93c8-4159a9f2ff0a" data-root-id="1268"></div>
+    </div>
+    
+    
+    
+    <div class="miss-plot">
+        
+<div class="bk-root" id="25ab3631-d386-422e-b1e9-b1700d452122" data-root-id="1333"></div>
+    </div>
+    
+    
+    
+    <div class="miss-plot">
+        
+<div class="bk-root" id="f6d23537-5665-4ee1-9e81-84cb6de1d796" data-root-id="1365"></div>
+    </div>
+    
+    
+</div>
+    </section>
+    
+
+</body>
+
+</html>

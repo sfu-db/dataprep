@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>create_report: generate profile reports from a pandas DataFrame &#8212; DataPrep 0.2.10 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EDA Case Study: Titanic" href="titanic.html" />
+    <link rel="prev" title="plot_missing(): analyze missing values" href="plot_missing.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/eda/create_report.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="active">
+                  <a href="introduction.html">EDA</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="plot.html">plot(): analyze distributions</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="plot_correlation.html">plot_correlation(): analyze correlations</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="plot_missing.html">plot_missing(): analyze missing values</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">create_report(): create a profile report</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="titanic.html">Case study: Titanic</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="house_price.html">Case study: House Prices</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../data_connector/data_connector.html">Data Connector</a>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#overview" class="nav-link">Overview</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#loading-dataset" class="nav-link">Loading dataset</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#generate-report-via-create-report-df" class="nav-link">Generate report via create_report(df)</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#overview-section" class="nav-link">Overview section</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#variables-section" class="nav-link">Variables section</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#interactions-section" class="nav-link">Interactions section</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#correlations-section" class="nav-link">Correlations section</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#missing-values-section" class="nav-link">Missing Values section</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="create-report-generate-profile-reports-from-a-pandas-dataframe">
+<h1><cite>create_report</cite>: generate profile reports from a pandas DataFrame<a class="headerlink" href="#create-report-generate-profile-reports-from-a-pandas-dataframe" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The goal of <cite>create_report</cite> is to generate profile reports from a pandas DataFrame. <cite>create_report</cite> utilizes the functionalities and formats the plots from <cite>dataprep</cite>. It provides the following information:</p>
+<ol class="arabic simple">
+<li><p>Overview: detect the types of columns in a dataframe</p></li>
+<li><p>Variables: variable type, unique values, distint count, missing values</p></li>
+<li><p>Quantile statistics like minimum value, Q1, median, Q3, maximum, range, interquartile range</p></li>
+<li><p>Descriptive statistics like mean, mode, standard deviation, sum, median absolute deviation, coefficient of variation, kurtosis, skewness</p></li>
+<li><p>Text analysis for length, sample and letter</p></li>
+<li><p>Correlations: highlighting of highly correlated variables, Spearman, Pearson and Kendall matrices</p></li>
+<li><p>Missing Values: bar chart, heatmap and spectrum of missing values</p></li>
+</ol>
+<p>In the following, we break down the report into different sections to demonstrate each section of the report.</p>
+</div>
+<div class="section" id="loading-dataset">
+<h2>Loading dataset<a class="headerlink" href="#loading-dataset" title="Permalink to this headline">¶</a></h2>
+<p>Here we load the <cite>titanic</cite> dataset into a pandas dataframe and use it to demonstrate our functionality:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="generate-report-via-create-report-df">
+<h2>Generate report via <cite>create_report(df)</cite><a class="headerlink" href="#generate-report-via-create-report-df" title="Permalink to this headline">¶</a></h2>
+<p>After getting a dataset, we could generate the report by calling <cite>create_report(df)</cite>. The following shows an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">create_report</span>
+<span class="n">create_report</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can see the full report <a class="reference download internal" download="" href="../../_downloads/c9bf292ac949ebcf9b65bb2a2bc5a149/titanic_dp.html"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
+</div>
+<div class="section" id="overview-section">
+<h2><cite>Overview</cite> section<a class="headerlink" href="#overview-section" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we can see the types of columns and the statistics of the dataset.</p>
+<iframe src="../_static/images/create_report/overview.html" height="340" width="100%"></iframe></div>
+<div class="section" id="variables-section">
+<h2><cite>Variables</cite> section<a class="headerlink" href="#variables-section" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we can see the statistics and plots for each of variable in the dataset.</p>
+<p>For numerical variable, the report shows quantile statistics, descriptive statistics, histogram, KDE plot, QQ norm plot and box plot.</p>
+<p>For categorical variable, the report shows text analysis, bar chart, pie chart, word cloud, word frequencies and word length.</p>
+<p>For datetime variable, the report shows line chart</p>
+<iframe src="../_static/images/create_report/variables_num.html" height="270" width="100%"></iframe><iframe src="../_static/images/create_report/variables_cat.html" height="270" width="100%"></iframe></div>
+<div class="section" id="interactions-section">
+<h2><cite>Interactions</cite> section<a class="headerlink" href="#interactions-section" title="Permalink to this headline">¶</a></h2>
+<p>In this section, the report will show an interactive plot, user can use the dropdown menu above the plot to select which two variables user wants to compare.</p>
+<p>The plot has scatter plot and the regression line regarding to the two variabes.</p>
+<iframe src="../_static/images/create_report/interactions.html" height="620" width="100%"></iframe></div>
+<div class="section" id="correlations-section">
+<h2><cite>Correlations</cite> section<a class="headerlink" href="#correlations-section" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we can see the correlations bewteen variables in Spearman, Pearson and Kendall matrices.</p>
+<iframe src="../_static/images/create_report/correlations.html" height="530" width="100%"></iframe></div>
+<div class="section" id="missing-values-section">
+<h2><cite>Missing Values</cite> section<a class="headerlink" href="#missing-values-section" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we can see the missing values in the dataset through bar chart, spectrum and heatmap.</p>
+<iframe src="../_static/images/create_report/missing.html" height="530" width="100%"></iframe></div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>
