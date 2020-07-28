@@ -24,10 +24,10 @@ pip install dataprep
 
 The following examples can give you an impression of what dataprep can do:
 
-* [Documentation: Data Connector](https://sfu-db.github.io/dataprep/data_connector.html)
-* [Documentation: EDA](https://sfu-db.github.io/dataprep/eda/introduction.html)
-* [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/case_study/titanic.html)
-* [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/case_study/house_price.html)
+* [Documentation: Data Connector](https://sfu-db.github.io/dataprep/user_guide/data_connector/data_connector.html)
+* [Documentation: EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
+* [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/user_guide/eda/titanic.html)
+* [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/user_guide/eda/house_price.html)
 
 ### EDA
 
