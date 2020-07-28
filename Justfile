@@ -74,6 +74,19 @@ release version:
       esac
   done
 
+  echo ================ Release Note ================
+  poetry run python scripts/release-note.py $(git rev-parse develop)
+  echo ================ Release Note ================
+  echo
+  echo Does release note looks good?
+
+  select yn in "Yes" "No"; do
+      case $yn in
+          Yes ) break;;
+          No ) exit;;
+      esac
+  done
+
   # Begin of the real stuff!
 
   # Create new release branch
@@ -102,10 +115,14 @@ release version:
   poetry build
 
   echo "Creating release draft"
-  semantic-release changelog | sed "1iv${to_version}\n" | hub release create -d -a "dist/dataprep-${to_version}-py3-none-any.whl" -a "dist/dataprep-${to_version}.tar.gz" -F - "v${to_version}"
 
-  
+  poetry run python scripts/release-note.py $(git rev-parse release/v${to_version}^) | sed "1iv${to_version}\n" | hub release create -d -a "dist/dataprep-${to_version}-py3-none-any.whl" -a "dist/dataprep-${to_version}.tar.gz" -F - "v${to_version}"
 
 
 @ensure-git-clean:
   if [ ! -z "$(git status --porcelain)" ]; then echo "Git tree is not clean, commit first"; exit 1; fi
+
+@release-note hash="":
+    echo ================ Release Note ================
+    poetry run python scripts/release-note.py {{hash}}
+    echo ================ Release Note ================
