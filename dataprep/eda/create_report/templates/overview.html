@@ -1,7 +1,7 @@
 <div class="ov-container">
     <div class="tb-container">
         <h3 class="tb-title">Dataset Statistics</h3>
-        <table>
+        <table class="rp-table">
             {% for h, d in context.components.overview[0].items() %}
             <tr>
                 <th>{{ h }}</th>
@@ -12,12 +12,14 @@
     </div>
     <div class="tb-container">
         <h3 class="tb-title">Variable Types</h3>
-        <table>
+        <table class="rp-table">
             {% for h, d in context.components.overview[1].items() %}
+            {% if d > 0 %}
             <tr>
                 <th>{{ h }}</th>
                 <td>{{ d }}</td>
             </tr>
+            {% endif %}
             {% endfor %}
         </table>
     </div>
