@@ -8,8 +8,8 @@
   {% include 'styles.html' %}
 </head>
 
-<body>
-  <nav class="navbar">
+<body class="bg-container">
+  <nav class="navbar-top">
     <a href="#"><span>{{ context.title }}</span></a>
     <a href="#overview">Overview</a>
     <div class="subnav" onclick="hideDropdown(this)">
@@ -28,7 +28,7 @@
   <div class="container-main">
     <div>
       <a class="id-anchor" id="overview"></a>
-      <h1>Overview</h1>
+      <h1 class="tb-title">Overview</h1>
     </div>
     <section class="section">
       <div class="section-start">
@@ -38,7 +38,7 @@
 
     <div>
       <a class="id-anchor" id="variables"></a>
-      <h1>Variables</h1>
+      <h1 class="tb-title">Variables</h1>
     </div>
     <section class="section">
       {% include 'variables.html' %}
@@ -46,7 +46,7 @@
 
     <div>
       <a class="id-anchor" id="interactions"></a>
-      <h1>Interactions</h1>
+      <h1 class="tb-title">Interactions</h1>
     </div>
     {% if context.components.has_interaction %}
     <section class="section">
@@ -62,7 +62,7 @@
 
     <div>
       <a class="id-anchor" id="correlations"></a>
-      <h1>Correlations</h1>
+      <h1 class="tb-title">Correlations</h1>
     </div>
     {% if context.components.has_correlation %}
     <section class="section">
@@ -78,7 +78,7 @@
 
     <div>
       <a class="id-anchor" id="missing-values"></a>
-      <h1>Missing Values</h1>
+      <h1 class="tb-title">Missing Values</h1>
     </div>
     {% if context.components.has_missing %}
     <section class="section">

@@ -5,7 +5,7 @@ import logging
 import numpy as np
 import pandas as pd
 import pytest
-from ...eda.create_report.formatter import format_report
+from ...eda import create_report
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,4 +40,4 @@ def simpledf() -> pd.DataFrame:
 
 
 def test_report(simpledf: pd.DataFrame) -> None:
-    format_report(simpledf, mode="basic")
+    create_report(simpledf, mode="basic")

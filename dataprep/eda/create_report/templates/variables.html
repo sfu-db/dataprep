@@ -11,7 +11,7 @@
             <a class="id-anchor" id="{{ key }}"></a>
             <div class="var-container">
                 <div class="var-title">
-                    <h2>{{ key }}</h2>
+                    <h2 class="tb-title">{{ key }}</h2>
                     <p>{{ value.col_type }}</p>
                     {% if value.col_type != 'datetime' %}
                     <button class="var-toggle" onclick="toggleDetails(this)">Show Details</button>
@@ -19,7 +19,7 @@
                 </div>
                 <div class="tb-container">
                     <div class="tb-{{ value.col_type }}">
-                        <table>
+                        <table class="rp-table">
                             {% for h, d in value.tabledata[0].items() %}
                             <tr>
                                 <th>{{ h }}</th>
@@ -48,7 +48,7 @@
                 <div class="vp-table">
                     <div>
                         <h4 class="tb-title">Quantile Statistics</h3>
-                            <table>
+                            <table class="rp-table">
                                 {% for h, d in value.tabledata[1].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
@@ -59,7 +59,7 @@
                     </div>
                     <div>
                         <h4 class="tb-title">Descriptive Statistics</h3>
-                            <table>
+                            <table class="rp-table">
                                 {% for h, d in value.tabledata[2].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
@@ -74,7 +74,7 @@
                 <div class="vp-table">
                     <div>
                         <h4 class="tb-title">Length</h3>
-                            <table>
+                            <table class="rp-table">
                                 {% for h, d in value.tabledata[1].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
@@ -85,7 +85,7 @@
                     </div>
                     <div>
                         <h4 class="tb-title">Sample</h3>
-                            <table>
+                            <table class="rp-table">
                                 {% for h, d in value.tabledata[2].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
@@ -96,7 +96,7 @@
                     </div>
                     <div>
                         <h4 class="tb-title">Letter</h3>
-                            <table>
+                            <table class="rp-table">
                                 {% for h, d in value.tabledata[3].items() %}
                                 <tr>
                                     <th>{{ h }}</th>

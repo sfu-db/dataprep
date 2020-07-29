@@ -1507,14 +1507,14 @@ def stats_viz_cat(
     return Panel(child=div, title="Stats")
 
 
-def stats_viz_dt(
-    data: Tuple[Dict[str, str]], plot_width: int, plot_height: int
-) -> Panel:
+def stats_viz_dt(stats: Dict[str, Any], plot_width: int, plot_height: int) -> Panel:
     """
     Render statistics panel for datetime data
     """
+
+    data = {k: _format_values(k, v) for k, v in stats.items()}
     ov_content = ""
-    for key, value in data[0].items():
+    for key, value in data.items():
         value = _sci_notation_superscript(value)
         if "Distinct" in key and float(value) > 50:
             ov_content += _create_table_row(key, value, True)
@@ -1679,7 +1679,7 @@ def render_dt(
     Render plots from plot(df, x) when x is a numerical column
     """
     tabs: List[Panel] = []
-    osd = itmdt["statsdata"]
+    osd = itmdt["stats"]
     tabs.append(stats_viz_dt(osd, plot_width, plot_height))
     df, timeunit, miss_pct = itmdt["data"]
     fig = dt_line_viz(
