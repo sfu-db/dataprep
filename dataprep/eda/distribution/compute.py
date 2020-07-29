@@ -383,7 +383,7 @@ def compute_univariate(
         data_dt.append(dask.delayed(calc_stats_dt)(df[x]))
         data, statsdata_dt = dask.compute(*data_dt)
         return Intermediate(
-            col=x, data=data, statsdata=statsdata_dt, visual_type="datetime_column",
+            col=x, data=data, stats=statsdata_dt, visual_type="datetime_column",
         )
     else:
         raise UnreachableError
@@ -1361,7 +1361,7 @@ def calc_heatmap(
     return df_res, grp_cnt_stats
 
 
-def calc_stats_dt(srs: dd.Series) -> Tuple[Dict[str, str]]:
+def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
     """
     Calculate stats from a datetime column
     Parameters
@@ -1386,7 +1386,7 @@ def calc_stats_dt(srs: dd.Series) -> Tuple[Dict[str, str]]:
         "Maximum": srs.max(),
     }
 
-    return ({k: _format_values(k, v) for k, v in overview_dict.items()},)
+    return overview_dict
 
 
 def _calc_box_stats(grp_srs: dd.Series, grp: str, dlyd: bool = False) -> pd.DataFrame:
@@ -1498,38 +1498,3 @@ def _get_timeunit(min_time: pd.Timestamp, max_time: pd.Timestamp, dflt: int) -> 
         prev_unit = unit
 
     return prev_unit
-
-
-def _format_values(key: str, value: Any) -> str:
-    if not isinstance(value, (int, float)):
-        # if value is a time
-        return str(value)
-    if "Memory" in key:
-        # for memory usage
-        ind = 0
-        unit = dict(enumerate(["B", "KB", "MB", "GB", "TB"], 0))
-        while value > 1024:
-            value /= 1024
-            ind += 1
-        return f"{value:.1f} {unit[ind]}"
-
-    if (value * 10) % 10 == 0:
-        # if value is int but in a float form with 0 at last digit
-        value = int(value)
-        if abs(value) >= 1000000:
-            return f"{value:.5g}"
-    elif abs(value) >= 1000000 or abs(value) < 0.001:
-        value = f"{value:.5g}"
-    elif abs(value) >= 1:
-        # eliminate trailing zeros
-        pre_value = float(f"{value:.4f}")
-        value = int(pre_value) if (pre_value * 10) % 10 == 0 else pre_value
-    elif 0.001 <= abs(value) < 1:
-        value = f"{value:.4g}"
-    else:
-        value = str(value)
-
-    if "%" in key:
-        # for percentage, only use digits before notation sign for extreme small number
-        value = f"{float(value):.1%}"
-    return str(value)

@@ -1,10 +1,9 @@
 <style>
-    body {
-        font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
-        -webkit-font-smoothing: antialiased;
+    .bg-container {
+        margin: 0;
     }
 
-    table {
+    .rp-table {
         border-collapse: collapse;
         font-size: 13px;
         table-layout: auto;
@@ -12,8 +11,17 @@
         color: #212f3c;
     }
 
-    th,
-    td {
+    .rp-table tr {
+        background: none !important;
+    }
+
+    .rp-table th {
+        border-bottom: 1px solid #cccccc;
+        text-align: left;
+        padding: 0.5em 0.5em !important;
+    }
+
+    .rp-table td {
         border-bottom: 1px solid #cccccc;
         text-align: left;
         padding: 0.5em 0.5em;
@@ -27,16 +35,23 @@
     }
 
     .container-main {
-        margin-top: 110px;
+        margin-top: 60px;
+        margin-left: 1%;
+        margin-right: 1%;
     }
 
     .footer {
-        text-align: center;
         font-family: monospace;
     }
 
-    .navbar {
-        position: fixed;
+    .footer p {
+        text-align: center;
+    }
+
+    .navbar-top {
+        font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+        -webkit-font-smooth: antialiased;
+        position: sticky;
         top: 0;
         left: 0;
         width: 100%;
@@ -48,14 +63,14 @@
         flex-wrap: wrap;
     }
 
-    .navbar span {
+    .navbar-top span {
         font-weight: bold;
         border: 1px solid #cccccc;
         border-radius: 5px;
         padding: 5px;
     }
 
-    .navbar a {
+    .navbar-top a {
         flex: 0 1 auto;
         color: #f2f2f2;
         text-align: center;
@@ -63,13 +78,13 @@
         text-decoration: none;
     }
 
-    .navbar a:hover {
+    .navbar-top a:hover {
         background-color: #212f3c;
     }
 
     .subcontent {
         display: none;
-        position: fixed;
+        position: absolute;
         top: 46px;
         background-color: #17202a;
         z-index: 1;
@@ -98,13 +113,19 @@
         display: block;
     }
 
-    h1 {
-        width: 1200px;
+    .tb-title {
+        font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+        -webkit-font-smooth: antialiased;
+        color: black;
+    }
+
+    h1.tb-title {
+        max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
     }
 
-    h2 {
+    h2.tb-title {
         font-size: 1em;
         margin-bottom: 0;
         max-width: 150px;
@@ -113,21 +134,23 @@
         text-overflow: ellipsis;
     }
 
-    h2:hover {
+    h2.tb-title:hover {
         overflow: visible;
         word-break: break-word;
         white-space: normal;
     }
 
-    h3 {
+    h3.tb-title {
         text-align: center;
     }
 
-    h4 {
+    h4.tb-title {
         text-align: center;
     }
 
     .section {
+        font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+        -webkit-font-smoothing: antialiased;
         padding: 1px;
         background-color: white;
         border-radius: 10px;
@@ -137,7 +160,7 @@
         margin-left: auto;
         margin-right: auto;
         margin-bottom: 70px;
-        width: 1200px;
+        max-width: 1200px;
     }
 
     .section-variable p {
@@ -326,6 +349,13 @@
 
     .missing-container {
         margin: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .miss-plot {
+        flex: 0 1 45%;
     }
 
     .no-render-title {
@@ -348,16 +378,16 @@
     }
 
     @media screen and (max-width: 1024px) {
-        h1 {
-            width: 850px;
+        h1.tb-title {
+            max-width: 850px;
         }
 
-        h2 {
+        h2.tb-title {
             max-width: 120px;
         }
 
         .section {
-            width: 850px;
+            max-width: 850px;
         }
 
         .var-container>.var-title {
@@ -366,6 +396,10 @@
 
         .var-container>.tb-container {
             flex: 2 1 350px;
+        }
+
+        .var-toggle {
+            width: 70px;
         }
 
         .vp-plot-categorical {
@@ -379,7 +413,7 @@
     }
 
     @media screen and (max-width: 425px) {
-        .navbar a {
+        .navbar-top a {
             padding: 5px 5px;
             font-size: 15px;
         }
@@ -388,27 +422,27 @@
             margin-top: 80px;
         }
 
-        table {
+        .rp-table {
             font-size: 10px;
         }
 
-        h1 {
+        h1.tb-title {
             width: 100%;
             text-align: center;
         }
 
-        h2 {
+        h2.tb-title {
             max-width: unset;
             overflow: unset;
             white-space: unset;
             text-overflow: unset;
         }
 
-        h3 {
+        h3.tb-title {
             font-size: 15px;
         }
 
-        h4 {
+        h4.tb-title {
             font-size: 13px;
         }
 
@@ -460,6 +494,10 @@
 
         .vp-plot-categorical {
             flex-direction: column;
+        }
+
+        .missing-container {
+            display: block;
         }
 
         .no-render-title {
