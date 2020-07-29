@@ -19,7 +19,7 @@ The goal of `create_report` is to generate profile reports from a pandas DataFra
 6. Correlations: highlighting of highly correlated variables, Spearman, Pearson and Kendall matrices
 7. Missing Values: bar chart, heatmap and spectrum of missing values
 
-In the following, we break down the report into different sections to demonstrate each section of the report.
+In the following, we break down the report into different sections to demonstrate each part of the report.
 
 Loading dataset
 ===============
@@ -45,7 +45,7 @@ In this section, we can see the types of columns and the statistics of the datas
 
 .. raw:: html
 
-   <iframe src="../_static/images/create_report/overview.html" height="340" width="100%"></iframe>
+   <iframe src="../../_static/images/create_report/overview.html" height="345" width="70%"></iframe>
 
 `Variables` section
 ===================
@@ -60,11 +60,11 @@ For datetime variable, the report shows line chart
 
 .. raw:: html
 
-    <iframe src="../_static/images/create_report/variables_num.html" height="270" width="100%"></iframe>
+    <iframe src="../../_static/images/create_report/variables_num.html" height="275" width="70%"></iframe>
 
 .. raw:: html
 
-    <iframe src="../_static/images/create_report/variables_cat.html" height="270" width="100%"></iframe>
+    <iframe src="../../_static/images/create_report/variables_cat.html" height="275" width="70%"></iframe>
 
 `Interactions` section
 ======================
@@ -75,7 +75,7 @@ The plot has scatter plot and the regression line regarding to the two variabes.
 
 .. raw:: html
 
-    <iframe src="../_static/images/create_report/interactions.html" height="620" width="100%"></iframe>
+    <iframe src="../../_static/images/create_report/interactions.html" height="625" width="70%"></iframe>
 
 
 `Correlations` section
@@ -85,7 +85,7 @@ In this section, we can see the correlations bewteen variables in Spearman, Pear
 
 .. raw:: html
 
-    <iframe src="../_static/images/create_report/correlations.html" height="530" width="100%"></iframe>
+    <iframe src="../../_static/images/create_report/correlations.html" height="530" width="70%"></iframe>
 
 
 `Missing Values` section
@@ -95,4 +95,4 @@ In this section, we can see the missing values in the dataset through bar chart,
 
 .. raw:: html
 
-    <iframe src="../_static/images/create_report/missing.html" height="530" width="100%"></iframe>
+    <iframe src="../../_static/images/create_report/missing.html" height="530" width="70%"></iframe>
