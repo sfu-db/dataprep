@@ -1,6 +1,7 @@
 """
     module for testing plot_corr(df, x, y) function.
 """
+from dataprep.eda.data_array import DataArray
 import random
 from time import time
 
@@ -11,15 +12,19 @@ import pandas as pd
 import pytest
 
 from ...eda.correlation import compute_correlation, plot_correlation
-from ...eda.correlation.compute import (
-    kendall_tau_1xn,
-    kendall_tau_nxn,
-    pearson_1xn,
-    pearson_nxn,
-    spearman_1xn,
-    spearman_nxn,
+from ...eda.correlation.compute.univariate import (
+    _kendall_tau_1xn,
+    _pearson_1xn,
+    _spearman_1xn,
+    _corr_filter,
+)
+from ...eda.correlation.compute.nullivariate import (
+    _spearman_nxn,
+    _pearson_nxn,
+    _kendall_tau_nxn,
 )
 from ...eda.utils import to_dask
+from ...eda.data_array import DataArray
 
 
 @pytest.fixture(scope="module")  # type: ignore
@@ -113,40 +118,52 @@ def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
     plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3)
 
 
-def test_compute_pearson() -> None:
-    array = np.random.rand(100, 10)
-    darray = da.from_array(array)
-    a = pearson_nxn(darray).compute()
-    b = pd.DataFrame(data=array).corr("pearson").values
-    assert np.isclose(a, b).all()
+def test_compute_pearson(simpledf: dd.DataFrame) -> None:
+    df = DataArray(simpledf)
+    df = df.select_num_columns()
+    df.compute_length()
+    darray = df.values
+    array = darray.compute()
+
+    corr_eda = _pearson_nxn(df).compute()
+    corr_pd = pd.DataFrame(data=array).corr("pearson").values
+    assert np.isclose(corr_eda, corr_pd).all()
 
     for i in range(array.shape[1]):
-        _, a = pearson_1xn(darray[:, i], darray)
-        assert np.isclose(a, np.sort(b[:, i])).all()
+        corr_eda = _pearson_1xn(darray[:, i : i + 1], darray).compute()
+        assert np.isclose(_corr_filter(corr_eda)[1], np.sort(corr_pd[:, i])).all()
 
 
-def test_compute_spearman() -> None:
-    array = np.random.rand(100, 10)
-    darray = da.from_array(array)
-    a = spearman_nxn(darray).compute()
-    b = pd.DataFrame(data=array).corr("spearman").values
-    assert np.isclose(a, b).all()
+def test_compute_spearman(simpledf: dd.DataFrame) -> None:
+    df = DataArray(simpledf)
+    df = df.select_num_columns()
+    df.compute_length()
+    darray = df.values
+    array = darray.compute()
 
-    for i in range(array.shape[1]):
-        _, a = spearman_1xn(darray[:, i], darray)
-        assert np.isclose(a, np.sort(b[:, i])).all()
-
-
-def test_compute_kendall() -> None:
-    array = np.random.rand(100, 10)
-    darray = da.from_array(array)
-    a = kendall_tau_nxn(darray).compute()
-    b = pd.DataFrame(data=array).corr("kendall").values
-    assert np.isclose(a, b).all()
+    corr_eda = _spearman_nxn(df).compute()
+    corr_pd = pd.DataFrame(data=array).corr("spearman").values
+    assert np.isclose(corr_eda, corr_pd).all()
 
     for i in range(array.shape[1]):
-        _, a = kendall_tau_1xn(darray[:, i], darray)
-        assert np.isclose(a, np.sort(b[:, i])).all()
+        corr_eda = _spearman_1xn(darray[:, i : i + 1], darray).compute()
+        assert np.isclose(_corr_filter(corr_eda)[1], np.sort(corr_pd[:, i])).all()
+
+
+def test_compute_kendall(simpledf: dd.DataFrame) -> None:
+    df = DataArray(simpledf)
+    df = df.select_num_columns()
+    df.compute_length()
+    darray = df.values
+    array = darray.compute()
+
+    corr_eda = _kendall_tau_nxn(df).compute()
+    corr_pd = pd.DataFrame(data=array).corr("kendall").values
+    assert np.isclose(corr_eda, corr_pd).all()
+
+    for i in range(array.shape[1]):
+        corr_eda = _kendall_tau_1xn(darray[:, i : i + 1], darray).compute()
+        assert np.isclose(_corr_filter(corr_eda)[1], np.sort(corr_pd[:, i])).all()
 
 
 # def test_plot_corr_df() -> None:  # pylint: disable=too-many-locals
