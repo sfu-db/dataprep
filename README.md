@@ -1,8 +1,22 @@
 <div align="center"><img width="100%" src="https://github.com/sfu-db/dataprep/raw/develop/assets/logo.png"/></div>
 
 -----------------
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/pypi/l/dataprep?style=flat-square"/></a>
+  <a href="https://sfu-db.github.io/dataprep/"><img src="https://img.shields.io/badge/dynamic/json?color=blue&label=docs&prefix=v&query=%24.info.version&url=https%3A%2F%2Fpypi.org%2Fpypi%2Fdataprep%2Fjson&style=flat-square"/></a>
+  <a href="https://pypi.org/project/dataprep/"><img src="https://img.shields.io/pypi/pyversions/dataprep?style=flat-square"/></a>
+  <a href="https://codecov.io/gh/sfu-db/dataprep"><img src="https://img.shields.io/codecov/c/github/sfu-db/dataprep?style=flat-square"/></a>
+  <a href="https://discord.gg/xwbkFNk"><img src="https://img.shields.io/discord/702765817154109472?style=flat-square"/></a>
+</p>
 
-[![License]](LICENSE) [![Doc Badge]](https://sfu-db.github.io/dataprep/) [![Version]](https://pypi.org/project/dataprep/) [![Python Version]](https://pypi.org/project/dataprep/)  [![Downloads]](https://pepy.tech/project/dataprep) [![Codecov]](https://codecov.io/gh/sfu-db/dataprep) ![Build Status]  [![Chat]](https://discord.gg/xwbkFNk) 
+
+<p align="center">
+  <a href="https://sfu-db.github.io/dataprep/">Documentation</a>
+  |
+  <a href="https://discord.gg/xwbkFNk">Forum</a>
+  | 
+  <a href="https://groups.google.com/forum/#!forum/dataprep">Mail List</a>
+</p>
 
 Dataprep lets you prepare your data using a single library with a few lines of code.
 
@@ -11,8 +25,28 @@ Currently, you can use `dataprep` to:
 * Do your exploratory data analysis (through `dataprep.eda`)
 * ...more modules are coming
 
+## Releases
 
-[Documentation] | [Mail List & Forum] 
+<div align="center">
+  <table>
+    <tr>
+      <th>Repo</th>
+      <th>Version</th>
+      <th>Downloads</th>
+    </tr>
+    <tr>
+      <td>PyPI</td>
+      <td><a href="https://pypi.org/project/dataprep/"><img src="https://img.shields.io/pypi/v/dataprep?style=flat-square"/></a></td>
+      <td><a href="https://pepy.tech/project/dataprep"><img src="https://pepy.tech/badge/dataprep"/></a></td>
+    </tr>
+    <tr> 
+      <td>conda-forge</td>
+      <td><a href="https://anaconda.org/conda-forge/dataprep"><img src="https://img.shields.io/conda/vn/conda-forge/dataprep.svg"/></a></td>
+      <td><a href="https://anaconda.org/conda-forge/dataprep"><img src="https://img.shields.io/conda/dn/conda-forge/dataprep.svg"/></a></td>
+    </tr>
+  </table>
+</div>
+
 
 ## Installation
 
@@ -91,15 +125,7 @@ Please take a look at our [wiki] for development documentations!
 
 
 [Build Status]: https://img.shields.io/circleci/build/github/sfu-db/dataprep/master?style=flat-square&token=f68e38757f5c98771f46d1c7e700f285a0b9784d
-[Documentation]: https://sfu-db.github.io/dataprep/
 [Mail list & Forum]: https://groups.google.com/forum/#!forum/dataprep
 [wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
-[Chat]: https://img.shields.io/discord/702765817154109472?style=flat-square
-[License]: https://img.shields.io/pypi/l/dataprep?style=flat-square
-[Downloads]: https://pepy.tech/badge/dataprep
-[Python Version]: https://img.shields.io/pypi/pyversions/dataprep?style=flat-square
-[Version]: https://img.shields.io/pypi/v/dataprep?style=flat-square
-[Codecov]: https://img.shields.io/codecov/c/github/sfu-db/dataprep?style=flat-square
 [Twitter]: https://img.shields.io/twitter/follow/sfu_db?style=social
-[Doc Badge]: https://img.shields.io/badge/dynamic/json?color=blue&label=docs&prefix=v&query=%24.info.version&url=https%3A%2F%2Fpypi.org%2Fpypi%2Fdataprep%2Fjson&style=flat-square
