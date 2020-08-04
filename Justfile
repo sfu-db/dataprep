@@ -19,8 +19,9 @@ ci-black:
 format:
   poetry run black dataprep
 
-typeck: ci-mypy
-
+typeck:
+  pyright
+  
 test +ARGS="":
   poetry run pytest dataprep/tests {{ARGS}}
 
