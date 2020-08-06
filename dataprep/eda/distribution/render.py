@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from scipy.stats import norm
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row
 from bokeh.models import (
@@ -176,6 +177,56 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
         fig.yaxis.major_label_standoff = 5
 
 
+def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
+    """
+    Auxillary function to format bin intervals in a histogram
+    """
+    bins_arr = np.round(bins_arr, 3)
+    bins_arr = [int(val) if float(val).is_integer() else val for val in bins_arr]
+    intervals = [
+        f"[{bins_arr[i]}, {bins_arr[i + 1]})" for i in range(len(bins_arr) - 2)
+    ]
+    intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
+    return intervals
+
+
+def _format_values(key: str, value: Any) -> str:
+
+    if not isinstance(value, (int, float)):
+        # if value is a time
+        return str(value)
+
+    if "Memory" in key:
+        # for memory usage
+        ind = 0
+        unit = dict(enumerate(["B", "KB", "MB", "GB", "TB"], 0))
+        while value > 1024:
+            value /= 1024
+            ind += 1
+        return f"{value:.1f} {unit[ind]}"
+
+    if (value * 10) % 10 == 0:
+        # if value is int but in a float form with 0 at last digit
+        value = int(value)
+        if abs(value) >= 1000000:
+            return f"{value:.5g}"
+    elif abs(value) >= 1000000 or abs(value) < 0.001:
+        value = f"{value:.5g}"
+    elif abs(value) >= 1:
+        # eliminate trailing zeros
+        pre_value = float(f"{value:.4f}")
+        value = int(pre_value) if (pre_value * 10) % 10 == 0 else pre_value
+    elif 0.001 <= abs(value) < 1:
+        value = f"{value:.4g}"
+    else:
+        value = str(value)
+
+    if "%" in key:
+        # for percentage, only use digits before notation sign for extreme small number
+        value = f"{float(value):.1%}"
+    return str(value)
+
+
 def _create_table_row(key: str, value: Union[str, int], highlight: bool = False) -> str:
     """
     Create table row for stats panel
@@ -210,15 +261,9 @@ def _sci_notation_superscript(value: str) -> str:
     return value
 
 
-def wordcloud_viz(
-    freq_tuple: Tuple[int, List[Tuple[str, int]]], plot_width: int, plot_height: int,
-) -> Figure:
+def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> Panel:
     """
-    Visualize the wordcloud
-    Parameters
-    ----------
-    freq_tuple
-        Tuple contains total frequency of words and frequency dict
+    Visualize the word cloud
     """  # pylint: disable=unsubscriptable-object
     ellipse_mask = np.array(
         Image.open(f"{Path(__file__).parent.parent.parent}/assets/ellipse.jpg")
@@ -226,8 +271,7 @@ def wordcloud_viz(
     wordcloud = WordCloud(
         background_color="white", mask=ellipse_mask, width=800, height=400
     )
-    top_freq = freq_tuple[1]
-    wordcloud.generate_from_frequencies(dict(top_freq))
+    wordcloud.generate_from_frequencies(word_cnts)
     wcimg = wordcloud.to_array().astype(np.uint8)
     alpha = np.full([*wcimg.shape[:2], 1], 255, dtype=np.uint8)
     wcimg = np.concatenate([wcimg, alpha], axis=2)[::-1, :]
@@ -235,7 +279,7 @@ def wordcloud_viz(
     fig = figure(
         plot_width=plot_width,
         plot_height=plot_height,
-        title="WordCloud",
+        title="Word Cloud",
         x_range=(0, 1),
         y_range=(0, 1),
         toolbar_location=None,
@@ -244,11 +288,12 @@ def wordcloud_viz(
 
     fig.axis.visible = False
     fig.grid.visible = False
-    return fig
+    return Panel(child=row(fig), title="Word Cloud")
 
 
 def wordfreq_viz(
-    freq_tuple: Tuple[int, List[Tuple[str, int]]],
+    word_cnts: pd.Series,
+    nrows: int,
     plot_width: int,
     plot_height: int,
     show_yticks: bool,
@@ -256,31 +301,32 @@ def wordfreq_viz(
     """
     Visualize the word frequency bar chart
     """
-    top_freq = freq_tuple[1]
-    total_freq = freq_tuple[0]
-    words = list(list(zip(*top_freq))[0])
-    counts = list(list(zip(*top_freq))[1])
-    freq_percent = [round((i / total_freq) * 100, 2) for i in counts]
-    wordcloud_dict = dict(word=words, cnt=counts, pct=freq_percent)
-    tooltips = [("word", "@word"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    col = word_cnts.name
+    df = word_cnts.to_frame()
+    df["pct"] = df[col] / nrows * 100
+
+    tooltips = [("Word", "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
     fig = figure(
-        x_range=list(wordcloud_dict["word"]),
         plot_width=plot_width,
         plot_height=plot_height,
-        title="Words Frequency",
+        title="Word Frequencies",
         toolbar_location=None,
         tools="hover",
         tooltips=tooltips,
+        x_range=list(df.index),
     )
-    fig.vbar(x="word", top="cnt", width=0.9, source=wordcloud_dict)
+    fig.vbar(x="index", top=col, width=0.9, source=df)
+    fig.yaxis.axis_label = "Count"
     tweak_figure(fig, "bar", show_yticks)
-    return fig
+    _format_axis(fig, 0, df[col].max(), "y")
+    return Panel(child=row(fig), title="Word Frequencies")
 
 
 def bar_viz(
     df: pd.DataFrame,
-    total_grps: int,
-    miss_pct: float,
+    ttl_grps: int,
+    npresent: int,
+    nrows: int,
     col: str,
     yscale: str,
     plot_width: int,
@@ -291,55 +337,60 @@ def bar_viz(
     Render a bar chart
     """
     # pylint: disable=too-many-arguments
-    title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
-    tooltips = [(f"{col}", "@col"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
+    df["pct"] = df[col] / nrows * 100
+    miss_pct = np.round((nrows - npresent) / nrows * 100, 1)
+    df.index = [str(val) for val in df.index]
+
+    title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else col
+    tooltips = [(col, "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
     if show_yticks:
         if len(df) > 10:
             plot_width = 28 * len(df)
     fig = Figure(
-        x_range=list(df["col"]),
-        title=title,
         plot_width=plot_width,
         plot_height=plot_height,
-        y_axis_type=yscale,
-        tools="hover",
+        title=title,
         toolbar_location=None,
         tooltips=tooltips,
+        tools="hover",
+        x_range=list(df.index),
+        y_axis_type=yscale,
     )
-    fig.vbar(x="col", width=0.9, top="cnt", bottom=0.01, source=df)
+    fig.vbar(x="index", width=0.9, top=col, bottom=0.01, source=df)
     tweak_figure(fig, "bar", show_yticks)
     fig.yaxis.axis_label = "Count"
-    if total_grps > len(df):
-        fig.xaxis.axis_label = f"Top {len(df)} of {total_grps} {col}"
+    if ttl_grps > len(df):
+        fig.xaxis.axis_label = f"Top {len(df)} of {ttl_grps} {col}"
         fig.xaxis.axis_label_standoff = 0
     if show_yticks and yscale == "linear":
-        _format_axis(fig, 0, df["cnt"].max(), "y")
+        _format_axis(fig, 0, df[col].max(), "y")
     return fig
 
 
 def pie_viz(
-    df: pd.DataFrame, col: str, miss_pct: float, plot_width: int, plot_height: int,
+    df: pd.DataFrame, nrows: int, col: str, plot_width: int, plot_height: int,
 ) -> Panel:
     """
     Render a pie chart
     """
-    title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
-    tooltips = [(f"{col}", "@col"), ("Count", "@cnt"), ("Percent", "@pct{0.2f}%")]
-    df["angle"] = df["cnt"] / df["cnt"].sum() * 2 * pi
+    npresent = df[col].sum()
+    if nrows > npresent:
+        df = df.append(pd.DataFrame({col: [nrows - npresent]}, index=["Others"]))
+    df["pct"] = df[col] / nrows * 100
+    df["angle"] = df[col] / npresent * 2 * pi
+
+    tooltips = [(col, "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
     fig = Figure(
-        title=title,
         plot_width=plot_width,
         plot_height=plot_height,
-        tools="hover",
+        title=col,
         toolbar_location=None,
+        tools="hover",
         tooltips=tooltips,
     )
     color_list = PALETTE * (len(df) // len(PALETTE) + 1)
     df["colour"] = color_list[0 : len(df)]
-    df["col"] = df["col"].map(lambda x: x[0:13] + "..." if len(x) > 13 else x)
-
-    if df.iloc[-1]["cnt"] == 0:  # no "Others" group
-        df = df.iloc[:-1]
+    df.index = df.index.map(lambda x: x[0:13] + "..." if len(x) > 13 else x)
 
     pie = fig.wedge(
         x=0,
@@ -351,7 +402,7 @@ def pie_viz(
         fill_color="colour",
         source=df,
     )
-    legend = Legend(items=[LegendItem(label=dict(field="col"), renderers=[pie])])
+    legend = Legend(items=[LegendItem(label=dict(field="index"), renderers=[pie])])
     legend.label_text_font_size = "8pt"
     fig.add_layout(legend, "right")
     tweak_figure(fig, "pie")
@@ -361,8 +412,8 @@ def pie_viz(
 
 
 def hist_viz(
-    df: pd.DataFrame,
-    miss_pct: float,
+    hist: Tuple[np.ndarray, np.ndarray],
+    nrows: int,
     col: str,
     yscale: str,
     plot_width: int,
@@ -372,15 +423,29 @@ def hist_viz(
     """
     Render a histogram
     """
-    # pylint: disable=too-many-arguments
-    title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else f"{col}"
-    tooltips = [("Bin", "@intvls"), ("Frequency", "@freq"), ("Percent", "@pct{0.2f}%")]
+    # pylint: disable=too-many-arguments,too-many-locals
+    counts, bins = hist
+    npresent = counts.sum()
+    intvls = _format_bin_intervals(bins)
+    df = pd.DataFrame(
+        {
+            "intvl": intvls,
+            "left": bins[:-1],
+            "right": bins[1:],
+            "freq": counts,
+            "pct": counts / nrows * 100,
+        }
+    )
+    miss_pct = np.round((nrows - npresent) / nrows * 100, 1)
+
+    title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else col
+    tooltips = [("Bin", "@intvl"), ("Frequency", "@freq"), ("Percent", "@pct{0.2f}%")]
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
-        toolbar_location=None,
         title=title,
-        tools=[],
+        toolbar_location=None,
+        tools="",
         y_axis_type=yscale,
     )
     bottom = 0 if yscale == "linear" or df.empty else df["freq"].min() / 2
@@ -407,10 +472,9 @@ def hist_viz(
     return fig
 
 
-def hist_kde_viz(
-    df: pd.DataFrame,
-    pts_rng: np.ndarray,
-    pdf: np.ndarray,
+def kde_viz(
+    hist: Tuple[np.ndarray, np.ndarray],
+    kde: np.ndarray,
     col: str,
     yscale: str,
     plot_width: int,
@@ -419,30 +483,37 @@ def hist_kde_viz(
     """
     Render histogram with overlayed kde
     """
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-locals
+    dens, bins = hist
+    intvls = _format_bin_intervals(bins)
+    df = pd.DataFrame(
+        {"intvl": intvls, "left": bins[:-1], "right": bins[1:], "dens": dens,}
+    )
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
-        title=f"{col}",
-        tools=[],
+        title=col,
+        tools="",
         toolbar_location=None,
         y_axis_type=yscale,
     )
-    bottom = 0 if yscale == "linear" or df.empty else df["freq"].min() / 2
+    bottom = 0 if yscale == "linear" or df.empty else df["dens"].min() / 2
     hist = fig.quad(
         source=df,
         left="left",
         right="right",
         bottom=bottom,
         alpha=0.5,
-        top="freq",
+        top="dens",
         fill_color="#6baed6",
     )
     hover_hist = HoverTool(
         renderers=[hist],
-        tooltips=[("Bin", "@intervals"), ("Density", "@freq")],
+        tooltips=[("Bin", "@intvl"), ("Density", "@dens")],
         mode="vline",
     )
+    pts_rng = np.linspace(df.loc[0, "left"], df.loc[len(df) - 1, "right"], 1000)
+    pdf = kde(pts_rng)
     line = fig.line(  # pylint: disable=too-many-function-args
         pts_rng, pdf, line_color="#9467bd", line_width=2, alpha=0.5
     )
@@ -454,13 +525,14 @@ def hist_kde_viz(
     fig.xaxis.axis_label = col
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if yscale == "linear":
-        _format_axis(fig, 0, max(df["freq"].max(), pdf.max()), "y")
+        _format_axis(fig, 0, max(df["dens"].max(), pdf.max()), "y")
     return Panel(child=fig, title="KDE plot")
 
 
 def qqnorm_viz(
-    actual_qs: np.ndarray,
-    theory_qs: np.ndarray,
+    qntls: pd.Series,
+    mean: float,
+    std: float,
     col: str,
     plot_width: int,
     plot_height: int,
@@ -468,26 +540,112 @@ def qqnorm_viz(
     """
     Render a qq plot
     """
+    # pylint: disable=too-many-arguments
+    theory_qntls = norm.ppf(np.linspace(0.01, 0.99, 99), mean, std)
     tooltips = [("x", "@x"), ("y", "@y")]
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
-        title=f"{col}",
+        title=col,
         tools="hover",
         toolbar_location=None,
         tooltips=tooltips,
     )
     fig.circle(
-        x=theory_qs, y=actual_qs, size=3, color=PALETTE[0],
+        x=theory_qntls, y=qntls, size=3, color=PALETTE[0],
     )
-    vals = np.concatenate((theory_qs, actual_qs))
+    vals = np.concatenate((theory_qntls, qntls))
     fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color="red")
     tweak_figure(fig, "qq")
     fig.xaxis.axis_label = "Normal Quantiles"
     fig.yaxis.axis_label = f"Quantiles of {col}"
     _format_axis(fig, vals.min(), vals.max(), "x")
     _format_axis(fig, vals.min(), vals.max(), "y")
-    return Panel(child=fig, title="QQ Normal Plot")
+    return Panel(child=fig, title="Normal Q-Q Plot")
+
+
+def univar_box_viz(
+    box_data: Dict[str, Any], col: str, plot_width: int, plot_height: int,
+) -> Panel:
+    """
+    Render a box plot visualization
+    """
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-statements
+    otlrs = box_data.pop("otlrs")
+    df = pd.DataFrame(box_data, index=[0])
+
+    fig = figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        title=col,
+        toolbar_location=None,
+        tools="",
+        x_range=list(df["grp"]),
+    )
+    utail = fig.segment(
+        x0="grp", y0="uw", x1="grp", y1="q3", line_color="black", source=df
+    )
+    ltail = fig.segment(
+        x0="grp", y0="lw", x1="grp", y1="q1", line_color="black", source=df
+    )
+    ubox = fig.vbar(
+        x="grp",
+        width=0.7,
+        top="q3",
+        bottom="q2",
+        fill_color=PALETTE[0],
+        line_color="black",
+        source=df,
+    )
+    lbox = fig.vbar(
+        x="grp",
+        width=0.7,
+        top="q2",
+        bottom="q1",
+        fill_color=PALETTE[0],
+        line_color="black",
+        source=df,
+    )
+    loww = fig.segment(
+        x0="x0", y0="lw", x1="x1", y1="lw", line_color="black", source=df
+    )
+    upw = fig.segment(x0="x0", y0="uw", x1="x1", y1="uw", line_color="black", source=df)
+    if otlrs.any():
+        otlrs = np.random.choice(otlrs, size=100)
+        otlrs_grp = [col] * len(otlrs)
+        circ = fig.circle(  # pylint: disable=too-many-function-args
+            otlrs_grp,
+            otlrs,
+            size=3,
+            line_color="black",
+            color=PALETTE[6],
+            fill_alpha=0.6,
+        )
+        fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
+    tooltips = [
+        ("Upper Whisker", "@uw"),
+        ("Upper Quartile", "@q3"),
+        ("Median", "@q2"),
+        ("Lower Quartile", "@q1"),
+        ("Lower Whisker", "@lw"),
+    ]
+    fig.add_tools(
+        HoverTool(
+            renderers=[upw, utail, ubox, lbox, ltail, loww],
+            tooltips=tooltips,
+            point_policy="follow_mouse",
+        )
+    )
+    tweak_figure(fig, "box")
+    fig.xaxis.major_tick_line_color = None
+    fig.xaxis.major_label_text_font_size = "0pt"
+    fig.yaxis.axis_label = col
+
+    minw = otlrs.min() if otlrs.any() else np.nan
+    maxw = otlrs.max() if otlrs.any() else np.nan
+    _format_axis(fig, min(df["lw"].min(), minw), max(df["uw"].max(), maxw), "y")
+
+    return Panel(child=fig, title="Box Plot")
 
 
 def box_viz(
@@ -1096,18 +1254,32 @@ def dt_multiline_viz(
     return Panel(child=fig, title="Line Chart")
 
 
-def stats_viz(
-    data: Tuple[Dict[str, str], Dict[str, int]], plot_width: int, plot_height: int
-) -> Div:
+def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
     """
     Render statistics information for grid plots
     """
+    # pylint: disable=too-many-locals
+    nrows, ncols, npresent_cells, nrows_wo_dups, mem_use, dtypes_cnt = stats.values()
+    ncells = nrows * ncols
+
+    data = {
+        "Number of Variables": ncols,
+        "Number of Observations": nrows,
+        "Missing Cells": float(ncells - npresent_cells),
+        "Missing Cells (%)": 1 - (npresent_cells / ncells),
+        "Duplicate Rows": nrows - nrows_wo_dups,
+        "Duplicate Rows (%)": 1 - (nrows_wo_dups / nrows),
+        "Total Size in Memory": float(mem_use),
+        "Average Record Size in Memory": mem_use / nrows,
+    }
+    data = {k: _format_values(k, v) for k, v in data.items()}
+
     ov_content = '<h3 style="text-align:center;">Dataset Statistics</h3>'
     type_content = '<h3 style="text-align:center;">Variable Types</h3>'
-    for key, value in data[0].items():
+    for key, value in data.items():
         value = _sci_notation_superscript(value)
         ov_content += _create_table_row(key, value)
-    for key, value in data[1].items():  # type: ignore
+    for key, value in dtypes_cnt.items():  # type: ignore
         type_content += _create_table_row(key, value)
 
     ov_content = f"""
@@ -1139,20 +1311,56 @@ def stats_viz(
     )
 
 
-def stats_viz_num(
-    data: Tuple[Dict[str, str], Dict[str, str], Dict[str, str]],
-    plot_width: int,
-    plot_height: int,
-) -> Panel:
+def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
     """
     Render statistics panel for numerical data
     """
+    overview = {
+        "Distinct Count": data["nunique"],
+        "Unique (%)": data["nunique"] / data["npresent"],
+        "Missing": data["nrows"] - data["npresent"],
+        "Missing (%)": 1 - (data["npresent"] / data["nrows"]),
+        "Infinite": data["ninfinite"],
+        "Infinite (%)": data["ninfinite"] / data["nrows"],
+        "Mean": data["mean"],
+        "Minimum": data["min"],
+        "Maximum": data["max"],
+        "Zeros": data["nzero"],
+        "Zeros (%)": data["nzero"] / data["nrows"],
+        "Memory Size": data["mem_use"],
+    }
+    quantile = {
+        "Minimum": data["min"],
+        "5-th Percentile": data["qntls"].iloc[5],
+        "Q1": data["qntls"].iloc[25],
+        "Median": data["qntls"].iloc[50],
+        "Q3": data["qntls"].iloc[75],
+        "95-th Percentile": data["qntls"].iloc[95],
+        "Maximum": data["max"],
+        "Range": data["max"] - data["min"],
+        "IQR": data["qntls"].iloc[75] - data["qntls"].iloc[25],
+    }
+    descriptive = {
+        "Standard Deviation": data["std"],
+        "Coefficient of Variation": data["std"] / data["mean"]
+        if data["mean"] != 0
+        else np.nan,
+        "Kurtosis": float(data["kurt"]),
+        "Mean": data["mean"],
+        "Skewness": float(data["skew"]),
+        "Sum": data["mean"] * data["npresent"],
+        "Variance": data["std"] ** 2,
+    }
+    overview = {k: _format_values(k, v) for k, v in overview.items()}
+    quantile = {k: _format_values(k, v) for k, v in quantile.items()}
+    descriptive = {k: _format_values(k, v) for k, v in descriptive.items()}
+
     ov_content = ""
     qs_content = (
         '<h4 style="text-align:center; margin:1em auto 0.2em;">Quantile Statistics</h4>'
     )
     ds_content = '<h4 style="text-align:center; margin:1em auto 0.2em;">Descriptive Statistics</h4>'
-    for key, value in data[0].items():
+    for key, value in overview.items():
         value = _sci_notation_superscript(value)
         if "Distinct" in key and float(value) > 50:
             ov_content += _create_table_row(key, value, True)
@@ -1165,10 +1373,10 @@ def stats_viz_num(
             ov_content += _create_table_row(key, value, True)
         else:
             ov_content += _create_table_row(key, value)
-    for key, value in data[1].items():
+    for key, value in quantile.items():
         value = _sci_notation_superscript(value)
         qs_content += _create_table_row(key, value)
-    for key, value in data[2].items():
+    for key, value in descriptive.items():
         value = _sci_notation_superscript(value)
         if "Skewness" in key and float(value) > 20:
             ds_content += _create_table_row(key, value, True)
@@ -1211,19 +1419,37 @@ def stats_viz_num(
 
 
 def stats_viz_cat(
-    data: Tuple[Dict[str, str], Dict[str, str], Dict[str, str], Dict[str, str]],
+    stats: Dict[str, Any],
+    length_stats: Dict[str, Any],
+    letter_stats: Dict[str, Any],
     plot_width: int,
     plot_height: int,
 ) -> Panel:
     """
     Render statistics panel for categorical data
     """
+    # pylint: disable=too-many-locals
+    ov_stats = {
+        "Distinct Count": stats["nunique"],
+        "Unique (%)": stats["nunique"] / stats["npresent"],
+        "Missing": stats["nrows"] - stats["npresent"],
+        "Missing (%)": 1 - stats["npresent"] / stats["nrows"],
+        "Memory Size": stats["mem_use"],
+    }
+    sampled_rows = ("1st row", "2nd row", "3rd row", "4th row", "5th row")
+    smpl = dict(zip(sampled_rows, stats["first_rows"]))
+
+    ov_stats = {k: _format_values(k, v) for k, v in ov_stats.items()}
+    length_stats = {k: _format_values(k, v) for k, v in length_stats.items()}
+    smpl = {k: f"{v[:18]}..." if len(v) > 18 else v for k, v in smpl.items()}
+    letter_stats = {k: _format_values(k, v) for k, v in letter_stats.items()}
+
     # pylint: disable=line-too-long
     ov_content = ""
     lens_content = ""
-    qs_content = ""
+    smpl_content = ""
     ls_content = ""
-    for key, value in data[0].items():
+    for key, value in ov_stats.items():
         value = _sci_notation_superscript(value)
         if "Distinct" in key and float(value) > 50:
             ov_content += _create_table_row(key, value, True)
@@ -1233,11 +1459,11 @@ def stats_viz_cat(
             ov_content += _create_table_row(key, value, True)
         else:
             ov_content += _create_table_row(key, value)
-    for key, value in data[1].items():
+    for key, value in length_stats.items():
         lens_content += _create_table_row(key, value)
-    for key, value in data[2].items():
-        qs_content += _create_table_row(key, value)
-    for key, value in data[3].items():
+    for key, value in smpl.items():
+        smpl_content += _create_table_row(key, value)
+    for key, value in letter_stats.items():
         ls_content += _create_table_row(key, value)
 
     ov_content = f"""
@@ -1248,11 +1474,11 @@ def stats_viz_cat(
         </table>
     </div>
     """
-    qs_content = f"""
+    smpl_content = f"""
     <div style="grid-area: b;">
         <h3 style="text-align: center;">Sample</h3>
         <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{qs_content}</tbody>
+            <tbody>{smpl_content}</tbody>
         </table>
     </div>
     """
@@ -1275,7 +1501,7 @@ def stats_viz_cat(
 
     container = f"""<div style="display: grid;grid-template-columns: 1fr 1fr;grid-template-rows: 1fr 1fr;gap: 1px 1px;
                 grid-template-areas:\'a b\' \'c d\';">
-                {ov_content}{qs_content}{ls_content}{lens_content}</div>"""
+                {ov_content}{smpl_content}{ls_content}{lens_content}</div>"""
 
     div = Div(
         text=container, width=plot_width, height=plot_height, style={"width": "100%"}
@@ -1314,20 +1540,22 @@ def stats_viz_dt(
     return Panel(child=div, title="Stats")
 
 
-def render_basic(
+def render_distribution_grid(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
 ) -> Box:
     """
     Render plots and dataset stats from plot(df)
     """  # pylint: disable=too-many-locals
     figs = list()
+    nrows = itmdt["stats"]["nrows"]
     for col, dtype, data in itmdt["data"]:
         if is_dtype(dtype, Nominal()):
-            df, total_grps, miss_pct = data
+            df, ttl_grps, npresent = data
             fig = bar_viz(
-                df[:-1],
-                total_grps,
-                miss_pct,
+                df,
+                ttl_grps,
+                npresent,
+                nrows,
                 col,
                 yscale,
                 plot_width,
@@ -1336,8 +1564,7 @@ def render_basic(
             )
             figs.append(fig)
         elif is_dtype(dtype, Continuous()):
-            df, miss_pct = data
-            fig = hist_viz(df, miss_pct, col, yscale, plot_width, plot_height, False)
+            fig = hist_viz(data, nrows, col, yscale, plot_width, plot_height, False)
             figs.append(fig)
         elif is_dtype(dtype, DateTime()):
             df, timeunit, miss_pct = data
@@ -1347,12 +1574,11 @@ def render_basic(
             figs.append(fig)
 
     stats_section = stats_viz(
-        itmdt["statsdata"], plot_width=plot_width, plot_height=plot_height
+        itmdt["stats"], plot_width=plot_width, plot_height=plot_height
     )
     plot_section = gridplot(
         children=figs, sizing_mode=None, toolbar_location=None, ncols=3,
     )
-
     button = Button(
         label="Show Stats Info", width=plot_width * 3, button_type="primary"
     )
@@ -1378,35 +1604,39 @@ def render_cat(
     """
     Render plots from plot(df, x) when x is a categorical column
     """
+    # pylint: disable=too-many-locals
     tabs: List[Panel] = []
-    osd = itmdt["statsdata"]
-    tabs.append(stats_viz_cat(osd, plot_width, plot_height))
-    df, total_grps, miss_pct = itmdt["data"]
+    col = itmdt["col"]
+    # overview, word length, and charater level statistcs
+    stats, length_stats, letter_stats = itmdt["stats"]
+    # histogram or word lengths
+    hist = length_stats.pop("hist")
+    # number of present (not null) rows, and total rows
+    npresent, nrows = stats["npresent"], stats["nrows"]
+
+    # categorical statistics
+    tabs.append(
+        stats_viz_cat(stats, length_stats, letter_stats, plot_width, plot_height)
+    )
+    # Bar chart and pie chart of the categorical values.
+    df, ttl_grps = itmdt["bar_pie"]
     fig = bar_viz(
-        df[:-1],
-        total_grps,
-        miss_pct,
-        itmdt["col"],
-        yscale,
-        plot_width,
-        plot_height,
-        True,
+        df, ttl_grps, npresent, nrows, col, yscale, plot_width, plot_height, True,
     )
     tabs.append(Panel(child=row(fig), title="Bar Chart"))
-    tabs.append(pie_viz(df, itmdt["col"], miss_pct, plot_width, plot_height))
-    freq_tuple = itmdt["word_cloud"]
-    if freq_tuple[0] != 0:
-        word_cloud = wordcloud_viz(freq_tuple, plot_width, plot_height)
-        tabs.append(Panel(child=row(word_cloud), title="Word Cloud"))
-        wordfreq = wordfreq_viz(freq_tuple, plot_width, plot_height, True)
-        tabs.append(Panel(child=row(wordfreq), title="Word Frequencies"))
-    df, miss_pct = itmdt["length_dist"]
-    length_dist = hist_viz(
-        df, miss_pct, "length", yscale, plot_width, plot_height, True
-    )
-    tabs.append(Panel(child=row(length_dist), title="Word Length"))
-    tabs = Tabs(tabs=tabs)
+    tabs.append(pie_viz(df, nrows, col, plot_width, plot_height))
 
+    # word counts and total number of words for the wordcloud and word frequencies bar chart
+    word_cnts, nwords = itmdt["word_data"]
+    if nwords > 0:
+        tabs.append(wordcloud_viz(word_cnts, plot_width, plot_height))
+        tabs.append(wordfreq_viz(word_cnts, nwords, plot_width, plot_height, True))
+
+    # word length histogram
+    length_dist = hist_viz(hist, nrows, "length", yscale, plot_width, plot_height, True)
+    tabs.append(Panel(child=row(length_dist), title="Word Length"))
+
+    tabs = Tabs(tabs=tabs)
     return tabs
 
 
@@ -1416,27 +1646,30 @@ def render_num(
     """
     Render plots from plot(df, x) when x is a numerical column
     """  # pylint: disable=too-many-locals
+    col = itmdt["col"]
     tabs: List[Panel] = []
-    osd, qsd, dsd = itmdt["statsdata"]
-    tabs.append(stats_viz_num((osd, qsd, dsd), plot_width, plot_height))
-    df, miss_pct = itmdt["histdata"]
-    fig = hist_viz(df, miss_pct, itmdt["col"], yscale, plot_width, plot_height, True)
+    tabs.append(stats_viz_num(itmdt["stats"], plot_width, plot_height))
+    fig = hist_viz(
+        itmdt["hist"],
+        itmdt["stats"]["nrows"],
+        col,
+        yscale,
+        plot_width,
+        plot_height,
+        True,
+    )
     tabs.append(Panel(child=fig, title="Histogram"))
-    df, pts_rng, pdf, _, _ = itmdt["kdedata"]
-    if np.any(pdf):
-        tabs.append(
-            hist_kde_viz(
-                df, pts_rng, pdf, itmdt["col"], yscale, plot_width, plot_height
-            )
-        )
-    actual_qs, theory_qs, _, _ = itmdt["qqdata"]
-    if np.any(theory_qs[~np.isnan(theory_qs)]):
-        tabs.append(
-            qqnorm_viz(actual_qs, theory_qs, itmdt["col"], plot_width, plot_height)
-        )
-    df, outx, outy, _ = itmdt["boxdata"]
-    tabs.append(box_viz(df, outx, outy, itmdt["col"], plot_width, plot_height))
-
+    hist, kde = itmdt["kde"]
+    if kde is not None:
+        tabs.append(kde_viz(hist, kde, col, yscale, plot_width, plot_height))
+    qntls, mean, std = (
+        itmdt["stats"]["qntls"],
+        itmdt["stats"]["mean"],
+        itmdt["stats"]["std"],
+    )
+    if qntls.any():
+        tabs.append(qqnorm_viz(qntls, mean, std, col, plot_width, plot_height))
+    tabs.append(univar_box_viz(itmdt["box_data"], col, plot_width, plot_height))
     tabs = Tabs(tabs=tabs)
     return tabs
 
@@ -1685,8 +1918,10 @@ def render(
         The width of the wide plots
     """
     # pylint: disable=too-many-arguments
-    if itmdt.visual_type == "basic_grid":
-        visual_elem = render_basic(itmdt, yscale, plot_width_sml, plot_height_sml)
+    if itmdt.visual_type == "distribution_grid":
+        visual_elem = render_distribution_grid(
+            itmdt, yscale, plot_width_sml, plot_height_sml
+        )
     elif itmdt.visual_type == "categorical_column":
         visual_elem = render_cat(itmdt, yscale, plot_width_lrg, plot_height_lrg)
     elif itmdt.visual_type == "numerical_column":

@@ -1,32 +1,29 @@
 """
 This module implements the intermediates computation for plot(df) function.
 """  # pylint: disable=too-many-lines
-from sys import stderr
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, Tuple, Union, cast, DefaultDict
 
-import copy
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from scipy.stats import gaussian_kde, norm, kurtosis, skew, median_absolute_deviation
-from nltk.tokenize import RegexpTokenizer
+from dask.array.stats import kurtosis, skew
 from nltk.stem import PorterStemmer, WordNetLemmatizer
-from nltk import FreqDist
+from scipy.stats import gaussian_kde
 
-
+from ...assets.english_stopwords import english_stopwords
 from ...errors import UnreachableError
-from ...assets import english_stopwords
 from ..dtypes import (
-    is_dtype,
-    detect_dtype,
-    DType,
-    Nominal,
     Continuous,
     DateTime,
+    DType,
     DTypeDef,
+    Nominal,
+    detect_dtype,
     drop_null,
+    is_dtype,
 )
 from ..intermediate import Intermediate
 from ..utils import to_dask
@@ -62,12 +59,12 @@ def compute(
     timeunit: str = "auto",
     agg: str = "mean",
     sample_size: int = 1000,
+    top_words: int = 30,
+    stopword: bool = True,
+    lemmatize: bool = False,
+    stem: bool = False,
     value_range: Optional[Tuple[float, float]] = None,
     dtype: Optional[DTypeDef] = None,
-    top_words: Optional[int] = 30,
-    stopword: Optional[bool] = True,
-    lemmatize: Optional[bool] = False,
-    stem: Optional[bool] = False,
 ) -> Intermediate:
     """
     Parameters
@@ -104,14 +101,6 @@ def compute(
         Specify the aggregate to use when aggregating over a numeric column
     sample_size: int, default 1000
         Sample size for the scatter plot
-    value_range: Optional[Tuple[float, float]], default None
-        The lower and upper bounds on the range of a numerical column.
-        Applies when column x is specified and column y is unspecified.
-    dtype: str or DType or dict of str or dict of DType, default None
-        Specify Data Types for designated column or all columns.
-        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
-        dtype = {"a": Continuous(), "b": "nominal"}
-        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     top_words: int, default 30
         Specify the amount of words to show in the wordcloud and
         word frequency bar chart
@@ -124,6 +113,14 @@ def compute(
     stem: bool, default False
         Apply Potter Stem on the text data for plotting wordcloud and
         word frequency bar chart
+    value_range: Optional[Tuple[float, float]], default None
+        The lower and upper bounds on the range of a numerical column.
+        Applies when column x is specified and column y is unspecified.
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """  # pylint: disable=too-many-locals
 
     df = to_dask(df)
@@ -140,12 +137,12 @@ def compute(
             ngroups,
             largest,
             timeunit,
-            value_range,
-            dtype,
             top_words,
             stopword,
             lemmatize,
             stem,
+            value_range,
+            dtype,
         )
 
     if sum(v is None for v in (x, y, z)) == 1:
@@ -178,7 +175,7 @@ def compute_overview(
     timeunit: str,
     dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-locals
     """
     Compute functions for plot(df)
     Parameters
@@ -207,32 +204,43 @@ def compute_overview(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
+    # extract the first rows for checking if a column contains a mutable type
+    first_rows: pd.DataFrame = df.head()  # dd.DataFrame.head triggers a (small) data read
 
     datas: List[Any] = []
-    counter = {"Categorical": 0, "Numerical": 0, "Datetime": 0}
+    dtype_cnts: DefaultDict[str, int] = defaultdict(int)
     col_names_dtypes: List[Tuple[str, DType]] = []
     for column in df.columns:
-        column_dtype = detect_dtype(df[column], dtype)
+        srs = df[column]
+        column_dtype = detect_dtype(srs, dtype)
+
         if is_dtype(column_dtype, Nominal()):
+            # cast the column as string type if it contains a mutable type
+            try:
+                first_rows[column].apply(hash)
+            except TypeError:
+                srs = df[column] = srs.dropna().astype(str)
             # bar chart
-            datas.append(dask.delayed(calc_bar_pie)(df[column], ngroups, largest))
+            datas.append(calc_bar(srs, ngroups, largest))
             col_names_dtypes.append((column, Nominal()))
-            counter["Categorical"] += 1
+            dtype_cnts["Categorical"] += 1
         elif is_dtype(column_dtype, Continuous()):
             # histogram
-            datas.append(dask.delayed(calc_hist)(df[column], bins))
+            hist = da.histogram(drop_null(srs), bins=bins, range=[srs.min(), srs.max()])
+            datas.append(hist)
             col_names_dtypes.append((column, Continuous()))
-            counter["Numerical"] += 1
+            dtype_cnts["Numerical"] += 1
         elif is_dtype(column_dtype, DateTime()):
             datas.append(dask.delayed(calc_line_dt)(df[[column]], timeunit))
             col_names_dtypes.append((column, DateTime()))
-            counter["Datetime"] += 1
+            dtype_cnts["DateTime"] += 1
         else:
             raise UnreachableError
-    datas.append(dask.delayed(calc_stats)(df, counter))
-    datas = dask.compute(*datas)
-    data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas[:-1])]
-    return Intermediate(data=data, statsdata=datas[-1], visual_type="basic_grid")
+
+    stats = calc_stats(df, dtype_cnts)
+    datas, stats = dask.compute(datas, stats)
+    data = [(col, dtp, dat) for (col, dtp), dat in zip(col_names_dtypes, datas)]
+    return Intermediate(data=data, stats=stats, visual_type="distribution_grid",)
 
 
 def compute_univariate(
@@ -242,12 +250,12 @@ def compute_univariate(
     ngroups: int,
     largest: bool,
     timeunit: str,
+    top_words: int,
+    stopword: bool = True,
+    lemmatize: bool = False,
+    stem: bool = False,
     value_range: Optional[Tuple[float, float]] = None,
     dtype: Optional[DTypeDef] = None,
-    top_words: Optional[int] = 30,
-    stopword: Optional[bool] = True,
-    lemmatize: Optional[bool] = False,
-    stem: Optional[bool] = False,
 ) -> Intermediate:
     """
     Compute functions for plot(df, x)
@@ -273,14 +281,6 @@ def compute_univariate(
         It can be "year", "quarter", "month", "week", "day", "hour",
         "minute", "second". With default value "auto", it will use the
         time unit such that the resulting number of groups is closest to 15.
-    value_range
-        The lower and upper bounds on the range of a numerical column.
-        Applies when column x is specified and column y is unspecified.
-    dtype: str or DType or dict of str or dict of DType, default None
-        Specify Data Types for designated column or all columns.
-        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
-        dtype = {"a": Continuous(), "b": "nominal"}
-        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     top_words: int, default 30
         Specify the amount of words to show in the wordcloud and
         word frequency bar chart
@@ -293,77 +293,86 @@ def compute_univariate(
     stem: bool, default False
         Apply Potter Stem on the text data for plotting wordcloud and
         word frequency bar chart
+    value_range
+        The lower and upper bounds on the range of a numerical column.
+        Applies when column x is specified and column y is unspecified.
+    dtype: str or DType or dict of str or dict of DType, default None
+        Specify Data Types for designated column or all columns.
+        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
+        dtype = {"a": Continuous(), "b": "nominal"}
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-locals, too-many-arguments
 
     col_dtype = detect_dtype(df[x], dtype)
     if is_dtype(col_dtype, Nominal()):
-        data_cat: List[Any] = []
-        # reset index for calculating quantile stats
-        df = df.reset_index()
-        # stats
-        data_cat.append(dask.delayed(calc_stats_cat)(df[x]))
-        # drop nan and empty spaces for plots
-        df[x].replace("", np.nan)
-        df = df.dropna(subset=[x])
-        # data for bar and pie charts
-        data_cat.append(dask.delayed(calc_bar_pie)(df[x], ngroups, largest))
-        # length_distribution
-        data_cat.append(dask.delayed(calc_hist)(df[x].str.len(), bins))
+        # extract the column
+        df_x = df[x]
+        # calculate the total rows
+        nrows = df_x.shape[0]
+        # cast the column as string type if it contains a mutable type
+        if df_x.head().apply(lambda x: hasattr(x, "__hash__")).any():
+            # drop_null() will not work if the column conatains a mutable type
+            df_x = df_x.dropna().astype(str)
 
-        statsdata_cat, data, length_dist = dask.compute(*data_cat)
+        # drop null values
+        df_x = drop_null(df_x)
 
-        # wordcloud and word frequencies
-        word_cloud = cal_word_freq(df, x, top_words, stopword, lemmatize, stem)
+        # calc_word_freq() returns the frequency of words (for the word cloud and word
+        # frequency bar chart) and the total number of words
+        word_data = calc_word_freq(df_x, top_words, stopword, lemmatize, stem)
+
+        # calc_cat_stats() computes all the categorical stats including the length
+        # histogram. calc_bar_pie() does the calculations for the bar and pie charts
+        # NOTE this dictionary could be returned to create_report without
+        # calling the subsequent compute
+        cat_data = {
+            "stats": calc_cat_stats(df_x, nrows, bins),
+            "bar_pie": calc_bar_pie(df_x, ngroups, largest),
+            "word_data": word_data,
+        }
+        cat_data = dask.compute(cat_data)[0]
 
         return Intermediate(
             col=x,
-            data=data,
-            statsdata=statsdata_cat,
-            word_cloud=word_cloud,
-            length_dist=length_dist,
+            stats=cat_data["stats"],
+            bar_pie=cat_data["bar_pie"],
+            word_data=cat_data["word_data"],
             visual_type="categorical_column",
         )
     elif is_dtype(col_dtype, Continuous()):
-        if value_range is not None:
-            if (
-                (value_range[0] <= np.nanmax(df[x]))
-                and (value_range[1] >= np.nanmin(df[x]))
-                and (value_range[0] < value_range[1])
-            ):
-                df = df[df[x].between(value_range[0], value_range[1])]
-            else:
-                print("Invalid range of values for this column", file=stderr)
-        data_num: List[Any] = []
+
+        # calculate the total number of rows then drop the missing values
+        nrows = df.shape[0]
         df_x = drop_null(df[x])
 
-        # qq plot
-        qqdata = calc_qqnorm(df_x)
-        # kde plot
-        kdedata = calc_hist_kde(df_x.values, bins)
-        # box plot
-        boxdata = calc_box(df_x.to_frame(), bins, dtype=dtype)
-        # histogram
-        data_num.append(dask.delayed(calc_hist)(df[x], bins))
-        # stats
-        data_num.append(
-            dask.delayed(calc_stats_num)(
-                df[x],
-                mean=qqdata[2],
-                std=qqdata[3],
-                min=kdedata[3],
-                max=kdedata[4],
-                quantile=qqdata[0],
-            )
-        )
-        histdata, statsdata_num = dask.compute(*data_num)
+        if value_range is not None:
+            df_x = df_x[df_x.between(*value_range)]
+
+        # TODO perhaps we should not use to_dask() on the entire
+        # initial dataframe and instead only use the column of data
+        # df_x = df_x.repartition(partition_size="100MB")
+
+        # calculate numerical statistics and extract the min and max
+        num_stats = calc_num_stats(df_x, nrows)
+        minv, maxv = num_stats["min"], num_stats["max"]
+
+        # NOTE this dictionary could be returned to create_report without
+        # calling the subsequent compute
+        num_data = {
+            "hist": da.histogram(df_x, bins=bins, range=[minv, maxv]),
+            "kde": calc_kde(df_x, bins, minv, maxv),
+            "box_data": calc_box_new(df_x, num_stats["qntls"]),
+            "stats": num_stats,
+        }
+        num_data = dask.compute(num_data)[0]
+
         return Intermediate(
             col=x,
-            histdata=histdata,
-            kdedata=kdedata,
-            qqdata=qqdata,
-            boxdata=boxdata,
-            statsdata=statsdata_num,
+            hist=num_data["hist"],
+            kde=num_data["kde"],
+            box_data=num_data["box_data"],
+            stats=num_data["stats"],
             visual_type="numerical_column",
         )
     elif is_dtype(col_dtype, DateTime()):
@@ -798,11 +807,14 @@ def calc_stacked_dt(
     return dfr, grp_cnt_stats, DTMAP[unit][3]
 
 
-def calc_bar_pie(
+def calc_bar(
     srs: dd.Series, ngroups: int, largest: bool
-) -> Tuple[pd.DataFrame, int, float]:
+) -> Tuple[dd.DataFrame, dd.core.Scalar, dd.core.Scalar]:
     """
-    Calculates the group counts given a series.
+    Calculates the counts of categorical values, the total number of
+    categorical values, and the number of non-null cells required
+    for a bar chart in plot(df).
+
     Parameters
     ----------
     srs
@@ -812,187 +824,273 @@ def calc_bar_pie(
     largest
         If true, show the groups with the largest count,
         else show the groups with the smallest count
-    Returns
-    -------
-    Tuple[pd.DataFrame, float]
-        A dataframe of the group counts, the total count of groups,
-        and the percent of missing values
     """
-    miss_pct = round(srs.isna().sum() / len(srs) * 100, 1)
-    try:
-        grp_srs = srs.groupby(srs).size()
-    except TypeError:
-        srs = srs.astype(str)
-        grp_srs = srs.groupby(srs).size()
-    # select largest or smallest groups
-    smp_srs = grp_srs.nlargest(n=ngroups) if largest else grp_srs.nsmallest(n=ngroups)
-    df = smp_srs.to_frame().rename(columns={srs.name: "cnt"}).reset_index()
-    # add a row containing the sum of the other groups
-    other_cnt = len(srs) - df["cnt"].sum()
-    df = df.append(pd.DataFrame({srs.name: ["Others"], "cnt": [other_cnt]}))
-    # add a column containing the percent of count in each group
-    df["pct"] = df["cnt"] / len(srs) * 100
-    df.columns = ["col", "cnt", "pct"]
-    df["col"] = df["col"].astype(str)  # needed when numeric is cast as categorical
-    return df, len(grp_srs), miss_pct
+    # drop null values
+    srs_present = drop_null(srs)
+    # number of present (not null) values
+    npresent = srs_present.shape[0]
+    # counts of unique values in the series
+    grps = srs_present.value_counts(sort=False)
+    # total number of groups
+    ttl_grps = grps.shape[0]
+    # select the largest or smallest groups
+    fnl_grp_cnts = grps.nlargest(ngroups) if largest else grps.nsmallest(ngroups)
+
+    return fnl_grp_cnts.to_frame(), ttl_grps, npresent
 
 
-def tokenize_text(df: dd.DataFrame, x: str) -> dd.DataFrame:
+def calc_bar_pie(
+    srs: dd.Series, ngroups: int, largest: bool
+) -> Tuple[dd.DataFrame, dd.core.Scalar]:
     """
-    tokenize the text column and only keep the words
-    """
+    Calculates the counts of categorical values and the total number of
+    categorical values required for the bar and pie charts in plot(df, x).
 
-    def tokenize(text: str) -> Any:
-        text = text.lower()
-        tokenizer = RegexpTokenizer(r"\w+")
-        tokens = tokenizer.tokenize(text)
-        return tokens
-
-    df[x] = df[x].astype(str)
-    df["clean_text"] = df[x].apply(tokenize)
-    return df
-
-
-def clean_text(
-    freqdist: Dict[str, int],
-    non_single_word: int,
-    top_words: Optional[int] = 30,
-    stopword: Optional[bool] = True,
-    lemmatize: Optional[bool] = False,
-    stem: Optional[bool] = False,
-) -> Dict[Any, Any]:
-    """
-    clean the frequency dictionary by stopwords, lemmatization and stemming
-    """  # pylint: disable=too-many-arguments
-    freq_copy = copy.deepcopy(freqdist)
-    lemmatizer = WordNetLemmatizer()
-    porter = PorterStemmer()
-    for key in freq_copy.keys():
-        if stopword and non_single_word > top_words:  # type: ignore
-            if key in english_stopwords.english_stopwords or len(key) <= 2:
-                del freqdist[key]
-        if lemmatize:
-            if lemmatizer.lemmatize(key) != key:
-                freqdist[lemmatizer.lemmatize(key)] = freqdist[key]
-                del freqdist[key]
-        if stem:
-            if porter.stem(key) != key:
-                freqdist[porter.stem(key)] = freqdist[key]
-                del freqdist[key]
-    return freqdist
-
-
-def cal_word_freq(
-    df: dd.DataFrame,
-    x: str,
-    top_words: Optional[int] = 30,
-    stopword: Optional[bool] = True,
-    lemmatize: Optional[bool] = False,
-    stem: Optional[bool] = False,
-) -> Tuple[int, List[Tuple[str, int]]]:
-    """
-    Tokenize and clean the text column and calculate the top frequency words and total frequency
-    """
-    # pylint: disable=too-many-locals, too-many-arguments
-    df = df.map_partitions(tokenize_text, x)
-    df = dd.compute(df)
-    non_single_word = ((df[0][x].str.len()) > 1).sum()
-    freq = FreqDist([a for b in df[0]["clean_text"] for a in b])
-    freq = clean_text(freq, non_single_word, top_words, stopword, lemmatize, stem)
-    total_freq = sum(freq.values())
-    if len(freq) < top_words:  # type: ignore
-        top_words = len(freq)
-    top_freq = freq.most_common(top_words)
-
-    return total_freq, top_freq
-
-
-def calc_hist(srs: dd.Series, bins: int,) -> Tuple[pd.DataFrame, float]:
-    """
-    Calculate a histogram over a given series.
     Parameters
     ----------
     srs
-        One numerical column over which to compute the histogram
-    bins
-        Number of bins to use in the histogram
-    Returns
-    -------
-    Tuple[pd.DataFrame, float]:
-        The histogram in a dataframe and the percent of missing values
+        One categorical column
+    ngroups
+        Number of groups to return
+    largest
+        If true, show the groups with the largest count,
+        else show the groups with the smallest count
     """
-    miss_pct = round(srs.isna().sum() / len(srs) * 100, 1)
-    data = drop_null(srs).values
-    if len(data) == 0:  # all values in column are missing
-        return pd.DataFrame({"left": [], "right": [], "freq": []}), miss_pct
-    hist_arr, bins_arr = np.histogram(data, range=[data.min(), data.max()], bins=bins)
-    intvls = _format_bin_intervals(bins_arr)
-    hist_df = pd.DataFrame(
-        {
-            "intvls": intvls,
-            "left": bins_arr[:-1],
-            "right": bins_arr[1:],
-            "freq": hist_arr,
-            "pct": hist_arr / len(srs) * 100,
-        }
-    )
-    return hist_df, miss_pct
+    # counts of unique values in the series
+    grps = srs.value_counts(sort=False)
+    # total number of groups
+    ttl_grps = grps.shape[0]
+    # select the largest or smallest groups
+    fnl_grp_cnts = grps.nlargest(ngroups) if largest else grps.nsmallest(ngroups)
+
+    return fnl_grp_cnts.to_frame(), ttl_grps
 
 
-def calc_hist_kde(
-    data: da.Array, bins: int,
-) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray, float, float]:
+def calc_word_freq(
+    srs: dd.Series,
+    top_words: int = 30,
+    stopword: bool = True,
+    lemmatize: bool = False,
+    stem: bool = False,
+) -> Tuple[dd.Series, dd.core.Scalar]:
+    """
+    Parse a categorical column of text data into words, and then
+    compute the frequency distribution of words and the total
+    number of words.
+
+    Parameters
+    ----------
+    srs
+        One categorical column
+    top_words
+        Number of highest frequency words to show in the
+        wordcloud and word frequency bar chart
+    stopword
+        If True, remove stop words, else keep them
+    lemmatize
+        If True, lemmatize the words before computing
+        the word frequencies, else don't
+    stem
+        If True, extract the stem of the words before
+        computing the word frequencies, else don't
+    """
+    # pylint: disable=unnecessary-lambda
+    if stopword:
+        # use a regex to replace stop words with empty string
+        srs = srs.str.replace(r"\b(?:{})\b".format("|".join(english_stopwords)), "")
+    # replace all non-alphanumeric characters with an empty string, and convert to lowercase
+    srs = srs.str.replace(r"[^\w+ ]", "").str.lower()
+
+    # split each string on whitespace into words then apply "explode()" to "stack" all
+    # the words into a series
+    # NOTE this is slow. One possibly better solution: after .split(), count the words
+    # immediately rather than create a new series with .explode() and apply
+    # .value_counts()
+    srs = srs.str.split().explode()
+
+    # lemmatize and stem
+    if lemmatize or stem:
+        srs = srs.dropna()
+    if lemmatize:
+        lem = WordNetLemmatizer()
+        srs = srs.apply(lambda x: lem.lemmatize(x), meta=(srs.name, "object"))
+    if stem:
+        porter = PorterStemmer()
+        srs = srs.apply(lambda x: porter.stem(x), meta=(srs.name, "object"))
+
+    # counts of words, excludes null values
+    word_cnts = srs.value_counts(sort=False)
+    # total number of words
+    nwords = word_cnts.sum()
+    # words with the highest frequency
+    fnl_word_cnts = word_cnts.nlargest(n=top_words)
+
+    return fnl_word_cnts, nwords
+
+
+def calc_kde(
+    srs: dd.Series, bins: int, minv: float, maxv: float,
+) -> Tuple[Tuple[da.core.Array, da.core.Array], np.ndarray]:
     """
     Calculate a density histogram and its corresponding kernel density
-    estimate over a given series. The kernel is guassian.
+    estimate over a given series. The kernel is Gaussian.
     Parameters
     ----------
     data
         One numerical column over which to compute the histogram and kde
     bins
         Number of bins to use in the histogram
-    Returns
-    -------
-    Tuple[pd.DataFrame, np.ndarray, np.ndarray]
-        The histogram in a dataframe, range of points for the kde,
-        and the kde calculated at the specified points
     """
-    minv, maxv = dask.compute(data.min(), data.max())
-    hist_arr, bins_arr = da.histogram(data, range=[minv, maxv], bins=bins, density=True)
-    hist_arr = hist_arr.compute()
-    intervals = _format_bin_intervals(bins_arr)
-    hist_df = pd.DataFrame(
-        {
-            "intervals": intervals,
-            "left": bins_arr[:-1],
-            "right": bins_arr[1:],
-            "freq": hist_arr,
-        }
-    )
-    pts_rng = np.linspace(minv, maxv, 1000)
-    if minv == maxv:
-        pdf = np.zeros(1000, dtype=np.float64)
-    else:
-        pdf = gaussian_kde(data.compute())(pts_rng)
-    return hist_df, pts_rng, pdf, minv, maxv
+    # compute the density histogram
+    hist = da.histogram(srs, bins=bins, range=[minv, maxv], density=True)
+    # probability density function for the series
+    # NOTE gaussian_kde triggers a .compute()
+    try:
+        kde = gaussian_kde(
+            srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
+        )
+    except np.linalg.LinAlgError:
+        kde = None
+
+    return hist, kde
 
 
-def calc_qqnorm(srs: dd.Series) -> Tuple[np.ndarray, np.ndarray, float, float]:
+def calc_box_new(srs: dd.Series, qntls: dd.Series) -> Dict[str, Any]:
     """
-    Calculate QQ plot given a series.
+    Calculate the data required for a box plot
     Parameters
     ----------
     srs
-        One numerical column from which to compute the quantiles
-    Returns
-    -------
-    Tuple[np.ndarray, np.ndarray]
-        A tuple of (actual quantiles, theoretical quantiles)
+        One numerical column from which to compute the box plot data
+    qntls
+        Quantiles from the normal Q-Q plot
     """
-    q_range = np.linspace(0.01, 0.99, 100)
-    actual_qs, mean, std = dask.compute(srs.quantile(q_range), srs.mean(), srs.std())
-    theory_qs = np.sort(np.asarray(norm.ppf(q_range, mean, std)))
-    return actual_qs, theory_qs, mean, std
+    # box plot stats
+    # inter-quartile range
+    # TODO figure out how to extract a scalar from a Dask series without using a function like sum()
+    qrtl1 = qntls.loc[0.25].sum()
+    qrtl3 = qntls.loc[0.75].sum()
+    iqr = qrtl3 - qrtl1
+    srs_iqr = srs[srs.between(qrtl1 - 1.5 * iqr, qrtl3 + 1.5 * iqr)]
+    # outliers
+    otlrs = srs[~srs.between(qrtl1 - 1.5 * iqr, qrtl3 + 1.5 * iqr)]
+    # randomly sample at most 100 outliers from each partition without replacement
+    otlrs = otlrs.map_partitions(lambda x: x.sample(min(100, x.shape[0])), meta=otlrs)
+
+    box_data = {
+        "grp": srs.name,
+        "q1": qrtl1,
+        "q2": qntls.loc[0.5].sum(),
+        "q3": qrtl3,
+        "lw": srs_iqr.min(),
+        "uw": srs_iqr.max(),
+        "otlrs": otlrs.values,
+        "x": 1,  # x, x0, and x1 are for plotting the box plot with bokeh
+        "x0": 0.2,
+        "x1": 0.8,
+    }
+
+    return box_data
+
+
+def calc_stats(
+    df: dd.DataFrame, dtype_cnts: Dict[str, int]
+) -> Dict[str, Union[int, dd.core.Scalar, Dict[str, int]]]:
+    """
+    Calculate the statistics for plot(df) from a DataFrame
+
+    Parameters
+    ----------
+    df
+        a DataFrame
+    dtype_cnts
+        a dictionary that contains the count for each type
+    """
+    stats = {
+        "nrows": df.shape[0],
+        "ncols": df.shape[1],
+        "npresent_cells": df.count().sum(),
+        "nrows_wo_dups": df.drop_duplicates().shape[0],
+        "mem_use": df.memory_usage(deep=True).sum(),
+        "dtype_cnts": dtype_cnts,
+    }
+
+    return stats
+
+
+def calc_num_stats(srs: dd.Series, nrows: dd.core.Scalar,) -> Dict[str, Any]:
+    """
+    Calculate statistics for a numerical column
+    Parameters
+    ----------
+    srs
+        a numerical column
+    nrows
+        number of rows in the column before dropping null values
+    """
+    stats = {
+        "nrows": nrows,
+        "npresent": srs.shape[0],
+        "nunique": srs.nunique(),
+        "ninfinite": ((srs == np.inf) | (srs == -np.inf)).sum(),
+        "nzero": (srs == 0).sum(),
+        "min": srs.min(),
+        "max": srs.max(),
+        "qntls": srs.quantile(np.linspace(0.01, 0.99, 99)),
+        "mean": srs.mean(),
+        "std": srs.std(),
+        "skew": skew(srs),
+        "kurt": kurtosis(srs),
+        "mem_use": srs.memory_usage(),
+    }
+
+    return stats
+
+
+def calc_cat_stats(
+    srs: dd.Series, nrows: int, bins: int,
+) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+    """
+    Calculate stats for a categorical column
+    Parameters
+    ----------
+    srs
+        a categorical column
+    nrows
+        number of rows before dropping null values
+    bins
+        number of bins for the category length frequency histogram
+    """
+    # overview stats
+    stats = {
+        "nrows": nrows,
+        "npresent": srs.shape[0],
+        "nunique": srs.nunique(),
+        "mem_use": srs.memory_usage(),
+        "first_rows": srs.loc[:4],
+    }
+    # length stats
+    lengths = srs.str.len()
+    minv, maxv = lengths.min(), lengths.max()
+    hist = da.histogram(lengths.values, bins=bins, range=[minv, maxv])
+    length_stats = {
+        "Mean": lengths.mean(),
+        "Median": lengths.quantile(0.5),
+        "Minimum": minv,
+        "Maximum": maxv,
+        "hist": hist,
+    }
+    # letter stats
+    letter_stats = {
+        "Count": srs.str.count(r"[a-zA-Z]").sum(),
+        "Lowercase Letter": srs.str.count(r"[a-z]").sum(),
+        "Space Separator": srs.str.count(r"[ ]").sum(),
+        "Uppercase Letter": srs.str.count(r"[A-Z]").sum(),
+        "Dash Punctuation": srs.str.count(r"[-]").sum(),
+        "Decimal Number": srs.str.count(r"[0-9]").sum(),
+    }
+
+    return stats, length_stats, letter_stats
 
 
 def calc_box(
@@ -1263,156 +1361,6 @@ def calc_heatmap(
     return df_res, grp_cnt_stats
 
 
-def calc_stats_num(
-    srs: dd.Series, **kwargs: Any,
-) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
-    """
-    Calculate stats from a numerical column
-    Parameters
-    ----------
-    srs
-        a numerical column
-    Returns
-    -------
-    Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]
-        Dictionaries that contain Overview, Quantiles and Descriptives
-    """
-    size = len(srs)  # include nan
-    count = srs.count()  # exclude nan
-    uniq_count = srs.nunique()
-    inf_count = ((srs == np.inf) | (srs == -np.inf)).sum()
-    non_zero_count = np.count_nonzero(srs)
-    overview_dict = {
-        "Distinct Count": uniq_count,
-        "Unique (%)": uniq_count / count,
-        "Missing": size - count,
-        "Missing (%)": 1 - (count / size),
-        "Infinite": inf_count,
-        "Infinite (%)": inf_count / size,
-        "Mean": kwargs["mean"],
-        "Minimum": kwargs["min"],
-        "Maximum": kwargs["max"],
-        "Zeros": size - non_zero_count,
-        "Zeros (%)": 1 - non_zero_count / size,
-        "Memory Size": srs.memory_usage(),
-    }
-    quantiles_dict = {
-        "Minimum": kwargs["min"],
-        "5-th Percentile": kwargs["quantile"].iloc[5],
-        "Q1": kwargs["quantile"].iloc[25],
-        "Median": kwargs["quantile"].iloc[50],
-        "Q3": kwargs["quantile"].iloc[75],
-        "95-th Percentile": kwargs["quantile"].iloc[95],
-        "Maximum": kwargs["max"],
-        "Range": kwargs["max"] - kwargs["min"],
-        "IQR": kwargs["quantile"].iloc[75] - kwargs["quantile"].iloc[25],
-    }
-    descriptives_dict = {
-        "Standard Deviation": kwargs["std"],
-        "Coefficient of Variation": kwargs["std"] / kwargs["mean"]
-        if kwargs["mean"] != 0
-        else np.nan,
-        "Kurtosis": float(kurtosis(srs, nan_policy="omit")),
-        "Mean": kwargs["mean"],
-        "Median Absolute Deviation": float(
-            median_absolute_deviation(srs, nan_policy="omit")
-        ),
-        "Skewness": float(skew(srs, nan_policy="omit")),
-        "Sum": kwargs["mean"] * count,
-        "Variance": kwargs["std"] ** 2,
-    }
-    return (
-        {k: _format_values(k, v) for k, v in overview_dict.items()},
-        {k: _format_values(k, v) for k, v in quantiles_dict.items()},
-        {k: _format_values(k, v) for k, v in descriptives_dict.items()},
-    )
-
-
-def calc_stats_cat(
-    srs: dd.Series,
-) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str], Dict[str, str]]:
-    """
-    Calculate stats from a categorical column
-    Parameters
-    ----------
-    srs
-        a categorical column
-    Returns
-    -------
-    Dict[str, str]
-        Dictionary that contains Overview
-    """
-    # overview stats
-    size = len(srs)  # include nan
-    count = srs.count()  # exclude nan
-    try:
-        uniq_count = srs.nunique()
-    except TypeError:
-        srs = srs.astype(str)
-        uniq_count = srs.nunique()
-    overview_dict = {
-        "Distinct Count": uniq_count,
-        "Unique (%)": uniq_count / count,
-        "Missing": size - count,
-        "Missing (%)": 1 - (count / size),
-        "Memory Size": srs.memory_usage(),
-    }
-    srs = srs.astype("str")
-    # length stats
-    length = srs.str.len()
-    length_dict = {
-        "Mean": length.mean(),
-        "Median": length.median(),
-        "Minimum": length.min(),
-        "Maximum": length.max(),
-    }
-    # quantile stats
-    max_lbl_len = 25
-    quantile_dict = {}
-    for label, centile in zip(
-        ("1st Row", "25% Row", "50% Row", "75% Row", "Last Row",),
-        (0, 0.25, 0.5, 0.75, 1),
-    ):
-        if round(len(srs) * centile) == 0:
-            element = srs[round(len(srs) * centile)]
-            if len(element) > max_lbl_len:
-                quantile_dict[label] = element[0 : max_lbl_len - 2] + "..."
-            else:
-                quantile_dict[label] = element
-        else:
-            element = srs[round(len(srs) * centile) - 1]
-            if len(element) > max_lbl_len:
-                quantile_dict[label] = element[0 : max_lbl_len - 2] + "..."
-            else:
-                quantile_dict[label] = element
-
-    srs = drop_null(srs)
-    # length stats
-    length = srs.str.len()
-    length_dict = {
-        "Mean": length.mean(),
-        "Standard Deviation": length.std(),
-        "Median": length.median(),
-        "Minimum": length.min(),
-        "Maximum": length.max(),
-    }
-    # letter stats
-    letter_dict = {
-        "Count": srs.str.count(r"[a-zA-Z]").sum(),
-        "Lowercase Letter": srs.str.count(r"[a-z]").sum(),
-        "Space Separator": srs.str.count(r"[ ]").sum(),
-        "Uppercase Letter": srs.str.count(r"[A-Z]").sum(),
-        "Dash Punctuation": srs.str.count(r"[-]").sum(),
-        "Decimal Number": srs.str.count(r"[0-9]").sum(),
-    }
-    return (
-        {k: _format_values(k, v) for k, v in overview_dict.items()},
-        {k: _format_values(k, v) for k, v in length_dict.items()},
-        quantile_dict,
-        {k: _format_values(k, v) for k, v in letter_dict.items()},
-    )
-
-
 def calc_stats_dt(srs: dd.Series) -> Tuple[Dict[str, str]]:
     """
     Calculate stats from a datetime column
@@ -1439,48 +1387,6 @@ def calc_stats_dt(srs: dd.Series) -> Tuple[Dict[str, str]]:
     }
 
     return ({k: _format_values(k, v) for k, v in overview_dict.items()},)
-
-
-def calc_stats(
-    df: Union[dd.DataFrame, pd.DataFrame], counter: Dict[str, int]
-) -> Tuple[Dict[str, str], Dict[str, int]]:
-    """
-    Calculate stats from a DataFrame
-
-    Parameters
-    ----------
-    df
-        a DataFrame
-    counter
-        a dictionary that contains count for each type
-    Returns
-    -------
-    Tuple[Dict[str, str], Dict[str, int]]
-        Dictionary that contains Overview and Variable Types
-    """
-    dim = df.shape
-    total_cell = dim[0] * dim[1]
-    nonan_cell = df.count().sum()
-    memory_usage = float(df.memory_usage().sum())
-    try:  # for unhashable data types
-        dup_rows = len(df.drop_duplicates())
-    except TypeError:
-        df = df.astype(str)
-        dup_rows = len(df.drop_duplicates())
-    overview_dict = {
-        "Number of Variables": dim[1],
-        "Number of Observations": dim[0],
-        "Missing Cells": float(total_cell - nonan_cell),
-        "Missing Cells (%)": 1 - (nonan_cell / total_cell),
-        "Duplicate Rows": dim[0] - dup_rows,
-        "Duplicate Rows (%)": 1 - (dup_rows / dim[0]),
-        "Total Size in Memory": memory_usage,
-        "Average Record Size in Memory": memory_usage / dim[0],
-    }
-    return (
-        {k: _format_values(k, v) for k, v in overview_dict.items()},
-        {k: v for k, v in counter.items() if v != 0},
-    )
 
 
 def _calc_box_stats(grp_srs: dd.Series, grp: str, dlyd: bool = False) -> pd.DataFrame:
