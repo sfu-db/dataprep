@@ -14,6 +14,7 @@ from bokeh.models import (
     ColumnDataSource,
     CustomJS,
     FactorRange,
+    FuncTickFormatter,
     HoverTool,
     Legend,
     LegendItem,
@@ -116,6 +117,13 @@ def tweak_figure(fig: Figure) -> None:
     fig.axis.major_label_text_font_size = "9pt"
     fig.axis.major_label_standoff = 0
     fig.xaxis.major_label_orientation = math.pi / 3
+    # truncate axis tick values
+    format_js = """
+        if (tick.length > 15) return tick.substring(0, 13) + '...';
+        else return tick;
+    """
+    fig.xaxis.formatter = FuncTickFormatter(code=format_js)
+    fig.yaxis.formatter = FuncTickFormatter(code=format_js)
 
 
 def render_correlation_heatmaps(
@@ -207,7 +215,6 @@ def render_correlation_single_heatmaps(
         )
 
         fig.add_layout(color_bar, "right")
-
         tab = Panel(child=fig, title=method)
         tabs.append(tab)
 
