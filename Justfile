@@ -21,8 +21,8 @@ format:
 
 typeck: ci-mypy
 
-test:
-  poetry run pytest dataprep
+test +ARGS="":
+  poetry run pytest dataprep {{ARGS}}
 
 testf +ARGS="dataprep":
   poetry run pytest {{ARGS}}
