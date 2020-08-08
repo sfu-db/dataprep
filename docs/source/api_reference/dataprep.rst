@@ -14,7 +14,7 @@ auto-generated from the docstrings in the project source code.
    :maxdepth: 2
    :hidden:
 
-   dataprep.eda.basic
+   dataprep.eda.distribution
    dataprep.eda.correlation
    dataprep.eda.missing
    dataprep.eda.create_report
@@ -29,7 +29,7 @@ EDA Documentation
 .. toctree::
    :maxdepth: 2
 
-   dataprep.eda.basic
+   dataprep.eda.distribution
    dataprep.eda.correlation
    dataprep.eda.missing
    dataprep.eda.create_report
