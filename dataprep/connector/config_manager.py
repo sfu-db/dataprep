@@ -23,7 +23,7 @@ def config_directory() -> Path:
     Returns the config directory path
     """
     tmp = gettempdir()
-    return Path(tmp) / "dataprep" / "data_connector"
+    return Path(tmp) / "dataprep" / "connector"
 
 
 def ensure_config(impdb: str) -> bool:

@@ -10,4 +10,4 @@ The User Guide introduces the components of the DataPrep library.
     :titlesonly:
 
     eda/introduction
-    data_connector/data_connector
+    connector/connector

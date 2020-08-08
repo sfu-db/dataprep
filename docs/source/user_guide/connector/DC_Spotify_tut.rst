@@ -1,6 +1,6 @@
 
 ==================================================
-Tutorial - Data Connector for Spotify 
+Tutorial - Connector for Spotify 
 ==================================================
 
 .. toctree::
@@ -9,7 +9,7 @@ Tutorial - Data Connector for Spotify
 Overview
 ========
 
-data_connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. The goal is to help the users skip the complex API configuration. In this tutorial, we illustrate how to use data_connector library with Spotify.
+Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. The goal is to help the users skip the complex API configuration. In this tutorial, we illustrate how to use connector library with Spotify.
 
 
 Preprocessing
@@ -145,13 +145,13 @@ Below the configuration file are stored with dataprep.
 
 
     
-Initialize data_connector
+Initialize connector
 =============================
-To initialize the data_connector, run the following code below. Copy and paste your Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
+To initialize the connector, run the following code below. Copy and paste your Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
 
 ::
 
-    from dataprep.data_connector import Connector
+    from dataprep.connector import Connector
     client_id = “insert_client_id”
     client_secret = “insert_client_secret”
     access_token = “insert_token_key”
@@ -161,7 +161,7 @@ To initialize the data_connector, run the following code below. Copy and paste y
     
 Functionalities
 ===================
-Data connector has several functions you can perform to gain insight on the data downloaded from Spotify.
+Connector has several functions you can perform to gain insight on the data downloaded from Spotify.
 
 Connector.info
 ------------------
@@ -211,7 +211,7 @@ Connector.query
 ------------------
 The query method downloads the website data and displays it in a Dataframe. The parameters must meet the requirements as indicated in connector.info for the operation to run.
 
-When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.
+When the data is received from the server, it will either be in a JSON or XML format. The connector reformats the data in pandas Dataframe for the convenience of downstream operations.
 
 As an example, let's try to get the data from the "artist" table, providing the query search for the artist "beyonce".
 
@@ -225,7 +225,7 @@ As an example, let's try to get the data from the "artist" table, providing the 
    	:height: 460
     
 From query results, you can see how easy it is to download the artist data from Spotify into a pandas Dataframe.
-Now that you have an understanding of how data connector operates, you can easily accomplish the task with two lines of code.
+Now that you have an understanding of how connector operates, you can easily accomplish the task with two lines of code.
 
 ::
 
@@ -254,7 +254,7 @@ Pagination does not concurrently work with the **limit** parameter in a query, y
     
 That's all for now.
 ===================
-Please visit the other tutorials that are available if you are interested in setting up a data connector.
-If you are interested in creating other data connectors, please visit this `link
+Please visit the other tutorials that are available if you are interested in setting up a connector.
+If you are interested in creating other connectors, please visit this `link
 <https://github.com/sfu-db/DataConnectorConfigs>`_.
 

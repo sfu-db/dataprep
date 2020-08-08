@@ -3,14 +3,14 @@ from os import environ
 import asyncio
 import pytest
 
-from ...data_connector import Connector
+from ...connector import Connector
 
 
 @pytest.mark.skipif(
     environ.get("DATAPREP_CREDENTIAL_TESTS", "0") == "0",
     reason="Skip tests that requires credential",
 )
-def test_data_connector() -> None:
+def test_connector() -> None:
     token = environ["DATAPREP_DATA_CONNECTOR_YELP_TOKEN"]
     dc = Connector("yelp", _auth={"access_token": token}, _concurrency=3)
     df = asyncio.run(dc.query("businesses", term="ramen", location="vancouver"))
