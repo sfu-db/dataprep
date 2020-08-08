@@ -3,24 +3,28 @@
     visualization part.
 """
 import math
-from typing import Tuple, Union
-from typing import List, Sequence, Optional
+from typing import Tuple, Union, Dict
+from typing import List, Sequence, Optional, Any
 import numpy as np
 
 import pandas as pd
+from bokeh.layouts import row
 from bokeh.models import (
     BasicTicker,
     CategoricalColorMapper,
     ColorBar,
+    ColumnDataSource,
     FactorRange,
+    FuncTickFormatter,
+    HoverTool,
     LayoutDOM,
     LinearColorMapper,
     NumeralTickFormatter,
     Panel,
+    PrintfTickFormatter,
     Range1d,
     Tabs,
     Title,
-    PrintfTickFormatter,
 )
 
 # pylint: disable=no-name-in-module
@@ -272,15 +276,22 @@ def render_missing_impact(
     """
     tabs: List[Panel] = []
     fig_barchart = render_bar_chart(
-        itmdt["data_bars"], "linear", plot_width, plot_height, False
+        itmdt["data_bars"], "linear", plot_width, plot_height
     )
-    tabs.append(Panel(child=fig_barchart, title="Bar Chart"))
+    tabs.append(Panel(child=row(fig_barchart), title="Bar Chart"))
+
     fig_spectrum = render_missing_spectrum(
         itmdt["data_spectrum"], itmdt["data_total_missing"], plot_width, plot_height
     )
-    tabs.append(Panel(child=fig_spectrum, title="Spectrum"))
+    tabs.append(Panel(child=row(fig_spectrum), title="Spectrum"))
+
     fig_heatmap = render_heatmaps(itmdt["data_heatmap"], plot_width, plot_height)
-    tabs.append(Panel(child=fig_heatmap, title="Heatmap"))
+    tabs.append(Panel(child=row(fig_heatmap), title="Heatmap"))
+
+    fig_dendrogram = render_dendrogram(
+        itmdt["data_dendrogram"], plot_width, plot_height
+    )
+    tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
 
     tabs = Tabs(tabs=tabs)
     return tabs
@@ -354,6 +365,12 @@ def render_heatmaps(
                 fill_color={"field": "correlation", "transform": mapper},
                 line_color=None,
             )
+            format_js = """
+                if (tick.length > 15) return tick.substring(0, 13) + '...';
+                else return tick;
+            """
+            fig.xaxis.formatter = FuncTickFormatter(code=format_js)
+            fig.yaxis.formatter = FuncTickFormatter(code=format_js)
         else:
             fig = empty_figure()
     else:
@@ -368,11 +385,7 @@ def render_heatmaps(
 
 
 def render_bar_chart(
-    data_barchart: pd.DataFrame,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
-    show_yticks: bool,
+    data_barchart: pd.DataFrame, yscale: str, plot_width: int, plot_height: int,
 ) -> Figure:
     """
     Render a bar chart
@@ -387,9 +400,8 @@ def render_bar_chart(
         "Missing": data_barchart["missing"],
     }
 
-    if show_yticks:
-        if len(data_barchart) > 10:
-            plot_width = 28 * len(data_barchart)
+    if len(data_barchart) > 20:
+        plot_width = 28 * len(data_barchart)
 
     fig = Figure(
         x_range=data_barchart.index.tolist(),
@@ -410,6 +422,11 @@ def render_bar_chart(
         source=data,
         legend_label=value_type,
     )
+    format_js = """
+        if (tick.length > 18) return tick.substring(0, 16) + '...';
+        else return tick;
+    """
+    fig.xaxis.formatter = FuncTickFormatter(code=format_js)
 
     fig.legend.location = "top_right"
     fig.y_range.start = 0
@@ -453,6 +470,8 @@ def render_missing_spectrum(
     x_range = FactorRange(*df["column_with_perc"].unique())
     minimum, maximum = df["location"].min(), df["location"].max()
     y_range = Range1d(maximum + radius, minimum - radius)
+    if df["column"].nunique() > 20:
+        plot_width = 28 * df["column"].nunique()
 
     fig = tweak_figure(
         Figure(
@@ -480,6 +499,54 @@ def render_missing_spectrum(
         line_color=None,
     )
     fig.add_layout(color_bar, "right")
+    return fig
+
+
+def render_dendrogram(
+    dend: Dict["str", Any], plot_width: int, plot_height: int
+) -> Figure:
+    """
+    Render a missing dendrogram.
+    """
+    # list of lists of dcoords and icoords from scipy.dendrogram
+    xs, ys, cols = dend["icoord"], dend["dcoord"], dend["ivl"]
+
+    # if the number of columns is greater than 20, make the plot wider
+    if len(cols) > 20:
+        plot_width = 28 * len(cols)
+
+    fig = Figure(
+        plot_width=plot_width, plot_height=plot_height, toolbar_location=None, tools="",
+    )
+
+    # round the coordinates to integers, and plot the dendrogram
+    xs = [[round(coord) for coord in coords] for coords in xs]
+    ys = [[round(coord, 2) for coord in coords] for coords in ys]
+    fig.multi_line(xs=xs, ys=ys, line_color="#8073ac")
+
+    # extract the horizontal lines for the hover tooltip
+    h_lns_x = [coords[1:3] for coords in xs]
+    h_lns_y = [coords[1:3] for coords in ys]
+    null_mismatch_vals = [coord[0] for coord in h_lns_y]
+    source = ColumnDataSource(dict(x=h_lns_x, y=h_lns_y, n=null_mismatch_vals))
+    h_lns = fig.multi_line(xs="x", ys="y", source=source, line_color="#8073ac")
+    hover_pts = HoverTool(
+        renderers=[h_lns],
+        tooltips=[("Average distance", "@n{0.1f}")],
+        line_policy="interp",
+    )
+    fig.add_tools(hover_pts)
+
+    # shorten column labels if necessary, and override coordinates with column names
+    cols = [f"{col[:16]}..." if len(col) > 18 else col for col in cols]
+    axis_coords = list(range(5, 10 * len(cols) + 1, 10))
+    axis_overrides = dict(zip(axis_coords, cols))
+    fig.xaxis.ticker = axis_coords
+    fig.xaxis.major_label_overrides = axis_overrides
+    fig.xaxis.major_label_orientation = np.pi / 3
+    fig.yaxis.axis_label = "Average Distance Between Clusters"
+    fig.grid.visible = False
+
     return fig
 
 
