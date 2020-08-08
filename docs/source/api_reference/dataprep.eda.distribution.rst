@@ -1,6 +1,6 @@
-.. _dataprep.eda.basic:
+.. _dataprep.eda.distribution:
 
-dataprep.eda.basic
+dataprep.eda.distribution
 =========================================
 
 .. _plot_doc:
@@ -8,12 +8,12 @@ dataprep.eda.basic
 plot
 ----
 
-.. autofunction:: dataprep.eda.basic.plot
+.. autofunction:: dataprep.eda.distribution.plot
 
 compute
 -------
 
-.. automodule:: dataprep.eda.basic.compute
+.. automodule:: dataprep.eda.distribution.compute
    :members:
    :undoc-members:
    :show-inheritance:
@@ -21,7 +21,7 @@ compute
 render
 ------
 
-.. automodule:: dataprep.eda.basic.render
+.. automodule:: dataprep.eda.distribution.render
    :members:
    :undoc-members:
    :show-inheritance:
