@@ -1,6 +1,6 @@
 
 ==================================================
-Tutorial - Data Connector for Yelp 
+Tutorial - Connector for Yelp 
 ==================================================
 
 .. toctree::
@@ -9,9 +9,9 @@ Tutorial - Data Connector for Yelp
 Overview
 ========
 
-data_connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
+Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
 The goal is to help the users skip the complex API configuration. In this tutorial, we demonstrate how to use 
-data_connector library with Yelp.
+connector library with Yelp.
 
 
 Preprocessing
@@ -77,19 +77,19 @@ Below the configuration file are stored with dataprep.
 
 
     
-Initialize data_connector
+Initialize connector
 =============================
 To initialize run the following code. Copy and paste the Yelp API key into the **access_token** variable and ensure the connector path is correct. Once you have that running, you can use the built in functions available in connector.
 
 ::
 
-    from dataprep.data_connector import Connector
+    from dataprep.connector import Connector
     access_token = “insert_token_key”
     dc = Connector("./DataConnectorConfigs/yelp", _auth={"access_token":access_token})
     
 Functionalities
 ===================
-Data connector has several functions you can perform to gain insight on the data downloaded from Yelp.
+Connector has several functions you can perform to gain insight on the data downloaded from Yelp.
 
 Connector.info
 ------------------
@@ -140,7 +140,7 @@ Connector.query
 ------------------
 The query method downloads the website data. The parameters must meet the requirements as indicated in connector.info for the operation to run.
 
-When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.
+When the data is received from the server, it will either be in a JSON or XML format. The connector reformats the data in pandas Dataframe for the convenience of downstream operations.
 
 As an example, let's try to get the data from the "business" table, providing the term "city" and location "seattle".
 
@@ -154,7 +154,7 @@ As an example, let's try to get the data from the "business" table, providing th
    	:height: 460
     
 From query results, you can see how easy it is to download the restaurant data from Yelp into a pandas Dataframe.
-Now that you have an understanding of how data connector operates, you can easily accomplish the task with two lines of code.
+Now that you have an understanding of how connector operates, you can easily accomplish the task with two lines of code.
 
 ::
 
@@ -182,7 +182,7 @@ Pagination does not concurrently work with the **limit** parameter in a query, y
 
 That's all for now.
 ===================
-Please visit the other tutorials that are available if you are interested in setting up a different data connector. 
+Please visit the other tutorials that are available if you are interested in setting up a different connector. 
 If you are interested in writing your own configuration file or modify an existing one, refer to the `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_.
 

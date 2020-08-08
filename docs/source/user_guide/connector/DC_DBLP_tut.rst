@@ -1,6 +1,6 @@
 
 ==================================================
-Tutorial - Data Connector for DBLP 
+Tutorial - Connector for DBLP 
 ==================================================
 
 .. toctree::
@@ -9,8 +9,8 @@ Tutorial - Data Connector for DBLP
 Overview
 ========
 
-data_connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
-The goal is to help the users skip the complex API configuration. In this tutorial, we demonstrate how to use data_connector library with DBLP.
+Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
+The goal is to help the users skip the complex API configuration. In this tutorial, we demonstrate how to use connector library with DBLP.
 
 Preprocessing
 ================
@@ -55,18 +55,18 @@ Below the configuration file are stored with dataprep.
 
 
     
-Initialize data_connector
+Initialize connector
 =============================
 To initialize, run the following code. 
 
 ::
 
-    from dataprep.data_connector import Connector
+    from dataprep.connector import Connector
     dc = Connector("./DataConnectorConfigs/DBLP")
     
 Functionalities
 ===================
-Data connector has several functions you can perform to gain insight on the data downloaded from DBLP.
+Connector has several functions you can perform to gain insight on the data downloaded from DBLP.
 
 Connector.info
 ------------------
@@ -117,7 +117,7 @@ Connector.query
 ------------------
 The query method downloads the website data. The parameters must meet the requirements as indicated in connector.info for the operation to run.
 
-When the data is received from the server, it will either be in a JSON or XML format. The data_connector reformats the data in pandas Dataframe for the convenience of downstream operations.
+When the data is received from the server, it will either be in a JSON or XML format. The connector reformats the data in pandas Dataframe for the convenience of downstream operations.
 
 As an example, let's try to get the data from the "publication" table, providing the query search for "lee".
 
@@ -131,7 +131,7 @@ As an example, let's try to get the data from the "publication" table, providing
    	:height: 500
     
 From query results, you can see how easy it is to download the publication data from DBLP into a pandas Dataframe.
-Now that you have an understanding of how data connector operates, you can easily accomplish the task with two lines of code.
+Now that you have an understanding of how connector operates, you can easily accomplish the task with two lines of code.
 
 ::
 
@@ -173,6 +173,6 @@ All publications of one specific author
     
 That's all for now.
 ===================
-Please visit the other tutorials that are available if you are interested in setting up a different data connector. 
+Please visit the other tutorials that are available if you are interested in setting up a different connector. 
 If you are interested in writing your own configuration file or modify an existing one, refer to the `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_.

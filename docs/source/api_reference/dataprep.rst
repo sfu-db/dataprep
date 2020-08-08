@@ -19,7 +19,7 @@ auto-generated from the docstrings in the project source code.
    dataprep.eda.missing
    dataprep.eda.create_report
    dataprep.eda
-   dataprep.data_connector
+   dataprep.connector
 
 
 
@@ -35,10 +35,10 @@ EDA Documentation
    dataprep.eda.create_report
    dataprep.eda
 
-Data-Connector Documentation
+Connector Documentation
 ============================
 
 .. toctree::
    :maxdepth: 2
 
-   dataprep.data_connector
+   dataprep.connector

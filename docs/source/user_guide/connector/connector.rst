@@ -1,8 +1,8 @@
 .. _dataconnector:
 
-==============
-Data Connector
-==============
+=========
+Connector
+=========
 
 .. toctree::
     :maxdepth: 1
@@ -13,9 +13,9 @@ Data Connector
 
 Overview
 ==========
-data_connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
+Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
 The goal is to help the users skip the complex API configuration.
-We illustrate how to use data_connector library with Yelp.
+We illustrate how to use connector library with Yelp.
 
 
 Initializing a connector class for a website
@@ -24,9 +24,9 @@ The first step is to initialize a Connector class with the configuration file lo
 <https://www.yelp.com/developers/documentation/v3/authentication>`_).
 Available configuration files can be manually downloaded here: `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_ or automatically downloaded at usage.
-To initialize a data_connector::
+To initialize a connector::
 
-    from dataprep.data_connector import Connector
+    from dataprep.connector import Connector
     dc = Connector("./DataConnectorConfigs/yelp", auth_params={"access_token":access_token})
 
 
@@ -41,7 +41,7 @@ Getting the guidline of the connector with `Connector.info`
 
     dc.info
 
-.. image:: ../../_static/images/data_connector/info.png
+.. image:: ../../_static/images/connector/info.png
 	:align: center
    	:width: 496
    	:height: 215
@@ -59,7 +59,7 @@ The first column is the column name and the second is the datatype.
     dc.show_schema('businesses')
 
 
-.. image:: ../../_static/images/data_connector/show_schema.png
+.. image:: ../../_static/images/connector/show_schema.png
    :align: center
    :width: 208
    :height: 458 
@@ -70,20 +70,20 @@ Getting web data with `Connector.query()`
 the `query()` method downloads the website data.
 The parameters should meet the requriement in `Connector.info`
 Usually the raw data is returned in JSON or xml format.
-data_connector re-format the data in pandas dataframe for the convenience of downstream operations.
+connector re-format the data in pandas dataframe for the convenience of downstream operations.
 
 ::
 
     df = dc.query('businesses', term="korean", location="seattle")
     df
 
-.. image:: ../../_static/images/data_connector/query.png
+.. image:: ../../_static/images/connector/query.png
    :align: center
    :width: 870
    :height: 491
 
 
-Advanced: writing your own data_connector configuration file
+Advanced: writing your own connector configuration file
 ==============================================================
 A configuration file defines the infomation neccessary to fetch data from a website, e.g. the request url; the API authorization type; the parameters needed from the uses(API key, search keyword, etc.); the returned data's schema. 
 All the information are reusable.

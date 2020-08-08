@@ -38,7 +38,7 @@ Examples
 
 class Connector:
     """
-    This is the main class of data_connector component.
+    This is the main class of the connector component.
     Initialize Connector class as the example code.
 
     Parameters
@@ -55,7 +55,7 @@ class Connector:
 
     Example
     -------
-    >>> from dataprep.data_connector import Connector
+    >>> from dataprep.connector import Connector
     >>> dc = Connector("yelp", _auth={"access_token": access_token})
     """
 

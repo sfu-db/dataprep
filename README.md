@@ -21,7 +21,7 @@
 Dataprep lets you prepare your data using a single library with a few lines of code.
 
 Currently, you can use `dataprep` to:
-* Collect data from common data sources (through `dataprep.data_connector`)
+* Collect data from common data sources (through `dataprep.connector`)
 * Do your exploratory data analysis (through `dataprep.eda`)
 * ...more modules are coming
 
@@ -58,7 +58,7 @@ pip install dataprep
 
 The following examples can give you an impression of what dataprep can do:
 
-* [Documentation: Data Connector](https://sfu-db.github.io/dataprep/user_guide/data_connector/data_connector.html)
+* [Documentation: Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
 * [Documentation: EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
 * [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/user_guide/eda/titanic.html)
 * [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/user_guide/eda/house_price.html)
@@ -98,14 +98,14 @@ You can drill down to get more information by given `plot`, `plot_correlation` a
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
 
-### Data Connector
+### Connector
 
 You can download Yelp business search result into a pandas DataFrame, 
 using two lines of code, without taking deep looking into the Yelp documentation!
-Moreover, Data Connector will automatically do the pagination for you so that 
+Moreover, Connector will automatically do the pagination for you so that 
 you can specify the desire count of the returned results without even considering the count-per-request restriction from the API.
 
-<a href="https://sfu-db.github.io/dataprep/user_guide/data_connector/DC_Yelp_tut.html#pagination"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/data_connector.png"/></a>
+<a href="https://sfu-db.github.io/dataprep/user_guide/connector/DC_Yelp_tut.html#pagination"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector.png"/></a>
 
 _The code requests 120 records even though Yelp restricts you can only fetch 50 per request._
 

@@ -5,7 +5,7 @@ dataprep.data\_connector
 Configuration Manager
 -----------------------------------------------
 
-.. automodule:: dataprep.data_connector.config_manager
+.. automodule:: dataprep.connector.config_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -13,7 +13,7 @@ Configuration Manager
 Connector
 -----------------------------------------
 
-.. automodule:: dataprep.data_connector.connector
+.. automodule:: dataprep.connector.connector
    :members:
    :undoc-members:
    :show-inheritance:
@@ -21,7 +21,7 @@ Connector
 Schema
 --------------------------------------
 
-.. automodule:: dataprep.data_connector.schema
+.. automodule:: dataprep.connector.schema
    :members:
    :undoc-members:
    :show-inheritance:
@@ -29,7 +29,7 @@ Schema
 Types
 -------------------------------------
 
-.. automodule:: dataprep.data_connector.types
+.. automodule:: dataprep.connector.types
    :members:
    :undoc-members:
    :show-inheritance:
@@ -37,7 +37,7 @@ Types
 Implicit database
 --------------------------------------------------
 
-.. automodule:: dataprep.data_connector.implicit_database
+.. automodule:: dataprep.connector.implicit_database
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,7 +45,7 @@ Implicit database
 Errors
 --------------------------------------
 
-.. automodule:: dataprep.data_connector.errors
+.. automodule:: dataprep.connector.errors
    :members:
    :undoc-members:
    :show-inheritance:

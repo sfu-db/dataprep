@@ -1,6 +1,5 @@
-"""
-    This module implements the plot_missing(df) function's
-    calculating intermediate part
+"""This module implements the plot_missing(df) function's
+calculating intermediate part
 """
 from typing import Any, Callable, List, Optional, Tuple, Union
 
@@ -460,7 +459,7 @@ def compute_missing(
         a valid column name of the data frame
     y
         a valid column name of the data frame
-     bins
+    bins
         The number of rows in the figure
     ndist_sample
         The number of sample points
