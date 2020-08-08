@@ -13,7 +13,6 @@ import jsonschema
 import pandas as pd
 from jsonpath_ng import parse as jparse
 from lxml import etree  # pytype: disable=import-error
-from requests import Response
 
 from ..errors import UnreachableError
 from .schema import CONFIG_SCHEMA
@@ -129,14 +128,14 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         }
         self.orient = Orient(response_def["orient"])
 
-    def from_response(self, resp: Response) -> pd.DataFrame:
+    def from_response(self, payload: str) -> pd.DataFrame:
         """
-        Create a dataframe from a http response.
+        Create a dataframe from a http body payload.
         """
         if self.ctype == "application/json":
-            rows = self.from_json(resp.text)
+            rows = self.from_json(payload)
         elif self.ctype == "application/xml":
-            rows = self.from_xml(resp.text)
+            rows = self.from_xml(payload)
         else:
             raise UnreachableError
 
