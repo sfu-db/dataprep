@@ -2,13 +2,15 @@
     This module implements the plot_missing(df) function's
     calculating intermediate part
 """
-from typing import List, Optional, Tuple, Union, Callable
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+from dask import delayed
+from scipy.cluster import hierarchy
 from scipy.stats import rv_histogram
 
 from ...errors import UnreachableError
@@ -90,15 +92,17 @@ def missing_impact(df: dd.DataFrame, bins: int) -> Intermediate:
         null_perc,
         missing_bars(null_perc, cols),
         missing_heatmap(nulldf, null_perc, cols),
+        missing_dendrogram(nullity, cols),
     )
 
-    spectrum, null_perc, bars, heatmap = dd.compute(*tasks)
+    spectrum, null_perc, bars, heatmap, dendrogram = dd.compute(*tasks)
 
     return Intermediate(
         data_total_missing={col: null_perc[idx] for idx, col in enumerate(cols)},
         data_spectrum=spectrum,
         data_bars=bars,
         data_heatmap=heatmap,
+        data_dendrogram=dendrogram,
         visual_type="missing_impact",
     )
 
@@ -214,6 +218,24 @@ def missing_heatmap(
 
     corr_mat = nulldf[cols].corr()
     return corr_mat
+
+
+def missing_dendrogram(nullity: da.Array, cols: List[str]) -> Any:
+    """
+    Calculate a missing values dendrogram
+    """
+    # Link the hierarchical output matrix, figure out orientation, construct base dendrogram.
+    linkage_matrix = delayed(hierarchy.linkage)(nullity.T, "average")
+
+    dendrogram = delayed(hierarchy.dendrogram)(
+        Z=linkage_matrix,
+        orientation="bottom",
+        labels=cols,
+        distance_sort="descending",
+        no_plot=True,
+    )
+
+    return dendrogram
 
 
 def missing_impact_1vn(  # pylint: disable=too-many-locals
