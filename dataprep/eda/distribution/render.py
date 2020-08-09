@@ -1,13 +1,11 @@
 """
 This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
-from math import pi
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 from bokeh.events import ButtonClick
 from bokeh.layouts import column, row
 from bokeh.models import (
@@ -30,16 +28,16 @@ from bokeh.models import (
     PrintfTickFormatter,
     Tabs,
 )
-from bokeh.palettes import Pastel1, viridis  # pylint: disable=E0611 # type: ignore
 from bokeh.plotting import Figure, figure, gridplot
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
 from PIL import Image
+from scipy.stats import norm
 from wordcloud import WordCloud
 
 from ..dtypes import Continuous, DateTime, Nominal, is_dtype
 from ..intermediate import Intermediate
-from ..palette import BIPALETTE, PALETTE
+from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS
 
 __all__ = ["render"]
 
@@ -65,7 +63,7 @@ def tweak_figure(
         fig.yaxis.major_label_text_font_size = "0pt"
         fig.yaxis.major_tick_line_color = None
     if ptype in ["bar", "nested", "stacked", "heatmap", "box"]:
-        fig.xaxis.major_label_orientation = pi / 3
+        fig.xaxis.major_label_orientation = np.pi / 3
         fig.xaxis.formatter = FuncTickFormatter(
             code="""
             if (tick.length > %d) return tick.substring(0, %d-2) + '...';
@@ -377,7 +375,7 @@ def pie_viz(
     if nrows > npresent:
         df = df.append(pd.DataFrame({col: [nrows - npresent]}, index=["Others"]))
     df["pct"] = df[col] / nrows * 100
-    df["angle"] = df[col] / npresent * 2 * pi
+    df["angle"] = df[col] / npresent * 2 * np.pi
 
     tooltips = [(col, "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
     fig = Figure(
@@ -388,7 +386,7 @@ def pie_viz(
         tools="hover",
         tooltips=tooltips,
     )
-    color_list = PALETTE * (len(df) // len(PALETTE) + 1)
+    color_list = CATEGORY20 * (len(df) // len(CATEGORY20) + 1)
     df["colour"] = color_list[0 : len(df)]
     df.index = df.index.map(lambda x: x[0:13] + "..." if len(x) > 13 else x)
 
@@ -526,7 +524,7 @@ def kde_viz(
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if yscale == "linear":
         _format_axis(fig, 0, max(df["dens"].max(), pdf.max()), "y")
-    return Panel(child=fig, title="KDE plot")
+    return Panel(child=fig, title="KDE Plot")
 
 
 def qqnorm_viz(
@@ -552,7 +550,7 @@ def qqnorm_viz(
         tooltips=tooltips,
     )
     fig.circle(
-        x=theory_qntls, y=qntls, size=3, color=PALETTE[0],
+        x=theory_qntls, y=qntls, size=3, color=CATEGORY20[0],
     )
     vals = np.concatenate((theory_qntls, qntls))
     fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color="red")
@@ -593,7 +591,7 @@ def univar_box_viz(
         width=0.7,
         top="q3",
         bottom="q2",
-        fill_color=PALETTE[0],
+        fill_color=CATEGORY20[0],
         line_color="black",
         source=df,
     )
@@ -602,7 +600,7 @@ def univar_box_viz(
         width=0.7,
         top="q2",
         bottom="q1",
-        fill_color=PALETTE[0],
+        fill_color=CATEGORY20[0],
         line_color="black",
         source=df,
     )
@@ -618,7 +616,7 @@ def univar_box_viz(
             otlrs,
             size=3,
             line_color="black",
-            color=PALETTE[6],
+            color=CATEGORY20[6],
             fill_alpha=0.6,
         )
         fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
@@ -691,7 +689,7 @@ def box_viz(
         width=width,
         top="q3",
         bottom="q2",
-        fill_color=PALETTE[0],
+        fill_color=CATEGORY20[0],
         line_color="black",
         source=df,
     )
@@ -700,7 +698,7 @@ def box_viz(
         width=width,
         top="q2",
         bottom="q1",
-        fill_color=PALETTE[0],
+        fill_color=CATEGORY20[0],
         line_color="black",
         source=df,
     )
@@ -710,7 +708,7 @@ def box_viz(
     upw = fig.segment(x0="x0", y0="uw", x1="x1", y1="uw", line_color="black", source=df)
     if outx:
         circ = fig.circle(  # pylint: disable=too-many-function-args
-            outx, outy, size=3, line_color="black", color=PALETTE[6], fill_alpha=0.6
+            outx, outy, size=3, line_color="black", color=CATEGORY20[6], fill_alpha=0.6
         )
         fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
     tooltips = [
@@ -769,7 +767,7 @@ def box_viz(
     if timeunit == "Week of":
         fig.xaxis.axis_label = x + ", the week of"
 
-    return Panel(child=fig, title="Box Plot")
+    return Panel(child=row(fig), title="Box Plot")
 
 
 def line_viz(
@@ -787,7 +785,7 @@ def line_viz(
     """
     # pylint: disable=too-many-arguments,too-many-locals
     grps = list(data.keys())
-    palette = PALETTE * (len(grps) // len(PALETTE) + 1)
+    palette = CATEGORY20 * (len(grps) // len(CATEGORY20) + 1)
     title = _make_title(grp_cnt_stats, x, y)
 
     fig = figure(
@@ -836,7 +834,7 @@ def line_viz(
     if yscale == "linear":
         _format_axis(fig, ymin, ymax, "y")
 
-    return Panel(child=fig, title="Line Chart")
+    return Panel(child=row(fig), title="Line Chart")
 
 
 def scatter_viz(
@@ -857,7 +855,7 @@ def scatter_viz(
         plot_height=plot_height,
     )
     fig.circle(  # pylint: disable=too-many-function-args
-        x, y, color=PALETTE[0], size=4, name="points", source=df
+        x, y, color=CATEGORY20[0], size=4, name="points", source=df
     )
     tweak_figure(fig)
     fig.xaxis.axis_label = x
@@ -902,7 +900,7 @@ def hexbin_viz(
         plot_height=plot_height,
     )
 
-    palette = list(reversed(viridis(256)))
+    palette = list(reversed(VIRIDIS))
     rend = fig.hex_tile(
         q="q",
         r="r",
@@ -969,7 +967,7 @@ def nested_viz(
     )
     tweak_figure(fig, "nested")
     fig.yaxis.axis_label = "Count"
-    fig.xaxis.major_label_orientation = pi / 2
+    fig.xaxis.major_label_orientation = np.pi / 2
     _format_axis(fig, 0, df["cnt"].max(), "y")
     return Panel(child=fig, title="Nested Bar Chart")
 
@@ -1005,7 +1003,7 @@ def stacked_viz(
         plot_height=plot_height,
     )
     grps = list(df.columns)
-    palette = Pastel1[9] * (len(grps) // len(Pastel1) + 1)
+    palette = PASTEL1 * (len(grps) // len(PASTEL1) + 1)
     if "Others" in grps:
         colours = palette[0 : len(grps) - 1] + ("#636363",)
     else:
@@ -1082,7 +1080,7 @@ def heatmap_viz(
     title = _make_title(grp_cnt_stats, x, y)
 
     source = ColumnDataSource(data=df)
-    palette = BIPALETTE[(len(BIPALETTE) // 2 - 1) :]
+    palette = RDBU[(len(RDBU) // 2 - 1) :]
     mapper = LinearColorMapper(
         palette=palette, low=df["cnt"].min() - 0.01, high=df["cnt"].max()
     )
@@ -1206,7 +1204,7 @@ def dt_multiline_viz(
     """
     # pylint: disable=too-many-arguments,too-many-locals
     grps = list(data.keys())
-    palette = PALETTE * (len(grps) // len(PALETTE) + 1)
+    palette = CATEGORY20 * (len(grps) // len(CATEGORY20) + 1)
     if z is None:
         title = _make_title(grp_cnt_stats, x, y)
     else:
