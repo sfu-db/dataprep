@@ -2,11 +2,9 @@
     This module implements the plot_missing(df, x, y) function's
     visualization part.
 """
-import math
-from typing import Tuple, Union, Dict
-from typing import List, Sequence, Optional, Any
-import numpy as np
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+import numpy as np
 import pandas as pd
 from bokeh.layouts import row
 from bokeh.models import (
@@ -26,22 +24,14 @@ from bokeh.models import (
     Tabs,
     Title,
 )
-
-# pylint: disable=no-name-in-module
-from bokeh.palettes import Category10, Greys256  # type: ignore
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
-from ..dtypes import is_dtype, Nominal, Continuous, drop_null
-from ..intermediate import Intermediate, ColumnMetadata
+from ..dtypes import Continuous, Nominal, drop_null, is_dtype
+from ..intermediate import ColumnMetadata, Intermediate
+from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
-from ..palette import PALETTE
-from ..palette import BIPALETTE
-
-
-# pylint: enable=no-name-in-module
-
 
 __all__ = ["render_missing"]
 
@@ -71,7 +61,7 @@ def tweak_figure(fig: Figure) -> Figure:
     fig.axis.major_tick_line_color = None
     fig.axis.major_label_text_font_size = "9pt"
     fig.axis.major_label_standoff = 0
-    fig.xaxis.major_label_orientation = math.pi / 3
+    fig.xaxis.major_label_orientation = np.pi / 3
 
     return fig
 
@@ -105,7 +95,7 @@ def render_dist(
     for idx, label in enumerate(LABELS):
         group = df[df["label"] == label]
         fig.line(
-            x="x", y=typ, source=group, color=Category10[3][idx], legend_label=label,
+            x="x", y=typ, source=group, color=CATEGORY10[idx], legend_label=label,
         )
 
     relocate_legend(fig, "right")
@@ -137,7 +127,7 @@ def render_hist(
             ("Label", "@label"),
         ]
 
-    cmapper = CategoricalColorMapper(palette=Category10[3], factors=LABELS)
+    cmapper = CategoricalColorMapper(palette=CATEGORY10, factors=LABELS)
 
     if is_dtype(meta["dtype"], Nominal()):
         radius = 0.99
@@ -213,10 +203,22 @@ def render_boxwhisker(df: pd.DataFrame, plot_width: int, plot_height: int) -> Fi
 
     # boxes
     fig.vbar(  # pylint: disable=too-many-function-args
-        "label", 0.7, "q2", "q3", source=df, fill_color=PALETTE[0], line_color="black",
+        "label",
+        0.7,
+        "q2",
+        "q3",
+        source=df,
+        fill_color=CATEGORY20[0],
+        line_color="black",
     )
     fig.vbar(  # pylint: disable=too-many-function-args
-        "label", 0.7, "q2", "q1", source=df, fill_color=PALETTE[0], line_color="black",
+        "label",
+        0.7,
+        "q2",
+        "q1",
+        source=df,
+        fill_color=CATEGORY20[0],
+        line_color="black",
     )
     # whiskers (almost-0 height rects simpler than segments)
     fig.rect(  # pylint: disable=too-many-function-args
@@ -236,7 +238,7 @@ def create_color_mapper() -> Tuple[LinearColorMapper, ColorBar]:
     """
     Create a color mapper and a colorbar for spectrum
     """
-    mapper = LinearColorMapper(palette=list(reversed(Greys256)), low=0, high=1)
+    mapper = LinearColorMapper(palette=list(reversed(GREYS256)), low=0, high=1)
     colorbar = ColorBar(
         color_mapper=mapper,
         major_label_text_font_size="8pt",
@@ -304,7 +306,7 @@ def render_heatmaps(
     Render missing heatmaps in to tabs
     """
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
-    mapper, color_bar = create_color_mapper_heatmap(BIPALETTE)
+    mapper, color_bar = create_color_mapper_heatmap(RDBU)
 
     def empty_figure() -> Figure:
         # If no data to render in the heatmap, i.e. no missing values
@@ -391,7 +393,7 @@ def render_bar_chart(
     Render a bar chart
     """
 
-    colors = [PALETTE[0], PALETTE[2]]
+    colors = [CATEGORY20[0], CATEGORY20[2]]
     value_type = ["Not Missing", "Missing"]
 
     data = {
