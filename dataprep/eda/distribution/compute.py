@@ -2,7 +2,7 @@
 This module implements the intermediates computation for plot(df) function.
 """  # pylint: disable=too-many-lines
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple, Union, cast, DefaultDict
+from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Union, cast
 
 import dask
 import dask.array as da
