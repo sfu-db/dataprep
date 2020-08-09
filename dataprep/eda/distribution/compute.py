@@ -360,19 +360,19 @@ def compute_univariate(
         # NOTE this dictionary could be returned to create_report without
         # calling the subsequent compute
         num_data = {
+            "stats": num_stats,
             "hist": da.histogram(df_x, bins=bins, range=[minv, maxv]),
             "kde": calc_kde(df_x, bins, minv, maxv),
             "box_data": calc_box_new(df_x, num_stats["qntls"]),
-            "stats": num_stats,
         }
         num_data = dask.compute(num_data)[0]
 
         return Intermediate(
             col=x,
+            stats=num_data["stats"],
             hist=num_data["hist"],
             kde=num_data["kde"],
             box_data=num_data["box_data"],
-            stats=num_data["stats"],
             visual_type="numerical_column",
         )
     elif is_dtype(col_dtype, DateTime()):

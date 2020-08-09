@@ -1252,12 +1252,11 @@ def dt_multiline_viz(
     return Panel(child=fig, title="Line Chart")
 
 
-def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
+def format_overview_stats(stats: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Render statistics information for grid plots
+    Create and format the dictionary for the overview statistics table
     """
-    # pylint: disable=too-many-locals
-    nrows, ncols, npresent_cells, nrows_wo_dups, mem_use, dtypes_cnt = stats.values()
+    nrows, ncols, npresent_cells, nrows_wo_dups, mem_use, _ = stats.values()
     ncells = nrows * ncols
 
     data = {
@@ -1270,14 +1269,21 @@ def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
         "Total Size in Memory": float(mem_use),
         "Average Record Size in Memory": mem_use / nrows,
     }
-    data = {k: _format_values(k, v) for k, v in data.items()}
+    return {k: _format_values(k, v) for k, v in data.items()}
+
+
+def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
+    """
+    Render statistics information for grid plots
+    """
+    data = format_overview_stats(stats)
 
     ov_content = '<h3 style="text-align:center;">Dataset Statistics</h3>'
     type_content = '<h3 style="text-align:center;">Variable Types</h3>'
     for key, value in data.items():
         value = _sci_notation_superscript(value)
         ov_content += _create_table_row(key, value)
-    for key, value in dtypes_cnt.items():  # type: ignore
+    for key, value in stats["dtype_cnts"].items():
         type_content += _create_table_row(key, value)
 
     ov_content = f"""
@@ -1309,49 +1315,59 @@ def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
     )
 
 
-def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
+def format_num_stats(stats: Dict[str, Any]) -> Any:
     """
-    Render statistics panel for numerical data
+    Create and format the dictionaries for the numerical statistics tables
     """
+
     overview = {
-        "Distinct Count": data["nunique"],
-        "Unique (%)": data["nunique"] / data["npresent"],
-        "Missing": data["nrows"] - data["npresent"],
-        "Missing (%)": 1 - (data["npresent"] / data["nrows"]),
-        "Infinite": data["ninfinite"],
-        "Infinite (%)": data["ninfinite"] / data["nrows"],
-        "Mean": data["mean"],
-        "Minimum": data["min"],
-        "Maximum": data["max"],
-        "Zeros": data["nzero"],
-        "Zeros (%)": data["nzero"] / data["nrows"],
-        "Memory Size": data["mem_use"],
+        "Distinct Count": stats["nunique"],
+        "Unique (%)": stats["nunique"] / stats["npresent"],
+        "Missing": stats["nrows"] - stats["npresent"],
+        "Missing (%)": 1 - (stats["npresent"] / stats["nrows"]),
+        "Infinite": stats["ninfinite"],
+        "Infinite (%)": stats["ninfinite"] / stats["nrows"],
+        "Mean": stats["mean"],
+        "Minimum": stats["min"],
+        "Maximum": stats["max"],
+        "Zeros": stats["nzero"],
+        "Zeros (%)": stats["nzero"] / stats["nrows"],
+        "Memory Size": stats["mem_use"],
     }
     quantile = {
-        "Minimum": data["min"],
-        "5-th Percentile": data["qntls"].iloc[5],
-        "Q1": data["qntls"].iloc[25],
-        "Median": data["qntls"].iloc[50],
-        "Q3": data["qntls"].iloc[75],
-        "95-th Percentile": data["qntls"].iloc[95],
-        "Maximum": data["max"],
-        "Range": data["max"] - data["min"],
-        "IQR": data["qntls"].iloc[75] - data["qntls"].iloc[25],
+        "Minimum": stats["min"],
+        "5-th Percentile": stats["qntls"].iloc[5],
+        "Q1": stats["qntls"].iloc[25],
+        "Median": stats["qntls"].iloc[50],
+        "Q3": stats["qntls"].iloc[75],
+        "95-th Percentile": stats["qntls"].iloc[95],
+        "Maximum": stats["max"],
+        "Range": stats["max"] - stats["min"],
+        "IQR": stats["qntls"].iloc[75] - stats["qntls"].iloc[25],
     }
     descriptive = {
-        "Standard Deviation": data["std"],
-        "Coefficient of Variation": data["std"] / data["mean"]
-        if data["mean"] != 0
+        "Standard Deviation": stats["std"],
+        "Coefficient of Variation": stats["std"] / stats["mean"]
+        if stats["mean"] != 0
         else np.nan,
-        "Kurtosis": float(data["kurt"]),
-        "Mean": data["mean"],
-        "Skewness": float(data["skew"]),
-        "Sum": data["mean"] * data["npresent"],
-        "Variance": data["std"] ** 2,
+        "Kurtosis": float(stats["kurt"]),
+        "Mean": stats["mean"],
+        "Skewness": float(stats["skew"]),
+        "Sum": stats["mean"] * stats["npresent"],
+        "Variance": stats["std"] ** 2,
     }
     overview = {k: _format_values(k, v) for k, v in overview.items()}
     quantile = {k: _format_values(k, v) for k, v in quantile.items()}
     descriptive = {k: _format_values(k, v) for k, v in descriptive.items()}
+
+    return overview, quantile, descriptive
+
+
+def stats_viz_num(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
+    """
+    Render statistics panel for numerical stats
+    """
+    overview, quantile, descriptive = format_num_stats(stats)
 
     ov_content = ""
     qs_content = (
@@ -1416,17 +1432,12 @@ def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> P
     return Panel(child=div, title="Stats")
 
 
-def stats_viz_cat(
-    stats: Dict[str, Any],
-    length_stats: Dict[str, Any],
-    letter_stats: Dict[str, Any],
-    plot_width: int,
-    plot_height: int,
-) -> Panel:
+def format_cat_stats(
+    stats: Dict[str, Any], length_stats: Dict[str, Any], letter_stats: Dict[str, Any]
+) -> Any:
     """
-    Render statistics panel for categorical data
+    Create and format the dictionaries for the categorical statistics tables
     """
-    # pylint: disable=too-many-locals
     ov_stats = {
         "Distinct Count": stats["nunique"],
         "Unique (%)": stats["nunique"] / stats["npresent"],
@@ -1439,8 +1450,25 @@ def stats_viz_cat(
 
     ov_stats = {k: _format_values(k, v) for k, v in ov_stats.items()}
     length_stats = {k: _format_values(k, v) for k, v in length_stats.items()}
-    smpl = {k: f"{v[:18]}..." if len(v) > 18 else v for k, v in smpl.items()}
+    smpl = {k: f"{v[:18]}..." if len(v) > 20 else v for k, v in smpl.items()}
     letter_stats = {k: _format_values(k, v) for k, v in letter_stats.items()}
+
+    return ov_stats, length_stats, smpl, letter_stats
+
+
+def stats_viz_cat(
+    stats: Dict[str, Any],
+    length_stats: Dict[str, Any],
+    letter_stats: Dict[str, Any],
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
+    """
+    Render statistics panel for categorical stats
+    """
+    ov_stats, length_stats, smpl, letter_stats = format_cat_stats(
+        stats, length_stats, letter_stats
+    )
 
     # pylint: disable=line-too-long
     ov_content = ""
@@ -1508,13 +1536,13 @@ def stats_viz_cat(
 
 
 def stats_viz_dt(
-    data: Tuple[Dict[str, str]], plot_width: int, plot_height: int
+    stats: Tuple[Dict[str, str]], plot_width: int, plot_height: int
 ) -> Panel:
     """
-    Render statistics panel for datetime data
+    Render statistics panel for datetime stats
     """
     ov_content = ""
-    for key, value in data[0].items():
+    for key, value in stats[0].items():
         value = _sci_notation_superscript(value)
         if "Distinct" in key and float(value) > 50:
             ov_content += _create_table_row(key, value, True)
