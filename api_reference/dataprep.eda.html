@@ -4,9 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.2.10 documentation</title>
+  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.2.11 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -21,7 +21,7 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="dataprep.data_connector" href="dataprep.data_connector.html" />
+    <link rel="next" title="dataprep.data_connector" href="dataprep.connector.html" />
     <link rel="prev" title="dataprep.eda.create_report" href="dataprep.eda.create_report.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
@@ -129,7 +129,7 @@
           
             
               <li class="">
-                  <a href="dataprep.eda.basic.html">dataprep.eda.basic</a>
+                  <a href="dataprep.eda.distribution.html">dataprep.eda.distribution</a>
               </li>
             
           
@@ -159,7 +159,7 @@
           
             
               <li class="">
-                  <a href="dataprep.data_connector.html">dataprep.data_connector</a>
+                  <a href="dataprep.connector.html">dataprep.data_connector</a>
               </li>
             
           
@@ -277,8 +277,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>col</strong> (<em>dask.datafram.Series</em>) – A dataframe column</p></li>
-<li><p><strong>known_dtype</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Union</em><em>[</em><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em>]</em><em>]</em><em>, </em><em>default None</em>) – A dictionary or single DType given by users to specify the types for designated columns or
+<li><p><strong>col</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dask.datafram.Series</span></code>) – A dataframe column</p></li>
+<li><p><strong>known_dtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[Union[Dict[str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Union[DType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str]]</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DType]]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A dictionary or single DType given by users to specify the types for designated columns or
 all columns. E.g.  known_dtype = {“a”: Continuous, “b”: “Nominal”} or
 known_dtype = {“a”: Continuous(), “b”: “nominal”} or
 known_dtype = Continuous() or known_dtype = “Continuous” or known_dtype = Continuous()</p></li>
@@ -402,7 +402,7 @@ We will map Categorical() to Nominal() and Numerical() to Continuous()</p>
 This is immutable</p>
 <dl class="py attribute">
 <dt id="dataprep.eda.intermediate.ColumnMetadata.metadata">
-<code class="sig-name descname">metadata</code><em class="property">: pd.Series</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata.metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">metadata</code><em class="property">: pandas.core.series.Series</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata.metadata" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -414,7 +414,7 @@ This is immutable</p>
 <p>Container for storing each column’s metadata</p>
 <dl class="py attribute">
 <dt id="dataprep.eda.intermediate.ColumnsMetadata.metadata">
-<code class="sig-name descname">metadata</code><em class="property">: pd.DataFrame</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata.metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">metadata</code><em class="property">: pandas.core.frame.DataFrame</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata.metadata" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -480,7 +480,7 @@ from terminmal or when the fig is very large in notebook.</p>
 
 <dl class="py attribute">
 <dt id="dataprep.eda.report.Report.to_render">
-<code class="sig-name descname">to_render</code><em class="property">: LayoutDOM</em><a class="headerlink" href="#dataprep.eda.report.Report.to_render" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_render</code><em class="property">: bokeh.models.layouts.LayoutDOM</em><a class="headerlink" href="#dataprep.eda.report.Report.to_render" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

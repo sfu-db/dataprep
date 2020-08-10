@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.11 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link href="../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dataprep.eda.correlation" href="dataprep.eda.correlation.html" />
+    <link rel="prev" title="API Reference" href="dataprep.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/api_reference/dataprep.eda.distribution.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+          
+            
+              <li class="active">
+                  <a href="">dataprep.eda.distribution</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.correlation.html">dataprep.eda.correlation</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.missing.html">dataprep.eda.missing</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.create_report.html">dataprep.eda.create_report</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.html">dataprep.eda auxiliary modules</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.connector.html">dataprep.data_connector</a>
+              </li>
+            
+          
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#plot" class="nav-link">plot</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.distribution.compute" class="nav-link">compute</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.distribution.render" class="nav-link">render</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="dataprep-eda-distribution">
+<span id="id1"></span><h1>dataprep.eda.distribution<a class="headerlink" href="#dataprep-eda-distribution" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="plot">
+<span id="plot-doc"></span><h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="dataprep.eda.distribution.plot">
+<code class="sig-prename descclassname">dataprep.eda.distribution.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">top_words</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">stopword</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lemmatize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stem</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yscale</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">tile_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates plots for exploratory data analysis.</p>
+<p>If no columns are specified, the distribution of
+each coloumn is plotted. A histogram is plotted if the
+column contains numerical values, a bar chart is plotted
+if the column contains categorical values, a line chart is
+plotted if the column is of type datetime.</p>
+<p>If one column (x) is specified, the
+distribution of x is plotted in various ways. If x
+contains categorical values, a bar chart and pie chart are
+plotted. If x contains numerical values, a histogram,
+kernel density estimate plot, box plot, and qq plot are plotted.
+If x contains datetime values, a line chart is plotted.</p>
+<p>If two columns (x and y) are specified, plots depicting
+the relationship between the variables will be displayed. If
+x and y contain numerical values, a scatter plot, hexbin
+plot, and binned box plot are plotted. If one of x and y
+contain categorical values and the other contains numerical values,
+a box plot and multiline histogram are plotted. If x and y
+contain categorical vales, a nested bar chart, stacked bar chart, and
+heat map are plotted. If one of x and y contains datetime values
+and the other contains numerical values, a line chart and a box plot
+are shown. If one of x and y contains datetime values and the other
+contains categorical values, a multiline chart and a stacked box plot
+are shown.</p>
+<p>If x, y, and z are specified, they must be one each of type datetime,
+numerical, and categorical. A multiline chart containing an aggregate
+on the numerical column grouped by the categorical column over time is
+plotted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Dataframe from which plots are to be generated</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A valid column name from the dataframe</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A valid column name from the dataframe</p></li>
+<li><p><strong>z</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A valid column name from the dataframe</p></li>
+<li><p><strong>bins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10</span></code>) – For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p></li>
+<li><p><strong>ngroups</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10</span></code>) – When grouping over a categorical column, it defines the
+number of groups to show in the plot. Ie, the number of
+bars to show in a bar chart.</p></li>
+<li><p><strong>largest</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) – If true, when grouping over a categorical column, the groups
+with the largest count will be output. If false, the groups
+with the smallest count will be output.</p></li>
+<li><p><strong>nsubgroups</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">5</span></code>) – If x and y are categorical columns, ngroups refers to
+how many groups to show from column x, and nsubgroups refers to
+how many subgroups to show from column y in each group in column x.</p></li>
+<li><p><strong>timeunit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>) – Defines the time unit to group values over for a datetime column.
+It can be “year”, “quarter”, “month”, “week”, “day”, “hour”,
+“minute”, or “second”. With default value “auto”, it will use the
+time unit such that the resulting number of groups is closest to 15.</p></li>
+<li><p><strong>agg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>) – Specify the aggregate to use when aggregating over a numerical
+column</p></li>
+<li><p><strong>sample_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1000</span></code>) – Sample size for the scatter plot</p></li>
+<li><p><strong>top_words</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">30</span></code>) – Specify the amount of words to show in the wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>stopword</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) – Eliminate the stopwords in the text data for plotting wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>lemmatize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) – Lemmatize the words in the text data for plotting wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>stem</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) – Apply Potter Stem on the text data for plotting wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>value_range</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[Tuple[float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float]]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p></li>
+<li><p><strong>yscale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
+<li><p><strong>tile_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[float]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p></li>
+<li><p><strong>dtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – Specify Data Types for designated column or all columns.
+E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
+dtype = {“a”: Continuous(), “b”: “nominal”}
+or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_length&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s2">&quot;petal_width&quot;</span><span class="p">,</span> <span class="s2">&quot;species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="dataprep.eda.html#dataprep.eda.report.Report" title="dataprep.eda.report.Report"><code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.distribution.compute">
+<span id="compute"></span><h2>compute<a class="headerlink" href="#module-dataprep.eda.distribution.compute" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the intermediates computation for plot(df) function.</p>
+<dl class="py function">
+<dt id="dataprep.eda.distribution.compute.compute">
+<code class="sig-prename descclassname">dataprep.eda.distribution.compute.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">top_words</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">stopword</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lemmatize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stem</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.compute.compute" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Dataframe from which plots are to be generated</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A valid column name from the dataframe</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A valid column name from the dataframe</p></li>
+<li><p><strong>z</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A valid column name from the dataframe</p></li>
+<li><p><strong>bins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10</span></code>) – For a histogram or box plot with numerical x axis, it defines
+the number of equal-width bins to use when grouping.</p></li>
+<li><p><strong>ngroups</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10</span></code>) – When grouping over a categorical column, it defines the
+number of groups to show in the plot. Ie, the number of
+bars to show in a bar chart.</p></li>
+<li><p><strong>largest</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) – If true, when grouping over a categorical column, the groups
+with the largest count will be output. If false, the groups
+with the smallest count will be output.</p></li>
+<li><p><strong>nsubgroups</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">5</span></code>) – If x and y are categorical columns, ngroups refers to
+how many groups to show from column x, and nsubgroups refers to
+how many subgroups to show from column y in each group in column x.</p></li>
+<li><p><strong>timeunit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>) – Defines the time unit to group values over for a datetime column.
+It can be “year”, “quarter”, “month”, “week”, “day”, “hour”,
+“minute”, “second”. With default value “auto”, it will use the
+time unit such that the resulting number of groups is closest to 15.</p></li>
+<li><p><strong>agg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>) – Specify the aggregate to use when aggregating over a numeric column</p></li>
+<li><p><strong>sample_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1000</span></code>) – Sample size for the scatter plot</p></li>
+<li><p><strong>top_words</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">30</span></code>) – Specify the amount of words to show in the wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>stopword</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>) – Eliminate the stopwords in the text data for plotting wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>lemmatize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) – Lemmatize the words in the text data for plotting wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>stem</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>) – Apply Potter Stem on the text data for plotting wordcloud and
+word frequency bar chart</p></li>
+<li><p><strong>value_range</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[Tuple[float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float]]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – The lower and upper bounds on the range of a numerical column.
+Applies when column x is specified and column y is unspecified.</p></li>
+<li><p><strong>dtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – Specify Data Types for designated column or all columns.
+E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
+dtype = {“a”: Continuous(), “b”: “nominal”}
+or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="dataprep.eda.html#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate"><code class="xref py py-class docutils literal notranslate"><span class="pre">Intermediate</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.distribution.render">
+<span id="render"></span><h2>render<a class="headerlink" href="#module-dataprep.eda.distribution.render" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the visualization for the plot(df) function.</p>
+<dl class="py function">
+<dt id="dataprep.eda.distribution.render.render">
+<code class="sig-prename descclassname">dataprep.eda.distribution.render.</code><code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">itmdt</span></em>, <em class="sig-param"><span class="n">yscale</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">tile_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot_width_sml</span><span class="o">=</span><span class="default_value">324</span></em>, <em class="sig-param"><span class="n">plot_height_sml</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">plot_width_lrg</span><span class="o">=</span><span class="default_value">450</span></em>, <em class="sig-param"><span class="n">plot_height_lrg</span><span class="o">=</span><span class="default_value">400</span></em>, <em class="sig-param"><span class="n">plot_width_wide</span><span class="o">=</span><span class="default_value">972</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/render.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.render.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a basic plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>itmdt</strong> (<a class="reference internal" href="dataprep.eda.html#dataprep.eda.intermediate.Intermediate" title="dataprep.eda.intermediate.Intermediate"><code class="xref py py-class docutils literal notranslate"><span class="pre">Intermediate</span></code></a>) – The Intermediate containing results from the compute function.</p></li>
+<li><p><strong>yscale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;linear&quot;</span></code>) – The scale to show on the y axis. Can be “linear” or “log”.</p></li>
+<li><p><strong>tile_size</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – Size of the tile for the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p></li>
+<li><p><strong>plot_width_small</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">324</span></code>) – The width of the small plots</p></li>
+<li><p><strong>plot_height_small</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">300</span></code>) – The height of the small plots</p></li>
+<li><p><strong>plot_width_large</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">972</span></code>) – The width of the large plots</p></li>
+<li><p><strong>plot_height_large</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">400</span></code>) – The height of the large plots</p></li>
+<li><p><strong>plot_width_large</strong> – The width of the large plots</p></li>
+<li><p><strong>plot_width_wide</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">972</span></code>) – The width of the wide plots</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">LayoutDOM</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

@@ -4,9 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.create_report &#8212; DataPrep 0.2.10 documentation</title>
+  <title>dataprep.eda.create_report &#8212; DataPrep 0.2.11 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -129,7 +129,7 @@
           
             
               <li class="">
-                  <a href="dataprep.eda.basic.html">dataprep.eda.basic</a>
+                  <a href="dataprep.eda.distribution.html">dataprep.eda.distribution</a>
               </li>
             
           
@@ -159,7 +159,7 @@
           
             
               <li class="">
-                  <a href="dataprep.data_connector.html">dataprep.data_connector</a>
+                  <a href="dataprep.connector.html">dataprep.data_connector</a>
               </li>
             
           
@@ -203,8 +203,8 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p></li>
-<li><p><strong>title</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default &quot;DataPrep Report&quot;</em>) – The title and the filename of the report.</p></li>
-<li><p><strong>mode</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default &quot;basic&quot;</em>) – This controls what type of report to be generated.
+<li><p><strong>title</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;DataPrep</span> <span class="pre">Report&quot;</span></code>) – The title of the report, which will be shown on the navigation bar.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">&quot;basic&quot;</span></code>) – This controls what type of report to be generated.
 Currently only the ‘basic’ is fully implemented.</p></li>
 </ul>
 </dd>
@@ -212,13 +212,16 @@ Currently only the ‘basic’ is fully implemented.</p></li>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataprep.eda</span> <span class="kn">import</span> <span class="n">create_report</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">create_report</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">create_report</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="c1"># show report in notebook</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;My Fantastic Report&#39;</span><span class="p">)</span> <span class="c1"># save report to local disk</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span><span class="o">.</span><span class="n">show_browser</span><span class="p">()</span> <span class="c1"># show report in the browser</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -257,7 +260,7 @@ This variable acts like an API in passing data to the template engine.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p></li>
-<li><p><strong>mode</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – This controls what type of report to be generated.
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[str]</span></code>) – This controls what type of report to be generated.
 Currently only the ‘basic’ is fully implemented.</p></li>
 </ul>
 </dd>

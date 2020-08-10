@@ -4,9 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing.compute &#8212; DataPrep 0.2.10 documentation</title>
+  <title>dataprep.eda.missing.compute &#8212; DataPrep 0.2.11 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -143,17 +143,18 @@
           <div>
             
   <h1>Source code for dataprep.eda.missing.compute</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This module implements the plot_missing(df) function&#39;s</span>
-<span class="sd">    calculating intermediate part</span>
+<span></span><span class="sd">&quot;&quot;&quot;This module implements the plot_missing(df) function&#39;s</span>
+<span class="sd">calculating intermediate part</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dask</span> <span class="kn">import</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster</span> <span class="kn">import</span> <span class="n">hierarchy</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">rv_histogram</span>
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
@@ -235,15 +236,17 @@
         <span class="n">null_perc</span><span class="p">,</span>
         <span class="n">missing_bars</span><span class="p">(</span><span class="n">null_perc</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span>
         <span class="n">missing_heatmap</span><span class="p">(</span><span class="n">nulldf</span><span class="p">,</span> <span class="n">null_perc</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span>
+        <span class="n">missing_dendrogram</span><span class="p">(</span><span class="n">nullity</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">spectrum</span><span class="p">,</span> <span class="n">null_perc</span><span class="p">,</span> <span class="n">bars</span><span class="p">,</span> <span class="n">heatmap</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
+    <span class="n">spectrum</span><span class="p">,</span> <span class="n">null_perc</span><span class="p">,</span> <span class="n">bars</span><span class="p">,</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">dendrogram</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Intermediate</span><span class="p">(</span>
         <span class="n">data_total_missing</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">null_perc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cols</span><span class="p">)},</span>
         <span class="n">data_spectrum</span><span class="o">=</span><span class="n">spectrum</span><span class="p">,</span>
         <span class="n">data_bars</span><span class="o">=</span><span class="n">bars</span><span class="p">,</span>
         <span class="n">data_heatmap</span><span class="o">=</span><span class="n">heatmap</span><span class="p">,</span>
+        <span class="n">data_dendrogram</span><span class="o">=</span><span class="n">dendrogram</span><span class="p">,</span>
         <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;missing_impact&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -359,6 +362,24 @@
 
     <span class="n">corr_mat</span> <span class="o">=</span> <span class="n">nulldf</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">corr_mat</span>
+
+
+<span class="k">def</span> <span class="nf">missing_dendrogram</span><span class="p">(</span><span class="n">nullity</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a missing values dendrogram</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Link the hierarchical output matrix, figure out orientation, construct base dendrogram.</span>
+    <span class="n">linkage_matrix</span> <span class="o">=</span> <span class="n">delayed</span><span class="p">(</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">linkage</span><span class="p">)(</span><span class="n">nullity</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s2">&quot;average&quot;</span><span class="p">)</span>
+
+    <span class="n">dendrogram</span> <span class="o">=</span> <span class="n">delayed</span><span class="p">(</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">dendrogram</span><span class="p">)(</span>
+        <span class="n">Z</span><span class="o">=</span><span class="n">linkage_matrix</span><span class="p">,</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span>
+        <span class="n">distance_sort</span><span class="o">=</span><span class="s2">&quot;descending&quot;</span><span class="p">,</span>
+        <span class="n">no_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dendrogram</span>
 
 
 <span class="k">def</span> <span class="nf">missing_impact_1vn</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals</span>
@@ -583,7 +604,7 @@
 <span class="sd">        a valid column name of the data frame</span>
 <span class="sd">    y</span>
 <span class="sd">        a valid column name of the data frame</span>
-<span class="sd">     bins</span>
+<span class="sd">    bins</span>
 <span class="sd">        The number of rows in the figure</span>
 <span class="sd">    ndist_sample</span>
 <span class="sd">        The number of sample points</span>

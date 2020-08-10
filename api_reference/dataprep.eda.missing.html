@@ -4,9 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing &#8212; DataPrep 0.2.10 documentation</title>
+  <title>dataprep.eda.missing &#8212; DataPrep 0.2.11 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -129,7 +129,7 @@
           
             
               <li class="">
-                  <a href="dataprep.eda.basic.html">dataprep.eda.basic</a>
+                  <a href="dataprep.eda.distribution.html">dataprep.eda.distribution</a>
               </li>
             
           
@@ -159,7 +159,7 @@
           
             
               <li class="">
-                  <a href="dataprep.data_connector.html">dataprep.data_connector</a>
+                  <a href="dataprep.connector.html">dataprep.data_connector</a>
               </li>
             
           
@@ -209,7 +209,7 @@
 <li><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
 <li><p><strong>bins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rows in the figure</p></li>
 <li><p><strong>ndist_sample</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of sample points</p></li>
-<li><p><strong>wdtype</strong> (<em>str</em><em> or </em><a class="reference internal" href="dataprep.eda.html#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
+<li><p><strong>wdtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – Specify Data Types for designated column or all columns.
 E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
 dtype = {“a”: Continuous(), “b”: “nominal”}
 or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>
@@ -247,14 +247,10 @@ plot_missing(df, x, y)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – the pandas data_frame for which plots are calculated for each column</p></li>
 <li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
-<li><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – <p>a valid column name of the data frame
-bins</p>
-<blockquote>
-<div><p>The number of rows in the figure</p>
-</div></blockquote>
-</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
+<li><p><strong>bins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rows in the figure</p></li>
 <li><p><strong>ndist_sample</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of sample points</p></li>
-<li><p><strong>dtype</strong> (<em>str</em><em> or </em><a class="reference internal" href="dataprep.eda.html#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
+<li><p><strong>dtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">DType</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – Specify Data Types for designated column or all columns.
 E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
 dtype = {“a”: Continuous(), “b”: “nominal”}
 or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p></li>

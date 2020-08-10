@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Tutorial - Connector for Spotify &#8212; DataPrep 0.2.11 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tutorial - Connector for Yelp" href="DC_Yelp_tut.html" />
+    <link rel="prev" title="Tutorial - Connector for DBLP" href="DC_DBLP_tut.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/connector/DC_Spotify_tut.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="connector.html">Connector</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="DC_DBLP_tut.html">Tutorial - Connector for DBLP</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">Tutorial - Connector for Spotify</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="DC_Yelp_tut.html">Tutorial - Connector for Yelp</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#overview" class="nav-link">Overview</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#preprocessing" class="nav-link">Preprocessing</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#obtaining-access-token-from-spotify" class="nav-link">Obtaining access token from Spotify</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#providing-the-credentials" class="nav-link">Providing the Credentials</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#running-the-application" class="nav-link">Running the Application</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#download-and-store-the-configuration-files-in-dataprep" class="nav-link">Download and store the configuration files in dataprep</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#initialize-connector" class="nav-link">Initialize connector</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#functionalities" class="nav-link">Functionalities</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#connector-info" class="nav-link">Connector.info</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h4">
+          <a href="#parameters" class="nav-link">Parameters</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#connector-show-schema" class="nav-link">Connector.show_schema</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#connector-query" class="nav-link">Connector.query</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#pagination" class="nav-link">Pagination</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#that-s-all-for-now" class="nav-link">That’s all for now.</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="tutorial-connector-for-spotify">
+<h1>Tutorial - Connector for Spotify<a class="headerlink" href="#tutorial-connector-for-spotify" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. The goal is to help the users skip the complex API configuration. In this tutorial, we illustrate how to use connector library with Spotify.</p>
+</div>
+<div class="section" id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<p>If you haven’t installed dataprep, run command pip install dataprep or execute the following cell.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!pip install dataprep
+</pre></div>
+</div>
+</div>
+<div class="section" id="obtaining-access-token-from-spotify">
+<h2>Obtaining access token from Spotify<a class="headerlink" href="#obtaining-access-token-from-spotify" title="Permalink to this headline">¶</a></h2>
+<p>To connect to Spotify, you need to generate a token. This token is a unique identifier of an application requesting access to the Spotify’s API. Once an application creates the token, it will act as your credential when making an API request.
+To receive an access token the user needs to create a server side application from Spotify. You can create a token by following the <a class="reference external" href="https://developer.spotify.com/documentation/web-api/">Spotify document</a>, or through the comprehensive guide below.</p>
+<p>Start by setting up a Spotify Developer account.</p>
+<a class="reference internal image-reference" href="../../_images/Spotify_authentication.png"><img alt="../../_images/Spotify_authentication.png" class="align-center" src="../../_images/Spotify_authentication.png" style="width: 700px; height: 470px;" /></a>
+<p>Once an account is created, click the “Dashboard” link and register a new application. Name and describe the application as you want.</p>
+<a class="reference internal image-reference" href="../../_images/Spotify_dashboard.png"><img alt="../../_images/Spotify_dashboard.png" class="align-center" src="../../_images/Spotify_dashboard.png" style="width: 600px; height: 400px;" /></a>
+<p>Proceed to <a class="reference external" href="https://developer.spotify.com/documentation/web-api/">Spotify’s GitHub account</a> and download/clone the Authentication Flow example app code.
+If the clone was successful, a new sub-directory appears on your local drive in the directory where you cloned your repository.</p>
+<a class="reference internal image-reference" href="../../_images/Spotify_git_page.png"><img alt="../../_images/Spotify_git_page.png" class="align-center" src="../../_images/Spotify_git_page.png" style="width: 650px; height: 400px;" /></a>
+<p>Download and install <a class="reference external" href="https://nodejs.org/en/">Node.js</a>, if you have not done so already.</p>
+<a class="reference internal image-reference" href="../../_images/Node_js.png"><img alt="../../_images/Node_js.png" class="align-center" src="../../_images/Node_js.png" style="width: 650px; height: 400px;" /></a>
+<div class="section" id="providing-the-credentials">
+<h3>Providing the Credentials<a class="headerlink" href="#providing-the-credentials" title="Permalink to this headline">¶</a></h3>
+<p>In the web-api-auth-examples folder, navigator to the authorization_code folder and there is a file called apps.js.</p>
+<a class="reference internal image-reference" href="../../_images/App_find.png"><img alt="../../_images/App_find.png" class="align-center" src="../../_images/App_find.png" style="width: 650px; height: 330px;" /></a>
+<p>Open apps.js with your favourite editor. In the file, it contains a section for client ID, client secret, and redirect URI. Insert the information available in the “white out” section. This is the call that starts the process of authenticating to user and gets the user’s authorization to access data.</p>
+<a class="reference internal image-reference" href="../../_images/App.js_config.png"><img alt="../../_images/App.js_config.png" class="align-center" src="../../_images/App.js_config.png" style="width: 650px; height: 100px;" /></a>
+<p>The client ID and client secret can be found in the dashboard app the user generated. The client ID is a public information for applications. The client secret must be kept confidential, it is used to verify that your request made with the client ID are authorized.</p>
+<a class="reference internal image-reference" href="../../_images/ID_and_secret.png"><img alt="../../_images/ID_and_secret.png" class="align-center" src="../../_images/ID_and_secret.png" style="width: 600px; height: 350px;" /></a>
+<p>Go back to the application dashboard and click the edit settings which can be found on the top right. In this section, insert the http link in the redirect_uri, “<a class="reference external" href="http://localhost:8888/callback">http://localhost:8888/callback</a>”. The redirect URI will safely send the user back to their application once Spotify has authorized the app. Copy and store the access token in a safe area.</p>
+<a class="reference internal image-reference" href="../../_images/URI_.png"><img alt="../../_images/URI_.png" class="align-center" src="../../_images/URI_.png" style="width: 300px; height: 400px;" /></a>
+</div>
+<div class="section" id="running-the-application">
+<h3>Running the Application<a class="headerlink" href="#running-the-application" title="Permalink to this headline">¶</a></h3>
+<p>Start the server by running the following command in the terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">node</span> <span class="n">app</span><span class="o">.</span><span class="n">js</span>
+</pre></div>
+</div>
+<p>Open a browser and visit the project home page again. Now that the server is running, you can use the following URL: <a class="reference external" href="http://localhost:8888">http://localhost:8888</a>.</p>
+<a class="reference internal image-reference" href="../../_images/Spotify_server.png"><img alt="../../_images/Spotify_server.png" class="align-center" src="../../_images/Spotify_server.png" style="width: 800px; height: 400px;" /></a>
+<p>When you click on the log in link, it will send you back to your redirect URI. You should see your Spotify account information as well as your access token and refresh token.</p>
+<a class="reference internal image-reference" href="../../_images/SFU_Spotify.png"><img alt="../../_images/SFU_Spotify.png" class="align-center" src="../../_images/SFU_Spotify.png" style="width: 800px; height: 400px;" /></a>
+</div>
+</div>
+<div class="section" id="download-and-store-the-configuration-files-in-dataprep">
+<h2>Download and store the configuration files in dataprep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
+<p>The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
+<p>To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files.
+When you decided on a location, enter the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/sfu-db/DataConnectorConfigs.git</span></code>. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder.</p>
+<p>From here you can proceed with the next steps.</p>
+<a class="reference internal image-reference" href="../../_images/dc_git.png"><img alt="../../_images/dc_git.png" class="align-center" src="../../_images/dc_git.png" style="width: 1000px; height: 500px;" /></a>
+<a class="reference internal image-reference" href="../../_images/dc_git_clone.png"><img alt="../../_images/dc_git_clone.png" class="align-center" src="../../_images/dc_git_clone.png" style="width: 725px; height: 125px;" /></a>
+<p>Below the configuration file are stored with dataprep.</p>
+<a class="reference internal image-reference" href="../../_images/Config_destination.png"><img alt="../../_images/Config_destination.png" class="align-center" src="../../_images/Config_destination.png" style="width: 586px; height: 132px;" /></a>
+</div>
+<div class="section" id="initialize-connector">
+<h2>Initialize connector<a class="headerlink" href="#initialize-connector" title="Permalink to this headline">¶</a></h2>
+<p>To initialize the connector, run the following code below. Copy and paste your Spotify <strong>access_token</strong>, <strong>client_id</strong>, and <strong>client_secret</strong> in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>from dataprep.connector import Connector
+client_id = “insert_client_id”
+client_secret = “insert_client_secret”
+access_token = “insert_token_key”
+dc = Connector(&quot;./DataConnectorConfigs/spotify&quot;, _auth={&quot;client_id&quot;:client_id,
+                                                       &quot;client_secret&quot;:client_secret,
+                                                       &quot;access_token&quot;:access_token})
+</pre></div>
+</div>
+</div>
+<div class="section" id="functionalities">
+<h2>Functionalities<a class="headerlink" href="#functionalities" title="Permalink to this headline">¶</a></h2>
+<p>Connector has several functions you can perform to gain insight on the data downloaded from Spotify.</p>
+<div class="section" id="connector-info">
+<h3>Connector.info<a class="headerlink" href="#connector-info" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">a. Table - The table(s) being accessed.</div>
+<div class="line">b. Parameters - Identifies which parameters can be used to call the method.</div>
+<div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/dc_spotify_info.png"><img alt="../../_images/dc_spotify_info.png" class="align-center" src="../../_images/dc_spotify_info.png" style="width: 285px; height: 405px;" /></a>
+<div class="section" id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp’s business query can either be required or optional. The required parameter is <strong>q</strong> while the optional parameters are <strong>limit</strong> and <strong>offset</strong>. The parameters are described below.</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">a. <strong>q</strong> - Required - Search term, for example “Beyonce”.</div>
+<div class="line">b. <strong>limit</strong> - Optional -  It is the maximum number of results to return. By default, it will return 20. Maximum is 50.</div>
+<div class="line">c. <strong>offset</strong> - Optional - Offset allows you to specify the ranking number of the first item on the page. By default, it will return 0. Maximum is 2,000.</div>
+</div>
+</div>
+<p>There are additional parameters to query with Spotify. If you are interested in reading up the other available parameters and setting up your own config files, please read this <a class="reference external" href="https://developer.spotify.com/documentation/web-api/reference/search/search/">Spotify link</a> and this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files link</a>.</p>
+</div>
+</div>
+<div class="section" id="connector-show-schema">
+<h3>Connector.show_schema<a class="headerlink" href="#connector-show-schema" title="Permalink to this headline">¶</a></h3>
+<p>The show_schema method returns the website data in a Dataframe format. There are two columns in the response. The first column is the column name and the second is the datatype.
+As an example, lets see what is in the artist table.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/dc_spotify_show_schema.png"><img alt="../../_images/dc_spotify_show_schema.png" class="align-center" src="../../_images/dc_spotify_show_schema.png" style="width: 285px; height: 320px;" /></a>
+</div>
+<div class="section" id="connector-query">
+<h3>Connector.query<a class="headerlink" href="#connector-query" title="Permalink to this headline">¶</a></h3>
+<p>The query method downloads the website data and displays it in a Dataframe. The parameters must meet the requirements as indicated in connector.info for the operation to run.</p>
+<p>When the data is received from the server, it will either be in a JSON or XML format. The connector reformats the data in pandas Dataframe for the convenience of downstream operations.</p>
+<p>As an example, let’s try to get the data from the “artist” table, providing the query search for the artist “beyonce”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;beyonce&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/dc_spotify_query.png"><img alt="../../_images/dc_spotify_query.png" class="align-center" src="../../_images/dc_spotify_query.png" style="width: 1000px; height: 460px;" /></a>
+<p>From query results, you can see how easy it is to download the artist data from Spotify into a pandas Dataframe.
+Now that you have an understanding of how connector operates, you can easily accomplish the task with two lines of code.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Another feature available in the config files is pagination. Pagination is the process of dividing a document into discrete pages, breaking the content into pages and allow visitors to switch between them. It returns the maximum number of searches to return.</div>
+<div class="line"><br /></div>
+<div class="line">To use pagination, you need to include <strong>_count</strong> in your query. The <strong>_count</strong> parameter represents the number of records a user would like to return, which can be larger than the maximum limit of records each return of API itself. Users can still fetch multiple pages of records by using parameters like limit and offset, however this requires users to understand how pagination works different website APIs.</div>
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;twice&quot;</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/dc_spotify_query_pag.png"><img alt="../../_images/dc_spotify_query_pag.png" class="align-center" src="../../_images/dc_spotify_query_pag.png" style="width: 1000px; height: 490px;" /></a>
+<p>Pagination does not concurrently work with the <strong>limit</strong> parameter in a query, you need to select either <strong>limit</strong> or <strong>_count</strong>. If you select <strong>_count</strong>, it bypasses the initial restriction set by Spotify’s <strong>limit</strong> parameter.</p>
+</div>
+<div class="section" id="that-s-all-for-now">
+<h2>That’s all for now.<a class="headerlink" href="#that-s-all-for-now" title="Permalink to this headline">¶</a></h2>
+<p>Please visit the other tutorials that are available if you are interested in setting up a connector.
+If you are interested in creating other connectors, please visit this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">link</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>
