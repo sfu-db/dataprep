@@ -12,7 +12,6 @@ from bokeh.io.notebook import load_notebook
 from bokeh.embed.notebook import notebook_content
 from bokeh.models import LayoutDOM
 from bokeh.resources import CDN
-from IPython.display import HTML, display
 from jinja2 import Template
 
 from .utils import is_notebook
@@ -104,12 +103,19 @@ class Report:
         # if not call from notebook environment, ref to show_browser function.
         if not is_notebook():
             print(
-                "The report is not shown in a notebook environment,"
-                " please try 'show_browser' if you want to open it in browser",
+                "The report will not show in a notebook environment, "
+                "please try 'show_browser' if you want to open it in browser",
                 file=sys.stderr,
             )
+        try:
+            from IPython.display import (  # pylint: disable=import-outside-toplevel
+                HTML,
+                display,
+            )
 
-        display(HTML(self._repr_html_()))
+            display(HTML(self._repr_html_()))
+        except ImportError:
+            pass
 
     def show_browser(self) -> None:
         """
