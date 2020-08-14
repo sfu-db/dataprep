@@ -84,12 +84,14 @@ def missing_impact(df: dd.DataFrame, bins: int) -> Intermediate:
     (nulldf,) = dask.persist(df.isnull())
     nullity = nulldf.to_dask_array(lengths=True)
 
-    null_perc = nullity.sum(axis=0) / nullity.shape[0]
+    null_cnts = nullity.sum(axis=0)
+    nrows = nullity.shape[0]
+    null_perc = null_cnts / nrows
 
     tasks = (
         missing_spectrum(nullity, cols, bins=bins),
         null_perc,
-        missing_bars(null_perc, cols),
+        missing_bars(null_cnts, cols, nrows),
         missing_heatmap(nulldf, null_perc, cols),
         missing_dendrogram(nullity, cols),
     )
@@ -186,18 +188,20 @@ def missing_spectrum(  # pylint: disable=too-many-locals
     return df
 
 
-def missing_bars(null_perc: da.Array, cols: np.ndarray) -> pd.DataFrame:
+def missing_bars(
+    null_cnts: da.Array, cols: np.ndarray, nrows: dd.core.Scalar
+) -> pd.DataFrame:
     """
     Calculate a bar chart visualization of nullity correlation in the given DataFrame
     """
-    notnull_perc = 1 - null_perc
+    pres_cnts = nrows - null_cnts
 
     df = dd.from_dask_array(
-        da.stack([null_perc, notnull_perc, da.from_array(cols, (1,))], axis=1),
-        columns=["missing", "not missing", "columns"],
+        da.stack([pres_cnts, null_cnts, da.from_array(cols, (1,))], axis=1),
+        columns=["Present", "Missing", "index"],
     )
 
-    df = df.set_index("columns")
+    df = df.set_index("index")
 
     return df
 
