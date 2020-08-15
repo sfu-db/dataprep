@@ -12,6 +12,7 @@ from bokeh.models import (
     CategoricalColorMapper,
     ColorBar,
     ColumnDataSource,
+    CustomJSHover,
     FactorRange,
     FuncTickFormatter,
     HoverTool,
@@ -387,56 +388,72 @@ def render_heatmaps(
 
 
 def render_bar_chart(
-    data_barchart: pd.DataFrame, yscale: str, plot_width: int, plot_height: int,
+    df: pd.DataFrame, yscale: str, plot_width: int, plot_height: int,
 ) -> Figure:
     """
-    Render a bar chart
+    Render a bar chart for the missing and present values
     """
 
-    colors = [CATEGORY20[0], CATEGORY20[2]]
-    value_type = ["Not Missing", "Missing"]
-
-    data = {
-        "cols": data_barchart.index,
-        "Not Missing": data_barchart["not missing"],
-        "Missing": data_barchart["missing"],
-    }
-
-    if len(data_barchart) > 20:
-        plot_width = 28 * len(data_barchart)
+    if len(df) > 20:
+        plot_width = 28 * len(df)
 
     fig = Figure(
-        x_range=data_barchart.index.tolist(),
-        y_range=[0, 1],
+        x_range=list(df.index),
+        y_range=[0, df["Present"][0] + df["Missing"][0]],
         plot_width=plot_width,
         plot_height=plot_height,
         y_axis_type=yscale,
         toolbar_location=None,
-        tooltips="@cols: @$name{1%} $name",
-        tools="hover",
+        tools=[],
     )
 
-    fig.vbar_stack(
-        value_type,
-        x="cols",
+    rend = fig.vbar_stack(
+        stackers=df.columns,
+        x="index",
         width=0.9,
-        color=colors,
-        source=data,
-        legend_label=value_type,
+        color=[CATEGORY20[0], CATEGORY20[2]],
+        source=df,
+        legend_label=list(df.columns),
     )
+
+    # hover tool with count and percent
+    formatter = CustomJSHover(
+        args=dict(source=ColumnDataSource(df)),
+        code="""
+        const columns = Object.keys(source.data)
+        const cur_bar = special_vars.data_x - 0.5
+        var ttl_bar = 0
+        for (let i = 0; i < columns.length; i++) {
+            if (columns[i] != 'index'){
+                ttl_bar = ttl_bar + source.data[columns[i]][cur_bar]
+            }
+        }
+        const cur_val = source.data[special_vars.name][cur_bar]
+        return (cur_val/ttl_bar * 100).toFixed(2)+'%';
+    """,
+    )
+    for i, val in enumerate(df.columns):
+        hover = HoverTool(
+            tooltips=[
+                ("Column", "@index"),
+                (f"{val} count", "@$name"),
+                (f"{val} percent", "@{%s}{custom}" % rend[i].name),
+            ],
+            formatters={"@{%s}" % rend[i].name: formatter},
+            renderers=[rend[i]],
+        )
+        fig.add_tools(hover)
+
     format_js = """
         if (tick.length > 18) return tick.substring(0, 16) + '...';
         else return tick;
     """
     fig.xaxis.formatter = FuncTickFormatter(code=format_js)
 
-    fig.legend.location = "top_right"
-    fig.y_range.start = 0
-    fig.x_range.range_padding = 0
-    fig.yaxis.axis_label = "Total Count"
-
+    fig.yaxis.axis_label = "Row Count"
     tweak_figure(fig)
     relocate_legend(fig, "right")
+
     return fig
 
 
