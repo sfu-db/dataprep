@@ -320,6 +320,48 @@ def wordfreq_viz(
     return Panel(child=row(fig), title="Word Frequencies")
 
 
+def bar_viz_new(
+    df: pd.DataFrame,
+    ttl_grps: int,
+    nrows: int,
+    col: str,
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
+    show_yticks: bool,
+) -> Figure:
+    """
+    Render a bar chart
+    """
+    # pylint: disable=too-many-arguments
+    df["pct"] = df[col] / nrows * 100
+    df.index = [str(val) for val in df.index]
+
+    tooltips = [(col, "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
+    if show_yticks:
+        if len(df) > 10:
+            plot_width = 28 * len(df)
+    fig = Figure(
+        plot_width=plot_width,
+        plot_height=plot_height,
+        title=col,
+        toolbar_location=None,
+        tooltips=tooltips,
+        tools="hover",
+        x_range=list(df.index),
+        y_axis_type=yscale,
+    )
+    fig.vbar(x="index", width=0.9, top=col, bottom=0.01, source=df)
+    tweak_figure(fig, "bar", show_yticks)
+    fig.yaxis.axis_label = "Count"
+    if ttl_grps > len(df):
+        fig.xaxis.axis_label = f"Top {len(df)} of {ttl_grps} {col}"
+        fig.xaxis.axis_label_standoff = 0
+    if show_yticks and yscale == "linear":
+        _format_axis(fig, 0, df[col].max(), "y")
+    return fig
+
+
 def bar_viz(
     df: pd.DataFrame,
     ttl_grps: int,
@@ -1507,12 +1549,11 @@ def stats_viz_cat(
     return Panel(child=div, title="Stats")
 
 
-def stats_viz_dt(stats: Dict[str, Any], plot_width: int, plot_height: int) -> Panel:
+def stats_viz_dt(data: Dict[str, str], plot_width: int, plot_height: int) -> Panel:
     """
     Render statistics panel for datetime data
     """
-
-    data = {k: _format_values(k, v) for k, v in stats.items()}
+    data = {k: _format_values(k, v) for k, v in data.items()}
     ov_content = ""
     for key, value in data.items():
         value = _sci_notation_superscript(value)
@@ -1548,17 +1589,9 @@ def render_distribution_grid(
     nrows = itmdt["stats"]["nrows"]
     for col, dtype, data in itmdt["data"]:
         if is_dtype(dtype, Nominal()):
-            df, ttl_grps, npresent = data
-            fig = bar_viz(
-                df,
-                ttl_grps,
-                npresent,
-                nrows,
-                col,
-                yscale,
-                plot_width,
-                plot_height,
-                False,
+            df, ttl_grps = data
+            fig = bar_viz_new(
+                df, ttl_grps, nrows, col, yscale, plot_width, plot_height, False,
             )
             figs.append(fig)
         elif is_dtype(dtype, Continuous()):
