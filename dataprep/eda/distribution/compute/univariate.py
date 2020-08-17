@@ -1,12 +1,12 @@
 """Computations for plot(df, x)."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
-from dask.array.stats import kurtosis, skew
+from dask.array.stats import chisquare, kurtosis, normaltest, skew
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from scipy.stats import gaussian_kde
 
@@ -88,114 +88,219 @@ def compute_univariate(
 
     col_dtype = detect_dtype(df[x], dtype)
     if is_dtype(col_dtype, Nominal()):
-        # extract the column
-        df_x = df[x]
-        # calculate the total rows
-        nrows = df_x.shape[0]
-        # cast the column as string type if it contains a mutable type
-        if df_x.head().apply(lambda x: hasattr(x, "__hash__")).any():
-            # drop_null() will not work if the column conatains a mutable type
-            df_x = df_x.dropna().astype(str)
-
-        # drop null values
-        df_x = drop_null(df_x)
-
-        # calc_word_freq() returns the frequency of words (for the word cloud and word
-        # frequency bar chart) and the total number of words
-        word_data = calc_word_freq(df_x, top_words, stopword, lemmatize, stem)
-
-        # calc_cat_stats() computes all the categorical stats including the length
-        # histogram. calc_bar_pie() does the calculations for the bar and pie charts
-        # NOTE this dictionary could be returned to create_report without
-        # calling the subsequent compute
-        cat_data = {
-            "stats": calc_cat_stats(df_x, nrows, bins),
-            "bar_pie": calc_bar_pie(df_x, ngroups, largest),
-            "word_data": word_data,
-        }
-        cat_data = dask.compute(cat_data)[0]
-
-        return Intermediate(
-            col=x,
-            stats=cat_data["stats"],
-            bar_pie=cat_data["bar_pie"],
-            word_data=cat_data["word_data"],
-            visual_type="categorical_column",
+        # all computations for plot(df, Nominal())
+        data = nom_comps(
+            df[x], ngroups, largest, bins, top_words, stopword, lemmatize, stem
         )
+        (data,) = dask.compute(data)
+
+        return Intermediate(col=x, data=data, visual_type="categorical_column",)
+
     elif is_dtype(col_dtype, Continuous()):
-
-        # calculate the total number of rows then drop the missing values
-        nrows = df.shape[0]
-        df_x = drop_null(df[x])
-
+        # extract the column
+        srs = df[x]
+        # select values in the user defined range
         if value_range is not None:
-            df_x = df_x[df_x.between(*value_range)]
+            srs = srs[srs.between(*value_range)]
 
-        # TODO perhaps we should not use to_dask() on the entire
-        # initial dataframe and instead only use the column of data
-        # df_x = df_x.repartition(partition_size="100MB")
+        # all computations for plot(df, Continuous())
+        (data,) = dask.compute(cont_comps(srs, bins))
 
-        # calculate numerical statistics and extract the min and max
-        num_stats = calc_num_stats(df_x, nrows)
-        minv, maxv = num_stats["min"], num_stats["max"]
+        return Intermediate(col=x, data=data, visual_type="numerical_column",)
 
-        # NOTE this dictionary could be returned to create_report without
-        # calling the subsequent compute
-        num_data = {
-            "hist": da.histogram(df_x, bins=bins, range=[minv, maxv]),
-            "kde": calc_kde(df_x, bins, minv, maxv),
-            "box_data": calc_box_new(df_x, num_stats["qntls"]),
-            "stats": num_stats,
-        }
-        num_data = dask.compute(num_data)[0]
-
-        return Intermediate(
-            col=x,
-            hist=num_data["hist"],
-            kde=num_data["kde"],
-            box_data=num_data["box_data"],
-            stats=num_data["stats"],
-            visual_type="numerical_column",
-        )
     elif is_dtype(col_dtype, DateTime()):
         data_dt: List[Any] = []
-        # line chart
-        data_dt.append(dask.delayed(_calc_line_dt)(df[[x]], timeunit))
         # stats
         data_dt.append(dask.delayed(calc_stats_dt)(df[x]))
-        data, statsdata_dt = dask.compute(*data_dt)
-        return Intermediate(
-            col=x, data=data, stats=statsdata_dt, visual_type="datetime_column",
-        )
+        # line chart
+        data_dt.append(dask.delayed(_calc_line_dt)(df[[x]], timeunit))
+        data, line = dask.compute(*data_dt)
+        return Intermediate(col=x, data=data, line=line, visual_type="datetime_column",)
     else:
         raise UnreachableError
 
 
-def calc_bar_pie(
-    srs: dd.Series, ngroups: int, largest: bool
-) -> Tuple[dd.DataFrame, dd.core.Scalar]:
+def nom_comps(
+    srs: dd.Series,
+    ngroups: int,
+    largest: bool,
+    bins: int,
+    top_words: int,
+    stopword: bool,
+    lemmatize: bool,
+    stem: bool,
+) -> Dict[str, Any]:
     """
-    Calculates the counts of categorical values and the total number of
-    categorical values required for the bar and pie charts in plot(df, x).
+    This function aggregates all of the computations required for plot(df, Nominal())
 
     Parameters
     ----------
     srs
-        One categorical column
+        one categorical column
     ngroups
         Number of groups to return
     largest
         If true, show the groups with the largest count,
         else show the groups with the smallest count
-    """
+    bins
+        number of bins for the category length frequency histogram
+    top_words
+        Number of highest frequency words to show in the
+        wordcloud and word frequency bar chart
+    stopword
+        If True, remove stop words, else keep them
+    lemmatize
+        If True, lemmatize the words before computing
+        the word frequencies, else don't
+    stem
+        If True, extract the stem of the words before
+        computing the word frequencies, else don't
+    """  # pylint: disable=too-many-arguments
+
+    data: Dict[str, Any] = {}
+
+    # total rows
+    data["nrows"] = srs.shape[0]
+    # cast the column as string type if it contains a mutable type
+    first_rows = srs.head()  # dd.Series.head() triggers a (small) data read
+    try:
+        first_rows.apply(hash)
+    except TypeError:
+        srs = srs.astype(str)
+    # drop null values
+    srs = drop_null(srs)
+
+    (srs,) = dask.persist(srs)
+
+    ## if cfg.bar_enable or cfg.pie_enable
     # counts of unique values in the series
     grps = srs.value_counts(sort=False)
     # total number of groups
-    ttl_grps = grps.shape[0]
+    data["nuniq"] = grps.shape[0]
     # select the largest or smallest groups
-    fnl_grp_cnts = grps.nlargest(ngroups) if largest else grps.nsmallest(ngroups)
+    data["bar"] = grps.nlargest(ngroups) if largest else grps.nsmallest(ngroups)
+    ##     if cfg.barchart_bars == cfg.piechart_slices:
+    data["pie"] = data["bar"]
+    ##     else
+    ##     data["pie"] = grps.nlargest(ngroups) if largest else grps.nsmallest(ngroups)
+    ##     if cfg.insights.evenness_enable
+    data["chisq"] = chisquare(grps.values)
 
-    return fnl_grp_cnts.to_frame(), ttl_grps
+    if not first_rows.apply(lambda x: isinstance(x, str)).all():
+        srs = srs.astype(str)  # srs must be a string to compute the value lengths
+    ## if cfg.stats_enable
+    data.update(calc_cat_stats(srs, bins, data["nrows"], data["nuniq"]))
+    ## if cfg.word_freq_enable
+    data.update(calc_word_freq(srs, top_words, stopword, lemmatize, stem))
+
+    return data
+
+
+def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
+    """
+    This function aggregates all of the computations required for plot(df, Continuous())
+
+    Parameters
+    ----------
+    srs
+        one numerical column
+    bins
+        the number of bins in the histogram
+    """
+
+    data: Dict[str, Any] = {}
+
+    ## if cfg.stats_enable or cfg.hist_enable or
+    # calculate the total number of rows then drop the missing values
+    data["nrows"] = srs.shape[0]
+    srs = drop_null(srs)
+    ## if cfg.stats_enable
+    # number of not null (present) values
+    data["npres"] = srs.shape[0]
+    # remove infinite values
+    srs = srs[~srs.isin({np.inf, -np.inf})]
+
+    (srs,) = dask.persist(srs)
+
+    # shared computations
+    ## if cfg.stats_enable or cfg.hist_enable or cfg.qqplot_enable and cfg.insights_enable:
+    data["min"], data["max"] = srs.min(), srs.max()
+    ## if cfg.hist_enable or cfg.qqplot_enable and cfg.ingsights_enable:
+    data["hist"] = da.histogram(srs, bins=bins, range=[data["min"], data["max"]])
+    ## if cfg.insights_enable and (cfg.qqplot_enable or cfg.hist_enable):
+    data["norm"] = normaltest(data["hist"][0])
+    ## if cfg.qqplot_enable
+    data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
+    ## elif cfg.stats_enable
+    ## data["qntls"] = srs.quantile([0.05, 0.25, 0.5, 0.75, 0.95])
+    ## elif cfg.boxplot_enable
+    ## data["qntls"] = srs.quantile([0.25, 0.5, 0.75])
+    ## if cfg.stats_enable or cfg.hist_enable and cfg.insights_enable:
+    data["skew"] = skew(srs)
+
+    # if cfg.stats_enable
+    data["nuniq"] = srs.nunique()
+    data["nreals"] = srs.shape[0]
+    data["nzero"] = (srs == 0).sum()
+    data["nneg"] = (srs < 0).sum()
+    data["mean"] = srs.mean()
+    data["std"] = srs.std()
+    data["kurt"] = kurtosis(srs)
+    data["mem_use"] = srs.memory_usage(deep=True)
+
+    ## if cfg.hist_enable and cfg.insight_enable
+    data["chisq"] = chisquare(data["hist"][0])
+
+    # compute the density histogram
+    data["dens"] = da.histogram(
+        srs, bins=bins, range=[data["min"], data["max"]], density=True
+    )
+    # gaussian kernel density estimate
+    try:  # NOTE gaussian_kde triggers a .compute()
+        data["kde"] = gaussian_kde(
+            srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
+        )
+    except np.linalg.LinAlgError:
+        data["kde"] = None
+
+    ## if cfg.box_enable
+    data.update(calc_box(srs, data["qntls"]))
+
+    return data
+
+
+def calc_box(srs: dd.Series, qntls: da.Array) -> Dict[str, Any]:
+    """
+    Box plot calculations
+
+    Parameters
+    ----------
+    srs
+        one numerical column
+    qntls
+        quantiles of the column
+    """
+    data: Dict[str, Any] = {}
+
+    # quartiles
+    data["qrtl1"] = qntls.loc[0.25].sum()
+    data["qrtl2"] = qntls.loc[0.5].sum()
+    data["qrtl3"] = qntls.loc[0.75].sum()
+    iqr = data["qrtl3"] - data["qrtl1"]
+    srs_iqr = srs[srs.between(data["qrtl1"] - 1.5 * iqr, data["qrtl3"] + 1.5 * iqr)]
+    # outliers
+    otlrs = srs[~srs.between(data["qrtl1"] - 1.5 * iqr, data["qrtl3"] + 1.5 * iqr)]
+    # randomly sample at most 100 outliers from each partition without replacement
+    smp_otlrs = otlrs.map_partitions(
+        lambda x: x.sample(min(100, x.shape[0])), meta=otlrs
+    )
+    data["lw"] = srs_iqr.min()
+    data["uw"] = srs_iqr.max()
+    data["otlrs"] = smp_otlrs.values
+    ##    if cfg.insights_enable
+    data["notlrs"] = otlrs.shape[0]
+
+    return data
 
 
 def calc_word_freq(
@@ -204,7 +309,7 @@ def calc_word_freq(
     stopword: bool = True,
     lemmatize: bool = False,
     stem: bool = False,
-) -> Tuple[dd.Series, dd.core.Scalar]:
+) -> Dict[str, Any]:
     """
     Parse a categorical column of text data into words, and then
     compute the frequency distribution of words and the total
@@ -254,111 +359,17 @@ def calc_word_freq(
     word_cnts = srs.value_counts(sort=False)
     # total number of words
     nwords = word_cnts.sum()
+    # total uniq words
+    nuniq_words = word_cnts.shape[0]
     # words with the highest frequency
     fnl_word_cnts = word_cnts.nlargest(n=top_words)
 
-    return fnl_word_cnts, nwords
-
-
-def calc_kde(
-    srs: dd.Series, bins: int, minv: float, maxv: float,
-) -> Tuple[Tuple[da.core.Array, da.core.Array], np.ndarray]:
-    """
-    Calculate a density histogram and its corresponding kernel density
-    estimate over a given series. The kernel is Gaussian.
-
-    Parameters
-    ----------
-    data
-        One numerical column over which to compute the histogram and kde
-    bins
-        Number of bins to use in the histogram
-    """
-    # compute the density histogram
-    hist = da.histogram(srs, bins=bins, range=[minv, maxv], density=True)
-    # probability density function for the series
-    # NOTE gaussian_kde triggers a .compute()
-    try:
-        kde = gaussian_kde(
-            srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
-        )
-    except np.linalg.LinAlgError:
-        kde = None
-
-    return hist, kde
-
-
-def calc_box_new(srs: dd.Series, qntls: dd.Series) -> Dict[str, Any]:
-    """
-    Calculate the data required for a box plot
-
-    Parameters
-    ----------
-    srs
-        One numerical column from which to compute the box plot data
-    qntls
-        Quantiles from the normal Q-Q plot
-    """
-    # box plot stats
-    # inter-quartile range
-    # TODO figure out how to extract a scalar from a Dask series without using a function like sum()
-    qrtl1 = qntls.loc[0.25].sum()
-    qrtl3 = qntls.loc[0.75].sum()
-    iqr = qrtl3 - qrtl1
-    srs_iqr = srs[srs.between(qrtl1 - 1.5 * iqr, qrtl3 + 1.5 * iqr)]
-    # outliers
-    otlrs = srs[~srs.between(qrtl1 - 1.5 * iqr, qrtl3 + 1.5 * iqr)]
-    # randomly sample at most 100 outliers from each partition without replacement
-    otlrs = otlrs.map_partitions(lambda x: x.sample(min(100, x.shape[0])), meta=otlrs)
-
-    box_data = {
-        "grp": srs.name,
-        "q1": qrtl1,
-        "q2": qntls.loc[0.5].sum(),
-        "q3": qrtl3,
-        "lw": srs_iqr.min(),
-        "uw": srs_iqr.max(),
-        "otlrs": otlrs.values,
-        "x": 1,  # x, x0, and x1 are for plotting the box plot with bokeh
-        "x0": 0.2,
-        "x1": 0.8,
-    }
-
-    return box_data
-
-
-def calc_num_stats(srs: dd.Series, nrows: dd.core.Scalar) -> Dict[str, Any]:
-    """
-    Calculate statistics for a numerical column
-
-    Parameters
-    ----------
-    srs
-        a numerical column
-    nrows
-        number of rows in the column before dropping null values
-    """
-    stats = {
-        "nrows": nrows,
-        "npresent": srs.shape[0],
-        "nunique": srs.nunique(),
-        "ninfinite": ((srs == np.inf) | (srs == -np.inf)).sum(),
-        "nzero": (srs == 0).sum(),
-        "min": srs.min(),
-        "max": srs.max(),
-        "qntls": srs.quantile(np.linspace(0.01, 0.99, 99)),
-        "mean": srs.mean(),
-        "std": srs.std(),
-        "skew": skew(srs),
-        "kurt": kurtosis(srs),
-        "mem_use": srs.memory_usage(),
-    }
-    return stats
+    return {"word_cnts": fnl_word_cnts, "nwords": nwords, "nuniq_words": nuniq_words}
 
 
 def calc_cat_stats(
-    srs: dd.Series, nrows: int, bins: int
-) -> Union[Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]], Dict[str, Any]]:
+    srs: dd.Series, bins: int, nrows: int, nuniq: Optional[dd.core.Scalar] = None
+) -> Dict[str, Any]:
     """
     Calculate stats for a categorical column
 
@@ -374,24 +385,24 @@ def calc_cat_stats(
     # overview stats
     stats = {
         "nrows": nrows,
-        "npresent": srs.shape[0],
-        "nunique": srs.nunique(),
-        "mem_use": srs.memory_usage(),
-        "first_rows": srs.loc[:4],
+        "npres": srs.shape[0],
+        "nuniq": nuniq,  # if cfg.bar_endable or cfg.pie_enable else srs.nunique(),
+        "mem_use": srs.memory_usage(deep=True),
+        "first_rows": srs.reset_index(drop=True).loc[:4],
     }
     # length stats
     lengths = srs.str.len()
     minv, maxv = lengths.min(), lengths.max()
     hist = da.histogram(lengths.values, bins=bins, range=[minv, maxv])
-    length_stats = {
+    leng = {
         "Mean": lengths.mean(),
+        "Standard Deviation": lengths.std(),
         "Median": lengths.quantile(0.5),
         "Minimum": minv,
         "Maximum": maxv,
-        "hist": hist,
     }
     # letter stats
-    letter_stats = {
+    letter = {
         "Count": srs.str.count(r"[a-zA-Z]").sum(),
         "Lowercase Letter": srs.str.count(r"[a-z]").sum(),
         "Space Separator": srs.str.count(r"[ ]").sum(),
@@ -400,7 +411,7 @@ def calc_cat_stats(
         "Decimal Number": srs.str.count(r"[0-9]").sum(),
     }
 
-    return stats, length_stats, letter_stats
+    return {"stats": stats, "len_stats": leng, "letter_stats": letter, "len_hist": hist}
 
 
 def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
