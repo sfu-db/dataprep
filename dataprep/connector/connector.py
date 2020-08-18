@@ -2,21 +2,22 @@
 This module contains the Connector class.
 Every data fetching action should begin with instantiating this Connector class.
 """
-import asyncio
 import math
+import sys
+from asyncio import as_completed
 from pathlib import Path
 from typing import Any, Awaitable, Dict, List, Optional, Union
 
 import pandas as pd
-from jinja2 import Environment, StrictUndefined, Template
-
 from aiohttp import ClientSession
+from jinja2 import Environment, StrictUndefined, Template
 
 from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
 from .errors import RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
-from .throttle import Throttler
+from .int_ref import IntRef
+from .throttler import OrderedThrottler, ThrottleSession
 
 INFO_TEMPLATE = Template(
     """{% for tb in tbs.keys() %}
@@ -89,13 +90,14 @@ class Connector:
         self._auth = _auth or {}
         self._concurrency = _concurrency
         self._jenv = Environment(undefined=StrictUndefined)
-        self._throttler = Throttler(_concurrency)
+        self._throttler = OrderedThrottler(_concurrency)
 
     async def query(  # pylint: disable=too-many-locals
         self,
         table: str,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
+        _concurrency: Optional[int] = None,
         **where: Any,
     ) -> Union[Awaitable[pd.DataFrame], pd.DataFrame]:
         """
@@ -188,17 +190,118 @@ class Connector:
             new_schema_dict["data_type"].append(schema[k]["type"])
         return pd.DataFrame.from_dict(new_schema_dict)
 
+    async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches
+        self,
+        table: str,
+        kwargs: Dict[str, Any],
+        *,
+        _auth: Optional[Dict[str, Any]] = None,
+        _count: Optional[int] = None,
+    ) -> pd.DataFrame:
+        assert (
+            table in self._impdb.tables
+        ), f"No such table {table} in {self._impdb.name}"
+
+        itable = self._impdb.tables[table]
+        if itable.pag_params is None and _count is not None:
+            print(
+                f"ignoring _count since {table} has no pagination settings",
+                file=sys.stderr,
+            )
+
+        if _count is not None and _count <= 0:
+            raise RuntimeError("_count should be larger than 0")
+
+        async with ClientSession() as client:
+            throttler = self._throttler.session()
+
+            if itable.pag_params is None or _count is None:
+                df = await self._fetch(
+                    itable, kwargs, _client=client, _throttler=throttler, _auth=_auth,
+                )
+                return df
+
+            pag_type = itable.pag_params.type
+
+            # pagination begins
+            max_per_page = itable.pag_params.max_count
+            total = _count
+            n_page = math.ceil(total / max_per_page)
+            remaining = total % max_per_page
+
+            if pag_type == "cursor":
+                last_id = 0
+                dfs = []
+                # No way to parallelize for cursor type
+                for i in range(n_page):
+                    count = max_per_page if i < n_page - 1 else remaining
+
+                    df = await self._fetch(
+                        itable,
+                        kwargs,
+                        _client=client,
+                        _throttler=throttler,
+                        _auth=_auth,
+                        _count=count,
+                        _cursor=last_id - 1,
+                    )
+
+                    if df is None:
+                        raise NotImplementedError
+
+                    if len(df) == 0:
+                        # The API returns empty for this page, maybe we've reached the end
+                        break
+
+                    last_id = int(df[itable.pag_params.cursor_id][len(df) - 1]) - 1
+                    dfs.append(df)
+
+            elif pag_type == "limit":
+                resps_coros = []
+                allowed_page = IntRef(n_page)
+                for i in range(n_page):
+                    count = max_per_page if i < n_page - 1 else remaining
+
+                    resps_coros.append(
+                        self._fetch(
+                            itable,
+                            kwargs,
+                            _client=client,
+                            _throttler=throttler,
+                            _page=i,
+                            _allowed_page=allowed_page,
+                            _auth=_auth,
+                            _count=count,
+                            _cursor=i * max_per_page,
+                        )
+                    )
+
+                dfs = []
+                for resp_coro in as_completed(resps_coros):
+                    df = await resp_coro
+                    if df is not None:
+                        dfs.append(df)
+
+            else:
+                raise NotImplementedError
+
+        df = pd.concat(dfs, axis=0).reset_index(drop=True)
+
+        return df
+
     async def _fetch(  # pylint: disable=too-many-locals,too-many-branches
         self,
         table: ImplicitTable,
         kwargs: Dict[str, Any],
         *,
         _client: ClientSession,
-        _throttler: Throttler,
+        _throttler: ThrottleSession,
+        _page: int = 0,
+        _allowed_page: Optional[IntRef] = None,
         _count: Optional[int] = None,
         _cursor: Optional[int] = None,
         _auth: Optional[Dict[str, Any]] = None,
-    ) -> str:
+    ) -> Optional[pd.DataFrame]:
         assert (_count is None) == (
             _cursor is None
         ), "_cursor and _count should both be None or not None"
@@ -252,7 +355,14 @@ class Connector:
                 raise UniversalParameterOverridden(cursor_key, "_cursor")
             req_data["params"][cursor_key] = _cursor
 
-        async with _throttler, _client.request(
+        await _throttler.acquire(_page)
+
+        if _allowed_page is not None and int(_allowed_page) <= _page:
+            # cancel current throttler counter since the request is not sent out
+            _throttler.release()
+            return None
+
+        async with _client.request(
             method=method,
             url=url,
             headers=req_data["headers"],
@@ -263,106 +373,10 @@ class Connector:
         ) as resp:
             if resp.status != 200:
                 raise RequestError(status_code=resp.status, message=await resp.text())
-            content: str = await resp.text()
-            return content
+            df = table.from_response(await resp.text())
 
-    async def _query_imp(  # pylint: disable=too-many-locals
-        self,
-        table: str,
-        kwargs: Dict[str, Any],
-        *,
-        _auth: Optional[Dict[str, Any]] = None,
-        _count: Optional[int] = None,
-    ) -> pd.DataFrame:
-        assert (
-            table in self._impdb.tables
-        ), f"No such table {table} in {self._impdb.name}"
-
-        async with ClientSession() as client:
-            itable = self._impdb.tables[table]
-            if itable.pag_params is None:
-                resp = await self._fetch(
-                    itable,
-                    kwargs,
-                    _client=client,
-                    _throttler=self._throttler,
-                    _auth=_auth,
-                )
-                df = itable.from_response(resp)
-                return df
-
-            pag_type = itable.pag_params.type
-
-            if _count is None:
-                # User doesn't specify _count
-                resp = await self._fetch(
-                    itable,
-                    kwargs,
-                    _client=client,
-                    _throttler=self._throttler,
-                    _auth=_auth,
-                )
-                df = itable.from_response(resp)
-                return df
-
-            # pagination begins
-            max_count = itable.pag_params.max_count
-            count = _count or 1
-            n_page = math.ceil(count / max_count)
-            remain = count % max_count
-
-            if pag_type == "cursor":
-                last_id = 0
-                dfs = []
-                # No way to parallel for cursor type
-                for i in range(n_page):
-                    remain = remain if remain > 0 else max_count
-                    cnt_to_fetch = max_count if i < n_page - 1 else remain
-                    resp = await self._fetch(
-                        itable,
-                        kwargs,
-                        _client=client,
-                        _throttler=self._throttler,
-                        _auth=_auth,
-                        _count=cnt_to_fetch,
-                        _cursor=last_id - 1,
-                    )
-
-                    df_ = itable.from_response(resp)
-
-                    if len(df_) == 0:
-                        # The API returns empty for this page, maybe we've reached the end
-                        break
-
-                    last_id = int(df_[itable.pag_params.cursor_id][len(df_) - 1]) - 1
-                    dfs.append(df_)
-            elif pag_type == "limit":
-                df_coros = set()
-                for i in range(n_page):
-                    remain = remain if remain > 0 else max_count
-                    cnt_to_fetch = max_count if i < n_page - 1 else remain
-                    df_coros.add(
-                        self._fetch(
-                            itable,
-                            kwargs,
-                            _client=client,
-                            _throttler=self._throttler,
-                            _auth=_auth,
-                            _count=cnt_to_fetch,
-                            _cursor=i * max_count,
-                        )
-                    )
-                df_futs, _ = await asyncio.wait(df_coros)
-
-                dfs = []
-                for fut in df_futs:
-                    resp = fut.result()
-                    df = itable.from_response(resp)
-                    dfs.append(df)
-                # dfs = [itable.from_response(fut.result()) for fut in df_futs]
+            if len(df) == 0 and _allowed_page is not None and _page is not None:
+                _allowed_page.set(_page)
+                return None
             else:
-                raise NotImplementedError
-
-        df = pd.concat(dfs, axis=0).reset_index(drop=True)
-
-        return df
+                return df
