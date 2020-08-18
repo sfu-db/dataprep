@@ -1,22 +1,28 @@
-version: 2.0
-jobs:
-  install_dependencies:
+version: 2.1
+orbs:
+  coverage-reporter: codacy/coverage-reporter@11.2.0
+executors:
+  python37:
     docker:
       - image: circleci/python:3.7.2
+commands:
+  bootstrap:
     steps:
-      - &step_add_path
-        run:
+      - run:
           name: Add python user PATH into PATH
           command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
-      - &step_install_pipenv
-        run: 
+      - run: 
           name: Install python tools
           command: pip install --user poetry==1.0.0b9
-      - &step_inproject_venv
-        run:
+      - run:
           name: Set venv inproject
           command: poetry config virtualenvs.in-project true
+jobs:
+  install_dependencies:
+    executor: python37
+    steps:
       - checkout
+      - bootstrap
       - run:
           name: Install dependencies
           command: poetry install
@@ -28,13 +34,10 @@ jobs:
           root: .
           paths: .venv
   check:
-    docker:
-      - image: circleci/python:3.7.2
+    executor: python37
     steps:
-      - *step_add_path
-      - *step_install_pipenv
-      - *step_inproject_venv
       - checkout
+      - bootstrap
       - attach_workspace:
           at: .
       - run:
@@ -45,24 +48,24 @@ jobs:
           command: poetry run mypy dataprep
       - run:
           name: Test the project
-          command: poetry run pytest --cov=dataprep
+          command: poetry run pytest --cov=dataprep dataprep/tests
       - run:
           name: Style check the project
           command: poetry run pylint dataprep
       - run:
-          name: Update coverage data to codecov
+          name: Upload coverage data to codecov
           command: poetry run codecov 
+      - run:
+          name: Upload coverage data to codacy
+          command: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml && bash <(curl -Ls https://coverage.codacy.com/get.sh) final # coverage-reporter/send_report:            # coverage-reports: 'report.xml,coverage.info'            # project-token: $CODACY_PROJECT_TOKEN            # skip: false
   docs-build:
-    docker:
-      - image: circleci/python:3.7.2
+    executor: python37
     steps:
+      - checkout
       - run:
           name: Pandoc Installation
           command: curl -L https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb -o /tmp/pandoc.deb && sudo dpkg -i /tmp/pandoc.deb
-      - *step_add_path
-      - *step_install_pipenv
-      - *step_inproject_venv
-      - checkout
+      - bootstrap
       - attach_workspace:
           at: .
       - run:
@@ -94,7 +97,6 @@ jobs:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/build/html
 workflows:
-  version: 2
   build_and_test:
     jobs:
       - install_dependencies
