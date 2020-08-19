@@ -6,15 +6,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from bokeh.events import ButtonClick
-from bokeh.layouts import column, row
+from bokeh.layouts import row
 from bokeh.models import (
     BasicTicker,
-    Box,
-    Button,
     ColorBar,
     ColumnDataSource,
-    CustomJS,
     CustomJSHover,
     Div,
     FactorRange,
@@ -28,7 +24,7 @@ from bokeh.models import (
     PrintfTickFormatter,
     Tabs,
 )
-from bokeh.plotting import Figure, figure, gridplot
+from bokeh.plotting import Figure, figure
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
 from PIL import Image
@@ -337,7 +333,7 @@ def bar_viz_new(
     df["pct"] = df[col] / nrows * 100
     df.index = [str(val) for val in df.index]
 
-    tooltips = [(col, "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
+    tooltips = [(col, "@index"), ("Count", f"@{{{col}}}"), ("Percent", "@pct{0.2f}%")]
     if show_yticks:
         if len(df) > 10:
             plot_width = 28 * len(df)
@@ -465,7 +461,6 @@ def hist_viz(
     """
     # pylint: disable=too-many-arguments,too-many-locals
     counts, bins = hist
-    npresent = counts.sum()
     intvls = _format_bin_intervals(bins)
     df = pd.DataFrame(
         {
@@ -476,14 +471,12 @@ def hist_viz(
             "pct": counts / nrows * 100,
         }
     )
-    miss_pct = np.round((nrows - npresent) / nrows * 100, 1)
 
-    title = f"{col} ({miss_pct}% missing)" if miss_pct > 0 else col
     tooltips = [("Bin", "@intvl"), ("Frequency", "@freq"), ("Percent", "@pct{0.2f}%")]
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
-        title=title,
+        title=col,
         toolbar_location=None,
         tools="",
         y_axis_type=yscale,
@@ -1294,9 +1287,9 @@ def dt_multiline_viz(
     return Panel(child=fig, title="Line Chart")
 
 
-def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
+def stats_viz(stats: Dict[str, Any]) -> Tuple[Dict[str, str], Dict[str, Any]]:
     """
-    Render statistics information for grid plots
+    Render statistics information for distribution grid
     """
     # pylint: disable=too-many-locals
     nrows, ncols, npresent_cells, nrows_wo_dups, mem_use, dtypes_cnt = stats.values()
@@ -1304,51 +1297,15 @@ def stats_viz(stats: Dict[str, Any], plot_width: int, plot_height: int,) -> Div:
 
     data = {
         "Number of Variables": ncols,
-        "Number of Observations": nrows,
+        "Number of Rows": nrows,
         "Missing Cells": float(ncells - npresent_cells),
         "Missing Cells (%)": 1 - (npresent_cells / ncells),
         "Duplicate Rows": nrows - nrows_wo_dups,
         "Duplicate Rows (%)": 1 - (nrows_wo_dups / nrows),
         "Total Size in Memory": float(mem_use),
-        "Average Record Size in Memory": mem_use / nrows,
+        "Average Row Size in Memory": mem_use / nrows,
     }
-    data = {k: _format_values(k, v) for k, v in data.items()}
-
-    ov_content = '<h3 style="text-align:center;">Dataset Statistics</h3>'
-    type_content = '<h3 style="text-align:center;">Variable Types</h3>'
-    for key, value in data.items():
-        value = _sci_notation_superscript(value)
-        ov_content += _create_table_row(key, value)
-    for key, value in dtypes_cnt.items():  # type: ignore
-        type_content += _create_table_row(key, value)
-
-    ov_content = f"""
-    <div style="flex: 50%; margin-right: 6px;">
-        <table style="width: 100%; table-layout: auto;">
-            <tbody>{ov_content}</tbody>
-        </table>
-    </div>
-    """
-    type_content = f"""
-    <div style="flex: 50%; margin-right: 6px;">
-        <table style="width: 100%; table-layout: auto;">
-            <tbody>{type_content}</tbody>
-        </table>
-    </div>
-    """
-    container = f"""
-    <div style="display: flex;">
-        {ov_content}
-        {type_content}
-    </div>
-    """
-    return Div(
-        text=container,
-        width=plot_width * 3,
-        height=plot_height - 20,
-        style={"width": "100%"},
-        visible=False,
-    )
+    return {k: _format_values(k, v) for k, v in data.items()}, dtypes_cnt
 
 
 def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
@@ -1581,19 +1538,27 @@ def stats_viz_dt(data: Dict[str, str], plot_width: int, plot_height: int) -> Pan
 
 def render_distribution_grid(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
-) -> Box:
+) -> Dict[
+    str,
+    Union[
+        List[str],
+        List[LayoutDOM],
+        Tuple[Dict[str, str], Dict[str, str]],
+        Dict[int, List[str]],
+    ],
+]:
     """
     Render plots and dataset stats from plot(df)
     """  # pylint: disable=too-many-locals
-    figs = list()
+    figs: List[LayoutDOM] = list()
     nrows = itmdt["stats"]["nrows"]
+    titles: List[str] = []
     for col, dtype, data in itmdt["data"]:
         if is_dtype(dtype, Nominal()):
             df, ttl_grps = data
             fig = bar_viz_new(
                 df, ttl_grps, nrows, col, yscale, plot_width, plot_height, False,
             )
-            figs.append(fig)
         elif is_dtype(dtype, Continuous()):
             fig = hist_viz(data, nrows, col, yscale, plot_width, plot_height, False)
             figs.append(fig)
@@ -1602,31 +1567,18 @@ def render_distribution_grid(
             fig = dt_line_viz(
                 df, col, timeunit, yscale, plot_width, plot_height, False, miss_pct
             )
-            figs.append(fig)
+        fig.frame_height = plot_height
+        titles.append(fig.title.text)
+        fig.title.text = ""
+        figs.append(fig)
 
-    stats_section = stats_viz(
-        itmdt["stats"], plot_width=plot_width, plot_height=plot_height
-    )
-    plot_section = gridplot(
-        children=figs, sizing_mode=None, toolbar_location=None, ncols=3,
-    )
-    button = Button(
-        label="Show Stats Info", width=plot_width * 3, button_type="primary"
-    )
-    button.js_on_event(
-        ButtonClick,
-        CustomJS(
-            args={"button": button, "div": stats_section},
-            code="""
-        let buttonLabel = button.label;
-        let isDivVisible = div.visible;
-        div.visible = isDivVisible ? false : true;
-        button.label = (buttonLabel === 'Show Stats Info') ? 'Hide Stats Info' : 'Show Stats Info';
-    """,
-        ),
-    )
-
-    return column(button, stats_section, plot_section)
+    return {
+        "layout": figs,
+        "meta": titles,
+        "tabledata": stats_viz(itmdt["stats"]),
+        "column_insights": itmdt["column_insights"],
+        "overview_insights": itmdt["overview_insights"],
+    }
 
 
 def render_cat(

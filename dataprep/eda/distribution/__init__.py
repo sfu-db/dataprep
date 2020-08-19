@@ -6,12 +6,12 @@ from typing import Optional, Tuple, Union, Dict
 
 import dask.dataframe as dd
 import pandas as pd
-from bokeh.io import show
 
 from .compute import compute
 from .render import render
 from ..report import Report
 from ..dtypes import DTypeDef
+from ..container import Container
 
 __all__ = ["plot", "compute", "render"]
 
@@ -37,7 +37,7 @@ def plot(
     yscale: str = "linear",
     tile_size: Optional[float] = None,
     dtype: Optional[DTypeDef] = None,
-) -> Report:
+) -> Union[Report, Container]:
     """Generates plots for exploratory data analysis.
 
     If no columns are specified, the distribution of
@@ -163,5 +163,7 @@ def plot(
         dtype=dtype,
     )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
-
-    return Report(figure)
+    if intermediate.visual_type == "distribution_grid":
+        return Container(figure)
+    else:
+        return Report(figure)
