@@ -73,4 +73,3 @@ class Report:
         with open(tmpf.name, "w") as file:
             file.write(self.report)
         webbrowser.open(f"file://{tmpf.name}", new=2)
-        print("Opening report in browser...")

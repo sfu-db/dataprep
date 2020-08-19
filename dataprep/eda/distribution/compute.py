@@ -856,7 +856,7 @@ def calc_cont_col(srs: dd.Series, bins: int) -> Dict[str, Any]:
     data["npres"] = srs.shape[0]
 
     ## if cfg.insight.infinity_enable:
-    data["ninf"] = (~srs.isin({np.inf, -np.inf})).sum()
+    data["ninf"] = srs.isin({np.inf, -np.inf}).sum()
 
     # remove infinite values
     srs = srs[~srs.isin({np.inf, -np.inf})]
@@ -1591,7 +1591,7 @@ def format_cont(col: str, data: Dict[str, Any], nrows: int) -> Any:
         ins.append({"Negatives": f"{col} has {nneg} ({pneg}%) negatives"})
 
     ## if cfg.insight.normal_enable:
-    if data["norm"][1] > 0.05:
+    if data["norm"][1] > 0.1:
         ins.append({"Normal": f"{col} is normally distributed"})
 
     hist = data["hist"]  ## if cfg.hist_enable else None
@@ -1688,10 +1688,10 @@ def _insight_pagination(ins: List[Dict[str, str]]) -> Dict[int, List[Dict[str, s
     # sort the insights based on the list ins_order
     ins.sort(key=lambda x: ins_order.index(list(x.keys())[0]))
     # paginate the sorted insights
-    page_count = int(np.ceil(len(ins) / 11))
+    page_count = int(np.ceil(len(ins) / 10))
     paginated_ins: Dict[int, List[Dict[str, str]]] = {}
     for i in range(1, page_count + 1):
-        paginated_ins[i] = ins[(i - 1) * 11 : i * 11]
+        paginated_ins[i] = ins[(i - 1) * 10 : i * 10]
 
     return paginated_ins
 

@@ -38,7 +38,7 @@ INLINE_TEMPLATE = Template(
 
 class Report:
     """
-    This class creates a customized Report object for the plot* functions and create_report function
+    This class creates a customized Report object for the plot* functions.
     """
 
     to_render: LayoutDOM
