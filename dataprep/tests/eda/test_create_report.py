@@ -28,9 +28,9 @@ def simpledf() -> pd.DataFrame:
         ],
         axis=1,
     )
-    df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
-    df.columns = ["a", "b", "c", "d", "e", "f"]
-    df["e"] = pd.to_datetime(df["e"])
+    # df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
+    df.columns = ["a", "b", "c", "d", "e"]
+    # df["e"] = pd.to_datetime(df["e"])
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
