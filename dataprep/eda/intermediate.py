@@ -13,7 +13,7 @@ class Intermediate(Dict[str, Any]):
 
     visual_type: str
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         if (
             len(args) == 1
             and isinstance(args[0], dict)
@@ -27,7 +27,7 @@ class Intermediate(Dict[str, Any]):
             super().__init__(**kwargs)
             self.visual_type = visual_type
         else:
-            assert False, "Unsupported initialization"
+            raise ValueError("Unsupported initialization")
 
 
 class ColumnsMetadata:

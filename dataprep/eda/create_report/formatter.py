@@ -11,7 +11,7 @@ from bokeh.models import Title
 from bokeh.plotting import Figure
 
 from ..distribution import compute, render
-from ..distribution.compute import calc_stats
+from ..distribution.compute.overview import calc_stats
 from ..distribution.render import _format_values
 from ..correlation import compute_correlation, render_correlation
 from ..dtypes import Continuous, DateTime, Nominal, detect_dtype, is_dtype
@@ -146,7 +146,7 @@ def format_basic(df: pd.DataFrame, comps: Dict[str, Any]) -> Dict[str, Any]:
                 pbar.set_description(desc=f"Formating {col}")
                 pbar.update(1)
                 rendered = render(itmdt)
-                data = itmdt["stats"]
+                data = itmdt["stats"]  # pylint: disable=unsubscriptable-object
                 if is_dtype(detect_dtype(df[col]), Continuous()):
                     stats = _format_stats(data, "var_num")
                 elif is_dtype(detect_dtype(df[col]), Nominal()):
