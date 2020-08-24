@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  coverage-reporter: codacy/coverage-reporter@11.2.0
+  coverage-reporter: codacy/coverage-reporter@11.2.1
 executors:
   python37:
     docker:
@@ -54,10 +54,10 @@ jobs:
           command: poetry run pylint dataprep
       - run:
           name: Upload coverage data to codecov
-          command: poetry run codecov 
-      - run:
-          name: Upload coverage data to codacy
-          command: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml && bash <(curl -Ls https://coverage.codacy.com/get.sh) final # coverage-reporter/send_report:            # coverage-reports: 'report.xml,coverage.info'            # project-token: $CODACY_PROJECT_TOKEN            # skip: false
+          command: poetry run codecov
+      - coverage-reporter/send_report:
+          coverage-reports: 'coverage.xml'
+          project-token: $CODACY_PROJECT_TOKEN
   docs-build:
     executor: python37
     steps:
