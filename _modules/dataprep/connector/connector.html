@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.connector.connector &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.connector.connector &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -147,21 +147,22 @@
 <span class="sd">This module contains the Connector class.</span>
 <span class="sd">Every data fetching action should begin with instantiating this Connector class.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">Template</span>
-
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">ClientSession</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">Template</span>
 
 <span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">config_directory</span><span class="p">,</span> <span class="n">ensure_config</span>
 <span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">RequestError</span><span class="p">,</span> <span class="n">UniversalParameterOverridden</span>
 <span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span><span class="p">,</span> <span class="n">ImplicitTable</span>
-<span class="kn">from</span> <span class="nn">.throttle</span> <span class="kn">import</span> <span class="n">Throttler</span>
+<span class="kn">from</span> <span class="nn">.int_ref</span> <span class="kn">import</span> <span class="n">IntRef</span>
+<span class="kn">from</span> <span class="nn">.throttler</span> <span class="kn">import</span> <span class="n">OrderedThrottler</span><span class="p">,</span> <span class="n">ThrottleSession</span>
 
 <span class="n">INFO_TEMPLATE</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
     <span class="sd">&quot;&quot;&quot;{% for tb in tbs.keys() %}</span>
@@ -234,13 +235,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">_auth</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_concurrency</span> <span class="o">=</span> <span class="n">_concurrency</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">undefined</span><span class="o">=</span><span class="n">StrictUndefined</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span> <span class="o">=</span> <span class="n">Throttler</span><span class="p">(</span><span class="n">_concurrency</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span> <span class="o">=</span> <span class="n">OrderedThrottler</span><span class="p">(</span><span class="n">_concurrency</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Connector.query"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector.query">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">query</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_concurrency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">where</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Awaitable</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -333,17 +335,118 @@
             <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">new_schema_dict</span><span class="p">)</span></div>
 
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_query_imp</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;No such table </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">itable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;ignoring _count since </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> has no pagination settings&quot;</span><span class="p">,</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_count</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;_count should be larger than 0&quot;</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">throttler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
+                    <span class="n">itable</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">df</span>
+
+            <span class="n">pag_type</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">type</span>
+
+            <span class="c1"># pagination begins</span>
+            <span class="n">max_per_page</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">max_count</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">_count</span>
+            <span class="n">n_page</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total</span> <span class="o">/</span> <span class="n">max_per_page</span><span class="p">)</span>
+            <span class="n">remaining</span> <span class="o">=</span> <span class="n">total</span> <span class="o">%</span> <span class="n">max_per_page</span>
+
+            <span class="k">if</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;cursor&quot;</span><span class="p">:</span>
+                <span class="n">last_id</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="c1"># No way to parallelize for cursor type</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="n">max_per_page</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">remaining</span>
+
+                    <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
+                        <span class="n">itable</span><span class="p">,</span>
+                        <span class="n">kwargs</span><span class="p">,</span>
+                        <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+                        <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span>
+                        <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
+                        <span class="n">_count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                        <span class="n">_cursor</span><span class="o">=</span><span class="n">last_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># The API returns empty for this page, maybe we&#39;ve reached the end</span>
+                        <span class="k">break</span>
+
+                    <span class="n">last_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">cursor_id</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span>
+                <span class="n">resps_coros</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">allowed_page</span> <span class="o">=</span> <span class="n">IntRef</span><span class="p">(</span><span class="n">n_page</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="n">max_per_page</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">remaining</span>
+
+                    <span class="n">resps_coros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
+                            <span class="n">itable</span><span class="p">,</span>
+                            <span class="n">kwargs</span><span class="p">,</span>
+                            <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+                            <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span>
+                            <span class="n">_page</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                            <span class="n">_allowed_page</span><span class="o">=</span><span class="n">allowed_page</span><span class="p">,</span>
+                            <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
+                            <span class="n">_count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                            <span class="n">_cursor</span><span class="o">=</span><span class="n">i</span> <span class="o">*</span> <span class="n">max_per_page</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">resp_coro</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">resps_coros</span><span class="p">):</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp_coro</span>
+                    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_fetch</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">table</span><span class="p">:</span> <span class="n">ImplicitTable</span><span class="p">,</span>
         <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">_client</span><span class="p">:</span> <span class="n">ClientSession</span><span class="p">,</span>
-        <span class="n">_throttler</span><span class="p">:</span> <span class="n">Throttler</span><span class="p">,</span>
+        <span class="n">_throttler</span><span class="p">:</span> <span class="n">ThrottleSession</span><span class="p">,</span>
+        <span class="n">_page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">_allowed_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IntRef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_cursor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="p">(</span><span class="n">_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span>
             <span class="n">_cursor</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="p">),</span> <span class="s2">&quot;_cursor and _count should both be None or not None&quot;</span>
@@ -397,7 +500,14 @@
                 <span class="k">raise</span> <span class="n">UniversalParameterOverridden</span><span class="p">(</span><span class="n">cursor_key</span><span class="p">,</span> <span class="s2">&quot;_cursor&quot;</span><span class="p">)</span>
             <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">cursor_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cursor</span>
 
-        <span class="k">async</span> <span class="k">with</span> <span class="n">_throttler</span><span class="p">,</span> <span class="n">_client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+        <span class="k">await</span> <span class="n">_throttler</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">_page</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_allowed_page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">_allowed_page</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">_page</span><span class="p">:</span>
+            <span class="c1"># cancel current throttler counter since the request is not sent out</span>
+            <span class="n">_throttler</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">_client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
             <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
             <span class="n">headers</span><span class="o">=</span><span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">],</span>
@@ -408,109 +518,13 @@
         <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">RequestError</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
-            <span class="n">content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">content</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_query_imp</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span>
-        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;No such table </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-
-        <span class="k">async</span> <span class="k">with</span> <span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-            <span class="n">itable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
-                    <span class="n">itable</span><span class="p">,</span>
-                    <span class="n">kwargs</span><span class="p">,</span>
-                    <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-                    <span class="n">_throttler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span><span class="p">,</span>
-                    <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">df</span>
-
-            <span class="n">pag_type</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">type</span>
-
-            <span class="k">if</span> <span class="n">_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># User doesn&#39;t specify _count</span>
-                <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
-                    <span class="n">itable</span><span class="p">,</span>
-                    <span class="n">kwargs</span><span class="p">,</span>
-                    <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-                    <span class="n">_throttler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span><span class="p">,</span>
-                    <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">df</span>
-
-            <span class="c1"># pagination begins</span>
-            <span class="n">max_count</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">max_count</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="n">_count</span> <span class="ow">or</span> <span class="mi">1</span>
-            <span class="n">n_page</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">max_count</span><span class="p">)</span>
-            <span class="n">remain</span> <span class="o">=</span> <span class="n">count</span> <span class="o">%</span> <span class="n">max_count</span>
-
-            <span class="k">if</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;cursor&quot;</span><span class="p">:</span>
-                <span class="n">last_id</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="c1"># No way to parallel for cursor type</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
-                    <span class="n">remain</span> <span class="o">=</span> <span class="n">remain</span> <span class="k">if</span> <span class="n">remain</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">max_count</span>
-                    <span class="n">cnt_to_fetch</span> <span class="o">=</span> <span class="n">max_count</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">remain</span>
-                    <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
-                        <span class="n">itable</span><span class="p">,</span>
-                        <span class="n">kwargs</span><span class="p">,</span>
-                        <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-                        <span class="n">_throttler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span><span class="p">,</span>
-                        <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
-                        <span class="n">_count</span><span class="o">=</span><span class="n">cnt_to_fetch</span><span class="p">,</span>
-                        <span class="n">_cursor</span><span class="o">=</span><span class="n">last_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
-                    <span class="p">)</span>
-
-                    <span class="n">df_</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
-
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="c1"># The API returns empty for this page, maybe we&#39;ve reached the end</span>
-                        <span class="k">break</span>
-
-                    <span class="n">last_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df_</span><span class="p">[</span><span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">cursor_id</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">df_</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span>
-                <span class="n">df_coros</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
-                    <span class="n">remain</span> <span class="o">=</span> <span class="n">remain</span> <span class="k">if</span> <span class="n">remain</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">max_count</span>
-                    <span class="n">cnt_to_fetch</span> <span class="o">=</span> <span class="n">max_count</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">remain</span>
-                    <span class="n">df_coros</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
-                            <span class="n">itable</span><span class="p">,</span>
-                            <span class="n">kwargs</span><span class="p">,</span>
-                            <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-                            <span class="n">_throttler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span><span class="p">,</span>
-                            <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
-                            <span class="n">_count</span><span class="o">=</span><span class="n">cnt_to_fetch</span><span class="p">,</span>
-                            <span class="n">_cursor</span><span class="o">=</span><span class="n">i</span> <span class="o">*</span> <span class="n">max_count</span><span class="p">,</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
-                <span class="n">df_futs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">df_coros</span><span class="p">)</span>
-
-                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">df_futs</span><span class="p">:</span>
-                    <span class="n">resp</span> <span class="o">=</span> <span class="n">fut</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-                    <span class="n">df</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
-                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-                <span class="c1"># dfs = [itable.from_response(fut.result()) for fut in df_futs]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">_allowed_page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_allowed_page</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">_page</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">df</span></div>
+                <span class="k">return</span> <span class="n">df</span></div>
 </pre></div>
 
           </div>

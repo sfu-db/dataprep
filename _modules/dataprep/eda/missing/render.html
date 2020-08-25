@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing.render &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.eda.missing.render &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -157,6 +157,7 @@
     <span class="n">CategoricalColorMapper</span><span class="p">,</span>
     <span class="n">ColorBar</span><span class="p">,</span>
     <span class="n">ColumnDataSource</span><span class="p">,</span>
+    <span class="n">CustomJSHover</span><span class="p">,</span>
     <span class="n">FactorRange</span><span class="p">,</span>
     <span class="n">FuncTickFormatter</span><span class="p">,</span>
     <span class="n">HoverTool</span><span class="p">,</span>
@@ -532,56 +533,72 @@
 
 
 <span class="k">def</span> <span class="nf">render_bar_chart</span><span class="p">(</span>
-    <span class="n">data_barchart</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Render a bar chart</span>
+<span class="sd">    Render a bar chart for the missing and present values</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">CATEGORY20</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CATEGORY20</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
-    <span class="n">value_type</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Not Missing&quot;</span><span class="p">,</span> <span class="s2">&quot;Missing&quot;</span><span class="p">]</span>
-
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;cols&quot;</span><span class="p">:</span> <span class="n">data_barchart</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-        <span class="s2">&quot;Not Missing&quot;</span><span class="p">:</span> <span class="n">data_barchart</span><span class="p">[</span><span class="s2">&quot;not missing&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">data_barchart</span><span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">],</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_barchart</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
-        <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_barchart</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
+        <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
-        <span class="n">x_range</span><span class="o">=</span><span class="n">data_barchart</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-        <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">x_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+        <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Present&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Missing&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
         <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
         <span class="n">y_axis_type</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span>
         <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">tooltips</span><span class="o">=</span><span class="s2">&quot;@cols: @$name{1%} $name&quot;</span><span class="p">,</span>
-        <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[],</span>
     <span class="p">)</span>
 
-    <span class="n">fig</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span>
-        <span class="n">value_type</span><span class="p">,</span>
-        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;cols&quot;</span><span class="p">,</span>
+    <span class="n">rend</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span>
+        <span class="n">stackers</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-        <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-        <span class="n">source</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-        <span class="n">legend_label</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="n">CATEGORY20</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CATEGORY20</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+        <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">legend_label</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
     <span class="p">)</span>
+
+    <span class="c1"># hover tool with count and percent</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">CustomJSHover</span><span class="p">(</span>
+        <span class="n">args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">df</span><span class="p">)),</span>
+        <span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        const columns = Object.keys(source.data)</span>
+<span class="s2">        const cur_bar = special_vars.data_x - 0.5</span>
+<span class="s2">        var ttl_bar = 0</span>
+<span class="s2">        for (let i = 0; i &lt; columns.length; i++) {</span>
+<span class="s2">            if (columns[i] != &#39;index&#39;){</span>
+<span class="s2">                ttl_bar = ttl_bar + source.data[columns[i]][cur_bar]</span>
+<span class="s2">            }</span>
+<span class="s2">        }</span>
+<span class="s2">        const cur_val = source.data[special_vars.name][cur_bar]</span>
+<span class="s2">        return (cur_val/ttl_bar * 100).toFixed(2)+&#39;%&#39;;</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;Column&quot;</span><span class="p">,</span> <span class="s2">&quot;@index&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> count&quot;</span><span class="p">,</span> <span class="s2">&quot;@$name&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> percent&quot;</span><span class="p">,</span> <span class="s2">&quot;@{</span><span class="si">%s</span><span class="s2">}</span><span class="si">{custom}</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rend</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">formatters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;@{</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">rend</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">formatter</span><span class="p">},</span>
+            <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">rend</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+        <span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+
     <span class="n">format_js</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        if (tick.length &gt; 18) return tick.substring(0, 16) + &#39;...&#39;;</span>
 <span class="s2">        else return tick;</span>
 <span class="s2">    &quot;&quot;&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">FuncTickFormatter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">format_js</span><span class="p">)</span>
 
-    <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;top_right&quot;</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">x_range</span><span class="o">.</span><span class="n">range_padding</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Total Count&quot;</span>
-
+    <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Row Count&quot;</span>
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">relocate_legend</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">fig</span>
 
 

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -151,12 +151,12 @@
 
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span>
 
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render</span>
 <span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
 <span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span>
+<span class="kn">from</span> <span class="nn">..container</span> <span class="kn">import</span> <span class="n">Container</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;plot&quot;</span><span class="p">,</span> <span class="s2">&quot;compute&quot;</span><span class="p">,</span> <span class="s2">&quot;render&quot;</span><span class="p">]</span>
 
@@ -182,7 +182,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Report</span><span class="p">,</span> <span class="n">Container</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Generates plots for exploratory data analysis.</span>
 
 <span class="sd">    If no columns are specified, the distribution of</span>
@@ -308,8 +308,10 @@
         <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;distribution_grid&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

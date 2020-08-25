@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.dtypes &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.eda.dtypes &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -146,9 +146,8 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">In this module lives the type tree.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Type</span>
 
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -424,6 +423,27 @@
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input should be a Pandas/Dask Dataframe or Series&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_dtype_cnts"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.get_dtype_cnts">[docs]</a><span class="k">def</span> <span class="nf">get_dtype_cnts</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">DType</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DType</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DType</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the count of each dtype in a dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtype_cnts</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">col_dtype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()):</span>
+            <span class="n">dtype_cnts</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
+            <span class="n">dtype_cnts</span><span class="p">[</span><span class="s2">&quot;Numerical&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()):</span>
+            <span class="n">dtype_cnts</span><span class="p">[</span><span class="s2">&quot;DateTime&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="k">return</span> <span class="n">dtype_cnts</span></div>
 </pre></div>
 
           </div>

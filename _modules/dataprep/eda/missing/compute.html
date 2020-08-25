@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing.compute &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.eda.missing.compute &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -229,12 +229,14 @@
     <span class="p">(</span><span class="n">nulldf</span><span class="p">,)</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">persist</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span>
     <span class="n">nullity</span> <span class="o">=</span> <span class="n">nulldf</span><span class="o">.</span><span class="n">to_dask_array</span><span class="p">(</span><span class="n">lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">null_perc</span> <span class="o">=</span> <span class="n">nullity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">nullity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">null_cnts</span> <span class="o">=</span> <span class="n">nullity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="n">nullity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">null_perc</span> <span class="o">=</span> <span class="n">null_cnts</span> <span class="o">/</span> <span class="n">nrows</span>
 
     <span class="n">tasks</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">missing_spectrum</span><span class="p">(</span><span class="n">nullity</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">),</span>
         <span class="n">null_perc</span><span class="p">,</span>
-        <span class="n">missing_bars</span><span class="p">(</span><span class="n">null_perc</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span>
+        <span class="n">missing_bars</span><span class="p">(</span><span class="n">null_cnts</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
         <span class="n">missing_heatmap</span><span class="p">(</span><span class="n">nulldf</span><span class="p">,</span> <span class="n">null_perc</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span>
         <span class="n">missing_dendrogram</span><span class="p">(</span><span class="n">nullity</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span>
     <span class="p">)</span>
@@ -331,18 +333,20 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="k">def</span> <span class="nf">missing_bars</span><span class="p">(</span><span class="n">null_perc</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">missing_bars</span><span class="p">(</span>
+    <span class="n">null_cnts</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">nrows</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Scalar</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a bar chart visualization of nullity correlation in the given DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">notnull_perc</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">null_perc</span>
+    <span class="n">pres_cnts</span> <span class="o">=</span> <span class="n">nrows</span> <span class="o">-</span> <span class="n">null_cnts</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">from_dask_array</span><span class="p">(</span>
-        <span class="n">da</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">null_perc</span><span class="p">,</span> <span class="n">notnull_perc</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">,</span> <span class="s2">&quot;not missing&quot;</span><span class="p">,</span> <span class="s2">&quot;columns&quot;</span><span class="p">],</span>
+        <span class="n">da</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">pres_cnts</span><span class="p">,</span> <span class="n">null_cnts</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Present&quot;</span><span class="p">,</span> <span class="s2">&quot;Missing&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">],</span>
     <span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;columns&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span>
 

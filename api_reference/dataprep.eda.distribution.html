@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -285,7 +285,7 @@ or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p><
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="dataprep.eda.html#dataprep.eda.report.Report" title="dataprep.eda.report.Report"><code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code></a></p>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="dataprep.eda.html#dataprep.eda.report.Report" title="dataprep.eda.report.Report"><code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,11 +293,12 @@ or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p><
 </div>
 <div class="section" id="module-dataprep.eda.distribution.compute">
 <span id="compute"></span><h2>compute<a class="headerlink" href="#module-dataprep.eda.distribution.compute" title="Permalink to this headline">¶</a></h2>
-<p>This module implements the intermediates computation for plot(df) function.</p>
+<p>Computations for plot(df, …).</p>
 <dl class="py function">
 <dt id="dataprep.eda.distribution.compute.compute">
 <code class="sig-prename descclassname">dataprep.eda.distribution.compute.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">ngroups</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">largest</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">nsubgroups</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timeunit</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">agg</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">top_words</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">stopword</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lemmatize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stem</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">value_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.compute.compute" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>All in one compute function.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Dataframe from which plots are to be generated</p></li>

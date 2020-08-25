@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.report &#8212; DataPrep 0.2.11 documentation</title>
+  <title>dataprep.eda.report &#8212; DataPrep 0.2.12 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -157,7 +157,6 @@
 <span class="kn">from</span> <span class="nn">bokeh.embed.notebook</span> <span class="kn">import</span> <span class="n">notebook_content</span>
 <span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">LayoutDOM</span>
 <span class="kn">from</span> <span class="nn">bokeh.resources</span> <span class="kn">import</span> <span class="n">CDN</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Template</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">is_notebook</span>
@@ -184,7 +183,7 @@
 
 <div class="viewcode-block" id="Report"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.report.Report">[docs]</a><span class="k">class</span> <span class="nc">Report</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class creates a customized Report object for the plot* functions and create_report function</span>
+<span class="sd">    This class creates a customized Report object for the plot* functions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">to_render</span><span class="p">:</span> <span class="n">LayoutDOM</span>
@@ -249,12 +248,19 @@
         <span class="c1"># if not call from notebook environment, ref to show_browser function.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_notebook</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;The report is not shown in a notebook environment,&quot;</span>
-                <span class="s2">&quot; please try &#39;show_browser&#39; if you want to open it in browser&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The report will not show in a notebook environment, &quot;</span>
+                <span class="s2">&quot;please try &#39;show_browser&#39; if you want to open it in browser&quot;</span><span class="p">,</span>
                 <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+                <span class="n">HTML</span><span class="p">,</span>
+                <span class="n">display</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()))</span></div>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()))</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Report.show_browser"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.report.Report.show_browser">[docs]</a>    <span class="k">def</span> <span class="nf">show_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
