@@ -5,6 +5,7 @@ Every data fetching action should begin with instantiating this Connector class.
 import math
 import sys
 from asyncio import as_completed
+from math import gcd, log10, pow
 from pathlib import Path
 from typing import Any, Awaitable, Dict, List, Optional, Tuple, Union
 from warnings import warn
@@ -15,6 +16,7 @@ from aiohttp.client_reqrep import ClientResponse
 from jinja2 import Environment, StrictUndefined, Template, UndefinedError
 from jsonpath_ng import parse as jparse
 
+from warnings import warn
 from .config_manager import config_directory, ensure_config
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
@@ -28,7 +30,7 @@ from .schema import (
     TokenLocation,
     TokenPaginationDef,
 )
-from .throttler import OrderedThrottler, ThrottleSession
+from .throttler import Throttler, OrderedThrottleSession
 
 INFO_TEMPLATE = Template(
     """{% for tb in tbs.keys() %}
@@ -76,14 +78,17 @@ class Connector:
     _auth: Dict[str, Any]
     # storage for authorization
     _storage: Dict[str, Any]
-    _concurrency: int
+    _concurrency: float
     _jenv: Environment
+    _throttler: Throttler
+    start_quota = None
+    current_quota = None
 
     def __init__(
         self,
         config_path: str,
         _auth: Optional[Dict[str, Any]] = None,
-        _concurrency: int = 1,
+        _concurrency: float = 6,
         **kwargs: Any,
     ) -> None:
         if (
@@ -104,7 +109,8 @@ class Connector:
         self._storage = {}
         self._concurrency = _concurrency
         self._jenv = Environment(undefined=StrictUndefined)
-        self._throttler = OrderedThrottler(_concurrency)
+        gcd = float_gcd(_concurrency, 1)
+        self._throttler = Throttler(int(_concurrency / gcd), int(1 / gcd))
 
     async def query(  # pylint: disable=too-many-locals
         self,
@@ -236,7 +242,7 @@ class Connector:
 
         async with ClientSession() as client:
 
-            throttler = self._throttler.session()
+            throttler = self._throttler.ordered()
 
             if reqconf.pagination is None or _count is None:
                 df = await self._fetch(
@@ -359,7 +365,7 @@ class Connector:
         kwargs: Dict[str, Any],
         *,
         _client: ClientSession,
-        _throttler: ThrottleSession,
+        _throttler: OrderedThrottleSession,
         _page: int = 0,
         _allowed_page: Optional[Ref[int]] = None,
         _limit: Optional[int] = None,
@@ -450,35 +456,62 @@ class Connector:
             if field_def is not None:
                 validate_fields(field_def, req_data[key])
 
-        await _throttler.acquire(_page)
+        while True:
+            async with _throttler.acquire(_page) as (cancel, fail):
 
-        if _allowed_page is not None and int(_allowed_page) <= _page:
-            # cancel current throttler counter since the request is not sent out
-            _throttler.release()
-            return None
+                if _allowed_page is not None and int(_allowed_page) <= _page:
+                    # cancel current throttler counter since the request is not sent out
+                    cancel()
+                    return None
 
-        async with _client.request(
-            method=method,
-            url=url,
-            headers=req_data["headers"],
-            params=req_data["params"],
-            json=req_data.get("json"),
-            data=req_data.get("data"),
-            cookies=req_data["cookies"],
-        ) as resp:
-            if resp.status != 200:
-                raise RequestError(status_code=resp.status, message=await resp.text())
-            content = await resp.text()
-            df = table.from_response(content)
+                async with _client.request(
+                    method=method,
+                    url=url,
+                    headers=req_data["headers"],
+                    params=req_data["params"],
+                    json=req_data.get("json"),
+                    data=req_data.get("data"),
+                    cookies=req_data["cookies"],
+                ) as resp:
 
-            if len(df) == 0 and _allowed_page is not None and _page is not None:
-                _allowed_page.set(_page)
-                df = None
+                    if "ratelimit-resettime" in resp.headers:
+                        # print(
+                        #     "reset",
+                        #     resp.headers["ratelimit-resettime"],
+                        #     "limit",
+                        #     resp.headers["ratelimit-dailylimit"],
+                        #     "remaining",
+                        #     resp.headers["ratelimit-remaining"],
+                        # )
+                        if self.start_quota is None:
+                            self.start_quota = resp.headers["ratelimit-remaining"]
+                        self.current_quota = resp.headers["ratelimit-remaining"]
 
-            if _raw:
-                return df, resp
-            else:
-                return df
+                    if resp.status == 429:
+                        # print(await resp.text())
+                        # print(resp.header)
+                        fail()
+                        # warn(
+                        #     f"HTTP 429 error, decreasing the concurrency level to {_throttler.req_per_window}",
+                        #     RuntimeWarning,
+                        # )
+                        continue
+                    elif resp.status != 200:
+                        raise RequestError(status_code=resp.status, message=await resp.text())
+
+                    content = await resp.text()
+                    break
+
+        df = table.from_response(content)
+
+        if len(df) == 0 and _allowed_page is not None and _page is not None:
+            _allowed_page.set(_page)
+            df = None
+
+        if _raw:
+            return df, resp
+        else:
+            return df
 
 
 def validate_fields(fields: Dict[str, FieldDefUnion], data: Dict[str, Any]) -> None:
@@ -546,3 +579,29 @@ def populate_field(  # pylint: disable=too-many-branches
                 ret[to_key] = str_value
                 continue
     return ret
+
+
+def float_scale(x: float) -> int:
+    max_digits = 14
+    int_part = int(abs(x))
+    magnitude = 1 if int_part == 0 else int(log10(int_part)) + 1
+    if magnitude >= max_digits:
+        return 0
+    frac_part = abs(x) - int_part
+    multiplier = 10 ** (max_digits - magnitude)
+    frac_digits = multiplier + int(multiplier * frac_part + 0.5)
+    while frac_digits % 10 == 0:
+        frac_digits /= 10
+    return int(log10(frac_digits))
+
+
+def float_gcd(a: float, b: float) -> float:
+    sc = float_scale(a)
+    sc_b = float_scale(b)
+    sc = sc_b if sc_b > sc else sc
+    fac = pow(10, sc)
+
+    a = int(round(a * fac))
+    b = int(round(b * fac))
+
+    return round(gcd(a, b) / fac, sc)
