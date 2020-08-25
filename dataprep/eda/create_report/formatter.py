@@ -146,7 +146,7 @@ def format_basic(df: pd.DataFrame, comps: Dict[str, Any]) -> Dict[str, Any]:
                 pbar.set_description(desc=f"Formating {col}")
                 pbar.update(1)
                 rendered = render(itmdt)
-                data = itmdt["stats"]  # pylint: disable=unsubscriptable-object
+                data = itmdt["data"]  # pylint: disable=unsubscriptable-object
                 if is_dtype(detect_dtype(df[col]), Continuous()):
                     stats = _format_stats(data, "var_num")
                 elif is_dtype(detect_dtype(df[col]), Nominal()):
@@ -305,52 +305,59 @@ def _format_stats(stats: Any, at: str,) -> Any:
         return data, dtypes_cnt
     elif at == "var_num":
         overview = {
-            "Distinct Count": stats["nunique"],
-            "Unique (%)": stats["nunique"] / stats["npresent"],
-            "Missing": stats["nrows"] - stats["npresent"],
-            "Missing (%)": 1 - (stats["npresent"] / stats["nrows"]),
-            "Infinite": stats["ninfinite"],
-            "Infinite (%)": stats["ninfinite"] / stats["nrows"],
+            "Distinct Count": stats["nuniq"],
+            "Unique (%)": stats["nuniq"] / stats["npres"],
+            "Missing": stats["nrows"] - stats["npres"],
+            "Missing (%)": 1 - (stats["npres"] / stats["nrows"]),
+            "Infinite": (stats["npres"] - stats["nreals"]),
+            "Infinite (%)": (stats["npres"] - stats["nreals"]) / stats["nrows"],
+            "Memory Size": stats["mem_use"],
             "Mean": stats["mean"],
             "Minimum": stats["min"],
             "Maximum": stats["max"],
             "Zeros": stats["nzero"],
             "Zeros (%)": stats["nzero"] / stats["nrows"],
-            "Memory Size": stats["mem_use"],
+            "Negatives": stats["nneg"],
+            "Negatives (%)": stats["nneg"] / stats["nrows"],
         }
+        stats["qntls"].index = np.round(stats["qntls"].index, 2)
         quantile = {
             "Minimum": stats["min"],
-            "5-th Percentile": stats["qntls"].iloc[5],
-            "Q1": stats["qntls"].iloc[25],
-            "Median": stats["qntls"].iloc[50],
-            "Q3": stats["qntls"].iloc[75],
-            "95-th Percentile": stats["qntls"].iloc[95],
+            "5-th Percentile": stats["qntls"].loc[0.05],
+            "Q1": stats["qntls"].loc[0.25],
+            "Median": stats["qntls"].loc[0.50],
+            "Q3": stats["qntls"].loc[0.75],
+            "95-th Percentile": stats["qntls"].loc[0.95],
             "Maximum": stats["max"],
             "Range": stats["max"] - stats["min"],
-            "IQR": stats["qntls"].iloc[75] - stats["qntls"].iloc[25],
+            "IQR": stats["qntls"].loc[0.75] - stats["qntls"].loc[0.25],
         }
         descriptive = {
+            "Mean": stats["mean"],
             "Standard Deviation": stats["std"],
+            "Variance": stats["std"] ** 2,
+            "Sum": stats["mean"] * stats["npres"],
+            "Skewness": float(stats["skew"]),
+            "Kurtosis": float(stats["kurt"]),
             "Coefficient of Variation": stats["std"] / stats["mean"]
             if stats["mean"] != 0
             else np.nan,
-            "Kurtosis": float(stats["kurt"]),
-            "Mean": stats["mean"],
-            "Skewness": float(stats["skew"]),
-            "Sum": stats["mean"] * stats["npresent"],
-            "Variance": stats["std"] ** 2,
         }
         overview = {k: _format_values(k, v) for k, v in overview.items()}
         quantile = {k: _format_values(k, v) for k, v in quantile.items()}
         descriptive = {k: _format_values(k, v) for k, v in descriptive.items()}
         return overview, quantile, descriptive
     elif at == "var_cat":
-        stats, length_stats, letter_stats = stats
+        stats, length_stats, letter_stats = (
+            stats["stats"],
+            stats["len_stats"],
+            stats["letter_stats"],
+        )
         ov_stats = {
-            "Distinct Count": stats["nunique"],
-            "Unique (%)": stats["nunique"] / stats["npresent"],
-            "Missing": stats["nrows"] - stats["npresent"],
-            "Missing (%)": 1 - stats["npresent"] / stats["nrows"],
+            "Distinct Count": stats["nuniq"],
+            "Unique (%)": stats["nuniq"] / stats["npres"],
+            "Missing": stats["nrows"] - stats["npres"],
+            "Missing (%)": 1 - stats["npres"] / stats["nrows"],
             "Memory Size": stats["mem_use"],
         }
         sampled_rows = (
