@@ -102,16 +102,15 @@ Don't forget to checkout the [examples] folder for detailed demonstration!
 
 ### Connector
 
-Connector provides a simple way to collects data from different websites, offering several benifits:
-* A unified API:  you can fetch data using one or two lines of code to get data from many websites.
-* Auto Pagination: it automatically do the pagination for you so that 
-you can specify the desire count of the returned results without even considering the count-per-request restriction from the API.
-* Smart API request strategy: it is able to issue API requests in parallel while respects the rate limit policy.
+Connector provides a simple way to collect data from different websites, offering several benefits:
+* A unified API: you can fetch data using one or two lines of code to get data from many websites.
+* Auto Pagination: it automatically does the pagination for you so that you can specify the desired count of the returned results without even considering the count-per-request restriction from the API.
+* Smart API request strategy: it can issue API requests in parallel while respecting the rate limit policy.
 
-In the following examples, you can download Yelp business search result into a pandas DataFrame, 
+In the following examples, you can download the Yelp business search result into a pandas DataFrame, 
 using only two lines of code, without taking deep looking into the Yelp documentation!
-More examples can be found here: 
-[Examples](https://https://github.com/sfu-db/dataprep/tree/develop/examples)
+More examples can be found here:
+[Examples](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
 <center><a href="https://sfu-db.github.io/dataprep/connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector.png"/></a></center>
 
