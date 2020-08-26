@@ -126,3 +126,6 @@ release version:
     echo ================ Release Note ================
     poetry run python scripts/release-note.py {{hash}}
     echo ================ Release Note ================
+
+setuppy:
+    python scripts/gen-setup.py
