@@ -20,7 +20,7 @@
                 <div class="tb-container">
                     <div class="tb-{{ value.col_type }}">
                         <table class="rp-table">
-                            {% for h, d in value.tabledata[0].items() %}
+                            {% for h, d in value.tabledata['Overview'].items() %}
                             <tr>
                                 <th>{{ h }}</th>
                                 <td>{{ d }}</td>
@@ -49,7 +49,7 @@
                     <div>
                         <h4 class="tb-title">Quantile Statistics</h3>
                             <table class="rp-table">
-                                {% for h, d in value.tabledata[1].items() %}
+                                {% for h, d in value.tabledata['Quantile Statistics'].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
                                     <td>{{ d }}</td>
@@ -60,7 +60,7 @@
                     <div>
                         <h4 class="tb-title">Descriptive Statistics</h3>
                             <table class="rp-table">
-                                {% for h, d in value.tabledata[2].items() %}
+                                {% for h, d in value.tabledata['Descriptive Statistics'].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
                                     <td>{{ d }}</td>
@@ -75,7 +75,7 @@
                     <div>
                         <h4 class="tb-title">Length</h3>
                             <table class="rp-table">
-                                {% for h, d in value.tabledata[1].items() %}
+                                {% for h, d in value.tabledata['Length'].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
                                     <td>{{ d }}</td>
@@ -86,7 +86,7 @@
                     <div>
                         <h4 class="tb-title">Sample</h3>
                             <table class="rp-table">
-                                {% for h, d in value.tabledata[2].items() %}
+                                {% for h, d in value.tabledata['Sample'].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
                                     <td>{{ d }}</td>
@@ -97,7 +97,7 @@
                     <div>
                         <h4 class="tb-title">Letter</h3>
                             <table class="rp-table">
-                                {% for h, d in value.tabledata[3].items() %}
+                                {% for h, d in value.tabledata['Letter'].items() %}
                                 <tr>
                                     <th>{{ h }}</th>
                                     <td>{{ d }}</td>

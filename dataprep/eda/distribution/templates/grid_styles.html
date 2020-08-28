@@ -1,5 +1,5 @@
 <style>
-    .plot {
+    .plot-{{ context.rnd }} {
         font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
         -webkit-font-smoothing: antialiased;
         display: flex;
@@ -7,22 +7,52 @@
         width: 972px;
     }
 
-    .fig {
+    .fig-{{ context.rnd }} {
         flex: 0 1 324px;
         margin-top: 10px;
+        background: white;
     }
 
-    .menu {
+    .menu-{{ context.rnd }} {
         width: 293px;
         height: 20px;
         position: relative;
         left: 27px;
     }
 
-    .plot-title {
+    .insight-pre-{{ context.rnd }} {
+        max-width: 200px;
+        font-size: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        cursor: none;
+    }
+
+    .expandable-{{ context.rnd }}:hover .insight-pre-{{ context.rnd }} {
+        max-width: 0;
+        width: auto;
+    }
+
+    .expandable-{{ context.rnd }}:hover .plot-title-{{ context.rnd }} {
+        max-width: 100% !important;
+        width: auto;
+    }
+
+    .insight-pre-{{ context.rnd }}>span{
+        margin: 0 5px;
+    }
+    
+    .col-cat-des-{{ context.rnd }} {
+        flex: 0 1 auto;
+        text-overflow: clip;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .plot-title-{{ context.rnd }} {
         font-weight: 800;
         color: #828282;
-        margin: 0;
         display: inline-block;
         width: 269px;
         text-overflow: ellipsis;
@@ -31,7 +61,7 @@
         vertical-align: middle;
     }
 
-    .insight-btn {
+    .insight-btn-{{ context.rnd }} {
         filter: invert(73%) sepia(44%) saturate(243%) hue-rotate(181deg) brightness(87%) contrast(87%);
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' class='exclamation-circle w-6 h-6'%3E%3Cpath fill-rule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
         background-size: 20px;
@@ -44,20 +74,20 @@
         cursor: pointer;
     }
 
-    .insight-btn:hover {
+    .insight-btn-{{ context.rnd }}:hover {
         opacity: 1;
     }
 
-    .insight-check:checked~.insight-btn {
+    .insight-check-{{ context.rnd }}:checked~.insight-btn-{{ context.rnd }} {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' class='x-circle w-6 h-6'%3E%3Cpath fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
     }
 
-    .insight-panel {
+    .insight-panel-{{ context.rnd }} {
         color: #141212;
         border: 1px solid #444444;
         opacity: 0;
         background-color: #212121;
-        transition: all .2s ease-in;
+        transition: all .2s ease;
         position: relative;
         top: 27px;
         margin-top: -20px;
@@ -71,26 +101,25 @@
             0 3px 1px -2px rgba(0, 0, 0, .2);
     }
 
-    .insight-check:checked~.insight-panel {
+    .insight-check-{{ context.rnd }}:checked~.insight-panel-{{ context.rnd }} {
         opacity: 0.9;
-        transition: all .2s ease-out;
         z-index: 1;
     }
 
-    .insight-panel ol {
+    .insight-panel-{{ context.rnd }} ol {
         padding-right: 1em !important;
         margin: 1em 0 !important;
     }
 
-    .insight-panel .entry {
+    .insight-panel-{{ context.rnd }} .entry-{{ context.rnd }} {
         color: #fff;
         font-weight: 500;
         font-size: 12px;
-        list-style: decimal;
         margin: 5px 0;
+        hyphens: auto;
     }
 
-    .insight-panel h4 {
+    .insight-panel-{{ context.rnd }} h4 {
         -webkit-font-smoothing: antialiased;
         text-align: center;
         color: #fff;
@@ -98,23 +127,23 @@
         margin-bottom: 0 !important;
     }
 
-    #tb:checked+label+div {
+    #tb-{{ context.rnd }}:checked+label+div {
         display: flex;
     }
 
-    #tb+label::before {
+    #tb-{{ context.rnd }}+label::before {
         content: "Show ";
     }
 
-    #tb:checked+label::before {
+    #tb-{{ context.rnd }}:checked+label::before {
         content: "Hide ";
     }
 
-    #tb:checked ~ .page-switch-box  {
+    #tb-{{ context.rnd }}:checked~.page-switch-box-{{ context.rnd }} {
         display: block;
     }
 
-    .toggle-label {
+    .toggle-label-{{ context.rnd }} {
         font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
         -webkit-font-smoothing: antialiased;
         color: #141212;
@@ -130,18 +159,18 @@
         font-size: 15px;
     }
 
-    .toggle-label:hover {
+    .toggle-label-{{ context.rnd }}:hover {
         background-color: #5DADE2;
     }
 
-    .stats {
+    .stats-{{ context.rnd }} {
         display: none;
         justify-content: space-between;
         width: 972px;
         height: 350px;
     }
 
-    .stats table {
+    .stats-{{ context.rnd }} table {
         font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
         -webkit-font-smoothing: antialiased;
         border-collapse: collapse;
@@ -150,68 +179,68 @@
         width: 100%;
     }
 
-    .stats table th {
+    .stats-{{ context.rnd }} table th {
         border-bottom: 1px solid #cccccc;
     }
 
-    .stats table td {
+    .stats-{{ context.rnd }} table td {
         border-bottom: 1px solid #cccccc;
     }
 
-    .tabledata {
+    .tabledata-{{ context.rnd }} {
         flex: 0 1 50%;
         max-width: 477px;
     }
 
-    .tabledata h3 {
+    .tabledata-{{ context.rnd }} h3 {
         text-align: center;
     }
 
-    .tabledata th {
+    .tabledata-{{ context.rnd }} th {
         text-align: left;
     }
 
-    .tabledata td {
+    .tabledata-{{ context.rnd }} td {
         text-align: left;
     }
 
-    .insights {
+    .insights-{{ context.rnd }} {
         flex: 0 1 50%;
         text-align: center;
         max-width: 477px;
     }
 
-    .page-box {
+    .page-box-{{ context.rnd }} {
         display: none;
     }
 
-    .page-box table {
+    .page-box-{{ context.rnd }} table {
         table-layout: auto;
         width: 100%;
         border-collapse: collapse;
     }
 
-    .page-box th {
+    .page-box-{{ context.rnd }} th {
         text-align: left;
     }
 
-    .page-box td {
+    .page-box-{{ context.rnd }} td {
         text-align: center;
     }
 
-    .page-box:first-of-type {
+    .page-box-{{ context.rnd }}:first-of-type {
         display: block;
     }
 
-    .insights p {
+    .insights-{{ context.rnd }} p {
         vertical-align: middle;
     }
 
-    .insights table td {
+    .insights-{{ context.rnd }} table td {
         min-width: 82px;
     }
 
-    .ins_type {
+    .ins-type-{{ context.rnd }} {
         font-weight: 700;
         font-size: 85%;
         letter-spacing: -0.5px;
@@ -221,7 +250,7 @@
         padding: 2px 4px;
     }
 
-    .col_name {
+    .col-name-{{ context.rnd }} {
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         font-size: 85%;
         background-color: #f9f2f4;
@@ -236,20 +265,27 @@
         vertical-align: middle;
         color: #000000;
     }
+    
+    .col-cat-{{ context.rnd }} {
+        border-radius: 2px;
+        flex: 0 1 auto;
+        line-height: 18px;
+        font-size: 85%;
+    }
 
-    .page-switch-box {
+    .page-switch-box-{{ context.rnd }} {
         display: none;
         margin-left: 477px;
         width: 477px;
     }
 
-    .page-switch {
+    .page-switch-{{ context.rnd }} {
         list-style: none;
         display: flex;
         justify-content: center;
     }
 
-    .page-switch li {
+    .page-switch-{{ context.rnd }} li {
         flex: 0 1 auto;
         text-align: center;
         text-decoration: none;
@@ -266,13 +302,17 @@
         list-style: none;
     }
 
-    .page-switch li:first-of-type {
+    .page-switch-{{ context.rnd }} li:first-of-type {
         background-color: #5DADE2;
     }
 
-    #vtr ul{
+    #vtr-{{ context.rnd }} ul {
         list-style: none;
         margin: 0;
         padding: 0;
+    }
+
+    .patch-cls-{{ context.rnd }} {
+        max-width: 100%;
     }
 </style>

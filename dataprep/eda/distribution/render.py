@@ -3,7 +3,6 @@ This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
-
 import numpy as np
 import pandas as pd
 from bokeh.layouts import row
@@ -12,7 +11,6 @@ from bokeh.models import (
     ColorBar,
     ColumnDataSource,
     CustomJSHover,
-    Div,
     FactorRange,
     FuncTickFormatter,
     HoverTool,
@@ -221,40 +219,6 @@ def _format_values(key: str, value: Any) -> str:
     return str(value)
 
 
-def _create_table_row(key: str, value: Union[str, int], highlight: bool = False) -> str:
-    """
-    Create table row for stats panel
-    """
-    template_stats_data = """
-    <tr style="border-bottom: 1px solid;">
-        <th style="text-align: left">{key}</th>
-        <td style="text-align: left">{value}</td>
-    </tr>
-    """
-    template_stats_data_red = """
-    <tr style="color: #f00; border-bottom: 1px solid;">
-        <th style="text-align: left">{key}</th>
-        <td style="text-align: left">{value}</td>\
-    </tr>
-    """
-    return (
-        template_stats_data_red.format(key=key, value=value)
-        if highlight
-        else template_stats_data.format(key=key, value=value)
-    )
-
-
-def _sci_notation_superscript(value: str) -> str:
-    """
-    Strip off character e in scientific notation to a superscript tag
-    """
-    if "e+" in value:
-        value = value.replace("e+", "×10<sup>") + "</sup>"
-    elif "e-" in value:
-        value = value.replace("e", "×10<sup>") + "</sup>"
-    return value
-
-
 def _empty_figure(title: str, plot_height: int, plot_width: int) -> Figure:
     # If no data to render in the heatmap, i.e. no missing values
     # we render a blank heatmap
@@ -425,7 +389,7 @@ def pie_viz(
     )
     legend = Legend(items=[LegendItem(label=dict(field="index"), renderers=[pie])])
     legend.label_text_font_size = "8pt"
-    fig.add_layout(legend, "right")
+    fig.add_layout(legend, "left")
     tweak_figure(fig, "pie")
     fig.axis.major_label_text_font_size = "0pt"
     fig.axis.major_tick_line_color = None
@@ -1337,9 +1301,7 @@ def format_ov_stats(stats: Dict[str, Any]) -> Tuple[Dict[str, str], Dict[str, An
     return {k: _format_values(k, v) for k, v in data.items()}, dtypes_cnt
 
 
-def format_num_stats(
-    data: Dict[str, Any]
-) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+def format_num_stats(data: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     """
     Format numerical statistics
     """
@@ -1382,85 +1344,19 @@ def format_num_stats(
         if data["mean"] != 0
         else np.nan,
     }
-    overview = {k: _format_values(k, v) for k, v in overview.items()}
-    quantile = {k: _format_values(k, v) for k, v in quantile.items()}
-    descriptive = {k: _format_values(k, v) for k, v in descriptive.items()}
 
-    return overview, quantile, descriptive
-
-
-def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
-    """
-    Render statistics panel for numerical data
-    """
-    overview, quantile, descriptive = format_num_stats(data)
-
-    ov_content = ""
-    qs_content = (
-        '<h4 style="text-align:center; margin:1em auto 0.2em;">Quantile Statistics</h4>'
-    )
-    ds_content = '<h4 style="text-align:center; margin:1em auto 0.2em;">Descriptive Statistics</h4>'
-    for key, value in overview.items():
-        value = _sci_notation_superscript(value)
-        if "Distinct" in key and float(value) > 50:
-            ov_content += _create_table_row(key, value, True)
-        elif "Unique" in key and float(value.replace("%", "")) == 100:
-            ov_content += _create_table_row(key, value, True)
-        elif (
-            any(x in key for x in ["Missing", "Zeros", "Infinite"])
-            and float(value.replace("%", "")) != 0
-        ):
-            ov_content += _create_table_row(key, value, True)
-        else:
-            ov_content += _create_table_row(key, value)
-    for key, value in quantile.items():
-        value = _sci_notation_superscript(value)
-        qs_content += _create_table_row(key, value)
-    for key, value in descriptive.items():
-        frmtd_value = _sci_notation_superscript(value)
-        if "Skewness" in key and float(value) > 20:
-            ds_content += _create_table_row(key, frmtd_value, True)
-        else:
-            ds_content += _create_table_row(key, frmtd_value)
-
-    ov_content = f"""
-    <h4 style="text-align: center; margin:0 auto 0.2em;">Overview</h4>
-    <div style="columns: 2">
-    <table style="width: 100%; table-layout: auto; font-size:11px;">
-        <tbody>{ov_content}</tbody>
-    </table>
-    </div>
-    """
-    qs_content = f"""
-    <div style="flex: 50%; margin-right: 6px;">
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{qs_content}</tbody>
-        </table>
-    </div>
-    """
-    ds_content = f"""
-    <div style="flex: 50%; margin-right: 6px;">
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{ds_content}</tbody>
-        </table>
-    </div>
-    """
-    container = (
-        f'{ov_content}<div style="display: flex;">{qs_content}{ds_content}</div>'
-    )
-
-    div = Div(
-        text=container,
-        width=plot_width,
-        height=plot_height + 30,
-        style={"width": "100%"},
-    )
-    return Panel(child=div, title="Stats")
+    return {
+        "Overview": {k: _format_values(k, v) for k, v in overview.items()},
+        "Quantile Statistics": {k: _format_values(k, v) for k, v in quantile.items()},
+        "Descriptive Statistics": {
+            k: _format_values(k, v) for k, v in descriptive.items()
+        },
+    }
 
 
 def format_cat_stats(
     stats: Dict[str, Any], len_stats: Dict[str, Any], letter_stats: Dict[str, Any],
-) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+) -> Dict[str, Dict[str, str]]:
     """
     Format categorical statistics
     """
@@ -1474,122 +1370,20 @@ def format_cat_stats(
     sampled_rows = ("1st row", "2nd row", "3rd row", "4th row", "5th row")
     smpl = dict(zip(sampled_rows, stats["first_rows"]))
 
-    ov_stats = {k: _format_values(k, v) for k, v in ov_stats.items()}
-    len_stats = {k: _format_values(k, v) for k, v in len_stats.items()}
-    smpl = {k: f"{v[:18]}..." if len(v) > 18 else v for k, v in smpl.items()}
-    letter_stats = {k: _format_values(k, v) for k, v in letter_stats.items()}
-
-    return ov_stats, len_stats, smpl, letter_stats
-
-
-def stats_viz_cat(
-    stats: Dict[str, Any],
-    len_stats: Dict[str, Any],
-    letter_stats: Dict[str, Any],
-    plot_width: int,
-    plot_height: int,
-) -> Panel:
-    """
-    Render statistics panel for categorical data
-    """
-    # pylint: disable=too-many-locals
-    ov_stats, len_stats, smpl, letter_stats = format_cat_stats(
-        stats, len_stats, letter_stats
-    )
-
-    # pylint: disable=line-too-long
-    ov_content = ""
-    lens_content = ""
-    smpl_content = ""
-    ls_content = ""
-    for key, value in ov_stats.items():
-        value = _sci_notation_superscript(value)
-        if "Distinct" in key and float(value) > 50:
-            ov_content += _create_table_row(key, value, True)
-        elif "Unique" in key and float(value.replace("%", "")) == 100:
-            ov_content += _create_table_row(key, value, True)
-        elif "Missing" in key and float(value.replace("%", "")) != 0:
-            ov_content += _create_table_row(key, value, True)
-        else:
-            ov_content += _create_table_row(key, value)
-    for key, value in len_stats.items():
-        lens_content += _create_table_row(key, value)
-    for key, value in smpl.items():
-        smpl_content += _create_table_row(key, value)
-    for key, value in letter_stats.items():
-        ls_content += _create_table_row(key, value)
-
-    ov_content = f"""
-    <div style="grid-area: a;">
-        <h3 style="text-align: center;">Overview</h3>
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{ov_content}</tbody>
-        </table>
-    </div>
-    """
-    smpl_content = f"""
-    <div style="grid-area: b;">
-        <h3 style="text-align: center;">Sample</h3>
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{smpl_content}</tbody>
-        </table>
-    </div>
-    """
-    ls_content = f"""
-    <div style="grid-area: c;">
-        <h3 style="text-align: center;">Letter</h3>
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{ls_content}</tbody>
-        </table>
-    </div>
-    """
-    lens_content = f"""
-    <div style="grid-area: d;">
-        <h3 style="text-align: center;">Length</h3>
-        <table style="width: 100%; table-layout: auto; font-size:11px;">
-            <tbody>{lens_content}</tbody>
-        </table>
-    </div>
-    """
-
-    container = f"""<div style="display: grid;grid-template-columns: 1fr 1fr;grid-template-rows: 1fr 1fr;gap: 1px 1px;
-                grid-template-areas:\'a b\' \'c d\';">
-                {ov_content}{smpl_content}{ls_content}{lens_content}</div>"""
-
-    div = Div(
-        text=container, width=plot_width, height=plot_height, style={"width": "100%"}
-    )
-    return Panel(child=div, title="Stats")
+    return {
+        "Overview": {k: _format_values(k, v) for k, v in ov_stats.items()},
+        "Length": {k: _format_values(k, v) for k, v in len_stats.items()},
+        "Sample": {k: f"{v[:18]}..." if len(v) > 18 else v for k, v in smpl.items()},
+        "Letter": {k: _format_values(k, v) for k, v in letter_stats.items()},
+    }
 
 
-def stats_viz_dt(data: Dict[str, str], plot_width: int, plot_height: int) -> Panel:
+def stats_viz_dt(stats: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     """
     Render statistics panel for datetime data
     """
-    data = {k: _format_values(k, v) for k, v in data.items()}
-    ov_content = ""
-    for key, value in data.items():
-        value = _sci_notation_superscript(value)
-        if "Distinct" in key and float(value) > 50:
-            ov_content += _create_table_row(key, value, True)
-        elif "Unique" in key and float(value.replace("%", "")) == 100:
-            ov_content += _create_table_row(key, value, True)
-        elif "Missing" in key and float(value.replace("%", "")) != 0:
-            ov_content += _create_table_row(key, value, True)
-        else:
-            ov_content += _create_table_row(key, value)
-    ov_content = f"""
-    <h3 style="text-align: center;">Overview</h3>
-    <div">
-        <table style="width: 100%; table-layout: auto;">
-            <tbody>{ov_content}</tbody>
-        </table>
-    </div>
-    """
-    div = Div(
-        text=ov_content, width=plot_width, height=plot_height, style={"width": "100%"}
-    )
-    return Panel(child=div, title="Stats")
+
+    return {"Overview": {k: _format_values(k, v) for k, v in stats.items()}}
 
 
 def render_distribution_grid(
@@ -1598,15 +1392,16 @@ def render_distribution_grid(
     str,
     Union[
         List[str],
-        List[LayoutDOM],
+        List[Figure],
         Tuple[Dict[str, str], Dict[str, str]],
         Dict[int, List[str]],
+        Dict[str, List[Union[str, int]]],
     ],
 ]:
     """
     Render plots and dataset stats from plot(df)
     """  # pylint: disable=too-many-locals
-    figs: List[LayoutDOM] = list()
+    figs: List[Figure] = list()
     nrows = itmdt["stats"]["nrows"]
     titles: List[str] = []
     for col, dtype, data in itmdt["data"]:
@@ -1632,14 +1427,14 @@ def render_distribution_grid(
         "layout": figs,
         "meta": titles,
         "tabledata": format_ov_stats(itmdt["stats"]),
-        "column_insights": itmdt["column_insights"],
         "overview_insights": itmdt["overview_insights"],
+        "column_insights": itmdt["column_insights"],
     }
 
 
 def render_cat(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x) when x is a categorical column
     """
@@ -1654,8 +1449,6 @@ def render_cat(
     )
     # number of present (not null) rows, and total rows
     nrows, nuniq = data["nrows"], data["nuniq"]
-    # categorical statistics
-    tabs.append(stats_viz_cat(stats, len_stats, letter_stats, plot_width, plot_height))
     # bar chart and pie chart of the categorical values
     bar_data, pie = data["bar"].to_frame(), data["pie"].to_frame()
     fig = bar_viz(bar_data, nuniq, nrows, col, yscale, plot_width, plot_height, True,)
@@ -1671,11 +1464,17 @@ def render_cat(
         data["len_hist"], nrows, "Word Length", yscale, plot_width, plot_height, True
     )
     tabs.append(Panel(child=row(length_dist), title="Word Length"))
-    tabs = Tabs(tabs=tabs)
-    # insights
-    nom_insights(data, col)
-    # TODO return insights
-    return tabs
+
+    # panel.child.children[0] is a figure
+    for panel in tabs:
+        panel.child.children[0].frame_width = int(plot_width * 0.9)
+
+    return {
+        "tabledata": format_cat_stats(stats, len_stats, letter_stats),
+        "insights": nom_insights(data, col),
+        "layout": [panel.child.children[0] for panel in tabs],
+        "meta": [tab.title for tab in tabs],
+    }
 
 
 def nom_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
@@ -1685,54 +1484,54 @@ def nom_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
     # pylint: disable=line-too-long
     # insight dictionary, with a list associated with each plot
     ins: Dict[str, List[str]] = {
-        "stat": [],
-        "bar": [],
-        "pie": [],
-        "cloud": [],
-        "wf": [],
-        "wl": [],
+        "Stats": [],
+        "Bar Chart": [],
+        "Pie Chart": [],
+        "Word Cloud": [],
+        "Word Frequencies": [],
+        "Word Length": [],
     }
 
     ## if cfg.insight.constant_enable:
     if data["nuniq"] == 1:
-        ins["stat"].append(f"{col} has a constant value")
+        ins["Stats"].append(f"{col} has a constant value")
 
     ## if cfg.insight.high_cardinality_enable:
     if data["nuniq"] > 50:  ## cfg.insght.high_cardinality_threshold
         nuniq = data["nuniq"]
-        ins["stat"].append(f"{col} has a high cardinality: {nuniq} distinct values")
+        ins["Stats"].append(f"{col} has a high cardinality: {nuniq} distinct values")
 
     ## if cfg.insight.missing_enable:
     pmiss = round((data["nrows"] - data["stats"]["npres"]) / data["nrows"] * 100, 2)
     if pmiss > 1:  ## cfg.insight.missing_threshold
         nmiss = data["nrows"] - data["stats"]["npres"]
-        ins["stat"].append(f"{col} has {nmiss} ({pmiss}%) missing values")
+        ins["Stats"].append(f"{col} has {nmiss} ({pmiss}%) missing values")
 
     ## if cfg.insight.constant_length_enable:
     if data["stats"]["nuniq"] == data["stats"]["npres"]:
-        ins["stat"].append(f"{col} has all distinct values")
+        ins["Stats"].append(f"{col} has all distinct values")
 
     ## if cfg.insight.evenness_enable:
     if data["chisq"][1] > 0.999:  ## cfg.insight.uniform_threshold
-        ins["bar"].append(f"{col} is relatively evenly distributed")
+        ins["Bar Chart"].append(f"{col} is relatively evenly distributed")
 
     ## if cfg.insight.outstanding_no1_enable
     factor = data["bar"][0] / data["bar"][1] if len(data["bar"]) > 1 else 0
     if factor > 1.5:
         val1, val2 = data["bar"].index[0], data["bar"].index[1]
-        ins["bar"].append(
+        ins["Bar Chart"].append(
             f"The largest value ({val1}) is over {factor} times larger than the second largest value ({val2})"
         )
 
     ## if cfg.insight.attribution_enable
     if data["pie"][:2].sum() / data["nrows"] > 0.5 and len(data["pie"]) >= 2:
         vals = ", ".join(data["pie"].index[i] for i in range(2))
-        ins["pie"].append(f"The top 2 categories ({vals}) take over 50%")
+        ins["Pie Chart"].append(f"The top 2 categories ({vals}) take over 50%")
 
     ## if cfg.insight.high_word_cardinlaity_enable
     if data["nwords"] > 1000:
         nwords = data["nwords"]
-        ins["cloud"].append(f"{col} contains many words: {nwords} words")
+        ins["Word Cloud"].append(f"{col} contains many words: {nwords} words")
 
     ## if cfg.insight.outstanding_no1_word_enable
     factor = (
@@ -1740,29 +1539,27 @@ def nom_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
     )
     if factor > 1.5:
         val1, val2 = data["word_cnts"].index[0], data["word_cnts"].index[1]
-        ins["wf"].append(
+        ins["Word Frequencies"].append(
             f"The largest value ({val1}) is over {factor} times larger than the second largest value ({val2})"
         )
 
     ## if cfg.insight.constant_word_length_enable
     if data["len_stats"]["Minimum"] == data["len_stats"]["Maximum"]:
-        ins["wf"].append(f"{col} has words of constant length")
+        ins["Word Frequencies"].append(f"{col} has words of constant length")
 
     return ins
 
 
 def render_num(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
-) -> Tabs:
+) -> Dict[str, Any]:
+    # pylint: disable=too-many-locals
     """
     Render plots from plot(df, x) when x is a numerical column
     """
     col, data = itmdt["col"], itmdt["data"]
 
     tabs: List[Panel] = []
-    # numerical statistics
-    tabs.append(stats_viz_num(data, plot_width, plot_height))
-    # values histogram
     fig = hist_viz(
         data["hist"], data["nrows"], col, yscale, plot_width, plot_height, True,
     )
@@ -1774,6 +1571,7 @@ def render_num(
     if data["qntls"].any():
         qntls, mean, std = data["qntls"], data["mean"], data["std"]
         tabs.append(qqnorm_viz(qntls, mean, std, col, plot_width, plot_height))
+
     # box plot
     box_data = {
         "grp": col,
@@ -1786,11 +1584,17 @@ def render_num(
     }
     df = pd.DataFrame(box_data, index=[0])
     tabs.append(box_viz(df, col, plot_width, plot_height))
-    tabs = Tabs(tabs=tabs)
-    # insights
-    cont_insights(data, col)
-    # TODO return insights
-    return tabs
+
+    # panel.child.children[0] is a figure
+    for panel in tabs:
+        panel.child.children[0].frame_width = int(plot_width * 0.9)
+
+    return {
+        "tabledata": format_num_stats(data),
+        "insights": cont_insights(data, col),
+        "layout": [panel.child for panel in tabs],
+        "meta": [tab.title for tab in tabs],
+    }
 
 
 def cont_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
@@ -1798,31 +1602,37 @@ def cont_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
     Format the insights for plot(df, Continuous())
     """
     # insight dictionary with a list associated with each plot
-    ins: Dict[str, List[str]] = {"stat": [], "hist": [], "qq": [], "box": []}
+    ins: Dict[str, List[str]] = {
+        "Stats": [],
+        "Histogram": [],
+        "KDE Plot": [],
+        "Normal Q-Q Plot": [],
+        "Box Plot": [],
+    }
 
     ## if cfg.insight.infinity_enable:
     pinf = round((data["npres"] - data["nreals"]) / data["nrows"] * 100, 2)
     if pinf > 1:  ## cfg.insight.infinity_threshold
         ninf = data["npres"] - data["nreals"]
-        ins["stat"].append(f"{col} has {ninf} ({pinf}%) infinite values")
+        ins["Stats"].append(f"{col} has {ninf} ({pinf}%) infinite values")
 
     ## if cfg.insight.missing_enable:
     pmiss = round((data["nrows"] - data["npres"]) / data["nrows"] * 100, 2)
     if pmiss > 1:  ## cfg.insight.missing_threshold
         nmiss = data["nrows"] - data["npres"]
-        ins["stat"].append(f"{col} has {nmiss} ({pmiss}%) missing values")
+        ins["Stats"].append(f"{col} has {nmiss} ({pmiss}%) missing values")
 
     ## if cfg.insight.negatives_enable:
     pneg = round(data["nneg"] / data["nrows"] * 100, 2)
     if pneg > 1:  ## cfg.insight.negatives_threshold
         nneg = data["nneg"]
-        ins["stat"].append(f"{col} has {nneg} ({pneg}%) negatives")
+        ins["Stats"].append(f"{col} has {nneg} ({pneg}%) negatives")
 
     ## if cfg.insight.zeros_enable:
     pzero = round(data["nzero"] / data["nrows"] * 100, 2)
     if pzero > 5:  ## cfg.insight.zeros_threshold
         nzero = data["nzero"]
-        ins["stat"].append(f"{col} has {nzero} ({pzero}%) zeros")
+        ins["Stats"].append(f"{col} has {nzero} ({pzero}%) zeros")
 
     ## if cfg.insight.normal_enable:
     if data["norm"][1] > 0.99:
@@ -1830,45 +1640,50 @@ def cont_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
 
     ## if cfg.insight.uniform_enable:
     if data["chisq"][1] > 0.999:  ## cfg.insight.uniform_threshold
-        ins["hist"].append(f"{col} is uniformly distributed")
+        ins["Histogram"].append(f"{col} is uniformly distributed")
 
     ## if cfg.insight.skewed_enable:
     skw = np.round(data["skew"], 4)
     if skw >= 20:  ## cfg.insight.skewed_threshold
-        ins["hist"].append(f"{col} is skewed right (\u03B31 = {skw})")
+        ins["Histogram"].append(f"{col} is skewed right (\u03B31 = {skw})")
     if skw <= -20:  ## cfg.insight.skewed_threshold
-        ins["hist"].append(f"{col} is skewed left (\u03B31 = {skw})")
+        ins["Histogram"].append(f"{col} is skewed left (\u03B31 = {skw})")
 
     ## if cfg.insight.normal_enable:
     if data["norm"][1] <= 0.01:
         pval = data["norm"][1]
-        ins["qq"].append(f"{col} is not normally distributed (p-value {pval})")
+        ins["Normal Q-Q Plot"].append(
+            f"{col} is not normally distributed (p-value {pval})"
+        )
 
     ## if cfg.insight.box_enable
     if data["notlrs"] > 0:
         notlrs = data["notlrs"]
-        ins["box"].append(f"{col} has {notlrs} outliers")
+        ins["Box Plot"].append(f"{col} has {notlrs} outliers")
 
     return ins
 
 
 def render_dt(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x) when x is a numerical column
     """
     tabs: List[Panel] = []
-    osd = itmdt["data"]
-    tabs.append(stats_viz_dt(osd, plot_width, plot_height))
     df, timeunit, miss_pct = itmdt["line"]
     fig = dt_line_viz(
         df, itmdt["col"], timeunit, yscale, plot_width, plot_height, True, miss_pct
     )
+    fig.frame_width = int(plot_width * 0.95)
     tabs.append(Panel(child=fig, title="Line Chart"))
 
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    return {
+        "tabledata": stats_viz_dt(itmdt["data"]),
+        "insights": None,
+        "layout": [panel.child for panel in tabs],
+        "meta": [tab.title for tab in tabs],
+    }
 
 
 def render_cat_num(
@@ -2078,7 +1893,7 @@ def render(
     plot_width_lrg: int = 450,
     plot_height_lrg: int = 400,
     plot_width_wide: int = 972,
-) -> LayoutDOM:
+) -> Union[LayoutDOM, Dict[str, Any]]:
     """
     Render a basic plot
 

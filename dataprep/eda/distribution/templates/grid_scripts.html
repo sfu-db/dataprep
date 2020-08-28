@@ -1,23 +1,23 @@
-{{ context.components[0] }}
 {{ context.resources }}
+{{ context.components[0] }}
 
 <script>
     setTimeout(init, 100);
 
     function init() {
-        const tableRows = document.querySelectorAll('.tabledata tr');
+        const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
     }
 
-    function switchPage(e) {
+    function switchPage{{ context.rnd }}(e) {
         const pageTo = e.id.replace('switch', 'page');
         const pageBox = document.getElementById(pageTo);
-        const pageBoxAll = document.getElementsByClassName('page-box');
+        const pageBoxAll = document.getElementsByClassName('page-box-{{ context.rnd }}');
         for (let i of pageBoxAll) {
             i.style.display = 'none';
         }
-        for (let i of document.querySelectorAll('.page-switch li')) {
+        for (let i of document.querySelectorAll('.page-switch-{{ context.rnd }} li')) {
             i.style.backgroundColor = 'white';
         }
         pageBox.style.display = 'block';

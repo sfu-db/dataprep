@@ -121,6 +121,7 @@ def compute_overview(
         stats=ov_stats,
         column_insights=col_insights,
         overview_insights=_insight_pagination(ov_insights),
+        ov_insights=ov_insights,
         visual_type="distribution_grid",
     )
 
@@ -446,9 +447,9 @@ def _insight_pagination(ins: List[Dict[str, str]]) -> Dict[int, List[Dict[str, s
     # sort the insights based on the list ins_order
     ins.sort(key=lambda x: ins_order.index(list(x.keys())[0]))
     # paginate the sorted insights
-    page_count = int(np.ceil(len(ins) / 11))
+    page_count = int(np.ceil(len(ins) / 10))
     paginated_ins: Dict[int, List[Dict[str, str]]] = {}
     for i in range(1, page_count + 1):
-        paginated_ins[i] = ins[(i - 1) * 11 : i * 11]
+        paginated_ins[i] = ins[(i - 1) * 10 : i * 10]
 
     return paginated_ins

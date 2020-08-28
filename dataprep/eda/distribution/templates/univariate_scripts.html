@@ -1,0 +1,62 @@
+{{ context.resources }}
+{{ context.components[0] }}
+
+<script>
+    setTimeout(init, 100);
+
+    function init() {
+        const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
+        highlightTableValue(tableRows, '#f00');
+        scientificNotationStrip(tableRows);
+    }
+
+    function switchTab{{ context.rnd }}(e) {
+        const selectedAreaSuffix = e.parentElement.parentElement.className.split('-')[1];
+        const selectedTabId = e.id.split('-')[2];
+        const selectedTabContent = document.querySelector(`.contents-${selectedAreaSuffix}>div:nth-of-type(${selectedTabId})`);
+        const contentArray = document.getElementsByClassName('plots-{{ context.rnd }}')
+        for (let i of contentArray) {
+            i.style.display = 'none';
+        }
+        selectedTabContent.style.display = (selectedTabId === 1) ? 'block' : 'flex';
+    }
+
+    function highlightTableValue(element, color) {
+        for (let i of element) {
+            let thValue = i.firstElementChild.innerText;
+            let tbValue = i.lastElementChild.innerText;
+            if (thValue.includes('Distinct') && tbValue > 50) {
+                i.style.color = color;
+            } else if (thValue.includes('Unique') && tbValue.replace('%',
+                    '') == 100) {
+                i.style.color = color;
+            } else if (thValue.includes('Missing') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Zeros') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Infinite') && tbValue.replace('%',
+                    '') != 0) {
+                i.style.color = color;
+            } else if (thValue.includes('Skewness' && tbValue > 20)) {
+                i.style.color = color;
+            }
+        }
+    }
+
+    function scientificNotationStrip(element) {
+        for (let i of element) {
+            let tbValue = i.lastElementChild.innerHTML;
+            if (!isNaN(tbValue)) {
+                if (tbValue.includes('e+')) {
+                    let newValue = tbValue.replace('e+', '×10<sup>') + '</sup>';
+                    i.lastElementChild.innerHTML = newValue;
+                } else if (tbValue.includes('e-')) {
+                    let newValue = tbValue.replace('e', '×10<sup>') + '</sup>';
+                    i.lastElementChild.innerHTML = newValue;
+                }
+            }
+        }
+    }
+</script>
