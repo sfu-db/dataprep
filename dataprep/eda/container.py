@@ -4,11 +4,11 @@
 
 import sys
 import webbrowser
+import random
 from tempfile import NamedTemporaryFile
-from typing import List, Dict, Union, Tuple
+from typing import Any, Dict
 from bokeh.io import output_notebook
 from bokeh.embed import components
-from bokeh.models import LayoutDOM
 from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
 from .utils import is_notebook
@@ -25,28 +25,39 @@ class Container:
     This class creates a customized Container object for the plot(df) function.
     """
 
-    def __init__(
-        self,
-        to_render: Dict[
-            str,
-            Union[
-                List[str],
-                List[LayoutDOM],
-                Tuple[Dict[str, str], Dict[str, str]],
-                Dict[int, List[str]],
-            ],
-        ],
-    ) -> None:
-        self.context = {
-            "resources": INLINE.render(),
-            "components": components(to_render["layout"]),
-            "tabledata": to_render["tabledata"],
-            "overview_insights": to_render["overview_insights"],
-            "column_insights": to_render["column_insights"],
-            "meta": to_render["meta"],
-            "title": "DataPrep.EDA Report",
-        }
-        self.template_base = ENV_LOADER.get_template("base.html")
+    def __init__(self, to_render: Dict[str, Any], visual_type: str,) -> None:
+        if visual_type == "distribution_grid":
+            self.context = {
+                "resources": INLINE.render(),
+                "components": components(to_render["layout"]),
+                "tabledata": to_render["tabledata"],
+                "overview_insights": to_render["overview_insights"],
+                "column_insights": to_render["column_insights"],
+                "meta": to_render["meta"],
+                "title": "DataPrep.EDA Report",
+                "rnd": random.randint(
+                    0, 99
+                ),  # for multiple cells running in the same notebook
+            }
+            self.template_base = ENV_LOADER.get_template("grid_base.html")
+
+        elif "_column" in visual_type:
+            # todo: param management
+            to_render["meta"].insert(0, "Stats")
+            self.context = {
+                "resources": INLINE.render(),
+                "tabledata": to_render["tabledata"],
+                "insights": to_render["insights"],
+                "components": components(to_render["layout"]),
+                "meta": to_render["meta"],
+                "title": "DataPrep.EDA Report",
+                "rnd": random.randint(
+                    100, 999
+                ),  # for multiple cells running in the same notebook
+            }
+            self.template_base = ENV_LOADER.get_template("univariate_base.html")
+        else:
+            raise TypeError(f"Unsupported Visual Type: {visual_type}.")
 
     def save(self, filename: str) -> None:
         """

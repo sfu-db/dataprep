@@ -2,18 +2,18 @@
 
 <head>
     <title> {{ context.title }} </title>
-    {% include 'scripts.html' %}
-    {% include 'styles.html' %}
+    {% include 'grid_scripts.html' %}
+    {% include 'grid_styles.html' %}
 </head>
 
 <body>
-    <div class="top-info">
-        <input type='checkbox' style='display: none' id="tb">
-        <label class="toggle-label" for="tb">
+    <div class="top-info-{{ context.rnd }}">
+        <input type='checkbox' style='display: none' id="tb-{{ context.rnd }}">
+        <label class="toggle-label-{{ context.rnd }}" for="tb-{{ context.rnd }}">
             Stats and Insights
         </label>
-        <div class="stats">
-            <div class="tabledata">
+        <div class="stats-{{ context.rnd }}">
+            <div class="tabledata-{{ context.rnd }}">
                 <div>
                     <h3>Dataset Statistics</h3>
                     <table>
@@ -23,7 +23,7 @@
                             <td>{{ td }}</td>
                         </tr>
                         {% endfor %}
-                        <tr id="vtr">
+                        <tr id="vtr-{{ context.rnd }}">
                             <th style="vertical-align: top;">Variable Types</th>
                             <td>
                                 <ul>
@@ -36,19 +36,19 @@
                     </table>
                 </div>
             </div>
-            <div class="insights">
+            <div class="insights-{{ context.rnd }}">
                 {% for page, content in context.overview_insights.items() %}
-                <div class="page-box" id="page-{{ loop.index }}">
+                <div class="page-box-{{ context.rnd }}" id="page-{{ context.rnd }}-{{ loop.index }}">
                     <h3>Dataset Insights</h3>
                     <table>
                         {% for entry in content %}
                         {% for ins_type, insight in entry.items() %}
                         <tr>
-                            <th class="des">
-                                <span title="{{ col_name }}" class="col_name">{{ insight.split(' ')[0] }}</span>
+                            <th id="des-{{ context.rnd }}">
+                                <span title="{{ col_name }}" class="col-name-{{ context.rnd }}">{{ insight.split(' ')[0] }}</span>
                                 {{ insight.replace(insight.split(' ')[0], '') }}
                             </th>
-                            <td><span class="ins_type">{{ ins_type }}</span></td>
+                            <td><span class="ins-type-{{ context.rnd }}">{{ ins_type }}</span></td>
                         </tr>
                         {% endfor %}
                         {% endfor %}
@@ -57,36 +57,37 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="page-switch-box">
-            <ul class="page-switch">
+        <div class="page-switch-box-{{ context.rnd }}">
+            <ul class="page-switch-{{ context.rnd }}">
                 {% for _ in context.overview_insights %}
                 {% if loop.length > 1 %}
-                <li id="switch-{{ loop.index }}" onclick="switchPage(this)">{{ loop.index }}</li>
+                <li id="switch-{{ context.rnd }}-{{ loop.index }}" onclick="switchPage{{ context.rnd }}(this)">{{ loop.index }}</li>
                 {% endif %}
                 {% endfor %}
             </ul>
         </div>
     </div>
-    <div class="plot">
+    <div class="plot-{{ context.rnd }}">
         {% for fig in context.components[1] %}
-        <div class="fig">
-            <div class="menu">
-                <div class="plot-title">{{ context.meta[loop.index0] }}</div>
+        <div class="fig-{{ context.rnd }}">
+            <div class="menu-{{ context.rnd }}">
+                <div class="plot-title-{{ context.rnd }}">{{ context.meta[loop.index0] }}</div>
                 {% if context.column_insights[context.meta[loop.index0]] %}
-                <input type='checkbox' style='display: none' id="ib{{ loop.index0 }}" class="insight-check">
-                <label class="insight-btn" for="ib{{ loop.index0 }}"></label>
-                <div class="insight-panel">
+                <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
+                <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
+                <div class="insight-panel-{{ context.rnd }}">
                     <h4>Column Insights</h3>
                         <ol>
                             {% for insight in context.column_insights[context.meta[loop.index0]] %}
-                            <li class="entry"><span
-                                    class="col_name">{{ insight.split(' ')[0] }}</span>{{ insight.replace(insight.split(' ')[0], '') }}
+                            <li class="entry-{{ context.rnd }}"><span
+                                    class="col-name-{{ context.rnd }}">{{ insight.split(' ')[0] }}</span>{{ insight.replace(insight.split(' ')[0], '') }}
                             </li>
                             {% endfor %}
                         </ol>
                 </div>
                 {% endif %}
             </div>
+            
             {{ fig }}
         </div>
         {% endfor %}

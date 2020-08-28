@@ -1,0 +1,60 @@
+<html>
+
+<head>
+    <title> {{ context.title }} </title>
+    {% include 'univariate_scripts.html' %}
+    {% include 'univariate_styles.html' %}
+</head>
+
+<body>
+    <div class="container-{{ context.rnd }}">
+        <div class="tabs-{{ context.rnd }}">
+            {% for title in context.meta %}
+            <input type="radio" name="select" id="tab-{{ context.rnd }}-{{ loop.index }}" {{ 'checked' if loop.first }} onclick="switchTab{{ context.rnd }}(this)">
+            <label for="tab-{{ context.rnd }}-{{ loop.index }}">{{ title }}</label>
+            {% endfor %}
+        </div>
+        <div class="contents-{{ context.rnd }}">
+            {% if context.tabledata %}
+            <div class="plots-{{ context.rnd }}">
+                <div class="stats-{{ context.rnd }}">
+                    {% for title, table in context.tabledata.items() %}
+                    <div class="tabledata-{{ context.rnd }}">
+                        <h3>{{ title }}</h3>
+                        <table>
+                            {% for th, td in table.items() %}
+                            <tr>
+                                <th>{{ th }}</th><td>{{ td }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% endfor %}
+                    {% if context.insights[context.meta[0]] %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% for fig in context.components[1] %}
+            <div class="plots-{{ context.rnd }}">
+                {% if context.insights[context.meta[loop.index]] %}
+                <div class="insight-container-{{ context.rnd }}">
+                    <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
+                    <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
+                    <div class="insight-panel-{{ context.rnd }}">
+                        <ol>
+                            {% for insight in context.insights[context.meta[loop.index]] %}
+                            <li class="entry-{{ context.rnd }}">
+                                {{ insight }}
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+                {% endif %}
+                {{ fig }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
