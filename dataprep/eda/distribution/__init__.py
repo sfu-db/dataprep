@@ -2,16 +2,17 @@
 This module implements the plot(df) function.
 """
 
-from typing import Optional, Tuple, Union, Dict
+from typing import Optional, Tuple, Union
 
 import dask.dataframe as dd
 import pandas as pd
 
+from ..container import Container
+from ..dtypes import DTypeDef
+from ..progress_bar import ProgressBar
+from ..report import Report
 from .compute import compute
 from .render import render
-from ..report import Report
-from ..dtypes import DTypeDef
-from ..container import Container
 
 __all__ = ["plot", "compute", "render"]
 
@@ -143,25 +144,26 @@ def plot(
     """
     # pylint: disable=too-many-locals,line-too-long
 
-    intermediate = compute(
-        df,
-        x=x,
-        y=y,
-        z=z,
-        bins=bins,
-        ngroups=ngroups,
-        largest=largest,
-        nsubgroups=nsubgroups,
-        timeunit=timeunit.lower(),
-        agg=agg,
-        sample_size=sample_size,
-        top_words=top_words,
-        stopword=stopword,
-        lemmatize=lemmatize,
-        stem=stem,
-        value_range=value_range,
-        dtype=dtype,
-    )
+    with ProgressBar(minimum=1):
+        intermediate = compute(
+            df,
+            x=x,
+            y=y,
+            z=z,
+            bins=bins,
+            ngroups=ngroups,
+            largest=largest,
+            nsubgroups=nsubgroups,
+            timeunit=timeunit.lower(),
+            agg=agg,
+            sample_size=sample_size,
+            top_words=top_words,
+            stopword=stopword,
+            lemmatize=lemmatize,
+            stem=stem,
+            value_range=value_range,
+            dtype=dtype,
+        )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
     if intermediate.visual_type == "distribution_grid":
         return Container(figure)
