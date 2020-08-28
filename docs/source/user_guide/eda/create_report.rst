@@ -31,10 +31,23 @@ Here we load the `titanic` dataset into a pandas dataframe and use it to demonst
 Generate report via `create_report(df)`
 =======================================
 
-After getting a dataset, we could generate the report by calling `create_report(df)`. The following shows an example::
+After getting a dataset, we could generate the report object by calling `create_report(df)`. The following shows an example::
 
     from dataprep.eda import create_report
-    create_report(df)
+    report = create_report(df, title='My Report')
+
+Once we have a report object, we can show it in the notebook::
+
+    report
+
+Or we want to open the report in browser::
+
+    report.show_browser()
+
+Or just save the report to local::
+
+    report.save(filename='report_01', to='~/Desktop')
+
 
 You can see the full report :download:`here <../../_static/images/create_report/titanic_dp.html>`
 
@@ -45,7 +58,7 @@ In this section, we can see the types of columns and the statistics of the datas
 
 .. raw:: html
 
-   <iframe src="../../_static/images/create_report/overview.html" height="345" width="70%"></iframe>
+   <iframe src="../../_static/images/create_report/overview.html" height="345" width="70%" style="border: 0"></iframe>
 
 `Variables` section
 ===================
@@ -60,11 +73,11 @@ For datetime variable, the report shows line chart
 
 .. raw:: html
 
-    <iframe src="../../_static/images/create_report/variables_num.html" height="275" width="70%"></iframe>
+    <iframe src="../../_static/images/create_report/variables_num.html" height="275" width="70%" style="border: 0"></iframe>
 
 .. raw:: html
 
-    <iframe src="../../_static/images/create_report/variables_cat.html" height="275" width="70%"></iframe>
+    <iframe src="../../_static/images/create_report/variables_cat.html" height="275" width="70%" style="border: 0"></iframe>
 
 `Interactions` section
 ======================
@@ -75,7 +88,7 @@ The plot has scatter plot and the regression line regarding to the two variabes.
 
 .. raw:: html
 
-    <iframe src="../../_static/images/create_report/interactions.html" height="625" width="70%"></iframe>
+    <iframe src="../../_static/images/create_report/interactions.html" height="625" width="70%" style="border: 0"></iframe>
 
 
 `Correlations` section
@@ -85,7 +98,7 @@ In this section, we can see the correlations bewteen variables in Spearman, Pear
 
 .. raw:: html
 
-    <iframe src="../../_static/images/create_report/correlations.html" height="530" width="70%"></iframe>
+    <iframe src="../../_static/images/create_report/correlations.html" height="530" width="70%" style="border: 0"></iframe>
 
 
 `Missing Values` section
@@ -95,4 +108,4 @@ In this section, we can see the missing values in the dataset through bar chart,
 
 .. raw:: html
 
-    <iframe src="../../_static/images/create_report/missing.html" height="530" width="70%"></iframe>
+    <iframe src="../../_static/images/create_report/missing.html" height="530" width="70%" style="border: 0"></iframe>

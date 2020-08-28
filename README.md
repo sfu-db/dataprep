@@ -5,7 +5,9 @@
   <a href="LICENSE"><img src="https://img.shields.io/pypi/l/dataprep?style=flat-square"/></a>
   <a href="https://sfu-db.github.io/dataprep/"><img src="https://img.shields.io/badge/dynamic/json?color=blue&label=docs&prefix=v&query=%24.info.version&url=https%3A%2F%2Fpypi.org%2Fpypi%2Fdataprep%2Fjson&style=flat-square"/></a>
   <a href="https://pypi.org/project/dataprep/"><img src="https://img.shields.io/pypi/pyversions/dataprep?style=flat-square"/></a>
-  <a href="https://codecov.io/gh/sfu-db/dataprep"><img src="https://img.shields.io/codecov/c/github/sfu-db/dataprep?style=flat-square"/></a>
+  <a href="https://www.codacy.com/gh/sfu-db/dataprep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sfu-db/dataprep&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/ed658f08dcce4f088c850253475540ba"/></a>
+<!--   <a href="https://codecov.io/gh/sfu-db/dataprep"><img src="https://img.shields.io/codecov/c/github/sfu-db/dataprep?style=flat-square"/></a> -->
+  <a href="https://www.codacy.com/gh/sfu-db/dataprep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sfu-db/dataprep&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/ed658f08dcce4f088c850253475540ba"/></a>
   <a href="https://discord.gg/xwbkFNk"><img src="https://img.shields.io/discord/702765817154109472?style=flat-square"/></a>
 </p>
 
@@ -21,7 +23,7 @@
 Dataprep lets you prepare your data using a single library with a few lines of code.
 
 Currently, you can use `dataprep` to:
-* Collect data from common data sources (through `dataprep.data_connector`)
+* Collect data from common data sources (through `dataprep.connector`)
 * Do your exploratory data analysis (through `dataprep.eda`)
 * ...more modules are coming
 
@@ -51,14 +53,14 @@ Currently, you can use `dataprep` to:
 ## Installation
 
 ```bash
-pip install dataprep
+pip install -U dataprep
 ```
 
 ## Examples & Usages
 
 The following examples can give you an impression of what dataprep can do:
 
-* [Documentation: Data Connector](https://sfu-db.github.io/dataprep/user_guide/data_connector/data_connector.html)
+* [Documentation: Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
 * [Documentation: EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
 * [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/user_guide/eda/titanic.html)
 * [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/user_guide/eda/house_price.html)
@@ -98,16 +100,20 @@ You can drill down to get more information by given `plot`, `plot_correlation` a
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
 
-### Data Connector
+### Connector
 
-You can download Yelp business search result into a pandas DataFrame, 
-using two lines of code, without taking deep looking into the Yelp documentation!
-Moreover, Data Connector will automatically do the pagination for you so that 
-you can specify the desire count of the returned results without even considering the count-per-request restriction from the API.
+Connector provides a simple way to collect data from different websites, offering several benefits:
+* A unified API: you can fetch data using one or two lines of code to get data from many websites.
+* Auto Pagination: it automatically does the pagination for you so that you can specify the desired count of the returned results without even considering the count-per-request restriction from the API.
+* Smart API request strategy: it can issue API requests in parallel while respecting the rate limit policy.
 
-<a href="https://sfu-db.github.io/dataprep/user_guide/data_connector/DC_Yelp_tut.html#pagination"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/data_connector.png"/></a>
+In the following examples, you can download the Yelp business search result into a pandas DataFrame, 
+using only two lines of code, without taking deep looking into the Yelp documentation!
+More examples can be found here:
+[Examples](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
-_The code requests 120 records even though Yelp restricts you can only fetch 50 per request._
+<center><a href="https://sfu-db.github.io/dataprep/connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector.png"/></a></center>
+
 
 ## Contribute
 

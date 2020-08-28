@@ -2,7 +2,6 @@
     This module implements the visualization for
     plot_correlation(df) function
 """
-import math
 from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -14,6 +13,7 @@ from bokeh.models import (
     ColumnDataSource,
     CustomJS,
     FactorRange,
+    FuncTickFormatter,
     HoverTool,
     Legend,
     LegendItem,
@@ -26,7 +26,7 @@ from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import Figure, figure
 
 from ..intermediate import Intermediate
-from ..palette import BIPALETTE, BRG
+from ..palette import BRG, RDBU
 
 __all__ = ["render_correlation"]
 
@@ -60,11 +60,11 @@ def render_correlation(
         visual_elem = Figure()
     elif itmdt.visual_type == "correlation_heatmaps":
         visual_elem = render_correlation_heatmaps(
-            itmdt, plot_width, plot_height, palette or BIPALETTE
+            itmdt, plot_width, plot_height, palette or RDBU
         )
     elif itmdt.visual_type == "correlation_single_heatmaps":
         visual_elem = render_correlation_single_heatmaps(
-            itmdt, plot_width, plot_height, palette or BIPALETTE
+            itmdt, plot_width, plot_height, palette or RDBU
         )
     elif itmdt.visual_type == "correlation_scatter":
         visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
@@ -115,7 +115,14 @@ def tweak_figure(fig: Figure) -> None:
     fig.axis.major_tick_line_color = None
     fig.axis.major_label_text_font_size = "9pt"
     fig.axis.major_label_standoff = 0
-    fig.xaxis.major_label_orientation = math.pi / 3
+    fig.xaxis.major_label_orientation = np.pi / 3
+    # truncate axis tick values
+    format_js = """
+        if (tick.length > 15) return tick.substring(0, 13) + '...';
+        else return tick;
+    """
+    fig.xaxis.formatter = FuncTickFormatter(code=format_js)
+    fig.yaxis.formatter = FuncTickFormatter(code=format_js)
 
 
 def render_correlation_heatmaps(
@@ -207,7 +214,6 @@ def render_correlation_single_heatmaps(
         )
 
         fig.add_layout(color_bar, "right")
-
         tab = Panel(child=fig, title=method)
         tabs.append(tab)
 

@@ -2,42 +2,37 @@
     This module implements the plot_missing(df, x, y) function's
     visualization part.
 """
-import math
-from typing import Tuple, Union
-from typing import List, Sequence, Optional
-import numpy as np
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+import numpy as np
 import pandas as pd
+from bokeh.layouts import row
 from bokeh.models import (
     BasicTicker,
     CategoricalColorMapper,
     ColorBar,
+    ColumnDataSource,
+    CustomJSHover,
     FactorRange,
+    FuncTickFormatter,
+    HoverTool,
     LayoutDOM,
     LinearColorMapper,
     NumeralTickFormatter,
     Panel,
+    PrintfTickFormatter,
     Range1d,
     Tabs,
     Title,
-    PrintfTickFormatter,
 )
-
-# pylint: disable=no-name-in-module
-from bokeh.palettes import Category10, Greys256  # type: ignore
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
-from ..dtypes import is_dtype, Nominal, Continuous, drop_null
-from ..intermediate import Intermediate, ColumnMetadata
+from ..dtypes import Continuous, Nominal, drop_null, is_dtype
+from ..intermediate import ColumnMetadata, Intermediate
+from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
 from .compute import LABELS
-from ..palette import PALETTE
-from ..palette import BIPALETTE
-
-
-# pylint: enable=no-name-in-module
-
 
 __all__ = ["render_missing"]
 
@@ -67,7 +62,7 @@ def tweak_figure(fig: Figure) -> Figure:
     fig.axis.major_tick_line_color = None
     fig.axis.major_label_text_font_size = "9pt"
     fig.axis.major_label_standoff = 0
-    fig.xaxis.major_label_orientation = math.pi / 3
+    fig.xaxis.major_label_orientation = np.pi / 3
 
     return fig
 
@@ -101,7 +96,7 @@ def render_dist(
     for idx, label in enumerate(LABELS):
         group = df[df["label"] == label]
         fig.line(
-            x="x", y=typ, source=group, color=Category10[3][idx], legend_label=label,
+            x="x", y=typ, source=group, color=CATEGORY10[idx], legend_label=label,
         )
 
     relocate_legend(fig, "right")
@@ -133,7 +128,7 @@ def render_hist(
             ("Label", "@label"),
         ]
 
-    cmapper = CategoricalColorMapper(palette=Category10[3], factors=LABELS)
+    cmapper = CategoricalColorMapper(palette=CATEGORY10, factors=LABELS)
 
     if is_dtype(meta["dtype"], Nominal()):
         radius = 0.99
@@ -209,10 +204,22 @@ def render_boxwhisker(df: pd.DataFrame, plot_width: int, plot_height: int) -> Fi
 
     # boxes
     fig.vbar(  # pylint: disable=too-many-function-args
-        "label", 0.7, "q2", "q3", source=df, fill_color=PALETTE[0], line_color="black",
+        "label",
+        0.7,
+        "q2",
+        "q3",
+        source=df,
+        fill_color=CATEGORY20[0],
+        line_color="black",
     )
     fig.vbar(  # pylint: disable=too-many-function-args
-        "label", 0.7, "q2", "q1", source=df, fill_color=PALETTE[0], line_color="black",
+        "label",
+        0.7,
+        "q2",
+        "q1",
+        source=df,
+        fill_color=CATEGORY20[0],
+        line_color="black",
     )
     # whiskers (almost-0 height rects simpler than segments)
     fig.rect(  # pylint: disable=too-many-function-args
@@ -232,7 +239,7 @@ def create_color_mapper() -> Tuple[LinearColorMapper, ColorBar]:
     """
     Create a color mapper and a colorbar for spectrum
     """
-    mapper = LinearColorMapper(palette=list(reversed(Greys256)), low=0, high=1)
+    mapper = LinearColorMapper(palette=list(reversed(GREYS256)), low=0, high=1)
     colorbar = ColorBar(
         color_mapper=mapper,
         major_label_text_font_size="8pt",
@@ -272,15 +279,22 @@ def render_missing_impact(
     """
     tabs: List[Panel] = []
     fig_barchart = render_bar_chart(
-        itmdt["data_bars"], "linear", plot_width, plot_height, False
+        itmdt["data_bars"], "linear", plot_width, plot_height
     )
-    tabs.append(Panel(child=fig_barchart, title="Bar Chart"))
+    tabs.append(Panel(child=row(fig_barchart), title="Bar Chart"))
+
     fig_spectrum = render_missing_spectrum(
         itmdt["data_spectrum"], itmdt["data_total_missing"], plot_width, plot_height
     )
-    tabs.append(Panel(child=fig_spectrum, title="Spectrum"))
+    tabs.append(Panel(child=row(fig_spectrum), title="Spectrum"))
+
     fig_heatmap = render_heatmaps(itmdt["data_heatmap"], plot_width, plot_height)
-    tabs.append(Panel(child=fig_heatmap, title="Heatmap"))
+    tabs.append(Panel(child=row(fig_heatmap), title="Heatmap"))
+
+    fig_dendrogram = render_dendrogram(
+        itmdt["data_dendrogram"], plot_width, plot_height
+    )
+    tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
 
     tabs = Tabs(tabs=tabs)
     return tabs
@@ -293,7 +307,7 @@ def render_heatmaps(
     Render missing heatmaps in to tabs
     """
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
-    mapper, color_bar = create_color_mapper_heatmap(BIPALETTE)
+    mapper, color_bar = create_color_mapper_heatmap(RDBU)
 
     def empty_figure() -> Figure:
         # If no data to render in the heatmap, i.e. no missing values
@@ -354,6 +368,12 @@ def render_heatmaps(
                 fill_color={"field": "correlation", "transform": mapper},
                 line_color=None,
             )
+            format_js = """
+                if (tick.length > 15) return tick.substring(0, 13) + '...';
+                else return tick;
+            """
+            fig.xaxis.formatter = FuncTickFormatter(code=format_js)
+            fig.yaxis.formatter = FuncTickFormatter(code=format_js)
         else:
             fig = empty_figure()
     else:
@@ -368,56 +388,72 @@ def render_heatmaps(
 
 
 def render_bar_chart(
-    data_barchart: pd.DataFrame,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
-    show_yticks: bool,
+    df: pd.DataFrame, yscale: str, plot_width: int, plot_height: int,
 ) -> Figure:
     """
-    Render a bar chart
+    Render a bar chart for the missing and present values
     """
 
-    colors = [PALETTE[0], PALETTE[2]]
-    value_type = ["Not Missing", "Missing"]
-
-    data = {
-        "cols": data_barchart.index,
-        "Not Missing": data_barchart["not missing"],
-        "Missing": data_barchart["missing"],
-    }
-
-    if show_yticks:
-        if len(data_barchart) > 10:
-            plot_width = 28 * len(data_barchart)
+    if len(df) > 20:
+        plot_width = 28 * len(df)
 
     fig = Figure(
-        x_range=data_barchart.index.tolist(),
-        y_range=[0, 1],
+        x_range=list(df.index),
+        y_range=[0, df["Present"][0] + df["Missing"][0]],
         plot_width=plot_width,
         plot_height=plot_height,
         y_axis_type=yscale,
         toolbar_location=None,
-        tooltips="@cols: @$name{1%} $name",
-        tools="hover",
+        tools=[],
     )
 
-    fig.vbar_stack(
-        value_type,
-        x="cols",
+    rend = fig.vbar_stack(
+        stackers=df.columns,
+        x="index",
         width=0.9,
-        color=colors,
-        source=data,
-        legend_label=value_type,
+        color=[CATEGORY20[0], CATEGORY20[2]],
+        source=df,
+        legend_label=list(df.columns),
     )
 
-    fig.legend.location = "top_right"
-    fig.y_range.start = 0
-    fig.x_range.range_padding = 0
-    fig.yaxis.axis_label = "Total Count"
+    # hover tool with count and percent
+    formatter = CustomJSHover(
+        args=dict(source=ColumnDataSource(df)),
+        code="""
+        const columns = Object.keys(source.data)
+        const cur_bar = special_vars.data_x - 0.5
+        var ttl_bar = 0
+        for (let i = 0; i < columns.length; i++) {
+            if (columns[i] != 'index'){
+                ttl_bar = ttl_bar + source.data[columns[i]][cur_bar]
+            }
+        }
+        const cur_val = source.data[special_vars.name][cur_bar]
+        return (cur_val/ttl_bar * 100).toFixed(2)+'%';
+    """,
+    )
+    for i, val in enumerate(df.columns):
+        hover = HoverTool(
+            tooltips=[
+                ("Column", "@index"),
+                (f"{val} count", "@$name"),
+                (f"{val} percent", "@{%s}{custom}" % rend[i].name),
+            ],
+            formatters={"@{%s}" % rend[i].name: formatter},
+            renderers=[rend[i]],
+        )
+        fig.add_tools(hover)
 
+    format_js = """
+        if (tick.length > 18) return tick.substring(0, 16) + '...';
+        else return tick;
+    """
+    fig.xaxis.formatter = FuncTickFormatter(code=format_js)
+
+    fig.yaxis.axis_label = "Row Count"
     tweak_figure(fig)
     relocate_legend(fig, "right")
+
     return fig
 
 
@@ -453,6 +489,8 @@ def render_missing_spectrum(
     x_range = FactorRange(*df["column_with_perc"].unique())
     minimum, maximum = df["location"].min(), df["location"].max()
     y_range = Range1d(maximum + radius, minimum - radius)
+    if df["column"].nunique() > 20:
+        plot_width = 28 * df["column"].nunique()
 
     fig = tweak_figure(
         Figure(
@@ -480,6 +518,54 @@ def render_missing_spectrum(
         line_color=None,
     )
     fig.add_layout(color_bar, "right")
+    return fig
+
+
+def render_dendrogram(
+    dend: Dict["str", Any], plot_width: int, plot_height: int
+) -> Figure:
+    """
+    Render a missing dendrogram.
+    """
+    # list of lists of dcoords and icoords from scipy.dendrogram
+    xs, ys, cols = dend["icoord"], dend["dcoord"], dend["ivl"]
+
+    # if the number of columns is greater than 20, make the plot wider
+    if len(cols) > 20:
+        plot_width = 28 * len(cols)
+
+    fig = Figure(
+        plot_width=plot_width, plot_height=plot_height, toolbar_location=None, tools="",
+    )
+
+    # round the coordinates to integers, and plot the dendrogram
+    xs = [[round(coord) for coord in coords] for coords in xs]
+    ys = [[round(coord, 2) for coord in coords] for coords in ys]
+    fig.multi_line(xs=xs, ys=ys, line_color="#8073ac")
+
+    # extract the horizontal lines for the hover tooltip
+    h_lns_x = [coords[1:3] for coords in xs]
+    h_lns_y = [coords[1:3] for coords in ys]
+    null_mismatch_vals = [coord[0] for coord in h_lns_y]
+    source = ColumnDataSource(dict(x=h_lns_x, y=h_lns_y, n=null_mismatch_vals))
+    h_lns = fig.multi_line(xs="x", ys="y", source=source, line_color="#8073ac")
+    hover_pts = HoverTool(
+        renderers=[h_lns],
+        tooltips=[("Average distance", "@n{0.1f}")],
+        line_policy="interp",
+    )
+    fig.add_tools(hover_pts)
+
+    # shorten column labels if necessary, and override coordinates with column names
+    cols = [f"{col[:16]}..." if len(col) > 18 else col for col in cols]
+    axis_coords = list(range(5, 10 * len(cols) + 1, 10))
+    axis_overrides = dict(zip(axis_coords, cols))
+    fig.xaxis.ticker = axis_coords
+    fig.xaxis.major_label_overrides = axis_overrides
+    fig.xaxis.major_label_orientation = np.pi / 3
+    fig.yaxis.axis_label = "Average Distance Between Clusters"
+    fig.grid.visible = False
+
     return fig
 
 

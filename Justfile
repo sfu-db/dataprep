@@ -21,8 +21,8 @@ format:
 
 typeck: ci-mypy
 
-test:
-  poetry run pytest dataprep
+test +ARGS="":
+  poetry run pytest dataprep/tests {{ARGS}}
 
 testf +ARGS="dataprep":
   poetry run pytest {{ARGS}}
@@ -126,3 +126,6 @@ release version:
     echo ================ Release Note ================
     poetry run python scripts/release-note.py {{hash}}
     echo ================ Release Note ================
+
+setuppy:
+    python scripts/gen-setup.py

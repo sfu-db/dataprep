@@ -1,14 +1,15 @@
+"""This module implements the plot_missing(df) function's
+calculating intermediate part
 """
-    This module implements the plot_missing(df) function's
-    calculating intermediate part
-"""
-from typing import List, Optional, Tuple, Union, Callable
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+from dask import delayed
+from scipy.cluster import hierarchy
 from scipy.stats import rv_histogram
 
 from ...errors import UnreachableError
@@ -83,22 +84,26 @@ def missing_impact(df: dd.DataFrame, bins: int) -> Intermediate:
     (nulldf,) = dask.persist(df.isnull())
     nullity = nulldf.to_dask_array(lengths=True)
 
-    null_perc = nullity.sum(axis=0) / nullity.shape[0]
+    null_cnts = nullity.sum(axis=0)
+    nrows = nullity.shape[0]
+    null_perc = null_cnts / nrows
 
     tasks = (
         missing_spectrum(nullity, cols, bins=bins),
         null_perc,
-        missing_bars(null_perc, cols),
+        missing_bars(null_cnts, cols, nrows),
         missing_heatmap(nulldf, null_perc, cols),
+        missing_dendrogram(nullity, cols),
     )
 
-    spectrum, null_perc, bars, heatmap = dd.compute(*tasks)
+    spectrum, null_perc, bars, heatmap, dendrogram = dd.compute(*tasks)
 
     return Intermediate(
         data_total_missing={col: null_perc[idx] for idx, col in enumerate(cols)},
         data_spectrum=spectrum,
         data_bars=bars,
         data_heatmap=heatmap,
+        data_dendrogram=dendrogram,
         visual_type="missing_impact",
     )
 
@@ -183,18 +188,20 @@ def missing_spectrum(  # pylint: disable=too-many-locals
     return df
 
 
-def missing_bars(null_perc: da.Array, cols: np.ndarray) -> pd.DataFrame:
+def missing_bars(
+    null_cnts: da.Array, cols: np.ndarray, nrows: dd.core.Scalar
+) -> pd.DataFrame:
     """
     Calculate a bar chart visualization of nullity correlation in the given DataFrame
     """
-    notnull_perc = 1 - null_perc
+    pres_cnts = nrows - null_cnts
 
     df = dd.from_dask_array(
-        da.stack([null_perc, notnull_perc, da.from_array(cols, (1,))], axis=1),
-        columns=["missing", "not missing", "columns"],
+        da.stack([pres_cnts, null_cnts, da.from_array(cols, (1,))], axis=1),
+        columns=["Present", "Missing", "index"],
     )
 
-    df = df.set_index("columns")
+    df = df.set_index("index")
 
     return df
 
@@ -214,6 +221,24 @@ def missing_heatmap(
 
     corr_mat = nulldf[cols].corr()
     return corr_mat
+
+
+def missing_dendrogram(nullity: da.Array, cols: List[str]) -> Any:
+    """
+    Calculate a missing values dendrogram
+    """
+    # Link the hierarchical output matrix, figure out orientation, construct base dendrogram.
+    linkage_matrix = delayed(hierarchy.linkage)(nullity.T, "average")
+
+    dendrogram = delayed(hierarchy.dendrogram)(
+        Z=linkage_matrix,
+        orientation="bottom",
+        labels=cols,
+        distance_sort="descending",
+        no_plot=True,
+    )
+
+    return dendrogram
 
 
 def missing_impact_1vn(  # pylint: disable=too-many-locals
@@ -438,7 +463,7 @@ def compute_missing(
         a valid column name of the data frame
     y
         a valid column name of the data frame
-     bins
+    bins
         The number of rows in the figure
     ndist_sample
         The number of sample points
