@@ -8,7 +8,7 @@ import pandas as pd
 import dask.dataframe as dd
 from scipy.stats import normaltest as normaltest_, ks_2samp as ks_2samp_
 
-from ...dtypes import drop_null, is_dtype, detect_dtype, Continuous, DTypeDef
+from ...dtypes import drop_null
 
 # Dictionary for mapping the time unit to its formatting. Each entry is of the
 # form unit:(unit code for pd.Grouper freq parameter, pandas to_period strftime
@@ -51,90 +51,6 @@ def _get_timeunit(min_time: pd.Timestamp, max_time: pd.Timestamp, dflt: int) -> 
         prev_unit = unit
 
     return prev_unit
-
-
-def calc_box(
-    df: dd.DataFrame,
-    bins: int,
-    ngroups: int = 10,
-    largest: bool = True,
-    dtype: Optional[DTypeDef] = None,
-) -> Tuple[pd.DataFrame, List[str], List[float], Optional[Dict[str, int]]]:
-    """
-    Compute a box plot over either
-        1) the values in one column
-        2) the values corresponding to groups in another column
-        3) the values corresponding to binning another column
-
-    Parameters
-    ----------
-    df
-        Dataframe with one or two columns
-    bins
-        Number of bins to use if df has two numerical columns
-    ngroups
-        Number of groups to show if df has a categorical and numerical column
-    largest
-        When calculating a box plot per group, select the largest or smallest groups
-    dtype: str or DType or dict of str or dict of DType, default None
-        Specify Data Types for designated column or all columns.
-        E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
-        dtype = {"a": Continuous(), "b": "nominal"}
-        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
-    Returns
-    -------
-    Tuple[pd.DataFrame, List[str], List[float], Dict[str, int]]
-        The box plot statistics in a dataframe, a list of the outlier
-        groups and another list of the outlier values, a dictionary
-        logging the sampled group output
-    """
-    # pylint: disable=too-many-locals
-    grp_cnt_stats = None  # to inform the user of sampled output
-    x = df.columns[0]
-    if len(df.columns) == 1:
-        df = _calc_box_stats(df[x], x)
-    else:
-        y = df.columns[1]
-        if is_dtype(detect_dtype(df[x], dtype), Continuous()) and is_dtype(
-            detect_dtype(df[y], dtype), Continuous()
-        ):
-            minv, maxv, cnt = dask.compute(df[x].min(), df[x].max(), df[x].nunique())
-            bins = cnt if cnt < bins else bins
-            endpts = np.linspace(minv, maxv, num=bins + 1)
-            # calculate a box plot over each bin
-            df = dd.concat(
-                [
-                    _calc_box_stats(
-                        df[(df[x] >= endpts[i]) & (df[x] < endpts[i + 1])][y],
-                        f"[{endpts[i]},{endpts[i + 1]})",
-                    )
-                    if i != len(endpts) - 2
-                    else _calc_box_stats(
-                        df[(df[x] >= endpts[i]) & (df[x] <= endpts[i + 1])][y],
-                        f"[{endpts[i]},{endpts[i + 1]}]",
-                    )
-                    for i in range(len(endpts) - 1)
-                ],
-                axis=1,
-            ).compute()
-            endpts_df = pd.DataFrame(
-                [endpts[:-1], endpts[1:]], ["lb", "ub"], df.columns
-            )
-            df = pd.concat([df, endpts_df], axis=0)
-        else:
-            df, grp_cnt_stats, largest_grps = _calc_groups(df, x, ngroups, largest)
-            # calculate a box plot over each group
-            df = dd.concat(
-                [_calc_box_stats(df[df[x] == grp][y], grp) for grp in largest_grps],
-                axis=1,
-            ).compute()
-
-    df = df.append(pd.Series({c: i + 1 for i, c in enumerate(df.columns)}, name="x",)).T
-    df.index.name = "grp"
-    df = df.reset_index()
-    df["x0"], df["x1"] = df["x"] - 0.8, df["x"] - 0.2  # width of whiskers for plotting
-    outx, outy = _calc_box_otlrs(df)
-    return df, outx, outy, grp_cnt_stats
 
 
 def _calc_box_stats(grp_srs: dd.Series, grp: str, dlyd: bool = False) -> pd.DataFrame:
