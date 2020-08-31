@@ -49,3 +49,18 @@ class UniversalParameterOverridden(Exception):
 
     def __str__(self) -> str:
         return f"the parameter {self.param} is overridden by {self.uparam}"
+
+
+class InvalidParameterError(Exception):
+    """
+    The parameter used in the query is invalid
+    """
+
+    param: str
+
+    def __init__(self, param: str) -> None:
+        super().__init__()
+        self.param = param
+
+    def __str__(self) -> str:
+        return f"the parameter {self.param} is invalid, refer info method"
