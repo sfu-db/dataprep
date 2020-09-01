@@ -1,10 +1,10 @@
 """
     This module implements the generation of connector configuration files
 """
-from requests import Request, Response, Session
 import re
 import json
 from urllib import parse
+from requests import Request, Response, Session
 
 
 def create_config(example: str) -> 'ConfigGenerator':
@@ -17,11 +17,12 @@ def create_config(example: str) -> 'ConfigGenerator':
     ConfigGenerator
         The ConfigGenerator instance.
     """
-    cg = ConfigGenerator()
-    cg.add_example(example)
-    return cg
+    config_gen = ConfigGenerator()
+    config_gen.add_example(example)
+    return config_gen
 
 
+# pylint: disable=too-many-instance-attributes
 class ConfigGenerator:
     """
     Class that generate configuration files according to
@@ -31,8 +32,8 @@ class ConfigGenerator:
     Example
     -------
     >>> from dataprep.connector import config_generator as cg
-    >>> request_example = "GET https://openlibrary.org/api/books?bibkeys=ISBN:0385472579&format=json"
-    >>> config = cg.create_config(request_example)
+    >>> req_example = "GET https://openlibrary.org/api/books?bibkeys=ISBN:0385472579&format=json"
+    >>> config = cg.create_config(req_example)
 
     """
     _request_example: str
@@ -110,9 +111,11 @@ class ConfigGenerator:
         """
         self._request_example = request_example
         try:
-            request_full_url = re.search("(?P<url>https?://[^\s]+)", self._request_example).group("url")
+            request_full_url = re.search("(?P<url>https?://[^\s]+)",
+                                         self._request_example).group("url")
         except Exception:
-            raise RuntimeError(f"Malformed request example syntax: {self._request_example}") from None
+            raise RuntimeError(f"Malformed request example syntax: \
+                               {self._request_example}") from None
         else:
             parsed_full_url = parse.urlparse(request_full_url)
             self._parameters = parse.parse_qs(parsed_full_url.query)
@@ -121,14 +124,16 @@ class ConfigGenerator:
                 lst_parsed_full_url[4] = str()
                 self._url = parse.urlunparse(lst_parsed_full_url)
             else:
-                raise RuntimeError(f"Malformed request example syntax: {self._request_example}") from None
+                raise RuntimeError(f"Malformed request example syntax: \
+                                   {self._request_example}") from None
 
     def _execute_request(
             self
     ) -> None:
         """
-        Execute an HTTP request taking as input all the parameters extracted from the request example,
-        then, extract all the relevant information from the received HTTP response.
+        Execute an HTTP request taking as input all the parameters extracted from
+        the request example, then, extract all the relevant information from the
+        received HTTP response.
         """
         request = Request(
             method=self._method,
@@ -140,21 +145,17 @@ class ConfigGenerator:
             cookies=dict(),
         )
         prep_request = request.prepare()
-        try:
-            resp: Response = self._session.send(
-                prep_request
-            )
-        except OSError:
-            raise
+        resp: Response = self._session.send(prep_request)
+        if resp.status_code == 200:
+            self._content_type = resp.headers['content-type']
+            try:
+                self._response = resp.json()
+            except ValueError:
+                raise RuntimeError(f"Response body from {self._url} \
+                                   does not contain a valid JSON.") from None
         else:
-            if resp.status_code == 200:
-                self._content_type = resp.headers['content-type']
-                try:
-                    self._response = resp.json()
-                except ValueError:
-                    raise RuntimeError(f"Response body from {self._url} does not contain a valid JSON.") from None
-            else:
-                raise RuntimeError(f"HTTP status received: {resp.status_code}. Expected: 200.") from None
+            raise RuntimeError(f"HTTP status received: {resp.status_code}. \
+                                Expected: 200.") from None
 
     def _create_config_file_representation(
             self
@@ -171,12 +172,13 @@ class ConfigGenerator:
             "request": {
                 "url": self._url,
                 "method": self._method,
-                "params": {p: False for p in self._parameters.keys()}
+                "params": {p: False for p in self._parameters}
             },
             "response": {
                 "ctype": "application/json",
                 "tablePath": self._table_path,
-                "schema": {sc: {"target": f"$." + sc, "type": "string"} for sc in self._schema_cols},
+                "schema": {sc: {"target": "$." + sc, "type": "string"}
+                           for sc in self._schema_cols},
                 "orient": self._orient
             }
         }
@@ -195,11 +197,8 @@ class ConfigGenerator:
         filename
             Name of the file to be saved. It can include the path.
         """
-        try:
-            with open(filename, "w") as outfile:
-                outfile.write(self._config)
-        except IOError:
-            raise
+        with open(filename, "w") as outfile:
+            outfile.write(self._config)
 
     def to_string(
             self
