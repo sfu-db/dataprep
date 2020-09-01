@@ -18,6 +18,7 @@ from ...dtypes import (
     drop_null,
     is_dtype,
 )
+from ...utils import get_intervals
 from .common import (
     DTMAP,
     _get_timeunit,
@@ -295,7 +296,8 @@ def calc_hist_by_group(
     minv, maxv = dask.compute(df[df.columns[1]].min(), df[df.columns[1]].max())
     for grp in largest_grps:
         grp_srs = groups.get_group(grp)[df.columns[1]]
-        hist_arr, bins_arr = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
+        frmtd_bins = get_intervals(minv, maxv, bins)
+        hist_arr, bins_arr = da.histogram(grp_srs, bins=frmtd_bins)
         intervals = _format_bin_intervals(bins_arr)
         hist_lst.append((hist_arr, bins_arr, intervals))
 

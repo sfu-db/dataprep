@@ -2,10 +2,11 @@
 """
 import logging
 from math import ceil
-from typing import Any, Union
+from typing import Any, Union, List
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+import dask
 from bokeh.models import Legend
 from bokeh.plotting import Figure
 
@@ -93,3 +94,36 @@ def fuse_missing_perc(name: str, perc: float) -> str:
         return name
 
     return f"{name} ({perc:.1%})"
+
+
+def get_intervals(minv: float, maxv: float, bins: int) -> List[float]:
+    """
+    returns the bin intervals used for the histogram as a list of floats
+    """
+    # compute the min and max of the column
+    minv, maxv = dask.compute(minv, maxv)
+    # calculate the gap (interval)
+    gap = abs((maxv - minv) / bins)
+    # get exponent from scientific notation
+    _, after = f"{gap:.0e}".split("e")
+    # round to this amount
+    round_to = -1 * int(after)
+    # round value between ticks
+    gap = np.round(gap, round_to)
+
+    if minv <= 0 <= maxv:
+        ticks = [0.0]
+        # iterate to go from 0 to minv
+        while min(ticks) > minv:
+            ticks.insert(0, min(ticks) - gap)
+        # iterate to go from 0 to maxv
+        while max(ticks) < maxv:
+            ticks.append(max(ticks) + gap)
+    else:
+        # round the first x tick
+        rounded_minv = np.round(minv, round_to)
+        ticks = [rounded_minv - gap] if rounded_minv > minv else [rounded_minv]
+        while max(ticks) < maxv:
+            ticks.append(max(ticks) + gap)
+
+    return ticks
