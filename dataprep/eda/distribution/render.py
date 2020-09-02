@@ -255,6 +255,27 @@ def _sci_notation_superscript(value: str) -> str:
     return value
 
 
+def _empty_figure(title: str, plot_height: int, plot_width: int) -> Figure:
+    # If no data to render in the heatmap, i.e. no missing values
+    # we render a blank heatmap
+    fig = Figure(
+        x_range=[],
+        y_range=[],
+        plot_height=plot_height,
+        plot_width=plot_width,
+        title=title,
+        x_axis_location="below",
+        tools="hover",
+        toolbar_location=None,
+        background_fill_color="#fafafa",
+    )
+
+    # Add at least one renderer to fig, otherwise bokeh
+    # gives us error -1000 (MISSING_RENDERERS): Plot has no renderers
+    fig.rect(x=0, y=0, width=0, height=0)
+    return fig
+
+
 def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> Panel:
     """
     Visualize the word cloud
@@ -262,13 +283,16 @@ def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> P
     ellipse_mask = np.array(
         Image.open(f"{Path(__file__).parent.parent.parent}/assets/ellipse.jpg")
     )
-    wordcloud = WordCloud(
-        background_color="white", mask=ellipse_mask, width=800, height=400
-    )
+    wordcloud = WordCloud(background_color="white", mask=ellipse_mask)
     wordcloud.generate_from_frequencies(word_cnts)
-    wcimg = wordcloud.to_array().astype(np.uint8)
-    alpha = np.full([*wcimg.shape[:2], 1], 255, dtype=np.uint8)
-    wcimg = np.concatenate([wcimg, alpha], axis=2)[::-1, :]
+    wcarr = wordcloud.to_array().astype(np.uint8)
+
+    # use image_rgba following this example
+    # https://docs.bokeh.org/en/latest/docs/gallery/image_rgba.html
+    img = np.empty(wcarr.shape[:2], dtype=np.uint32)
+    view = img.view(dtype=np.uint8).reshape((*wcarr.shape[:2], 4))
+    alpha = np.full((*wcarr.shape[:2], 1), 255, dtype=np.uint8)
+    view[:] = np.concatenate([wcarr, alpha], axis=2)[::-1]
 
     fig = figure(
         plot_width=plot_width,
@@ -278,7 +302,7 @@ def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> P
         y_range=(0, 1),
         toolbar_location=None,
     )
-    fig.image_rgba(image=[wcimg], x=0, y=0, dh=1, dw=1)
+    fig.image_rgba(image=[img], x=0, y=0, dw=1, dh=1)
 
     fig.axis.visible = False
     fig.grid.visible = False
@@ -368,7 +392,7 @@ def pie_viz(
     if nrows > npresent:
         df = df.append(pd.DataFrame({col: [nrows - npresent]}, index=["Others"]))
     df["pct"] = df[col] / nrows * 100
-    df["angle"] = df[col] / npresent * 2 * np.pi
+    df["angle"] = df[col] / nrows * 2 * np.pi
 
     tooltips = [(col, "@index"), ("Count", f"@{col}"), ("Percent", "@pct{0.2f}%")]
     fig = Figure(
@@ -417,6 +441,8 @@ def hist_viz(
     """
     # pylint: disable=too-many-arguments,too-many-locals
     counts, bins = hist
+    if sum(counts) == 0:
+        return _empty_figure(col, plot_height, plot_width)
     intvls = _format_bin_intervals(bins)
     df = pd.DataFrame(
         {
@@ -451,8 +477,7 @@ def hist_viz(
     fig.add_tools(hover)
     tweak_figure(fig, "hist", show_yticks)
     fig.yaxis.axis_label = "Frequency"
-    if not df.empty:
-        _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
+    _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if show_yticks:
         fig.xaxis.axis_label = col
         if yscale == "linear":
