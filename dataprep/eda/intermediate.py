@@ -1,15 +1,13 @@
 """
 Intermediate class
 """
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Tuple, Union, Dict
 
 import pandas as pd
 
 
 class Intermediate(Dict[str, Any]):
-    """
-    This class contains intermediate results.
-    """
+    """This class contains intermediate results."""
 
     visual_type: str
 
@@ -31,9 +29,7 @@ class Intermediate(Dict[str, Any]):
 
 
 class ColumnsMetadata:
-    """
-    Container for storing each column's metadata
-    """
+    """Container for storing each column's metadata."""
 
     metadata: pd.DataFrame
 
@@ -61,9 +57,8 @@ class ColumnsMetadata:
 
 
 class ColumnMetadata:
-    """
-    Container for storing a single column's metadata.
-    This is immutable
+    """Container for storing a single column's metadata.
+    This is immutable.
     """
 
     metadata: pd.Series
