@@ -3,6 +3,7 @@
 import logging
 from math import ceil
 from typing import Any, Union
+
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
@@ -31,22 +32,19 @@ def is_notebook() -> Any:
 
 
 def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
-    """
-    Convert a dataframe to a dask dataframe.
-    """
+    """Convert a dataframe to a dask dataframe."""
     if isinstance(df, dd.DataFrame):
         return df
 
     df_size = df.memory_usage(deep=True).sum()
-    npartitions = ceil(df_size / 128 / 1024 / 1024)
+    npartitions = ceil(df_size / 128 / 1024 / 1024)  # 128 MB partition size
     return dd.from_pandas(df, npartitions=npartitions)
 
 
 def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103
-    """
-    Sample n values uniformly from the range of the `arr`,
-    not from the distribution of `arr`'s elems.
-    """
+    """Sample n values uniformly from the range of the `arr`,
+    not from the distribution of `arr`'s elems."""
+
     if len(arr) <= n:
         return arr
 
@@ -56,9 +54,7 @@ def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103
 
 
 def relocate_legend(fig: Figure, loc: str) -> Figure:
-    """
-    Relocate legend(s) from center to `loc`
-    """
+    """Relocate legend(s) from center to `loc`."""
     remains = []
     targets = []
     for layout in fig.center:
@@ -74,10 +70,9 @@ def relocate_legend(fig: Figure, loc: str) -> Figure:
 
 
 def cut_long_name(name: str, max_len: int = 12) -> str:
-    """
-    If the name is longer than `max_len`,
-    cut it to `max_len` length and append "..."
-    """
+    """If the name is longer than `max_len`,
+    cut it to `max_len` length and append "..."""
+
     # Bug 136 Fixed
     name = str(name)
     if len(name) <= max_len:
@@ -86,9 +81,7 @@ def cut_long_name(name: str, max_len: int = 12) -> str:
 
 
 def fuse_missing_perc(name: str, perc: float) -> str:
-    """
-    Append (x.y%) to the name if `perc` is not 0
-    """
+    """Append (x.y%) to the name if `perc` is not 0."""
     if perc == 0:
         return name
 

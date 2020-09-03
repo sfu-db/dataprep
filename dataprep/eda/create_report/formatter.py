@@ -146,7 +146,7 @@ def format_basic(df: pd.DataFrame, comps: Dict[str, Any]) -> Dict[str, Any]:
                 pbar.set_description(desc=f"Formating {col}")
                 pbar.update(1)
                 rendered = render(itmdt)
-                data = itmdt["data"]  # pylint: disable=unsubscriptable-object
+                data = itmdt["data"]
                 if is_dtype(detect_dtype(df[col]), Continuous()):
                     stats = _format_stats(data, "var_num")
                 elif is_dtype(detect_dtype(df[col]), Nominal()):
@@ -226,7 +226,7 @@ def format_basic(df: pd.DataFrame, comps: Dict[str, Any]) -> Dict[str, Any]:
                         )
                         pbar.update(1)
                         itmdt = compute_correlation(df, v_1, v_2)
-                        coeff_a, coeff_b = itmdt["coeffs"]
+                        (coeff_a, coeff_b,) = itmdt["coeffs"]
                         line_x = np.asarray(
                             [
                                 itmdt["data"].iloc[:, 0].min(),
