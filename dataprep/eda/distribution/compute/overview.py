@@ -1,15 +1,14 @@
 """Computations for plot(df) function."""
 
-from typing import Any, Dict, List, Optional, Tuple
 from itertools import combinations
+from typing import Any, Dict, List, Optional, Tuple
 
 import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from dask.array.stats import chisquare, normaltest, skew
-from scipy.stats import ks_2samp
+from dask.array.stats import chisquare, skew
 
 from ....errors import UnreachableError
 from ...dtypes import (
@@ -24,7 +23,7 @@ from ...dtypes import (
     is_dtype,
 )
 from ...intermediate import Intermediate
-from .common import _calc_line_dt
+from .common import _calc_line_dt, ks_2samp, normaltest
 
 
 def compute_overview(
@@ -81,9 +80,7 @@ def compute_overview(
                 first_rows[col].apply(hash)
             except TypeError:
                 srs = df[col] = srs.astype(str)
-            datas.append(
-                calc_nom_col(drop_null(srs), first_rows[col], ngroups, largest)
-            )
+            datas.append(calc_nom_col(drop_null(srs), ngroups, largest))
             col_names_dtypes.append((col, Nominal()))
         elif is_dtype(col_dtype, Continuous()):
             ## if cfg.hist_enable or cfg.any_insights("hist"):
@@ -179,9 +176,7 @@ def calc_cont_col(srs: dd.Series, bins: int) -> Dict[str, Any]:
 
 
 ## def calc_nom_col(srs: dd.Series, first_rows: pd.Series, cfg: Config)
-def calc_nom_col(
-    srs: dd.Series, first_rows: pd.Series, ngroups: int, largest: bool
-) -> Dict[str, Any]:
+def calc_nom_col(srs: dd.Series, ngroups: int, largest: bool) -> Dict[str, Any]:
     """
     Computations for a categorical column in plot(df)
 
@@ -227,9 +222,7 @@ def calc_nom_col(
     ## data["npresent"] = srs.shape[0]
 
     ## if cfg.insight.constant_length_enable:
-    if not first_rows.apply(lambda x: isinstance(x, str)).all():
-        srs = srs.astype(str)  # srs must be a string to compute the value lengths
-    length = srs.str.len()
+    length = srs.apply(lambda v: len(str(v)), meta=(srs.name, np.int64))
     data["min_len"], data["max_len"] = length.min(), length.max()
 
     return data
@@ -269,12 +262,13 @@ def calc_stats(
     # compute distribution similarity on a data sample
     # TODO .map_partitions() fails for create_report since it calls calc_stats() with a pd dataframe
     # df_smp = df.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=df)
-    # NOTE ks_2samp triggers a .compute(), could use .delayed()
+
     if num_cols:  # remove this if statement when create_report is refactored
         stats["ks_tests"] = []
         for col1, col2 in list(combinations(num_cols, 2)):
-            if ks_2samp(df[col1], df[col2])[1] > 0.05:
-                stats["ks_tests"].append((col1, col2))
+            stats["ks_tests"].append(
+                (col1, col2, ks_2samp(df[col1], df[col2])[1] > 0.05)
+            )
 
     return stats
 
@@ -299,9 +293,10 @@ def format_overview(data: Dict[str, Any]) -> List[Dict[str, str]]:
         ins.append({"Duplicates": f"Dataset has {ndup} ({pdup}%) duplicate rows"})
 
     ## if cfg.insight.similar_distribution_enable
-    for cols in data.get("ks_tests", []):
-        msg = f"{cols[0]} and {cols[1]} have similar distributions"
-        ins.append({"Similar Distribution": msg})
+    for (*cols, test_result) in data.get("ks_tests", []):
+        if test_result:
+            msg = f"{cols[0]} and {cols[1]} have similar distributions"
+            ins.append({"Similar Distribution": msg})
 
     data.pop("ks_tests", None)
 
