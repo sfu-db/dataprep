@@ -93,21 +93,13 @@ class ProgressBar(Callback):  # type: ignore
         if self._started is None:
             raise ValueError("ProgressBar not started properly")
 
-        if self._pbar is None and time() - self._started > self._minimum:
+        if self._pbar is None and then - self._started > self._minimum:
             self._init_pbar()
 
         if isinstance(key, tuple):
             key = key[0]
 
-        if self._pbar is not None:
-            if self._last_updated is None:
-                raise ValueError("ProgressBar not started properly")
-
-            if time() - self._last_updated > self._interval:
-                self._pbar.set_description(f"Computing {key}")
-                self._last_updated = time()
-        else:
-            self._last_task = key
+        self._last_task = key
 
         self._pbar_runtime += time() - then
 
@@ -155,7 +147,10 @@ class ProgressBar(Callback):  # type: ignore
 
         self._pbar_runtime += time() - then
 
-        if self._pbar_runtime / (time() - self._started) > 0.3:
+        if (
+            self._pbar_runtime > 0.1 * (time() - self._started)
+            and self._pbar_runtime > 1
+        ):
             print(
                 "[ProgressBar] ProgressBar takes additional 10%+ of the computation time,"
                 " consider disable it by passing 'progress=False' to the plot function.",
@@ -171,6 +166,7 @@ class ProgressBar(Callback):  # type: ignore
             return
         ndone, _ = self._count_tasks()
 
+        self._pbar.set_description(f"Computing {self._last_task}", refresh=False)
         self._pbar.update(max(0, ndone - self._pbar.n))
 
     def _init_pbar(self) -> None:
@@ -189,7 +185,6 @@ class ProgressBar(Callback):  # type: ignore
                 dynamic_ncols=True,
                 mininterval=self._interval,
                 initial=ndone,
-                desc=desc,
             )
         else:
             self._pbar = tqdm(
@@ -197,9 +192,9 @@ class ProgressBar(Callback):  # type: ignore
                 ncols=self._width,
                 mininterval=self._interval,
                 initial=ndone,
-                desc=desc,
             )
 
+        self._pbar.set_description(desc)
         self._pbar.start_t = self._started
         self._pbar.refresh()
 
