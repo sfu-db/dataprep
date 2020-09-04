@@ -9,9 +9,9 @@ import dask.array as da
 import numpy as np
 import pandas as pd
 
-from ...intermediate import Intermediate
 from ...data_array import DataArray
-from .common import CorrelationMethod, kendalltau, nanrankdata
+from ...intermediate import Intermediate
+from .common import CorrelationMethod, kendalltau, nanrankdata, corrcoef
 
 
 def _calc_univariate(
@@ -74,17 +74,17 @@ def _calc_univariate(
 def _pearson_1xn(x: da.Array, data: da.Array) -> da.Array:
     _, ncols = data.shape
 
-    datamask = da.isnan(data)
-    xmask = da.isnan(x)[:, 0]
+    fused = da.concatenate([data, x], axis=1)
+    mask = ~da.isnan(data)
 
     corrs = []
     for j in range(ncols):
-        y = data[:, [j]]
-
-        mask = ~(xmask | datamask[:, j])
-        xy = np.concatenate([x, y], axis=1)[mask]
-        xy.compute_chunk_sizes()  # Not optimal here
-        _, (corr, _) = da.corrcoef(xy, rowvar=False)
+        xy = fused[:, [-1, j]]
+        mask_ = mask[:, -1] & mask[:, j]
+        xy = xy[mask_]
+        corr = da.from_delayed(corrcoef(xy), dtype=np.float, shape=())
+        # not usable because xy has unknown rows due to the null filter
+        # _, (corr, _) = da.corrcoef(xy, rowvar=False)
         corrs.append(corr)
 
     return da.stack(corrs)
