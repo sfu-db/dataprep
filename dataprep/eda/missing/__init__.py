@@ -6,12 +6,12 @@ from typing import Optional, Union
 
 import dask.dataframe as dd
 import pandas as pd
-from bokeh.io import show
 
+from ..dtypes import DTypeDef
+from ..progress_bar import ProgressBar
+from ..report import Report
 from .compute import compute_missing
 from .render import render_missing
-from ..report import Report
-from ..dtypes import DTypeDef
 
 __all__ = ["render_missing", "compute_missing", "plot_missing"]
 
@@ -56,6 +56,10 @@ def plot_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
-    itmdt = compute_missing(df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample)
+
+    with ProgressBar(minimum=1):
+        itmdt = compute_missing(
+            df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample
+        )
     fig = render_missing(itmdt)
     return Report(fig)
