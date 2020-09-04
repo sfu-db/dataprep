@@ -38,6 +38,7 @@ def plot(
     yscale: str = "linear",
     tile_size: Optional[float] = None,
     dtype: Optional[DTypeDef] = None,
+    progress: bool = True,
 ) -> Union[Report, Container]:
     """Generates plots for exploratory data analysis.
 
@@ -133,6 +134,9 @@ def plot(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+    progress
+        Enable the progress bar.
+
     Examples
     --------
     >>> import pandas as pd
@@ -144,7 +148,7 @@ def plot(
     """
     # pylint: disable=too-many-locals,line-too-long
 
-    with ProgressBar(minimum=1):
+    with ProgressBar(minimum=1, disable=not progress):
         intermediate = compute(
             df,
             x=x,
