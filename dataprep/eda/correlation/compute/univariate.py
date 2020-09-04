@@ -134,6 +134,7 @@ def _corr_filter(
         # pylint: enable=invalid-unary-operand-type
 
     sorted_idx = np.argsort(corrs)
+    sorted_idx = np.roll(sorted_idx, np.count_nonzero(np.isnan(corrs)))
     sorted_corrs = corrs[sorted_idx]
 
     if value_range is not None:
