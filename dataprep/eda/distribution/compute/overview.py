@@ -354,7 +354,7 @@ def format_cont(col: str, data: Dict[str, Any], nrows: int) -> Any:
         ins.append({"Negatives": f"{col} has {nneg} ({pneg}%) negatives"})
 
     ## if cfg.insight.normal_enable:
-    if data["norm"][1] > 0.05:
+    if data["norm"][1] > 0.99:
         ins.append({"Normal": f"{col} is normally distributed"})
 
     hist = data["hist"]  ## if cfg.hist_enable else None
