@@ -28,7 +28,7 @@ def rankdata(data: np.ndarray, axis: int = 0) -> np.ndarray:
     name="rankdata-bottleneck", pure=True
 )
 def nanrankdata(data: np.ndarray, axis: int = 0) -> np.ndarray:
-    """delayed version of rankdata"""
+    """delayed version of rankdata."""
     return nanrankdata_(data, axis=axis)
 
 
@@ -38,6 +38,13 @@ def nanrankdata(data: np.ndarray, axis: int = 0) -> np.ndarray:
 def kendalltau(  # pylint: disable=invalid-name
     a: np.ndarray, b: np.ndarray
 ) -> np.ndarray:
-    """delayed version of kendalltau"""
+    """delayed version of kendalltau."""
     corr = kendalltau_(a, b).correlation
     return np.float64(corr)  # Sometimes corr is a float, causes dask error
+
+
+@dask.delayed
+def corrcoef(arr: np.ndarray) -> np.ndarray:
+    """delayed version of np.corrcoef."""
+    _, (corr, _) = np.corrcoef(arr, rowvar=False)
+    return corr
