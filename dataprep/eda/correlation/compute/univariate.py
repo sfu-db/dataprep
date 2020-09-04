@@ -75,7 +75,7 @@ def _pearson_1xn(x: da.Array, data: da.Array) -> da.Array:
     _, ncols = data.shape
 
     fused = da.concatenate([data, x], axis=1)
-    mask = ~da.isnan(data)
+    mask = ~da.isnan(fused)
 
     corrs = []
     for j in range(ncols):
