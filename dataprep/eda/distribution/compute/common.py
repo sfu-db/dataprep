@@ -1,11 +1,12 @@
 """Common types and functionalities for compute(...)."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import dask
 import numpy as np
 import pandas as pd
 import dask.dataframe as dd
+from scipy.stats import normaltest as normaltest_, ks_2samp as ks_2samp_
 
 from ...dtypes import drop_null, is_dtype, detect_dtype, Continuous, DTypeDef
 
@@ -271,9 +272,8 @@ def _calc_line_dt(
 def _calc_groups(
     df: dd.DataFrame, x: str, ngroups: int, largest: bool = True
 ) -> Tuple[dd.DataFrame, Dict[str, int], List[str]]:
-    """
-    Auxillary function to parse the dataframe to consist of only the
-    groups with the largest counts
+    """Auxillary function to parse the dataframe to consist of only the
+    groups with the largest counts.
     """
 
     # group count statistics to inform the user of the sampled output
@@ -292,3 +292,20 @@ def _calc_groups(
     grp_cnt_stats[f"{x}_shw"] = len(largest_grps)
 
     return df, grp_cnt_stats, largest_grps
+
+
+@dask.delayed(  # pylint: disable=no-value-for-parameter
+    name="scipy-normaltest", pure=True, nout=2
+)
+def normaltest(arr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Delayed version of scipy normaltest. Due to the dask version will
+    trigger a compute."""
+    return cast(Tuple[np.ndarray, np.ndarray], normaltest_(arr))
+
+
+@dask.delayed(  # pylint: disable=no-value-for-parameter
+    name="scipy-ks_2samp", pure=True, nout=2
+)
+def ks_2samp(data1: np.ndarray, data2: np.ndarray) -> Tuple[float, float]:
+    """Delayed version of scipy ks_2samp."""
+    return cast(Tuple[float, float], ks_2samp_(data1, data2))

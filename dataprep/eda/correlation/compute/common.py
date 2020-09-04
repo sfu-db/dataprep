@@ -43,7 +43,9 @@ def kendalltau(  # pylint: disable=invalid-name
     return np.float64(corr)  # Sometimes corr is a float, causes dask error
 
 
-@dask.delayed
+@dask.delayed(  # pylint: disable=no-value-for-parameter
+    name="kendalltau-scipy", pure=True
+)
 def corrcoef(arr: np.ndarray) -> np.ndarray:
     """delayed version of np.corrcoef."""
     _, (corr, _) = np.corrcoef(arr, rowvar=False)
