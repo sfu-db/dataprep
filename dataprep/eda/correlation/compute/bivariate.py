@@ -28,7 +28,7 @@ def _calc_bivariate(
 
     xname, yname = x, y
 
-    df.compute_length()
+    df.compute()
 
     xloc = df.columns.get_loc(x)
     yloc = df.columns.get_loc(y)
