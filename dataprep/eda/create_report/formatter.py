@@ -1,8 +1,7 @@
-"""
-    This module implements the formatting
-    for create_report(df) function.
-"""
-from typing import Any, Dict, List, Optional, Union
+"""This module implements the formatting
+for create_report(df) function."""
+
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import dask
 import dask.dataframe as dd
@@ -12,22 +11,16 @@ from bokeh.models import Title
 from bokeh.plotting import Figure
 
 from ..correlation import render_correlation
-from ..correlation.compute.nullivariate import correlation_nxn_frame
+from ..correlation.compute.nullivariate import correlation_nxn
+from ..data_array import DataArray
 from ..distribution import render
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import cont_comps, nom_comps
 from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats
-from ..dtypes import (
-    CATEGORICAL_DTYPES,
-    NUMERICAL_DTYPES,  # DateTime,
-    Continuous,
-    Nominal,
-    detect_dtype,
-    is_dtype,
-)
+from ..dtypes import CATEGORICAL_DTYPES, Continuous, Nominal, detect_dtype, is_dtype
 from ..intermediate import Intermediate
 from ..missing import render_missing
-from ..missing.compute import dlyd_missing_comps
+from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ..progress_bar import ProgressBar
 from ..utils import to_dask
 
@@ -85,7 +78,7 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals
     # aggregate all computations
-    data = basic_computations(df)
+    data, completions = basic_computations(df)
 
     (data,) = dask.compute(data)
 
@@ -158,15 +151,9 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
 
     # missing
     res["has_missing"] = True
-    spectrum, null_perc, bars, heatmap, dendrogram = data["miss"]
-    itmdt = Intermediate(
-        data_total_missing={col: null_perc[i] for i, col in enumerate(df.columns)},
-        data_spectrum=spectrum,
-        data_bars=bars,
-        data_heatmap=heatmap,
-        data_dendrogram=dendrogram,
-        visual_type="missing_impact",
-    )
+
+    itmdt = completions["miss"](data["miss"])
+
     rndrd = render_missing(itmdt)
     figs.clear()
     for tab in rndrd.tabs:
@@ -179,38 +166,45 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
     return res
 
 
-def basic_computations(df: dd.DataFrame) -> Dict[str, Any]:
-    """
-    Computations for the basic version
+def basic_computations(df: dd.DataFrame) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Computations for the basic version.
 
     Parameters
     ----------
     df
-        The DataFrame for which data are calculated
+        The DataFrame for which data are calculated.
     """
     data: Dict[str, Any] = {}
+    df = DataArray(df)
 
-    df_num = df.select_dtypes(NUMERICAL_DTYPES)
+    df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
-    first_rows = df.select_dtypes(CATEGORICAL_DTYPES).head()
+    first_rows = df.select_dtypes(CATEGORICAL_DTYPES).head
 
     # overview
-    data["ov"] = calc_stats(df, None)
+    data["ov"] = calc_stats(df.frame, None)
     # # variables
     for col in df.columns:
-        if is_dtype(detect_dtype(df[col]), Continuous()):
-            data[col] = cont_comps(df[col], 20)
-        elif is_dtype(detect_dtype(df[col]), Nominal()):
+        if is_dtype(detect_dtype(df.frame[col]), Continuous()):
+            data[col] = cont_comps(df.frame[col], 20)
+        elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
             data[col] = nom_comps(
-                df[col], first_rows[col], 10, True, 10, 20, True, False, False
+                df.frame[col], first_rows[col], 10, True, 10, 20, True, False, False
             )
     # interactions
-    data["scat"] = df_num.map_partitions(
-        lambda x: x.sample(min(1000, x.shape[0])), meta=df_num
+    data["scat"] = df_num.frame.map_partitions(
+        lambda x: x.sample(min(1000, x.shape[0])), meta=df_num.frame
     )
     # correlations
-    data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn_frame(df_num)))
+    data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num)))
     # missing values
-    data["miss"] = dlyd_missing_comps(df, 30)
+    (
+        delayed,
+        completion,
+    ) = compute_missing_nullivariate(  # pylint: disable=unexpected-keyword-arg
+        df, 30, _staged=True
+    )
+    data["miss"] = delayed
+    completions = {"miss": completion}
 
-    return data
+    return data, completions
