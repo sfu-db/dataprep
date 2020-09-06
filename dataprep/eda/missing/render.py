@@ -388,11 +388,16 @@ def render_heatmaps(
 
 
 def render_bar_chart(
-    df: pd.DataFrame, yscale: str, plot_width: int, plot_height: int,
+    data: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
 ) -> Figure:
     """
     Render a bar chart for the missing and present values
     """
+    pres_cnts, null_cnts, cols = data
+    df = pd.DataFrame({"Present": pres_cnts, "Missing": null_cnts}, index=cols)
 
     if len(df) > 20:
         plot_width = 28 * len(df)

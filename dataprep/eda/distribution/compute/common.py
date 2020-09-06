@@ -3,10 +3,12 @@
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import dask
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
-from scipy.stats import normaltest as normaltest_, ks_2samp as ks_2samp_
+from scipy.stats import gaussian_kde as gaussian_kde_
+from scipy.stats import ks_2samp as ks_2samp_
+from scipy.stats import normaltest as normaltest_
 
 from ...dtypes import drop_null
 
@@ -225,3 +227,11 @@ def normaltest(arr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 def ks_2samp(data1: np.ndarray, data2: np.ndarray) -> Tuple[float, float]:
     """Delayed version of scipy ks_2samp."""
     return cast(Tuple[float, float], ks_2samp_(data1, data2))
+
+
+@dask.delayed(  # pylint: disable=no-value-for-parameter
+    name="scipy-gaussian_kde", pure=True, nout=2
+)
+def gaussian_kde(arr: np.ndarray) -> Tuple[float, float]:
+    """Delayed version of scipy ks_2samp."""
+    return cast(Tuple[np.ndarray, np.ndarray], gaussian_kde_(arr))

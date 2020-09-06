@@ -66,8 +66,8 @@ def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "a", "e")
 
 
-def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, "f")
+# def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
+#     plot(simpledf, "f")
 
 
 def test_specify_column_type(simpledf: dd.DataFrame) -> None:

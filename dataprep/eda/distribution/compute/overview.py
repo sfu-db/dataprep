@@ -19,7 +19,7 @@ from ...dtypes import (
     Nominal,
     detect_dtype,
     drop_null,
-    get_dtype_cnts,
+    get_dtype_cnts_and_num_cols,
     is_dtype,
 )
 from ...intermediate import Intermediate
@@ -69,7 +69,7 @@ def compute_overview(
 
     datas: List[Any] = []
     col_names_dtypes: List[Tuple[str, DType]] = []
-    num_cols: List[str] = []
+
     for col in df.columns:
         srs = df[col]
         col_dtype = detect_dtype(srs, dtype)
@@ -86,14 +86,13 @@ def compute_overview(
             ## if cfg.hist_enable or cfg.any_insights("hist"):
             datas.append(calc_cont_col(drop_null(srs), bins))
             col_names_dtypes.append((col, Continuous()))
-            num_cols.append(col)
         elif is_dtype(col_dtype, DateTime()):
             datas.append(dask.delayed(_calc_line_dt)(df[[col]], timeunit))
             col_names_dtypes.append((col, DateTime()))
         else:
             raise UnreachableError
 
-    ov_stats = calc_stats(df, get_dtype_cnts(df, dtype), num_cols)
+    ov_stats = calc_stats(df, dtype)
     datas, ov_stats = dask.compute(datas, ov_stats)
 
     # extract the plotting data, and detect and format the insights
@@ -229,9 +228,7 @@ def calc_nom_col(srs: dd.Series, ngroups: int, largest: bool) -> Dict[str, Any]:
 
 
 ## def calc_stats(srs: dd.Series, dtype_cnts: Dict[str, int], num_cols: List[str], cfg: Config)
-def calc_stats(
-    df: dd.DataFrame, dtype_cnts: Dict[str, int], num_cols: Optional[List[str]] = None
-) -> Dict[str, Any]:
+def calc_stats(df: dd.DataFrame, dtype: Optional[DTypeDef]) -> Dict[str, Any]:
     """
     Calculate the statistics for plot(df) from a DataFrame
 
@@ -248,6 +245,7 @@ def calc_stats(
     stats = {"nrows": df.shape[0]}
 
     ## if cfg.stats_enable
+    dtype_cnts, num_cols = get_dtype_cnts_and_num_cols(df, dtype)
     stats["nrows"] = df.shape[0]
     stats["ncols"] = df.shape[1]
     stats["npresent_cells"] = df.count().sum()
@@ -260,15 +258,12 @@ def calc_stats(
 
     ## if cfg.insight.similar_distribution_enable
     # compute distribution similarity on a data sample
-    # TODO .map_partitions() fails for create_report since it calls calc_stats() with a pd dataframe
-    # df_smp = df.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=df)
-
-    if num_cols:  # remove this if statement when create_report is refactored
-        stats["ks_tests"] = []
-        for col1, col2 in list(combinations(num_cols, 2)):
-            stats["ks_tests"].append(
-                (col1, col2, ks_2samp(df[col1], df[col2])[1] > 0.05)
-            )
+    df_smp = df.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=df)
+    stats["ks_tests"] = []
+    for col1, col2 in list(combinations(num_cols, 2)):
+        stats["ks_tests"].append(
+            (col1, col2, ks_2samp(df_smp[col1], df_smp[col2])[1] > 0.05)
+        )
 
     return stats
 

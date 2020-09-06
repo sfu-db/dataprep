@@ -80,6 +80,26 @@ def missing_impact(df: dd.DataFrame, bins: int) -> Intermediate:
     Calculate the data for visualizing the plot_missing(df).
     This contains the missing spectrum, missing bar chart and missing heatmap.
     """
+    tasks = dlyd_missing_comps(df, bins)
+
+    spectrum, null_perc, bars, heatmap, dendrogram = dd.compute(*tasks)
+
+    return Intermediate(
+        data_total_missing={col: null_perc[idx] for idx, col in enumerate(df.columns)},
+        data_spectrum=spectrum,
+        data_bars=bars,
+        data_heatmap=heatmap,
+        data_dendrogram=dendrogram,
+        visual_type="missing_impact",
+    )
+
+
+def dlyd_missing_comps(
+    df: dd.DataFrame, bins: int
+) -> Tuple[Any, Any, Any, Optional[Any], Any]:
+    """
+    Delayed Dask computations for missing impact
+    """
     cols = df.columns.values
     (nulldf,) = dask.persist(df.isnull())
     nullity = nulldf.to_dask_array(lengths=True)
@@ -88,23 +108,12 @@ def missing_impact(df: dd.DataFrame, bins: int) -> Intermediate:
     nrows = nullity.shape[0]
     null_perc = null_cnts / nrows
 
-    tasks = (
+    return (
         missing_spectrum(nullity, cols, bins=bins),
         null_perc,
         missing_bars(null_cnts, cols, nrows),
         missing_heatmap(nulldf, null_perc, cols),
         missing_dendrogram(nullity, cols),
-    )
-
-    spectrum, null_perc, bars, heatmap, dendrogram = dd.compute(*tasks)
-
-    return Intermediate(
-        data_total_missing={col: null_perc[idx] for idx, col in enumerate(cols)},
-        data_spectrum=spectrum,
-        data_bars=bars,
-        data_heatmap=heatmap,
-        data_dendrogram=dendrogram,
-        visual_type="missing_impact",
     )
 
 
@@ -190,20 +199,11 @@ def missing_spectrum(  # pylint: disable=too-many-locals
 
 def missing_bars(
     null_cnts: da.Array, cols: np.ndarray, nrows: dd.core.Scalar
-) -> pd.DataFrame:
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate a bar chart visualization of nullity correlation in the given DataFrame
     """
-    pres_cnts = nrows - null_cnts
-
-    df = dd.from_dask_array(
-        da.stack([pres_cnts, null_cnts, da.from_array(cols, (1,))], axis=1),
-        columns=["Present", "Missing", "index"],
-    )
-
-    df = df.set_index("index")
-
-    return df
+    return nrows - null_cnts, null_cnts, cols
 
 
 def missing_heatmap(
