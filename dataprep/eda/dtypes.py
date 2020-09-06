@@ -2,7 +2,7 @@
 In this module lives the type tree.
 """
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, Optional, Union, Type
+from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Type, Union
 
 
 import numpy as np
@@ -280,22 +280,24 @@ def drop_null(
     raise ValueError("Input should be a Pandas/Dask Dataframe or Series")
 
 
-def get_dtype_cnts(
+def get_dtype_cnts_and_num_cols(
     df: dd.DataFrame,
     dtype: Union[Dict[str, Union[DType, Type[DType], str]], DType, Type[DType], None],
-) -> Dict[str, int]:
+) -> Tuple[Dict[str, int], List[str]]:
     """
     Get the count of each dtype in a dataframe
     """
     dtype_cnts: DefaultDict[str, int] = defaultdict(int)
+    num_cols: List[str] = []
     for col in df.columns:
         col_dtype = detect_dtype(df[col], dtype)
         if is_dtype(col_dtype, Nominal()):
             dtype_cnts["Categorical"] += 1
         elif is_dtype(col_dtype, Continuous()):
             dtype_cnts["Numerical"] += 1
+            num_cols.append(col)
         elif is_dtype(col_dtype, DateTime()):
             dtype_cnts["DateTime"] += 1
         else:
             raise NotImplementedError
-    return dtype_cnts
+    return dtype_cnts, num_cols

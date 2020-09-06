@@ -393,6 +393,7 @@ def pie_viz(
     Render a pie chart
     """
     npresent = df[col].sum()
+    df.index = list(df.index)  # for CategoricalIndex to normal Index
     if nrows > npresent:
         df = df.append(pd.DataFrame({col: [nrows - npresent]}, index=["Others"]))
     df["pct"] = df[col] / nrows * 100
@@ -540,7 +541,7 @@ def kde_viz(
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if yscale == "linear":
         _format_axis(fig, 0, max(df["dens"].max(), pdf.max()), "y")
-    return Panel(child=fig, title="KDE Plot")
+    return Panel(child=row(fig), title="KDE Plot")
 
 
 def qqnorm_viz(
@@ -575,7 +576,7 @@ def qqnorm_viz(
     fig.yaxis.axis_label = f"Quantiles of {col}"
     _format_axis(fig, vals.min(), vals.max(), "x")
     _format_axis(fig, vals.min(), vals.max(), "y")
-    return Panel(child=fig, title="Normal Q-Q Plot")
+    return Panel(child=row(fig), title="Normal Q-Q Plot")
 
 
 def box_viz(
@@ -699,7 +700,7 @@ def box_viz(
         tweak_figure(fig, "boxnum")
         fig.xaxis.major_label_text_font_size = "10pt"
 
-    return Panel(child=fig, title="Box Plot")
+    return Panel(child=row(fig), title="Box Plot")
 
 
 # this function should be removed when datetime is refactored
@@ -1315,7 +1316,7 @@ def dt_multiline_viz(
     return Panel(child=fig, title="Line Chart")
 
 
-def stats_viz(stats: Dict[str, Any]) -> Tuple[Dict[str, str], Dict[str, Any]]:
+def format_ov_stats(stats: Dict[str, Any]) -> Tuple[Dict[str, str], Dict[str, Any]]:
     """
     Render statistics information for distribution grid
     """
@@ -1336,9 +1337,11 @@ def stats_viz(stats: Dict[str, Any]) -> Tuple[Dict[str, str], Dict[str, Any]]:
     return {k: _format_values(k, v) for k, v in data.items()}, dtypes_cnt
 
 
-def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
+def format_num_stats(
+    data: Dict[str, Any]
+) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
     """
-    Render statistics panel for numerical data
+    Format numerical statistics
     """
     overview = {
         "Distinct Count": data["nuniq"],
@@ -1383,6 +1386,15 @@ def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> P
     quantile = {k: _format_values(k, v) for k, v in quantile.items()}
     descriptive = {k: _format_values(k, v) for k, v in descriptive.items()}
 
+    return overview, quantile, descriptive
+
+
+def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> Panel:
+    """
+    Render statistics panel for numerical data
+    """
+    overview, quantile, descriptive = format_num_stats(data)
+
     ov_content = ""
     qs_content = (
         '<h4 style="text-align:center; margin:1em auto 0.2em;">Quantile Statistics</h4>'
@@ -1405,11 +1417,11 @@ def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> P
         value = _sci_notation_superscript(value)
         qs_content += _create_table_row(key, value)
     for key, value in descriptive.items():
-        value = _sci_notation_superscript(value)
+        frmtd_value = _sci_notation_superscript(value)
         if "Skewness" in key and float(value) > 20:
-            ds_content += _create_table_row(key, value, True)
+            ds_content += _create_table_row(key, frmtd_value, True)
         else:
-            ds_content += _create_table_row(key, value)
+            ds_content += _create_table_row(key, frmtd_value)
 
     ov_content = f"""
     <h4 style="text-align: center; margin:0 auto 0.2em;">Overview</h4>
@@ -1446,17 +1458,12 @@ def stats_viz_num(data: Dict[str, Any], plot_width: int, plot_height: int,) -> P
     return Panel(child=div, title="Stats")
 
 
-def stats_viz_cat(
-    stats: Dict[str, Any],
-    len_stats: Dict[str, Any],
-    letter_stats: Dict[str, Any],
-    plot_width: int,
-    plot_height: int,
-) -> Panel:
+def format_cat_stats(
+    stats: Dict[str, Any], len_stats: Dict[str, Any], letter_stats: Dict[str, Any],
+) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
     """
-    Render statistics panel for categorical data
+    Format categorical statistics
     """
-    # pylint: disable=too-many-locals
     ov_stats = {
         "Distinct Count": stats["nuniq"],
         "Unique (%)": stats["nuniq"] / stats["npres"],
@@ -1471,6 +1478,24 @@ def stats_viz_cat(
     len_stats = {k: _format_values(k, v) for k, v in len_stats.items()}
     smpl = {k: f"{v[:18]}..." if len(v) > 18 else v for k, v in smpl.items()}
     letter_stats = {k: _format_values(k, v) for k, v in letter_stats.items()}
+
+    return ov_stats, len_stats, smpl, letter_stats
+
+
+def stats_viz_cat(
+    stats: Dict[str, Any],
+    len_stats: Dict[str, Any],
+    letter_stats: Dict[str, Any],
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
+    """
+    Render statistics panel for categorical data
+    """
+    # pylint: disable=too-many-locals
+    ov_stats, len_stats, smpl, letter_stats = format_cat_stats(
+        stats, len_stats, letter_stats
+    )
 
     # pylint: disable=line-too-long
     ov_content = ""
@@ -1606,7 +1631,7 @@ def render_distribution_grid(
     return {
         "layout": figs,
         "meta": titles,
-        "tabledata": stats_viz(itmdt["stats"]),
+        "tabledata": format_ov_stats(itmdt["stats"]),
         "column_insights": itmdt["column_insights"],
         "overview_insights": itmdt["overview_insights"],
     }
@@ -1741,7 +1766,7 @@ def render_num(
     fig = hist_viz(
         data["hist"], data["nrows"], col, yscale, plot_width, plot_height, True,
     )
-    tabs.append(Panel(child=fig, title="Histogram"))
+    tabs.append(Panel(child=row(fig), title="Histogram"))
     # kde and q-q normal
     if data["kde"] is not None:
         dens, kde = data["dens"], data["kde"]
