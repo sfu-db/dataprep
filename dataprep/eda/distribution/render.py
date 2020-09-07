@@ -1725,7 +1725,7 @@ def nom_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
         )
 
     ## if cfg.insight.attribution_enable
-    if data["pie"][:2].sum() / data["nrows"] > 0.5:
+    if data["pie"][:2].sum() / data["nrows"] > 0.5 and len(data["pie"]) >= 2:
         vals = ", ".join(data["pie"].index[i] for i in range(2))
         ins["pie"].append(f"The top 2 categories ({vals}) take over 50%")
 
