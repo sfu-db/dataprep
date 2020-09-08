@@ -33,7 +33,7 @@ from ..utils import to_dask
 
 
 def format_report(
-    df: Union[pd.DataFrame, dd.DataFrame], mode: Optional[str]
+    df: Union[pd.DataFrame, dd.DataFrame], mode: Optional[str], progress: bool = True
 ) -> Dict[str, Any]:
     """
     Format the data and figures needed by report
@@ -42,9 +42,11 @@ def format_report(
     ----------
     df
         The DataFrame for which data are calculated.
-    mode: Optional[str]
+    mode
         This controls what type of report to be generated.
         Currently only the 'basic' is fully implemented.
+    progress
+        Whether to show the progress bar.
 
     Returns
     -------
@@ -53,7 +55,7 @@ def format_report(
         This variable acts like an API in passing data to the template engine.
     """
     # pylint: disable=too-many-locals,too-many-statements
-    with ProgressBar(minimum=1):
+    with ProgressBar(minimum=1, disable=not progress):
         df = to_dask(df)
         if mode == "basic":
             comps = format_basic(df)
