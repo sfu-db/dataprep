@@ -94,7 +94,7 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
     res: Dict[str, Any] = {}
 
     # overview
-    data["ov"].pop("ks_tests")
+    # data["ov"].pop("ks_tests")
     res["overview"] = format_ov_stats(data["ov"])
 
     # variables

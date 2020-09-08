@@ -200,7 +200,7 @@ def nom_comps(
         df[df.columns[0]] = df[df.columns[0]].astype(str)
     data.update(calc_cat_stats(srs, df, bins, data["nrows"], data["nuniq"]))
     # ## if cfg.word_freq_enable
-    data.update(calc_word_freq(df, top_words, stopword, lemmatize, stem))
+    # data.update(calc_word_freq(df, top_words, stopword, lemmatize, stem))
 
     return data
 
@@ -235,11 +235,11 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
     ## if cfg.hist_enable or cfg.qqplot_enable and cfg.ingsights_enable:
     data["hist"] = da.histogram(srs, bins=bins, range=[data["min"], data["max"]])
     ## if cfg.insights_enable and (cfg.qqplot_enable or cfg.hist_enable):
-    data["norm"] = normaltest(data["hist"][0])
+    # data["norm"] = normaltest(data["hist"][0])
     ## if cfg.qqplot_enable
-    data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
+    # data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
     ## elif cfg.stats_enable
-    ## data["qntls"] = srs.quantile([0.05, 0.25, 0.5, 0.75, 0.95])
+    data["qntls"] = srs.quantile([0.05, 0.25, 0.5, 0.75, 0.95])
     ## elif cfg.boxplot_enable
     ## data["qntls"] = srs.quantile([0.25, 0.5, 0.75])
     ## if cfg.stats_enable or cfg.hist_enable and cfg.insights_enable:
@@ -259,16 +259,16 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
     data["chisq"] = chisquare(data["hist"][0])
 
     # compute the density histogram
-    data["dens"] = da.histogram(
-        srs, bins=bins, range=[data["min"], data["max"]], density=True
-    )
+    # data["dens"] = da.histogram(
+    #     srs, bins=bins, range=[data["min"], data["max"]], density=True
+    # )
     # gaussian kernel density estimate
-    data["kde"] = gaussian_kde(
-        srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
-    )
+    # data["kde"] = gaussian_kde(
+    #     srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
+    # )
 
     ## if cfg.box_enable
-    data.update(calc_box(srs, data["qntls"]))
+    # data.update(calc_box(srs, data["qntls"]))
 
     return data
 
@@ -406,7 +406,7 @@ def calc_cat_stats(
     hist = da.histogram(lengths.values, bins=bins, range=[minv, maxv])
     leng = {
         "Mean": lengths.mean(),
-        "Standard Deviation": lengths.std(),
+        # "Standard Deviation": lengths.std(),
         "Median": lengths.quantile(0.5),
         "Minimum": minv,
         "Maximum": maxv,
@@ -414,19 +414,19 @@ def calc_cat_stats(
     # letter stats
     # computed on groupby-count:
     # compute the statistic for each group then multiply by the count of the group
-    grp, col = df.columns
-    lc_cnt = (df[grp].str.count(r"[a-z]") * df[col]).sum()
-    uc_cnt = (df[grp].str.count(r"[A-Z]") * df[col]).sum()
-    letter = {
-        "Count": lc_cnt + uc_cnt,
-        "Lowercase Letter": lc_cnt,
-        "Space Separator": (df[grp].str.count(r"[ ]") * df[col]).sum(),
-        "Uppercase Letter": uc_cnt,
-        "Dash Punctuation": (df[grp].str.count(r"[-]") * df[col]).sum(),
-        "Decimal Number": (df[grp].str.count(r"[0-9]") * df[col]).sum(),
-    }
+    # grp, col = df.columns
+    # lc_cnt = (df[grp].str.count(r"[a-z]") * df[col]).sum()
+    # uc_cnt = (df[grp].str.count(r"[A-Z]") * df[col]).sum()
+    # letter = {
+    #     "Count": lc_cnt + uc_cnt,
+    #     "Lowercase Letter": lc_cnt,
+    #     "Space Separator": (df[grp].str.count(r"[ ]") * df[col]).sum(),
+    #     "Uppercase Letter": uc_cnt,
+    #     "Dash Punctuation": (df[grp].str.count(r"[-]") * df[col]).sum(),
+    #     "Decimal Number": (df[grp].str.count(r"[0-9]") * df[col]).sum(),
+    # }
 
-    return {"stats": stats, "len_stats": leng, "letter_stats": letter, "len_hist": hist}
+    return {"stats": stats, "len_stats": leng, "letter_stats": None, "len_hist": hist}
 
 
 def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
