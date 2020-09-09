@@ -196,7 +196,9 @@ class DataArray:
 
         if isinstance(df, dd.DataFrame):
             is_pandas = False
-            self._ddf = df.astype({col: np.object for col in cat_cols})
+            if cat_cols and df.shape[1] != 0:
+                df = df.astype({col: np.object for col in cat_cols})
+            self._ddf = df
         elif isinstance(df, DataArray):
             self._ddf = df._ddf
             self._values = df._values
@@ -329,10 +331,11 @@ class DataArray:
         df = DataArray(subdf)
         df._values = self.values[:, cidx]  # pylint: disable=W0212
 
-        # coerce the array to it's minimal type
-        dtype = reduce(np.promote_types, df.dtypes.values)
-        if df._values.dtype != dtype:
-            df._values = df._values.astype(dtype)
+        if df.shape[1] != 0:
+            # coerce the array to it's minimal type
+            dtype = reduce(np.promote_types, df.dtypes.values)
+            if df._values.dtype != dtype:
+                df._values = df._values.astype(dtype)
 
         df._nulls = self.nulls[:, cidx]  # pylint: disable=W0212
         if self._head is not None:
