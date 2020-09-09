@@ -7,7 +7,6 @@ from typing import Dict, Optional, Tuple
 
 import dask
 import dask.array as da
-import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
@@ -166,54 +165,3 @@ def _kendall_tau_nxn(df: DataArray) -> da.Array:
 #             )
 
 #     return da.stack(corrmat)
-
-# to work on a dataframe for create_report
-def correlation_nxn_frame(
-    df: dd.DataFrame,
-) -> Tuple[np.ndarray, np.ndarray, Dict[CorrelationMethod, da.Array]]:
-    """
-    Calculation of a n x n correlation matrix for n columns
-
-    Returns
-    -------
-        The long format of the correlations
-    """
-
-    ncols = len(df.columns)
-    cordx, cordy = np.meshgrid(range(ncols), range(ncols))
-    cordx, cordy = cordy.ravel(), cordx.ravel()
-
-    corrs = {
-        CorrelationMethod.Pearson: _pearson_nxn_frame(df),
-        CorrelationMethod.Spearman: _spearman_nxn_frame(df),
-        CorrelationMethod.KendallTau: _kendall_tau_nxn_frame(df),
-    }
-
-    return cordx, cordy, corrs
-
-
-def _pearson_nxn_frame(df: dd.DataFrame) -> da.Array:
-    """Calculate column-wise pearson correlation."""
-    return (
-        df.repartition(npartitions=1)
-        .map_partitions(partial(pd.DataFrame.corr, method="pearson"))
-        .to_dask_array()
-    )
-
-
-def _spearman_nxn_frame(df: dd.DataFrame) -> da.Array:
-    """Calculate column-wise spearman correlation."""
-    return (
-        df.repartition(npartitions=1)
-        .map_partitions(partial(pd.DataFrame.corr, method="spearman"))
-        .to_dask_array()
-    )
-
-
-def _kendall_tau_nxn_frame(df: dd.DataFrame) -> da.Array:
-    """Calculate column-wise kendalltau correlation."""
-    return (
-        df.repartition(npartitions=1)
-        .map_partitions(partial(pd.DataFrame.corr, method="kendall"))
-        .to_dask_array()
-    )
