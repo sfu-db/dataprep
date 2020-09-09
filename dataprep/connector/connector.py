@@ -232,7 +232,7 @@ class Connector:
                 dfs = []
                 # No way to parallelize for cursor type
                 for i in range(n_page):
-                    count = min(total - max(i - 1, 0) * max_per_page, max_per_page)
+                    count = min(total - i * max_per_page, max_per_page)
 
                     df = await self._fetch(
                         itable,
@@ -257,9 +257,8 @@ class Connector:
             elif pag_type == "limit":
                 resps_coros = []
                 allowed_page = IntRef(n_page)
-                for i in range(n_page,):
-                    count = min(total - max(i - 1, 0) * max_per_page, max_per_page)
-
+                for i in range(n_page):
+                    count = min(total - i * max_per_page, max_per_page)
                     resps_coros.append(
                         self._fetch(
                             itable,
