@@ -121,7 +121,7 @@ def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
 def test_compute_pearson(simpledf: dd.DataFrame) -> None:
     df = DataArray(simpledf)
     df = df.select_num_columns()
-    df.compute_length()
+    df.compute()
     darray = df.values
     array = darray.compute()
 
@@ -137,7 +137,7 @@ def test_compute_pearson(simpledf: dd.DataFrame) -> None:
 def test_compute_spearman(simpledf: dd.DataFrame) -> None:
     df = DataArray(simpledf)
     df = df.select_num_columns()
-    df.compute_length()
+    df.compute()
     darray = df.values
     array = darray.compute()
 
@@ -153,7 +153,7 @@ def test_compute_spearman(simpledf: dd.DataFrame) -> None:
 def test_compute_kendall(simpledf: dd.DataFrame) -> None:
     df = DataArray(simpledf)
     df = df.select_num_columns()
-    df.compute_length()
+    df.compute()
     darray = df.values
     array = darray.compute()
 

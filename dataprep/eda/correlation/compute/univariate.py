@@ -40,7 +40,7 @@ def _calc_univariate(
     if x not in df.columns:
         raise ValueError(f"{x} not in numerical column names")
 
-    df.compute_length()
+    df.compute()
     columns = df.columns[df.columns != x]
     xarr = df.values[:, df.columns == x]
     data = df.values[:, df.columns != x]

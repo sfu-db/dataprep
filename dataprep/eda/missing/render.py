@@ -32,7 +32,7 @@ from ..dtypes import Continuous, Nominal, drop_null, is_dtype
 from ..intermediate import ColumnMetadata, Intermediate
 from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
-from .compute import LABELS
+from .compute.common import LABELS
 
 __all__ = ["render_missing"]
 
@@ -138,6 +138,7 @@ def render_hist(
         df["x"] = df["x"].astype("str")
         x_range = FactorRange(*df["x"].unique())
     else:
+
         radius = df["x"][1] - df["x"][0]
         x_range = Range1d(df["x"].min() - radius, df["x"].max() + radius)
 
