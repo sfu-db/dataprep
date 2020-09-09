@@ -2,6 +2,7 @@
 for create_report(df) function."""
 
 from typing import Any, Dict, List, Optional, Tuple, Union
+from warnings import catch_warnings, filterwarnings
 
 import dask
 import dask.dataframe as dd
@@ -80,7 +81,13 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
     # aggregate all computations
     data, completions = basic_computations(df)
 
-    (data,) = dask.compute(data)
+    with catch_warnings():
+        filterwarnings(
+            "ignore",
+            "invalid value encountered in true_divide",
+            category=RuntimeWarning,
+        )
+        (data,) = dask.compute(data)
 
     # results dictionary
     res: Dict[str, Any] = {}
