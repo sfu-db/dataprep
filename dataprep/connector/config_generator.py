@@ -7,7 +7,7 @@ from urllib import parse
 from requests import Request, Response, Session
 
 
-def create_config(example: str) -> 'ConfigGenerator':
+def create_config(example: str) -> "ConfigGenerator":
     """
     Creates a ConfigGenerator object which has an in-memory
     representation of a configuration file
@@ -36,6 +36,7 @@ class ConfigGenerator:
     >>> config = cg.create_config(req_example)
 
     """
+
     _request_example: str
     _url: str
     _parameters: dict
@@ -51,9 +52,7 @@ class ConfigGenerator:
     _session: Session
     _config: str
 
-    def __init__(
-            self
-    ) -> None:
+    def __init__(self) -> None:
         self._request_example = str()
         self._url = str()
         self._parameters = dict()
@@ -69,10 +68,7 @@ class ConfigGenerator:
         self._session = Session()
         self._config = str()
 
-    def add_example(
-            self,
-            request_example: str
-    ) -> 'ConfigGenerator':
+    def add_example(self, request_example: str) -> "ConfigGenerator":
         """
         Parse the request example, execute the request, create the in-memory
         representation of a configuration file and returns the corresponding
@@ -95,10 +91,7 @@ class ConfigGenerator:
         self._create_config_file_representation()
         return self
 
-    def _parse_example(
-            self,
-            request_example: str
-    ) -> None:
+    def _parse_example(self, request_example: str) -> None:
         """
         Parse the request example extracting all the relevant information to perform
         a request.
@@ -111,11 +104,14 @@ class ConfigGenerator:
         """
         self._request_example = request_example
         try:
-            request_full_url = re.search("(?P<url>https?://[^\s]+)",
-                                         self._request_example).group("url")
+            request_full_url = re.search(
+                "(?P<url>https?://[^\s]+)", self._request_example
+            ).group("url")
         except Exception:
-            raise RuntimeError(f"Malformed request example syntax: \
-                               {self._request_example}") from None
+            raise RuntimeError(
+                f"Malformed request example syntax: \
+                               {self._request_example}"
+            ) from None
         else:
             parsed_full_url = parse.urlparse(request_full_url)
             self._parameters = parse.parse_qs(parsed_full_url.query)
@@ -124,12 +120,12 @@ class ConfigGenerator:
                 lst_parsed_full_url[4] = str()
                 self._url = parse.urlunparse(lst_parsed_full_url)
             else:
-                raise RuntimeError(f"Malformed request example syntax: \
-                                   {self._request_example}") from None
+                raise RuntimeError(
+                    f"Malformed request example syntax: \
+                                   {self._request_example}"
+                ) from None
 
-    def _execute_request(
-            self
-    ) -> None:
+    def _execute_request(self) -> None:
         """
         Execute an HTTP request taking as input all the parameters extracted from
         the request example, then, extract all the relevant information from the
@@ -147,19 +143,21 @@ class ConfigGenerator:
         prep_request = request.prepare()
         resp: Response = self._session.send(prep_request)
         if resp.status_code == 200:
-            self._content_type = resp.headers['content-type']
+            self._content_type = resp.headers["content-type"]
             try:
                 self._response = resp.json()
             except ValueError:
-                raise RuntimeError(f"Response body from {self._url} \
-                                   does not contain a valid JSON.") from None
+                raise RuntimeError(
+                    f"Response body from {self._url} \
+                                   does not contain a valid JSON."
+                ) from None
         else:
-            raise RuntimeError(f"HTTP status received: {resp.status_code}. \
-                                Expected: 200.") from None
+            raise RuntimeError(
+                f"HTTP status received: {resp.status_code}. \
+                                Expected: 200."
+            ) from None
 
-    def _create_config_file_representation(
-            self
-    ) -> None:
+    def _create_config_file_representation(self) -> None:
         """
         Creates an in-memory representation (string) of a configuration file.
         """
@@ -172,22 +170,21 @@ class ConfigGenerator:
             "request": {
                 "url": self._url,
                 "method": self._method,
-                "params": {p: False for p in self._parameters}
+                "params": {p: False for p in self._parameters},
             },
             "response": {
                 "ctype": "application/json",
                 "tablePath": self._table_path,
-                "schema": {sc: {"target": "$." + sc, "type": "string"}
-                           for sc in self._schema_cols},
-                "orient": self._orient
-            }
+                "schema": {
+                    sc: {"target": "$." + sc, "type": "string"}
+                    for sc in self._schema_cols
+                },
+                "orient": self._orient,
+            },
         }
         self._config = json.dumps(config, indent=4)
 
-    def save(
-            self,
-            filename: str
-    ) -> None:
+    def save(self, filename: str) -> None:
         """
         Save to disk the current in-memory representation (string) of a configuration file to a
         file specified as parameter.
@@ -200,9 +197,7 @@ class ConfigGenerator:
         with open(filename, "w") as outfile:
             outfile.write(self._config)
 
-    def to_string(
-            self
-    ) -> str:
+    def to_string(self) -> str:
         """
         Return the current in-memory representation (string) of a configuration file.
 
