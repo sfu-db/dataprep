@@ -2,15 +2,15 @@
     This module implements the plot_correlation(df) function.
 """
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import dask.dataframe as dd
 import pandas as pd
-from bokeh.io import show
 
+from ..progress_bar import ProgressBar
+from ..report import Report
 from .compute import compute_correlation
 from .render import render_correlation
-from ..report import Report
 
 __all__ = ["render_correlation", "compute_correlation", "plot_correlation"]
 
@@ -22,6 +22,7 @@ def plot_correlation(
     *,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
+    progress: bool = True,
 ) -> Report:
     """
     This function is designed to calculate the correlation between columns
@@ -32,15 +33,17 @@ def plot_correlation(
     Parameters
     ----------
     df
-        The pandas data_frame for which plots are calculated for each column
+        The pandas data_frame for which plots are calculated for each column.
     x
-        A valid column name of the data frame
+        A valid column name of the data frame.
     y
-        A valid column name of the data frame
+        A valid column name of the data frame.
     value_range
-        Range of value
+        Range of value.
     k
-        Choose top-k element
+        Choose top-k element.
+    progress
+        Enable the progress bar.
 
     Examples
     --------
@@ -61,8 +64,8 @@ def plot_correlation(
     This function only supports numerical or categorical data,
     and it is better to drop None, Nan and Null value before using it
     """
-
-    intermediate = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
+    with ProgressBar(minimum=1, disable=not progress):
+        intermediate = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
     figure = render_correlation(intermediate)
 
     return Report(figure)

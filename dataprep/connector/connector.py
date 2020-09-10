@@ -198,9 +198,8 @@ class Connector:
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
     ) -> pd.DataFrame:
-        assert (
-            table in self._impdb.tables
-        ), f"No such table {table} in {self._impdb.name}"
+        if table not in self._impdb.tables:
+            raise ValueError(f"No such table {table} in {self._impdb.name}")
 
         itable = self._impdb.tables[table]
         if itable.pag_params is None and _count is not None:
@@ -227,14 +226,13 @@ class Connector:
             max_per_page = itable.pag_params.max_count
             total = _count
             n_page = math.ceil(total / max_per_page)
-            remaining = total % max_per_page
 
             if pag_type == "cursor":
                 last_id = 0
                 dfs = []
                 # No way to parallelize for cursor type
                 for i in range(n_page):
-                    count = max_per_page if i < n_page - 1 else remaining
+                    count = min(total - i * max_per_page, max_per_page)
 
                     df = await self._fetch(
                         itable,
@@ -260,8 +258,7 @@ class Connector:
                 resps_coros = []
                 allowed_page = IntRef(n_page)
                 for i in range(n_page):
-                    count = max_per_page if i < n_page - 1 else remaining
-
+                    count = min(total - i * max_per_page, max_per_page)
                     resps_coros.append(
                         self._fetch(
                             itable,
@@ -302,9 +299,8 @@ class Connector:
         _cursor: Optional[int] = None,
         _auth: Optional[Dict[str, Any]] = None,
     ) -> Optional[pd.DataFrame]:
-        assert (_count is None) == (
-            _cursor is None
-        ), "_cursor and _count should both be None or not None"
+        if (_count is None) != (_cursor is None):
+            raise ValueError("_cursor and _count should both be None or not None")
 
         method = table.method
         url = table.url
@@ -339,10 +335,16 @@ class Connector:
             pag_type = table.pag_params.type
             count_key = table.pag_params.count_key
             if pag_type == "cursor":
-                assert table.pag_params.cursor_key is not None
+                if table.pag_params.cursor_key is None:
+                    raise ValueError(
+                        "pagination type is cursor but no cursor_key set in the configuration file."
+                    )
                 cursor_key = table.pag_params.cursor_key
             elif pag_type == "limit":
-                assert table.pag_params.anchor_key is not None
+                if table.pag_params.anchor_key is None:
+                    raise ValueError(
+                        "pagination type is limit but no anchor_key set in the configuration file."
+                    )
                 cursor_key = table.pag_params.anchor_key
             else:
                 raise UnreachableError()
@@ -373,7 +375,8 @@ class Connector:
         ) as resp:
             if resp.status != 200:
                 raise RequestError(status_code=resp.status, message=await resp.text())
-            df = table.from_response(await resp.text())
+            content = await resp.text()
+            df = table.from_response(content)
 
             if len(df) == 0 and _allowed_page is not None and _page is not None:
                 _allowed_page.set(_page)

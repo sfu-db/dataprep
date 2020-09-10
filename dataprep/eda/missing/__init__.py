@@ -6,12 +6,12 @@ from typing import Optional, Union
 
 import dask.dataframe as dd
 import pandas as pd
-from bokeh.io import show
 
+from ..dtypes import DTypeDef
+from ..progress_bar import ProgressBar
+from ..report import Report
 from .compute import compute_missing
 from .render import render_missing
-from ..report import Report
-from ..dtypes import DTypeDef
 
 __all__ = ["render_missing", "compute_missing", "plot_missing"]
 
@@ -24,6 +24,7 @@ def plot_missing(
     bins: int = 30,
     ndist_sample: int = 100,
     dtype: Optional[DTypeDef] = None,
+    progress: bool = True,
 ) -> Report:
     """
     This function is designed to deal with missing values
@@ -33,20 +34,22 @@ def plot_missing(
     Parameters
     ----------
     df
-        the pandas data_frame for which plots are calculated for each column
+        the pandas data_frame for which plots are calculated for each column.
     x
-        a valid column name of the data frame
+        a valid column name of the data frame.
     y
-        a valid column name of the data frame
+        a valid column name of the data frame.
     bins
-        The number of rows in the figure
+        The number of rows in the figure.
     ndist_sample
-        The number of sample points
+        The number of sample points.
     wdtype: str or DType or dict of str or dict of DType, default None
         Specify Data Types for designated column or all columns.
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
-        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous().
+    progress
+        Enable the progress bar.
 
     Examples
     ----------
@@ -56,6 +59,10 @@ def plot_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
-    itmdt = compute_missing(df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample)
+
+    with ProgressBar(minimum=1, disable=not progress):
+        itmdt = compute_missing(
+            df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample
+        )
     fig = render_missing(itmdt)
     return Report(fig)
