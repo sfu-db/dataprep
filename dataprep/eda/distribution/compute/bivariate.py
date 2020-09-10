@@ -1,8 +1,7 @@
 """Computations for plot(df, x, y)."""
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import dask
-import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
@@ -21,7 +20,6 @@ from ...dtypes import (
 from .common import (
     DTMAP,
     _get_timeunit,
-    calc_box,
     _calc_line_dt,
     _calc_groups,
     _calc_box_otlrs,
@@ -93,14 +91,17 @@ def compute_bivariate(
         and is_dtype(ytype, Nominal())
     ):
         x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
-        df = drop_null(df[[x, y]])
-        df[x] = df[x].apply(str, meta=(x, str))
-        # box plot per group
-        boxdata = calc_box(df, bins, ngroups, largest, dtype)
-        # histogram per group
-        hisdata = calc_hist_by_group(df, bins, ngroups, largest)
+        df = df[[x, y]]
+        first_rows = df.head()
+        try:
+            first_rows[x].apply(hash)
+        except TypeError:
+            df[x] = df[x].astype(str)
+
+        (comps,) = dask.compute(nom_cont_comps(drop_null(df), bins, ngroups, largest))
+
         return Intermediate(
-            x=x, y=y, boxdata=boxdata, histdata=hisdata, visual_type="cat_and_num_cols",
+            x=x, y=y, data=comps, ngroups=ngroups, visual_type="cat_and_num_cols"
         )
     elif (
         is_dtype(xtype, DateTime())
@@ -148,42 +149,155 @@ def compute_bivariate(
             visual_type="dt_and_cat_cols",
         )
     elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
-        df = drop_null(df[[x, y]])
-        df[x] = df[x].apply(str, meta=(x, str))
-        df[y] = df[y].apply(str, meta=(y, str))
-        # nested bar chart
-        nesteddata = calc_nested(df, ngroups, nsubgroups)
-        # stacked bar chart
-        stackdata = calc_stacked(df, ngroups, nsubgroups)
-        # heat map
-        heatmapdata = calc_heatmap(df, ngroups, nsubgroups)
+        df = df[[x, y]]
+        first_rows = df.head()
+        try:
+            first_rows[x].apply(hash)
+        except TypeError:
+            df[x] = df[x].astype(str)
+        try:
+            first_rows[y].apply(hash)
+        except TypeError:
+            df[y] = df[y].astype(str)
+
+        (comps,) = dask.compute(drop_null(df).groupby([x, y]).size())
+
         return Intermediate(
             x=x,
             y=y,
-            nesteddata=nesteddata,
-            stackdata=stackdata,
-            heatmapdata=heatmapdata,
+            data=comps,
+            ngroups=ngroups,
+            nsubgroups=nsubgroups,
             visual_type="two_cat_cols",
         )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
         df = drop_null(df[[x, y]])
-        # scatter plot
-        scatdata = calc_scatter(df, sample_size)
-        # hexbin plot
-        hexbindata = df.compute()
+
+        data: Dict[str, Any] = {}
+        # scatter plot data
+        data["scat"] = df.map_partitions(
+            lambda x: x.sample(min(100, x.shape[0])), meta=df
+        )
+        # hexbin plot data
+        data["hex"] = df
         # box plot
-        boxdata = calc_box(df, bins)
+        data["box"] = calc_box_num(df, bins)
+
+        (data,) = dask.compute(data)
+
         return Intermediate(
-            x=x,
-            y=y,
-            scatdata=scatdata,
-            boxdata=boxdata,
-            hexbindata=hexbindata,
-            spl_sz=sample_size,
-            visual_type="two_num_cols",
+            x=x, y=y, data=data, spl_sz=sample_size, visual_type="two_num_cols",
         )
     else:
         raise UnreachableError
+
+
+def nom_cont_comps(
+    df: dd.DataFrame, bins: int, ngroups: int, largest: bool
+) -> Dict[str, Any]:
+    """
+    Computations for a nominal and continuous column
+
+    Parameters
+    ----------
+    df
+        Dask dataframe with one categorical and one numerical column
+    bins
+        Number of bins to use in the histogram
+    ngroups
+        Number of groups to show from the categorical column
+    largest
+        Select the largest or smallest groups
+    """
+    data: Dict[str, Any] = {}
+
+    x, y = df.columns[0], df.columns[1]
+
+    # filter the dataframe to consist of ngroup groups
+    # https://stackoverflow.com/questions/46927174/filtering-grouped-df-in-dask
+    cnts = df[x].value_counts(sort=False)
+    data["ttl_grps"] = cnts.shape[0]
+    thresh = cnts.nlargest(ngroups).min() if largest else cnts.nsmallest(ngroups).max()
+    df = df[df[x].map(cnts) >= thresh] if largest else df[df[x].map(cnts) <= thresh]
+
+    # group the data to compute a box plot and histogram for each group
+    grps = df.groupby(x)[y]
+    data["box"] = grps.apply(box_comps, meta="object")
+
+    minv, maxv = df[y].min(), df[y].max()
+    # TODO when are minv and maxv computed? This may not be optimal if
+    # minv and maxv are computed ngroups times for each histogram
+    data["hist"] = grps.apply(hist, bins, minv, maxv, meta="object")
+
+    return data
+
+
+def calc_box_num(df: dd.DataFrame, bins: int) -> dd.Series:
+    """
+    Box plot for a binned numerical variable
+
+    Parameters
+    ----------
+    df
+        dask dataframe
+    bins
+        number of bins to compute a box plot
+    """
+    x, y = df.columns[0], df.columns[1]
+    # group the data into intervals
+    # https://stackoverflow.com/questions/42442043/how-to-use-pandas-cut-or-equivalent-in-dask-efficiently
+    df["grp"] = df[x].map_partitions(pd.cut, bins=bins, include_lowest=True)
+    # TODO is this calculating the box plot stats for each group in parallel?
+    # https://examples.dask.org/dataframes/02-groupby.html#Groupby-Apply
+    # https://github.com/dask/dask/issues/4239
+    # https://github.com/dask/dask/issues/5124
+    srs = df.groupby("grp")[y].apply(box_comps, meta="object")
+
+    return srs
+
+
+def box_comps(srs: pd.Series) -> Dict[str, Union[float, np.array]]:
+    """
+    Box plot computations
+
+    Parameters
+    ----------
+    srs
+        pandas series
+    """
+    data: Dict[str, Any] = {}
+
+    # quartiles
+    data.update(zip(("q1", "q2", "q3"), srs.quantile([0.25, 0.5, 0.75])))
+    iqr = data["q3"] - data["q1"]
+    # inliers
+    srs_iqr = srs[srs.between(data["q1"] - 1.5 * iqr, data["q3"] + 1.5 * iqr)]
+    data["lw"], data["uw"] = srs_iqr.min(), srs_iqr.max()
+    # outliers
+    otlrs = srs[~srs.between(data["q1"] - 1.5 * iqr, data["q3"] + 1.5 * iqr)]
+    # randomly sample at most 100 outliers
+    data["otlrs"] = otlrs.sample(min(100, otlrs.shape[0])).values
+
+    return data
+
+
+def hist(srs: pd.Series, bins: int, minv: float, maxv: float) -> Any:
+    """
+    Compute a histogram on a given series
+
+    Parameters
+    ----------
+    srs
+        pandas Series of values for the histogram
+    bins
+        number of bins
+    minv
+        lowest bin endpoint
+    maxv
+        highest bin endpoint
+    """
+
+    return np.histogram(srs, bins=bins, range=[minv, maxv])
 
 
 def calc_box_dt(
@@ -260,200 +374,3 @@ def calc_stacked_dt(
     dfr.index = dfr.index.to_period("S").strftime(DTMAP[unit][2])  # format labels
 
     return dfr, grp_cnt_stats, DTMAP[unit][3]
-
-
-def calc_hist_by_group(
-    df: dd.DataFrame, bins: int, ngroups: int, largest: bool
-) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """
-    Compute a histogram over the values corresponding to the groups in another column
-
-    Parameters
-    ----------
-    df
-        Dataframe with one categorical and one numerical column
-    bins
-        Number of bins to use in the histogram
-    ngroups
-        Number of groups to show from the categorical column
-    largest
-        Select the largest or smallest groups
-    Returns
-    -------
-    Tuple[pd.DataFrame, Dict[str, int]]
-        The histograms in a dataframe and a dictionary
-        logging the sampled group output
-    """
-    # pylint: disable=too-many-locals
-
-    hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]] = dict()
-    hist_lst: List[Tuple[np.ndarray, np.ndarray, List[str]]] = list()
-    df, grp_cnt_stats, largest_grps = _calc_groups(df, df.columns[0], ngroups, largest)
-
-    # create a histogram for each group
-    groups = df.groupby([df.columns[0]])
-    minv, maxv = dask.compute(df[df.columns[1]].min(), df[df.columns[1]].max())
-    for grp in largest_grps:
-        grp_srs = groups.get_group(grp)[df.columns[1]]
-        hist_arr, bins_arr = da.histogram(grp_srs, range=[minv, maxv], bins=bins)
-        intervals = _format_bin_intervals(bins_arr)
-        hist_lst.append((hist_arr, bins_arr, intervals))
-
-    hist_lst = dask.compute(*hist_lst)
-
-    for elem in zip(largest_grps, hist_lst):
-        hist_dict[elem[0]] = elem[1]
-
-    return hist_dict, grp_cnt_stats
-
-
-def calc_scatter(df: dd.DataFrame, sample_size: int) -> pd.DataFrame:
-    """
-    Extracts the points to use in a scatter plot
-    Parameters
-    ----------
-    df
-        Dataframe with two numerical columns
-    sample_size
-        the number of points to randomly sample in the scatter plot
-    Returns
-    -------
-    pd.DataFrame
-        A dataframe containing the scatter points
-    """
-    if len(df) > sample_size:
-        df = df.sample(frac=sample_size / len(df))
-    return df.compute()
-
-
-def calc_nested(
-    df: dd.DataFrame, ngroups: int, nsubgroups: int,
-) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """
-    Calculate a nested bar chart of the counts of two columns
-    Parameters
-    ----------
-    df
-        Dataframe with two categorical columns
-    ngroups
-        Number of groups to show from the first column
-    nsubgroups
-        Number of subgroups (from the second column) to show in each group
-    Returns
-    -------
-    Tuple[pd.DataFrame, Dict[str, int]]
-        The bar chart counts in a dataframe and a dictionary
-        logging the sampled group output
-    """
-    x, y = df.columns[0], df.columns[1]
-    df, grp_cnt_stats, _ = _calc_groups(df, x, ngroups)
-
-    df2 = df.groupby([x, y]).size().reset_index()
-    max_subcol_cnt = df2.groupby(x).size().max().compute()
-    df2.columns = [x, y, "cnt"]
-    df_res = (
-        df2.groupby(x)[[y, "cnt"]]
-        .apply(
-            lambda x: x.nlargest(n=nsubgroups, columns="cnt"),
-            meta=({y: "f8", "cnt": "i8"}),
-        )
-        .reset_index()
-        .compute()
-    )
-    df_res["grp_names"] = list(zip(df_res[x], df_res[y]))
-    df_res = df_res.drop([x, "level_1", y], axis=1)
-    grp_cnt_stats[f"{y}_ttl"] = max_subcol_cnt
-    grp_cnt_stats[f"{y}_shw"] = min(max_subcol_cnt, nsubgroups)
-
-    return df_res, grp_cnt_stats
-
-
-def calc_stacked(
-    df: dd.DataFrame, ngroups: int, nsubgroups: int,
-) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """
-    Calculate a stacked bar chart of the counts of two columns
-    Parameters
-    ----------
-    df
-        two categorical columns
-    ngroups
-        number of groups to show from the first column
-    nsubgroups
-        number of subgroups (from the second column) to show in each group
-    Returns
-    -------
-    Tuple[pd.DataFrame, Dict[str, int]]
-        The bar chart counts in a dataframe and a dictionary
-        logging the sampled group output
-    """
-    x, y = df.columns[0], df.columns[1]
-    df, grp_cnt_stats, largest_grps = _calc_groups(df, x, ngroups)
-
-    fin_df = pd.DataFrame()
-    for grp in largest_grps:
-        df_grp = df[df[x] == grp]
-        df_res = df_grp.groupby(y).size().nlargest(n=nsubgroups) / len(df_grp) * 100
-        df_res = df_res.to_frame().compute().T
-        df_res.columns = list(df_res.columns)
-        df_res["Others"] = 100 - df_res.sum(axis=1)
-        fin_df = fin_df.append(df_res, sort=False)
-
-    fin_df = fin_df.fillna(value=0)
-    others = fin_df.pop("Others")
-    if others.sum() > 1e-4:
-        fin_df["Others"] = others
-    fin_df.index = list(largest_grps)
-    return fin_df, grp_cnt_stats
-
-
-def calc_heatmap(
-    df: dd.DataFrame, ngroups: int, nsubgroups: int,
-) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """
-    Calculate a heatmap of the counts of two columns
-    Parameters
-    ----------
-    df
-        Dataframe with two categorical columns
-    ngroups
-        Number of groups to show from the first column
-    nsubgroups
-        Number of subgroups (from the second column) to show in each group
-    Returns
-    -------
-    Tuple[pd.DataFrame, Dict[str, int]]
-        The heatmap counts in a dataframe and a dictionary
-        logging the sampled group output
-    """
-    x, y = df.columns[0], df.columns[1]
-    df, grp_cnt_stats, _ = _calc_groups(df, x, ngroups)
-
-    srs = df.groupby(y).size()
-    srs_lrgst = srs.nlargest(n=nsubgroups)
-    largest_subgrps = list(srs_lrgst.index.compute())
-    df = df[df[y].isin(largest_subgrps)]
-
-    df_res = df.groupby([x, y]).size().reset_index().compute()
-    df_res.columns = ["x", "y", "cnt"]
-    df_res = pd.pivot_table(
-        df_res, index=["x", "y"], values="cnt", fill_value=0, aggfunc=np.sum,
-    ).reset_index()
-
-    grp_cnt_stats[f"{y}_ttl"] = len(srs.index.compute())
-    grp_cnt_stats[f"{y}_shw"] = len(largest_subgrps)
-
-    return df_res, grp_cnt_stats
-
-
-def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
-    """
-    Auxillary function to format bin intervals in a histogram
-    """
-    bins_arr = np.round(bins_arr, 3)
-    bins_arr = [int(val) if float(val).is_integer() else val for val in bins_arr]
-    intervals = [
-        f"[{bins_arr[i]}, {bins_arr[i + 1]})" for i in range(len(bins_arr) - 2)
-    ]
-    intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
-    return intervals

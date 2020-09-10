@@ -6,11 +6,11 @@ import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
-from dask.array.stats import chisquare, kurtosis, normaltest, skew
+import pandas as pd
+from dask.array.stats import chisquare, kurtosis, skew
 from nltk.stem import PorterStemmer, WordNetLemmatizer
-from scipy.stats import gaussian_kde
 
-from ....assets.english_stopwords import english_stopwords
+from ....assets.english_stopwords import english_stopwords as ess
 from ....errors import UnreachableError
 from ...dtypes import (
     Continuous,
@@ -22,7 +22,7 @@ from ...dtypes import (
     is_dtype,
 )
 from ...intermediate import Intermediate
-from .common import _calc_line_dt
+from .common import _calc_line_dt, gaussian_kde, normaltest
 
 
 def compute_univariate(
@@ -88,9 +88,18 @@ def compute_univariate(
 
     col_dtype = detect_dtype(df[x], dtype)
     if is_dtype(col_dtype, Nominal()):
+        first_rows = df[x].head()  # dd.Series.head() triggers a (small) data read
         # all computations for plot(df, Nominal())
         data = nom_comps(
-            df[x], ngroups, largest, bins, top_words, stopword, lemmatize, stem
+            df[x],
+            first_rows,
+            ngroups,
+            largest,
+            bins,
+            top_words,
+            stopword,
+            lemmatize,
+            stem,
         )
         (data,) = dask.compute(data)
 
@@ -122,6 +131,7 @@ def compute_univariate(
 
 def nom_comps(
     srs: dd.Series,
+    first_rows: pd.Series,
     ngroups: int,
     largest: bool,
     bins: int,
@@ -162,15 +172,12 @@ def nom_comps(
     # total rows
     data["nrows"] = srs.shape[0]
     # cast the column as string type if it contains a mutable type
-    first_rows = srs.head()  # dd.Series.head() triggers a (small) data read
     try:
         first_rows.apply(hash)
     except TypeError:
         srs = srs.astype(str)
     # drop null values
     srs = drop_null(srs)
-
-    (srs,) = dask.persist(srs)
 
     ## if cfg.bar_enable or cfg.pie_enable
     # counts of unique values in the series
@@ -186,12 +193,15 @@ def nom_comps(
     ##     if cfg.insights.evenness_enable
     data["chisq"] = chisquare(grps.values)
 
+    ## if cfg.stats_enable
+    df = grps.reset_index()
+    ## if cfg.stats_enable or cfg.word_freq_enable
     if not first_rows.apply(lambda x: isinstance(x, str)).all():
         srs = srs.astype(str)  # srs must be a string to compute the value lengths
-    ## if cfg.stats_enable
-    data.update(calc_cat_stats(srs, bins, data["nrows"], data["nuniq"]))
-    ## if cfg.word_freq_enable
-    data.update(calc_word_freq(srs, top_words, stopword, lemmatize, stem))
+        df[df.columns[0]] = df[df.columns[0]].astype(str)
+    data.update(calc_cat_stats(srs, df, bins, data["nrows"], data["nuniq"]))
+    # ## if cfg.word_freq_enable
+    data.update(calc_word_freq(df, top_words, stopword, lemmatize, stem))
 
     return data
 
@@ -220,14 +230,13 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
     # remove infinite values
     srs = srs[~srs.isin({np.inf, -np.inf})]
 
-    (srs,) = dask.persist(srs)
-
     # shared computations
     ## if cfg.stats_enable or cfg.hist_enable or cfg.qqplot_enable and cfg.insights_enable:
     data["min"], data["max"] = srs.min(), srs.max()
     ## if cfg.hist_enable or cfg.qqplot_enable and cfg.ingsights_enable:
     data["hist"] = da.histogram(srs, bins=bins, range=[data["min"], data["max"]])
     ## if cfg.insights_enable and (cfg.qqplot_enable or cfg.hist_enable):
+    # NOTE normal test does a .compute() and I cannot fix it with delayed
     data["norm"] = normaltest(data["hist"][0])
     ## if cfg.qqplot_enable
     data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
@@ -256,12 +265,9 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
         srs, bins=bins, range=[data["min"], data["max"]], density=True
     )
     # gaussian kernel density estimate
-    try:  # NOTE gaussian_kde triggers a .compute()
-        data["kde"] = gaussian_kde(
-            srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
-        )
-    except np.linalg.LinAlgError:
-        data["kde"] = None
+    data["kde"] = gaussian_kde(
+        srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
+    )
 
     ## if cfg.box_enable
     data.update(calc_box(srs, data["qntls"]))
@@ -304,7 +310,7 @@ def calc_box(srs: dd.Series, qntls: da.Array) -> Dict[str, Any]:
 
 
 def calc_word_freq(
-    srs: dd.Series,
+    df: dd.DataFrame,
     top_words: int = 30,
     stopword: bool = True,
     lemmatize: bool = False,
@@ -317,8 +323,8 @@ def calc_word_freq(
 
     Parameters
     ----------
-    srs
-        One categorical column
+    df
+        Groupby-count on the categorical column as a dataframe
     top_words
         Number of highest frequency words to show in the
         wordcloud and word frequency bar chart
@@ -331,32 +337,29 @@ def calc_word_freq(
         If True, extract the stem of the words before
         computing the word frequencies, else don't
     """
-    # pylint: disable=unnecessary-lambda
+    col = df.columns[0]
     if stopword:
-        # use a regex to replace stop words with empty string
-        srs = srs.str.replace(r"\b(?:{})\b".format("|".join(english_stopwords)), "")
-    # replace all non-alphanumeric characters with an empty string, and convert to lowercase
-    srs = srs.str.replace(r"[^\w+ ]", "").str.lower()
-
-    # split each string on whitespace into words then apply "explode()" to "stack" all
-    # the words into a series
-    # NOTE this is slow. One possibly better solution: after .split(), count the words
-    # immediately rather than create a new series with .explode() and apply
-    # .value_counts()
-    srs = srs.str.split().explode()
+        # use a regex to replace stop words and non-alphanumeric characters with empty string
+        df[col] = df[col].str.replace(fr"\b(?:{'|'.join(ess)})\b|[^\w+ ]", "")
+    else:
+        df[col] = df[col].str.replace(r"[^\w+ ]", "")
+    # convert to lowercase and split
+    df[col] = df[col].str.lower().str.split()
+    # "explode()" to "stack" all the words in a list into a new column
+    df = df.explode(col)
 
     # lemmatize and stem
     if lemmatize or stem:
-        srs = srs.dropna()
+        df[col] = df[col].dropna()
     if lemmatize:
         lem = WordNetLemmatizer()
-        srs = srs.apply(lambda x: lem.lemmatize(x), meta=(srs.name, "object"))
+        df[col] = df[col].apply(lem.lemmatize, meta="object")
     if stem:
         porter = PorterStemmer()
-        srs = srs.apply(lambda x: porter.stem(x), meta=(srs.name, "object"))
+        df[col] = df[col].apply(porter.stem, meta="object")
 
     # counts of words, excludes null values
-    word_cnts = srs.value_counts(sort=False)
+    word_cnts = df.groupby(col)[df.columns[1]].sum()
     # total number of words
     nwords = word_cnts.sum()
     # total uniq words
@@ -368,7 +371,11 @@ def calc_word_freq(
 
 
 def calc_cat_stats(
-    srs: dd.Series, bins: int, nrows: int, nuniq: Optional[dd.core.Scalar] = None
+    srs: dd.Series,
+    df: dd.DataFrame,
+    bins: int,
+    nrows: int,
+    nuniq: Optional[dd.core.Scalar] = None,
 ) -> Dict[str, Any]:
     """
     Calculate stats for a categorical column
@@ -377,11 +384,16 @@ def calc_cat_stats(
     ----------
     srs
         a categorical column
-    nrows
-        number of rows before dropping null values
+    df
+        groupby-count on the categorical column as a dataframe
     bins
         number of bins for the category length frequency histogram
+    nrows
+        number of rows before dropping null values
+    nuniq
+        number of unique values in the column
     """
+    # pylint: disable=too-many-locals
     # overview stats
     stats = {
         "nrows": nrows,
@@ -402,13 +414,18 @@ def calc_cat_stats(
         "Maximum": maxv,
     }
     # letter stats
+    # computed on groupby-count:
+    # compute the statistic for each group then multiply by the count of the group
+    grp, col = df.columns
+    lc_cnt = (df[grp].str.count(r"[a-z]") * df[col]).sum()
+    uc_cnt = (df[grp].str.count(r"[A-Z]") * df[col]).sum()
     letter = {
-        "Count": srs.str.count(r"[a-zA-Z]").sum(),
-        "Lowercase Letter": srs.str.count(r"[a-z]").sum(),
-        "Space Separator": srs.str.count(r"[ ]").sum(),
-        "Uppercase Letter": srs.str.count(r"[A-Z]").sum(),
-        "Dash Punctuation": srs.str.count(r"[-]").sum(),
-        "Decimal Number": srs.str.count(r"[0-9]").sum(),
+        "Count": lc_cnt + uc_cnt,
+        "Lowercase Letter": lc_cnt,
+        "Space Separator": (df[grp].str.count(r"[ ]") * df[col]).sum(),
+        "Uppercase Letter": uc_cnt,
+        "Dash Punctuation": (df[grp].str.count(r"[-]") * df[col]).sum(),
+        "Decimal Number": (df[grp].str.count(r"[0-9]") * df[col]).sum(),
     }
 
     return {"stats": stats, "len_stats": leng, "letter_stats": letter, "len_hist": hist}

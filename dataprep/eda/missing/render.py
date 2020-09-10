@@ -32,7 +32,7 @@ from ..dtypes import Continuous, Nominal, drop_null, is_dtype
 from ..intermediate import ColumnMetadata, Intermediate
 from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
-from .compute import LABELS
+from .compute.common import LABELS
 
 __all__ = ["render_missing"]
 
@@ -138,6 +138,7 @@ def render_hist(
         df["x"] = df["x"].astype("str")
         x_range = FactorRange(*df["x"].unique())
     else:
+
         radius = df["x"][1] - df["x"][0]
         x_range = Range1d(df["x"].min() - radius, df["x"].max() + radius)
 
@@ -388,11 +389,16 @@ def render_heatmaps(
 
 
 def render_bar_chart(
-    df: pd.DataFrame, yscale: str, plot_width: int, plot_height: int,
+    data: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
 ) -> Figure:
     """
     Render a bar chart for the missing and present values
     """
+    pres_cnts, null_cnts, cols = data
+    df = pd.DataFrame({"Present": pres_cnts, "Missing": null_cnts}, index=cols)
 
     if len(df) > 20:
         plot_width = 28 * len(df)

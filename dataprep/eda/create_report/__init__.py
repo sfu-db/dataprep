@@ -21,6 +21,7 @@ def create_report(
     df: pd.DataFrame,
     title: Optional[str] = "DataPrep Report",
     mode: Optional[str] = "basic",
+    progress: bool = True,
 ) -> Report:
     """
     This function is to generate and render element in a report object.
@@ -34,6 +35,8 @@ def create_report(
     mode: Optional[str], default "basic"
         This controls what type of report to be generated.
         Currently only the 'basic' is fully implemented.
+    progress
+        Whether to show the progress bar.
 
     Examples
     --------
@@ -48,7 +51,7 @@ def create_report(
     context = {
         "resources": INLINE.render(),
         "title": title,
-        "components": format_report(df, mode),
+        "components": format_report(df, mode, progress),
     }
     template_base = ENV_LOADER.get_template("base.html")
     report = template_base.render(context=context)

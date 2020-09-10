@@ -2,25 +2,24 @@
 dataprep.eda
 ============
 """
-import tempfile
+from bokeh.io import output_notebook
 
-from bokeh.io import output_file, output_notebook
-from .distribution import compute, plot, render
 from .correlation import compute_correlation, plot_correlation, render_correlation
-from .missing import compute_missing, plot_missing, render_missing
 from .create_report import create_report
-from .utils import is_notebook
+from .distribution import compute, plot, render
 from .dtypes import (
-    DType,
     Categorical,
-    Nominal,
-    Ordinal,
-    Numerical,
     Continuous,
-    Discrete,
     DateTime,
+    Discrete,
+    DType,
+    Nominal,
+    Numerical,
+    Ordinal,
     Text,
 )
+from .missing import compute_missing, plot_missing, render_missing
+from .utils import is_notebook
 
 __all__ = [
     "plot_correlation",
