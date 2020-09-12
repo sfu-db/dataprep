@@ -97,7 +97,6 @@ class Connector:
         table: str,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
-        _concurrency: Optional[int] = None,
         **where: Any,
     ) -> Union[Awaitable[pd.DataFrame], pd.DataFrame]:
         """
@@ -232,10 +231,10 @@ class Connector:
             total = _count
             n_page = math.ceil(total / max_per_page)
 
-            if pag_type == "cursor":
+            if pag_type == "seek":
                 last_id = 0
                 dfs = []
-                # No way to parallelize for cursor type
+                # No way to parallelize for seek type
                 for i in range(n_page):
                     count = min(total - i * max_per_page, max_per_page)
 
@@ -245,8 +244,8 @@ class Connector:
                         _client=client,
                         _throttler=throttler,
                         _auth=_auth,
-                        _count=count,
-                        _cursor=last_id - 1,
+                        _limit=count,
+                        _offset=last_id - 1,
                     )
 
                     if df is None:
@@ -256,10 +255,10 @@ class Connector:
                         # The API returns empty for this page, maybe we've reached the end
                         break
 
-                    last_id = int(df[itable.pag_params.cursor_id][len(df) - 1]) - 1
+                    last_id = int(df[itable.pag_params.seek_id][len(df) - 1]) - 1
                     dfs.append(df)
 
-            elif pag_type == "limit":
+            elif pag_type == "offset":
                 resps_coros = []
                 allowed_page = IntRef(n_page)
                 for i in range(n_page):
@@ -273,8 +272,8 @@ class Connector:
                             _page=i,
                             _allowed_page=allowed_page,
                             _auth=_auth,
-                            _count=count,
-                            _cursor=i * max_per_page,
+                            _limit=count,
+                            _offset=i * max_per_page,
                         )
                     )
 
@@ -300,12 +299,12 @@ class Connector:
         _throttler: ThrottleSession,
         _page: int = 0,
         _allowed_page: Optional[IntRef] = None,
-        _count: Optional[int] = None,
-        _cursor: Optional[int] = None,
+        _limit: Optional[int] = None,
+        _offset: Optional[int] = None,
         _auth: Optional[Dict[str, Any]] = None,
     ) -> Optional[pd.DataFrame]:
-        if (_count is None) != (_cursor is None):
-            raise ValueError("_cursor and _count should both be None or not None")
+        if (_limit is None) != (_offset is None):
+            raise ValueError("_limit and _offset should both be None or not None")
 
         method = table.method
         url = table.url
@@ -336,31 +335,31 @@ class Connector:
             else:
                 raise NotImplementedError(table.body_ctype)
 
-        if table.pag_params is not None and _count is not None:
+        if table.pag_params is not None and _limit is not None:
             pag_type = table.pag_params.type
-            count_key = table.pag_params.count_key
-            if pag_type == "cursor":
-                if table.pag_params.cursor_key is None:
+            limit_key = table.pag_params.limit_key
+            if pag_type == "seek":
+                if table.pag_params.seek_key is None:
                     raise ValueError(
-                        "pagination type is cursor but no cursor_key set in the configuration file."
+                        "pagination type is seek but no seek_key set in the configuration file."
                     )
-                cursor_key = table.pag_params.cursor_key
-            elif pag_type == "limit":
-                if table.pag_params.anchor_key is None:
+                offset_key = table.pag_params.seek_key
+            elif pag_type == "offset":
+                if table.pag_params.offset_key is None:
                     raise ValueError(
-                        "pagination type is limit but no anchor_key set in the configuration file."
+                        "pagination type is offset but no offset_key set in the configuration file."
                     )
-                cursor_key = table.pag_params.anchor_key
+                offset_key = table.pag_params.offset_key
             else:
                 raise UnreachableError()
 
-            if count_key in req_data["params"]:
-                raise UniversalParameterOverridden(count_key, "_count")
-            req_data["params"][count_key] = _count
+            if limit_key in req_data["params"]:
+                raise UniversalParameterOverridden(limit_key, "_limit")
+            req_data["params"][limit_key] = _limit
 
-            if cursor_key in req_data["params"]:
-                raise UniversalParameterOverridden(cursor_key, "_cursor")
-            req_data["params"][cursor_key] = _cursor
+            if offset_key in req_data["params"]:
+                raise UniversalParameterOverridden(offset_key, "_offset")
+            req_data["params"][offset_key] = _offset
 
         await _throttler.acquire(_page)
 
