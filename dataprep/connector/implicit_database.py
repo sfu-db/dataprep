@@ -27,9 +27,7 @@ _TYPE_MAPPING = {
 
 
 class SchemaField(NamedTuple):
-    """
-    Schema of one table field
-    """
+    """Schema of one table field."""
 
     target: str
     type: str
@@ -37,25 +35,23 @@ class SchemaField(NamedTuple):
 
 
 class Pagination:
-    """
-    Schema of Pagination field
-    """
+    """Schema of Pagination field."""
 
     type: str
-    count_key: str
+    limit_key: str
     max_count: int
-    anchor_key: Optional[str]
-    cursor_id: Optional[str]
-    cursor_key: Optional[str]
+    offset_key: Optional[str]
+    seek_id: Optional[str]
+    seek_key: Optional[str]
 
     def __init__(self, pdef: Dict[str, Any]) -> None:
 
         self.type = pdef["type"]
         self.max_count = pdef["max_count"]
-        self.count_key = pdef["count_key"]
-        self.anchor_key = pdef.get("anchor_key")
-        self.cursor_id = pdef.get("cursor_id")
-        self.cursor_key = pdef.get("cursor_key")
+        self.limit_key = pdef["limit_key"]
+        self.offset_key = pdef.get("offset_key")
+        self.seek_id = pdef.get("seek_id")
+        self.seek_key = pdef.get("seek_key")
 
 
 class ImplicitTable:  # pylint: disable=too-many-instance-attributes
