@@ -15,8 +15,7 @@ from ...intermediate import Intermediate
 from ...staged import staged
 
 
-@staged
-def compute_missing_nullivariate(
+def _compute_missing_nullivariate(
     df: DataArray, bins: int
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the data for visualizing the plot_missing(df).
@@ -54,6 +53,12 @@ def compute_missing_nullivariate(
         data_dendrogram=dendrogram,
         visual_type="missing_impact",
     )
+
+
+# Not using decorator here because jupyter autoreload does not support it.
+compute_missing_nullivariate = staged(  # pylint: disable=invalid-name
+    _compute_missing_nullivariate
+)
 
 
 def missing_perc_blockwise(bin_size: int) -> Callable[[np.ndarray], np.ndarray]:
