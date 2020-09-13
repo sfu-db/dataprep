@@ -94,8 +94,8 @@ def compute(
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """  # pylint: disable=too-many-locals
 
-    df.columns = df.columns.astype(str)
     df = to_dask(df)
+    df.columns = df.columns.astype(str)
 
     if not any((x, y, z)):
         return compute_overview(df, bins, ngroups, largest, timeunit, dtype)
