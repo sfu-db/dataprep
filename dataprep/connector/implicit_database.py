@@ -7,16 +7,16 @@ from io import StringIO
 from json import load as jload
 from json import loads as jloads
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Union
+from typing import Any, Dict, List, Union
 
-import jsonschema
 import pandas as pd
 from jsonpath_ng import parse as jparse
 from lxml import etree  # pytype: disable=import-error
 
+from dataprep.connector.schema.defs import ConfigDef
+
 from ..errors import UnreachableError
-from .schema import CONFIG_SCHEMA
-from .types import Authorization, AuthorizationType, Fields, Orient
+from .schema import ConfigDef
 
 _TYPE_MAPPING = {
     "int": int,
@@ -26,111 +26,25 @@ _TYPE_MAPPING = {
 }
 
 
-class SchemaField(NamedTuple):
-    """Schema of one table field."""
-
-    target: str
-    type: str
-    description: Optional[str]
-
-
-class Pagination:
-    """Schema of Pagination field."""
-
-    type: str
-    limit_key: str
-    max_count: int
-    offset_key: Optional[str]
-    seek_id: Optional[str]
-    seek_key: Optional[str]
-
-    def __init__(self, pdef: Dict[str, Any]) -> None:
-
-        self.type = pdef["type"]
-        self.max_count = pdef["max_count"]
-        self.limit_key = pdef["limit_key"]
-        self.offset_key = pdef.get("offset_key")
-        self.seek_id = pdef.get("seek_id")
-        self.seek_key = pdef.get("seek_key")
-
-
 class ImplicitTable:  # pylint: disable=too-many-instance-attributes
-    """
-    ImplicitTable class abstracts the request and the response to a Restful API,
-    so that the remote API can be treated as a database table.
-    """
+    """ImplicitTable class abstracts the request and the response
+    to a Restful API, so that the remote API can be treated as a database
+    table."""
 
     name: str
-    config: Dict[str, Any]
-    # Request related
-    method: str
-    url: str
-    authorization: Optional[Authorization] = None
-    headers: Optional[Fields] = None
-    params: Optional[Fields] = None
-    body_ctype: str
-    body: Optional[Fields] = None
-    cookies: Optional[Fields] = None
-    pag_params: Optional[Pagination] = None
-
-    # Response related
-    ctype: str
-    table_path: str
-    schema: Dict[str, SchemaField]
-    orient: Orient
+    config: ConfigDef
 
     def __init__(self, name: str, config: Dict[str, Any]) -> None:
-        jsonschema.validate(
-            config, CONFIG_SCHEMA
-        )  # This will throw errors if validate failed
         self.name = name
-        self.config = config
-
-        request_def = config["request"]
-
-        self.method = request_def["method"]
-        self.url = request_def["url"]
-
-        if "authorization" in request_def:
-            auth_def = request_def["authorization"]
-            if isinstance(auth_def, str):
-                auth_type = AuthorizationType[auth_def]
-                auth_params: Dict[str, str] = {}
-            elif isinstance(auth_def, dict):
-                auth_type = AuthorizationType[auth_def.pop("type")]
-                auth_params = {**auth_def}
-            else:
-                raise NotImplementedError
-            self.authorization = Authorization(auth_type=auth_type, params=auth_params)
-
-        if "pagination" in request_def:
-            self.pag_params = Pagination(request_def["pagination"])
-
-        for key in ["headers", "params", "cookies"]:
-            if key in request_def:
-                setattr(self, key, Fields(request_def[key]))
-
-        if "body" in request_def:
-            body_def = request_def["body"]
-            self.body_ctype = body_def["ctype"]
-            self.body = Fields(body_def["content"])
-
-        response_def = config["response"]
-        self.ctype = response_def["ctype"]
-        self.table_path = response_def["tablePath"]
-        self.schema = {
-            name: SchemaField(def_["target"], def_["type"], def_.get("description"))
-            for name, def_ in response_def["schema"].items()
-        }
-        self.orient = Orient(response_def["orient"])
+        self.config = ConfigDef(**config)
 
     def from_response(self, payload: str) -> pd.DataFrame:
-        """
-        Create a dataframe from a http body payload.
-        """
-        if self.ctype == "application/json":
+        """Create a dataframe from a http body payload."""
+
+        ctype = self.config.response.ctype  # pylint: disable=no-member
+        if ctype == "application/json":
             rows = self.from_json(payload)
-        elif self.ctype == "application/xml":
+        elif ctype == "application/xml":
             rows = self.from_xml(payload)
         else:
             raise UnreachableError
@@ -138,17 +52,20 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         return pd.DataFrame(rows)
 
     def from_json(self, data: str) -> Dict[str, List[Any]]:
-        """
-        Create rows from json string.
-        """
+        """Create rows from json string."""
+
         data = jloads(data)
         table_data = {}
-        table_expr = jparse(self.table_path)
+        respdef = self.config.response
+        table_expr = jparse(respdef.table_path)  # pylint: disable=no-member
 
-        if self.orient == Orient.Records:
+        if respdef.orient == "records":  # pylint: disable=no-member
             data_rows = [match.value for match in table_expr.find(data)]
 
-            for column_name, column_def in self.schema.items():
+            for (
+                column_name,
+                column_def,
+            ) in respdef.schema_.items():  # pylint: disable=no-member
                 column_target = column_def.target
                 column_type = column_def.type
 
@@ -185,14 +102,17 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         Create rows from xml string.
         """
         table_data = {}
-
+        respdef = self.config.response
         data = data.replace('<?xml version="1.0" encoding="UTF-8"?>', "")
 
         root = etree.parse(StringIO(data))
-        data_rows = root.xpath(self.table_path)
+        data_rows = root.xpath(respdef.table_path)  # pylint: disable=no-member
 
-        if self.orient.value == Orient.Records.value:
-            for column_name, column_def in self.schema.items():
+        if respdef.orient == "records":  # pylint: disable=no-member
+            for (
+                column_name,
+                column_def,
+            ) in respdef.schema_.items():  # pylint: disable=no-member
                 column_target = column_def.target
                 column_type = column_def.type
 
@@ -246,7 +166,7 @@ class ImplicitDatabase:
                 # ignore meta file
                 continue
             if table_config_path.suffix != ".json":
-                # ifnote non json file
+                # ignote non json file
                 continue
 
             with open(table_config_path) as f:
