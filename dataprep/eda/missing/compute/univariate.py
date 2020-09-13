@@ -19,14 +19,11 @@ from ...staged import staged
 from .common import LABELS, histogram
 
 
-@staged
-def compute_missing_univariate(  # pylint: disable=too-many-locals
+def _compute_missing_univariate(  # pylint: disable=too-many-locals
     df: DataArray, x: str, bins: int, dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on other columns when
     the missing values in x is dropped."""
-    df.compute("nulls")
-
     j = df.columns.get_loc(x)
 
     hists = {}
@@ -46,7 +43,7 @@ def compute_missing_univariate(  # pylint: disable=too-many-locals
             hist_range = (col0.min(axis=0), col0.max(axis=0))
 
         hists[col_name] = [
-            histogram(col, dtype=dtype, bins=bins, return_edges=True, range=hist_range,)
+            histogram(col, dtype=dtype, bins=bins, return_edges=True, range=hist_range)
             for col in [col0, col1]
         ]
 
@@ -97,3 +94,9 @@ def compute_missing_univariate(  # pylint: disable=too-many-locals
         dfs[col_name] = ret_df
 
     return Intermediate(data=dfs, x=x, meta=meta, visual_type="missing_impact_1vn")
+
+
+# Not using decorator here because jupyter autoreload does not support it.
+compute_missing_univariate = staged(  # pylint: disable=invalid-name
+    _compute_missing_univariate
+)
