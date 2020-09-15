@@ -14,7 +14,6 @@ from ...dtypes import (
     DTypeDef,
     Nominal,
     detect_dtype,
-    drop_null,
     is_dtype,
 )
 from .common import (
@@ -98,7 +97,7 @@ def compute_bivariate(
         except TypeError:
             df[x] = df[x].astype(str)
 
-        (comps,) = dask.compute(nom_cont_comps(drop_null(df), bins, ngroups, largest))
+        (comps,) = dask.compute(nom_cont_comps(df.dropna(), bins, ngroups, largest))
 
         return Intermediate(
             x=x, y=y, data=comps, ngroups=ngroups, visual_type="cat_and_num_cols"
@@ -110,7 +109,7 @@ def compute_bivariate(
         and is_dtype(ytype, DateTime())
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
-        df = drop_null(df[[x, y]])
+        df = df[[x, y]].dropna()
         dtnum: List[Any] = []
         # line chart
         dtnum.append(dask.delayed(_calc_line_dt)(df, timeunit, agg))
@@ -131,7 +130,7 @@ def compute_bivariate(
         and is_dtype(ytype, DateTime())
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
-        df = drop_null(df[[x, y]])
+        df = df[[x, y]].dropna()
         df[y] = df[y].apply(str, meta=(y, str))
         dtcat: List[Any] = []
         # line chart
@@ -160,7 +159,7 @@ def compute_bivariate(
         except TypeError:
             df[y] = df[y].astype(str)
 
-        (comps,) = dask.compute(drop_null(df).groupby([x, y]).size())
+        (comps,) = dask.compute(df.dropna().groupby([x, y]).size())
 
         return Intermediate(
             x=x,
@@ -171,7 +170,7 @@ def compute_bivariate(
             visual_type="two_cat_cols",
         )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
-        df = drop_null(df[[x, y]])
+        df = df[[x, y]].dropna()
 
         data: Dict[str, Any] = {}
         # scatter plot data
