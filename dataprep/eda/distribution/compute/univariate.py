@@ -18,7 +18,6 @@ from ...dtypes import (
     DTypeDef,
     Nominal,
     detect_dtype,
-    drop_null,
     is_dtype,
 )
 from ...intermediate import Intermediate
@@ -177,7 +176,7 @@ def nom_comps(
     except TypeError:
         srs = srs.astype(str)
     # drop null values
-    srs = drop_null(srs)
+    srs = srs.dropna()
 
     ## if cfg.bar_enable or cfg.pie_enable
     # counts of unique values in the series
@@ -223,7 +222,7 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
     ## if cfg.stats_enable or cfg.hist_enable or
     # calculate the total number of rows then drop the missing values
     data["nrows"] = srs.shape[0]
-    srs = drop_null(srs)
+    srs = srs.dropna()
     ## if cfg.stats_enable
     # number of not null (present) values
     data["npres"] = srs.shape[0]
@@ -236,7 +235,6 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
     ## if cfg.hist_enable or cfg.qqplot_enable and cfg.ingsights_enable:
     data["hist"] = da.histogram(srs, bins=bins, range=[data["min"], data["max"]])
     ## if cfg.insights_enable and (cfg.qqplot_enable or cfg.hist_enable):
-    # NOTE normal test does a .compute() and I cannot fix it with delayed
     data["norm"] = normaltest(data["hist"][0])
     ## if cfg.qqplot_enable
     data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))

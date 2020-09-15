@@ -1636,7 +1636,7 @@ def cont_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
 
     ## if cfg.insight.normal_enable:
     if data["norm"][1] > 0.99:
-        ins["hist"].append(f"{col} is normally distributed")
+        ins["Histogram"].append(f"{col} is normally distributed")
 
     ## if cfg.insight.uniform_enable:
     if data["chisq"][1] > 0.999:  ## cfg.insight.uniform_threshold
