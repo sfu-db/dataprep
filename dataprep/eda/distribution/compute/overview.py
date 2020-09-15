@@ -8,7 +8,7 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from dask.array.stats import chisquare, skew
+from dask.array.stats import chisquare
 
 from ....errors import UnreachableError
 from ...dtypes import (
@@ -18,12 +18,11 @@ from ...dtypes import (
     DTypeDef,
     Nominal,
     detect_dtype,
-    drop_null,
     get_dtype_cnts_and_num_cols,
     is_dtype,
 )
 from ...intermediate import Intermediate
-from .common import _calc_line_dt, ks_2samp, normaltest
+from .common import _calc_line_dt, ks_2samp, normaltest, skewtest
 
 
 def compute_overview(
@@ -80,11 +79,11 @@ def compute_overview(
                 first_rows[col].apply(hash)
             except TypeError:
                 srs = df[col] = srs.astype(str)
-            datas.append(calc_nom_col(drop_null(srs), ngroups, largest))
+            datas.append(calc_nom_col(srs.dropna(), first_rows[col], ngroups, largest))
             col_names_dtypes.append((col, Nominal()))
         elif is_dtype(col_dtype, Continuous()):
             ## if cfg.hist_enable or cfg.any_insights("hist"):
-            datas.append(calc_cont_col(drop_null(srs), bins))
+            datas.append(calc_cont_col(srs.dropna(), bins))
             col_names_dtypes.append((col, Continuous()))
         elif is_dtype(col_dtype, DateTime()):
             datas.append(dask.delayed(_calc_line_dt)(df[[col]], timeunit))
@@ -145,10 +144,11 @@ def calc_cont_col(srs: dd.Series, bins: int) -> Dict[str, Any]:
     data["npres"] = srs.shape[0]
 
     ## if cfg.insight.infinity_enable:
-    data["ninf"] = srs.isin({np.inf, -np.inf}).sum()
+    is_inf_srs = srs.isin({np.inf, -np.inf})
+    data["ninf"] = is_inf_srs.sum()
 
     # remove infinite values
-    srs = srs[~srs.isin({np.inf, -np.inf})]
+    srs = srs[~is_inf_srs]
 
     ## if cfg.hist_enable or config.insight.uniform_enable or cfg.insight.normal_enable:
     ## bins = cfg.hist_bins
@@ -164,7 +164,7 @@ def calc_cont_col(srs: dd.Series, bins: int) -> Dict[str, Any]:
     data["nneg"] = (srs < 0).sum()
 
     ## if cfg.insight.skew_enabled:
-    data["skew"] = skew(srs)
+    data["skew"] = skewtest(data["hist"][0])
 
     ## if cfg.insight.unique_enabled:
     data["nuniq"] = srs.nunique()
@@ -176,7 +176,9 @@ def calc_cont_col(srs: dd.Series, bins: int) -> Dict[str, Any]:
 
 
 ## def calc_nom_col(srs: dd.Series, first_rows: pd.Series, cfg: Config)
-def calc_nom_col(srs: dd.Series, ngroups: int, largest: bool) -> Dict[str, Any]:
+def calc_nom_col(
+    srs: dd.Series, first_rows: pd.Series, ngroups: int, largest: bool
+) -> Dict[str, Any]:
     """
     Computations for a categorical column in plot(df)
 
@@ -222,8 +224,10 @@ def calc_nom_col(srs: dd.Series, ngroups: int, largest: bool) -> Dict[str, Any]:
     ## data["npresent"] = srs.shape[0]
 
     ## if cfg.insight.constant_length_enable:
-    length = srs.apply(lambda v: len(str(v)), meta=(srs.name, np.int64))
-    data["min_len"], data["max_len"] = length.min(), length.max()
+    if not first_rows.apply(lambda x: isinstance(x, str)).all():
+        srs = srs.astype(str)  # srs must be a string to compute the value lengths
+    lengths = srs.str.len()
+    data["min_len"], data["max_len"] = lengths.min(), lengths.max()
 
     return data
 
@@ -247,7 +251,6 @@ def calc_stats(df: dd.DataFrame, dtype: Optional[DTypeDef]) -> Dict[str, Any]:
 
     ## if cfg.stats_enable
     dtype_cnts, num_cols = get_dtype_cnts_and_num_cols(df, dtype)
-    stats["nrows"] = df.shape[0]
     stats["ncols"] = df.shape[1]
     stats["npresent_cells"] = df.count().sum()
     stats["nrows_wo_dups"] = df.drop_duplicates().shape[0]
@@ -327,9 +330,8 @@ def format_cont(col: str, data: Dict[str, Any], nrows: int) -> Any:
         ins.append({"Missing": f"{col} has {nmiss} ({pmiss}%) missing values"})
 
     ## if cfg.insight.skewed_enable:
-    if data["skew"] >= 20:  ## cfg.insight.skewed_threshold
-        skew_val = np.round(data["skew"], 4)
-        ins.append({"Skewed": f"{col} is skewed (\u03B31 = {skew_val})"})
+    if data["skew"][1] < 1e-5:  ## cfg.insight.skewed_threshold
+        ins.append({"Skewed": f"{col} is skewed"})
 
     ## if cfg.insight.infinity_enable:
     pinf = round(data["ninf"] / nrows * 100, 2)
