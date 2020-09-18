@@ -37,4 +37,10 @@ def simpledf() -> pd.DataFrame:
 
 
 def test_report(simpledf: pd.DataFrame) -> None:
+    from sys import platform
+
+    if platform == "darwin":
+        import matplotlib
+
+        matplotlib.use("PS")
     create_report(simpledf, mode="basic")
