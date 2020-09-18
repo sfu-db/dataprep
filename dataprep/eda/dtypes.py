@@ -12,7 +12,7 @@ import dask.dataframe as dd
 from ..errors import UnreachableError
 
 CATEGORICAL_NUMPY_DTYPES = [np.bool, np.object]
-CATEGORICAL_PANDAS_DTYPES = [pd.CategoricalDtype, pd.PeriodDtype]
+CATEGORICAL_PANDAS_DTYPES = [pd.CategoricalDtype, pd.PeriodDtype, pd.StringDtype]
 CATEGORICAL_DTYPES = CATEGORICAL_NUMPY_DTYPES + CATEGORICAL_PANDAS_DTYPES
 
 NUMERICAL_NUMPY_DTYPES = [np.number]
