@@ -14,7 +14,7 @@ from jinja2 import Environment, StrictUndefined, Template
 
 from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
-from .errors import RequestError, UniversalParameterOverridden
+from .errors import RequestError, UniversalParameterOverridden, InvalidParameterError
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .int_ref import IntRef
 from .throttler import OrderedThrottler, ThrottleSession
@@ -117,6 +117,11 @@ class Connector:
         **where
             The additional parameters required for the query.
         """
+        allowed_params = self._impdb.tables[table].config["request"]["params"]
+        for key in where:
+            if key not in allowed_params:
+                raise InvalidParameterError(key)
+
         return await self._query_imp(table, where, _auth=_auth, _count=_count)
 
     @property
