@@ -28,6 +28,7 @@ If you want to get involved with the DataPrep community see :ref:`contribute`.
     user_guide/user_guide
     api_reference/dataprep
     contribute
+    acknowledgement
 
 .. Indices and tables
 .. ==================
