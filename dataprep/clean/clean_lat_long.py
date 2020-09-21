@@ -10,7 +10,7 @@ import dask
 import numpy as np
 import pandas as pd
 
-from .utils import NULL_VALUES, report, to_dask
+from .utils import NULL_VALUES, create_report, to_dask
 
 LAT_LONG_PATTERN = re.compile(
     r"""
@@ -87,6 +87,7 @@ def clean_lat_long(
     output_format: str = "dd",
     split: bool = False,
     inplace: bool = False,
+    report: bool = True,
     errors: str = "coerce",
 ) -> pd.DataFrame:
     """
@@ -114,6 +115,8 @@ def clean_lat_long(
     inplace
         If True, delete the given column with dirty data, else, create a new
         column with cleaned data.
+    report
+        If True, output the summary report. Otherwise, no report is outputted.
     errors {‘ignore’, ‘raise’, ‘coerce’}, default 'coerce'
         * If ‘raise’, then invalid parsing will raise an exception.
         * If ‘coerce’, then invalid parsing will be set as NaT.
@@ -192,7 +195,8 @@ def clean_lat_long(
     df, nrows = dask.compute(df, df.shape[0])
 
     # output the report describing the changes to the column
-    report(STATS, nrows)
+    if report:
+        create_report(STATS, nrows)
 
     return df
 

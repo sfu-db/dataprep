@@ -40,7 +40,7 @@ def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
     return dd.from_pandas(df, npartitions=npartitions)
 
 
-def report(stats: Dict[str, int], nrows: int) -> None:
+def create_report(stats: Dict[str, int], nrows: int) -> None:
     """
     Describe what was done in the cleaning process
     """
