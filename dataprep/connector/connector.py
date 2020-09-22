@@ -97,6 +97,7 @@ class Connector:
         table: str,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
+        _q: Optional[str] = None,
         _concurrency: Optional[int] = None,
         **where: Any,
     ) -> Union[Awaitable[pd.DataFrame], pd.DataFrame]:
@@ -114,6 +115,8 @@ class Connector:
             This parameter will override the one from Connector if passed.
         _count: Optional[int] = None
             Count of returned records.
+        _q: Optional[str] = None
+            Search string to be matched in the response
         **where
             The additional parameters required for the query.
         """
@@ -122,7 +125,7 @@ class Connector:
             if key not in allowed_params:
                 raise InvalidParameterError(key)
 
-        return await self._query_imp(table, where, _auth=_auth, _count=_count)
+        return await self._query_imp(table, where, _auth=_auth, _q=_q, _count=_count)
 
     @property
     def table_names(self) -> List[str]:
@@ -202,6 +205,7 @@ class Connector:
         *,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
+        _q: Optional[str] = None,
     ) -> pd.DataFrame:
         if table not in self._impdb.tables:
             raise ValueError(f"No such table {table} in {self._impdb.name}")
@@ -221,7 +225,7 @@ class Connector:
 
             if itable.pag_params is None or _count is None:
                 df = await self._fetch(
-                    itable, kwargs, _client=client, _throttler=throttler, _auth=_auth,
+                    itable, kwargs, _client=client, _throttler=throttler, _auth=_auth, _q=_q,
                 )
                 return df
 
@@ -245,6 +249,7 @@ class Connector:
                         _client=client,
                         _throttler=throttler,
                         _auth=_auth,
+                        _q=_q,
                         _count=count,
                         _cursor=last_id - 1,
                     )
@@ -273,6 +278,7 @@ class Connector:
                             _page=i,
                             _allowed_page=allowed_page,
                             _auth=_auth,
+                            _q=_q,
                             _count=count,
                             _cursor=i * max_per_page,
                         )
@@ -303,6 +309,7 @@ class Connector:
         _count: Optional[int] = None,
         _cursor: Optional[int] = None,
         _auth: Optional[Dict[str, Any]] = None,
+        _q: Optional[str] = None,
     ) -> Optional[pd.DataFrame]:
         if (_count is None) != (_cursor is None):
             raise ValueError("_cursor and _count should both be None or not None")
@@ -361,6 +368,12 @@ class Connector:
             if cursor_key in req_data["params"]:
                 raise UniversalParameterOverridden(cursor_key, "_cursor")
             req_data["params"][cursor_key] = _cursor
+
+        if table.search_params is not None and _q is not None:
+            search_key = table.search_params.search_key
+            if search_key in req_data["params"]:
+                raise UniversalParameterOverridden(search_key, "_q")
+            req_data["params"][search_key] = _q
 
         await _throttler.acquire(_page)
 

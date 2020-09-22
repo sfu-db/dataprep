@@ -36,6 +36,18 @@ class SchemaField(NamedTuple):
     description: Optional[str]
 
 
+class Search:
+    """
+    Schema of Search field
+    """
+
+    search_key: str
+
+    def __init__(self, pdef: Dict[str, Any]) -> None:
+
+        self.search_key = pdef["search_key"]
+
+
 class Pagination:
     """
     Schema of Pagination field
@@ -75,6 +87,7 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
     body_ctype: str
     body: Optional[Fields] = None
     cookies: Optional[Fields] = None
+    search_params: Optional[Search] = None
     pag_params: Optional[Pagination] = None
 
     # Response related
@@ -106,6 +119,9 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
             else:
                 raise NotImplementedError
             self.authorization = Authorization(auth_type=auth_type, params=auth_params)
+
+        if "search" in request_def:
+            self.search_params = Search(request_def["search"])
 
         if "pagination" in request_def:
             self.pag_params = Pagination(request_def["pagination"])
