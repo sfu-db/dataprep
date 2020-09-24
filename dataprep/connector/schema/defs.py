@@ -85,9 +85,8 @@ class QueryParamAuthorizationDef(BaseDef):
         params: Dict[str, Any],
         storage: Optional[Dict[str, Any]] = None,  # pylint: disable=unused-argument
     ) -> None:
-        """Populate some required fields to the request data.
-        Complex logic may also happens in this function (e.g. start a server to do OAuth).
-        """
+        """Populate some required fields to the request data."""
+
         req_data["params"][self.key_param] = params["access_token"]
 
 
@@ -100,14 +99,33 @@ class BearerAuthorizationDef(BaseDef):
         params: Dict[str, Any],
         storage: Optional[Dict[str, Any]] = None,  # pylint: disable=unused-argument
     ) -> None:
-        """Populate some required fields to the request data.
-        Complex logic may also happens in this function (e.g. start a server to do OAuth).
-        """
+        """Populate some required fields to the request data."""
+
         req_data["headers"]["Authorization"] = f"Bearer {params['access_token']}"
 
 
+class HeaderAuthorizationDef(BaseDef):
+    type: str = Field("Header", const=True)
+    key_name: str
+    extra: Dict[str, str] = Field(default_factory=dict)
+
+    def build(
+        self,
+        req_data: Dict[str, Any],
+        params: Dict[str, Any],
+        storage: Optional[Dict[str, Any]] = None,  # pylint: disable=unused-argument
+    ) -> None:
+        """Populate some required fields to the request data."""
+
+        req_data["headers"][self.key_name] = params["access_token"]
+        req_data["headers"].update(self.extra)
+
+
 AuthorizationDef = Union[
-    OAuth2AuthorizationDef, QueryParamAuthorizationDef, BearerAuthorizationDef
+    OAuth2AuthorizationDef,
+    QueryParamAuthorizationDef,
+    BearerAuthorizationDef,
+    HeaderAuthorizationDef,
 ]
 
 
