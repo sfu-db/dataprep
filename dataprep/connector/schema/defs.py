@@ -1,7 +1,7 @@
 """Strong typed schema definition."""
+from __future__ import annotations
 
 from base64 import b64encode
-from copy import deepcopy
 from enum import Enum
 from time import time
 from typing import Any, Dict, Optional, Union
@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional, Union
 import requests
 from pydantic import Field
 
-from .base import BaseDef
+from .base import BaseDef, BaseDefT
 
 
 # pylint: disable=missing-class-docstring,missing-function-docstring
@@ -156,7 +156,7 @@ class SchemaFieldDef(BaseDef):
     type: str
     description: Optional[str]
 
-    def merge(self, rhs: Any) -> "SchemaFieldDef":
+    def merge(self, rhs: BaseDefT) -> BaseDefT:
         if not isinstance(rhs, SchemaFieldDef):
             raise ValueError(f"Cannot merge {type(self)} with {type(rhs)}")
 
@@ -165,11 +165,11 @@ class SchemaFieldDef(BaseDef):
 
         merged_type = merge_type(self.type, rhs.type)
 
-        cur = deepcopy(self)
+        cur: SchemaFieldDef = self.copy()  # type: ignore
         cur.type = merged_type
         cur.description = rhs.description
 
-        return cur
+        return cur  # type: ignore
 
 
 TYPE_TREE = {

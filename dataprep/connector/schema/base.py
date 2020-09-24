@@ -4,12 +4,13 @@
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, TypeVar
+from typing import Callable, Dict, Optional, TypeVar, cast, Any
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 from stringcase import camelcase
 
 T = TypeVar("T")  # pylint: disable=invalid-name
+BaseDefT = TypeVar("BaseDefT", bound="BaseDef")
 
 
 @dataclass
@@ -31,11 +32,11 @@ class BaseDef(BaseModel):
         extra: str = "forbid"
         validate_all: bool = True
 
-    def merge(self, rhs: Any) -> "BaseDef":
+    def merge(self, rhs: BaseDefT) -> BaseDefT:
         if not isinstance(rhs, type(self)):
             raise ValueError(f"Cannot merge {type(self)} with {type(rhs)}")
 
-        cur: "BaseDef" = self.copy()
+        cur: BaseDefT = cast(BaseDefT, self.copy())
 
         for attr, _ in self.__fields__.items():
             cur_value, rhs_value = getattr(cur, attr), getattr(rhs, attr)
@@ -61,8 +62,8 @@ class BaseDef(BaseModel):
 
 
 def merge_values(  # pylint: disable=too-many-branches
-    lhs: T, rhs: T, attr: str, policy: Policy
-) -> T:
+    lhs: Any, rhs: Any, attr: str, policy: Policy
+) -> Any:
     """merge two not none values."""
 
     if not isinstance(rhs, type(lhs)):
@@ -73,6 +74,9 @@ def merge_values(  # pylint: disable=too-many-branches
     if isinstance(lhs, BaseDef):
         return lhs.merge(rhs)
     elif isinstance(rhs, dict):
+        lhs = cast(Dict[str, Any], lhs)
+        rhs = cast(Dict[str, Any], rhs)
+
         for key in rhs.keys():
             if key in lhs:
                 lhs[key] = merge_values(lhs[key], rhs[key], attr, policy)

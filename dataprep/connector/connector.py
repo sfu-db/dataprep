@@ -6,7 +6,7 @@ import math
 import sys
 from asyncio import as_completed
 from pathlib import Path
-from typing import Any, Awaitable, Dict, List, Optional, Union, cast
+from typing import Any, Awaitable, Dict, List, Optional, Union
 
 import pandas as pd
 from aiohttp import ClientSession
@@ -14,10 +14,10 @@ from jinja2 import Environment, StrictUndefined, Template, UndefinedError
 
 from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
-from .errors import RequestError, UniversalParameterOverridden, InvalidParameterError
+from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .int_ref import IntRef
-from .schema import ConfigDef, FieldDef
+from .schema import ConfigDef, FieldDefUnion
 from .throttler import OrderedThrottler, ThrottleSession
 
 INFO_TEMPLATE = Template(
@@ -402,7 +402,7 @@ class Connector:
 
 
 def populate_field(  # pylint: disable=too-many-branches
-    fields: Dict[str, FieldDef], jenv: Environment, params: Dict[str, Any]
+    fields: Dict[str, FieldDefUnion], jenv: Environment, params: Dict[str, Any]
 ) -> Dict[str, str]:
     """Populate a dict based on the fields definition and provided vars."""
 
@@ -419,8 +419,7 @@ def populate_field(  # pylint: disable=too-many-branches
             remove_if_empty = False
         elif isinstance(def_, str):
             # is a template
-            template: Optional[str] = def_
-            tmplt = jenv.from_string(cast(str, template))
+            tmplt = jenv.from_string(def_)
             value = tmplt.render(**params)
             remove_if_empty = False
         else:
