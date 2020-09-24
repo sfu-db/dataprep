@@ -6,17 +6,16 @@ import math
 import sys
 from asyncio import as_completed
 from pathlib import Path
-from typing import Any, Awaitable, Dict, List, Optional, Union
+from typing import Any, Awaitable, Dict, List, Optional, Union, cast
 
 import pandas as pd
 from aiohttp import ClientSession
 from jinja2 import Environment, StrictUndefined, Template, UndefinedError
 
-from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
-from .int_ref import IntRef
+from .ref import Ref
 from .schema import ConfigDef, FieldDefUnion
 from .throttler import OrderedThrottler, ThrottleSession
 
@@ -254,7 +253,7 @@ class Connector:
                         _throttler=throttler,
                         _auth=_auth,
                         _limit=count,
-                        _offset=last_id - 1,
+                        _anchor=last_id - 1,
                     )
 
                     if df is None:
@@ -267,11 +266,18 @@ class Connector:
                     last_id = int(df[pagdef.seek_id][len(df) - 1]) - 1
                     dfs.append(df)
 
-            elif pagdef.type == "offset":
+            elif pagdef.type in {"offset", "page"}:
                 resps_coros = []
-                allowed_page = IntRef(n_page)
+                allowed_page = Ref(n_page)
                 for i in range(n_page):
                     count = min(total - i * max_per_page, max_per_page)
+                    if pagdef.type == "offset":
+                        anchor = i * max_per_page
+                    elif pagdef.type == "page":
+                        anchor = i + 1
+                    else:
+                        raise ValueError(f"Unknown pagination type {pagdef.type}")
+
                     resps_coros.append(
                         self._fetch(
                             itable,
@@ -282,7 +288,7 @@ class Connector:
                             _allowed_page=allowed_page,
                             _auth=_auth,
                             _limit=count,
-                            _offset=i * max_per_page,
+                            _anchor=anchor,
                         )
                     )
 
@@ -291,7 +297,6 @@ class Connector:
                     df = await resp_coro
                     if df is not None:
                         dfs.append(df)
-
             else:
                 raise NotImplementedError
 
@@ -307,12 +312,12 @@ class Connector:
         _client: ClientSession,
         _throttler: ThrottleSession,
         _page: int = 0,
-        _allowed_page: Optional[IntRef] = None,
+        _allowed_page: Optional[Ref[int]] = None,
         _limit: Optional[int] = None,
-        _offset: Optional[int] = None,
+        _anchor: Optional[int] = None,
         _auth: Optional[Dict[str, Any]] = None,
     ) -> Optional[pd.DataFrame]:
-        if (_limit is None) != (_offset is None):
+        if (_limit is None) != (_anchor is None):
             raise ValueError("_limit and _offset should both be None or not None")
 
         reqdef = table.config.request
@@ -350,28 +355,23 @@ class Connector:
             pagdef = reqdef.pagination
             pag_type = pagdef.type
             limit_key = pagdef.limit_key
+
             if pag_type == "seek":
-                if pagdef.seek_key is None:
-                    raise ValueError(
-                        "pagination type is seek but no seek_key set in the configuration file."
-                    )
-                offset_key = pagdef.seek_key
+                anchor = cast(str, pagdef.seek_key)
             elif pag_type == "offset":
-                if pagdef.offset_key is None:
-                    raise ValueError(
-                        "pagination type is offset but no offset_key set in the configuration file."
-                    )
-                offset_key = pagdef.offset_key
+                anchor = cast(str, pagdef.offset_key)
+            elif pag_type == "page":
+                anchor = cast(str, pagdef.page_key)
             else:
-                raise UnreachableError()
+                raise ValueError(f"Unknown pagination type {pag_type}.")
 
             if limit_key in req_data["params"]:
                 raise UniversalParameterOverridden(limit_key, "_limit")
             req_data["params"][limit_key] = _limit
 
-            if offset_key in req_data["params"]:
-                raise UniversalParameterOverridden(offset_key, "_offset")
-            req_data["params"][offset_key] = _offset
+            if anchor in req_data["params"]:
+                raise UniversalParameterOverridden(anchor, "_offset")
+            req_data["params"][anchor] = _anchor
 
         await _throttler.acquire(_page)
 
