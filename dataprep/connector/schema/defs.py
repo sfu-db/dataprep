@@ -211,7 +211,7 @@ TYPE_TREE = {
     "string": None,
     "float": "string",
     "int": "float",
-    "bool": "string",
+    "boolean": "string",
 }
 
 

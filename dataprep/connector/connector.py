@@ -274,7 +274,9 @@ class Connector:
                         # The API returns empty for this page, maybe we've reached the end
                         break
 
-                    last_id = int(df.iloc[-1, df.columns.get_loc(pagdef.seek_id)]) - 1  # type: ignore
+                    cid = df.columns.get_loc(pagdef.seek_id)
+                    last_id = int(df.iloc[-1, cid]) - 1  # type: ignore
+
                     dfs.append(df)
             elif isinstance(pagdef, TokenPaginationDef):
                 next_token = None
