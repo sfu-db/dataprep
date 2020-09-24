@@ -7,19 +7,31 @@ from time import time
 from typing import Any, Dict, Optional, Union
 
 import requests
-from pydantic import Field
+from pydantic import Field, root_validator
 
 from .base import BaseDef, BaseDefT
 
 
 # pylint: disable=missing-class-docstring,missing-function-docstring
 class PaginationDef(BaseDef):
-    type: str = Field(regex=r"^(offset|seek)$")
+    type: str = Field(regex=r"^(offset|seek|page)$")
     max_count: int
     offset_key: Optional[str]
     limit_key: str
     seek_id: Optional[str]
     seek_key: Optional[str]
+    page_key: Optional[str]
+
+    @root_validator(pre=True)
+    def check_key_provided(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        if values["type"] == "offset" and "offsetKey" not in values:
+            raise ValueError("Pagination type is 'offset' but no offsetKey set.")
+        elif values["type"] == "seek" and "seekKey" not in values:
+            raise ValueError("Pagination type is seek but no seekKey set.")
+        elif values["type"] == "page" and "pageKey" not in values:
+            raise ValueError("Pagination type is page but no pageKey set.")
+        else:
+            return values
 
 
 class FieldDef(BaseDef):
