@@ -29,6 +29,36 @@ NULL_VALUES = {
     "",
 }
 
+NEARBYKEYS = {
+    "a": ["q", "w", "s", "x", "z"],
+    "b": ["v", "g", "h", "n"],
+    "c": ["x", "d", "f", "v"],
+    "d": ["s", "e", "r", "f", "c", "x"],
+    "e": ["w", "s", "d", "r"],
+    "f": ["d", "r", "t", "g", "v", "c"],
+    "g": ["f", "t", "y", "h", "b", "v"],
+    "h": ["g", "y", "u", "j", "n", "b"],
+    "i": ["u", "j", "k", "o"],
+    "j": ["h", "u", "i", "k", "n", "m"],
+    "k": ["j", "i", "o", "l", "m"],
+    "l": ["k", "o", "p"],
+    "m": ["n", "j", "k", "l"],
+    "n": ["b", "h", "j", "m"],
+    "o": ["i", "k", "l", "p"],
+    "p": ["o", "l"],
+    "q": ["w", "a", "s"],
+    "r": ["e", "d", "f", "t"],
+    "s": ["w", "e", "d", "x", "z", "a"],
+    "t": ["r", "f", "g", "y"],
+    "u": ["y", "h", "j", "i"],
+    "v": ["c", "f", "g", "v", "b"],
+    "w": ["q", "a", "s", "e"],
+    "x": ["z", "s", "d", "c"],
+    "y": ["t", "g", "h", "u"],
+    "z": ["a", "s", "x"],
+    " ": ["c", "v", "b", "n", "m"],
+}
+
 
 def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
     """Convert a dataframe to a dask dataframe."""
