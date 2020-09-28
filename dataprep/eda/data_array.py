@@ -186,6 +186,9 @@ class DataArray:
     def __init__(
         self, df: DataFrame, value_length: bool = False, repartition: bool = True,
     ) -> None:
+        if isinstance(df, (dd.Series, pd.Series)):
+            df = df.to_frame()
+
         # numpy does not understand pandas types
         cat_cols = [
             col

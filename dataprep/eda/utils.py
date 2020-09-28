@@ -35,6 +35,11 @@ def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
     """Convert a dataframe to a dask dataframe."""
     if isinstance(df, dd.DataFrame):
         return df
+    elif isinstance(df, dd.Series):
+        return df.to_frame()
+
+    if isinstance(df, pd.Series):
+        df = df.to_frame()
 
     df_size = df.memory_usage(deep=True).sum()
     npartitions = ceil(df_size / 128 / 1024 / 1024)  # 128 MB partition size

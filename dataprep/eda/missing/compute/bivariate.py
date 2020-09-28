@@ -20,8 +20,7 @@ from ...staged import staged
 from .common import LABELS, histogram
 
 
-@staged
-def compute_missing_bivariate(  # pylint: disable=too-many-locals
+def _compute_missing_bivariate(  # pylint: disable=too-many-locals
     df: DataArray,
     x: str,
     y: str,
@@ -32,7 +31,6 @@ def compute_missing_bivariate(  # pylint: disable=too-many-locals
     # pylint: disable=too-many-arguments
     """Calculate the distribution change on another column y when
     the missing values in x is dropped."""
-    df.compute("nulls")
 
     xloc = df.columns.get_loc(x)
     yloc = df.columns.get_loc(y)
@@ -144,3 +142,9 @@ def compute_missing_bivariate(  # pylint: disable=too-many-locals
             hist=df_ret, x=x, y=y, meta=meta["y"], visual_type="missing_impact_1v1",
         )
         return itmdt
+
+
+# Not using decorator here because jupyter autoreload does not support it.
+compute_missing_bivariate = staged(  # pylint: disable=invalid-name
+    _compute_missing_bivariate
+)

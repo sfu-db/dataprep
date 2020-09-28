@@ -6,17 +6,28 @@ import math
 import sys
 from asyncio import as_completed
 from pathlib import Path
-from typing import Any, Awaitable, Dict, List, Optional, Union
+from typing import Any, Awaitable, Dict, List, Optional, Tuple, Union
+from warnings import warn
 
 import pandas as pd
 from aiohttp import ClientSession
-from jinja2 import Environment, StrictUndefined, Template
+from aiohttp.client_reqrep import ClientResponse
+from jinja2 import Environment, StrictUndefined, Template, UndefinedError
+from jsonpath_ng import parse as jparse
 
-from ..errors import UnreachableError
 from .config_manager import config_directory, ensure_config
-from .errors import RequestError, UniversalParameterOverridden
+from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
-from .int_ref import IntRef
+from .ref import Ref
+from .schema import (
+    ConfigDef,
+    FieldDefUnion,
+    OffsetPaginationDef,
+    PagePaginationDef,
+    SeekPaginationDef,
+    TokenLocation,
+    TokenPaginationDef,
+)
 from .throttler import OrderedThrottler, ThrottleSession
 
 INFO_TEMPLATE = Template(
@@ -38,8 +49,7 @@ Examples
 
 
 class Connector:
-    """
-    This is the main class of the connector component.
+    """This is the main class of the connector component.
     Initialize Connector class as the example code.
 
     Parameters
@@ -61,8 +71,11 @@ class Connector:
     """
 
     _impdb: ImplicitDatabase
+    # Varibles that used across different queries, can be overriden by query
     _vars: Dict[str, Any]
     _auth: Dict[str, Any]
+    # storage for authorization
+    _storage: Dict[str, Any]
     _concurrency: int
     _jenv: Environment
 
@@ -88,6 +101,7 @@ class Connector:
 
         self._vars = kwargs
         self._auth = _auth or {}
+        self._storage = {}
         self._concurrency = _concurrency
         self._jenv = Environment(undefined=StrictUndefined)
         self._throttler = OrderedThrottler(_concurrency)
@@ -95,9 +109,10 @@ class Connector:
     async def query(  # pylint: disable=too-many-locals
         self,
         table: str,
+        *,
+        _q: Optional[str] = None,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
-        _concurrency: Optional[int] = None,
         **where: Any,
     ) -> Union[Awaitable[pd.DataFrame], pd.DataFrame]:
         """
@@ -107,6 +122,8 @@ class Connector:
         ----------
         table
             The table name.
+        _q: Optional[str] = None
+            Search string to be matched in the response.
         _auth: Optional[Dict[str, Any]] = None
             The parameters for authentication. Usually the authentication parameters
             should be defined when instantiating the Connector. In case some tables have different
@@ -117,12 +134,18 @@ class Connector:
         **where
             The additional parameters required for the query.
         """
-        return await self._query_imp(table, where, _auth=_auth, _count=_count)
+        allowed_params = self._impdb.tables[table].config.request.params
+        for key in where:
+            if key not in allowed_params:
+                raise InvalidParameterError(key)
+
+        return await self._query_imp(table, where, _auth=_auth, _q=_q, _count=_count)
 
     @property
     def table_names(self) -> List[str]:
         """
         Return all the names of the available tables in a list.
+
         Note
         ----
         We abstract each website as a database containing several tables.
@@ -131,19 +154,18 @@ class Connector:
         return list(self._impdb.tables.keys())
 
     def info(self) -> None:
-        """
-        Show the basic information and provide guidance for users to issue queries.
-        """
+        """Show the basic information and provide guidance for users
+        to issue queries."""
 
         # get info
         tbs: Dict[str, Any] = {}
         for cur_table in self._impdb.tables:
-            table_config_content = self._impdb.tables[cur_table].config
+            table_config_content: ConfigDef = self._impdb.tables[cur_table].config
             params_required = []
             params_optional = []
             example_query_fields = []
             count = 1
-            for k, val in table_config_content["request"]["params"].items():
+            for k, val in table_config_content.request.params.items():
                 if isinstance(val, bool) and val:
                     params_required.append(k)
                     example_query_fields.append(f"""{k}="word{count}\"""")
@@ -163,46 +185,51 @@ class Connector:
         )
 
     def show_schema(self, table_name: str) -> pd.DataFrame:
-        """
-        This method shows the schema of the table that will be returned,
+        """This method shows the schema of the table that will be returned,
         so that the user knows what information to expect.
+
         Parameters
         ----------
         table_name
             The table name.
+
         Returns
         -------
         pd.DataFrame
             The returned data's schema.
+
         Note
         ----
         The schema is defined in the configuration file.
         The user can either use the default one or change it by editing the configuration file.
         """
         print(f"table: {table_name}")
-        table_config_content = self._impdb.tables[table_name].config
-        schema = table_config_content["response"]["schema"]
+        table_config_content: ConfigDef = self._impdb.tables[table_name].config
+        schema = table_config_content.response.schema_
         new_schema_dict: Dict[str, List[Any]] = {}
         new_schema_dict["column_name"] = []
         new_schema_dict["data_type"] = []
         for k in schema.keys():
             new_schema_dict["column_name"].append(k)
-            new_schema_dict["data_type"].append(schema[k]["type"])
+            new_schema_dict["data_type"].append(schema[k].type)
         return pd.DataFrame.from_dict(new_schema_dict)
 
-    async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches
+    async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
         table: str,
         kwargs: Dict[str, Any],
         *,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
+        _q: Optional[str] = None,
     ) -> pd.DataFrame:
         if table not in self._impdb.tables:
             raise ValueError(f"No such table {table} in {self._impdb.name}")
 
         itable = self._impdb.tables[table]
-        if itable.pag_params is None and _count is not None:
+        reqconf = itable.config.request
+
+        if reqconf.pagination is None and _count is not None:
             print(
                 f"ignoring _count since {table} has no pagination settings",
                 file=sys.stderr,
@@ -212,25 +239,31 @@ class Connector:
             raise RuntimeError("_count should be larger than 0")
 
         async with ClientSession() as client:
+
             throttler = self._throttler.session()
 
-            if itable.pag_params is None or _count is None:
+            if reqconf.pagination is None or _count is None:
                 df = await self._fetch(
-                    itable, kwargs, _client=client, _throttler=throttler, _auth=_auth,
+                    itable,
+                    kwargs,
+                    _client=client,
+                    _throttler=throttler,
+                    _auth=_auth,
+                    _q=_q,
                 )
                 return df
 
-            pag_type = itable.pag_params.type
+            pagdef = reqconf.pagination
 
             # pagination begins
-            max_per_page = itable.pag_params.max_count
+            max_per_page = pagdef.max_count
             total = _count
             n_page = math.ceil(total / max_per_page)
 
-            if pag_type == "cursor":
+            if isinstance(pagdef, SeekPaginationDef):
                 last_id = 0
                 dfs = []
-                # No way to parallelize for cursor type
+                # No way to parallelize for seek type
                 for i in range(n_page):
                     count = min(total - i * max_per_page, max_per_page)
 
@@ -239,9 +272,11 @@ class Connector:
                         kwargs,
                         _client=client,
                         _throttler=throttler,
+                        _page=i,
                         _auth=_auth,
-                        _count=count,
-                        _cursor=last_id - 1,
+                        _q=_q,
+                        _limit=count,
+                        _anchor=last_id - 1,
                     )
 
                     if df is None:
@@ -251,14 +286,50 @@ class Connector:
                         # The API returns empty for this page, maybe we've reached the end
                         break
 
-                    last_id = int(df[itable.pag_params.cursor_id][len(df) - 1]) - 1
-                    dfs.append(df)
+                    cid = df.columns.get_loc(pagdef.seek_id)  # type: ignore
+                    last_id = int(df.iloc[-1, cid]) - 1  # type: ignore
 
-            elif pag_type == "limit":
-                resps_coros = []
-                allowed_page = IntRef(n_page)
+                    dfs.append(df)
+            elif isinstance(pagdef, TokenPaginationDef):
+                next_token = None
+                dfs = []
+                # No way to parallelize for seek type
                 for i in range(n_page):
                     count = min(total - i * max_per_page, max_per_page)
+                    df, resp = await self._fetch(  # type: ignore
+                        itable,
+                        kwargs,
+                        _client=client,
+                        _throttler=throttler,
+                        _page=i,
+                        _auth=_auth,
+                        _q=_q,
+                        _limit=count,
+                        _anchor=next_token,
+                        _raw=True,
+                    )
+
+                    if pagdef.token_location == TokenLocation.Header:
+                        next_token = resp.headers[pagdef.token_accessor]
+                    elif pagdef.token_location == TokenLocation.Body:
+                        # only json body implemented
+                        token_expr = jparse(pagdef.token_accessor)
+                        (token_elem,) = token_expr.find(await resp.json())
+                        next_token = token_elem.value
+
+                    dfs.append(df)
+            elif isinstance(pagdef, (OffsetPaginationDef, PagePaginationDef)):
+                resps_coros = []
+                allowed_page = Ref(n_page)
+                for i in range(n_page):
+                    count = min(total - i * max_per_page, max_per_page)
+                    if pagdef.type == "offset":
+                        anchor = i * max_per_page
+                    elif pagdef.type == "page":
+                        anchor = i + 1
+                    else:
+                        raise ValueError(f"Unknown pagination type {pagdef.type}")
+
                     resps_coros.append(
                         self._fetch(
                             itable,
@@ -268,8 +339,9 @@ class Connector:
                             _page=i,
                             _allowed_page=allowed_page,
                             _auth=_auth,
-                            _count=count,
-                            _cursor=i * max_per_page,
+                            _q=_q,
+                            _limit=count,
+                            _anchor=anchor,
                         )
                     )
 
@@ -278,7 +350,6 @@ class Connector:
                     df = await resp_coro
                     if df is not None:
                         dfs.append(df)
-
             else:
                 raise NotImplementedError
 
@@ -286,7 +357,7 @@ class Connector:
 
         return df
 
-    async def _fetch(  # pylint: disable=too-many-locals,too-many-branches
+    async def _fetch(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
         table: ImplicitTable,
         kwargs: Dict[str, Any],
@@ -294,16 +365,17 @@ class Connector:
         _client: ClientSession,
         _throttler: ThrottleSession,
         _page: int = 0,
-        _allowed_page: Optional[IntRef] = None,
-        _count: Optional[int] = None,
-        _cursor: Optional[int] = None,
+        _allowed_page: Optional[Ref[int]] = None,
+        _limit: Optional[int] = None,
+        _anchor: Optional[Any] = None,
         _auth: Optional[Dict[str, Any]] = None,
-    ) -> Optional[pd.DataFrame]:
-        if (_count is None) != (_cursor is None):
-            raise ValueError("_cursor and _count should both be None or not None")
+        _q: Optional[str] = None,
+        _raw: bool = False,
+    ) -> Union[Optional[pd.DataFrame], Tuple[Optional[pd.DataFrame], ClientResponse]]:
 
-        method = table.method
-        url = table.url
+        reqdef = table.config.request
+        method = reqdef.method
+        url = reqdef.url
         req_data: Dict[str, Dict[str, Any]] = {
             "headers": {},
             "params": {},
@@ -311,51 +383,78 @@ class Connector:
         }
         merged_vars = {**self._vars, **kwargs}
 
-        if table.authorization is not None:
-            table.authorization.build(req_data, _auth or self._auth)
+        if reqdef.authorization is not None:
+            reqdef.authorization.build(req_data, _auth or self._auth, self._storage)
 
-        for key in ["headers", "params", "cookies"]:
-            if getattr(table, key) is not None:
-                instantiated_fields = getattr(table, key).populate(
-                    self._jenv, merged_vars
-                )
-                req_data[key].update(**instantiated_fields)
-
-        if table.body is not None:
+        if reqdef.body is not None:
             # TODO: do we support binary body?
-            instantiated_fields = table.body.populate(self._jenv, merged_vars)
-            if table.body_ctype == "application/x-www-form-urlencoded":
+            instantiated_fields = populate_field(
+                reqdef.body.content, self._jenv, merged_vars
+            )
+            if reqdef.body.ctype == "application/x-www-form-urlencoded":
                 req_data["data"] = instantiated_fields
-            elif table.body_ctype == "application/json":
+            elif reqdef.body.ctype == "application/json":
                 req_data["json"] = instantiated_fields
             else:
-                raise NotImplementedError(table.body_ctype)
+                raise NotImplementedError(reqdef.body.ctype)
 
-        if table.pag_params is not None and _count is not None:
-            pag_type = table.pag_params.type
-            count_key = table.pag_params.count_key
-            if pag_type == "cursor":
-                if table.pag_params.cursor_key is None:
-                    raise ValueError(
-                        "pagination type is cursor but no cursor_key set in the configuration file."
-                    )
-                cursor_key = table.pag_params.cursor_key
-            elif pag_type == "limit":
-                if table.pag_params.anchor_key is None:
-                    raise ValueError(
-                        "pagination type is limit but no anchor_key set in the configuration file."
-                    )
-                cursor_key = table.pag_params.anchor_key
+        if reqdef.pagination is not None and _limit is not None:
+            pagdef = reqdef.pagination
+            limit_key = pagdef.limit_key
+
+            if isinstance(pagdef, SeekPaginationDef):
+                anchor = pagdef.seek_key
+            elif isinstance(pagdef, OffsetPaginationDef):
+                anchor = pagdef.offset_key
+            elif isinstance(pagdef, PagePaginationDef):
+                anchor = pagdef.page_key
+            elif isinstance(pagdef, TokenPaginationDef):
+                anchor = pagdef.token_key
             else:
-                raise UnreachableError()
+                raise ValueError(f"Unknown pagination type {pagdef.type}.")
 
-            if count_key in req_data["params"]:
-                raise UniversalParameterOverridden(count_key, "_count")
-            req_data["params"][count_key] = _count
+            if limit_key in req_data["params"]:
+                raise UniversalParameterOverridden(limit_key, "_limit")
+            req_data["params"][limit_key] = _limit
 
-            if cursor_key in req_data["params"]:
-                raise UniversalParameterOverridden(cursor_key, "_cursor")
-            req_data["params"][cursor_key] = _cursor
+            if anchor in req_data["params"]:
+                raise UniversalParameterOverridden(anchor, "_offset")
+
+            if _anchor is not None:
+                req_data["params"][anchor] = _anchor
+
+        if _q is not None:
+            if reqdef.search is None:
+                raise ValueError(
+                    "_q specified but the API does not support custom search."
+                )
+
+            searchdef = reqdef.search
+            search_key = searchdef.key
+
+            if search_key in req_data["params"]:
+                raise UniversalParameterOverridden(search_key, "_q")
+            req_data["params"][search_key] = _q
+
+        for key in ["headers", "params", "cookies"]:
+            field_def = getattr(reqdef, key, None)
+            if field_def is not None:
+                instantiated_fields = populate_field(
+                    field_def, self._jenv, merged_vars,
+                )
+                for ikey in instantiated_fields:
+                    if ikey in req_data[key]:
+                        warn(
+                            f"Query parameter {ikey}={req_data[key][ikey]}"
+                            " is overriden by {ikey}={instantiated_fields[ikey]}",
+                            RuntimeWarning,
+                        )
+                req_data[key].update(**instantiated_fields)
+
+        for key in ["headers", "params", "cookies"]:
+            field_def = getattr(reqdef, key, None)
+            if field_def is not None:
+                validate_fields(field_def, req_data[key])
 
         await _throttler.acquire(_page)
 
@@ -380,6 +479,74 @@ class Connector:
 
             if len(df) == 0 and _allowed_page is not None and _page is not None:
                 _allowed_page.set(_page)
-                return None
+                df = None
+
+            if _raw:
+                return df, resp
             else:
                 return df
+
+
+def validate_fields(fields: Dict[str, FieldDefUnion], data: Dict[str, Any]) -> None:
+    """Check required fields are provided."""
+
+    for key, def_ in fields.items():
+        from_key, to_key = key, key
+
+        if isinstance(def_, bool):
+            required = def_
+            if required and to_key not in data:
+                raise KeyError(f"'{from_key}' is required but not provided")
+        elif isinstance(def_, str):
+            pass
+        else:
+            to_key = def_.to_key or to_key
+            from_key = def_.from_key or from_key
+            required = def_.required
+            if required and to_key not in data:
+                raise KeyError(f"'{from_key}' is required but not provided")
+
+
+def populate_field(  # pylint: disable=too-many-branches
+    fields: Dict[str, FieldDefUnion], jenv: Environment, params: Dict[str, Any],
+) -> Dict[str, str]:
+    """Populate a dict based on the fields definition and provided vars."""
+    ret: Dict[str, str] = {}
+
+    for key, def_ in fields.items():
+        from_key, to_key = key, key
+
+        if isinstance(def_, bool):
+            value = params.get(from_key)
+            remove_if_empty = False
+        elif isinstance(def_, str):
+            # is a template
+            tmplt = jenv.from_string(def_)
+            value = tmplt.render(**params)
+            remove_if_empty = False
+        else:
+            template = def_.template
+            remove_if_empty = def_.remove_if_empty
+            to_key = def_.to_key or to_key
+            from_key = def_.from_key or from_key
+
+            if template is None:
+                value = params.get(from_key)
+            else:
+                tmplt = jenv.from_string(template)
+                try:
+                    value = tmplt.render(**params)
+                except UndefinedError:
+                    value = ""  # This empty string will be removed if `remove_if_empty` is True
+
+        if value is not None:
+            str_value = str(value)
+            if not remove_if_empty or str_value:
+                if to_key in ret:
+                    warn(
+                        f"{to_key}={ret[to_key]} overriden by {to_key}={str_value}",
+                        RuntimeWarning,
+                    )
+                ret[to_key] = str_value
+                continue
+    return ret

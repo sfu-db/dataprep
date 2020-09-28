@@ -9,6 +9,7 @@ import pandas as pd
 from scipy.stats import gaussian_kde as gaussian_kde_
 from scipy.stats import ks_2samp as ks_2samp_
 from scipy.stats import normaltest as normaltest_
+from scipy.stats import skewtest as skewtest_
 
 from ...dtypes import drop_null
 
@@ -233,5 +234,13 @@ def ks_2samp(data1: np.ndarray, data2: np.ndarray) -> Tuple[float, float]:
     name="scipy-gaussian_kde", pure=True, nout=2
 )
 def gaussian_kde(arr: np.ndarray) -> Tuple[float, float]:
-    """Delayed version of scipy ks_2samp."""
+    """Delayed version of scipy gaussian_kde."""
     return cast(Tuple[np.ndarray, np.ndarray], gaussian_kde_(arr))
+
+
+@dask.delayed(  # pylint: disable=no-value-for-parameter
+    name="scipy-skewtest", pure=True, nout=2
+)
+def skewtest(arr: np.ndarray) -> Tuple[float, float]:
+    """Delayed version of scipy skewtest."""
+    return cast(Tuple[float, float], skewtest_(arr))

@@ -135,3 +135,15 @@ Please take a look at our [wiki] for development documentations!
 [wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
 [Twitter]: https://img.shields.io/twitter/follow/sfu_db?style=social
+
+## Acknowledgement
+
+  Some functionalities of DataPrep are inspired by the following packages.
+  
+- [Pandas Profiling](https://github.com/pandas-profiling/pandas-profiling)
+
+  Inspired the report functionality and insights provided in DataPrep.eda.
+
+- [missingno](https://github.com/ResidentMario/missingno) 
+
+  Inspired the missing value analysis in DataPrep.eda.

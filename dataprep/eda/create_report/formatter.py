@@ -63,6 +63,7 @@ def format_report(
 
 
 def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
+    # pylint: disable=too-many-statements
     """
     Format basic version.
 
@@ -104,20 +105,23 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
             itmdt = Intermediate(
                 col=col, data=data[col], visual_type="numerical_column"
             )
-            rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)
+            rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)["layout"]
             stats = format_num_stats(data[col])
         elif is_dtype(detect_dtype(df[col]), Nominal()):
             itmdt = Intermediate(
                 col=col, data=data[col], visual_type="categorical_column"
             )
-            rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)
+            rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)["layout"]
             stats = format_cat_stats(
                 data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
             )
         figs: List[Figure] = []
-        for tab in rndrd.tabs[1:]:
-            fig = tab.child.children[0]
-            fig.title = Title(text=tab.title, align="center")
+        for tab in rndrd:
+            try:
+                fig = tab.children[0]
+            except AttributeError:
+                fig = tab
+            # fig.title = Title(text=tab.title, align="center")
             figs.append(fig)
         res["variables"][col] = {
             "tabledata": stats,
