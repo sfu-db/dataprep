@@ -1,17 +1,13 @@
 """This module implements the generation of connector configuration files."""
 
-from dataprep.connector.schema.base import BaseDef
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 from urllib.parse import parse_qs, urlparse, urlunparse
 
 import requests
+from dataprep.connector.schema.base import BaseDef
 
-from ..schema import (
-    AuthorizationDef,
-    ConfigDef,
-    PaginationDef,
-)
+from ..schema import AuthorizationDef, ConfigDef, PaginationDef
 from .state import ConfigState
 from .table import gen_schema_from_path, search_table_path
 
@@ -43,9 +39,9 @@ class ConfigGenerator:
             self.config = ConfigState(ConfigDef(**config))
         self.storage = {}
 
-    def add_example(
+    def add_example(  # pylint: disable=too-many-locals
         self, example: Dict[str, Any]
-    ) -> None:  # pylint: disable=too-many-locals
+    ) -> None:
         """Add an example to the generator. The example
         should be in the dictionary format.
 
@@ -161,8 +157,12 @@ def _create_config(req: Dict[str, Any]) -> ConfigDef:
 
 
 class AuthUnion(BaseDef):
+    """Helper class for parsing authorization."""
+
     val: AuthorizationDef
 
 
 class PageUnion(BaseDef):
+    """Helper class for parsing pagination."""
+
     val: PaginationDef
