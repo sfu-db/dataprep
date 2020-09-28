@@ -174,15 +174,22 @@ class Method(str, Enum):
     PUT = "PUT"
 
 
+class SearchDef(BaseDef):
+    key: str
+
+
 class RequestDef(BaseDef):
     url: str
     method: Method
-    authorization: Optional[AuthorizationDef]
+
     headers: Optional[Dict[str, FieldDefUnion]]
     params: Dict[str, FieldDefUnion]
-    pagination: Optional[PaginationDef]
     body: Optional[BodyDef]
     cookies: Optional[Dict[str, FieldDefUnion]]
+
+    authorization: Optional[AuthorizationDef]
+    pagination: Optional[PaginationDef]
+    search: Optional[SearchDef]
 
 
 class SchemaFieldDef(BaseDef):
@@ -211,7 +218,7 @@ TYPE_TREE = {
     "string": None,
     "float": "string",
     "int": "float",
-    "bool": "string",
+    "boolean": "string",
 }
 
 
