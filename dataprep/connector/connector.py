@@ -6,12 +6,14 @@ import math
 import sys
 from asyncio import as_completed
 from pathlib import Path
-from typing import Any, Awaitable, Dict, List, Optional, Union, Tuple
-from aiohttp.client_reqrep import ClientResponse
-from jsonpath_ng import parse as jparse
+from typing import Any, Awaitable, Dict, List, Optional, Tuple, Union
+from warnings import warn
+
 import pandas as pd
 from aiohttp import ClientSession
+from aiohttp.client_reqrep import ClientResponse
 from jinja2 import Environment, StrictUndefined, Template, UndefinedError
+from jsonpath_ng import parse as jparse
 
 from .config_manager import config_directory, ensure_config
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
@@ -21,10 +23,10 @@ from .schema import (
     ConfigDef,
     FieldDefUnion,
     OffsetPaginationDef,
-    SeekPaginationDef,
     PagePaginationDef,
-    TokenPaginationDef,
+    SeekPaginationDef,
     TokenLocation,
+    TokenPaginationDef,
 )
 from .throttler import OrderedThrottler, ThrottleSession
 
@@ -108,6 +110,7 @@ class Connector:
         self,
         table: str,
         *,
+        _q: Optional[str] = None,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
         **where: Any,
@@ -119,6 +122,8 @@ class Connector:
         ----------
         table
             The table name.
+        _q: Optional[str] = None
+            Search string to be matched in the response.
         _auth: Optional[Dict[str, Any]] = None
             The parameters for authentication. Usually the authentication parameters
             should be defined when instantiating the Connector. In case some tables have different
@@ -134,12 +139,13 @@ class Connector:
             if key not in allowed_params:
                 raise InvalidParameterError(key)
 
-        return await self._query_imp(table, where, _auth=_auth, _count=_count)
+        return await self._query_imp(table, where, _auth=_auth, _q=_q, _count=_count)
 
     @property
     def table_names(self) -> List[str]:
         """
         Return all the names of the available tables in a list.
+
         Note
         ----
         We abstract each website as a database containing several tables.
@@ -148,9 +154,8 @@ class Connector:
         return list(self._impdb.tables.keys())
 
     def info(self) -> None:
-        """
-        Show the basic information and provide guidance for users to issue queries.
-        """
+        """Show the basic information and provide guidance for users
+        to issue queries."""
 
         # get info
         tbs: Dict[str, Any] = {}
@@ -216,6 +221,7 @@ class Connector:
         *,
         _auth: Optional[Dict[str, Any]] = None,
         _count: Optional[int] = None,
+        _q: Optional[str] = None,
     ) -> pd.DataFrame:
         if table not in self._impdb.tables:
             raise ValueError(f"No such table {table} in {self._impdb.name}")
@@ -238,7 +244,12 @@ class Connector:
 
             if reqconf.pagination is None or _count is None:
                 df = await self._fetch(
-                    itable, kwargs, _client=client, _throttler=throttler, _auth=_auth,
+                    itable,
+                    kwargs,
+                    _client=client,
+                    _throttler=throttler,
+                    _auth=_auth,
+                    _q=_q,
                 )
                 return df
 
@@ -263,6 +274,7 @@ class Connector:
                         _throttler=throttler,
                         _page=i,
                         _auth=_auth,
+                        _q=_q,
                         _limit=count,
                         _anchor=last_id - 1,
                     )
@@ -274,7 +286,7 @@ class Connector:
                         # The API returns empty for this page, maybe we've reached the end
                         break
 
-                    cid = df.columns.get_loc(pagdef.seek_id)
+                    cid = df.columns.get_loc(pagdef.seek_id)  # type: ignore
                     last_id = int(df.iloc[-1, cid]) - 1  # type: ignore
 
                     dfs.append(df)
@@ -291,6 +303,7 @@ class Connector:
                         _throttler=throttler,
                         _page=i,
                         _auth=_auth,
+                        _q=_q,
                         _limit=count,
                         _anchor=next_token,
                         _raw=True,
@@ -326,6 +339,7 @@ class Connector:
                             _page=i,
                             _allowed_page=allowed_page,
                             _auth=_auth,
+                            _q=_q,
                             _limit=count,
                             _anchor=anchor,
                         )
@@ -355,6 +369,7 @@ class Connector:
         _limit: Optional[int] = None,
         _anchor: Optional[Any] = None,
         _auth: Optional[Dict[str, Any]] = None,
+        _q: Optional[str] = None,
         _raw: bool = False,
     ) -> Union[Optional[pd.DataFrame], Tuple[Optional[pd.DataFrame], ClientResponse]]:
 
@@ -370,12 +385,6 @@ class Connector:
 
         if reqdef.authorization is not None:
             reqdef.authorization.build(req_data, _auth or self._auth, self._storage)
-
-        for key in ["headers", "params", "cookies"]:
-            field_def = getattr(reqdef, key, None)
-            if field_def is not None:
-                instantiated_fields = populate_field(field_def, self._jenv, merged_vars)
-                req_data[key].update(**instantiated_fields)
 
         if reqdef.body is not None:
             # TODO: do we support binary body?
@@ -414,6 +423,39 @@ class Connector:
             if _anchor is not None:
                 req_data["params"][anchor] = _anchor
 
+        if _q is not None:
+            if reqdef.search is None:
+                raise ValueError(
+                    "_q specified but the API does not support custom search."
+                )
+
+            searchdef = reqdef.search
+            search_key = searchdef.key
+
+            if search_key in req_data["params"]:
+                raise UniversalParameterOverridden(search_key, "_q")
+            req_data["params"][search_key] = _q
+
+        for key in ["headers", "params", "cookies"]:
+            field_def = getattr(reqdef, key, None)
+            if field_def is not None:
+                instantiated_fields = populate_field(
+                    field_def, self._jenv, merged_vars,
+                )
+                for ikey in instantiated_fields:
+                    if ikey in req_data[key]:
+                        warn(
+                            f"Query parameter {ikey}={req_data[key][ikey]}"
+                            " is overriden by {ikey}={instantiated_fields[ikey]}",
+                            RuntimeWarning,
+                        )
+                req_data[key].update(**instantiated_fields)
+
+        for key in ["headers", "params", "cookies"]:
+            field_def = getattr(reqdef, key, None)
+            if field_def is not None:
+                validate_fields(field_def, req_data[key])
+
         await _throttler.acquire(_page)
 
         if _allowed_page is not None and int(_allowed_page) <= _page:
@@ -445,21 +487,37 @@ class Connector:
                 return df
 
 
-def populate_field(  # pylint: disable=too-many-branches
-    fields: Dict[str, FieldDefUnion], jenv: Environment, params: Dict[str, Any]
-) -> Dict[str, str]:
-    """Populate a dict based on the fields definition and provided vars."""
-
-    ret: Dict[str, str] = {}
+def validate_fields(fields: Dict[str, FieldDefUnion], data: Dict[str, Any]) -> None:
+    """Check required fields are provided."""
 
     for key, def_ in fields.items():
         from_key, to_key = key, key
 
         if isinstance(def_, bool):
             required = def_
+            if required and to_key not in data:
+                raise KeyError(f"'{from_key}' is required but not provided")
+        elif isinstance(def_, str):
+            pass
+        else:
+            to_key = def_.to_key or to_key
+            from_key = def_.from_key or from_key
+            required = def_.required
+            if required and to_key not in data:
+                raise KeyError(f"'{from_key}' is required but not provided")
+
+
+def populate_field(  # pylint: disable=too-many-branches
+    fields: Dict[str, FieldDefUnion], jenv: Environment, params: Dict[str, Any],
+) -> Dict[str, str]:
+    """Populate a dict based on the fields definition and provided vars."""
+    ret: Dict[str, str] = {}
+
+    for key, def_ in fields.items():
+        from_key, to_key = key, key
+
+        if isinstance(def_, bool):
             value = params.get(from_key)
-            if value is None and required:
-                raise KeyError(from_key)
             remove_if_empty = False
         elif isinstance(def_, str):
             # is a template
@@ -473,10 +531,7 @@ def populate_field(  # pylint: disable=too-many-branches
             from_key = def_.from_key or from_key
 
             if template is None:
-                required = def_.required
                 value = params.get(from_key)
-                if value is None and required:
-                    raise KeyError(from_key)
             else:
                 tmplt = jenv.from_string(template)
                 try:
@@ -486,9 +541,12 @@ def populate_field(  # pylint: disable=too-many-branches
 
         if value is not None:
             str_value = str(value)
-            if not (remove_if_empty and not str_value):
+            if not remove_if_empty or str_value:
                 if to_key in ret:
-                    print(f"Param {key} conflicting with {to_key}", file=sys.stderr)
+                    warn(
+                        f"{to_key}={ret[to_key]} overriden by {to_key}={str_value}",
+                        RuntimeWarning,
+                    )
                 ret[to_key] = str_value
                 continue
     return ret
