@@ -15,6 +15,9 @@ CATEGORICAL_NUMPY_DTYPES = [np.bool, np.object]
 CATEGORICAL_PANDAS_DTYPES = [pd.CategoricalDtype, pd.PeriodDtype]
 CATEGORICAL_DTYPES = CATEGORICAL_NUMPY_DTYPES + CATEGORICAL_PANDAS_DTYPES
 
+STRING_PANDAS_DTYPES = [pd.StringDtype]
+STRING_DTYPES = STRING_PANDAS_DTYPES
+
 NUMERICAL_NUMPY_DTYPES = [np.number]
 NUMERICAL_DTYPES = NUMERICAL_NUMPY_DTYPES
 
@@ -254,6 +257,17 @@ def is_pandas_categorical(dtype: Any) -> bool:
     Detect if a dtype is categorical and from pandas.
     """
     return any(isinstance(dtype, c) for c in CATEGORICAL_PANDAS_DTYPES)
+
+
+def string_dtype_to_object(df: dd.DataFrame) -> dd.DataFrame:
+    """
+    Convert string dtype to object dtype
+    """
+    for col in df.columns:
+        if any(isinstance(df[col].dtype, c) for c in STRING_DTYPES):
+            df[col] = df[col].astype(object)
+
+    return df
 
 
 def drop_null(

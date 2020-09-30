@@ -5,7 +5,7 @@ from typing import Optional, Tuple, Union, cast
 import dask.dataframe as dd
 import pandas as pd
 
-from ...dtypes import DTypeDef
+from ...dtypes import DTypeDef, string_dtype_to_object
 from ...intermediate import Intermediate
 from ...utils import to_dask
 from .bivariate import compute_bivariate
@@ -93,9 +93,9 @@ def compute(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """  # pylint: disable=too-many-locals
-
     df = to_dask(df)
     df.columns = df.columns.astype(str)
+    df = string_dtype_to_object(df)
 
     if not any((x, y, z)):
         return compute_overview(df, bins, ngroups, largest, timeunit, dtype)
