@@ -14,7 +14,7 @@ from bokeh.models import LayoutDOM
 from bokeh.resources import CDN
 from jinja2 import Template
 
-from .utils import is_notebook
+from ..utils import is_notebook
 
 INLINE_TEMPLATE = Template(
     """
