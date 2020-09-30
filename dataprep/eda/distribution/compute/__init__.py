@@ -93,6 +93,10 @@ def compute(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """  # pylint: disable=too-many-locals
+	
+	for col in df:
+        if df[col].dtype=='string':
+            df[col] = df[col].astype('object') 
 
     df = to_dask(df)
     df.columns = df.columns.astype(str)
