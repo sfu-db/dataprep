@@ -18,7 +18,14 @@ from ..distribution import render
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import cont_comps, nom_comps
 from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats
-from ..dtypes import CATEGORICAL_DTYPES, Continuous, Nominal, detect_dtype, is_dtype
+from ..dtypes import (
+    CATEGORICAL_DTYPES,
+    Continuous,
+    Nominal,
+    detect_dtype,
+    is_dtype,
+    string_dtype_to_object,
+)
 from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
@@ -51,6 +58,7 @@ def format_report(
     # pylint: disable=too-many-locals,too-many-statements
     with ProgressBar(minimum=1, disable=not progress):
         df = to_dask(df)
+        df = string_dtype_to_object(df)
         if mode == "basic":
             comps = format_basic(df)
         # elif mode == "full":
