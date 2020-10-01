@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -166,6 +172,7 @@
     <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;DataPrep Report&quot;</span><span class="p">,</span>
     <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;basic&quot;</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is to generate and render element in a report object.</span>
@@ -179,6 +186,8 @@
 <span class="sd">    mode: Optional[str], default &quot;basic&quot;</span>
 <span class="sd">        This controls what type of report to be generated.</span>
 <span class="sd">        Currently only the &#39;basic&#39; is fully implemented.</span>
+<span class="sd">    progress</span>
+<span class="sd">        Whether to show the progress bar.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -193,7 +202,7 @@
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="n">INLINE</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span>
         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-        <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="n">format_report</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mode</span><span class="p">),</span>
+        <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="n">format_report</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="p">),</span>
     <span class="p">}</span>
     <span class="n">template_base</span> <span class="o">=</span> <span class="n">ENV_LOADER</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;base.html&quot;</span><span class="p">)</span>
     <span class="n">report</span> <span class="o">=</span> <span class="n">template_base</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>

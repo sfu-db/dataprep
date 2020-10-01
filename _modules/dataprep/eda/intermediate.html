@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -146,15 +152,13 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Intermediate class</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
 <div class="viewcode-block" id="Intermediate"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.intermediate.Intermediate">[docs]</a><span class="k">class</span> <span class="nc">Intermediate</span><span class="p">(</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class contains intermediate results.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This class contains intermediate results.&quot;&quot;&quot;</span>
 
     <span class="n">visual_type</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -176,9 +180,7 @@
 
 
 <div class="viewcode-block" id="ColumnsMetadata"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.intermediate.ColumnsMetadata">[docs]</a><span class="k">class</span> <span class="nc">ColumnsMetadata</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Container for storing each column&#39;s metadata</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Container for storing each column&#39;s metadata.&quot;&quot;&quot;</span>
 
     <span class="n">metadata</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
 
@@ -206,9 +208,8 @@
 
 
 <div class="viewcode-block" id="ColumnMetadata"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.intermediate.ColumnMetadata">[docs]</a><span class="k">class</span> <span class="nc">ColumnMetadata</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Container for storing a single column&#39;s metadata.</span>
-<span class="sd">    This is immutable</span>
+    <span class="sd">&quot;&quot;&quot;Container for storing a single column&#39;s metadata.</span>
+<span class="sd">    This is immutable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">metadata</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>

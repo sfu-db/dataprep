@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -147,7 +153,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -157,41 +164,25 @@
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="is_notebook"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.utils.is_notebook">[docs]</a><span class="k">def</span> <span class="nf">is_notebook</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :return: whether it is running in jupyter notebook</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># pytype: disable=import-error</span>
-        <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
-
-        <span class="c1"># pytype: enable=import-error</span>
-
-        <span class="n">shell</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="k">if</span> <span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;ZMQInteractiveShell&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">NameError</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
 <div class="viewcode-block" id="to_dask"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.utils.to_dask">[docs]</a><span class="k">def</span> <span class="nf">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a dataframe to a dask dataframe.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Convert a dataframe to a dask dataframe.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">df</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
 
     <span class="n">df_size</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">npartitions</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">df_size</span> <span class="o">/</span> <span class="mi">128</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="n">npartitions</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">df_size</span> <span class="o">/</span> <span class="mi">128</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)</span>  <span class="c1"># 128 MB partition size</span>
     <span class="k">return</span> <span class="n">dd</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">npartitions</span><span class="o">=</span><span class="n">npartitions</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="sample_n"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.utils.sample_n">[docs]</a><span class="k">def</span> <span class="nf">sample_n</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>  <span class="c1"># pylint: disable=C0103</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sample n values uniformly from the range of the `arr`,</span>
-<span class="sd">    not from the distribution of `arr`&#39;s elems.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Sample n values uniformly from the range of the `arr`,</span>
+<span class="sd">    not from the distribution of `arr`&#39;s elems.&quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">arr</span>
 
@@ -201,9 +192,7 @@
 
 
 <div class="viewcode-block" id="relocate_legend"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.utils.relocate_legend">[docs]</a><span class="k">def</span> <span class="nf">relocate_legend</span><span class="p">(</span><span class="n">fig</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Relocate legend(s) from center to `loc`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Relocate legend(s) from center to `loc`.&quot;&quot;&quot;</span>
     <span class="n">remains</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">center</span><span class="p">:</span>
@@ -219,10 +208,9 @@
 
 
 <div class="viewcode-block" id="cut_long_name"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.utils.cut_long_name">[docs]</a><span class="k">def</span> <span class="nf">cut_long_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    If the name is longer than `max_len`,</span>
-<span class="sd">    cut it to `max_len` length and append &quot;...&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;If the name is longer than `max_len`,</span>
+<span class="sd">    cut it to `max_len` length and append &quot;...&quot;&quot;&quot;</span>
+
     <span class="c1"># Bug 136 Fixed</span>
     <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_len</span><span class="p">:</span>
@@ -231,9 +219,7 @@
 
 
 <div class="viewcode-block" id="fuse_missing_perc"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.utils.fuse_missing_perc">[docs]</a><span class="k">def</span> <span class="nf">fuse_missing_perc</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">perc</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Append (x.y%) to the name if `perc` is not 0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Append (x.y%) to the name if `perc` is not 0.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">perc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">name</span>
 

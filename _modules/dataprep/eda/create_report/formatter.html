@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -143,34 +149,44 @@
           <div>
             
   <h1>Source code for dataprep.eda.create_report.formatter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This module implements the formatting</span>
-<span class="sd">    for create_report(df) function.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="sd">&quot;&quot;&quot;This module implements the formatting</span>
+<span class="sd">for create_report(df) function.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">catch_warnings</span><span class="p">,</span> <span class="n">filterwarnings</span>
+
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">bokeh.embed</span> <span class="kn">import</span> <span class="n">components</span>
 <span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">Title</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span>
 
-<span class="kn">from</span> <span class="nn">..distribution</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">..correlation</span> <span class="kn">import</span> <span class="n">render_correlation</span>
+<span class="kn">from</span> <span class="nn">..correlation.compute.nullivariate</span> <span class="kn">import</span> <span class="n">correlation_nxn</span>
+<span class="kn">from</span> <span class="nn">..data_array</span> <span class="kn">import</span> <span class="n">DataArray</span>
+<span class="kn">from</span> <span class="nn">..distribution</span> <span class="kn">import</span> <span class="n">render</span>
 <span class="kn">from</span> <span class="nn">..distribution.compute.overview</span> <span class="kn">import</span> <span class="n">calc_stats</span>
-<span class="kn">from</span> <span class="nn">..distribution.render</span> <span class="kn">import</span> <span class="n">_format_values</span>
-<span class="kn">from</span> <span class="nn">..correlation</span> <span class="kn">import</span> <span class="n">compute_correlation</span><span class="p">,</span> <span class="n">render_correlation</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">Continuous</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">,</span> <span class="n">detect_dtype</span><span class="p">,</span> <span class="n">is_dtype</span>
+<span class="kn">from</span> <span class="nn">..distribution.compute.univariate</span> <span class="kn">import</span> <span class="n">cont_comps</span><span class="p">,</span> <span class="n">nom_comps</span>
+<span class="kn">from</span> <span class="nn">..distribution.render</span> <span class="kn">import</span> <span class="n">format_cat_stats</span><span class="p">,</span> <span class="n">format_num_stats</span><span class="p">,</span> <span class="n">format_ov_stats</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CATEGORICAL_DTYPES</span><span class="p">,</span>
+    <span class="n">Continuous</span><span class="p">,</span>
+    <span class="n">Nominal</span><span class="p">,</span>
+    <span class="n">detect_dtype</span><span class="p">,</span>
+    <span class="n">is_dtype</span><span class="p">,</span>
+    <span class="n">string_dtype_to_object</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
-<span class="kn">from</span> <span class="nn">..missing</span> <span class="kn">import</span> <span class="n">compute_missing</span><span class="p">,</span> <span class="n">render_missing</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">is_notebook</span>
-
-<span class="k">if</span> <span class="n">is_notebook</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">tqdm.notebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">..missing</span> <span class="kn">import</span> <span class="n">render_missing</span>
+<span class="kn">from</span> <span class="nn">..missing.compute.nullivariate</span> <span class="kn">import</span> <span class="n">compute_missing_nullivariate</span>
+<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
 
 
-<div class="viewcode-block" id="format_report"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.create_report.html#dataprep.eda.create_report.formatter.format_report">[docs]</a><span class="k">def</span> <span class="nf">format_report</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="format_report"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.create_report.html#dataprep.eda.create_report.formatter.format_report">[docs]</a><span class="k">def</span> <span class="nf">format_report</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Format the data and figures needed by report</span>
 
@@ -178,9 +194,11 @@
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
 <span class="sd">        The DataFrame for which data are calculated.</span>
-<span class="sd">    mode: Optional[str]</span>
+<span class="sd">    mode</span>
 <span class="sd">        This controls what type of report to be generated.</span>
 <span class="sd">        Currently only the &#39;basic&#39; is fully implemented.</span>
+<span class="sd">    progress</span>
+<span class="sd">        Whether to show the progress bar.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -188,20 +206,23 @@
 <span class="sd">        A dictionary in which formatted data will be stored.</span>
 <span class="sd">        This variable acts like an API in passing data to the template engine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">comps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;basic&quot;</span><span class="p">:</span>
-        <span class="n">comps</span> <span class="o">=</span> <span class="n">format_basic</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">comps</span><span class="p">)</span>
-    <span class="c1"># elif mode == &quot;full&quot;:</span>
-    <span class="c1">#     comps = format_full(df, comps)</span>
-    <span class="c1"># elif mode == &quot;minimal&quot;:</span>
-    <span class="c1">#     comps = format_mini(df, comps)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># pylint: disable=too-many-locals,too-many-statements</span>
+    <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">string_dtype_to_object</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;basic&quot;</span><span class="p">:</span>
+            <span class="n">comps</span> <span class="o">=</span> <span class="n">format_basic</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="c1"># elif mode == &quot;full&quot;:</span>
+        <span class="c1">#     comps = format_full(df)</span>
+        <span class="c1"># elif mode == &quot;minimal&quot;:</span>
+        <span class="c1">#     comps = format_mini(df)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">comps</span></div>
 
 
-<div class="viewcode-block" id="format_basic"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.create_report.html#dataprep.eda.create_report.formatter.format_basic">[docs]</a><span class="k">def</span> <span class="nf">format_basic</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">comps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="format_basic"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.create_report.html#dataprep.eda.create_report.formatter.format_basic">[docs]</a><span class="k">def</span> <span class="nf">format_basic</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="c1"># pylint: disable=too-many-statements</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Format basic version.</span>
 
@@ -209,8 +230,6 @@
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
 <span class="sd">        The DataFrame for which data are calculated.</span>
-<span class="sd">    comp:</span>
-<span class="sd">        A dictionary in which formatted data will be stored.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -218,311 +237,147 @@
 <span class="sd">        A dictionary in which formatted data is stored.</span>
 <span class="sd">        This variable acts like an API in passing data to the template engine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-locals</span>
+    <span class="c1"># aggregate all computations</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">completions</span> <span class="o">=</span> <span class="n">basic_computations</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
-    <span class="c1"># pylint: disable=too-many-locals, too-many-statements, broad-except, too-many-branches</span>
-    <span class="n">num_col</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">filterwarnings</span><span class="p">(</span>
+            <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;invalid value encountered in true_divide&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="p">(</span><span class="n">data</span><span class="p">,)</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># results dictionary</span>
+    <span class="n">res</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># overview</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ov&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ks_tests&quot;</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;overview&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">format_ov_stats</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;ov&quot;</span><span class="p">])</span>
+
+    <span class="c1"># variables</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># needed for pylint</span>
         <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Continuous</span><span class="p">()):</span>
-            <span class="n">num_col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-
-    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span>
-        <span class="n">total</span><span class="o">=</span><span class="mi">7</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_col</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dynamic_ncols</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
-        <span class="c1"># Missing Values</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Computing Missing Values&quot;</span><span class="p">)</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_missing</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data_total_missing&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span>
+            <span class="p">)</span>
+            <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">format_num_stats</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Nominal</span><span class="p">()):</span>
+            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span>
+            <span class="p">)</span>
+            <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">format_cat_stats</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;len_stats&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;letter_stats&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="n">figs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Figure</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Formating Missing Values&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">rendered</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="n">_morph_figure</span><span class="p">(</span>
-                            <span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                            <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">&quot;stretch_width&quot;</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="n">Title</span><span class="p">(</span>
-                                <span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span>
-                            <span class="p">),</span>
-                        <span class="p">)</span>
-                        <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rendered</span><span class="o">.</span><span class="n">tabs</span>
-                    <span class="p">]</span>
-                <span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Something Happened...&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="n">error</span><span class="p">})</span>  <span class="c1"># same template for rendering</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Skipping Missing Values&quot;</span><span class="p">)</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="c1"># Overview</span>
-        <span class="n">counter</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Categorical&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Numerical&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Datetime&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="n">column_dtype</span> <span class="o">=</span> <span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">column_dtype</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">()):</span>
-                <span class="n">counter</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">column_dtype</span><span class="p">,</span> <span class="n">Continuous</span><span class="p">()):</span>
-                <span class="n">counter</span><span class="p">[</span><span class="s2">&quot;Numerical&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">column_dtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()):</span>
-                <span class="n">counter</span><span class="p">[</span><span class="s2">&quot;Datetime&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Computing Overview&quot;</span><span class="p">)</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">stats</span> <span class="o">=</span> <span class="n">calc_stats</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">counter</span><span class="p">)</span>
-
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Formating Overview&quot;</span><span class="p">)</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;overview&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_format_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s2">&quot;overview&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Variables</span>
-        <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Computing </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">top_words</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Formating </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">rendered</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-                <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Continuous</span><span class="p">()):</span>
-                    <span class="n">stats</span> <span class="o">=</span> <span class="n">_format_stats</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;var_num&quot;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Nominal</span><span class="p">()):</span>
-                    <span class="n">stats</span> <span class="o">=</span> <span class="n">_format_stats</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;var_cat&quot;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">DateTime</span><span class="p">()):</span>
-                    <span class="n">stats</span> <span class="o">=</span> <span class="n">_format_stats</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;var_dt&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported dtype: </span><span class="si">{</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
-                    <span class="s2">&quot;plots&quot;</span><span class="p">:</span> <span class="n">components</span><span class="p">(</span>
-                        <span class="p">[</span>
-                            <span class="n">_morph_figure</span><span class="p">(</span>
-                                <span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">)</span>
-                                <span class="k">else</span> <span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="p">,</span>
-                                <span class="n">plot_width</span><span class="o">=</span><span class="mi">280</span><span class="p">,</span>
-                                <span class="n">plot_height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
-                                <span class="n">title</span><span class="o">=</span><span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
-                            <span class="p">)</span>
-                            <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rendered</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                        <span class="p">]</span>
-                    <span class="p">),</span>  <span class="c1"># skip Div</span>
-                    <span class="s2">&quot;col_type&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_column&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                <span class="p">}</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Something Happened...&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="n">error</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
-
-        <span class="c1"># Correlations</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Computing Correlations&quot;</span><span class="p">)</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Formating Correlations&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">rendered</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;correlations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="n">_morph_figure</span><span class="p">(</span>
-                            <span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="p">,</span>
-                            <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">&quot;stretch_width&quot;</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="n">Title</span><span class="p">(</span>
-                                <span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span>
-                            <span class="p">),</span>
-                        <span class="p">)</span>
-                        <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rendered</span><span class="o">.</span><span class="n">tabs</span>
-                    <span class="p">]</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Skipping Correlations&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Something Happened...&quot;</span><span class="p">)</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;correlations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="n">error</span><span class="p">})</span>  <span class="c1"># same template for rendering</span>
-
-        <span class="c1"># Interactions</span>
-        <span class="n">df_coeffs</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_col</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_interaction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="c1"># set initial x,y axis value</span>
-            <span class="n">df_scatter</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">num_col</span><span class="p">]</span>
-            <span class="n">df_scatter</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;__x__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_scatter</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="n">df_scatter</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;__y__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_scatter</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">v_1</span> <span class="ow">in</span> <span class="n">num_col</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">v_2</span> <span class="ow">in</span> <span class="n">num_col</span><span class="p">:</span>
-                        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span>
-                            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Computing Interactions: </span><span class="si">{</span><span class="n">v_1</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">v_2</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="p">)</span>
-                        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">v_1</span><span class="p">,</span> <span class="n">v_2</span><span class="p">)</span>
-                        <span class="n">coeff_a</span><span class="p">,</span> <span class="n">coeff_b</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;coeffs&quot;</span><span class="p">]</span>
-                        <span class="n">line_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-                            <span class="p">[</span>
-                                <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
-                                <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
-                            <span class="p">]</span>
-                        <span class="p">)</span>
-                        <span class="n">line_y</span> <span class="o">=</span> <span class="n">coeff_a</span> <span class="o">*</span> <span class="n">line_x</span> <span class="o">+</span> <span class="n">coeff_b</span>
-                        <span class="n">df_coeffs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v_1</span><span class="si">}{</span><span class="n">v_2</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_x</span>
-                        <span class="n">df_coeffs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v_1</span><span class="si">}{</span><span class="n">v_2</span><span class="si">}</span><span class="s2">y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_y</span>
-                <span class="n">df_coeffs</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;__x__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_coeffs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-                <span class="n">df_coeffs</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;__y__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_coeffs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-                <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
-                    <span class="n">coeffs</span><span class="o">=</span><span class="n">df_coeffs</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">=</span><span class="n">df_scatter</span><span class="p">,</span>
-                    <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_crossfilter&quot;</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Formating Interactions&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">rendered</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;interactions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span>
-                    <span class="n">_morph_figure</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">&quot;stretch_width&quot;</span><span class="p">)</span>
-                <span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Something Happened...&quot;</span><span class="p">)</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;interactions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="n">error</span><span class="p">})</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Skipping Interactions&quot;</span><span class="p">)</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_col</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">comps</span><span class="p">[</span><span class="s2">&quot;has_interaction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Report has been created!&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">comps</span></div>
-
-
-<span class="c1"># def format_full(</span>
-<span class="c1">#     df: pd.DataFrame, comps: Dict[str, List[Tuple[str, str]]]</span>
-<span class="c1"># ) -&gt; Dict[str, Any]:</span>
-<span class="c1">#     pass</span>
-
-
-<span class="c1"># def format_mini(</span>
-<span class="c1">#     df: pd.DataFrame, comps: Dict[str, List[Tuple[str, str]]]</span>
-<span class="c1"># ) -&gt; Dict[str, Any]:</span>
-<span class="c1">#     pass</span>
-
-
-<span class="k">def</span> <span class="nf">_morph_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fig</span>
-
-
-<span class="k">def</span> <span class="nf">_format_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">at</span><span class="p">:</span> <span class="nb">str</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="c1"># pylint: disable=too-many-locals, invalid-name</span>
-    <span class="k">if</span> <span class="n">at</span> <span class="o">==</span> <span class="s2">&quot;overview&quot;</span><span class="p">:</span>
-        <span class="p">(</span>
-            <span class="n">nrows</span><span class="p">,</span>
-            <span class="n">ncols</span><span class="p">,</span>
-            <span class="n">npresent_cells</span><span class="p">,</span>
-            <span class="n">nrows_wo_dups</span><span class="p">,</span>
-            <span class="n">mem_use</span><span class="p">,</span>
-            <span class="n">dtypes_cnt</span><span class="p">,</span>
-        <span class="p">)</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-        <span class="n">ncells</span> <span class="o">=</span> <span class="n">nrows</span> <span class="o">*</span> <span class="n">ncols</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Number of Variables&quot;</span><span class="p">:</span> <span class="n">ncols</span><span class="p">,</span>
-            <span class="s2">&quot;Number of Observations&quot;</span><span class="p">:</span> <span class="n">nrows</span><span class="p">,</span>
-            <span class="s2">&quot;Missing Cells&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">ncells</span> <span class="o">-</span> <span class="n">npresent_cells</span><span class="p">),</span>
-            <span class="s2">&quot;Missing Cells (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">npresent_cells</span> <span class="o">/</span> <span class="n">ncells</span><span class="p">),</span>
-            <span class="s2">&quot;Duplicate Rows&quot;</span><span class="p">:</span> <span class="n">nrows</span> <span class="o">-</span> <span class="n">nrows_wo_dups</span><span class="p">,</span>
-            <span class="s2">&quot;Duplicate Rows (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">nrows_wo_dups</span> <span class="o">/</span> <span class="n">nrows</span><span class="p">),</span>
-            <span class="s2">&quot;Total Size in Memory&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">mem_use</span><span class="p">),</span>
-            <span class="s2">&quot;Average Record Size in Memory&quot;</span><span class="p">:</span> <span class="n">mem_use</span> <span class="o">/</span> <span class="n">nrows</span><span class="p">,</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span>
+            <span class="c1"># fig.title = Title(text=tab.title, align=&quot;center&quot;)</span>
+            <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
+            <span class="s2">&quot;plots&quot;</span><span class="p">:</span> <span class="n">components</span><span class="p">(</span><span class="n">figs</span><span class="p">),</span>
+            <span class="s2">&quot;col_type&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_column&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
         <span class="p">}</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">dtypes_cnt</span>
-    <span class="k">elif</span> <span class="n">at</span> <span class="o">==</span> <span class="s2">&quot;var_num&quot;</span><span class="p">:</span>
-        <span class="n">overview</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Distinct Count&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nuniq&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Unique (%)&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nuniq&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Missing (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;Infinite&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nreals&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;Infinite (%)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nreals&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Memory Size&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mem_use&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Mean&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Zeros&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nzero&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Zeros (%)&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nzero&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Negatives&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nneg&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Negatives (%)&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nneg&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span>
-        <span class="p">}</span>
-        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">quantile</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;5-th Percentile&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.05</span><span class="p">],</span>
-            <span class="s2">&quot;Q1&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.25</span><span class="p">],</span>
-            <span class="s2">&quot;Median&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.50</span><span class="p">],</span>
-            <span class="s2">&quot;Q3&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.75</span><span class="p">],</span>
-            <span class="s2">&quot;95-th Percentile&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.95</span><span class="p">],</span>
-            <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Range&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;IQR&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.75</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;qntls&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mf">0.25</span><span class="p">],</span>
-        <span class="p">}</span>
-        <span class="n">descriptive</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Mean&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Standard Deviation&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Variance&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;Sum&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Skewness&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;skew&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;Kurtosis&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;kurt&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;Coefficient of Variation&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
-            <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="n">overview</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overview</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">quantile</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">quantile</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">descriptive</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">descriptive</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">return</span> <span class="n">overview</span><span class="p">,</span> <span class="n">quantile</span><span class="p">,</span> <span class="n">descriptive</span>
-    <span class="k">elif</span> <span class="n">at</span> <span class="o">==</span> <span class="s2">&quot;var_cat&quot;</span><span class="p">:</span>
-        <span class="n">stats</span><span class="p">,</span> <span class="n">length_stats</span><span class="p">,</span> <span class="n">letter_stats</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">],</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;len_stats&quot;</span><span class="p">],</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;letter_stats&quot;</span><span class="p">],</span>
+
+    <span class="c1"># interactions</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_interaction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;scat&quot;</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_crossfilter&quot;</span><span class="p">)</span>
+    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
+    <span class="n">rndrd</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;interactions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">rndrd</span><span class="p">)</span>
+
+    <span class="c1"># correlations</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">dfs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">corr</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;corrs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">ndf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordx&quot;</span><span class="p">]],</span>
+                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordy&quot;</span><span class="p">]],</span>
+                <span class="s2">&quot;correlation&quot;</span><span class="p">:</span> <span class="n">corr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+            <span class="p">}</span>
         <span class="p">)</span>
-        <span class="n">ov_stats</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Distinct Count&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nuniq&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Unique (%)&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nuniq&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Missing (%)&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;Memory Size&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;mem_use&quot;</span><span class="p">],</span>
-        <span class="p">}</span>
-        <span class="n">sampled_rows</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;1st row&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;2nd row&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;3rd row&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;4th row&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;5th row&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">smpl</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">sampled_rows</span><span class="p">,</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;first_rows&quot;</span><span class="p">]))</span>
+        <span class="n">dfs</span><span class="p">[</span><span class="n">method</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndf</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordy&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordx&quot;</span><span class="p">]]</span>
+    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">]),</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
+    <span class="n">figs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">child</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)</span>
+        <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;correlations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">figs</span><span class="p">)</span>
 
-        <span class="n">ov_stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ov_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">length_stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">length_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">smpl</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">18</span> <span class="k">else</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">smpl</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">letter_stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">letter_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">return</span> <span class="n">ov_stats</span><span class="p">,</span> <span class="n">length_stats</span><span class="p">,</span> <span class="n">smpl</span><span class="p">,</span> <span class="n">letter_stats</span>
-    <span class="k">elif</span> <span class="n">at</span> <span class="o">==</span> <span class="s2">&quot;var_dt&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">_format_values</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">()},)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown section&quot;</span><span class="p">)</span>
+    <span class="c1"># missing</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">completions</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">](</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">])</span>
+
+    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
+    <span class="n">figs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)</span>
+        <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">figs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="basic_computations"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.create_report.html#dataprep.eda.create_report.formatter.basic_computations">[docs]</a><span class="k">def</span> <span class="nf">basic_computations</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Computations for the basic version.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        The DataFrame for which data are calculated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">df_num</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_num_columns</span><span class="p">()</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_num</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">first_rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">CATEGORICAL_DTYPES</span><span class="p">)</span><span class="o">.</span><span class="n">head</span>
+
+    <span class="c1"># overview</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_stats</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="c1"># # variables</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Continuous</span><span class="p">()):</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">cont_comps</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Nominal</span><span class="p">()):</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">nom_comps</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">first_rows</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="p">)</span>
+    <span class="c1"># interactions</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_num</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="n">meta</span><span class="o">=</span><span class="n">df_num</span><span class="o">.</span><span class="n">frame</span>
+    <span class="p">)</span>
+    <span class="c1"># correlations</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">zip</span><span class="p">((</span><span class="s2">&quot;cordx&quot;</span><span class="p">,</span> <span class="s2">&quot;cordy&quot;</span><span class="p">,</span> <span class="s2">&quot;corrs&quot;</span><span class="p">),</span> <span class="n">correlation_nxn</span><span class="p">(</span><span class="n">df_num</span><span class="p">)))</span>
+    <span class="c1"># missing values</span>
+    <span class="p">(</span>
+        <span class="n">delayed</span><span class="p">,</span>
+        <span class="n">completion</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">compute_missing_nullivariate</span><span class="p">(</span>  <span class="c1"># pylint: disable=unexpected-keyword-arg</span>
+        <span class="n">df</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">_staged</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delayed</span>
+    <span class="n">completions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;miss&quot;</span><span class="p">:</span> <span class="n">completion</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">completions</span></div>
 </pre></div>
 
           </div>

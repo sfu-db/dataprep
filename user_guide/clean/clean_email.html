@@ -1,0 +1,1321 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>clean_email(): Cleaning and validation for email address &#8212; DataPrep 0.2.12 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="API Reference" href="../../api_reference/dataprep.html" />
+    <link rel="prev" title="clean_lat_long(): Clean and validate geographical coordinates" href="clean_lat_long.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/clean/clean_email.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../connector/connector.html">Connector</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="introduction.html">Clean</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="clean_lat_long.html">clean_lat_long(): geographic coordinates</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">clean_email(): email addresses</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Introduction" class="nav-link">Introduction</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Example-dirty-dataset" class="nav-link">Example dirty dataset</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#1.-Default-clean_email()" class="nav-link">1. Default clean_email()</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#2.-Split-Parameter" class="nav-link">2. Split Parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#3.-Pre_clean-Parameter" class="nav-link">3. Pre_clean Parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#4.-Fix_domain-Parameter" class="nav-link">4. Fix_domain Parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#5.-Error-Parameter" class="nav-link">5. Error Parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#6.-Examples-for-validate_email()" class="nav-link">6. Examples for validate_email()</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="clean_email():-Cleaning-and-validation-for-email-address">
+<h1>clean_email(): Cleaning and validation for email address<a class="headerlink" href="#clean_email():-Cleaning-and-validation-for-email-address" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>clean_email() function supports cleaning of messy email values</p></li>
+<li><p>validate_email() function supports validation on email semantic type of single input value or an input column. When it returns True, the input value is a valid email address.</p></li>
+</ul>
+<p>Parameters for clean_email():</p>
+<ul class="simple">
+<li><p>split: whether to split input into multiple columns, default False</p></li>
+<li><p>inplace: whether to clean initial column in place, default False</p></li>
+<li><p>pre_clean: whether to pre clean input text, default False</p></li>
+<li><p>fix_domain: whether to fix common typos in domain, default False</p></li>
+<li><p>report: whether to generate report, default True</p></li>
+<li><p>errors: error handling types, default “coerce”</p>
+<ul>
+<li><p>‘raise’: raise an exception when there is broken value</p></li>
+<li><p>‘coerce’: set invalid value to NaN</p></li>
+<li><p>‘ignore’: just return the initial input</p></li>
+</ul>
+</li>
+</ul>
+<p>Parameters for validate_email():</p>
+<ul class="simple">
+<li><p>x: input value, can be Union of single value</p></li>
+</ul>
+</div>
+<div class="section" id="Example-dirty-dataset">
+<h2>Example dirty dataset<a class="headerlink" href="#Example-dirty-dataset" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;messy_email&quot;</span><span class="p">:</span>
+                   <span class="p">[</span><span class="s2">&quot;yi@gmali.com&quot;</span><span class="p">,</span><span class="s2">&quot;yi@sfu.ca&quot;</span><span class="p">,</span><span class="s2">&quot;y i@sfu.ca&quot;</span><span class="p">,</span><span class="s2">&quot;Yi@gmail.com&quot;</span><span class="p">,</span><span class="s2">&quot;H ELLO@hotmal.COM&quot;</span><span class="p">,</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s2">&quot;NULL&quot;</span><span class="p">]</span>
+                  <span class="p">})</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>messy_email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>yi@gmali.com</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y i@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Yi@gmail.com</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>H ELLO@hotmal.COM</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="1.-Default-clean_email()">
+<h2>1. Default clean_email()<a class="headerlink" href="#1.-Default-clean_email()" title="Permalink to this headline">¶</a></h2>
+<p>Under default setting, clean_email() will do the strict semantic type check and return report automatically. Broken values will be replaced by NaN.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">clean_email</span>
+<span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;messy_email&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+NumExpr defaulting to 8 threads.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Email Cleaning Report:
+        3 values with bad format (37.5%)
+Result contains 3 (37.5%) values in the correct format and 5 null values (62.5%)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>messy_email</th>
+      <th>messy_email_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>yi@gmali.com</td>
+      <td>yi@gmali.com</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y i@sfu.ca</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Yi@gmail.com</td>
+      <td>yi@gmail.com</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>H ELLO@hotmal.COM</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="2.-Split-Parameter">
+<h2>2. Split Parameter<a class="headerlink" href="#2.-Split-Parameter" title="Permalink to this headline">¶</a></h2>
+<p>By setting split parameter to True, returned table will contain separate columns for domain and username of valid emails.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;messy_email&quot;</span><span class="p">,</span> <span class="n">split</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Email Cleaning Report:
+        3 values with bad format (37.5%)
+Result contains 3 (37.5%) values in the correct format and 5 null values (62.5%)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>messy_email</th>
+      <th>username</th>
+      <th>domain</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>yi@gmali.com</td>
+      <td>yi</td>
+      <td>gmali.com</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>yi@sfu.ca</td>
+      <td>yi</td>
+      <td>sfu.ca</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>y i@sfu.ca</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Yi@gmail.com</td>
+      <td>yi</td>
+      <td>gmail.com</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>H ELLO@hotmal.COM</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="3.-Pre_clean-Parameter">
+<h2>3. Pre_clean Parameter<a class="headerlink" href="#3.-Pre_clean-Parameter" title="Permalink to this headline">¶</a></h2>
+<p>when pre_clean parameter is set to True, the function will fix broken text in advance before do semantic type check.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;messy_email&quot;</span><span class="p">,</span> <span class="n">pre_clean</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Email Cleaning Report:
+        1 values with bad format (12.5%)
+Result contains 5 (62.5%) values in the correct format and 3 null values (37.5%)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>messy_email</th>
+      <th>messy_email_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>yi@gmali.com</td>
+      <td>yi@gmali.com</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Yi@gmail.com</td>
+      <td>yi@gmail.com</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>HELLO@hotmal.COM</td>
+      <td>hello@hotmal.com</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>nan</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="4.-Fix_domain-Parameter">
+<h2>4. Fix_domain Parameter<a class="headerlink" href="#4.-Fix_domain-Parameter" title="Permalink to this headline">¶</a></h2>
+<p>When fix_domain parameter is set to True, the function will do basic check to avoid common typos for popular domains.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;messy_email&quot;</span><span class="p">,</span> <span class="n">fix_domain</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Email Cleaning Report:
+        1 values with bad format (12.5%)
+Result contains 5 (62.5%) values in the correct format and 3 null values (37.5%)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>messy_email</th>
+      <th>messy_email_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>yi@gmali.com</td>
+      <td>yi@gmail.com</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Yi@gmail.com</td>
+      <td>yi@gmail.com</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>HELLO@hotmal.COM</td>
+      <td>hello@hotmail.com</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>nan</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="5.-Error-Parameter">
+<h2>5. Error Parameter<a class="headerlink" href="#5.-Error-Parameter" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;messy_email&quot;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-6-13f2e99c7630&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>clean_email<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">&#34;messy_email&#34;</span><span class="ansi-blue-fg">,</span> errors <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">&#34;raise&#34;</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/Study/dataprep/code/docs:clean_email/dataprep/dataprep/clean/clean_email.py</span> in <span class="ansi-cyan-fg">clean_email</span><span class="ansi-blue-fg">(df, column, split, inplace, pre_clean, fix_domain, report, errors)</span>
+<span class="ansi-green-intense-fg ansi-bold">    275</span>         df <span class="ansi-blue-fg">=</span> df<span class="ansi-blue-fg">.</span>drop<span class="ansi-blue-fg">(</span>columns<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span>column<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    276</span>
+<span class="ansi-green-fg">--&gt; 277</span><span class="ansi-red-fg">     </span>df<span class="ansi-blue-fg">,</span> nrows <span class="ansi-blue-fg">=</span> dask<span class="ansi-blue-fg">.</span>compute<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">,</span> df<span class="ansi-blue-fg">.</span>shape<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    278</span>
+<span class="ansi-green-intense-fg ansi-bold">    279</span>     <span class="ansi-green-fg">if</span> report<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/base.py</span> in <span class="ansi-cyan-fg">compute</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    450</span>         postcomputes<span class="ansi-blue-fg">.</span>append<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">.</span>__dask_postcompute__<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    451</span>
+<span class="ansi-green-fg">--&gt; 452</span><span class="ansi-red-fg">     </span>results <span class="ansi-blue-fg">=</span> schedule<span class="ansi-blue-fg">(</span>dsk<span class="ansi-blue-fg">,</span> keys<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    453</span>     <span class="ansi-green-fg">return</span> repack<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>f<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>a<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> r<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">(</span>f<span class="ansi-blue-fg">,</span> a<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">in</span> zip<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">,</span> postcomputes<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    454</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/threaded.py</span> in <span class="ansi-cyan-fg">get</span><span class="ansi-blue-fg">(dsk, result, cache, num_workers, pool, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     82</span>         get_id<span class="ansi-blue-fg">=</span>_thread_get_id<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     83</span>         pack_exception<span class="ansi-blue-fg">=</span>pack_exception<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">---&gt; 84</span><span class="ansi-red-fg">         </span><span class="ansi-blue-fg">**</span>kwargs
+<span class="ansi-green-intense-fg ansi-bold">     85</span>     )
+<span class="ansi-green-intense-fg ansi-bold">     86</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">get_async</span><span class="ansi-blue-fg">(apply_async, num_workers, dsk, result, cache, get_id, rerun_exceptions_locally, pack_exception, raise_exception, callbacks, dumps, loads, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    484</span>                         _execute_task<span class="ansi-blue-fg">(</span>task<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>  <span class="ansi-red-fg"># Re-execute locally</span>
+<span class="ansi-green-intense-fg ansi-bold">    485</span>                     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 486</span><span class="ansi-red-fg">                         </span>raise_exception<span class="ansi-blue-fg">(</span>exc<span class="ansi-blue-fg">,</span> tb<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    487</span>                 res<span class="ansi-blue-fg">,</span> worker_id <span class="ansi-blue-fg">=</span> loads<span class="ansi-blue-fg">(</span>res_info<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    488</span>                 state<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;cache&#34;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">[</span>key<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> res
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">reraise</span><span class="ansi-blue-fg">(exc, tb)</span>
+<span class="ansi-green-intense-fg ansi-bold">    314</span>     <span class="ansi-green-fg">if</span> exc<span class="ansi-blue-fg">.</span>__traceback__ <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> tb<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    315</span>         <span class="ansi-green-fg">raise</span> exc<span class="ansi-blue-fg">.</span>with_traceback<span class="ansi-blue-fg">(</span>tb<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 316</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">raise</span> exc
+<span class="ansi-green-intense-fg ansi-bold">    317</span>
+<span class="ansi-green-intense-fg ansi-bold">    318</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">execute_task</span><span class="ansi-blue-fg">(key, task_info, dumps, loads, get_id, pack_exception)</span>
+<span class="ansi-green-intense-fg ansi-bold">    220</span>     <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    221</span>         task<span class="ansi-blue-fg">,</span> data <span class="ansi-blue-fg">=</span> loads<span class="ansi-blue-fg">(</span>task_info<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 222</span><span class="ansi-red-fg">         </span>result <span class="ansi-blue-fg">=</span> _execute_task<span class="ansi-blue-fg">(</span>task<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    223</span>         id <span class="ansi-blue-fg">=</span> get_id<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    224</span>         result <span class="ansi-blue-fg">=</span> dumps<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> id<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
+<span class="ansi-green-intense-fg ansi-bold">    119</span>         <span class="ansi-red-fg"># temporaries by their reference count and can execute certain</span>
+<span class="ansi-green-intense-fg ansi-bold">    120</span>         <span class="ansi-red-fg"># operations in-place.</span>
+<span class="ansi-green-fg">--&gt; 121</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>_execute_task<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> a <span class="ansi-green-fg">in</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> ishashable<span class="ansi-blue-fg">(</span>arg<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    123</span>         <span class="ansi-green-fg">return</span> arg
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/optimization.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, *args)</span>
+<span class="ansi-green-intense-fg ansi-bold">    960</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> len<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">==</span> len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    961</span>             <span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Expected %d args, got %d&#34;</span> <span class="ansi-blue-fg">%</span> <span class="ansi-blue-fg">(</span>len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> len<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 962</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> core<span class="ansi-blue-fg">.</span>get<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>dsk<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>outkey<span class="ansi-blue-fg">,</span> dict<span class="ansi-blue-fg">(</span>zip<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    963</span>
+<span class="ansi-green-intense-fg ansi-bold">    964</span>     <span class="ansi-green-fg">def</span> __reduce__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">get</span><span class="ansi-blue-fg">(dsk, out, cache)</span>
+<span class="ansi-green-intense-fg ansi-bold">    149</span>     <span class="ansi-green-fg">for</span> key <span class="ansi-green-fg">in</span> toposort<span class="ansi-blue-fg">(</span>dsk<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    150</span>         task <span class="ansi-blue-fg">=</span> dsk<span class="ansi-blue-fg">[</span>key<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-fg">--&gt; 151</span><span class="ansi-red-fg">         </span>result <span class="ansi-blue-fg">=</span> _execute_task<span class="ansi-blue-fg">(</span>task<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    152</span>         cache<span class="ansi-blue-fg">[</span>key<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> result
+<span class="ansi-green-intense-fg ansi-bold">    153</span>     result <span class="ansi-blue-fg">=</span> _execute_task<span class="ansi-blue-fg">(</span>out<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
+<span class="ansi-green-intense-fg ansi-bold">    119</span>         <span class="ansi-red-fg"># temporaries by their reference count and can execute certain</span>
+<span class="ansi-green-intense-fg ansi-bold">    120</span>         <span class="ansi-red-fg"># operations in-place.</span>
+<span class="ansi-green-fg">--&gt; 121</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>_execute_task<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> a <span class="ansi-green-fg">in</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> ishashable<span class="ansi-blue-fg">(</span>arg<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    123</span>         <span class="ansi-green-fg">return</span> arg
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/utils.py</span> in <span class="ansi-cyan-fg">apply</span><span class="ansi-blue-fg">(func, args, kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     27</span> <span class="ansi-green-fg">def</span> apply<span class="ansi-blue-fg">(</span>func<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">,</span> kwargs<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     28</span>     <span class="ansi-green-fg">if</span> kwargs<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 29</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     30</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     31</span>         <span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/dataframe/core.py</span> in <span class="ansi-cyan-fg">apply_and_enforce</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">   5283</span>     func <span class="ansi-blue-fg">=</span> kwargs<span class="ansi-blue-fg">.</span>pop<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;_func&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   5284</span>     meta <span class="ansi-blue-fg">=</span> kwargs<span class="ansi-blue-fg">.</span>pop<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;_meta&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">-&gt; 5285</span><span class="ansi-red-fg">     </span>df <span class="ansi-blue-fg">=</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   5286</span>     <span class="ansi-green-fg">if</span> is_dataframe_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> is_series_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> is_index_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">   5287</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> len<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/dask/utils.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, obj, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    891</span>
+<span class="ansi-green-intense-fg ansi-bold">    892</span>     <span class="ansi-green-fg">def</span> __call__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> obj<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 893</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> getattr<span class="ansi-blue-fg">(</span>obj<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>method<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    894</span>
+<span class="ansi-green-intense-fg ansi-bold">    895</span>     <span class="ansi-green-fg">def</span> __reduce__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/pandas/core/frame.py</span> in <span class="ansi-cyan-fg">apply</span><span class="ansi-blue-fg">(self, func, axis, raw, result_type, args, **kwds)</span>
+<span class="ansi-green-intense-fg ansi-bold">   7543</span>             kwds<span class="ansi-blue-fg">=</span>kwds<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   7544</span>         )
+<span class="ansi-green-fg">-&gt; 7545</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> op<span class="ansi-blue-fg">.</span>get_result<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   7546</span>
+<span class="ansi-green-intense-fg ansi-bold">   7547</span>     <span class="ansi-green-fg">def</span> applymap<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> func<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> <span class="ansi-blue-fg">&#34;DataFrame&#34;</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/pandas/core/apply.py</span> in <span class="ansi-cyan-fg">get_result</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    178</span>             <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>apply_raw<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    179</span>
+<span class="ansi-green-fg">--&gt; 180</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>apply_standard<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    181</span>
+<span class="ansi-green-intense-fg ansi-bold">    182</span>     <span class="ansi-green-fg">def</span> apply_empty_result<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/pandas/core/apply.py</span> in <span class="ansi-cyan-fg">apply_standard</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    253</span>
+<span class="ansi-green-intense-fg ansi-bold">    254</span>     <span class="ansi-green-fg">def</span> apply_standard<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 255</span><span class="ansi-red-fg">         </span>results<span class="ansi-blue-fg">,</span> res_index <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>apply_series_generator<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    256</span>
+<span class="ansi-green-intense-fg ansi-bold">    257</span>         <span class="ansi-red-fg"># wrap results</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/pandas/core/apply.py</span> in <span class="ansi-cyan-fg">apply_series_generator</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    282</span>                 <span class="ansi-green-fg">for</span> i<span class="ansi-blue-fg">,</span> v <span class="ansi-green-fg">in</span> enumerate<span class="ansi-blue-fg">(</span>series_gen<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    283</span>                     <span class="ansi-red-fg"># ignore SettingWithCopy here in case the user mutates</span>
+<span class="ansi-green-fg">--&gt; 284</span><span class="ansi-red-fg">                     </span>results<span class="ansi-blue-fg">[</span>i<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>f<span class="ansi-blue-fg">(</span>v<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    285</span>                     <span class="ansi-green-fg">if</span> isinstance<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">[</span>i<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> ABCSeries<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    286</span>                         <span class="ansi-red-fg"># If we have a view on v, we need to make a copy because</span>
+
+<span class="ansi-green-fg">//anaconda3/lib/python3.7/site-packages/pandas/core/apply.py</span> in <span class="ansi-cyan-fg">f</span><span class="ansi-blue-fg">(x)</span>
+<span class="ansi-green-intense-fg ansi-bold">    107</span>
+<span class="ansi-green-intense-fg ansi-bold">    108</span>             <span class="ansi-green-fg">def</span> f<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 109</span><span class="ansi-red-fg">                 </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwds<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    110</span>
+<span class="ansi-green-intense-fg ansi-bold">    111</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/Study/dataprep/code/docs:clean_email/dataprep/dataprep/clean/clean_email.py</span> in <span class="ansi-cyan-fg">format_email</span><span class="ansi-blue-fg">(row, col, split, pre_clean, fix_domain, errors)</span>
+<span class="ansi-green-intense-fg ansi-bold">    337</span>
+<span class="ansi-green-intense-fg ansi-bold">    338</span>     <span class="ansi-green-fg">if</span> valid_type <span class="ansi-blue-fg">!=</span> <span class="ansi-blue-fg">&#34;valid&#34;</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 339</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> not_email<span class="ansi-blue-fg">(</span>row<span class="ansi-blue-fg">,</span> col<span class="ansi-blue-fg">,</span> split<span class="ansi-blue-fg">,</span> valid_type<span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    340</span>
+<span class="ansi-green-intense-fg ansi-bold">    341</span>     user_part<span class="ansi-blue-fg">,</span> domain_part <span class="ansi-blue-fg">=</span> str<span class="ansi-blue-fg">(</span>row<span class="ansi-blue-fg">[</span>col<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>rsplit<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;@&#34;</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/Study/dataprep/code/docs:clean_email/dataprep/dataprep/clean/clean_email.py</span> in <span class="ansi-cyan-fg">not_email</span><span class="ansi-blue-fg">(row, col, split, errtype, processtype)</span>
+<span class="ansi-green-intense-fg ansi-bold">    422</span>             row<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f&#34;{col}_clean&#34;</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> row<span class="ansi-blue-fg">[</span>col<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">    423</span>     <span class="ansi-green-fg">elif</span> processtype <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;raise&#34;</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 424</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;unable to parse value {row[col]}&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    425</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    426</span>         <span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;invalid error processing type&#34;</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-red-fg">ValueError</span>: unable to parse value hello
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;messy_email&quot;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Email Cleaning Report:
+        1 values with bad format (12.5%)
+Result contains 5 (62.5%) values in the correct format and 3 null values (37.5%)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>messy_email</th>
+      <th>messy_email_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>yi@gmali.com</td>
+      <td>yi@gmali.com</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>yi@sfu.ca</td>
+      <td>yi@sfu.ca</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Yi@gmail.com</td>
+      <td>yi@gmail.com</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>HELLO@hotmal.COM</td>
+      <td>hello@hotmal.com</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>hello</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>nan</td>
+      <td>nan</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="6.-Examples-for-validate_email()">
+<h2>6. Examples for validate_email()<a class="headerlink" href="#6.-Examples-for-validate_email()" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">validate_email</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_email</span><span class="p">(</span><span class="s1">&#39;Abc.example.com&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_email</span><span class="p">(</span><span class="s1">&#39;prettyandsimple@example.com&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_email</span><span class="p">(</span><span class="s1">&#39;disposable.style.email.with+symbol@example.com&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_email</span><span class="p">(</span><span class="s1">&#39;this is&quot;not</span><span class="se">\a</span><span class="s1">llowed@example.com&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+False
+True
+True
+False
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">validate_email</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;messy_email&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     True
+1     True
+2     True
+3     True
+4     True
+5    False
+6    False
+7    False
+Name: messy_email, dtype: bool
+</pre></div></div>
+</div>
+<p>Note that validate_email() will do the strict semantic check by default.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

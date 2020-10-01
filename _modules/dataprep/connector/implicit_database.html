@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -152,134 +158,45 @@
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">load</span> <span class="k">as</span> <span class="n">jload</span>
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">loads</span> <span class="k">as</span> <span class="n">jloads</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">jsonpath_ng</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">jparse</span>
 <span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>  <span class="c1"># pytype: disable=import-error</span>
 
+<span class="kn">from</span> <span class="nn">dataprep.connector.schema.defs</span> <span class="kn">import</span> <span class="n">ConfigDef</span>
+
 <span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
-<span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="n">CONFIG_SCHEMA</span>
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">Authorization</span><span class="p">,</span> <span class="n">AuthorizationType</span><span class="p">,</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">Orient</span>
+<span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="n">ConfigDef</span>
 
 <span class="n">_TYPE_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="s2">&quot;float&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="s2">&quot;boolean&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="SchemaField"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.implicit_database.SchemaField">[docs]</a><span class="k">class</span> <span class="nc">SchemaField</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Schema of one table field</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
-
-
-<div class="viewcode-block" id="Pagination"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.implicit_database.Pagination">[docs]</a><span class="k">class</span> <span class="nc">Pagination</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Schema of Pagination field</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">count_key</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">max_count</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">anchor_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">cursor_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">cursor_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdef</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">pdef</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_count</span> <span class="o">=</span> <span class="n">pdef</span><span class="p">[</span><span class="s2">&quot;max_count&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">count_key</span> <span class="o">=</span> <span class="n">pdef</span><span class="p">[</span><span class="s2">&quot;count_key&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">anchor_key</span> <span class="o">=</span> <span class="n">pdef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;anchor_key&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cursor_id</span> <span class="o">=</span> <span class="n">pdef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor_id&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cursor_key</span> <span class="o">=</span> <span class="n">pdef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor_key&quot;</span><span class="p">)</span></div>
-
-
 <div class="viewcode-block" id="ImplicitTable"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.implicit_database.ImplicitTable">[docs]</a><span class="k">class</span> <span class="nc">ImplicitTable</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-many-instance-attributes</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ImplicitTable class abstracts the request and the response to a Restful API,</span>
-<span class="sd">    so that the remote API can be treated as a database table.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ImplicitTable class abstracts the request and the response</span>
+<span class="sd">    to a Restful API, so that the remote API can be treated as a database</span>
+<span class="sd">    table.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-    <span class="c1"># Request related</span>
-    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">authorization</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Authorization</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Fields</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Fields</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">body_ctype</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">body</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Fields</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">cookies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Fields</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">pag_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Pagination</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="c1"># Response related</span>
-    <span class="n">ctype</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">table_path</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SchemaField</span><span class="p">]</span>
-    <span class="n">orient</span><span class="p">:</span> <span class="n">Orient</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">ConfigDef</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span>
-            <span class="n">config</span><span class="p">,</span> <span class="n">CONFIG_SCHEMA</span>
-        <span class="p">)</span>  <span class="c1"># This will throw errors if validate failed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-
-        <span class="n">request_def</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">request_def</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">request_def</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="s2">&quot;authorization&quot;</span> <span class="ow">in</span> <span class="n">request_def</span><span class="p">:</span>
-            <span class="n">auth_def</span> <span class="o">=</span> <span class="n">request_def</span><span class="p">[</span><span class="s2">&quot;authorization&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auth_def</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">auth_type</span> <span class="o">=</span> <span class="n">AuthorizationType</span><span class="p">[</span><span class="n">auth_def</span><span class="p">]</span>
-                <span class="n">auth_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auth_def</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">auth_type</span> <span class="o">=</span> <span class="n">AuthorizationType</span><span class="p">[</span><span class="n">auth_def</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)]</span>
-                <span class="n">auth_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">auth_def</span><span class="p">}</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">authorization</span> <span class="o">=</span> <span class="n">Authorization</span><span class="p">(</span><span class="n">auth_type</span><span class="o">=</span><span class="n">auth_type</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">auth_params</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="s2">&quot;pagination&quot;</span> <span class="ow">in</span> <span class="n">request_def</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pag_params</span> <span class="o">=</span> <span class="n">Pagination</span><span class="p">(</span><span class="n">request_def</span><span class="p">[</span><span class="s2">&quot;pagination&quot;</span><span class="p">])</span>
-
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="s2">&quot;cookies&quot;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request_def</span><span class="p">:</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">Fields</span><span class="p">(</span><span class="n">request_def</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
-
-        <span class="k">if</span> <span class="s2">&quot;body&quot;</span> <span class="ow">in</span> <span class="n">request_def</span><span class="p">:</span>
-            <span class="n">body_def</span> <span class="o">=</span> <span class="n">request_def</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">body_ctype</span> <span class="o">=</span> <span class="n">body_def</span><span class="p">[</span><span class="s2">&quot;ctype&quot;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">Fields</span><span class="p">(</span><span class="n">body_def</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
-
-        <span class="n">response_def</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ctype</span> <span class="o">=</span> <span class="n">response_def</span><span class="p">[</span><span class="s2">&quot;ctype&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">table_path</span> <span class="o">=</span> <span class="n">response_def</span><span class="p">[</span><span class="s2">&quot;tablePath&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">name</span><span class="p">:</span> <span class="n">SchemaField</span><span class="p">(</span><span class="n">def_</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">def_</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">def_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">def_</span> <span class="ow">in</span> <span class="n">response_def</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">orient</span> <span class="o">=</span> <span class="n">Orient</span><span class="p">(</span><span class="n">response_def</span><span class="p">[</span><span class="s2">&quot;orient&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigDef</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ImplicitTable.from_response"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.implicit_database.ImplicitTable.from_response">[docs]</a>    <span class="k">def</span> <span class="nf">from_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a dataframe from a http body payload.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a dataframe from a http body payload.&quot;&quot;&quot;</span>
+
+        <span class="n">ctype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">ctype</span>  <span class="c1"># pylint: disable=no-member</span>
+        <span class="k">if</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/xml&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/xml&quot;</span><span class="p">:</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">UnreachableError</span>
@@ -287,17 +204,17 @@
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ImplicitTable.from_json"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.implicit_database.ImplicitTable.from_json">[docs]</a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create rows from json string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Create rows from json string.&quot;&quot;&quot;</span>
+
         <span class="n">data</span> <span class="o">=</span> <span class="n">jloads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">table_expr</span> <span class="o">=</span> <span class="n">jparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_path</span><span class="p">)</span>
+        <span class="n">respdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">response</span>
+        <span class="n">table_expr</span> <span class="o">=</span> <span class="n">jparse</span><span class="p">(</span><span class="n">respdef</span><span class="o">.</span><span class="n">table_path</span><span class="p">)</span>  <span class="c1"># pylint: disable=no-member</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orient</span> <span class="o">==</span> <span class="n">Orient</span><span class="o">.</span><span class="n">Records</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">respdef</span><span class="o">.</span><span class="n">orient</span> <span class="o">==</span> <span class="s2">&quot;records&quot;</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
             <span class="n">data_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">table_expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span>
 
-            <span class="k">for</span> <span class="n">column_name</span><span class="p">,</span> <span class="n">column_def</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="n">column_def</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">respdef</span><span class="o">.</span><span class="n">schema_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">column_target</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">target</span>
                 <span class="n">column_type</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">type</span>
 
@@ -334,14 +251,14 @@
 <span class="sd">        Create rows from xml string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
-
+        <span class="n">respdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">response</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
         <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-        <span class="n">data_rows</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_path</span><span class="p">)</span>
+        <span class="n">data_rows</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">respdef</span><span class="o">.</span><span class="n">table_path</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orient</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">Orient</span><span class="o">.</span><span class="n">Records</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">column_name</span><span class="p">,</span> <span class="n">column_def</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">respdef</span><span class="o">.</span><span class="n">orient</span> <span class="o">==</span> <span class="s2">&quot;records&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="n">column_def</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">respdef</span><span class="o">.</span><span class="n">schema_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">column_target</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">target</span>
                 <span class="n">column_type</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">type</span>
 
@@ -395,7 +312,7 @@
                 <span class="c1"># ignore meta file</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">table_config_path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.json&quot;</span><span class="p">:</span>
-                <span class="c1"># ifnote non json file</span>
+                <span class="c1"># ignote non json file</span>
                 <span class="k">continue</span>
 
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">table_config_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>

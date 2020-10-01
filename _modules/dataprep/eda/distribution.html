@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -147,16 +153,17 @@
 <span class="sd">This module implements the plot(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+<span class="kn">from</span> <span class="nn">..container</span> <span class="kn">import</span> <span class="n">Container</span>
+<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span>
+<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render</span>
-<span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span>
-<span class="kn">from</span> <span class="nn">..container</span> <span class="kn">import</span> <span class="n">Container</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;plot&quot;</span><span class="p">,</span> <span class="s2">&quot;compute&quot;</span><span class="p">,</span> <span class="s2">&quot;render&quot;</span><span class="p">]</span>
 
@@ -167,8 +174,8 @@
     <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
     <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
@@ -182,6 +189,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Report</span><span class="p">,</span> <span class="n">Container</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Generates plots for exploratory data analysis.</span>
 
@@ -277,6 +285,9 @@
 <span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
+<span class="sd">    progress</span>
+<span class="sd">        Enable the progress bar.</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
@@ -288,28 +299,32 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-locals,line-too-long</span>
 
-    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span>
-        <span class="n">df</span><span class="p">,</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-        <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-        <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
-        <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
-        <span class="n">ngroups</span><span class="o">=</span><span class="n">ngroups</span><span class="p">,</span>
-        <span class="n">largest</span><span class="o">=</span><span class="n">largest</span><span class="p">,</span>
-        <span class="n">nsubgroups</span><span class="o">=</span><span class="n">nsubgroups</span><span class="p">,</span>
-        <span class="n">timeunit</span><span class="o">=</span><span class="n">timeunit</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-        <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">,</span>
-        <span class="n">sample_size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
-        <span class="n">top_words</span><span class="o">=</span><span class="n">top_words</span><span class="p">,</span>
-        <span class="n">stopword</span><span class="o">=</span><span class="n">stopword</span><span class="p">,</span>
-        <span class="n">lemmatize</span><span class="o">=</span><span class="n">lemmatize</span><span class="p">,</span>
-        <span class="n">stem</span><span class="o">=</span><span class="n">stem</span><span class="p">,</span>
-        <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="n">ngroups</span><span class="o">=</span><span class="n">ngroups</span><span class="p">,</span>
+            <span class="n">largest</span><span class="o">=</span><span class="n">largest</span><span class="p">,</span>
+            <span class="n">nsubgroups</span><span class="o">=</span><span class="n">nsubgroups</span><span class="p">,</span>
+            <span class="n">timeunit</span><span class="o">=</span><span class="n">timeunit</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+            <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">,</span>
+            <span class="n">sample_size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span>
+            <span class="n">top_words</span><span class="o">=</span><span class="n">top_words</span><span class="p">,</span>
+            <span class="n">stopword</span><span class="o">=</span><span class="n">stopword</span><span class="p">,</span>
+            <span class="n">lemmatize</span><span class="o">=</span><span class="n">lemmatize</span><span class="p">,</span>
+            <span class="n">stem</span><span class="o">=</span><span class="n">stem</span><span class="p">,</span>
+            <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;distribution_grid&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;distribution_grid&quot;</span>
+        <span class="ow">or</span> <span class="s2">&quot;_column&quot;</span> <span class="ow">in</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span></div>
 </pre></div>

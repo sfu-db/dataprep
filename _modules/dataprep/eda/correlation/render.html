@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -118,6 +122,8 @@
     
 
     <ul class="nav bd-sidenav">
+      
+        
       
         
       
@@ -456,12 +462,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># pylint: disable=too-many-locals, too-many-function-args</span>
-    <span class="n">source_scatter</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
-    <span class="n">source_coeffs</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;coeffs&quot;</span><span class="p">])</span>
-    <span class="n">source_xy_value</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]}</span>
-    <span class="p">)</span>
-    <span class="n">var_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__x__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__y__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">source_scatter</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">source_xy_value</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]})</span>
+    <span class="n">var_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
 
     <span class="n">xcol</span> <span class="o">=</span> <span class="n">source_xy_value</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">ycol</span> <span class="o">=</span> <span class="n">source_xy_value</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -472,15 +478,13 @@
         <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
         <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Scatter Plot &amp; Regression Line&quot;</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Scatter Plot&quot;</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
         <span class="n">tools</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">x_axis_label</span><span class="o">=</span><span class="n">xcol</span><span class="p">,</span>
         <span class="n">y_axis_label</span><span class="o">=</span><span class="n">ycol</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">scatter</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="s2">&quot;__x__&quot;</span><span class="p">,</span> <span class="s2">&quot;__y__&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source_scatter</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="s2">&quot;__x__&quot;</span><span class="p">,</span> <span class="s2">&quot;__y__&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source_coeffs</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-    <span class="c1"># Not adding the tooltips before because we only want to apply tooltip to the scatter</span>
     <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">scatter</span><span class="p">])</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
 
@@ -491,25 +495,18 @@
         <span class="s2">&quot;value&quot;</span><span class="p">,</span>
         <span class="n">CustomJS</span><span class="p">(</span>
             <span class="n">args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">scatter</span><span class="o">=</span><span class="n">source_scatter</span><span class="p">,</span>
-                <span class="n">coeffs</span><span class="o">=</span><span class="n">source_coeffs</span><span class="p">,</span>
-                <span class="n">xy_value</span><span class="o">=</span><span class="n">source_xy_value</span><span class="p">,</span>
-                <span class="n">x_axis</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">scatter</span><span class="o">=</span><span class="n">source_scatter</span><span class="p">,</span> <span class="n">xy_value</span><span class="o">=</span><span class="n">source_xy_value</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
             <span class="p">),</span>
             <span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        let currentSelect = this.value;</span>
 <span class="s2">        let xyValueData = xy_value.data;</span>
 <span class="s2">        let scatterData = scatter.data;</span>
-<span class="s2">        let coeffsData = coeffs.data;</span>
 
 <span class="s2">        xyValueData[&#39;x&#39;][0] = currentSelect;</span>
 <span class="s2">        scatterData[&#39;__x__&#39;] = scatterData[currentSelect];</span>
-<span class="s2">        coeffsData[&#39;__x__&#39;] = coeffsData[`$</span><span class="si">{currentSelect}</span><span class="s2">$</span><span class="si">{xyValueData[&#39;y&#39;][0]}</span><span class="s2">x`];</span>
-<span class="s2">        coeffsData[&#39;__y__&#39;] = coeffsData[`$</span><span class="si">{currentSelect}</span><span class="s2">$</span><span class="si">{xyValueData[&#39;y&#39;][0]}</span><span class="s2">y`];</span>
 
 <span class="s2">        x_axis.axis_label = currentSelect;</span>
 <span class="s2">        scatter.change.emit();</span>
-<span class="s2">        coeffs.change.emit();</span>
 <span class="s2">        xy_value.change.emit();</span>
 <span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -518,25 +515,18 @@
         <span class="s2">&quot;value&quot;</span><span class="p">,</span>
         <span class="n">CustomJS</span><span class="p">(</span>
             <span class="n">args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">scatter</span><span class="o">=</span><span class="n">source_scatter</span><span class="p">,</span>
-                <span class="n">coeffs</span><span class="o">=</span><span class="n">source_coeffs</span><span class="p">,</span>
-                <span class="n">xy_value</span><span class="o">=</span><span class="n">source_xy_value</span><span class="p">,</span>
-                <span class="n">y_axis</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">scatter</span><span class="o">=</span><span class="n">source_scatter</span><span class="p">,</span> <span class="n">xy_value</span><span class="o">=</span><span class="n">source_xy_value</span><span class="p">,</span> <span class="n">y_axis</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
             <span class="p">),</span>
             <span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        let currentSelect = this.value;</span>
 <span class="s2">        let xyValueData = xy_value.data;</span>
 <span class="s2">        let scatterData = scatter.data;</span>
-<span class="s2">        let coeffsData = coeffs.data;</span>
 
 <span class="s2">        xyValueData[&#39;y&#39;][0] = currentSelect;</span>
 <span class="s2">        scatterData[&#39;__y__&#39;] = scatterData[currentSelect];</span>
-<span class="s2">        coeffsData[&#39;__x__&#39;] = coeffsData[`$</span><span class="si">{xyValueData[&#39;x&#39;][0]}</span><span class="s2">$</span><span class="si">{currentSelect}</span><span class="s2">x`];</span>
-<span class="s2">        coeffsData[&#39;__y__&#39;] = coeffsData[`$</span><span class="si">{xyValueData[&#39;x&#39;][0]}</span><span class="s2">$</span><span class="si">{currentSelect}</span><span class="s2">y`];</span>
 
 <span class="s2">        y_axis.axis_label = currentSelect;</span>
 <span class="s2">        scatter.change.emit();</span>
-<span class="s2">        coeffs.change.emit();</span>
 <span class="s2">        xy_value.change.emit();</span>
 <span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -546,6 +536,107 @@
         <span class="n">row</span><span class="p">(</span><span class="n">x_select</span><span class="p">,</span> <span class="n">y_select</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span> <span class="n">fig</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">&quot;stretch_width&quot;</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="c1"># ######### Interactions for report #########</span>
+<span class="c1"># def render_crossfilter(</span>
+<span class="c1">#     itmdt: Intermediate, plot_width: int, plot_height: int</span>
+<span class="c1"># ) -&gt; column:</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Render crossfilter scatter plot with a regression line.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+
+<span class="c1">#     # pylint: disable=too-many-locals, too-many-function-args</span>
+<span class="c1">#     source_scatter = ColumnDataSource(itmdt[&quot;data&quot;])</span>
+<span class="c1">#     source_coeffs = ColumnDataSource(itmdt[&quot;coeffs&quot;])</span>
+<span class="c1">#     source_xy_value = ColumnDataSource(</span>
+<span class="c1">#         {&quot;x&quot;: [itmdt[&quot;data&quot;].columns[0]], &quot;y&quot;: [itmdt[&quot;data&quot;].columns[0]]}</span>
+<span class="c1">#     )</span>
+<span class="c1">#     var_list = list(itmdt[&quot;data&quot;].columns)[0:-2]</span>
+
+<span class="c1">#     xcol = source_xy_value.data[&quot;x&quot;][0]</span>
+<span class="c1">#     ycol = source_xy_value.data[&quot;y&quot;][0]</span>
+
+<span class="c1">#     tooltips = [(&quot;X-Axis: &quot;, &quot;@__x__&quot;), (&quot;Y-Axis: &quot;, &quot;@__y__&quot;)]</span>
+
+<span class="c1">#     fig = Figure(</span>
+<span class="c1">#         plot_width=plot_width,</span>
+<span class="c1">#         plot_height=plot_height,</span>
+<span class="c1">#         toolbar_location=None,</span>
+<span class="c1">#         title=Title(text=&quot;Scatter Plot &amp; Regression Line&quot;, align=&quot;center&quot;),</span>
+<span class="c1">#         tools=[],</span>
+<span class="c1">#         x_axis_label=xcol,</span>
+<span class="c1">#         y_axis_label=ycol,</span>
+<span class="c1">#     )</span>
+<span class="c1">#     scatter = fig.scatter(&quot;__x__&quot;, &quot;__y__&quot;, source=source_scatter)</span>
+<span class="c1">#     fig.line(&quot;__x__&quot;, &quot;__y__&quot;, source=source_coeffs, line_width=3)</span>
+
+<span class="c1">#     # Not adding the tooltips before because we only want to apply tooltip to the scatter</span>
+<span class="c1">#     hover = HoverTool(tooltips=tooltips, renderers=[scatter])</span>
+<span class="c1">#     fig.add_tools(hover)</span>
+
+<span class="c1">#     x_select = Select(title=&quot;X-Axis&quot;, value=xcol, options=var_list, width=150)</span>
+<span class="c1">#     y_select = Select(title=&quot;Y-Axis&quot;, value=ycol, options=var_list, width=150)</span>
+
+<span class="c1">#     x_select.js_on_change(</span>
+<span class="c1">#         &quot;value&quot;,</span>
+<span class="c1">#         CustomJS(</span>
+<span class="c1">#             args=dict(</span>
+<span class="c1">#                 scatter=source_scatter,</span>
+<span class="c1">#                 coeffs=source_coeffs,</span>
+<span class="c1">#                 xy_value=source_xy_value,</span>
+<span class="c1">#                 x_axis=fig.xaxis[0],</span>
+<span class="c1">#             ),</span>
+<span class="c1">#             code=&quot;&quot;&quot;</span>
+<span class="c1">#         let currentSelect = this.value;</span>
+<span class="c1">#         let xyValueData = xy_value.data;</span>
+<span class="c1">#         let scatterData = scatter.data;</span>
+<span class="c1">#         let coeffsData = coeffs.data;</span>
+
+<span class="c1">#         xyValueData[&#39;x&#39;][0] = currentSelect;</span>
+<span class="c1">#         scatterData[&#39;__x__&#39;] = scatterData[currentSelect];</span>
+<span class="c1">#         coeffsData[&#39;__x__&#39;] = coeffsData[`${currentSelect}${xyValueData[&#39;y&#39;][0]}x`];</span>
+<span class="c1">#         coeffsData[&#39;__y__&#39;] = coeffsData[`${currentSelect}${xyValueData[&#39;y&#39;][0]}y`];</span>
+
+<span class="c1">#         x_axis.axis_label = currentSelect;</span>
+<span class="c1">#         scatter.change.emit();</span>
+<span class="c1">#         coeffs.change.emit();</span>
+<span class="c1">#         xy_value.change.emit();</span>
+<span class="c1">#         &quot;&quot;&quot;,</span>
+<span class="c1">#         ),</span>
+<span class="c1">#     )</span>
+<span class="c1">#     y_select.js_on_change(</span>
+<span class="c1">#         &quot;value&quot;,</span>
+<span class="c1">#         CustomJS(</span>
+<span class="c1">#             args=dict(</span>
+<span class="c1">#                 scatter=source_scatter,</span>
+<span class="c1">#                 coeffs=source_coeffs,</span>
+<span class="c1">#                 xy_value=source_xy_value,</span>
+<span class="c1">#                 y_axis=fig.yaxis[0],</span>
+<span class="c1">#             ),</span>
+<span class="c1">#             code=&quot;&quot;&quot;</span>
+<span class="c1">#         let currentSelect = this.value;</span>
+<span class="c1">#         let xyValueData = xy_value.data;</span>
+<span class="c1">#         let scatterData = scatter.data;</span>
+<span class="c1">#         let coeffsData = coeffs.data;</span>
+
+<span class="c1">#         xyValueData[&#39;y&#39;][0] = currentSelect;</span>
+<span class="c1">#         scatterData[&#39;__y__&#39;] = scatterData[currentSelect];</span>
+<span class="c1">#         coeffsData[&#39;__x__&#39;] = coeffsData[`${xyValueData[&#39;x&#39;][0]}${currentSelect}x`];</span>
+<span class="c1">#         coeffsData[&#39;__y__&#39;] = coeffsData[`${xyValueData[&#39;x&#39;][0]}${currentSelect}y`];</span>
+
+<span class="c1">#         y_axis.axis_label = currentSelect;</span>
+<span class="c1">#         scatter.change.emit();</span>
+<span class="c1">#         coeffs.change.emit();</span>
+<span class="c1">#         xy_value.change.emit();</span>
+<span class="c1">#         &quot;&quot;&quot;,</span>
+<span class="c1">#         ),</span>
+<span class="c1">#     )</span>
+
+<span class="c1">#     fig = column(</span>
+<span class="c1">#         row(x_select, y_select, align=&quot;center&quot;), fig, sizing_mode=&quot;stretch_width&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#     return fig</span>
 </pre></div>
 
           </div>

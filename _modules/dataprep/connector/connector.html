@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -151,17 +157,28 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">ClientSession</span>
-<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">aiohttp.client_reqrep</span> <span class="kn">import</span> <span class="n">ClientResponse</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">Template</span><span class="p">,</span> <span class="n">UndefinedError</span>
+<span class="kn">from</span> <span class="nn">jsonpath_ng</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">jparse</span>
 
-<span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">config_directory</span><span class="p">,</span> <span class="n">ensure_config</span>
-<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">RequestError</span><span class="p">,</span> <span class="n">UniversalParameterOverridden</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">InvalidParameterError</span><span class="p">,</span> <span class="n">RequestError</span><span class="p">,</span> <span class="n">UniversalParameterOverridden</span>
 <span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span><span class="p">,</span> <span class="n">ImplicitTable</span>
-<span class="kn">from</span> <span class="nn">.int_ref</span> <span class="kn">import</span> <span class="n">IntRef</span>
+<span class="kn">from</span> <span class="nn">.ref</span> <span class="kn">import</span> <span class="n">Ref</span>
+<span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigDef</span><span class="p">,</span>
+    <span class="n">FieldDefUnion</span><span class="p">,</span>
+    <span class="n">OffsetPaginationDef</span><span class="p">,</span>
+    <span class="n">PagePaginationDef</span><span class="p">,</span>
+    <span class="n">SeekPaginationDef</span><span class="p">,</span>
+    <span class="n">TokenLocation</span><span class="p">,</span>
+    <span class="n">TokenPaginationDef</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.throttler</span> <span class="kn">import</span> <span class="n">OrderedThrottler</span><span class="p">,</span> <span class="n">ThrottleSession</span>
 
 <span class="n">INFO_TEMPLATE</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
@@ -183,8 +200,7 @@
 
 
 <div class="viewcode-block" id="Connector"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector">[docs]</a><span class="k">class</span> <span class="nc">Connector</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is the main class of the connector component.</span>
+    <span class="sd">&quot;&quot;&quot;This is the main class of the connector component.</span>
 <span class="sd">    Initialize Connector class as the example code.</span>
 
 <span class="sd">    Parameters</span>
@@ -206,8 +222,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_impdb</span><span class="p">:</span> <span class="n">ImplicitDatabase</span>
+    <span class="c1"># Varibles that used across different queries, can be overriden by query</span>
     <span class="n">_vars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">_auth</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="c1"># storage for authorization</span>
+    <span class="n">_storage</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">_concurrency</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">_jenv</span><span class="p">:</span> <span class="n">Environment</span>
 
@@ -233,6 +252,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">_auth</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_concurrency</span> <span class="o">=</span> <span class="n">_concurrency</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">undefined</span><span class="o">=</span><span class="n">StrictUndefined</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span> <span class="o">=</span> <span class="n">OrderedThrottler</span><span class="p">(</span><span class="n">_concurrency</span><span class="p">)</span>
@@ -240,9 +260,10 @@
 <div class="viewcode-block" id="Connector.query"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector.query">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">query</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">_q</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">_concurrency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">where</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Awaitable</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -252,6 +273,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        table</span>
 <span class="sd">            The table name.</span>
+<span class="sd">        _q: Optional[str] = None</span>
+<span class="sd">            Search string to be matched in the response.</span>
 <span class="sd">        _auth: Optional[Dict[str, Any]] = None</span>
 <span class="sd">            The parameters for authentication. Usually the authentication parameters</span>
 <span class="sd">            should be defined when instantiating the Connector. In case some tables have different</span>
@@ -262,12 +285,18 @@
 <span class="sd">        **where</span>
 <span class="sd">            The additional parameters required for the query.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_imp</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="n">_count</span><span class="p">)</span></div>
+        <span class="n">allowed_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">params</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">where</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_params</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidParameterError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_imp</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span> <span class="n">_q</span><span class="o">=</span><span class="n">_q</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="n">_count</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">table_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return all the names of the available tables in a list.</span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        We abstract each website as a database containing several tables.</span>
@@ -276,19 +305,18 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 <div class="viewcode-block" id="Connector.info"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Show the basic information and provide guidance for users to issue queries.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Show the basic information and provide guidance for users</span>
+<span class="sd">        to issue queries.&quot;&quot;&quot;</span>
 
         <span class="c1"># get info</span>
         <span class="n">tbs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">cur_table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
-            <span class="n">table_config_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+            <span class="n">table_config_content</span><span class="p">:</span> <span class="n">ConfigDef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
             <span class="n">params_required</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">params_optional</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">example_query_fields</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">table_config_content</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="p">:</span>
                     <span class="n">params_required</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                     <span class="n">example_query_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&quot;word</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
@@ -308,47 +336,51 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Connector.show_schema"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector.show_schema">[docs]</a>    <span class="k">def</span> <span class="nf">show_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method shows the schema of the table that will be returned,</span>
+        <span class="sd">&quot;&quot;&quot;This method shows the schema of the table that will be returned,</span>
 <span class="sd">        so that the user knows what information to expect.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        table_name</span>
 <span class="sd">            The table name.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pd.DataFrame</span>
 <span class="sd">            The returned data&#39;s schema.</span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        The schema is defined in the configuration file.</span>
 <span class="sd">        The user can either use the default one or change it by editing the configuration file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;table: </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">table_config_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
-        <span class="n">schema</span> <span class="o">=</span> <span class="n">table_config_content</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">][</span><span class="s2">&quot;schema&quot;</span><span class="p">]</span>
+        <span class="n">table_config_content</span><span class="p">:</span> <span class="n">ConfigDef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">schema_</span>
         <span class="n">new_schema_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+            <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">new_schema_dict</span><span class="p">)</span></div>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_query_imp</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_query_imp</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches,too-many-statements</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_q</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span>
-        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;No such table </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">table</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No such table </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">itable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">reqconf</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span>
+
+        <span class="k">if</span> <span class="n">reqconf</span><span class="o">.</span><span class="n">pagination</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;ignoring _count since </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> has no pagination settings&quot;</span><span class="p">,</span>
                 <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
@@ -358,37 +390,44 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;_count should be larger than 0&quot;</span><span class="p">)</span>
 
         <span class="k">async</span> <span class="k">with</span> <span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+
             <span class="n">throttler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reqconf</span><span class="o">.</span><span class="n">pagination</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
-                    <span class="n">itable</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
+                    <span class="n">itable</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="p">,</span>
+                    <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+                    <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span>
+                    <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
+                    <span class="n">_q</span><span class="o">=</span><span class="n">_q</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">df</span>
 
-            <span class="n">pag_type</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">type</span>
+            <span class="n">pagdef</span> <span class="o">=</span> <span class="n">reqconf</span><span class="o">.</span><span class="n">pagination</span>
 
             <span class="c1"># pagination begins</span>
-            <span class="n">max_per_page</span> <span class="o">=</span> <span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">max_count</span>
+            <span class="n">max_per_page</span> <span class="o">=</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">max_count</span>
             <span class="n">total</span> <span class="o">=</span> <span class="n">_count</span>
             <span class="n">n_page</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total</span> <span class="o">/</span> <span class="n">max_per_page</span><span class="p">)</span>
-            <span class="n">remaining</span> <span class="o">=</span> <span class="n">total</span> <span class="o">%</span> <span class="n">max_per_page</span>
 
-            <span class="k">if</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;cursor&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="n">SeekPaginationDef</span><span class="p">):</span>
                 <span class="n">last_id</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="c1"># No way to parallelize for cursor type</span>
+                <span class="c1"># No way to parallelize for seek type</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
-                    <span class="n">count</span> <span class="o">=</span> <span class="n">max_per_page</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">remaining</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">i</span> <span class="o">*</span> <span class="n">max_per_page</span><span class="p">,</span> <span class="n">max_per_page</span><span class="p">)</span>
 
                     <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
                         <span class="n">itable</span><span class="p">,</span>
                         <span class="n">kwargs</span><span class="p">,</span>
                         <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
                         <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span>
+                        <span class="n">_page</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
                         <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
-                        <span class="n">_count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
-                        <span class="n">_cursor</span><span class="o">=</span><span class="n">last_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">_q</span><span class="o">=</span><span class="n">_q</span><span class="p">,</span>
+                        <span class="n">_limit</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                        <span class="n">_anchor</span><span class="o">=</span><span class="n">last_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
                     <span class="p">)</span>
 
                     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -398,14 +437,49 @@
                         <span class="c1"># The API returns empty for this page, maybe we&#39;ve reached the end</span>
                         <span class="k">break</span>
 
-                    <span class="n">last_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">itable</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">cursor_id</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                    <span class="n">cid</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">pagdef</span><span class="o">.</span><span class="n">seek_id</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">last_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cid</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># type: ignore</span>
 
-            <span class="k">elif</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span>
-                <span class="n">resps_coros</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">allowed_page</span> <span class="o">=</span> <span class="n">IntRef</span><span class="p">(</span><span class="n">n_page</span><span class="p">)</span>
+                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="n">TokenPaginationDef</span><span class="p">):</span>
+                <span class="n">next_token</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="c1"># No way to parallelize for seek type</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
-                    <span class="n">count</span> <span class="o">=</span> <span class="n">max_per_page</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">remaining</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">i</span> <span class="o">*</span> <span class="n">max_per_page</span><span class="p">,</span> <span class="n">max_per_page</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">,</span> <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">itable</span><span class="p">,</span>
+                        <span class="n">kwargs</span><span class="p">,</span>
+                        <span class="n">_client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+                        <span class="n">_throttler</span><span class="o">=</span><span class="n">throttler</span><span class="p">,</span>
+                        <span class="n">_page</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                        <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
+                        <span class="n">_q</span><span class="o">=</span><span class="n">_q</span><span class="p">,</span>
+                        <span class="n">_limit</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                        <span class="n">_anchor</span><span class="o">=</span><span class="n">next_token</span><span class="p">,</span>
+                        <span class="n">_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">token_location</span> <span class="o">==</span> <span class="n">TokenLocation</span><span class="o">.</span><span class="n">Header</span><span class="p">:</span>
+                        <span class="n">next_token</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="n">pagdef</span><span class="o">.</span><span class="n">token_accessor</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">token_location</span> <span class="o">==</span> <span class="n">TokenLocation</span><span class="o">.</span><span class="n">Body</span><span class="p">:</span>
+                        <span class="c1"># only json body implemented</span>
+                        <span class="n">token_expr</span> <span class="o">=</span> <span class="n">jparse</span><span class="p">(</span><span class="n">pagdef</span><span class="o">.</span><span class="n">token_accessor</span><span class="p">)</span>
+                        <span class="p">(</span><span class="n">token_elem</span><span class="p">,)</span> <span class="o">=</span> <span class="n">token_expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+                        <span class="n">next_token</span> <span class="o">=</span> <span class="n">token_elem</span><span class="o">.</span><span class="n">value</span>
+
+                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="p">(</span><span class="n">OffsetPaginationDef</span><span class="p">,</span> <span class="n">PagePaginationDef</span><span class="p">)):</span>
+                <span class="n">resps_coros</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">allowed_page</span> <span class="o">=</span> <span class="n">Ref</span><span class="p">(</span><span class="n">n_page</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_page</span><span class="p">):</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">i</span> <span class="o">*</span> <span class="n">max_per_page</span><span class="p">,</span> <span class="n">max_per_page</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;offset&quot;</span><span class="p">:</span>
+                        <span class="n">anchor</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">max_per_page</span>
+                    <span class="k">elif</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;page&quot;</span><span class="p">:</span>
+                        <span class="n">anchor</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown pagination type </span><span class="si">{</span><span class="n">pagdef</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                     <span class="n">resps_coros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span>
@@ -416,8 +490,9 @@
                             <span class="n">_page</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
                             <span class="n">_allowed_page</span><span class="o">=</span><span class="n">allowed_page</span><span class="p">,</span>
                             <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span>
-                            <span class="n">_count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
-                            <span class="n">_cursor</span><span class="o">=</span><span class="n">i</span> <span class="o">*</span> <span class="n">max_per_page</span><span class="p">,</span>
+                            <span class="n">_q</span><span class="o">=</span><span class="n">_q</span><span class="p">,</span>
+                            <span class="n">_limit</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                            <span class="n">_anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">,</span>
                         <span class="p">)</span>
                     <span class="p">)</span>
 
@@ -426,7 +501,6 @@
                     <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp_coro</span>
                     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
@@ -434,7 +508,7 @@
 
         <span class="k">return</span> <span class="n">df</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_fetch</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_fetch</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches,too-many-statements</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">table</span><span class="p">:</span> <span class="n">ImplicitTable</span><span class="p">,</span>
         <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -442,17 +516,17 @@
         <span class="n">_client</span><span class="p">:</span> <span class="n">ClientSession</span><span class="p">,</span>
         <span class="n">_throttler</span><span class="p">:</span> <span class="n">ThrottleSession</span><span class="p">,</span>
         <span class="n">_page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">_allowed_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IntRef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">_cursor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_allowed_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Ref</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_anchor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-        <span class="k">assert</span> <span class="p">(</span><span class="n">_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span>
-            <span class="n">_cursor</span> <span class="ow">is</span> <span class="kc">None</span>
-        <span class="p">),</span> <span class="s2">&quot;_cursor and _count should both be None or not None&quot;</span>
+        <span class="n">_q</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">_raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">ClientResponse</span><span class="p">]]:</span>
 
-        <span class="n">method</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">method</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">reqdef</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">url</span>
         <span class="n">req_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{},</span>
             <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{},</span>
@@ -460,45 +534,78 @@
         <span class="p">}</span>
         <span class="n">merged_vars</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
 
-        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">authorization</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">authorization</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">req_data</span><span class="p">,</span> <span class="n">_auth</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">authorization</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reqdef</span><span class="o">.</span><span class="n">authorization</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">req_data</span><span class="p">,</span> <span class="n">_auth</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="s2">&quot;cookies&quot;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">instantiated_fields</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span><span class="p">,</span> <span class="n">merged_vars</span>
-                <span class="p">)</span>
-                <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">instantiated_fields</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># TODO: do we support binary body?</span>
-            <span class="n">instantiated_fields</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span><span class="p">,</span> <span class="n">merged_vars</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">body_ctype</span> <span class="o">==</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">:</span>
+            <span class="n">instantiated_fields</span> <span class="o">=</span> <span class="n">populate_field</span><span class="p">(</span>
+                <span class="n">reqdef</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span><span class="p">,</span> <span class="n">merged_vars</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">:</span>
                 <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instantiated_fields</span>
-            <span class="k">elif</span> <span class="n">table</span><span class="o">.</span><span class="n">body_ctype</span> <span class="o">==</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
                 <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instantiated_fields</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">body_ctype</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">reqdef</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">ctype</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">pag_type</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">type</span>
-            <span class="n">count_key</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">count_key</span>
-            <span class="k">if</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;cursor&quot;</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">cursor_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="n">cursor_key</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">cursor_key</span>
-            <span class="k">elif</span> <span class="n">pag_type</span> <span class="o">==</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">anchor_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="n">cursor_key</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">pag_params</span><span class="o">.</span><span class="n">anchor_key</span>
+        <span class="k">if</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">pagination</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pagdef</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">pagination</span>
+            <span class="n">limit_key</span> <span class="o">=</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">limit_key</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="n">SeekPaginationDef</span><span class="p">):</span>
+                <span class="n">anchor</span> <span class="o">=</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">seek_key</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="n">OffsetPaginationDef</span><span class="p">):</span>
+                <span class="n">anchor</span> <span class="o">=</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">offset_key</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="n">PagePaginationDef</span><span class="p">):</span>
+                <span class="n">anchor</span> <span class="o">=</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">page_key</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pagdef</span><span class="p">,</span> <span class="n">TokenPaginationDef</span><span class="p">):</span>
+                <span class="n">anchor</span> <span class="o">=</span> <span class="n">pagdef</span><span class="o">.</span><span class="n">token_key</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">UnreachableError</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown pagination type </span><span class="si">{</span><span class="n">pagdef</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">count_key</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="n">UniversalParameterOverridden</span><span class="p">(</span><span class="n">count_key</span><span class="p">,</span> <span class="s2">&quot;_count&quot;</span><span class="p">)</span>
-            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">count_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_count</span>
+            <span class="k">if</span> <span class="n">limit_key</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="n">UniversalParameterOverridden</span><span class="p">(</span><span class="n">limit_key</span><span class="p">,</span> <span class="s2">&quot;_limit&quot;</span><span class="p">)</span>
+            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">limit_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_limit</span>
 
-            <span class="k">if</span> <span class="n">cursor_key</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="n">UniversalParameterOverridden</span><span class="p">(</span><span class="n">cursor_key</span><span class="p">,</span> <span class="s2">&quot;_cursor&quot;</span><span class="p">)</span>
-            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">cursor_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cursor</span>
+            <span class="k">if</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="n">UniversalParameterOverridden</span><span class="p">(</span><span class="n">anchor</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">_anchor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">anchor</span><span class="p">]</span> <span class="o">=</span> <span class="n">_anchor</span>
+
+        <span class="k">if</span> <span class="n">_q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">search</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;_q specified but the API does not support custom search.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">searchdef</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">search</span>
+            <span class="n">search_key</span> <span class="o">=</span> <span class="n">searchdef</span><span class="o">.</span><span class="n">key</span>
+
+            <span class="k">if</span> <span class="n">search_key</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="n">UniversalParameterOverridden</span><span class="p">(</span><span class="n">search_key</span><span class="p">,</span> <span class="s2">&quot;_q&quot;</span><span class="p">)</span>
+            <span class="n">req_data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">search_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_q</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="s2">&quot;cookies&quot;</span><span class="p">]:</span>
+            <span class="n">field_def</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">reqdef</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">field_def</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instantiated_fields</span> <span class="o">=</span> <span class="n">populate_field</span><span class="p">(</span>
+                    <span class="n">field_def</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span><span class="p">,</span> <span class="n">merged_vars</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">ikey</span> <span class="ow">in</span> <span class="n">instantiated_fields</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ikey</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                        <span class="n">warn</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Query parameter </span><span class="si">{</span><span class="n">ikey</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">ikey</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot; is overriden by </span><span class="si">{ikey}</span><span class="s2">=</span><span class="si">{instantiated_fields[ikey]}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="p">)</span>
+                <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">instantiated_fields</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="s2">&quot;cookies&quot;</span><span class="p">]:</span>
+            <span class="n">field_def</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">reqdef</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">field_def</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">validate_fields</span><span class="p">(</span><span class="n">field_def</span><span class="p">,</span> <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
         <span class="k">await</span> <span class="n">_throttler</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">_page</span><span class="p">)</span>
 
@@ -518,13 +625,82 @@
         <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">RequestError</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">_allowed_page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">_allowed_page</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">_page</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">None</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">_raw</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">resp</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="validate_fields"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.validate_fields">[docs]</a><span class="k">def</span> <span class="nf">validate_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldDefUnion</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Check required fields are provided.&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">def_</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">from_key</span><span class="p">,</span> <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="n">def_</span>
+            <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">to_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">from_key</span><span class="si">}</span><span class="s2">&#39; is required but not provided&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">to_key</span> <span class="ow">or</span> <span class="n">to_key</span>
+            <span class="n">from_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">from_key</span> <span class="ow">or</span> <span class="n">from_key</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">required</span>
+            <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">to_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">from_key</span><span class="si">}</span><span class="s2">&#39; is required but not provided&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="populate_field"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.populate_field">[docs]</a><span class="k">def</span> <span class="nf">populate_field</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches</span>
+    <span class="n">fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldDefUnion</span><span class="p">],</span> <span class="n">jenv</span><span class="p">:</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Populate a dict based on the fields definition and provided vars.&quot;&quot;&quot;</span>
+    <span class="n">ret</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">def_</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">from_key</span><span class="p">,</span> <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+            <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># is a template</span>
+            <span class="n">tmplt</span> <span class="o">=</span> <span class="n">jenv</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">def_</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">tmplt</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">template</span>
+            <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">remove_if_empty</span>
+            <span class="n">to_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">to_key</span> <span class="ow">or</span> <span class="n">to_key</span>
+            <span class="n">from_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">from_key</span> <span class="ow">or</span> <span class="n">from_key</span>
+
+            <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmplt</span> <span class="o">=</span> <span class="n">jenv</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">tmplt</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">UndefinedError</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># This empty string will be removed if `remove_if_empty` is True</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">str_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">remove_if_empty</span> <span class="ow">or</span> <span class="n">str_value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">to_key</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">to_key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">ret</span><span class="p">[</span><span class="n">to_key</span><span class="p">]</span><span class="si">}</span><span class="s2"> overriden by </span><span class="si">{</span><span class="n">to_key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">str_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">ret</span><span class="p">[</span><span class="n">to_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">str_value</span>
+                <span class="k">continue</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
 </pre></div>
 
           </div>

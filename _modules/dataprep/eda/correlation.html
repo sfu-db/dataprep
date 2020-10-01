@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -127,6 +131,8 @@
       
         
       
+        
+      
     </ul>
 
   </nav>
@@ -147,15 +153,15 @@
 <span class="sd">    This module implements the plot_correlation(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span>
 
+<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute_correlation</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render_correlation</span>
-<span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;compute_correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;plot_correlation&quot;</span><span class="p">]</span>
 
@@ -167,6 +173,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is designed to calculate the correlation between columns</span>
@@ -177,15 +184,17 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
-<span class="sd">        The pandas data_frame for which plots are calculated for each column</span>
+<span class="sd">        The pandas data_frame for which plots are calculated for each column.</span>
 <span class="sd">    x</span>
-<span class="sd">        A valid column name of the data frame</span>
+<span class="sd">        A valid column name of the data frame.</span>
 <span class="sd">    y</span>
-<span class="sd">        A valid column name of the data frame</span>
+<span class="sd">        A valid column name of the data frame.</span>
 <span class="sd">    value_range</span>
-<span class="sd">        Range of value</span>
+<span class="sd">        Range of value.</span>
 <span class="sd">    k</span>
-<span class="sd">        Choose top-k element</span>
+<span class="sd">        Choose top-k element.</span>
+<span class="sd">    progress</span>
+<span class="sd">        Enable the progress bar.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -206,8 +215,8 @@
 <span class="sd">    This function only supports numerical or categorical data,</span>
 <span class="sd">    and it is better to drop None, Nan and Null value before using it</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">intermediate</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">intermediate</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span></div>

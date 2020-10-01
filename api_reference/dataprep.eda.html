@@ -76,6 +76,10 @@
         <a class="nav-link" href="../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -163,6 +167,8 @@
               </li>
             
           
+        
+      
         
       
         
@@ -277,8 +283,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>col</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dask.datafram.Series</span></code>) – A dataframe column</p></li>
-<li><p><strong>known_dtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Optional[Union[Dict[str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Union[DType</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str]]</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DType]]</span></code>, <em>default</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>) – A dictionary or single DType given by users to specify the types for designated columns or
+<li><p><strong>col</strong> (<em>dask.datafram.Series</em>) – A dataframe column</p></li>
+<li><p><strong>known_dtype</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Union</em><em>[</em><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><a class="reference internal" href="#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em>]</em><em>]</em><em>, </em><em>default None</em>) – A dictionary or single DType given by users to specify the types for designated columns or
 all columns. E.g.  known_dtype = {“a”: Continuous, “b”: “Nominal”} or
 known_dtype = {“a”: Continuous(), “b”: “nominal”} or
 known_dtype = Continuous() or known_dtype = “Continuous” or known_dtype = Continuous()</p></li>
@@ -313,12 +319,12 @@ known_dtype = Continuous() or known_dtype = “Continuous” or known_dtype = Co
 </dd></dl>
 
 <dl class="py function">
-<dt id="dataprep.eda.dtypes.get_dtype_cnts">
-<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">get_dtype_cnts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#get_dtype_cnts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.get_dtype_cnts" title="Permalink to this definition">¶</a></dt>
+<dt id="dataprep.eda.dtypes.get_dtype_cnts_and_num_cols">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">get_dtype_cnts_and_num_cols</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">dtype</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#get_dtype_cnts_and_num_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.get_dtype_cnts_and_num_cols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the count of each dtype in a dataframe</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -401,6 +407,17 @@ We will map Categorical() to Nominal() and Numerical() to Continuous()</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt id="dataprep.eda.dtypes.string_dtype_to_object">
+<code class="sig-prename descclassname">dataprep.eda.dtypes.</code><code class="sig-name descname">string_dtype_to_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/dtypes.html#string_dtype_to_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.dtypes.string_dtype_to_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert string dtype to object dtype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dataprep.eda.intermediate">
 <span id="intermediate"></span><h2>Intermediate<a class="headerlink" href="#module-dataprep.eda.intermediate" title="Permalink to this headline">¶</a></h2>
@@ -410,7 +427,7 @@ We will map Categorical() to Nominal() and Numerical() to Continuous()</p>
 <em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">ColumnMetadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#ColumnMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Container for storing a single column’s metadata.
-This is immutable</p>
+This is immutable.</p>
 <dl class="py attribute">
 <dt id="dataprep.eda.intermediate.ColumnMetadata.metadata">
 <code class="sig-name descname">metadata</code><em class="property">: pandas.core.series.Series</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnMetadata.metadata" title="Permalink to this definition">¶</a></dt>
@@ -422,7 +439,7 @@ This is immutable</p>
 <dt id="dataprep.eda.intermediate.ColumnsMetadata">
 <em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">ColumnsMetadata</code><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#ColumnsMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Container for storing each column’s metadata</p>
+<p>Container for storing each column’s metadata.</p>
 <dl class="py attribute">
 <dt id="dataprep.eda.intermediate.ColumnsMetadata.metadata">
 <code class="sig-name descname">metadata</code><em class="property">: pandas.core.frame.DataFrame</em><a class="headerlink" href="#dataprep.eda.intermediate.ColumnsMetadata.metadata" title="Permalink to this definition">¶</a></dt>
@@ -504,7 +521,7 @@ from terminmal or when the fig is very large in notebook.</p>
 <dt id="dataprep.eda.utils.cut_long_name">
 <code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">cut_long_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">max_len</span><span class="o">=</span><span class="default_value">12</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#cut_long_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.cut_long_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>If the name is longer than <cite>max_len</cite>,
-cut it to <cite>max_len</cite> length and append “…”</p>
+cut it to <cite>max_len</cite> length and append “…</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
@@ -515,7 +532,7 @@ cut it to <cite>max_len</cite> length and append “…”</p>
 <dl class="py function">
 <dt id="dataprep.eda.utils.fuse_missing_perc">
 <code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">fuse_missing_perc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">perc</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#fuse_missing_perc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.fuse_missing_perc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append (x.y%) to the name if <cite>perc</cite> is not 0</p>
+<dd><p>Append (x.y%) to the name if <cite>perc</cite> is not 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
@@ -524,22 +541,9 @@ cut it to <cite>max_len</cite> length and append “…”</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="dataprep.eda.utils.is_notebook">
-<code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">is_notebook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#is_notebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.is_notebook" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>whether it is running in jupyter notebook</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="dataprep.eda.utils.relocate_legend">
 <code class="sig-prename descclassname">dataprep.eda.utils.</code><code class="sig-name descname">relocate_legend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">loc</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/utils.html#relocate_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.utils.relocate_legend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Relocate legend(s) from center to <cite>loc</cite></p>
+<dd><p>Relocate legend(s) from center to <cite>loc</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>

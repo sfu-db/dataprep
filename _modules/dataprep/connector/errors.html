@@ -74,6 +74,10 @@
         <a class="nav-link" href="../../../contribute.html">Contribute</a>
       </li>
       
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
       <li class="nav-item">
         <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
           Community
@@ -118,6 +122,8 @@
     
 
     <ul class="nav bd-sidenav">
+      
+        
       
         
       
@@ -194,6 +200,21 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;the parameter </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="si">}</span><span class="s2"> is overridden by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uparam</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="InvalidParameterError"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.errors.InvalidParameterError">[docs]</a><span class="k">class</span> <span class="nc">InvalidParameterError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The parameter used in the query is invalid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">param</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">param</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;the parameter </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="si">}</span><span class="s2"> is invalid, refer info method&quot;</span></div>
 </pre></div>
 
           </div>
