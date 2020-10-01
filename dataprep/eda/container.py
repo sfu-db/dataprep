@@ -11,7 +11,7 @@ from bokeh.io import output_notebook
 from bokeh.embed import components
 from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
-from .utils import is_notebook
+from ..utils import is_notebook
 
 output_notebook(INLINE, hide_banner=True)  # for offline usage
 

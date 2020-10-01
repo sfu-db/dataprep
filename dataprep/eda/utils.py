@@ -2,7 +2,7 @@
 """
 import logging
 from math import ceil
-from typing import Any, Union
+from typing import Union
 
 import dask.dataframe as dd
 import numpy as np
@@ -11,24 +11,6 @@ from bokeh.models import Legend
 from bokeh.plotting import Figure
 
 LOGGER = logging.getLogger(__name__)
-
-
-def is_notebook() -> Any:
-    """
-    :return: whether it is running in jupyter notebook
-    """
-    try:
-        # pytype: disable=import-error
-        from IPython import get_ipython  # pylint: disable=import-outside-toplevel
-
-        # pytype: enable=import-error
-
-        shell = get_ipython().__class__.__name__
-        if shell == "ZMQInteractiveShell":
-            return True
-        return False
-    except (NameError, ImportError):
-        return False
 
 
 def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
