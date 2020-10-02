@@ -3,7 +3,6 @@
 # pylint: disable=missing-function-docstring
 
 from copy import deepcopy
-from dataclasses import dataclass
 from typing import Callable, Dict, Optional, TypeVar, cast, Any
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
@@ -13,12 +12,15 @@ T = TypeVar("T")  # pylint: disable=invalid-name
 BaseDefT = TypeVar("BaseDefT", bound="BaseDef")
 
 
-@dataclass
 class Policy:
     """Merge policy. Defines how a field can be merged."""
 
     override_none: bool = False
     merge: str = "same"  # merge policy, values: same, override, keep or None
+
+    def __init__(self, override_none: bool = False, merge: str = "same") -> None:
+        self.override_none = override_none
+        self.merge = merge
 
 
 class BaseDef(BaseModel):
