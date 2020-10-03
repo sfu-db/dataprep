@@ -88,6 +88,11 @@ def compute_univariate(
     col_dtype = detect_dtype(df[x], dtype)
     if is_dtype(col_dtype, Nominal()):
         first_rows = df[x].head()  # dd.Series.head() triggers a (small) data read
+        # cast the column as string type if it contains a mutable type
+        try:
+            first_rows.apply(hash)
+        except TypeError:
+            df[x] = df[x].astype(str)
         # all computations for plot(df, Nominal())
         data = nom_comps(
             df[x],
@@ -170,11 +175,6 @@ def nom_comps(
 
     # total rows
     data["nrows"] = srs.shape[0]
-    # cast the column as string type if it contains a mutable type
-    try:
-        first_rows.apply(hash)
-    except TypeError:
-        srs = srs.astype(str)
     # drop null values
     srs = srs.dropna()
 

@@ -17,6 +17,7 @@ def simpledf() -> pd.DataFrame:
     df = pd.concat(
         [df, pd.Series(np.random.choice(["a", "b", "c"], 1000, replace=True))], axis=1
     )
+    df = pd.concat([df, pd.Series([["foo"] * 1000])], axis=1)
     df = pd.concat(
         [
             df,
@@ -29,7 +30,7 @@ def simpledf() -> pd.DataFrame:
         axis=1,
     )
     # df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
-    df.columns = ["a", "b", "c", "d", "e"]
+    df.columns = ["a", "b", "c", "d", "e", "f"]
     # df["e"] = pd.to_datetime(df["e"])
 
     idx = np.arange(1000)

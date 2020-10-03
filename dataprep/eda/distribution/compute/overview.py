@@ -241,10 +241,8 @@ def calc_stats(df: dd.DataFrame, dtype: Optional[DTypeDef]) -> Dict[str, Any]:
     ----------
     df
         a DataFrame
-    dtype_cnts
-        a dictionary that contains the count for each type
-    num_cols:
-        numerical columns in the dataset
+    dtype
+        str or DType or dict of str or dict of DType
     """
 
     stats = {"nrows": df.shape[0]}

@@ -137,42 +137,45 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
             "col_type": itmdt.visual_type.replace("_column", ""),
         }
 
-    # interactions
-    res["has_interaction"] = True
-    itmdt = Intermediate(data=data["scat"], visual_type="correlation_crossfilter")
-    rndrd = render_correlation(itmdt)
-    rndrd.sizing_mode = "stretch_width"
-    res["interactions"] = components(rndrd)
+    if len(data["num_cols"]) > 0:
+        # interactions
+        res["has_interaction"] = True
+        itmdt = Intermediate(data=data["scat"], visual_type="correlation_crossfilter")
+        rndrd = render_correlation(itmdt)
+        rndrd.sizing_mode = "stretch_width"
+        res["interactions"] = components(rndrd)
 
-    # correlations
-    res["has_correlation"] = True
-    dfs: Dict[str, pd.DataFrame] = {}
-    for method, corr in data["corrs"].items():
-        ndf = pd.DataFrame(
-            {
-                "x": data["num_cols"][data["cordx"]],
-                "y": data["num_cols"][data["cordy"]],
-                "correlation": corr.ravel(),
-            }
+        # correlations
+        res["has_correlation"] = True
+        dfs: Dict[str, pd.DataFrame] = {}
+        for method, corr in data["corrs"].items():
+            ndf = pd.DataFrame(
+                {
+                    "x": data["num_cols"][data["cordx"]],
+                    "y": data["num_cols"][data["cordy"]],
+                    "correlation": corr.ravel(),
+                }
+            )
+            dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
+        itmdt = Intermediate(
+            data=dfs,
+            axis_range=list(data["num_cols"]),
+            visual_type="correlation_heatmaps",
         )
-        dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
-    itmdt = Intermediate(
-        data=dfs, axis_range=list(data["num_cols"]), visual_type="correlation_heatmaps",
-    )
-    rndrd = render_correlation(itmdt)
-    figs.clear()
-    for tab in rndrd.tabs:
-        fig = tab.child
-        fig.sizing_mode = "stretch_width"
-        fig.title = Title(text=tab.title, align="center", text_font_size="20px")
-        figs.append(fig)
-    res["correlations"] = components(figs)
+        rndrd = render_correlation(itmdt)
+        figs.clear()
+        for tab in rndrd.tabs:
+            fig = tab.child
+            fig.sizing_mode = "stretch_width"
+            fig.title = Title(text=tab.title, align="center", text_font_size="20px")
+            figs.append(fig)
+        res["correlations"] = components(figs)
+    else:
+        res["has_interaction"], res["has_correlation"] = False, False
 
     # missing
     res["has_missing"] = True
-
     itmdt = completions["miss"](data["miss"])
-
     rndrd = render_missing(itmdt)
     figs.clear()
     for tab in rndrd.tabs:
@@ -200,16 +203,21 @@ def basic_computations(df: dd.DataFrame) -> Tuple[Dict[str, Any], Dict[str, Any]
     data["num_cols"] = df_num.columns
     first_rows = df.select_dtypes(CATEGORICAL_DTYPES).head
 
-    # overview
-    data["ov"] = calc_stats(df.frame, None)
-    # # variables
+    # variables
     for col in df.columns:
         if is_dtype(detect_dtype(df.frame[col]), Continuous()):
             data[col] = cont_comps(df.frame[col], 20)
         elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
+            # cast the column as string type if it contains a mutable type
+            try:
+                first_rows[col].apply(hash)
+            except TypeError:
+                df.frame[col] = df.frame[col].astype(str)
             data[col] = nom_comps(
                 df.frame[col], first_rows[col], 10, True, 10, 20, True, False, False
             )
+    # overview
+    data["ov"] = calc_stats(df.frame, None)
     # interactions
     data["scat"] = df_num.frame.map_partitions(
         lambda x: x.sample(min(1000, x.shape[0])), meta=df_num.frame
