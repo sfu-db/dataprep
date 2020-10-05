@@ -184,7 +184,10 @@ class DataArray:
     _head: Optional[pd.DataFrame] = None
 
     def __init__(
-        self, df: DataFrame, value_length: bool = False, repartition: bool = True,
+        self,
+        df: DataFrame,
+        value_length: bool = False,
+        repartition: bool = True,
     ) -> None:
         if isinstance(df, (dd.Series, pd.Series)):
             df = df.to_frame()
@@ -265,9 +268,7 @@ class DataArray:
             self._head = self.frame.head()
         return self._head
 
-    def compute(  # pylint: disable=redefined-builtin
-        self, type: str = "lengths"
-    ) -> None:
+    def compute(self, type: str = "lengths") -> None:  # pylint: disable=redefined-builtin
         """Compute the lengths or materialize the null values inplace.
 
         Parameters
@@ -305,9 +306,7 @@ class DataArray:
 
             chunks_, nulls = dask.compute(tuple(c), self.nulls)
 
-            chunks = tuple(
-                [tuple([int(chunk) for chunk in chunks]) for chunks in chunks_]
-            )
+            chunks = tuple([tuple([int(chunk) for chunk in chunks]) for chunks in chunks_])
             # pylint: enable=invalid-name
             self._nulls = nulls
             self._values._chunks = chunks

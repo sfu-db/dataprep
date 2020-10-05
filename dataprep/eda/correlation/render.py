@@ -59,9 +59,7 @@ def render_correlation(
     if itmdt.visual_type is None:
         visual_elem = Figure()
     elif itmdt.visual_type == "correlation_heatmaps":
-        visual_elem = render_correlation_heatmaps(
-            itmdt, plot_width, plot_height, palette or RDBU
-        )
+        visual_elem = render_correlation_heatmaps(itmdt, plot_width, plot_height, palette or RDBU)
     elif itmdt.visual_type == "correlation_single_heatmaps":
         visual_elem = render_correlation_single_heatmaps(
             itmdt, plot_width, plot_height, palette or RDBU
@@ -287,12 +285,8 @@ def render_scatter(
 
         legend = Legend(
             items=[
-                LegendItem(
-                    label="Most Influential (-)", renderers=[scatter], index=nidx
-                ),
-                LegendItem(
-                    label="Most Influential (+)", renderers=[scatter], index=pidx
-                ),
+                LegendItem(label="Most Influential (-)", renderers=[scatter], index=nidx),
+                LegendItem(label="Most Influential (+)", renderers=[scatter], index=pidx),
             ],
             margin=0,
             padding=0,
@@ -303,9 +297,7 @@ def render_scatter(
 
 
 ######### Interactions for report #########
-def render_crossfilter(
-    itmdt: Intermediate, plot_width: int, plot_height: int
-) -> column:
+def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -> column:
     """
     Render crossfilter scatter plot with a regression line.
     """
@@ -344,7 +336,9 @@ def render_crossfilter(
         "value",
         CustomJS(
             args=dict(
-                scatter=source_scatter, xy_value=source_xy_value, x_axis=fig.xaxis[0],
+                scatter=source_scatter,
+                xy_value=source_xy_value,
+                x_axis=fig.xaxis[0],
             ),
             code="""
         let currentSelect = this.value;
@@ -364,7 +358,9 @@ def render_crossfilter(
         "value",
         CustomJS(
             args=dict(
-                scatter=source_scatter, xy_value=source_xy_value, y_axis=fig.yaxis[0],
+                scatter=source_scatter,
+                xy_value=source_xy_value,
+                y_axis=fig.yaxis[0],
             ),
             code="""
         let currentSelect = this.value;
@@ -381,9 +377,7 @@ def render_crossfilter(
         ),
     )
 
-    fig = column(
-        row(x_select, y_select, align="center"), fig, sizing_mode="stretch_width"
-    )
+    fig = column(row(x_select, y_select, align="center"), fig, sizing_mode="stretch_width")
     return fig
 
 

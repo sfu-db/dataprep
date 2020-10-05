@@ -9,12 +9,8 @@ from typing import cast
 
 import requests
 
-META_URL = (
-    "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/{}/_meta.json"
-)
-TABLE_URL = (
-    "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/{}/{}.json"
-)
+META_URL = "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/{}/_meta.json"
+TABLE_URL = "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/{}/{}.json"
 GIT_REF_URL = "https://api.github.com/repos/sfu-db/DataConnectorConfigs/git/refs/heads"
 
 

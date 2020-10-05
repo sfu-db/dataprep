@@ -66,9 +66,7 @@ class TokenPaginationDef(BaseDef):
     token_key: str
 
 
-PaginationDef = Union[
-    OffsetPaginationDef, SeekPaginationDef, PagePaginationDef, TokenPaginationDef
-]
+PaginationDef = Union[OffsetPaginationDef, SeekPaginationDef, PagePaginationDef, TokenPaginationDef]
 
 
 class FieldDef(BaseDef):
@@ -108,9 +106,7 @@ class HTTPServer(http.server.BaseHTTPRequestHandler):
         self.server._oauth2_code = code  # type: ignore
         self.server._oauth2_state = state  # type: ignore
 
-    def log_request(
-        self, code: Union[str, int] = "-", size: Union[str, int] = "-"
-    ) -> None:
+    def log_request(self, code: Union[str, int] = "-", size: Union[str, int] = "-") -> None:
         pass
 
 
@@ -193,9 +189,7 @@ class OAuth2AuthorizationCodeAuthorizationDef(BaseDef):
             raise RuntimeError("OAuth2 state does not match")
 
         if httpd._oauth2_code is None:  # type: ignore
-            raise RuntimeError(
-                "OAuth2 authorization code auth failed, no code acquired."
-            )
+            raise RuntimeError("OAuth2 authorization code auth failed, no code acquired.")
         return httpd._oauth2_code  # type: ignore
 
 

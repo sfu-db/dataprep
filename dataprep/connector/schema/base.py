@@ -105,9 +105,7 @@ def merge_values(  # pylint: disable=too-many-branches
         raise RuntimeError(f"Unknown type {type(lhs).__name__}.")
 
 
-def coalesce(  # pylint: disable=invalid-name
-    a: Optional[T], b: Optional[T]
-) -> Optional[T]:
+def coalesce(a: Optional[T], b: Optional[T]) -> Optional[T]:  # pylint: disable=invalid-name
     if a is None:
         return b
     else:

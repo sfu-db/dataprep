@@ -107,7 +107,11 @@ def compute_univariate(
         )
         (data,) = dask.compute(data)
 
-        return Intermediate(col=x, data=data, visual_type="categorical_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            visual_type="categorical_column",
+        )
 
     elif is_dtype(col_dtype, Continuous()):
         # extract the column
@@ -119,7 +123,11 @@ def compute_univariate(
         # all computations for plot(df, Continuous())
         (data,) = dask.compute(cont_comps(srs, bins))
 
-        return Intermediate(col=x, data=data, visual_type="numerical_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            visual_type="numerical_column",
+        )
 
     elif is_dtype(col_dtype, DateTime()):
         data_dt: List[Any] = []
@@ -128,7 +136,12 @@ def compute_univariate(
         # line chart
         data_dt.append(dask.delayed(_calc_line_dt)(df[[x]], timeunit))
         data, line = dask.compute(*data_dt)
-        return Intermediate(col=x, data=data, line=line, visual_type="datetime_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            line=line,
+            visual_type="datetime_column",
+        )
     else:
         raise UnreachableError
 
@@ -259,9 +272,7 @@ def cont_comps(srs: dd.Series, bins: int) -> Dict[str, Any]:
     data["chisq"] = chisquare(data["hist"][0])
 
     # compute the density histogram
-    data["dens"] = da.histogram(
-        srs, bins=bins, range=[data["min"], data["max"]], density=True
-    )
+    data["dens"] = da.histogram(srs, bins=bins, range=[data["min"], data["max"]], density=True)
     # gaussian kernel density estimate
     data["kde"] = gaussian_kde(
         srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
@@ -295,9 +306,7 @@ def calc_box(srs: dd.Series, qntls: da.Array) -> Dict[str, Any]:
     # outliers
     otlrs = srs[~srs.between(data["qrtl1"] - 1.5 * iqr, data["qrtl3"] + 1.5 * iqr)]
     # randomly sample at most 100 outliers from each partition without replacement
-    smp_otlrs = otlrs.map_partitions(
-        lambda x: x.sample(min(100, x.shape[0])), meta=otlrs
-    )
+    smp_otlrs = otlrs.map_partitions(lambda x: x.sample(min(100, x.shape[0])), meta=otlrs)
     data["lw"] = srs_iqr.min()
     data["uw"] = srs_iqr.max()
     data["otlrs"] = smp_otlrs.values
