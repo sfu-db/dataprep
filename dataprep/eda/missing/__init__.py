@@ -61,8 +61,6 @@ def plot_missing(
     """
 
     with ProgressBar(minimum=1, disable=not progress):
-        itmdt = compute_missing(
-            df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample
-        )
+        itmdt = compute_missing(df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample)
     fig = render_missing(itmdt)
     return Report(fig)

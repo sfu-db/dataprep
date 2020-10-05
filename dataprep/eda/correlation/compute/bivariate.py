@@ -13,7 +13,11 @@ from ...intermediate import Intermediate
 
 
 def _calc_bivariate(
-    df: dd.DataFrame, x: str, y: str, *, k: Optional[int] = None,
+    df: dd.DataFrame,
+    x: str,
+    y: str,
+    *,
+    k: Optional[int] = None,
 ) -> Intermediate:
     if x not in df.columns:
         raise ValueError(f"{x} not in columns names")
@@ -62,9 +66,7 @@ def scatter_with_regression(
     (coeffa, coeffb), _, _, _ = da.linalg.lstsq(arr[:, [0, 2]], arr[:, 1])
 
     df = df.drop(columns=["ones"])
-    df_smp = df.map_partitions(
-        lambda x: x.sample(min(sample_size, x.shape[0])), meta=df
-    )
+    df_smp = df.map_partitions(lambda x: x.sample(min(sample_size, x.shape[0])), meta=df)
     # TODO influences should not be computed on a sample
     influences = (
         pearson_influence(

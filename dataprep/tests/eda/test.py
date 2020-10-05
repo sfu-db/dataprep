@@ -14,7 +14,15 @@ def test_dtypes() -> None:
         assert is_nominal(df[col].dtype)
 
     df = pd.DataFrame(
-        data=[[complex(3, 1), 1, 1.1, TimeDelta(1), DateTime.now(),]],
+        data=[
+            [
+                complex(3, 1),
+                1,
+                1.1,
+                TimeDelta(1),
+                DateTime.now(),
+            ]
+        ],
         columns=["IM", "I", "F", "TD", "DT"],
     )
 

@@ -25,7 +25,11 @@ class Container:
     This class creates a customized Container object for the plot(df) function.
     """
 
-    def __init__(self, to_render: Dict[str, Any], visual_type: str,) -> None:
+    def __init__(
+        self,
+        to_render: Dict[str, Any],
+        visual_type: str,
+    ) -> None:
         if visual_type == "distribution_grid":
             self.context = {
                 "resources": INLINE.render(),
@@ -35,9 +39,7 @@ class Container:
                 "column_insights": to_render["column_insights"],
                 "meta": to_render["meta"],
                 "title": "DataPrep.EDA Report",
-                "rnd": random.randint(
-                    0, 99
-                ),  # for multiple cells running in the same notebook
+                "rnd": random.randint(0, 99),  # for multiple cells running in the same notebook
             }
             self.template_base = ENV_LOADER.get_template("grid_base.html")
 
@@ -51,9 +53,7 @@ class Container:
                 "components": components(to_render["layout"]),
                 "meta": to_render["meta"],
                 "title": "DataPrep.EDA Report",
-                "rnd": random.randint(
-                    100, 999
-                ),  # for multiple cells running in the same notebook
+                "rnd": random.randint(100, 999),  # for multiple cells running in the same notebook
             }
             self.template_base = ENV_LOADER.get_template("univariate_base.html")
         else:
