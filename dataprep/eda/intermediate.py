@@ -41,8 +41,7 @@ class ColumnsMetadata:
         col, vtype = key
         if (
             isinstance(val, (tuple, list, dict))
-            and vtype
-            not in self.metadata.columns  # pylint: disable=unsupported-membership-test
+            and vtype not in self.metadata.columns  # pylint: disable=unsupported-membership-test
         ):
             self.metadata[vtype] = pd.Series(dtype="object")
 

@@ -39,9 +39,7 @@ class ConfigGenerator:
             self.config = ConfigState(ConfigDef(**config))
         self.storage = {}
 
-    def add_example(  # pylint: disable=too-many-locals
-        self, example: Dict[str, Any]
-    ) -> None:
+    def add_example(self, example: Dict[str, Any]) -> None:  # pylint: disable=too-many-locals
         """Add an example to the generator. The example
         should be in the dictionary format.
 
@@ -127,7 +125,10 @@ class ConfigGenerator:
 
 def _create_config(req: Dict[str, Any]) -> ConfigDef:
     resp = requests.request(
-        req["method"].lower(), req["url"], params=req["params"], headers=req["headers"],
+        req["method"].lower(),
+        req["url"],
+        params=req["params"],
+        headers=req["headers"],
     )
 
     if resp.status_code != 200:

@@ -16,7 +16,9 @@ LABELS = ["With Missing", "Missing Dropped"]
 
 
 def uni_histogram(
-    srs: dd.Series, bins: int, dtype: Optional[DTypeDef] = None,
+    srs: dd.Series,
+    bins: int,
+    dtype: Optional[DTypeDef] = None,
 ) -> Tuple[da.Array, ...]:
     """Calculate "histogram" for both numerical and categorical."""
 
@@ -60,9 +62,7 @@ def histogram(
             minimum, maximum = arr.min(axis=0), arr.max(axis=0)
 
         if bins is None:
-            raise ValueError(
-                "num_bins cannot be None if calculating numerical histograms."
-            )
+            raise ValueError("num_bins cannot be None if calculating numerical histograms.")
 
         counts, edges = da.histogram(arr, bins, range=[minimum, maximum])
         centers = (edges[:-1] + edges[1:]) / 2

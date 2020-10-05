@@ -113,7 +113,10 @@ DTypeDict = Union[Dict[str, Union[DType, Type[DType], str]], None]
 DTypeDef = Union[Dict[str, Union[DType, Type[DType], str]], DType, Type[DType], None]
 
 
-def detect_dtype(col: dd.Series, known_dtype: Optional[DTypeDef] = None,) -> DType:
+def detect_dtype(
+    col: dd.Series,
+    known_dtype: Optional[DTypeDef] = None,
+) -> DType:
     """
     Given a column, detect its type or transform its type according to users' specification
 

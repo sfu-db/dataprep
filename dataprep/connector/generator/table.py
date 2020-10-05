@@ -72,5 +72,11 @@ def gen_schema_from_path(path: str, val: Dict[str, Any]) -> Dict[str, SchemaFiel
 
 
 _TYPE_MAPPING = defaultdict(
-    lambda: "object", {int: "int", str: "string", float: "float", bool: "boolean",}
+    lambda: "object",
+    {
+        int: "int",
+        str: "string",
+        float: "float",
+        bool: "boolean",
+    },
 )

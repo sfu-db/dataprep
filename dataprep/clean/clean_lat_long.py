@@ -126,9 +126,7 @@ def clean_lat_long(
     reset_stats()
 
     if lat_long_col and (lat_col or long_col):
-        raise ValueError(
-            "lat_long_col must be None if either lat_col or long_col is not None"
-        )
+        raise ValueError("lat_long_col must be None if either lat_col or long_col is not None")
 
     if output_format not in {"dd", "ddh", "dm", "dms"}:
         raise ValueError(
@@ -183,13 +181,11 @@ def clean_lat_long(
         # merge the cleaned latitude and longitude
         if lat_col and long_col and not split:
             if output_format == "dd":
-                df["latitude_longitude"] = df[
-                    [f"{lat_col}_clean", f"{long_col}_clean"]
-                ].apply(tuple, axis=1)
-            else:
-                df["latitude_longitude"] = (
-                    df[f"{lat_col}_clean"] + ", " + df[f"{long_col}_clean"]
+                df["latitude_longitude"] = df[[f"{lat_col}_clean", f"{long_col}_clean"]].apply(
+                    tuple, axis=1
                 )
+            else:
+                df["latitude_longitude"] = df[f"{lat_col}_clean"] + ", " + df[f"{long_col}_clean"]
             df = df.drop(columns=[f"{lat_col}_clean", f"{long_col}_clean"])
 
     df, nrows = dask.compute(df, df.shape[0])
@@ -239,7 +235,11 @@ def validate_lat_long(
 
 
 def format_lat_long(
-    row: pd.Series, col: str, output_format: str, split: bool, errors: str,
+    row: pd.Series,
+    col: str,
+    output_format: str,
+    split: bool,
+    errors: str,
 ) -> pd.Series:
     """
     Function to transform a coordinate instance into the
@@ -252,9 +252,7 @@ def format_lat_long(
     # in row[col] could not be parsed) or "success" (a succesful parse of the value).
     # dds, mins, secs, hem are the latitude components and # dds2, mins2, secs2, hem2
     # are the longitude components
-    dds, mins, secs, hem, dds2, mins2, secs2, hem2, status = check_lat_long(
-        row[col], True
-    )
+    dds, mins, secs, hem, dds2, mins2, secs2, hem2, status = check_lat_long(row[col], True)
 
     if status == "null":  # row[col] contains a null value
         STATS["null"] += 1
@@ -370,18 +368,12 @@ def check_lat_long(val: Union[str, float, Any], clean: bool) -> Any:
         and abs(float(mch.group("deg2"))) > 180
         or abs(dds) > 90
         or abs(dds2) > 180
-        or sum([mch.group("dir_back") is not None, mch.group("dir_front") is not None])
-        > 1
-        or sum(
-            [mch.group("dir_back2") is not None, mch.group("dir_front2") is not None]
-        )
-        > 1
+        or sum([mch.group("dir_back") is not None, mch.group("dir_front") is not None]) > 1
+        or sum([mch.group("dir_back2") is not None, mch.group("dir_front2") is not None]) > 1
     ):
         return [""] * 8 + ["unknown"] if clean else False
 
-    return (
-        (dds, mins, secs, hem, dds2, mins2, secs2, hem2, "success") if clean else True
-    )
+    return (dds, mins, secs, hem, dds2, mins2, secs2, hem2, "success") if clean else True
 
 
 def format_lat_or_long(
@@ -473,8 +465,7 @@ def check_lat_or_long(val: Union[str, float, Any], clean: bool, hor_dir: str) ->
         or not hem
         and abs(float(mch.group("deg"))) > bound
         or abs(dds) > bound
-        or sum([mch.group("dir_back") is not None, mch.group("dir_front") is not None])
-        > 1
+        or sum([mch.group("dir_back") is not None, mch.group("dir_front") is not None]) > 1
     ):
         return [""] * 4 + ["unknown"] if clean else False
 

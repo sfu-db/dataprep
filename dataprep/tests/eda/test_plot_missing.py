@@ -15,9 +15,7 @@ from ...eda.utils import to_dask
 def simpledf() -> dd.DataFrame:
     df = pd.DataFrame(np.random.rand(1000, 3), columns=["a", "b", "c"])
 
-    df = pd.concat(
-        [df, pd.Series(np.random.choice(["a", "b", "c"], 1000, replace=True))], axis=1
-    )
+    df = pd.concat([df, pd.Series(np.random.choice(["a", "b", "c"], 1000, replace=True))], axis=1)
 
     df.columns = ["a", "b", "c", "d"]
     idx = np.arange(1000)
