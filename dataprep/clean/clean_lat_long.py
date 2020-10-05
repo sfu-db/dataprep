@@ -192,7 +192,7 @@ def clean_lat_long(
 
     # output the report describing the changes to the column
     if report:
-        create_report(STATS, nrows)
+        create_report("Latitude and Longitude", STATS, nrows)
 
     return df
 
