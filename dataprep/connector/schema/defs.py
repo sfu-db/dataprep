@@ -1,6 +1,4 @@
 """Strong typed schema definition."""
-from __future__ import annotations
-
 import http.server
 import random
 import socketserver
