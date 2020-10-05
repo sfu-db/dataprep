@@ -170,7 +170,8 @@ def compute_bivariate(
             visual_type="two_cat_cols",
         )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
-        df = df[[x, y]].dropna()
+        # one partition required for apply(pd.cut) in calc_box_num
+        df = df[[x, y]].dropna().repartition(npartitions=1)
 
         data: Dict[str, Any] = {}
         # scatter plot data

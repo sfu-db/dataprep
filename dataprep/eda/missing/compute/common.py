@@ -15,6 +15,33 @@ from ...dtypes import (
 LABELS = ["With Missing", "Missing Dropped"]
 
 
+def uni_histogram(
+    srs: dd.Series, bins: int, dtype: Optional[DTypeDef] = None,
+) -> Tuple[da.Array, ...]:
+    """Calculate "histogram" for both numerical and categorical."""
+
+    if is_dtype(detect_dtype(srs, dtype), Continuous()):
+
+        counts, edges = da.histogram(srs, bins, range=[srs.min(), srs.max()])
+        centers = (edges[:-1] + edges[1:]) / 2
+
+        return counts, centers, edges
+
+    elif is_dtype(detect_dtype(srs, dtype), Nominal()):
+        # Dask array's unique is way slower than the values_counts on Series
+        # See https://github.com/dask/dask/issues/2851
+        # centers, counts = da.unique(arr, return_counts=True)
+
+        value_counts = srs.value_counts()
+
+        counts = value_counts.to_dask_array()
+        centers = value_counts.index.to_dask_array()
+
+        return (counts, centers)
+    else:
+        raise ValueError(f"Unsupported dtype {srs.dtype}")
+
+
 def histogram(
     arr: da.Array,
     bins: Optional[int] = None,
