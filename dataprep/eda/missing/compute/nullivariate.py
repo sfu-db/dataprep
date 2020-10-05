@@ -15,9 +15,7 @@ from ...intermediate import Intermediate
 from ...staged import staged
 
 
-def _compute_missing_nullivariate(
-    df: DataArray, bins: int
-) -> Generator[Any, Any, Intermediate]:
+def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, Any, Intermediate]:
     """Calculate the data for visualizing the plot_missing(df).
     This contains the missing spectrum, missing bar chart and missing heatmap."""
 
@@ -56,9 +54,7 @@ def _compute_missing_nullivariate(
 
 
 # Not using decorator here because jupyter autoreload does not support it.
-compute_missing_nullivariate = staged(  # pylint: disable=invalid-name
-    _compute_missing_nullivariate
-)
+compute_missing_nullivariate = staged(_compute_missing_nullivariate)  # pylint: disable=invalid-name
 
 
 def missing_perc_blockwise(bin_size: int) -> Callable[[np.ndarray], np.ndarray]:
@@ -73,9 +69,7 @@ def missing_perc_blockwise(bin_size: int) -> Callable[[np.ndarray], np.ndarray]:
 
         # remaining data that cannot be fit into a single bin
         if block.shape[0] != sep:
-            ret_remainder = block[sep:].sum(axis=0, keepdims=True) / (
-                block.shape[0] - sep
-            )
+            ret_remainder = block[sep:].sum(axis=0, keepdims=True) / (block.shape[0] - sep)
             ret = np.concatenate([ret, ret_remainder], axis=0)
 
         return ret
@@ -93,9 +87,7 @@ def missing_spectrum(  # pylint: disable=too-many-locals
 
     num_bins = min(bins, nrows - 1)
     bin_size = nrows // num_bins
-    chunk_size = min(
-        1024 * 1024 * 128, nrows * ncols
-    )  # max 1024 x 1024 x 128 Bytes bool values
+    chunk_size = min(1024 * 1024 * 128, nrows * ncols)  # max 1024 x 1024 x 128 Bytes bool values
     nbins_per_chunk = max(chunk_size // (bin_size * data.shape[1]), 1)
 
     chunk_size = nbins_per_chunk * bin_size

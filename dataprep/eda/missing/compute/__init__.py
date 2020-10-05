@@ -63,7 +63,12 @@ def compute_missing(  # pylint: disable=too-many-arguments
         ret = compute_missing_univariate(df, dtype=dtype, x=x, bins=bins)
     elif x is not None and y is not None:
         ret = compute_missing_bivariate(
-            df, dtype=dtype, x=x, y=y, bins=bins, ndist_sample=ndist_sample,
+            df,
+            dtype=dtype,
+            x=x,
+            y=y,
+            bins=bins,
+            ndist_sample=ndist_sample,
         )
     else:
         # supress divide by 0 error due to heatmap

@@ -38,7 +38,9 @@ __all__ = ["render_missing"]
 
 
 def render_missing(
-    itmdt: Intermediate, plot_width: int = 500, plot_height: int = 500,
+    itmdt: Intermediate,
+    plot_width: int = 500,
+    plot_height: int = 500,
 ) -> LayoutDOM:
     """
     @Jinglin write here
@@ -68,7 +70,11 @@ def tweak_figure(fig: Figure) -> Figure:
 
 
 def render_dist(
-    df: pd.DataFrame, x: str, typ: str, plot_width: int, plot_height: int,
+    df: pd.DataFrame,
+    x: str,
+    typ: str,
+    plot_width: int,
+    plot_height: int,
 ) -> Figure:
     """
     Render a distribution, CDF or PDF
@@ -96,7 +102,11 @@ def render_dist(
     for idx, label in enumerate(LABELS):
         group = df[df["label"] == label]
         fig.line(
-            x="x", y=typ, source=group, color=CATEGORY10[idx], legend_label=label,
+            x="x",
+            y=typ,
+            source=group,
+            color=CATEGORY10[idx],
+            legend_label=label,
         )
 
     relocate_legend(fig, "right")
@@ -105,7 +115,11 @@ def render_dist(
 
 
 def render_hist(
-    df: pd.DataFrame, x: str, meta: ColumnMetadata, plot_width: int, plot_height: int,
+    df: pd.DataFrame,
+    x: str,
+    meta: ColumnMetadata,
+    plot_width: int,
+    plot_height: int,
 ) -> Figure:
     """
     Render a histogram
@@ -118,9 +132,7 @@ def render_hist(
         ]
     else:
         df = df.copy()
-        df["repr"] = [
-            f"[{row.lower_bound:.0f}~{row.upper_bound:.0f})" for row in df.itertuples()
-        ]
+        df["repr"] = [f"[{row.lower_bound:.0f}~{row.upper_bound:.0f})" for row in df.itertuples()]
 
         tooltips = [
             (x, "@repr"),
@@ -272,16 +284,12 @@ def create_color_mapper_heatmap(
     return mapper, colorbar
 
 
-def render_missing_impact(
-    itmdt: Intermediate, plot_width: int, plot_height: int
-) -> Tabs:
+def render_missing_impact(itmdt: Intermediate, plot_width: int, plot_height: int) -> Tabs:
     """
     Render correlation heatmaps in to tabs
     """
     tabs: List[Panel] = []
-    fig_barchart = render_bar_chart(
-        itmdt["data_bars"], "linear", plot_width, plot_height
-    )
+    fig_barchart = render_bar_chart(itmdt["data_bars"], "linear", plot_width, plot_height)
     tabs.append(Panel(child=row(fig_barchart), title="Bar Chart"))
 
     fig_spectrum = render_missing_spectrum(
@@ -292,18 +300,14 @@ def render_missing_impact(
     fig_heatmap = render_heatmaps(itmdt["data_heatmap"], plot_width, plot_height)
     tabs.append(Panel(child=row(fig_heatmap), title="Heatmap"))
 
-    fig_dendrogram = render_dendrogram(
-        itmdt["data_dendrogram"], plot_width, plot_height
-    )
+    fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
     tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
 
     tabs = Tabs(tabs=tabs)
     return tabs
 
 
-def render_heatmaps(
-    df: Optional[pd.DataFrame], plot_width: int, plot_height: int
-) -> Figure:
+def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: int) -> Figure:
     """
     Render missing heatmaps in to tabs
     """
@@ -331,9 +335,7 @@ def render_heatmaps(
 
     if df is not None:
 
-        df = df.where(
-            np.triu(np.ones(df.shape)).astype(np.bool)  # pylint: disable=no-member
-        ).T
+        df = df.where(np.triu(np.ones(df.shape)).astype(np.bool)).T  # pylint: disable=no-member
 
         if df.size != 0:
             x_range = FactorRange(*df.columns)
@@ -527,9 +529,7 @@ def render_missing_spectrum(
     return fig
 
 
-def render_dendrogram(
-    dend: Dict["str", Any], plot_width: int, plot_height: int
-) -> Figure:
+def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int) -> Figure:
     """
     Render a missing dendrogram.
     """
@@ -541,7 +541,10 @@ def render_dendrogram(
         plot_width = 28 * len(cols)
 
     fig = Figure(
-        plot_width=plot_width, plot_height=plot_height, toolbar_location=None, tools="",
+        plot_width=plot_width,
+        plot_height=plot_height,
+        toolbar_location=None,
+        tools="",
     )
 
     # round the coordinates to integers, and plot the dendrogram
@@ -576,7 +579,9 @@ def render_dendrogram(
 
 
 def render_missing_impact_1vn(
-    itmdt: Intermediate, plot_width: int, plot_height: int,
+    itmdt: Intermediate,
+    plot_width: int,
+    plot_height: int,
 ) -> Tabs:
     """
     Render the plot from `plot_missing(df, "x")`
@@ -592,9 +597,7 @@ def render_missing_impact_1vn(
         shown, total = meta[col]["partial"]
 
         if shown != total:
-            fig.title = Title(
-                text=f"Missing impact of {x} by ({shown} out of {total}) {col}"
-            )
+            fig.title = Title(text=f"Missing impact of {x} by ({shown} out of {total}) {col}")
         else:
             fig.title = Title(text=f"Missing impact of {x} by {col}")
         panels.append(Panel(child=fig, title=col))
@@ -604,7 +607,9 @@ def render_missing_impact_1vn(
 
 
 def render_missing_impact_1v1(
-    itmdt: Intermediate, plot_width: int, plot_height: int,
+    itmdt: Intermediate,
+    plot_width: int,
+    plot_height: int,
 ) -> Union[Tabs, Figure]:
     """
     Render the plot from `plot_missing(df, "x", "y")`
@@ -634,9 +639,7 @@ def render_missing_impact_1v1(
 
         shown, total = meta["partial"]
         if shown != total:
-            fig.title = Title(
-                text=f"Missing impact of {x} by ({shown} out of {total}) {y}"
-            )
+            fig.title = Title(text=f"Missing impact of {x} by ({shown} out of {total}) {y}")
         else:
             fig.title = Title(text=f"Missing impact of {x} by {y}")
         return fig
