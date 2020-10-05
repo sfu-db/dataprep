@@ -572,7 +572,7 @@ def box_viz(
         plot_height=plot_height,
         title=title,
         toolbar_location=None,
-        x_range=list(df["grp"]),
+        x_range=list(df["grp"].astype(str)),
     )
     low = fig.segment(x0="x0", y0="lw", x1="x1", y1="lw", line_color="black", source=df)
     ltail = fig.segment(
@@ -807,6 +807,7 @@ def line_viz(
     # pylint: disable=too-many-arguments,too-many-locals
     palette = CATEGORY20 * (len(df) // len(CATEGORY20) + 1)
     title = _make_title({f"{x}_ttl": ttl_grps, f"{x}_shw": len(df)}, x, y)
+    df.index = df.index.astype(str)
 
     fig = figure(
         plot_height=plot_height,
@@ -1525,7 +1526,7 @@ def nom_insights(data: Dict[str, Any], col: str) -> Dict[str, List[str]]:
 
     ## if cfg.insight.attribution_enable
     if data["pie"][:2].sum() / data["nrows"] > 0.5 and len(data["pie"]) >= 2:
-        vals = ", ".join(data["pie"].index[i] for i in range(2))
+        vals = ", ".join(str(data["pie"].index[i]) for i in range(2))
         ins["Pie Chart"].append(f"The top 2 categories ({vals}) take over 50%")
 
     ## if cfg.insight.high_word_cardinlaity_enable
@@ -1768,6 +1769,7 @@ def render_two_cat(itmdt: Intermediate, plot_width: int, plot_height: int,) -> T
     y_lrgst = ygrps.nlargest(itmdt["nsubgroups"])
     df = df[df[y].isin(y_lrgst.index)]
     stats.update(zip((f"{y}_ttl", f"{y}_shw"), (len(ygrps), len(y_lrgst))))
+    df[[x, y]] = df[[x, y]].astype(str)
 
     # final format
     df = df.pivot_table(index=y, columns=x, values="cnt", fill_value=0, aggfunc="sum")
