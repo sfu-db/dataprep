@@ -23,15 +23,11 @@ def test_connector() -> None:
 
     assert len(schema) > 0
 
-    df = asyncio.run(
-        dc.query("businesses", _count=120, term="ramen", location="vancouver")
-    )
+    df = asyncio.run(dc.query("businesses", _count=120, term="ramen", location="vancouver"))
 
     assert len(df) == 120
 
-    df = asyncio.run(
-        dc.query("businesses", _count=1000, term="ramen", location="vancouver")
-    )
+    df = asyncio.run(dc.query("businesses", _count=1000, term="ramen", location="vancouver"))
 
     assert len(df) < 1000
 

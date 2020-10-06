@@ -47,9 +47,7 @@ def _calc_nullivariate(
             thresh = ndf["correlation"].abs().nlargest(k).iloc[-1]
             ndf = ndf[(ndf["correlation"] >= thresh) | (ndf["correlation"] <= -thresh)]
         elif value_range is not None:
-            mask = (value_range[0] <= ndf["correlation"]) & (
-                ndf["correlation"] <= value_range[1]
-            )
+            mask = (value_range[0] <= ndf["correlation"]) & (ndf["correlation"] <= value_range[1])
             ndf = ndf[mask]
 
         dfs[method.name] = ndf

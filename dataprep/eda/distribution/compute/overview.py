@@ -241,10 +241,8 @@ def calc_stats(df: dd.DataFrame, dtype: Optional[DTypeDef]) -> Dict[str, Any]:
     ----------
     df
         a DataFrame
-    dtype_cnts
-        a dictionary that contains the count for each type
-    num_cols:
-        numerical columns in the dataset
+    dtype
+        str or DType or dict of str or dict of DType
     """
 
     stats = {"nrows": df.shape[0]}
@@ -265,9 +263,7 @@ def calc_stats(df: dd.DataFrame, dtype: Optional[DTypeDef]) -> Dict[str, Any]:
     df_smp = df.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=df)
     stats["ks_tests"] = []
     for col1, col2 in list(combinations(num_cols, 2)):
-        stats["ks_tests"].append(
-            (col1, col2, ks_2samp(df_smp[col1], df_smp[col2])[1] > 0.05)
-        )
+        stats["ks_tests"].append((col1, col2, ks_2samp(df_smp[col1], df_smp[col2])[1] > 0.05))
 
     return stats
 

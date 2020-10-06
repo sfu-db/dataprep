@@ -169,10 +169,7 @@ def plot(
             dtype=dtype,
         )
     figure = render(intermediate, yscale=yscale, tile_size=tile_size)
-    if (
-        intermediate.visual_type == "distribution_grid"
-        or "_column" in intermediate.visual_type
-    ):
+    if intermediate.visual_type == "distribution_grid" or "_column" in intermediate.visual_type:
         return Container(figure, intermediate.visual_type)
     else:
         return Report(figure)

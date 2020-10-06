@@ -146,9 +146,7 @@ def _calc_line_dt(
     if ngroups and largest:
         hist_dict: Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]] = dict()
         hist_lst: List[Tuple[np.ndarray, np.ndarray, List[str]]] = list()
-        agg = (
-            "freq" if agg is None else agg
-        )  # default agg if unspecified for notational concision
+        agg = "freq" if agg is None else agg  # default agg if unspecified for notational concision
 
         # categorical column for grouping over, each resulting group is a line in the chart
         grpby_col = df.columns[1] if len(df.columns) == 2 else df.columns[2]
@@ -213,18 +211,14 @@ def _calc_groups(
     return df, grp_cnt_stats, largest_grps
 
 
-@dask.delayed(  # pylint: disable=no-value-for-parameter
-    name="scipy-normaltest", pure=True, nout=2
-)
+@dask.delayed(name="scipy-normaltest", pure=True, nout=2)  # pylint: disable=no-value-for-parameter
 def normaltest(arr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Delayed version of scipy normaltest. Due to the dask version will
     trigger a compute."""
     return cast(Tuple[np.ndarray, np.ndarray], normaltest_(arr))
 
 
-@dask.delayed(  # pylint: disable=no-value-for-parameter
-    name="scipy-ks_2samp", pure=True, nout=2
-)
+@dask.delayed(name="scipy-ks_2samp", pure=True, nout=2)  # pylint: disable=no-value-for-parameter
 def ks_2samp(data1: np.ndarray, data2: np.ndarray) -> Tuple[float, float]:
     """Delayed version of scipy ks_2samp."""
     return cast(Tuple[float, float], ks_2samp_(data1, data2))
@@ -238,9 +232,7 @@ def gaussian_kde(arr: np.ndarray) -> Tuple[float, float]:
     return cast(Tuple[np.ndarray, np.ndarray], gaussian_kde_(arr))
 
 
-@dask.delayed(  # pylint: disable=no-value-for-parameter
-    name="scipy-skewtest", pure=True, nout=2
-)
+@dask.delayed(name="scipy-skewtest", pure=True, nout=2)  # pylint: disable=no-value-for-parameter
 def skewtest(arr: np.ndarray) -> Tuple[float, float]:
     """Delayed version of scipy skewtest."""
     return cast(Tuple[float, float], skewtest_(arr))

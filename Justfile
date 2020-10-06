@@ -96,7 +96,7 @@ release version:
   
   echo "Creating release commit"
   git add pyproject.toml
-  semantic-release version --{{version}}
+  poetry run semantic-release version --{{version}}
   
   # echo "Merge release/v${to_version} to master & develop"
   # git checkout master

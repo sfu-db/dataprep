@@ -99,9 +99,7 @@ def compute_bivariate(
 
         (comps,) = dask.compute(nom_cont_comps(df.dropna(), bins, ngroups, largest))
 
-        return Intermediate(
-            x=x, y=y, data=comps, ngroups=ngroups, visual_type="cat_and_num_cols"
-        )
+        return Intermediate(x=x, y=y, data=comps, ngroups=ngroups, visual_type="cat_and_num_cols")
     elif (
         is_dtype(xtype, DateTime())
         and is_dtype(ytype, Continuous())
@@ -134,9 +132,7 @@ def compute_bivariate(
         df[y] = df[y].apply(str, meta=(y, str))
         dtcat: List[Any] = []
         # line chart
-        dtcat.append(
-            dask.delayed(_calc_line_dt)(df, timeunit, ngroups=ngroups, largest=largest)
-        )
+        dtcat.append(dask.delayed(_calc_line_dt)(df, timeunit, ngroups=ngroups, largest=largest))
         # stacked bar chart
         dtcat.append(dask.delayed(calc_stacked_dt)(df, timeunit, ngroups, largest))
         dtcat = dask.compute(*dtcat)
@@ -170,13 +166,12 @@ def compute_bivariate(
             visual_type="two_cat_cols",
         )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
-        df = df[[x, y]].dropna()
+        # one partition required for apply(pd.cut) in calc_box_num
+        df = df[[x, y]].dropna().repartition(npartitions=1)
 
         data: Dict[str, Any] = {}
         # scatter plot data
-        data["scat"] = df.map_partitions(
-            lambda x: x.sample(min(100, x.shape[0])), meta=df
-        )
+        data["scat"] = df.map_partitions(lambda x: x.sample(min(100, x.shape[0])), meta=df)
         # hexbin plot data
         data["hex"] = df
         # box plot
@@ -185,15 +180,17 @@ def compute_bivariate(
         (data,) = dask.compute(data)
 
         return Intermediate(
-            x=x, y=y, data=data, spl_sz=sample_size, visual_type="two_num_cols",
+            x=x,
+            y=y,
+            data=data,
+            spl_sz=sample_size,
+            visual_type="two_num_cols",
         )
     else:
         raise UnreachableError
 
 
-def nom_cont_comps(
-    df: dd.DataFrame, bins: int, ngroups: int, largest: bool
-) -> Dict[str, Any]:
+def nom_cont_comps(df: dd.DataFrame, bins: int, ngroups: int, largest: bool) -> Dict[str, Any]:
     """
     Computations for a nominal and continuous column
 
@@ -299,9 +296,7 @@ def hist(srs: pd.Series, bins: int, minv: float, maxv: float) -> Any:
     return np.histogram(srs, bins=bins, range=[minv, maxv])
 
 
-def calc_box_dt(
-    df: dd.DataFrame, unit: str
-) -> Tuple[pd.DataFrame, List[str], List[float], str]:
+def calc_box_dt(df: dd.DataFrame, unit: str) -> Tuple[pd.DataFrame, List[str], List[float], str]:
     """
     Calculate a box plot with date on the x axis.
     Parameters
@@ -318,8 +313,16 @@ def calc_box_dt(
         raise ValueError
     grps = df.groupby(pd.Grouper(key=x, freq=DTMAP[unit][0]))  # time groups
     # box plot for the values in each time group
-    df = pd.concat([_calc_box_stats(g[1][y], g[0], True) for g in grps], axis=1,)
-    df = df.append(pd.Series({c: i + 1 for i, c in enumerate(df.columns)}, name="x",)).T
+    df = pd.concat(
+        [_calc_box_stats(g[1][y], g[0], True) for g in grps],
+        axis=1,
+    )
+    df = df.append(
+        pd.Series(
+            {c: i + 1 for i, c in enumerate(df.columns)},
+            name="x",
+        )
+    ).T
     # If grouping by week, make the label for the week the beginning Sunday
     df.index = df.index - pd.to_timedelta(6, unit="d") if unit == "week" else df.index
     df.index.name = "grp"
@@ -332,7 +335,10 @@ def calc_box_dt(
 
 
 def calc_stacked_dt(
-    df: dd.DataFrame, unit: str, ngroups: int, largest: bool,
+    df: dd.DataFrame,
+    unit: str,
+    ngroups: int,
+    largest: bool,
 ) -> Tuple[pd.DataFrame, Dict[str, int], str]:
     """
     Calculate a stacked bar chart with date on the x axis
@@ -359,7 +365,11 @@ def calc_stacked_dt(
     grouper = (pd.Grouper(key=x, freq=DTMAP[unit][0]),)  # time grouper
     # pivot table of counts with date groups as index and categorical values as column names
     dfr = pd.pivot_table(
-        df_grps, index=grouper, columns=y, aggfunc=len, fill_value=0,
+        df_grps,
+        index=grouper,
+        columns=y,
+        aggfunc=len,
+        fill_value=0,
     ).rename_axis(None)
 
     # if more than ngroups categorical values, aggregate the smallest groups into "Others"
