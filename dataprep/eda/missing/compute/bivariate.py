@@ -36,22 +36,16 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals
     yloc = df.columns.get_loc(y)
 
     col0 = df.values[~df.nulls[:, yloc], yloc].astype(df.dtypes[y])
-    col1 = df.values[~(df.nulls[:, xloc] | df.nulls[:, yloc]), yloc].astype(
-        df.dtypes[y]
-    )
+    col1 = df.values[~(df.nulls[:, xloc] | df.nulls[:, yloc]), yloc].astype(df.dtypes[y])
 
     minimum, maximum = col0.min(), col0.max()
 
-    hists = [
-        histogram(col, dtype=dtype, bins=bins, return_edges=True)
-        for col in [col0, col1]
-    ]
+    hists = [histogram(col, dtype=dtype, bins=bins, return_edges=True) for col in [col0, col1]]
 
     quantiles = None
     if is_dtype(detect_dtype(df.frame[y], dtype), Continuous()):
         quantiles = [
-            dd.from_dask_array(col).quantile([0, 0.25, 0.5, 0.75, 1])
-            for col in [col0, col1]
+            dd.from_dask_array(col).quantile([0, 0.25, 0.5, 0.75, 1]) for col in [col0, col1]
         ]
 
     ### Lazy Region Finished
@@ -139,12 +133,14 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals
         meta["y", "partial"] = partial
 
         itmdt = Intermediate(
-            hist=df_ret, x=x, y=y, meta=meta["y"], visual_type="missing_impact_1v1",
+            hist=df_ret,
+            x=x,
+            y=y,
+            meta=meta["y"],
+            visual_type="missing_impact_1v1",
         )
         return itmdt
 
 
 # Not using decorator here because jupyter autoreload does not support it.
-compute_missing_bivariate = staged(  # pylint: disable=invalid-name
-    _compute_missing_bivariate
-)
+compute_missing_bivariate = staged(_compute_missing_bivariate)  # pylint: disable=invalid-name

@@ -70,41 +70,27 @@ def compute_trivariate(
     ytype = detect_dtype(df[y], dtype)
     ztype = detect_dtype(df[z], dtype)
 
-    if (
-        is_dtype(xtype, DateTime())
-        and is_dtype(ytype, Nominal())
-        and is_dtype(ztype, Continuous())
-    ):
+    if is_dtype(xtype, DateTime()) and is_dtype(ytype, Nominal()) and is_dtype(ztype, Continuous()):
         y, z = z, y
     elif (
-        is_dtype(xtype, Continuous())
-        and is_dtype(ytype, DateTime())
-        and is_dtype(ztype, Nominal())
+        is_dtype(xtype, Continuous()) and is_dtype(ytype, DateTime()) and is_dtype(ztype, Nominal())
     ):
         x, y = y, x
     elif (
-        is_dtype(xtype, Continuous())
-        and is_dtype(ytype, Nominal())
-        and is_dtype(ztype, DateTime())
+        is_dtype(xtype, Continuous()) and is_dtype(ytype, Nominal()) and is_dtype(ztype, DateTime())
     ):
         x, y, z = z, x, y
     elif (
-        is_dtype(xtype, Nominal())
-        and is_dtype(ytype, DateTime())
-        and is_dtype(ztype, Continuous())
+        is_dtype(xtype, Nominal()) and is_dtype(ytype, DateTime()) and is_dtype(ztype, Continuous())
     ):
         x, y, z = y, z, x
     elif (
-        is_dtype(xtype, Nominal())
-        and is_dtype(ytype, Continuous())
-        and is_dtype(ztype, DateTime())
+        is_dtype(xtype, Nominal()) and is_dtype(ytype, Continuous()) and is_dtype(ztype, DateTime())
     ):
         x, z = z, x
 
     if not (
-        is_dtype(xtype, DateTime())
-        and is_dtype(ytype, Continuous())
-        and is_dtype(ztype, Nominal())
+        is_dtype(xtype, DateTime()) and is_dtype(ytype, Continuous()) and is_dtype(ztype, Nominal())
     ):
         raise ValueError(
             "x, y, and z must be one each of type datetime, numerical, and categorical"
@@ -114,9 +100,12 @@ def compute_trivariate(
     df[z] = df[z].apply(str, meta=(z, str))
 
     # line chart
-    data = dask.compute(
-        dask.delayed(_calc_line_dt)(df, timeunit, agg, ngroups, largest)
-    )
+    data = dask.compute(dask.delayed(_calc_line_dt)(df, timeunit, agg, ngroups, largest))
     return Intermediate(
-        x=x, y=y, z=z, agg=agg, data=data[0], visual_type="dt_cat_num_cols",
+        x=x,
+        y=y,
+        z=z,
+        agg=agg,
+        data=data[0],
+        visual_type="dt_cat_num_cols",
     )

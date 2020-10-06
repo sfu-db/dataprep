@@ -8,7 +8,6 @@ import pandas as pd
 
 from ...data_array import DataArray
 from ...dtypes import (
-    Continuous,
     DTypeDef,
     Nominal,
     detect_dtype,
@@ -16,36 +15,31 @@ from ...dtypes import (
 )
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
-from .common import LABELS, histogram
+from .common import LABELS, uni_histogram
 
 
 def _compute_missing_univariate(  # pylint: disable=too-many-locals
-    df: DataArray, x: str, bins: int, dtype: Optional[DTypeDef] = None,
+    df: DataArray,
+    x: str,
+    bins: int,
+    dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on other columns when
     the missing values in x is dropped."""
-    j = df.columns.get_loc(x)
+
+    # dataframe with all rows where column x is null removed
+    ddf = df.frame[~df.frame[x].isna()]
 
     hists = {}
 
-    for i in range(len(df.columns)):
-        if i == j:
+    for col in df.columns:
+        if col == x:
             continue
-        col_name = df.columns[i]
 
-        col0 = df.values[~df.nulls[:, i], i].astype(df.dtypes[col_name])
-        col1 = df.values[~(df.nulls[:, j] | df.nulls[:, i]), i].astype(
-            df.dtypes[col_name]
-        )
+        srs0 = df.frame[col].dropna()  # series from original dataframe
+        srs1 = ddf[col].dropna()  # series with null rows from col x removed
 
-        hist_range = None  # pylint: disable=redefined-builtin
-        if is_dtype(detect_dtype(col0, dtype), Continuous()):
-            hist_range = (col0.min(axis=0), col0.max(axis=0))
-
-        hists[col_name] = [
-            histogram(col, dtype=dtype, bins=bins, return_edges=True, range=hist_range)
-            for col in [col0, col1]
-        ]
+        hists[col] = [uni_histogram(srs, bins=bins, dtype=dtype) for srs in [srs0, srs1]]
 
     ### Lazy Region End
     hists = yield hists
@@ -81,9 +75,7 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
-        if len(counts[0]) > bins and is_dtype(
-            detect_dtype(df.frame[col_name], dtype), Nominal()
-        ):
+        if len(counts[0]) > bins and is_dtype(detect_dtype(df.frame[col_name], dtype), Nominal()):
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[:bins]]
             ret_df = ret_df[ret_df["x"].isin(selected_xs)]
@@ -97,6 +89,4 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
 
 
 # Not using decorator here because jupyter autoreload does not support it.
-compute_missing_univariate = staged(  # pylint: disable=invalid-name
-    _compute_missing_univariate
-)
+compute_missing_univariate = staged(_compute_missing_univariate)  # pylint: disable=invalid-name

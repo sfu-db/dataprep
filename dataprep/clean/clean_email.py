@@ -16,15 +16,13 @@ USER_REGEX = re.compile(
     # dot-atom
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+" r"(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"
     # quoted-string
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|'
-    r"""\\[\001-\011\013\014\016-\177])*"$)""",
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|' r"""\\[\001-\011\013\014\016-\177])*"$)""",
     re.IGNORECASE,
 )
 
 DOMAIN_REGEX = re.compile(
     # domain
-    r"(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+"
-    r"(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?$)"
+    r"(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+" r"(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?$)"
     # literal form, ipv4 address (SMTP 4.1.3)
     r"|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)" r"(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$",
     re.IGNORECASE,
@@ -329,9 +327,7 @@ def format_email(
 
     # pre-cleaning email text by removing all whitespaces
     if pre_clean:
-        row[col] = re.sub(
-            r"(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+", "", str(row[col])
-        )
+        row[col] = re.sub(r"(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+", "", str(row[col]))
 
     valid_type = check_email(row[col], True)
 
@@ -401,9 +397,7 @@ def check_email(val: Union[str, Any], clean: bool) -> Any:
     return "valid" if clean else True
 
 
-def not_email(
-    row: pd.Series, col: str, split: bool, errtype: str, processtype: str
-) -> pd.Series:
+def not_email(row: pd.Series, col: str, split: bool, errtype: str, processtype: str) -> pd.Series:
     """
     Return result when value unable to be parsed
     """

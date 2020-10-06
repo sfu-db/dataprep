@@ -19,16 +19,12 @@ LOGGER = logging.getLogger(__name__)
 def simpledf() -> dd.DataFrame:
     df = pd.DataFrame(np.random.rand(1000, 3), columns=["a", "b", "c"])
 
-    df = pd.concat(
-        [df, pd.Series(np.random.choice(["a", "b", "c"], 1000, replace=True))], axis=1
-    )
+    df = pd.concat([df, pd.Series(np.random.choice(["a", "b", "c"], 1000, replace=True))], axis=1)
     df = pd.concat(
         [
             df,
             pd.Series(
-                np.random.choice(
-                    ["2020/03/29", "2020/01/10", "2019/11/21"], 1000, replace=True
-                )
+                np.random.choice(["2020/03/29", "2020/01/10", "2019/11/21"], 1000, replace=True)
             ),
         ],
         axis=1,

@@ -5,7 +5,7 @@ from typing import Optional, cast
 from warnings import catch_warnings, filterwarnings
 
 from ...data_array import DataArray, DataFrame
-from ...dtypes import DTypeDef
+from ...dtypes import DTypeDef, string_dtype_to_object
 from ...intermediate import Intermediate
 from .bivariate import compute_missing_bivariate
 from .nullivariate import compute_missing_nullivariate
@@ -53,6 +53,7 @@ def compute_missing(  # pylint: disable=too-many-arguments
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
+    df = string_dtype_to_object(df)
     df = DataArray(df)
 
     # pylint: disable=no-else-raise
@@ -62,7 +63,12 @@ def compute_missing(  # pylint: disable=too-many-arguments
         ret = compute_missing_univariate(df, dtype=dtype, x=x, bins=bins)
     elif x is not None and y is not None:
         ret = compute_missing_bivariate(
-            df, dtype=dtype, x=x, y=y, bins=bins, ndist_sample=ndist_sample,
+            df,
+            dtype=dtype,
+            x=x,
+            y=y,
+            bins=bins,
+            ndist_sample=ndist_sample,
         )
     else:
         # supress divide by 0 error due to heatmap

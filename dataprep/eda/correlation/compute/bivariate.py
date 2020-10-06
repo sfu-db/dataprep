@@ -5,19 +5,17 @@ from operator import itruediv
 from typing import Optional, Tuple
 
 import dask
+import dask.dataframe as dd
 import dask.array as da
 import numpy as np
-import pandas as pd
 
-
-from ...data_array import DataArray
 from ...intermediate import Intermediate
 
 
 def _calc_bivariate(
-    df: DataArray,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    df: dd.DataFrame,
+    x: str,
+    y: str,
     *,
     k: Optional[int] = None,
 ) -> Intermediate:
@@ -26,24 +24,12 @@ def _calc_bivariate(
     if y not in df.columns:
         raise ValueError(f"{y} not in columns names")
 
-    xname, yname = x, y
+    df = df[[x, y]].dropna()
+    coeffs, df_smp, influences = scatter_with_regression(df, sample_size=1000, k=k)
 
-    df.compute()
+    coeffs, df_smp, influences = dask.compute(coeffs, df_smp, influences)
 
-    xloc = df.columns.get_loc(x)
-    yloc = df.columns.get_loc(y)
-
-    x = df.values[:, xloc]
-    y = df.values[:, yloc]
-    coeffs, (x, y), influences = scatter_with_regression(x, y, k=k, sample_size=1000,)
-
-    coeffs, (x, y), influences = dask.compute(coeffs, (x, y), influences)
-
-    # lazy/eager border line
-    result = {
-        "coeffs": coeffs,
-        "data": pd.DataFrame({xname: x, yname: y}),
-    }
+    result = {"coeffs": coeffs, "data": df_smp}
 
     if (influences is None) != (k is None):
         raise RuntimeError("Not possible")
@@ -55,51 +41,43 @@ def _calc_bivariate(
         labels[infidx[-k:]] = "-"  # type: ignore
         # pylint: enable=invalid-unary-operand-type
         labels[infidx[:k]] = "+"
-        result["data"]["influence"] = labels
+        result["data"]["influence"] = labels  # type: ignore
 
     return Intermediate(**result, visual_type="correlation_scatter")
 
 
 def scatter_with_regression(
-    x: da.Array, y: da.Array, sample_size: int, k: Optional[int] = None
+    df: dd.DataFrame, sample_size: int, k: Optional[int] = None
 ) -> Tuple[Tuple[da.Array, da.Array], Tuple[da.Array, da.Array], Optional[da.Array]]:
     """Calculate pearson correlation on 2 given arrays.
 
     Parameters
     ----------
-    xarr : da.Array
-    yarr : da.Array
-    sample_size : int
+    df
+        dataframe
+    sample_size
+        Number of points to show in the scatter plot
     k : Optional[int] = None
         Highlight k points which influence pearson correlation most
     """
-    if k == 0:
-        raise ValueError("k should be larger than 0")
+    df["ones"] = 1
+    arr = df.to_dask_array(lengths=True)
 
-    xp1 = da.vstack([x, da.ones_like(x)]).T
-    xp1 = xp1.rechunk((xp1.chunks[0], -1))
+    (coeffa, coeffb), _, _, _ = da.linalg.lstsq(arr[:, [0, 2]], arr[:, 1])
 
-    mask = ~(da.isnan(x) | da.isnan(y))
-    # if chunk size in the first dimension is 1, lstsq will use sfqr instead of tsqr,
-    # where the former does not support nan in shape.
+    df = df.drop(columns=["ones"])
+    df_smp = df.map_partitions(lambda x: x.sample(min(sample_size, x.shape[0])), meta=df)
+    # TODO influences should not be computed on a sample
+    influences = (
+        pearson_influence(
+            df_smp[df.columns[0]].to_dask_array(lengths=True),
+            df_smp[df.columns[1]].to_dask_array(lengths=True),
+        )
+        if k
+        else None
+    )
 
-    if len(xp1.chunks[0]) == 1:
-        xp1 = xp1.rechunk((2, -1))
-        y = y.rechunk((2, -1))
-        mask = mask.rechunk((2, -1))
-
-    (coeffa, coeffb), _, _, _ = da.linalg.lstsq(xp1[mask], y[mask])
-
-    if sample_size < x.shape[0]:
-        samplesel = da.random.choice(x.shape[0], int(sample_size), chunks=x.chunksize)
-        x = x[samplesel]
-        y = y[samplesel]
-
-    if k is None:
-        return (coeffa, coeffb), (x, y), None
-
-    influences = pearson_influence(x, y)
-    return (coeffa, coeffb), (x, y), influences
+    return (coeffa, coeffb), df_smp, influences
 
 
 def pearson_influence(xarr: da.Array, yarr: da.Array) -> da.Array:

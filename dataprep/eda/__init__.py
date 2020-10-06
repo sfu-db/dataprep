@@ -19,7 +19,7 @@ from .dtypes import (
     Text,
 )
 from .missing import compute_missing, plot_missing, render_missing
-from .utils import is_notebook
+from ..utils import is_notebook
 
 __all__ = [
     "plot_correlation",

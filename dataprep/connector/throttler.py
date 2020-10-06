@@ -66,9 +66,7 @@ class OrderedThrottler:
     window: float
     retry_interval: float
 
-    def __init__(
-        self, req_per_window: int, window: float = 1.0, retry_interval: float = 0.01
-    ):
+    def __init__(self, req_per_window: int, window: float = 1.0, retry_interval: float = 0.01):
         """
         Create a throttler.
         """
