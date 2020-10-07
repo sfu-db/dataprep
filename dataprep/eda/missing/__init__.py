@@ -12,6 +12,7 @@ from ..progress_bar import ProgressBar
 from ..report import Report
 from .compute import compute_missing
 from .render import render_missing
+from ..container import Container
 
 __all__ = ["render_missing", "compute_missing", "plot_missing"]
 
@@ -21,11 +22,11 @@ def plot_missing(
     x: Optional[str] = None,
     y: Optional[str] = None,
     *,
-    bins: int = 30,
+    bins: int = 20,
     ndist_sample: int = 100,
     dtype: Optional[DTypeDef] = None,
     progress: bool = True,
-) -> Report:
+) -> Container:
     """
     This function is designed to deal with missing values
     There are three functions: plot_missing(df), plot_missing(df, x)
@@ -63,4 +64,5 @@ def plot_missing(
     with ProgressBar(minimum=1, disable=not progress):
         itmdt = compute_missing(df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample)
     fig = render_missing(itmdt)
-    return Report(fig)
+
+    return Container(fig, itmdt.visual_type)

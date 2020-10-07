@@ -63,6 +63,12 @@ def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
 
 
 def test_no_missing() -> None:
+    from sys import platform
+
+    if platform == "darwin":
+        import matplotlib
+
+        matplotlib.use("PS")
     import seaborn as sns
 
     df = sns.load_dataset("iris")

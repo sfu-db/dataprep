@@ -7,6 +7,7 @@
 </head>
 
 <body>
+    {% if context.tabledata %}
     <div class="top-info-{{ context.rnd }}">
         <input type='checkbox' style='display: none' id="tb-{{ context.rnd }}">
         <label class="toggle-label-{{ context.rnd }}" for="tb-{{ context.rnd }}">
@@ -67,9 +68,21 @@
             </ul>
         </div>
     </div>
+    {% endif %}
+    {% if context.legend_labels %}
+    <div class="plot-legend-{{ context.rnd }}">
+        {% for legend in context.legend_labels %}
+            <div class="legend-bar-{{ context.rnd }}">
+                <div class="legend-color-{{ context.rnd }}" style="background-color: {{ legend.color }};"></div>
+                <div class="legend-label-{{ context.rnd }}">{{ legend.label }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="plot-{{ context.rnd }}">
         {% for fig in context.components[1] %}
         <div class="fig-{{ context.rnd }}">
+            {% if context.meta %}
             <div class="menu-{{ context.rnd }}">
                 <div class="plot-title-{{ context.rnd }}">{{ context.meta[loop.index0] }}</div>
                 {% if context.column_insights[context.meta[loop.index0]] %}
@@ -87,6 +100,7 @@
                 </div>
                 {% endif %}
             </div>
+            {% endif %}
             
             {{ fig }}
         </div>

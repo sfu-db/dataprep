@@ -12,7 +12,7 @@ from ...dtypes import (
     is_dtype,
 )
 
-LABELS = ["With Missing", "Missing Dropped"]
+LABELS = ["With Missing Remaining", "With Missing Dropped"]
 
 
 def uni_histogram(
