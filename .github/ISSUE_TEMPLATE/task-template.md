@@ -12,10 +12,10 @@ assignees: ''
 ## Summary
 <!--Use one or two lines to summary the task.-->
 
-## UI-level Explanation Actions
+## Design-level Explanation Actions
 <!--Actions to finish in order to write the next section.-->
 
-## UI-level Explanation
+## Design-level Explanation
 <!--Explain the designing as if it was already implemented and you were teaching it to the user.-->
 
 ## Implementation-level Explanation
