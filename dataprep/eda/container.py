@@ -16,13 +16,13 @@ from ..utils import is_notebook
 output_notebook(INLINE, hide_banner=True)  # for offline usage
 
 ENV_LOADER = Environment(
-    loader=PackageLoader("dataprep", "eda/distribution/templates"),
+    loader=PackageLoader("dataprep", "eda/templates"),
 )
 
 
 class Container:
     """
-    This class creates a customized Container object for the plot(df) function.
+    This class creates a customized Container object for the plot* function.
     """
 
     def __init__(
@@ -30,32 +30,38 @@ class Container:
         to_render: Dict[str, Any],
         visual_type: str,
     ) -> None:
-        if visual_type == "distribution_grid":
+        if visual_type in ("distribution_grid", "missing_impact_1vn"):
             self.context = {
                 "resources": INLINE.render(),
-                "components": components(to_render["layout"]),
-                "tabledata": to_render["tabledata"],
-                "overview_insights": to_render["overview_insights"],
-                "column_insights": to_render["column_insights"],
-                "meta": to_render["meta"],
+                "components": components(to_render.get("layout")),
+                "tabledata": to_render.get("tabledata"),
+                "overview_insights": to_render.get("overview_insights"),
+                "column_insights": to_render.get("column_insights"),
+                "meta": to_render.get("meta"),
                 "title": "DataPrep.EDA Report",
                 "rnd": random.randint(0, 99),  # for multiple cells running in the same notebook
+                "container_width": f"{to_render['fig_width']*3}px",
+                "legend_labels": to_render.get("legend_labels"),
             }
             self.template_base = ENV_LOADER.get_template("grid_base.html")
 
-        elif "_column" in visual_type:
+        elif "_column" in visual_type or visual_type in (
+            "missing_impact",
+            "missing_impact_1v1",
+        ):
             # todo: param management
-            to_render["meta"].insert(0, "Stats")
+            if to_render.get("tabledata"):
+                to_render["meta"].insert(0, "Stats")
             self.context = {
                 "resources": INLINE.render(),
-                "tabledata": to_render["tabledata"],
-                "insights": to_render["insights"],
-                "components": components(to_render["layout"]),
-                "meta": to_render["meta"],
+                "tabledata": to_render.get("tabledata"),
+                "insights": to_render.get("insights"),
+                "components": components(to_render.get("layout")),
+                "meta": to_render.get("meta"),
                 "title": "DataPrep.EDA Report",
                 "rnd": random.randint(100, 999),  # for multiple cells running in the same notebook
             }
-            self.template_base = ENV_LOADER.get_template("univariate_base.html")
+            self.template_base = ENV_LOADER.get_template("tab_base.html")
         else:
             raise TypeError(f"Unsupported Visual Type: {visual_type}.")
 

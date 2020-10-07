@@ -4,11 +4,11 @@
         -webkit-font-smoothing: antialiased;
         display: flex;
         flex-wrap: wrap;
-        width: 972px;
+        width: {{ context.container_width }};
     }
 
     .fig-{{ context.rnd }} {
-        flex: 0 1 324px;
+        flex: 0 1 30%;
         margin-top: 10px;
         background: white;
     }
@@ -314,5 +314,35 @@
 
     .patch-cls-{{ context.rnd }} {
         max-width: 100%;
+    }
+
+    .plot-legend-{{ context.rnd }} {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: {{ context.container_width }};
+        background-color: white;
+        cursor: default;
+    }
+
+    .legend-bar-{{ context.rnd }} {
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 0 1 250px;
+    }
+
+    .legend-color-{{ context.rnd }} {
+        width: 15px;
+        height: 15px;
+        filter: opacity(0.5);
+        border: 1px solid #444444;
+    }
+
+    .legend-label-{{ context.rnd }} {
+        text-align: center;
+        margin: 0 10px;
+        color: #444444
     }
 </style>
