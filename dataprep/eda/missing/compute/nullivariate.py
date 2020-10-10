@@ -1,7 +1,7 @@
 """This module implements the plot_missing(df) function's
 calculating intermediate part
 """
-from typing import Any, Callable, Dict, Generator, Optional, Tuple
+from typing import Any, Callable, Dict, Generator, Optional, Tuple, List
 
 import dask.array as da
 import dask.dataframe as dd
@@ -18,13 +18,21 @@ from ...staged import staged
 def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, Any, Intermediate]:
     """Calculate the data for visualizing the plot_missing(df).
     This contains the missing spectrum, missing bar chart and missing heatmap."""
+    # pylint: disable=too-many-locals
+
+    most_show = 5  # the most number of column/row to show in "insight"
+    longest = 5  # the longest length of word to show in "insight"
 
     df.compute()
 
     nullity = df.nulls
     null_cnts = nullity.sum(axis=0)
     nrows = df.shape[0]
+    ncols = df.shape[1]
     null_perc = null_cnts / nrows
+    miss_perc = nullity.sum() / (nrows * ncols)
+    avg_row = nullity.sum() / nrows
+    avg_col = nullity.sum() / ncols
 
     tasks = (
         missing_spectrum(df, bins=bins),
@@ -32,15 +40,57 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
         missing_bars(null_cnts, df.columns.values, nrows),
         missing_heatmap(df),
         missing_dendrogram(df),
+        nullity.sum(),
+        missing_col_cnt(df),
+        missing_row_cnt(df),
+        missing_most_col(df),
+        missing_most_row(df),
+        miss_perc,
+        avg_row,
+        avg_col,
     )
 
     ### Lazy Region End
-    spectrum, null_perc, bars, heatmap, dendrogram = yield tasks
+    (
+        spectrum,
+        null_perc,
+        bars,
+        heatmap,
+        dendrogram,
+        cnt,
+        col_cnt,
+        row_cnt,
+        most_col,
+        most_row,
+        miss_perc,
+        avg_row,
+        avg_col,
+    ) = yield tasks
     ### Eager Region Begin
 
     sel = ~((null_perc == 0) | (null_perc == 1))
     heatmap = pd.DataFrame(
         data=heatmap[:, sel][sel, :], columns=df.columns[sel], index=df.columns[sel]
+    )
+
+    suffix_col = "" if most_col[0] <= most_show else ", ..."
+    suffix_row = "" if most_row[0] <= most_show else ", ..."
+
+    top_miss_col = (
+        str(most_col[0])
+        + "-col(s) "
+        + str(
+            "("
+            + ", ".join(abbr(df.columns[e], longest) for e in most_col[2][:most_show])
+            + suffix_col
+            + ")"
+        )
+    )
+
+    top_miss_row = (
+        str(most_row[0])
+        + "-row(s) "
+        + str("(" + ", ".join(str(e) for e in most_row[2][:most_show]) + suffix_row + ")")
     )
 
     return Intermediate(
@@ -50,6 +100,26 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
         data_heatmap=heatmap,
         data_dendrogram=dendrogram,
         visual_type="missing_impact",
+        missing_stat={
+            "Missing Cells": cnt,
+            "Missing Cells (%)": str(round(miss_perc * 100, 1)) + "%",
+            "Missing Columns": col_cnt,
+            "Missing Rows": row_cnt,
+            "Avg Missing Cells per Column": round(avg_col, 2),
+            "Avg Missing Cells per Row": round(avg_row, 2),
+        },
+        insights={
+            "Bar Chart": [
+                top_miss_col
+                + " contain the most missing values with rate "
+                + str(round(most_col[1] * 100, 1))
+                + "%",
+                top_miss_row
+                + " contain the most missing columns with rate "
+                + str(round(most_row[1] * 100, 1))
+                + "%",
+            ]
+        },
     )
 
 
@@ -157,3 +227,83 @@ def missing_dendrogram(df: DataArray) -> Any:
     )
 
     return dendrogram
+
+
+def missing_col_cnt(df: DataArray) -> Any:
+    """Calculate how many columns contain missing values."""
+    nulls = df.nulls
+    rst = nulls.sum(0)
+    rst = rst[rst > 0]
+
+    return (rst > 0).sum()
+
+
+def missing_row_cnt(df: DataArray) -> Any:
+    """Calculate how many rows contain missing values."""
+    nulls = df.nulls
+    rst = nulls.sum(1)
+    rst = rst[rst > 0]
+
+    return (rst > 0).sum()
+
+
+def missing_most_col(df: DataArray) -> Tuple[int, float, List[Any]]:
+    """Find which column has the most number of missing values.
+
+    Parameters
+    ----------
+    df
+        the DataArray data_frame
+
+    Outputs
+    -------
+    cnt
+        the count of columns having the most missing values
+    rate
+        the highest rate of missing values in one column
+    rst
+        a list of column indices with highest missing rate
+    """
+    nulls = df.nulls
+    col_sum = nulls.sum(axis=0)
+    maximum = col_sum.max()
+    rate = maximum / df.shape[0]
+    cnt = (col_sum == maximum).sum()
+    rst = da.where(col_sum == maximum)[0]
+
+    return cnt, rate, rst
+
+
+def missing_most_row(df: DataArray) -> Tuple[int, float, List[Any]]:
+    """Find which row has the most number of missing values.
+
+    Parameters
+    ----------
+    df
+        the DataArray data_frame
+
+    Outputs
+    -------
+    cnt
+        the count of rows having the most missing values
+    rate
+        the highest rate of missing values in one row
+    rst
+        a list of row indices with highest missing rate
+    """
+    nulls = df.nulls
+    row_sum = nulls.sum(axis=1)
+    maximum = row_sum.max()
+    rate = maximum / df.shape[1]
+    cnt = (row_sum == maximum).sum()
+    rst = da.where(row_sum == maximum)[0]
+
+    return cnt, rate, rst
+
+
+def abbr(name: str, longest: int) -> str:
+    """Cut the name if it is too long."""
+    if len(name) > longest:
+        return str(name[0:longest] + "...")
+    else:
+        return name
