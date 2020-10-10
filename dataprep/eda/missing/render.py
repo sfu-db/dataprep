@@ -310,9 +310,7 @@ def create_color_mapper_heatmap(
     return mapper, colorbar
 
 
-def render_missing_impact(
-    itmdt: Intermediate, plot_width: int, plot_height: int
-) -> Dict[str, List[Any]]:
+def render_missing_impact(itmdt: Intermediate, plot_width: int, plot_height: int) -> Dict[str, Any]:
     """
     Render correlation heatmaps in to tabs
     """
@@ -331,7 +329,11 @@ def render_missing_impact(
     fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
     tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
 
+    stat_dict = {name: itmdt["missing_stat"][name] for name in itmdt["missing_stat"]}
+
     return {
+        "insights": itmdt["insights"],
+        "tabledata": {"Missing Statistics": stat_dict},
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [panel.title for panel in tabs],
     }
