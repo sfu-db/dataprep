@@ -1,6 +1,8 @@
 """
 Module defines errors used in this library.
 """
+from typing import Set
+
 from ..errors import DataprepError
 
 
@@ -64,3 +66,29 @@ class InvalidParameterError(Exception):
 
     def __str__(self) -> str:
         return f"the parameter {self.param} is invalid, refer info method"
+
+
+class MissingRequiredAuthParams(ValueError):
+    """Some parameters for Authorization are missing."""
+
+    params: Set[str]
+
+    def __init__(self, params: Set[str]) -> None:
+        super().__init__()
+        self.params = params
+
+    def __str__(self) -> str:
+        return f"Missing required authorization parameter(s) {self.params} in _auth"
+
+
+class InvalidAuthParams(ValueError):
+    """The parameters used for Authorization are invalid."""
+
+    params: Set[str]
+
+    def __init__(self, params: Set[str]) -> None:
+        super().__init__()
+        self.params = params
+
+    def __str__(self) -> str:
+        return f"Authorization parameter(s) {self.params} in _auth are not required."
