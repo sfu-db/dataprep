@@ -1421,16 +1421,7 @@ def stats_viz_dt(stats: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
 
 def render_distribution_grid(
     itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int
-) -> Dict[
-    str,
-    Union[
-        List[str],
-        List[Figure],
-        Tuple[Dict[str, str], Dict[str, str]],
-        Dict[int, List[str]],
-        Dict[str, List[Union[str, int]]],
-    ],
-]:
+) -> Dict[str, Any]:
     """
     Render plots and dataset stats from plot(df)
     """  # pylint: disable=too-many-locals
@@ -1467,6 +1458,7 @@ def render_distribution_grid(
         "tabledata": format_ov_stats(itmdt["stats"]),
         "overview_insights": itmdt["overview_insights"],
         "column_insights": itmdt["column_insights"],
+        "fig_width": plot_width,
     }
 
 

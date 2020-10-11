@@ -102,6 +102,8 @@ class ConfigGenerator:
         if pagination is not None:
             pagdef = PageUnion(val=pagination).val
             config.request.pagination = pagdef
+        if authdef is not None:
+            config.request.authorization = authdef
 
         self.config += config
 
