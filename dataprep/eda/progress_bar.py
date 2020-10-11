@@ -180,6 +180,7 @@ class ProgressBar(Callback):  # type: ignore
                 dynamic_ncols=True,
                 mininterval=self._interval,
                 initial=ndone,
+                leave=False,
             )
         else:
             self._pbar = tqdm(
@@ -187,6 +188,7 @@ class ProgressBar(Callback):  # type: ignore
                 ncols=self._width,
                 mininterval=self._interval,
                 initial=ndone,
+                leave=False,
             )
 
         self._pbar.set_description(desc)

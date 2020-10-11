@@ -6,31 +6,20 @@ labels: 'type: enhancement'
 assignees: ''
 
 ---
-
-<!--Adapted from https://github.com/rust-lang/rfcs/blob/master/0000-template.md-->
-
-<!--
-Guide: 
-1. Fill in the summary section first. Then put actions in the UI-level Explanation section when designing the feature. 
-2. After discussions/meetings/thinking/investigations, fill in the UI-level Explanation, Rational and Alternatives, Prior Art, Future Possibilities gradually. 
-3. If everyone agrees on the UI-level Explanation, filling in the Implementation-level Explanation.
-4. Finish implementation and amend this issue if necessary.
--->
-
-<!--Action means a sentence describing what to do and what is the outcome. E.g. "Read dask documentation" is a bad action, but "Read dask documentation to figure out the optimal block size" is good.-->
+<!--Please refer to https://github.com/sfu-db/dataprep/issues/360 as an example of filling this template-->
+<!--"Action" means a sentence describing what to do and what is the outcome. E.g. "Read dask documentation" is a bad action, but "Read dask documentation to figure out the optimal block size" is good.-->
 
 ## Summary
 <!--Use one or two lines to summary the task.-->
 
-## UI-level Explanation
+## Design-level Explanation Actions
+<!--Actions to finish in order to write the next section.-->
+
+## Design-level Explanation
 <!--Explain the designing as if it was already implemented and you were teaching it to the user.-->
-<!--E.g. We use ... as the config syntax for all the plot functions in EDA. xxx represents yyy...-->
-<!--Put actions below-->
 
 ## Implementation-level Explanation
 <!--This section should return to the examples given in the previous section, and explain more fully how the detailed implementation makes those examples work.-->
-<!--E.g. In order to support all the syntax defined in the previous section, we should do syntax normalization first.-->
-<!--Put actions below-->
 
 ## Rational and Alternatives
 <!--
@@ -43,8 +32,19 @@ What is the impact of not doing this?
 <!--Discuss prior art, e.g. how other libraries solve the same problem and why we are using it or not using it.-->
 
 ## Future Possibilities
+<!--Possible future directions of the current designing.-->
+
+## Implementation-level Actions
+<!--Implementation actions-->
 
 ## Additional Tasks
 
+<!--Check these when creating the issue-->
+- [ ] This task is put into a correct pipeline (Development Backlog or In Progress).
+- [ ] The label of this task is setting correctly.
+- [ ] The issue is assigned to the correct person.
+- [ ] The issue is linked to related Epic.
+
+<!--Check these after the implementation is finished-->
 - [ ] The documentation is changed accordingly.
 - [ ] Tests are added accordingly.
