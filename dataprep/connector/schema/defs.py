@@ -8,7 +8,7 @@ from enum import Enum
 from pathlib import Path
 from threading import Thread
 from time import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Set
 from urllib.parse import parse_qs, urlparse
 import socket
 import requests
@@ -16,6 +16,7 @@ from pydantic import Field
 
 from ...utils import is_notebook
 from .base import BaseDef, BaseDefT
+from ..errors import MissingRequiredAuthParams, InvalidAuthParams
 
 # pylint: disable=missing-class-docstring,missing-function-docstring
 FILE_PATH: Path = Path(__file__).resolve().parent
@@ -28,6 +29,16 @@ def get_random_string(length: int) -> str:
     letters = string.ascii_lowercase
     result_str = "".join(random.choice(letters) for _ in range(length))
     return result_str
+
+
+def validate_auth(required: Set[str], passed: Dict[str, Any]) -> None:
+    required_not_passed = required - passed.keys()
+    passed_not_required = passed.keys() - required
+    if required_not_passed:
+        raise MissingRequiredAuthParams(required_not_passed)
+
+    if passed_not_required:
+        raise InvalidAuthParams(passed_not_required)
 
 
 class OffsetPaginationDef(BaseDef):
@@ -130,6 +141,8 @@ class OAuth2AuthorizationCodeAuthorizationDef(BaseDef):
             port = params.get("port", 9999)
             code = self._auth(params["client_id"], port)
 
+            validate_auth({"client_id", "client_secret"}, params)
+
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
@@ -208,6 +221,8 @@ class OAuth2ClientCredentialsAuthorizationDef(BaseDef):
             raise ValueError("storage is required for OAuth2")
 
         if "access_token" not in storage or storage.get("expires_at", 0) < time():
+            validate_auth({"client_id", "client_secret"}, params)
+
             # Not yet authorized
             ckey = params["client_id"]
             csecret = params["client_secret"]
@@ -242,6 +257,8 @@ class QueryParamAuthorizationDef(BaseDef):
     ) -> None:
         """Populate some required fields to the request data."""
 
+        validate_auth({"access_token"}, params)
+
         req_data["params"][self.key_param] = params["access_token"]
 
 
@@ -255,6 +272,8 @@ class BearerAuthorizationDef(BaseDef):
         storage: Optional[Dict[str, Any]] = None,  # pylint: disable=unused-argument
     ) -> None:
         """Populate some required fields to the request data."""
+
+        validate_auth({"access_token"}, params)
 
         req_data["headers"]["Authorization"] = f"Bearer {params['access_token']}"
 
@@ -271,6 +290,8 @@ class HeaderAuthorizationDef(BaseDef):
         storage: Optional[Dict[str, Any]] = None,  # pylint: disable=unused-argument
     ) -> None:
         """Populate some required fields to the request data."""
+
+        validate_auth({"access_token"}, params)
 
         req_data["headers"][self.key_name] = params["access_token"]
         req_data["headers"].update(self.extra)
