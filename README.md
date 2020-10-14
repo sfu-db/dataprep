@@ -102,18 +102,46 @@ Don't forget to checkout the [examples] folder for detailed demonstration!
 
 ### Connector
 
-Connector provides a simple way to collect data from different websites, offering several benefits:
-* A unified API: you can fetch data using one or two lines of code to get data from many websites.
-* Auto Pagination: it automatically does the pagination for you so that you can specify the desired count of the returned results without even considering the count-per-request restriction from the API.
-* Smart API request strategy: it can issue API requests in parallel while respecting the rate limit policy.
+Connector provides a simple programming interface to collect structured data from different Web APIs (e.g., Twitter API, Yelp Fusion API, Spotify API, DBLP API), making web data collection easy and efficient, without requiring advanced programming skills.
 
-In the following examples, you can download the Yelp business search result into a pandas DataFrame, 
-using only two lines of code, without taking deep looking into the Yelp documentation!
-More examples can be found here:
-[Examples](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
-<center><a href="https://sfu-db.github.io/dataprep/connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector.png"/></a></center>
+Do you want to leverage the growing number of websites that are opening their data through public APIs?.
 
+
+Connector is for you!  
+
+Let's check out the several benefits that Connector offers:
+
+* **A unified API:** you can fetch data using one or two lines of code to get data from many websites.
+
+<img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_main.gif"/></a>
+
+* **Auto Pagination:** it automatically does the pagination for you so that you can specify the desired count of the returned results without even considering the count-per-request restriction from the API.
+
+<img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_pagination.gif"/></a>
+
+* **Smart API request strategy:** it can issue API requests in parallel while respecting the rate limit policy.
+
+<img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_concurrency.gif"/></a>
+
+
+Through <strong><em>configuration files</em></strong>, Connector specifies how to connect with each Web API for data gathering. If you want to connect with any of the APIs mentioned in the table below, with one line of code, you can get the most up-to-date version of the config file from our codebase and use it right away! 
+ 
+Web API |  Auth Method  | Connector Config File(s) | Description |
+|---|---|---|---|
+| [Twitter](https://developer.twitter.com/en)  | `OAuth2` |  [Twitter config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/twitter) |  API endpoint for Tweets information retrieval. |
+| [Spotify](https://developer.spotify.com/)  | `OAuth2` |  [Spotify config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spotify) |  Comprehensive API for retrieving albums, artists, and tracks metadata. |
+| [Yelp](https://www.yelp.com/developers)  | `Bearer Token` |  [Yelp config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/yelp) |  Leading API to access restaurant information by location.  |
+| [DBLP](https://dblp.org/faq/13501473.html) | No |  [DBLP config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/dblp) |   Open bibliographic API for computer science publications.  |
+| [Youtube](https://developers.google.com/youtube)  | `API Key` |  [Youtube config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/youtube) |  API for retrieving Youtube's content information.  |
+| [Finnhub](https://finnhub.io/)  | `API Key` |  [Finnhub config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/finnhub) |   Comprehensive API for financial, market, and economic data.  |
+| [Musixmatch](https://developer.musixmatch.com/)  | `API Key` |  [Musixmatch config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/musixmatch) |  Leading API for searching music lyrics.  |
+| [OpenWeatherMap](https://openweathermap.org/api)  | `API Key` |  [OpenWeatherMap config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/openweathermap) |  API for retrieving current and historical weather data. |
+| [Spoonacular](https://spoonacular.com/food-api)  | `API Key` |  [Spoonacular config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spoonacular) |  Recipe, food, and nutritional information API.  |
+
+If you want to connect with a different web API, Connector is designed to be easy to extend. You can write a simple config file describing the API's main attributes like the URL, query parameters, authentication and authorization method, pagination, etc.  
+
+In the following link, you can see detailed examples of how to use Connector for retrieving data from DBLP, Spotify, Yelp, and other sites, without taking an in-depth look into these websites documentation!: [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
 ## Contribute
 
