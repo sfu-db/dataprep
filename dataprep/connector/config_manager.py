@@ -22,11 +22,14 @@ def config_directory() -> Path:
     return Path(tmp) / "dataprep" / "connector"
 
 
-def ensure_config(impdb: str) -> bool:
+def ensure_config(impdb: str, update: bool) -> bool:
     """
     Ensure the config for `impdb` is downloaded
     """
     path = config_directory()
+    if (path / impdb).exists() and not update:
+        return True
+
     obsolete = is_obsolete(impdb)
 
     if (path / impdb).exists() and not obsolete:

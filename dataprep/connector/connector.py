@@ -61,6 +61,8 @@ class Connector:
         The parameters for authentication, e.g. OAuth2
     _concurrency: int = 5
         The concurrency setting. By default it is 1 reqs/sec.
+    update: bool = True
+        Force update the config file even if the local version exists.
     **kwargs
         Parameters that shared by different queries.
 
@@ -82,6 +84,8 @@ class Connector:
     def __init__(
         self,
         config_path: str,
+        *,
+        update: bool = False,
         _auth: Optional[Dict[str, Any]] = None,
         _concurrency: int = 1,
         **kwargs: Any,
@@ -94,7 +98,7 @@ class Connector:
             path = Path(config_path).resolve()
         else:
             # From Github!
-            ensure_config(config_path)
+            ensure_config(config_path, update)
             path = config_directory() / config_path
 
         self._impdb = ImplicitDatabase(path)
