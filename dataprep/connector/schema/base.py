@@ -1,15 +1,34 @@
 """Base class for schema definition."""
 
 # pylint: disable=missing-function-docstring
-
+import re
 from copy import deepcopy
 from typing import Callable, Dict, Optional, TypeVar, cast, Any
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
-from stringcase import camelcase
 
 T = TypeVar("T")  # pylint: disable=invalid-name
 BaseDefT = TypeVar("BaseDefT", bound="BaseDef")
+
+
+# copied from stringcase package
+def camelcase(string: str) -> str:
+    """Convert string into camel case.
+
+    Args:
+        string: String to convert.
+
+    Returns:
+        string: Camel case string.
+
+    """
+
+    string = re.sub(r"\w[\s\W]+\w", "", str(string))
+    if not string:
+        return string
+    return string[0].lower() + re.sub(
+        r"[\-_\.\s]([a-z])", lambda matched: matched.group(1).upper(), string[1:]
+    )
 
 
 class Policy:
