@@ -370,7 +370,7 @@ def merge_type(a: str, b: str) -> str:  # pylint: disable=invalid-name
 
 
 class ResponseDef(BaseDef):
-    ctype: str = Field(regex=r"^(application/xml|application/json)$")
+    ctype: str = Field("application/json", const=True)
     table_path: str
     schema_: Dict[str, SchemaFieldDef] = Field(alias="schema")
     orient: str = Field(regex=r"^(records|split)$")
