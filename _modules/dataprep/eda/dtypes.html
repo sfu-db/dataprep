@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.dtypes &#8212; DataPrep 0.2.13 documentation</title>
+  <title>dataprep.eda.dtypes &#8212; DataPrep 0.2.14 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -264,7 +264,10 @@
 <span class="n">DTypeDef</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">DType</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DType</span><span class="p">],</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DType</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="detect_dtype"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.detect_dtype">[docs]</a><span class="k">def</span> <span class="nf">detect_dtype</span><span class="p">(</span><span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">known_dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
+<div class="viewcode-block" id="detect_dtype"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.detect_dtype">[docs]</a><span class="k">def</span> <span class="nf">detect_dtype</span><span class="p">(</span>
+    <span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">known_dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a column, detect its type or transform its type according to users&#39; specification</span>
 

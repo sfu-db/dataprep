@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.connector.implicit_database &#8212; DataPrep 0.2.13 documentation</title>
+  <title>dataprep.connector.implicit_database &#8212; DataPrep 0.2.14 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -154,7 +154,6 @@
 <span class="sd">where ImplicitDatabase is a conceptual model describes</span>
 <span class="sd">a website and ImplicitTable describes an API endpoint.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">load</span> <span class="k">as</span> <span class="n">jload</span>
 <span class="kn">from</span> <span class="nn">json</span> <span class="kn">import</span> <span class="n">loads</span> <span class="k">as</span> <span class="n">jloads</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -162,11 +161,8 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">jsonpath_ng</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">jparse</span>
-<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>  <span class="c1"># pytype: disable=import-error</span>
-
 <span class="kn">from</span> <span class="nn">dataprep.connector.schema.defs</span> <span class="kn">import</span> <span class="n">ConfigDef</span>
 
-<span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="n">ConfigDef</span>
 
 <span class="n">_TYPE_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
@@ -196,10 +192,8 @@
         <span class="n">ctype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">ctype</span>  <span class="c1"># pylint: disable=no-member</span>
         <span class="k">if</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s2">&quot;application/xml&quot;</span><span class="p">:</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnreachableError</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span></div>
 
@@ -214,7 +208,10 @@
         <span class="k">if</span> <span class="n">respdef</span><span class="o">.</span><span class="n">orient</span> <span class="o">==</span> <span class="s2">&quot;records&quot;</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
             <span class="n">data_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">table_expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span>
 
-            <span class="k">for</span> <span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="n">column_def</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">respdef</span><span class="o">.</span><span class="n">schema_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="p">(</span>
+                <span class="n">column_name</span><span class="p">,</span>
+                <span class="n">column_def</span><span class="p">,</span>
+            <span class="p">)</span> <span class="ow">in</span> <span class="n">respdef</span><span class="o">.</span><span class="n">schema_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">column_target</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">target</span>
                 <span class="n">column_type</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">type</span>
 
@@ -225,48 +222,6 @@
                     <span class="n">maybe_cell_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">target_matcher</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">data_row</span><span class="p">)]</span>
 
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">maybe_cell_value</span><span class="p">:</span>  <span class="c1"># If no match</span>
-                        <span class="n">col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">maybe_cell_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">column_type</span> <span class="o">!=</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
-                        <span class="p">(</span><span class="n">cell_value</span><span class="p">,)</span> <span class="o">=</span> <span class="n">maybe_cell_value</span>
-                        <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="c1"># Even we have value matched,</span>
-                            <span class="c1"># the value might be None so we don&#39;t do type conversion.</span>
-                            <span class="n">cell_value</span> <span class="o">=</span> <span class="n">_TYPE_MAPPING</span><span class="p">[</span><span class="n">column_type</span><span class="p">](</span><span class="n">cell_value</span><span class="p">)</span>
-                        <span class="n">col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_value</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="k">assert</span> <span class="p">(</span>
-                            <span class="n">column_type</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span>
-                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">maybe_cell_value</span><span class="si">}</span><span class="s2"> is not </span><span class="si">{</span><span class="n">column_type</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="n">col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maybe_cell_value</span><span class="p">)</span>
-
-                <span class="n">table_data</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># TODO: split orient</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-        <span class="k">return</span> <span class="n">table_data</span></div>
-
-<div class="viewcode-block" id="ImplicitTable.from_xml"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.implicit_database.ImplicitTable.from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create rows from xml string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">respdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">response</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-        <span class="n">data_rows</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">respdef</span><span class="o">.</span><span class="n">table_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">respdef</span><span class="o">.</span><span class="n">orient</span> <span class="o">==</span> <span class="s2">&quot;records&quot;</span><span class="p">:</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="n">column_def</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">respdef</span><span class="o">.</span><span class="n">schema_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">column_target</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">target</span>
-                <span class="n">column_type</span> <span class="o">=</span> <span class="n">column_def</span><span class="o">.</span><span class="n">type</span>
-
-                <span class="n">col</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">data_row</span> <span class="ow">in</span> <span class="n">data_rows</span><span class="p">:</span>
-                    <span class="n">maybe_cell_value</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">column_target</span><span class="p">)</span>
-
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">maybe_cell_value</span><span class="p">:</span>
                         <span class="n">col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">maybe_cell_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">column_type</span> <span class="o">!=</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
                         <span class="p">(</span><span class="n">cell_value</span><span class="p">,)</span> <span class="o">=</span> <span class="n">maybe_cell_value</span>

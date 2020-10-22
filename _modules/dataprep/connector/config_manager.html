@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.connector.config_manager &#8212; DataPrep 0.2.13 documentation</title>
+  <title>dataprep.connector.config_manager &#8212; DataPrep 0.2.14 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -160,12 +160,8 @@
 
 <span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="n">META_URL</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/</span><span class="si">{}</span><span class="s2">/_meta.json&quot;</span>
-<span class="p">)</span>
-<span class="n">TABLE_URL</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">.json&quot;</span>
-<span class="p">)</span>
+<span class="n">META_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/</span><span class="si">{}</span><span class="s2">/_meta.json&quot;</span>
+<span class="n">TABLE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">.json&quot;</span>
 <span class="n">GIT_REF_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.github.com/repos/sfu-db/DataConnectorConfigs/git/refs/heads&quot;</span>
 
 
@@ -177,11 +173,14 @@
     <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;dataprep&quot;</span> <span class="o">/</span> <span class="s2">&quot;connector&quot;</span></div>
 
 
-<div class="viewcode-block" id="ensure_config"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.config_manager.ensure_config">[docs]</a><span class="k">def</span> <span class="nf">ensure_config</span><span class="p">(</span><span class="n">impdb</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="ensure_config"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.config_manager.ensure_config">[docs]</a><span class="k">def</span> <span class="nf">ensure_config</span><span class="p">(</span><span class="n">impdb</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">update</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ensure the config for `impdb` is downloaded</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">config_directory</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">impdb</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">update</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
     <span class="n">obsolete</span> <span class="o">=</span> <span class="n">is_obsolete</span><span class="p">(</span><span class="n">impdb</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">impdb</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">obsolete</span><span class="p">:</span>

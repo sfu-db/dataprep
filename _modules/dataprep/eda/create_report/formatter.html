@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.create_report.formatter &#8212; DataPrep 0.2.13 documentation</title>
+  <title>dataprep.eda.create_report.formatter &#8212; DataPrep 0.2.14 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -261,15 +261,11 @@
     <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="n">stats</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># needed for pylint</span>
         <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Continuous</span><span class="p">()):</span>
-            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span>
-            <span class="p">)</span>
+            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span><span class="p">)</span>
             <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">format_num_stats</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Nominal</span><span class="p">()):</span>
-            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
-                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span>
-            <span class="p">)</span>
+            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">)</span>
             <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">format_cat_stats</span><span class="p">(</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;len_stats&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;letter_stats&quot;</span><span class="p">]</span>
@@ -288,46 +284,49 @@
             <span class="s2">&quot;col_type&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_column&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
         <span class="p">}</span>
 
-    <span class="c1"># interactions</span>
-    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_interaction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;scat&quot;</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_crossfilter&quot;</span><span class="p">)</span>
-    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-    <span class="n">rndrd</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
-    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;interactions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">rndrd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># interactions</span>
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_interaction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;scat&quot;</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_crossfilter&quot;</span><span class="p">)</span>
+        <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
+        <span class="n">rndrd</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;interactions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">rndrd</span><span class="p">)</span>
 
-    <span class="c1"># correlations</span>
-    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">dfs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">corr</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;corrs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">ndf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordx&quot;</span><span class="p">]],</span>
-                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordy&quot;</span><span class="p">]],</span>
-                <span class="s2">&quot;correlation&quot;</span><span class="p">:</span> <span class="n">corr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-            <span class="p">}</span>
+        <span class="c1"># correlations</span>
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">dfs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">corr</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;corrs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ndf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordx&quot;</span><span class="p">]],</span>
+                    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordy&quot;</span><span class="p">]],</span>
+                    <span class="s2">&quot;correlation&quot;</span><span class="p">:</span> <span class="n">corr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">dfs</span><span class="p">[</span><span class="n">method</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndf</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordy&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordx&quot;</span><span class="p">]]</span>
+        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">dfs</span><span class="p">,</span>
+            <span class="n">axis_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">]),</span>
+            <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">dfs</span><span class="p">[</span><span class="n">method</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndf</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordy&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cordx&quot;</span><span class="p">]]</span>
-    <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">]),</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
-    <span class="n">figs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">child</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)</span>
-        <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-    <span class="n">res</span><span class="p">[</span><span class="s2">&quot;correlations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">figs</span><span class="p">)</span>
+        <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
+        <span class="n">figs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">child</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)</span>
+            <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;correlations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">figs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_interaction&quot;</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
 
     <span class="c1"># missing</span>
     <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-
     <span class="n">itmdt</span> <span class="o">=</span> <span class="n">completions</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">](</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">])</span>
 
-    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
+    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
     <span class="n">figs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)</span>
         <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
@@ -351,16 +350,21 @@
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_cols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_num</span><span class="o">.</span><span class="n">columns</span>
     <span class="n">first_rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">CATEGORICAL_DTYPES</span><span class="p">)</span><span class="o">.</span><span class="n">head</span>
 
-    <span class="c1"># overview</span>
-    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_stats</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="c1"># # variables</span>
+    <span class="c1"># variables</span>
     <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Continuous</span><span class="p">()):</span>
             <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">cont_comps</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">20</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Nominal</span><span class="p">()):</span>
+            <span class="c1"># cast the column as string type if it contains a mutable type</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">first_rows</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
             <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">nom_comps</span><span class="p">(</span>
                 <span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">first_rows</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
             <span class="p">)</span>
+    <span class="c1"># overview</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_stats</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="c1"># interactions</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_num</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="n">meta</span><span class="o">=</span><span class="n">df_num</span><span class="o">.</span><span class="n">frame</span>
@@ -368,10 +372,7 @@
     <span class="c1"># correlations</span>
     <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">zip</span><span class="p">((</span><span class="s2">&quot;cordx&quot;</span><span class="p">,</span> <span class="s2">&quot;cordy&quot;</span><span class="p">,</span> <span class="s2">&quot;corrs&quot;</span><span class="p">),</span> <span class="n">correlation_nxn</span><span class="p">(</span><span class="n">df_num</span><span class="p">)))</span>
     <span class="c1"># missing values</span>
-    <span class="p">(</span>
-        <span class="n">delayed</span><span class="p">,</span>
-        <span class="n">completion</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">=</span> <span class="n">compute_missing_nullivariate</span><span class="p">(</span>  <span class="c1"># pylint: disable=unexpected-keyword-arg</span>
+    <span class="p">(</span><span class="n">delayed</span><span class="p">,</span> <span class="n">completion</span><span class="p">,)</span> <span class="o">=</span> <span class="n">compute_missing_nullivariate</span><span class="p">(</span>  <span class="c1"># pylint: disable=unexpected-keyword-arg</span>
         <span class="n">df</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">_staged</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delayed</span>
