@@ -607,7 +607,9 @@ def box_viz(
     utail = fig.segment(x0="grp", y0="uw", x1="grp", y1="q3", line_color="black", source=df)
     upw = fig.segment(x0="x0", y0="uw", x1="x1", y1="uw", line_color="black", source=df)
 
-    df.loc[df["otlrs"].isna(), "otlrs"] = pd.Series([[]] * df["otlrs"].isna().sum()).values
+    df.loc[df["otlrs"].isna(), "otlrs"] = pd.Series(
+        [[]] * df["otlrs"].isna().sum(), dtype=np.float64
+    ).values
     otlrs = [otl for otls in df["otlrs"] for otl in otls]
     if otlrs:
         gps = [grp for grp, ols in zip(df["grp"], df["otlrs"]) for _ in range(len(ols))]
