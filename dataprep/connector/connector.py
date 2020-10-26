@@ -5,17 +5,15 @@ Every data fetching action should begin with instantiating this Connector class.
 import math
 import sys
 from asyncio import as_completed
-from pathlib import Path
 from typing import Any, Awaitable, Dict, List, Optional, Tuple, Union
 from warnings import warn
 
 import pandas as pd
 from aiohttp import ClientSession
 from aiohttp.client_reqrep import ClientResponse
-from jinja2 import Environment, StrictUndefined, Template, UndefinedError
+from jinja2 import Environment, StrictUndefined, UndefinedError
 from jsonpath_ng import parse as jparse
 
-from .config_manager import config_directory, ensure_config
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .ref import Ref
@@ -29,24 +27,7 @@ from .schema import (
     TokenPaginationDef,
 )
 from .throttler import OrderedThrottler, ThrottleSession
-
-INFO_TEMPLATE = Template(
-    """{% for tb in tbs.keys() %}
-Table {{dbname}}.{{tb}}
-
-Parameters
-----------
-{% if tbs[tb].required_params %}{{", ".join(tbs[tb].required_params)}} required {% endif %}
-{% if tbs[tb].optional_params %}{{", ".join(tbs[tb].optional_params)}} optional {% endif %}
-
-Examples
---------
->>> dc.query({{", ".join(["\\\"{}\\\"".format(tb)] + tbs[tb].joined_query_fields)}})
->>> dc.show_schema("{{tb}}")
-{% endfor %}
-"""
-)
-
+from dataprep.connector import info
 
 class Connector:
     """This is the main class of the connector component.
@@ -61,7 +42,7 @@ class Connector:
         The parameters for authentication, e.g. OAuth2
     _concurrency: int = 5
         The concurrency setting. By default it is 1 reqs/sec.
-    update: bool = True
+    update: bool = True    
         Force update the config file even if the local version exists.
     **kwargs
         Parameters that shared by different queries.
@@ -79,6 +60,7 @@ class Connector:
     # storage for authorization
     _storage: Dict[str, Any]
     _concurrency: int
+    _update : bool
     _jenv: Environment
 
     def __init__(
@@ -90,16 +72,7 @@ class Connector:
         _concurrency: int = 1,
         **kwargs: Any,
     ) -> None:
-        if (
-            config_path.startswith(".")
-            or config_path.startswith("/")
-            or config_path.startswith("~")
-        ):
-            path = Path(config_path).resolve()
-        else:
-            # From Github!
-            ensure_config(config_path, update)
-            path = config_directory() / config_path
+        path = info.initialize_path(config_path, update)
 
         self._impdb = ImplicitDatabase(path)
 
@@ -107,6 +80,7 @@ class Connector:
         self._auth = _auth or {}
         self._storage = {}
         self._concurrency = _concurrency
+        self._update = update
         self._jenv = Environment(undefined=StrictUndefined)
         self._throttler = OrderedThrottler(_concurrency)
 
@@ -158,31 +132,7 @@ class Connector:
         return list(self._impdb.tables.keys())
 
     def info(self) -> None:
-        """Show the basic information and provide guidance for users
-        to issue queries."""
-
-        # get info
-        tbs: Dict[str, Any] = {}
-        for cur_table in self._impdb.tables:
-            table_config_content: ConfigDef = self._impdb.tables[cur_table].config
-            params_required = []
-            params_optional = []
-            example_query_fields = []
-            count = 1
-            for k, val in table_config_content.request.params.items():
-                if isinstance(val, bool) and val:
-                    params_required.append(k)
-                    example_query_fields.append(f"""{k}="word{count}\"""")
-                    count += 1
-                elif isinstance(val, bool):
-                    params_optional.append(k)
-            tbs[cur_table] = {}
-            tbs[cur_table]["required_params"] = params_required
-            tbs[cur_table]["optional_params"] = params_optional
-            tbs[cur_table]["joined_query_fields"] = example_query_fields
-
-        # show table info
-        print(INFO_TEMPLATE.render(ntables=len(self.table_names), dbname=self._impdb.name, tbs=tbs))
+        info.info(self._impdb.name, self._update)
 
     def show_schema(self, table_name: str) -> pd.DataFrame:
         """This method shows the schema of the table that will be returned,
@@ -483,7 +433,6 @@ class Connector:
                 return df, resp
             else:
                 return df
-
 
 def validate_fields(fields: Dict[str, FieldDefUnion], data: Dict[str, Any]) -> None:
     """Check required fields are provided."""
