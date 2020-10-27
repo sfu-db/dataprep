@@ -27,6 +27,7 @@ NULL_VALUES = {
     "nan",
     "null",
     "",
+    None,
 }
 
 NEARBYKEYS = {
