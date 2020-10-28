@@ -21,11 +21,11 @@ from bokeh.models import (
     Panel,
     PrintfTickFormatter,
     Range1d,
-    Title,
 )
 from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
+from ..configs import Config
 from ..dtypes import Continuous, Nominal, drop_null, is_dtype
 from ..intermediate import ColumnMetadata, Intermediate
 from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
@@ -35,20 +35,17 @@ from .compute.common import LABELS
 __all__ = ["render_missing"]
 
 
-def render_missing(
-    itmdt: Intermediate,
-    plot_width: int = 400,
-    plot_height: int = 400,
-) -> Dict[str, Any]:
+def render_missing(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
-    @Jinglin write here
+    Render the visualizations from plot_missing
     """
+
     if itmdt.visual_type == "missing_impact":
-        return render_missing_impact(itmdt, plot_width, plot_height)
+        return render_missing_impact(itmdt, cfg)
     elif itmdt.visual_type == "missing_impact_1vn":
-        return render_missing_impact_1vn(itmdt, plot_width - 100, plot_height - 100)
+        return render_missing_impact_1vn(itmdt, cfg)
     elif itmdt.visual_type == "missing_impact_1v1":
-        return render_missing_impact_1v1(itmdt, plot_width, plot_height)
+        return render_missing_impact_1v1(itmdt, cfg)
     else:
         raise UnreachableError
 
@@ -95,10 +92,10 @@ def render_dist(
     tooltips = [
         (x, "@x"),
         (typ.upper(), f"@{{{typ}}}"),
-        ("Label", "@label"),
+        ("Label", f"@{{{typ}}}_label"),
     ]
     y_range = Range1d(0, df[typ].max() * 1.01)
-    x_range = Range1d(0, df["x"].max() * 1.01)
+    x_range = Range1d(0, df[f"x_{typ}"].max() * 1.01)
 
     fig = tweak_figure(
         Figure(
@@ -106,15 +103,16 @@ def render_dist(
             y_range=y_range,
             plot_width=plot_width,
             plot_height=plot_height,
+            title=" ",
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
         )
     )
     for idx, label in enumerate(LABELS):
-        group = df[df["label"] == label]
+        group = df[df[f"{typ}_label"] == label]
         fig.line(
-            x="x",
+            x=f"x_{typ}",
             y=typ,
             source=group,
             color=CATEGORY10[idx],
@@ -175,6 +173,7 @@ def render_hist(  # pylint: disable=too-many-arguments
             y_range=y_range,
             plot_width=plot_width,
             plot_height=plot_height,
+            title=" " if show_legend else "",
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
@@ -193,7 +192,7 @@ def render_hist(  # pylint: disable=too-many-arguments
 
         relocate_legend(fig, "left")
     else:
-        shown, total = meta["partial"]
+        shown, total = meta["shown"], meta["total"]
         if shown != total:
             fig.xaxis.axis_label = f"Top {shown} out of {total}"
             fig.xaxis.axis_label_standoff = 0
@@ -227,6 +226,7 @@ def render_boxwhisker(df: pd.DataFrame, plot_width: int, plot_height: int) -> Fi
             x_range=df["label"].unique(),
             plot_width=plot_width,
             plot_height=plot_height,
+            title=" ",
             tools="",
             toolbar_location=None,
             tooltips=tooltips,
@@ -310,33 +310,48 @@ def create_color_mapper_heatmap(
     return mapper, colorbar
 
 
-def render_missing_impact(itmdt: Intermediate, plot_width: int, plot_height: int) -> Dict[str, Any]:
+def render_missing_impact(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Render correlation heatmaps in to tabs
     """
+    plot_width = cfg.plot.width if cfg.plot.width else 400
+    plot_height = cfg.plot.height if cfg.plot.height else 400
+
     tabs: List[Panel] = []
-    fig_barchart = render_bar_chart(itmdt["data_bars"], "linear", plot_width, plot_height)
-    tabs.append(Panel(child=row(fig_barchart), title="Bar Chart"))
+    htgs: Dict[str, List[Tuple[str, str]]] = {}
 
-    fig_spectrum = render_missing_spectrum(
-        itmdt["data_spectrum"], itmdt["data_total_missing"], plot_width, plot_height
-    )
-    tabs.append(Panel(child=row(fig_spectrum), title="Spectrum"))
+    if cfg.bar.enable:
+        fig_barchart = render_bar_chart(itmdt["data_bars"], "linear", plot_width, plot_height)
+        tabs.append(Panel(child=row(fig_barchart), title="Bar Chart"))
+        htgs["Bar Chart"] = cfg.bar.missing_how_to_guide(plot_height, plot_width)
 
-    fig_heatmap = render_heatmaps(itmdt["data_heatmap"], plot_width, plot_height)
-    tabs.append(Panel(child=row(fig_heatmap), title="Heatmap"))
+    if cfg.spectrum.enable:
+        fig_spectrum = render_missing_spectrum(
+            itmdt["data_spectrum"], itmdt["data_total_missing"], plot_width, plot_height
+        )
+        tabs.append(Panel(child=row(fig_spectrum), title="Spectrum"))
+        htgs["Spectrum"] = cfg.spectrum.how_to_guide(plot_height, plot_width)
 
-    fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
-    tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
+    if cfg.heatmap.enable:
+        fig_heatmap = render_heatmaps(itmdt["data_heatmap"], plot_width, plot_height)
+        tabs.append(Panel(child=row(fig_heatmap), title="Heat Map"))
+        htgs["Heat Map"] = cfg.heatmap.missing_how_to_guide(plot_height, plot_width)
 
-    stat_dict = {name: itmdt["missing_stat"][name] for name in itmdt["missing_stat"]}
+    if cfg.dendro.enable:
+        fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
+        tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
+        htgs["Dendrogram"] = cfg.dendro.how_to_guide(plot_height, plot_width)
+
+    if cfg.stats.enable:
+        stat_dict = {name: itmdt["missing_stat"][name] for name in itmdt["missing_stat"]}
 
     return {
         "insights": itmdt["insights"],
-        "tabledata": {"Missing Statistics": stat_dict},
+        "tabledata": {"Missing Statistics": stat_dict} if cfg.stats.enable else {},
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [panel.title for panel in tabs],
         "container_width": plot_width + 160,
+        "how_to_guide": htgs,
     }
 
 
@@ -356,6 +371,7 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
             plot_width=plot_width,
             plot_height=plot_height,
             x_axis_location="below",
+            title=" ",
             tools="hover",
             toolbar_location=None,
             background_fill_color="#fafafa",
@@ -605,24 +621,30 @@ def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int)
     return fig
 
 
-def render_missing_impact_1vn(
-    itmdt: Intermediate,
-    plot_width: int,
-    plot_height: int,
-) -> Dict[str, Any]:
+def render_missing_impact_1vn(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Render the plot from `plot_missing(df, "x")`
     """
+    plot_width = cfg.plot.width if cfg.plot.width else 300
+    plot_height = cfg.plot.height if cfg.plot.height else 300
 
     dfs = itmdt["data"]
     x = itmdt["x"]
     meta = itmdt["meta"]
     panels = []
+    htgs: Dict[str, List[Tuple[str, str]]] = {}
+    titles: List[str] = []
     for col, df in dfs.items():
+        title = f"Missing impact of {x} by {col}"
         fig = render_hist(df, col, meta[col], plot_width, plot_height, False)
         fig.frame_height = plot_height
-        fig.title = Title(text=f"Missing impact of {x} by {col}")
         panels.append(Panel(child=fig, title=col))
+
+        if is_dtype(meta[col]["dtype"], Nominal()):
+            htgs[title] = cfg.bar.grid_how_to_guide()
+        else:
+            htgs[title] = cfg.hist.grid_how_to_guide()
+        titles.append(title)
     legend_colors = [CATEGORY10[count] for count in range(len(LABELS))]
     return {
         "layout": [panel.child for panel in panels],
@@ -630,34 +652,40 @@ def render_missing_impact_1vn(
         "legend_labels": [
             {"label": label, "color": color} for label, color in zip(LABELS, legend_colors)
         ],
+        "meta": titles,
+        "how_to_guide": htgs,
     }
 
 
-def render_missing_impact_1v1(
-    itmdt: Intermediate,
-    plot_width: int,
-    plot_height: int,
-) -> Dict[str, Any]:
+def render_missing_impact_1v1(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Render the plot from `plot_missing(df, "x", "y")`
     """
-    x, y = itmdt["x"], itmdt["y"]
-    meta = itmdt["meta"]
+    plot_width = cfg.plot.width if cfg.plot.width else 400
+    plot_height = cfg.plot.height if cfg.plot.height else 400
+
+    x, y, meta = itmdt["x"], itmdt["y"], itmdt["meta"]
+    htgs: Dict[str, List[Tuple[str, str]]] = {}
 
     if is_dtype(meta["dtype"], Continuous()):
         panels = []
 
-        fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height, True)
-        panels.append(Panel(child=fig, title="Histogram"))
-
-        fig = render_dist(itmdt["dist"], y, "pdf", plot_width, plot_height)
-        panels.append(Panel(child=fig, title="PDF"))
-
-        fig = render_dist(itmdt["dist"], y, "cdf", plot_width, plot_height)
-        panels.append(Panel(child=fig, title="CDF"))
-
-        fig = render_boxwhisker(itmdt["box"], plot_width, plot_height)
-        panels.append(Panel(child=fig, title="Box"))
+        if cfg.hist.enable:
+            fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height, True)
+            panels.append(Panel(child=fig, title="Histogram"))
+            htgs["Histogram"] = cfg.hist.how_to_guide(plot_height, plot_width)
+        if cfg.pdf.enable:
+            fig = render_dist(itmdt["dist"], y, "pdf", plot_width, plot_height)
+            panels.append(Panel(child=fig, title="PDF"))
+            htgs["PDF"] = cfg.pdf.how_to_guide(plot_height, plot_width)
+        if cfg.cdf.enable:
+            fig = render_dist(itmdt["dist"], y, "cdf", plot_width, plot_height)
+            panels.append(Panel(child=fig, title="CDF"))
+            htgs["CDF"] = cfg.cdf.how_to_guide(plot_height, plot_width)
+        if cfg.box.enable:
+            fig = render_boxwhisker(itmdt["box"], plot_width, plot_height)
+            panels.append(Panel(child=fig, title="Box Plot"))
+            htgs["Box Plot"] = cfg.box.univar_how_to_guide(plot_height, plot_width)
 
         for panel in panels:
             panel.child.frame_width = plot_width
@@ -666,13 +694,20 @@ def render_missing_impact_1v1(
             "layout": [panel.child for panel in panels],
             "meta": [panel.title for panel in panels],
             "container_width": plot_width + 240,
+            "how_to_guide": htgs,
         }
     else:
         fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height, True)
         fig.frame_width = plot_width
-        shown, total = meta["partial"]
+        shown, total = meta["shown"], meta["total"]
         if shown != total:
             _title = f"Missing impact of {x} by ({shown} out of {total}) {y}"
         else:
             _title = f"Missing impact of {x} by {y}"
-        return {"layout": [fig], "meta": [_title], "container_width": plot_width + 240}
+        htgs[_title] = cfg.bar.how_to_guide(plot_height, plot_width)
+        return {
+            "layout": [fig],
+            "meta": [_title],
+            "container_width": plot_width + 240,
+            "how_to_guide": htgs,
+        }

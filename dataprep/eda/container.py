@@ -2,16 +2,19 @@
     This module implements the Container class.
 """
 
+import random
 import sys
 import webbrowser
-import random
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict
-from bokeh.io import output_notebook
+
 from bokeh.embed import components
+from bokeh.io import output_notebook
 from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
+
 from ..utils import is_notebook
+from .configs import Config
 
 output_notebook(INLINE, hide_banner=True)  # for offline usage
 
@@ -44,16 +47,13 @@ class Container:
     This class creates a customized Container object for the plot* function.
     """
 
-    def __init__(
-        self,
-        to_render: Dict[str, Any],
-        visual_type: str,
-    ) -> None:
+    def __init__(self, to_render: Dict[str, Any], visual_type: str, cfg: Config) -> None:
         self.context = Context(**to_render)
         setattr(self.context, "rnd", random.randint(0, 9999))
         if visual_type in GRID_VISUAL_TYPES:
             self.template_base = ENV_LOADER.get_template("grid_base.html")
         elif visual_type in TAB_VISUAL_TYPES:
+            setattr(self.context, "highlight", cfg.insight.enable)
             if to_render.get("tabledata"):
                 self.context.meta.insert(0, "Stats")  # type: ignore
             if visual_type == "correlation_impact":
@@ -129,7 +129,14 @@ class Context:
 
         for attr, value in param.items():
             if attr == "layout":
-                setattr(self, "components", components(value))
+                if len(value) == 0:
+                    setattr(self, "components", ("", []))
+                else:
+                    setattr(self, "components", components(value))
+            elif attr == "meta":
+                setattr(self, attr, value)
+                figs = [val for val in value if val != "Stats"]
+                setattr(self, "figs", figs)
             else:
                 setattr(self, attr, value)
 

@@ -2,7 +2,7 @@
     This module implements the visualization for
     plot_correlation(df) function
 """
-from typing import List, Optional, Sequence, Tuple, Any, Dict
+from typing import Any, Dict, List, Sequence, Tuple
 
 import numpy as np
 from bokeh.layouts import column, row
@@ -25,6 +25,7 @@ from bokeh.models.annotations import Title
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.plotting import Figure, figure
 
+from ..configs import Config
 from ..intermediate import Intermediate
 from ..palette import BRG, RDBU
 
@@ -33,41 +34,31 @@ __all__ = ["render_correlation"]
 
 def render_correlation(
     itmdt: Intermediate,
-    plot_width: int = 400,
-    plot_height: int = 400,
-    palette: Optional[Sequence[str]] = None,
-) -> Figure:
+    cfg: Config,
+) -> Any:
     """
     Render a correlation plot
 
     Parameters
     ----------
     itmdt
-    plot_width
-        The width of the plot
-    plot_height
-        The height of the plot
-    palette
-        The palette to use. By default (None),
-        the palette will be automatically chosen based on different visualization types.
-
-    Returns
-    -------
-    Figure
-        The bokeh Figure instance.
+        Intermediate computations
+    cfg
+        Config instance
     """
+    plot_width = cfg.plot.width if cfg.plot.width else 400
+    plot_height = cfg.plot.height if cfg.plot.height else 400
+
     if itmdt.visual_type is None:
         visual_elem = Figure()
     elif itmdt.visual_type == "correlation_impact":
-        visual_elem = render_correlation_impact(itmdt, plot_width, plot_height, palette or RDBU)
+        visual_elem = render_correlation_impact(itmdt, plot_width, plot_height, cfg)
     elif itmdt.visual_type == "correlation_heatmaps":
-        visual_elem = render_correlation_heatmaps(itmdt, plot_width, plot_height, palette or RDBU)
+        visual_elem = render_correlation_heatmaps(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "correlation_single_heatmaps":
-        visual_elem = render_correlation_single_heatmaps(
-            itmdt, plot_width, plot_height, palette or RDBU
-        )
+        visual_elem = render_correlation_single_heatmaps(itmdt, plot_width, plot_height, cfg)
     elif itmdt.visual_type == "correlation_scatter":
-        visual_elem = render_scatter(itmdt, plot_width, plot_height, palette or BRG)
+        visual_elem = render_scatter(itmdt, plot_width, plot_height, cfg)
     elif itmdt.visual_type == "correlation_crossfilter":
         visual_elem = render_crossfilter(itmdt, plot_width, plot_height)
     else:
@@ -126,14 +117,13 @@ def tweak_figure(fig: Figure) -> None:
 
 
 def render_correlation_impact(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+    itmdt: Intermediate, plot_width: int, plot_height: int, cfg: Config
 ) -> Dict[str, Any]:
     """
     Render correlation heatmaps in to tabs
     """
     tabs: List[Panel] = []
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
-    axis_range = itmdt["axis_range"]
 
     for method, df in itmdt["data"].items():
         # in case of numerical column names
@@ -141,9 +131,9 @@ def render_correlation_impact(
         df["x"] = df["x"].apply(str)
         df["y"] = df["y"].apply(str)
 
-        mapper, color_bar = create_color_mapper(palette)
-        x_range = FactorRange(*axis_range)
-        y_range = FactorRange(*reversed(axis_range))
+        mapper, color_bar = create_color_mapper(RDBU)
+        x_range = FactorRange(*itmdt["axis_range"])
+        y_range = FactorRange(*reversed(itmdt["axis_range"]))
         fig = Figure(
             x_range=x_range,
             y_range=y_range,
@@ -179,12 +169,27 @@ def render_correlation_impact(
         "layout": [panel.child for panel in tabs],
         "meta": [panel.title for panel in tabs],
         "container_width": plot_width + 150,
+        "how_to_guide": corr_how_to_guides(cfg, plot_height, plot_width),
     }
 
 
-def render_correlation_heatmaps(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
-) -> Tabs:
+def corr_how_to_guides(cfg: Config, height: int, width: int) -> Dict[str, List[Tuple[str, str]]]:
+    """
+    How-to guide for correlation_impact
+    """
+    htgs: Dict[str, List[Tuple[str, str]]] = {}
+
+    if cfg.pearson.enable:
+        htgs["Pearson"] = cfg.pearson.how_to_guide(height, width)
+    if cfg.spearman.enable:
+        htgs["Spearman"] = cfg.spearman.how_to_guide(height, width)
+    if cfg.pearson.enable:
+        htgs["KendallTau"] = cfg.kendall.how_to_guide(height, width)
+
+    return htgs
+
+
+def render_correlation_heatmaps(itmdt: Intermediate, plot_width: int, plot_height: int) -> Tabs:
     """
     Render correlation heatmaps in to tabs
     """
@@ -198,7 +203,7 @@ def render_correlation_heatmaps(
         df["x"] = df["x"].apply(str)
         df["y"] = df["y"].apply(str)
 
-        mapper, color_bar = create_color_mapper(palette)
+        mapper, color_bar = create_color_mapper(RDBU)
         x_range = FactorRange(*axis_range)
         y_range = FactorRange(*reversed(axis_range))
         fig = Figure(
@@ -234,7 +239,7 @@ def render_correlation_heatmaps(
 
 
 def render_correlation_single_heatmaps(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+    itmdt: Intermediate, plot_width: int, plot_height: int, cfg: Config
 ) -> Dict[str, Any]:
     """
     Render correlation heatmaps, but with single column
@@ -243,7 +248,7 @@ def render_correlation_single_heatmaps(
     tooltips = [("y", "@y"), ("correlation", "@correlation{1.11}")]
 
     for method, df in itmdt["data"].items():
-        mapper, color_bar = create_color_mapper(palette)
+        mapper, color_bar = create_color_mapper(RDBU)
 
         x_range = FactorRange(*df["x"].unique())
         y_range = FactorRange(*df["y"].unique())
@@ -256,6 +261,7 @@ def render_correlation_single_heatmaps(
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
+            title=" ",
         )
 
         tweak_figure(fig)
@@ -275,9 +281,11 @@ def render_correlation_single_heatmaps(
         tabs.append(tab)
 
     return {
+        "tabledata": {},
         "layout": [panel.child for panel in tabs],
         "meta": [panel.title for panel in tabs],
         "container_width": plot_width,
+        "how_to_guide": corr_how_to_guides(cfg, plot_height, plot_width),
     }
 
 
@@ -300,7 +308,7 @@ def create_color_mapper(palette: Sequence[str]) -> Tuple[LinearColorMapper, Colo
 
 ######### Scatter #########
 def render_scatter(
-    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+    itmdt: Intermediate, plot_width: int, plot_height: int, cfg: Config
 ) -> Dict[str, Any]:
     """
     Render scatter plot with a regression line and possible most influencial points
@@ -320,13 +328,14 @@ def render_scatter(
         tools=[],
         x_axis_label=xcol,
         y_axis_label=ycol,
+        title=" ",
     )
 
     # Scatter
     scatter = fig.scatter(x=df.columns[0], y=df.columns[1], source=df)
     if maybe_label:
         assert len(maybe_label) == 1
-        mapper = CategoricalColorMapper(factors=["=", "+", "-"], palette=palette)
+        mapper = CategoricalColorMapper(factors=["=", "+", "-"], palette=BRG)
         scatter.glyph.fill_color = {"field": maybe_label[0], "transform": mapper}
         scatter.glyph.line_color = {"field": maybe_label[0], "transform": mapper}
 
@@ -354,10 +363,14 @@ def render_scatter(
         )
 
         fig.add_layout(legend, place="right")
+
     return {
         "layout": [fig],
         "meta": ["Scatter Plot & Regression Line"],
         "container_width": plot_width,
+        "how_to_guide": {
+            "Scatter Plot & Regression Line": cfg.scatter.how_to_guide(plot_height, plot_width)
+        },
     }
 
 

@@ -1,7 +1,7 @@
 """This module implements the plot_missing(df) function's
 calculating intermediate part
 """
-from typing import Any, Callable, Dict, Generator, Optional, Tuple, List
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple
 
 import dask.array as da
 import dask.dataframe as dd
@@ -9,20 +9,20 @@ import numpy as np
 import pandas as pd
 from dask import delayed
 from scipy.cluster import hierarchy
-from ...utils import cut_long_name
 
+from ...configs import Config
 from ...data_array import DataArray
 from ...intermediate import Intermediate
 from ...staged import staged
+from ...utils import cut_long_name
 
 
-def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, Any, Intermediate]:
+def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, Any, Intermediate]:
     """Calculate the data for visualizing the plot_missing(df).
     This contains the missing spectrum, missing bar chart and missing heatmap."""
     # pylint: disable=too-many-locals
 
     most_show = 5  # the most number of column/row to show in "insight"
-    # longest = 5  # the longest length of word to show in "insight"
 
     df.compute()
 
@@ -36,19 +36,19 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
     avg_col = nullity.sum() / ncols
 
     tasks = (
-        missing_spectrum(df, bins=bins),
-        null_perc,
-        missing_bars(null_cnts, df.columns.values, nrows),
-        missing_heatmap(df),
-        missing_dendrogram(df),
-        nullity.sum(),
-        missing_col_cnt(df),
-        missing_row_cnt(df),
-        missing_most_col(df),
-        missing_most_row(df),
-        miss_perc,
-        avg_row,
-        avg_col,
+        missing_spectrum(df, cfg.spectrum.bins) if cfg.spectrum.enable else None,
+        null_perc if cfg.spectrum.enable or cfg.heatmap.enable else None,
+        missing_bars(null_cnts, df.columns.values, nrows) if cfg.bar.enable else None,
+        missing_heatmap(df) if cfg.heatmap.enable else None,
+        missing_dendrogram(df) if cfg.dendro.enable else None,
+        nullity.sum() if cfg.stats.enable else None,
+        missing_col_cnt(df) if cfg.stats.enable else None,
+        missing_row_cnt(df) if cfg.stats.enable else None,
+        missing_most_col(df) if cfg.insight.enable else None,
+        missing_most_row(df) if cfg.insight.enable else None,
+        miss_perc if cfg.stats.enable else None,
+        avg_row if cfg.stats.enable else None,
+        avg_col if cfg.stats.enable else None,
     )
 
     ### Lazy Region End
@@ -69,61 +69,74 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
     ) = yield tasks
     ### Eager Region Begin
 
-    sel = ~((null_perc == 0) | (null_perc == 1))
-    if nrows != 1:
-        heatmap = pd.DataFrame(
-            data=heatmap[:, sel][sel, :], columns=df.columns[sel], index=df.columns[sel]
-        )
-    else:
-        heatmap = pd.DataFrame(data=heatmap, columns=df.columns[sel], index=df.columns[sel])
+    if cfg.heatmap.enable:
+        sel = ~((null_perc == 0) | (null_perc == 1))
+        if nrows != 1:
+            heatmap = pd.DataFrame(
+                data=heatmap[:, sel][sel, :], columns=df.columns[sel], index=df.columns[sel]
+            )
+        else:
+            heatmap = pd.DataFrame(data=heatmap, columns=df.columns[sel], index=df.columns[sel])
 
-    suffix_col = "" if most_col[0] <= most_show else ", ..."
-    suffix_row = "" if most_row[0] <= most_show else ", ..."
-
-    top_miss_col = (
-        str(most_col[0])
-        + " col(s): "
-        + str(
-            "("
-            + ", ".join(cut_long_name(df.columns[e]) for e in most_col[2][:most_show])
-            + suffix_col
-            + ")"
-        )
-    )
-
-    top_miss_row = (
-        str(most_row[0])
-        + " row(s): "
-        + str("(" + ", ".join(str(e) for e in most_row[2][:most_show]) + suffix_row + ")")
-    )
-
-    return Intermediate(
-        data_total_missing={col: null_perc[idx] for idx, col in enumerate(df.columns)},
-        data_spectrum=pd.DataFrame(spectrum),
-        data_bars=bars,
-        data_heatmap=heatmap,
-        data_dendrogram=dendrogram,
-        visual_type="missing_impact",
-        missing_stat={
+    if cfg.stats.enable:
+        missing_stat = {
             "Missing Cells": cnt,
             "Missing Cells (%)": str(round(miss_perc * 100, 1)) + "%",
             "Missing Columns": col_cnt,
             "Missing Rows": row_cnt,
             "Avg Missing Cells per Column": round(avg_col, 2),
             "Avg Missing Cells per Row": round(avg_row, 2),
-        },
-        insights={
-            "Bar Chart": [
-                top_miss_col
-                + " contain the most missing values with rate "
-                + str(round(most_col[1] * 100, 1))
-                + "%",
-                top_miss_row
-                + " contain the most missing columns with rate "
-                + str(round(most_row[1] * 100, 1))
-                + "%",
-            ]
-        },
+        }
+
+    if cfg.insight.enable:
+        suffix_col = "" if most_col[0] <= most_show else ", ..."
+        suffix_row = "" if most_row[0] <= most_show else ", ..."
+
+        top_miss_col = (
+            str(most_col[0])
+            + " col(s): "
+            + str(
+                "("
+                + ", ".join(cut_long_name(df.columns[e]) for e in most_col[2][:most_show])
+                + suffix_col
+                + ")"
+            )
+        )
+
+        top_miss_row = (
+            str(most_row[0])
+            + " row(s): "
+            + str("(" + ", ".join(str(e) for e in most_row[2][:most_show]) + suffix_row + ")")
+        )
+
+        insights = (
+            {
+                "Bar Chart": [
+                    top_miss_col
+                    + " contain the most missing values with rate "
+                    + str(round(most_col[1] * 100, 1))
+                    + "%",
+                    top_miss_row
+                    + " contain the most missing columns with rate "
+                    + str(round(most_row[1] * 100, 1))
+                    + "%",
+                ]
+            },
+        )
+
+    data_total_missing = {}
+    if cfg.spectrum.enable:
+        data_total_missing = {col: null_perc[i] for i, col in enumerate(df.columns)}
+
+    return Intermediate(
+        data_total_missing=data_total_missing,
+        data_spectrum=pd.DataFrame(spectrum) if spectrum else spectrum,
+        data_bars=bars,
+        data_heatmap=heatmap,
+        data_dendrogram=dendrogram,
+        visual_type="missing_impact",
+        missing_stat=missing_stat if cfg.stats.enable else {},
+        insights=insights if cfg.insight.enable else {},
     )
 
 
@@ -151,9 +164,9 @@ def missing_perc_blockwise(bin_size: int) -> Callable[[np.ndarray], np.ndarray]:
     return imp
 
 
-def missing_spectrum(  # pylint: disable=too-many-locals
+def missing_spectrum(
     df: DataArray, bins: int
-) -> Dict[str, da.Array]:
+) -> Dict[str, da.Array]:  # pylint: disable=too-many-locals
     """Calculate a missing spectrum for each column."""
 
     nrows, ncols = df.shape

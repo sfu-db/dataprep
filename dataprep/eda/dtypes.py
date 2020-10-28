@@ -4,10 +4,9 @@ In this module lives the type tree.
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Type, Union
 
-
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
 
 from ..errors import UnreachableError
 
@@ -192,6 +191,7 @@ def normalize_dtype(dtype_repr: Any) -> DType:
     """
     This function normalizes a dtype repr.
     """
+    print(dtype_repr)
     normalized: DType
     str_dic = {
         "Categorical": Categorical,

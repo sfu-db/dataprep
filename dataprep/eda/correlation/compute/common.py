@@ -4,7 +4,8 @@ from enum import Enum, auto
 
 import dask
 import numpy as np
-from bottleneck import rankdata as rankdata_, nanrankdata as nanrankdata_
+from bottleneck import nanrankdata as nanrankdata_
+from bottleneck import rankdata as rankdata_
 from scipy.stats import kendalltau as kendalltau_
 
 
