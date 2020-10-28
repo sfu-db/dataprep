@@ -49,14 +49,29 @@
             {% endif %}
             {% for fig in context.components[1] %}
             <div class="plots-{{ context.rnd }}">
-                {% if context.insights[context.meta[loop.index]] %}
+                {% if context.how_to_guide[context.figs[loop.index - 1]] %}
+                <div class="insight-container-{{ context.rnd }}">
+                    <input type='checkbox' style='display: none' id="htgbt-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
+                    <label class="htg-btn-{{ context.rnd }}" for="htgbt-{{ context.rnd }}-{{ loop.index0 }}"></label>
+                    <div class="insight-panel-{{ context.rnd }}" style="padding:20px;">
+                        {% for desc in context.how_to_guide[context.figs[loop.index - 1]] %}
+                        <div class="htg-entry-{{ context.rnd }}">
+                            <div class="htg-entry-conf-{{ context.rnd }}">{{ desc[0] }}</div>
+                            <div class="htg-entry-desc-{{ context.rnd }}">{{ desc[1] }}</div>
+                        </div>
+                        {% endfor %}
+                        <button class="htg-copy-btn-{{ context.rnd }}" onclick="copyParam(this)">Copy All Parameters</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if context.insights[context.figs[loop.index - 1]] %}
                 <div class="insight-container-{{ context.rnd }}">
                     <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}"
                         class="insight-check-{{ context.rnd }}">
                     <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
                     <div class="insight-panel-{{ context.rnd }}">
                         <ul>
-                            {% for insight in context.insights[context.meta[loop.index]] %}
+                            {% for insight in context.insights[context.figs[loop.index - 1]] %}
                             <li class="entry-{{ context.rnd }}">
                                 {{ insight }}
                             </li>

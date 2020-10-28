@@ -3,11 +3,11 @@
 """
 import sys
 import webbrowser
-from typing import Optional
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from ...utils import is_notebook
+from typing import Optional
 
+from ...utils import is_notebook
 
 CELL_HEIGHT_OVERRIDE = """<style>
                             div.output_scroll {

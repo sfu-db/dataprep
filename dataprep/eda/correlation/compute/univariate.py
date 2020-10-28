@@ -9,14 +9,16 @@ import dask.array as da
 import numpy as np
 import pandas as pd
 
+from ...configs import Config
 from ...data_array import DataArray
 from ...intermediate import Intermediate
-from .common import CorrelationMethod, kendalltau, nanrankdata, corrcoef
+from .common import CorrelationMethod, corrcoef, kendalltau, nanrankdata
 
 
 def _calc_univariate(
     df: DataArray,
-    x: Optional[str] = None,
+    x: str,
+    cfg: Config,
     *,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
@@ -28,6 +30,8 @@ def _calc_univariate(
         The dataframe for which plots are calculated.
     x
         A valid column name of the dataframe.
+    cfg
+        Config instance
     value_range
         If the correlation value is out of the range, don't show it.
     k
@@ -45,7 +49,13 @@ def _calc_univariate(
     xarr = df.values[:, df.columns == x]
     data = df.values[:, df.columns != x]
 
-    funcs = [_pearson_1xn, _spearman_1xn, _kendall_tau_1xn]
+    funcs = []
+    if cfg.pearson.enable:
+        funcs.append(_pearson_1xn)
+    if cfg.spearman.enable:
+        funcs.append(_spearman_1xn)
+    if cfg.kendall.enable:
+        funcs.append(_kendall_tau_1xn)
 
     dfs = {}
     (computed,) = dask.compute(

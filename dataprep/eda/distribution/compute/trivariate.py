@@ -4,15 +4,9 @@ from typing import Optional
 
 import dask
 import dask.dataframe as dd
-from ...dtypes import (
-    Continuous,
-    DateTime,
-    DTypeDef,
-    Nominal,
-    detect_dtype,
-    drop_null,
-    is_dtype,
-)
+
+from ...configs import Config
+from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, drop_null, is_dtype
 from ...intermediate import Intermediate
 from .common import _calc_line_dt
 
@@ -22,10 +16,7 @@ def compute_trivariate(
     x: str,
     y: str,
     z: str,
-    ngroups: int,
-    largest: bool,
-    timeunit: str,
-    agg: str,
+    cfg: Config,
     dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """Compute functions for plot(df, x, y, z).
@@ -33,31 +24,15 @@ def compute_trivariate(
     Parameters
     ----------
     df
-        Dataframe from which plots are to be generated
+        DataFrame from which visualizations are generated
     x
-        A valid column name from the dataframe
+        A column name from the DataFrame
     y
-        A valid column name from the dataframe
+        A column name from the DataFrame
     z
-        A valid column name from the dataframe
-    bins
-        For a histogram or box plot with numerical x axis, it defines
-        the number of equal-width bins to use when grouping.
-    ngroups
-        When grouping over a categorical column, it defines the
-        number of groups to show in the plot. Ie, the number of
-        bars to show in a bar chart.
-    largest
-        If true, when grouping over a categorical column, the groups
-        with the largest count will be output. If false, the groups
-        with the smallest count will be output.
-    timeunit
-        Defines the time unit to group values over for a datetime column.
-        It can be "year", "quarter", "month", "week", "day", "hour",
-        "minute", "second". With default value "auto", it will use the
-        time unit such that the resulting number of groups is closest to 15.
-    agg
-        Specify the aggregate to use when aggregating over a numeric column
+        A column name from the DataFrame
+    cfg:
+        Config instance
     dtype: str or DType or dict of str or dict of DType, default None
         Specify Data Types for designated column or all columns.
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
@@ -100,12 +75,16 @@ def compute_trivariate(
     df[z] = df[z].apply(str, meta=(z, str))
 
     # line chart
-    data = dask.compute(dask.delayed(_calc_line_dt)(df, timeunit, agg, ngroups, largest))
+    data = dask.compute(
+        dask.delayed(_calc_line_dt)(
+            df, cfg.line.unit, cfg.line.agg, cfg.line.ngroups, cfg.line.sort_descending
+        )
+    )
     return Intermediate(
         x=x,
         y=y,
         z=z,
-        agg=agg,
+        agg=cfg.line.agg,
         data=data[0],
         visual_type="dt_cat_num_cols",
     )

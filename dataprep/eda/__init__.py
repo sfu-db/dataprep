@@ -4,6 +4,7 @@ dataprep.eda
 """
 from bokeh.io import output_notebook
 
+from ..utils import is_notebook
 from .correlation import compute_correlation, plot_correlation, render_correlation
 from .create_report import create_report
 from .distribution import compute, plot, render
@@ -19,7 +20,6 @@ from .dtypes import (
     Text,
 )
 from .missing import compute_missing, plot_missing, render_missing
-from ..utils import is_notebook
 
 __all__ = [
     "plot_correlation",
