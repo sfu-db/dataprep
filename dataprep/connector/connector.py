@@ -5,7 +5,7 @@ Every data fetching action should begin with instantiating this Connector class.
 import math
 import sys
 from asyncio import as_completed
-from typing import Any, Awaitable, Dict, Optional, Tuple, Union
+from typing import Any, Awaitable, Dict, Optional, Tuple, Union, Set
 from warnings import warn
 
 import pandas as pd
@@ -18,6 +18,8 @@ from .errors import InvalidParameterError, RequestError, UniversalParameterOverr
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .ref import Ref
 from .schema import (
+    ConfigDef,
+    FieldDef,
     FieldDefUnion,
     OffsetPaginationDef,
     PagePaginationDef,
@@ -112,7 +114,19 @@ class Connector:  # pylint: disable=too-many-instance-attributes
         **where
             The additional parameters required for the query.
         """
-        allowed_params = self._impdb.tables[table].config.request.params
+        allowed_params: Set[str] = set()
+
+        for key, val in self._impdb.tables[table].config.request.params.items():
+            if isinstance(val, FieldDef):
+                if isinstance(val.from_key, list):
+                    allowed_params.update(val.from_key)
+                elif isinstance(val.from_key, str):
+                    allowed_params.add(val.from_key)
+                else:
+                    allowed_params.add(key)
+            else:
+                allowed_params.add(key)
+
         for key in where:
             if key not in allowed_params:
                 raise InvalidParameterError(key)
@@ -399,20 +413,19 @@ def validate_fields(fields: Dict[str, FieldDefUnion], data: Dict[str, Any]) -> N
     """Check required fields are provided."""
 
     for key, def_ in fields.items():
-        from_key, to_key = key, key
+        to_key = key
 
         if isinstance(def_, bool):
             required = def_
             if required and to_key not in data:
-                raise KeyError(f"'{from_key}' is required but not provided")
+                raise KeyError(f"'{to_key}' is required but not provided")
         elif isinstance(def_, str):
             pass
         else:
             to_key = def_.to_key or to_key
-            from_key = def_.from_key or from_key
             required = def_.required
             if required and to_key not in data:
-                raise KeyError(f"'{from_key}' is required but not provided")
+                raise KeyError(f"'{to_key}' is required but not provided")
 
 
 def populate_field(  # pylint: disable=too-many-branches
@@ -438,7 +451,8 @@ def populate_field(  # pylint: disable=too-many-branches
             template = def_.template
             remove_if_empty = def_.remove_if_empty
             to_key = def_.to_key or to_key
-            from_key = def_.from_key or from_key
+            if not isinstance(def_.from_key, list):
+                from_key = def_.from_key or from_key
 
             if template is None:
                 value = params.get(from_key)
