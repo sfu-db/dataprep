@@ -11,8 +11,9 @@ from time import time
 from typing import Any, Dict, List, Optional, Union, Set
 from urllib.parse import parse_qs, urlparse
 import socket
+import re
 import requests
-from pydantic import Field
+from pydantic import Field, root_validator
 
 from ...utils import is_notebook
 from .base import BaseDef, BaseDefT
@@ -82,10 +83,18 @@ PaginationDef = Union[OffsetPaginationDef, SeekPaginationDef, PagePaginationDef,
 
 class FieldDef(BaseDef):
     required: bool
-    from_key: Optional[str]
+    from_key: Optional[List[str]]
     to_key: Optional[str]
     template: Optional[str]
     remove_if_empty: bool
+
+    @root_validator(pre=True)
+    def from_key_validation(cls, values):
+        if "template" in values:
+            assert set(values["fromKey"]) == set(
+                re.findall("{{(\w+)}}", values["template"])
+            ), "template values and fromKey substitutes not matching"
+        return values
 
 
 FieldDefUnion = Union[FieldDef, bool, str]  # Put bool before str

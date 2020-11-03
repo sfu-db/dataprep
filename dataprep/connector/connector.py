@@ -21,6 +21,7 @@ from .implicit_database import ImplicitDatabase, ImplicitTable
 from .ref import Ref
 from .schema import (
     ConfigDef,
+    FieldDef,
     FieldDefUnion,
     OffsetPaginationDef,
     PagePaginationDef,
@@ -138,7 +139,12 @@ class Connector:
         **where
             The additional parameters required for the query.
         """
-        allowed_params = self._impdb.tables[table].config.request.params
+        allowed_params = self._impdb.tables[table].config.request.params.copy()
+
+        for key, val in self._impdb.tables[table].config.request.params.items():
+            if isinstance(val, FieldDef) and hasattr(val, "from_key"):
+                allowed_params.update(dict.fromkeys(val.from_key, True))
+
         for key in where:
             if key not in allowed_params:
                 raise InvalidParameterError(key)
