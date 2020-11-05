@@ -11,6 +11,7 @@ from ..progress_bar import ProgressBar
 from ..report import Report
 from .compute import compute_correlation
 from .render import render_correlation
+from ..container import Container
 
 __all__ = ["render_correlation", "compute_correlation", "plot_correlation"]
 
@@ -23,7 +24,7 @@ def plot_correlation(
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
     progress: bool = True,
-) -> Report:
+) -> Union[Report, Container]:
     """
     This function is designed to calculate the correlation between columns
     There are three functions: plot_correlation(df), plot_correlation(df, x)
@@ -65,7 +66,10 @@ def plot_correlation(
     and it is better to drop None, Nan and Null value before using it
     """
     with ProgressBar(minimum=1, disable=not progress):
-        intermediate = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
-    figure = render_correlation(intermediate)
+        itmdt = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
+    fig = render_correlation(itmdt)
 
-    return Report(figure)
+    if itmdt.visual_type == "correlation_impact" or "_column" in itmdt.visual_type:
+        return Container(fig, itmdt.visual_type)
+    else:
+        return Report(fig)

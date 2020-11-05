@@ -48,6 +48,7 @@ class Container:
         elif "_column" in visual_type or visual_type in (
             "missing_impact",
             "missing_impact_1v1",
+            "correlation_impact",
         ):
             # todo: param management
             if to_render.get("tabledata"):
@@ -61,7 +62,10 @@ class Container:
                 "title": "DataPrep.EDA Report",
                 "rnd": random.randint(100, 999),  # for multiple cells running in the same notebook
             }
-            self.template_base = ENV_LOADER.get_template("tab_base.html")
+            if visual_type == "correlation_impact":
+                self.template_base = ENV_LOADER.get_template("tab_base_corr.html")
+            else:
+                self.template_base = ENV_LOADER.get_template("tab_base.html")
         else:
             raise TypeError(f"Unsupported Visual Type: {visual_type}.")
 
