@@ -27,12 +27,13 @@ def ensure_config(impdb: str, update: bool) -> bool:
     Ensure the config for `impdb` is downloaded
     """
     path = config_directory()
-    if (path / impdb).exists() and not update:
+
+    if (path / impdb / "_meta.json").exists() and not update:
         return True
 
     obsolete = is_obsolete(impdb)
 
-    if (path / impdb).exists() and not obsolete:
+    if (path / impdb / "_meta.json").exists() and not obsolete:
         return True
     else:
         download_config(impdb)
@@ -40,12 +41,10 @@ def ensure_config(impdb: str, update: bool) -> bool:
 
 
 def is_obsolete(impdb: str) -> bool:
-    """
-    Test if the implicit db config files are obsolete
-    and need to be re-downloaded.
-    """
+    """Test if the implicit db config files are obsolete and need to be re-downloaded."""
+
     path = config_directory()
-    if not (path / impdb).exists():
+    if not (path / impdb / "_meta.json").exists():
         return True
     elif not (path / impdb / "_hash").exists():
         return True
