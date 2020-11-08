@@ -5,7 +5,7 @@ Every data fetching action should begin with instantiating this Connector class.
 import math
 import sys
 from asyncio import as_completed
-from typing import Any, Awaitable, Dict, List, Optional, Tuple, Union
+from typing import Any, Awaitable, Dict, Optional, Tuple, Union
 from warnings import warn
 
 import pandas as pd
@@ -18,7 +18,6 @@ from .errors import InvalidParameterError, RequestError, UniversalParameterOverr
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .ref import Ref
 from .schema import (
-    ConfigDef,
     FieldDefUnion,
     OffsetPaginationDef,
     PagePaginationDef,
@@ -27,7 +26,7 @@ from .schema import (
     TokenPaginationDef,
 )
 from .throttler import OrderedThrottler, ThrottleSession
-from dataprep.connector import info
+from .info import info, initialize_path
 
 class Connector:
     """This is the main class of the connector component.
@@ -72,7 +71,7 @@ class Connector:
         _concurrency: int = 1,
         **kwargs: Any,
     ) -> None:
-        path = info.initialize_path(config_path, update)
+        path = initialize_path(config_path, update)
 
         self._impdb = ImplicitDatabase(path)
 
@@ -119,50 +118,10 @@ class Connector:
 
         return await self._query_imp(table, where, _auth=_auth, _q=_q, _count=_count)
 
-    @property
-    def table_names(self) -> List[str]:
-        """
-        Return all the names of the available tables in a list.
-
-        Note
-        ----
-        We abstract each website as a database containing several tables.
-        For example in Spotify, we have artist and album table.
-        """
-        return list(self._impdb.tables.keys())
-
     def info(self) -> None:
-        info.info(self._impdb.name, self._update)
-
-    def show_schema(self, table_name: str) -> pd.DataFrame:
-        """This method shows the schema of the table that will be returned,
-        so that the user knows what information to expect.
-
-        Parameters
-        ----------
-        table_name
-            The table name.
-
-        Returns
-        -------
-        pd.DataFrame
-            The returned data's schema.
-
-        Note
-        ----
-        The schema is defined in the configuration file.
-        The user can either use the default one or change it by editing the configuration file.
-        """
-        print(f"table: {table_name}")
-        table_config_content: ConfigDef = self._impdb.tables[table_name].config
-        schema = table_config_content.response.schema_
-        new_schema_dict: Dict[str, List[Any]] = {}
-        new_schema_dict["column_name"] = []
-        new_schema_dict["data_type"] = []
-        for k in schema.keys():
-            new_schema_dict["column_name"].append(k)
-            new_schema_dict["data_type"].append(schema[k].type)
-        return pd.DataFrame.from_dict(new_schema_dict)
+        """Show the basic information and provide guidance for users
+        to issue queries."""
+        info(self._impdb.name, self._update)
 
     async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
