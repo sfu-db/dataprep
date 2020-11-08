@@ -6,7 +6,6 @@ import pandas as pd
 from .connector_UI import info_UI 
 from ..utils import get_styled_schema
 from typing import Any, Dict, List
-import requests
 
 GIT_REF_URL = "https://api.github.com/repos/sfu-db/DataConnectorConfigs/contents"
 

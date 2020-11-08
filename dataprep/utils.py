@@ -1,8 +1,6 @@
 """Utility functions used by the whole library."""
 from typing import Any
 import webbrowser
-from tempfile import NamedTemporaryFile
-import time
 from jinja2 import PackageLoader
 from tensorboard.data.experimental.experiment_from_dev import pandas
 
@@ -37,7 +35,6 @@ def display_html(html_content : str) -> None:
         with open(file_path, 'w') as tmpf:
             tmpf.write(html_content)
             webbrowser.open_new_tab("file://" + tmpf.name)
-#             tmpf.close()
             
 def display_dataframe(df: pandas.DataFrame) -> None:
     """Styles and displays dataframe in browser."""
