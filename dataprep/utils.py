@@ -34,6 +34,7 @@ def display_html(html_content : str) -> None:
 
         with open(file_path, 'w') as tmpf:
             tmpf.write(html_content)
+            tmpf.flush()
             webbrowser.open_new_tab("file://" + tmpf.name)
             
 def display_dataframe(df: pandas.DataFrame) -> None:
