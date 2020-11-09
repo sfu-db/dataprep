@@ -114,6 +114,43 @@ More examples can be found here:
 
 <center><a href="https://sfu-db.github.io/dataprep/connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector.png"/></a></center>
 
+### Clean
+
+DataPrep.Clean contains simple functions designed for cleaning and standardizing a column in a DataFrame. It provides
+* A unified API: each function follows the syntax `clean_{type}(df, "column name")` (see an example below)
+* Python Data Science Support: its design for cleaning pandas and Dask DataFrames enables seamless integration into the Python data science workflow
+* Transparency: a report is generated that summarizes the alterations to the data that occured during cleaning
+
+The following example shows how to clean a column containing messy emails:
+<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_1.jpg"/></center>
+<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_2.jpg"/></center>
+
+Type validation is also supported:
+<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_3.jpg"/></center>
+
+Below are the supported semantic types (more are currently being developed).
+<table>
+    <tr>
+      <th>Semantic Types</th>
+    </tr>
+    <tr>
+      <td>longitude/latitude</td>
+    </tr>
+    <tr>
+      <td>country</td>
+    </tr>
+    <tr>
+      <td>email</td>
+    </tr>
+    <tr>
+      <td>url</td>
+    </tr>
+    <tr>
+      <td>phone</td>
+    </tr>
+  </table>
+
+For more information, refer to the [User Guide](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html).
 
 ## Contribute
 
