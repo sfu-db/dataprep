@@ -210,7 +210,7 @@ class parsed_date():
         return False
 
     def set_hour(self, hour):
-        if (hour >= 0 and hour < 24)):
+        if (hour >= 0 and hour < 24):
             self.hour = hour
             return True
         self.valid = 'unknown'
