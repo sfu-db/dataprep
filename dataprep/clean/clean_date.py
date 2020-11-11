@@ -884,7 +884,7 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
         if token.isnumeric():
             num_tokens.append(token)
     for token in num_tokens:
-            remain_tokens.remove(token)
+        remain_tokens.remove(token)
 
     if not result.year is None:
         if len(num_tokens) == 1:
@@ -1114,6 +1114,277 @@ def change_timezone(parsed_date_data: Union[parsed_date, Any],
         result.utc_add= '-'
     return result
 
+def transform_year(result_str: Union[str, Any],
+                   year_token: Union[str, Any],
+                   year: Union[int, Any]) -> Any:
+    """
+    This function transform parsed year into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    year_token
+        token of year
+    year
+        value of year
+    """
+    result = deepcopy(result_str)
+    if not year_token is None:
+        if year is None:
+            if len(year_token) == 4:
+                result = result.replace(year_token, str('----'))
+            elif len(year_token) == 2:
+                result = result.replace(year_token, str('--'))
+            elif len(year_token) == 1:
+                result = result.replace(year_token, str('-'))
+        else:
+            if len(year_token) == 4:
+                result = result.replace(year_token, str(year))
+            else:
+                year = year - 2000
+                if year < 10:
+                    result = result.replace(year_token, "0" + str(year))
+                else:
+                    result = result.replace(year_token, str(year))
+
+    return result
+
+def transform_month(result_str: Union[str, Any],
+                   month_token: Union[str, Any],
+                   month: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    month_token
+        token of month
+    month
+        value of month
+    """
+    result = deepcopy(result_str)
+    month_token = month_token
+    if not month_token is None:
+        if month is None:
+            if len(month_token) == 3:
+                result = result.replace(month_token, str('---'))
+            elif len(month_token) == 5:
+                result = result.replace(month_token, str('-----'))
+            elif len(month_token) == 2:
+                result = result.replace(month_token, str('--'))
+            elif len(month_token) == 1:
+                result = result.replace(month_token, str('-'))
+        else:
+            if len(month_token) == 2:
+                if month < 10:
+                    result = result.replace(month_token, "0" + str(month), 1)
+                else:
+                    result = result.replace(month_token, str(month), 1)
+            elif len(month_token) == 3:
+                result = result.replace(month_token, TEXT_MONTHS[month - 1][0], 1)
+            elif len(month_token) == 5:
+                result = result.replace(month_token, TEXT_MONTHS[month - 1][1], 1)
+            else:
+                result = result.replace(month_token, str(month), 1)
+
+    return result
+
+def transform_day(result_str: Union[str, Any],
+                   day_token: Union[str, Any],
+                   day: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    day_token
+        token of day
+    day
+        value of day
+    """
+    result = deepcopy(result_str)
+    if not day_token is None:
+        if day is None:
+            if len(day_token) == 2:
+                result = result.replace(day_token, str('--'))
+            elif len(day_token) == 1:
+                result = result.replace(day_token, str('-'))
+        else:
+            if len(day_token) == 2:
+                if day < 10:
+                    result = result.replace(day_token, "0" + str(day), 1)
+                else:
+                    result = result.replace(day_token, str(day), 1)
+            else:
+                result = result.replace(day_token, str(day))
+
+    return result
+
+def transform_hour(result_str: Union[str, Any],
+                   hour_token: Union[str, Any],
+                   ispm: Union[bool, Any],
+                   hour: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    hour_token
+        token of hour
+    hour
+        value of hour
+    """
+    result = deepcopy(result_str)
+    if not hour_token is None:
+        if hour is None:
+            if len(hour_token) == 2:
+                result = result.replace(hour_token, str('--'))
+            elif len(hour_token) == 1:
+                result = result.replace(hour_token, str('-'))
+        else:
+            if ispm:
+                hour = hour - 12
+            if len(hour_token) == 2:
+                if hour < 10:
+                    result = result.replace(hour_token, "0" + str(hour), 1)
+                else:
+                    result = result.replace(hour_token, str(hour), 1)
+            else:
+                result = result.replace(hour_token, str(hour))
+
+    return result
+
+def transform_minute(result_str: Union[str, Any],
+                   minute_token: Union[str, Any],
+                   minute: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    minute_token
+        token of minute
+    minute
+        value of minute
+    """
+    result = deepcopy(result_str)
+    if not minute_token is None:
+        if minute is None:
+            if len(minute_token) == 2:
+                result = result.replace(minute_token, str('--'))
+            elif len(minute_token) == 1:
+                result = result.replace(minute_token, str('-'))
+        else:
+            if len(minute_token) == 2:
+                if minute < 10:
+                    result = result.replace(minute_token, "0" + str(minute), 1)
+                else:
+                    result = result.replace(minute_token, str(minute), 1)
+            else:
+                result = result.replace(minute_token, str(minute))
+
+    return result
+
+def transform_second(result_str: Union[str, Any],
+                   second_token: Union[str, Any],
+                   second: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    second_token
+        token of second
+    second
+        value of second
+    """
+    result = deepcopy(result_str)
+    if not second_token is None:
+        if second is None:
+            if len(second_token) == 2:
+                result = result.replace(second_token, str('--'))
+            elif len(second_token) == 1:
+                result = result.replace(second_token, str('-'))
+        else:
+            if len(second_token) == 2:
+                if second < 10:
+                    result = result.replace(second_token, "0" + str(second), 1)
+                else:
+                    result = result.replace(second_token, str(second), 1)
+            else:
+                result = result.replace(second_token, str(second))
+
+    return result
+
+def transform_weekday(result_str: Union[str, Any],
+                   weekday_token: Union[str, Any],
+                   weekday: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    weekday_token
+        token of weekday
+    weekday
+        value of weekday
+    """
+    result = deepcopy(result_str)
+    if not weekday_token is None:
+        if weekday is None:
+            if len(weekday_token) == 3:
+                result = result.replace(weekday_token, str('---'))
+            elif len(weekday_token) == 5:
+                result = result.replace(weekday_token, str('-----'))
+        else:
+            if len(weekday_token) == 3:
+                result = result.replace(weekday_token, TEXT_WEEKDAYS[weekday - 1][0])
+            elif len(weekday_token) == 5:
+                result = result.replace(weekday_token, TEXT_WEEKDAYS[weekday - 1][1])
+
+    return result
+
+def transform_timezone(result_str: Union[str, Any],
+                   timezone_token: Union[str, Any],
+                   timezone: Union[int, Any],
+                   utc_add: Union[str, Any],
+                   utc_offset_hours: Union[int, Any],
+                   utc_offset_minutes: Union[int, Any]) -> Any:
+    """
+    This function transform parsed month into target format
+    Parameters
+    ----------
+    result_str
+        result string
+    weekday_token
+        token of weekday
+    weekday
+        value of weekday
+    """
+    result = deepcopy(result_str)
+    if not timezone_token is None:
+        if timezone_token == 'z':
+            result = result.replace(timezone_token, timezone)
+        elif timezone_token == 'Z':
+            offset_hours_str = str(int(utc_offset_hours))
+            if len(offset_hours_str) == 1:
+                offset_hours_str = '0' + offset_hours_str
+            offset_minutes_str = str(int(utc_offset_minutes))
+            if len(offset_minutes_str) == 1:
+                offset_minutes_str = '0' + offset_minutes_str
+            result = result.replace(timezone_token,
+                                    "UTC" + utc_add +
+                                    offset_hours_str + ":"
+                                    + offset_minutes_str)
+
+    return result
+
 def transform(parsed_date_data: Union[parsed_date, Any],
               parsed_target_format_data: Union[parsed_target_format, Any],
               target_format: Union[str, Any],
@@ -1137,157 +1408,41 @@ def transform(parsed_date_data: Union[parsed_date, Any],
         parsed_date_data = change_timezone(parsed_date_data, target_timezone)
 
     # Handle year
-    year_token = parsed_target_format_data.year_token
-    if not year_token is None:
-        if parsed_date_data.year is None:
-            if len(year_token) == 4:
-                result = result.replace(year_token, str('----'))
-            elif len(year_token) == 2:
-                result = result.replace(year_token, str('--'))
-            elif len(year_token) == 1:
-                result = result.replace(year_token, str('-'))
-        else:
-            if len(year_token) == 4:
-                result = result.replace(year_token, str(parsed_date_data.year))
-            else:
-                year = parsed_date_data.year - 2000
-                if year < 10:
-                    result = result.replace(year_token, "0" + str(year))
-                else:
-                    result = result.replace(year_token, str(year))
+    result = transform_year(result,
+                            parsed_target_format_data.year_token,
+                            parsed_date_data.year)
     # Handle day
-    day_token = parsed_target_format_data.day_token
-    if not day_token is None:
-        if parsed_date_data.day is None:
-            if len(day_token) == 2:
-                result = result.replace(day_token, str('--'))
-            elif len(day_token) == 1:
-                result = result.replace(day_token, str('-'))
-        else:
-            if len(day_token) == 2:
-                day = parsed_date_data.day
-                if day < 10:
-                    result = result.replace(day_token, "0" + str(day), 1)
-                else:
-                    result = result.replace(day_token, str(day), 1)
-            else:
-                result = result.replace(day_token, str(parsed_date_data.day))
-
+    result = transform_day(result,
+                           parsed_target_format_data.day_token,
+                           parsed_date_data.day)
     # Handle hours
-    hour_token = parsed_target_format_data.hour_token
-    ispm = parsed_target_format_data.ispm
-    if not hour_token is None:
-        if parsed_date_data.hour is None:
-            if len(hour_token) == 2:
-                result = result.replace(hour_token, str('--'))
-            elif len(hour_token) == 1:
-                result = result.replace(hour_token, str('-'))
-        else:
-            if ispm:
-                hour = parsed_date_data.hour - 12
-            else:
-                hour = parsed_date_data.hour
-            if len(hour_token) == 2:
-                if hour < 10:
-                    result = result.replace(hour_token, "0" + str(hour), 1)
-                else:
-                    result = result.replace(hour_token, str(hour), 1)
-            else:
-                result = result.replace(hour_token, str(hour))
-
+    result = transform_hour(result,
+                            parsed_target_format_data.hour_token,
+                            parsed_target_format_data.ispm,
+                            parsed_date_data.hour)
     # Handle minutes
-    minute_token = parsed_target_format_data.minute_token
-    if not minute_token is None:
-        if parsed_date_data.minute is None:
-            if len(minute_token) == 2:
-                result = result.replace(minute_token, str('--'))
-            elif len(minute_token) == 1:
-                result = result.replace(minute_token, str('-'))
-        else:
-            minute = parsed_date_data.minute
-            if len(minute_token) == 2:
-                if minute < 10:
-                    result = result.replace(minute_token, "0" + str(minute), 1)
-                else:
-                    result = result.replace(minute_token, str(minute), 1)
-            else:
-                result = result.replace(minute_token, str(minute))
-
+    result = transform_minute(result,
+                             parsed_target_format_data.minute_token,
+                             parsed_date_data.minute)
     # Handle seconds
-    second_token = parsed_target_format_data.second_token
-    if not second_token is None:
-        if parsed_date_data.second is None:
-            if len(second_token) == 2:
-                result = result.replace(second_token, str('--'))
-            elif len(second_token) == 1:
-                result = result.replace(second_token, str('-'))
-        else:
-            second = parsed_date_data.second
-            if len(second_token) == 2:
-                if second < 10:
-                    result = result.replace(second_token, "0" + str(second), 1)
-                else:
-                    result = result.replace(second_token, str(second), 1)
-            else:
-                result = result.replace(second_token, str(second))
-
+    result = transform_second(result,
+                             parsed_target_format_data.second_token,
+                             parsed_date_data.second)
     # Handle month
-    month_token = parsed_target_format_data.month_token
-    if not month_token is None:
-        if parsed_date_data.month is None:
-            if len(month_token) == 3:
-                result = result.replace(month_token, str('---'))
-            elif len(month_token) == 5:
-                result = result.replace(month_token, str('-----'))
-            elif len(month_token) == 2:
-                result = result.replace(month_token, str('--'))
-            elif len(month_token) == 1:
-                result = result.replace(month_token, str('-'))
-        else:
-            if len(month_token) == 2:
-                month = parsed_date_data.month
-                if month < 10:
-                    result = result.replace(month_token, "0" + str(month), 1)
-                else:
-                    result = result.replace(month_token, str(month), 1)
-            elif len(month_token) == 3:
-                month = parsed_date_data.month
-                result = result.replace(month_token, TEXT_MONTHS[month - 1][0], 1)
-            elif len(month_token) == 5:
-                month = parsed_date_data.month
-                result = result.replace(month_token, TEXT_MONTHS[month - 1][1], 1)
-            else:
-                result = result.replace(month_token, str(parsed_date_data.month), 1)
-
+    result = transform_month(result,
+                             parsed_target_format_data.month_token,
+                             parsed_date_data.month)
     # Handle weekday
-    weekday_token = parsed_target_format_data.weekday_token
-    if not weekday_token is None:
-        if parsed_date_data.weekday is None:
-            if len(weekday_token) == 3:
-                result = result.replace(weekday_token, str('---'))
-            elif len(weekday_token) == 5:
-                result = result.replace(weekday_token, str('-----'))
-        else:
-            if len(weekday_token) == 3:
-                weekday = parsed_date_data.weekday
-                result = result.replace(weekday_token, TEXT_WEEKDAYS[weekday - 1][0])
-            elif len(weekday_token) == 5:
-                weekday = parsed_date_data.weekday
-                result = result.replace(weekday_token, TEXT_WEEKDAYS[weekday - 1][1])
-
+    result = transform_month(result,
+                             parsed_target_format_data.weekday_token,
+                             parsed_date_data.weekday)
     # Handle timezone
-    timezone_token = parsed_target_format_data.timezone_token
-    if not timezone_token is None:
-        if timezone_token == 'z':
-            result = result.replace(timezone_token, parsed_date_data.timezone)
-        elif timezone_token == 'Z':
-            offset_hours_str = str(int(parsed_date_data.utc_offset_hours))
-            if len(offset_hours_str) == 1:
-                offset_hours_str = '0' + offset_hours_str
-            offset_minutes_str = str(int(parsed_date_data.utc_offset_minutes))
-            if len(offset_minutes_str) == 1:
-                offset_minutes_str = '0' + offset_minutes_str
-            result = result.replace(timezone_token, "UTC" + parsed_date_data.utc_add + offset_hours_str + ":" + offset_minutes_str)
+    result = transform_month(result,
+                             parsed_target_format_data.timezone_token,
+                             parsed_date_data.timezone,
+                             parsed_date_data.utc_add,
+                             parsed_date_data.utc_offset_hours,
+                             parsed_date_data.utc_offset_minutes)
     return result
 
 def reset_stats() -> None:
