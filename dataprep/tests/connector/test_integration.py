@@ -4,6 +4,7 @@ import asyncio
 import pytest
 
 from ...connector import Connector
+from ...connector.utils import Request
 
 
 @pytest.mark.skipif(
@@ -44,3 +45,24 @@ def test_query_params() -> None:
     df = asyncio.run(dc.query("videos", q="covid", part="snippet"))
 
     assert len(df) != 0
+
+
+def test_requests() -> None:
+    # GET request
+    requests = Request("https://www.python.org/")
+    response = requests.get()
+    assert response.status == 200
+
+    # POST request
+    params = {"@number": 12524, "@type": "issue", "@action": "show"}
+    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+    requests = Request("https://bugs.python.org/")
+    response = requests.post(_data=params, _headers=headers)
+    assert response.status == 302
+
+    # PUT request
+    params = {"@number": 12524, "@type": "issue", "@action": "show"}
+    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+    requests = Request("https://bugs.python.org/")
+    response = requests.put(_data=params, _headers=headers)
+    assert response.status == 302

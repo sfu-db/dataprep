@@ -3,9 +3,10 @@
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 from urllib.parse import parse_qs, urlparse
+import json
 
-import requests
 from dataprep.connector.schema.base import BaseDef
+from dataprep.connector.utils import Request
 
 from ..schema import AuthorizationDef, ConfigDef, PaginationDef
 from .state import ConfigState
@@ -129,18 +130,12 @@ class ConfigGenerator:
 
 
 def _create_config(req: Dict[str, Any], table_path: Optional[str] = None) -> ConfigDef:
-    resp = requests.request(
-        req["method"].lower(),
-        req["url"],
-        params=req["params"],
-        headers=req["headers"],
-    )
+    requests = Request(req["url"])
+    resp = requests.post(_data=req["params"], _headers=req["headers"])
 
-    if resp.status_code != 200:
-        raise RuntimeError(
-            f"Request to HTTP endpoint not successful: {resp.status_code}: {resp.text}"
-        )
-    payload = resp.json()
+    if resp.status != 200:
+        raise RuntimeError(f"Request to HTTP endpoint not successful: {resp.status}: {resp.reason}")
+    payload = json.loads(resp.read())
 
     if table_path is None:
         table_path = search_table_path(payload)
