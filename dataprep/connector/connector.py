@@ -5,7 +5,7 @@ Every data fetching action should begin with instantiating this Connector class.
 import math
 import sys
 from asyncio import as_completed
-from typing import Any, Awaitable, Dict, Optional, Tuple, Union, Set
+from typing import Any, Awaitable, Dict, Optional, Set, Tuple, Union
 from warnings import warn
 
 import pandas as pd
@@ -16,9 +16,9 @@ from jsonpath_ng import parse as jparse
 
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
+from .info import info, initialize_path
 from .ref import Ref
 from .schema import (
-    ConfigDef,
     FieldDef,
     FieldDefUnion,
     OffsetPaginationDef,
@@ -28,7 +28,6 @@ from .schema import (
     TokenPaginationDef,
 )
 from .throttler import OrderedThrottler, ThrottleSession
-from .info import info, initialize_path
 
 
 class Connector:  # pylint: disable=too-many-instance-attributes
@@ -437,10 +436,10 @@ def populate_field(  # pylint: disable=too-many-branches
     ret: Dict[str, str] = {}
 
     for key, def_ in fields.items():
-        from_key, to_key = key, key
+        to_key = key
 
         if isinstance(def_, bool):
-            value = params.get(from_key)
+            value = params.get(to_key)
             remove_if_empty = False
         elif isinstance(def_, str):
             # is a template
@@ -451,11 +450,9 @@ def populate_field(  # pylint: disable=too-many-branches
             template = def_.template
             remove_if_empty = def_.remove_if_empty
             to_key = def_.to_key or to_key
-            if not isinstance(def_.from_key, list):
-                from_key = def_.from_key or from_key
 
             if template is None:
-                value = params.get(from_key)
+                value = params.get(to_key)
             else:
                 tmplt = jenv.from_string(template)
                 try:

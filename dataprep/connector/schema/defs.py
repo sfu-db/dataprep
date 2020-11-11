@@ -91,7 +91,8 @@ class FieldDef(BaseDef):
     remove_if_empty: bool
 
     @root_validator(pre=True)
-    def from_key_validation(cls, values):
+    # pylint: disable=no-self-argument,no-self-use
+    def from_key_validation(cls, values: Dict[str, Any]) -> Any:
         if "template" in values:
             parsed_content = Environment().parse(values["template"])
             variables = meta.find_undeclared_variables(parsed_content)  # type: ignore
@@ -169,20 +170,22 @@ class OAuth2AuthorizationCodeAuthorizationDef(BaseDef):
             code = self._auth(params["client_id"], port)
 
             validate_auth({"client_id", "client_secret"}, params)
-
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
 
-            resp: Dict[str, Any] = requests.post(
-                self.token_server_url,
-                headers={"Authorization": f"Basic {b64cred}"},
-                data={
-                    "grant_type": "authorization_code",
-                    "code": code,
-                    "redirect_uri": f"http://localhost:{port}/",
-                },
-            ).json()
+            headers = {
+                "Authorization": f"Basic {b64cred}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+            params = {
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": f"http://localhost:{port}/",
+            }
+            requests = Request(self.token_server_url)
+            response = requests.post(_headers=headers, _data=params)
+            resp: Dict[str, Any] = json.loads(response.read())
 
             if resp["token_type"].lower() != "bearer":
                 raise RuntimeError("token_type is not bearer")
@@ -254,11 +257,16 @@ class OAuth2ClientCredentialsAuthorizationDef(BaseDef):
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
-            resp: Dict[str, Any] = requests.post(
-                self.token_server_url,
-                headers={"Authorization": f"Basic {b64cred}"},
-                data={"grant_type": "client_credentials"},
-            ).json()
+
+            headers = {
+                "Authorization": f"Basic {b64cred}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+            params = {"grant_type": "client_credentials"}
+            requests = Request(self.token_server_url)
+            response = requests.post(_headers=headers, _data=params)
+            resp: Dict[str, Any] = json.loads(response.read())
+
             if resp["token_type"].lower() != "bearer":
                 raise RuntimeError("token_type is not bearer")
 
