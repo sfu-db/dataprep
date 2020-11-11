@@ -3,7 +3,6 @@ Module defines ImplicitDatabase and ImplicitTable,
 where ImplicitDatabase is a conceptual model describes
 a website and ImplicitTable describes an API endpoint.
 """
-from io import StringIO
 from json import load as jload
 from json import loads as jloads
 from pathlib import Path
@@ -11,11 +10,8 @@ from typing import Any, Dict, List, Union
 
 import pandas as pd
 from jsonpath_ng import parse as jparse
-from lxml import etree  # pytype: disable=import-error
-
 from dataprep.connector.schema.defs import ConfigDef
 
-from ..errors import UnreachableError
 from .schema import ConfigDef
 
 _TYPE_MAPPING = {
@@ -45,10 +41,8 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         ctype = self.config.response.ctype  # pylint: disable=no-member
         if ctype == "application/json":
             rows = self.from_json(payload)
-        elif ctype == "application/xml":
-            rows = self.from_xml(payload)
         else:
-            raise UnreachableError
+            raise NotImplementedError(f"{ctype} not supported")
 
         return pd.DataFrame(rows)
 
@@ -77,51 +71,6 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
                     maybe_cell_value = [m.value for m in target_matcher.find(data_row)]
 
                     if not maybe_cell_value:  # If no match
-                        col.append(None)
-                    elif len(maybe_cell_value) == 1 and column_type != "object":
-                        (cell_value,) = maybe_cell_value
-                        if cell_value is not None:
-                            # Even we have value matched,
-                            # the value might be None so we don't do type conversion.
-                            cell_value = _TYPE_MAPPING[column_type](cell_value)
-                        col.append(cell_value)
-                    else:
-                        assert (
-                            column_type == "object"
-                        ), f"{column_name}: {maybe_cell_value} is not {column_type}"
-                        col.append(maybe_cell_value)
-
-                table_data[column_name] = col
-        else:
-            # TODO: split orient
-            raise NotImplementedError
-
-        return table_data
-
-    def from_xml(self, data: str) -> Dict[str, List[Any]]:
-        """
-        Create rows from xml string.
-        """
-        table_data = {}
-        respdef = self.config.response
-        data = data.replace('<?xml version="1.0" encoding="UTF-8"?>', "")
-
-        root = etree.parse(StringIO(data))
-        data_rows = root.xpath(respdef.table_path)
-
-        if respdef.orient == "records":
-            for (
-                column_name,
-                column_def,
-            ) in respdef.schema_.items():
-                column_target = column_def.target
-                column_type = column_def.type
-
-                col: List[Any] = []
-                for data_row in data_rows:
-                    maybe_cell_value = data_row.xpath(column_target)
-
-                    if not maybe_cell_value:
                         col.append(None)
                     elif len(maybe_cell_value) == 1 and column_type != "object":
                         (cell_value,) = maybe_cell_value

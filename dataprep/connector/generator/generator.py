@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
-from urllib.parse import parse_qs, urlparse, urlunparse
+from urllib.parse import parse_qs, urlparse
 
 import requests
 from dataprep.connector.schema.base import BaseDef
@@ -39,7 +39,9 @@ class ConfigGenerator:
             self.config = ConfigState(ConfigDef(**config))
         self.storage = {}
 
-    def add_example(self, example: Dict[str, Any]) -> None:  # pylint: disable=too-many-locals
+    def add_example(  # pylint: disable=too-many-locals
+        self, example: Dict[str, Any], table_path: Optional[str] = None
+    ) -> None:  # pylint: disable=too-many-locals
         """Add an example to the generator. The example
         should be in the dictionary format.
 
@@ -65,7 +67,8 @@ class ConfigGenerator:
 
         params = example.get("params", {})
 
-        # Move url params to params
+        # Do sanity check on url. For all the parameters that already in the URL we keep them.
+        # For all the parameters that is not in the url we make it as free variables.
         parsed = urlparse(url)
 
         query_string = parse_qs(parsed.query)
@@ -74,9 +77,9 @@ class ConfigGenerator:
                 raise ValueError(
                     f"{key} appears in both url and params, but have different values."
                 )
-            params[key] = val
+            # params[key] = val
 
-        url = urlunparse((*parsed[:4], "", *parsed[5:]))
+        # url = urlunparse((*parsed[:4], "", *parsed[5:]))
         req = {
             "method": method,
             "url": url,
@@ -95,7 +98,7 @@ class ConfigGenerator:
             authdef.build(req, authparams, self.storage)
 
         # Send out request and construct config
-        config = _create_config(req)
+        config = _create_config(req, table_path)
 
         # Add pagination information into the config
         pagination = example.get("pagination")
@@ -125,7 +128,7 @@ class ConfigGenerator:
             f.write(self.to_string())
 
 
-def _create_config(req: Dict[str, Any]) -> ConfigDef:
+def _create_config(req: Dict[str, Any], table_path: Optional[str] = None) -> ConfigDef:
     resp = requests.request(
         req["method"].lower(),
         req["url"],
@@ -139,7 +142,8 @@ def _create_config(req: Dict[str, Any]) -> ConfigDef:
         )
     payload = resp.json()
 
-    table_path = search_table_path(payload)
+    if table_path is None:
+        table_path = search_table_path(payload)
 
     ret: Dict[str, Any] = {
         "version": 1,

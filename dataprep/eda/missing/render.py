@@ -2,7 +2,7 @@
     This module implements the plot_missing(df, x, y) function's
     visualization part.
 """
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Set
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -193,6 +193,10 @@ def render_hist(  # pylint: disable=too-many-arguments
 
         relocate_legend(fig, "right")
     else:
+        shown, total = meta["partial"]
+        if shown != total:
+            fig.xaxis.axis_label = f"Top {shown} out of {total}"
+            fig.xaxis.axis_label_standoff = 0
         fig.vbar(
             x="x",
             width=radius,
@@ -306,9 +310,7 @@ def create_color_mapper_heatmap(
     return mapper, colorbar
 
 
-def render_missing_impact(
-    itmdt: Intermediate, plot_width: int, plot_height: int
-) -> Dict[str, List[Any]]:
+def render_missing_impact(itmdt: Intermediate, plot_width: int, plot_height: int) -> Dict[str, Any]:
     """
     Render correlation heatmaps in to tabs
     """
@@ -327,7 +329,11 @@ def render_missing_impact(
     fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
     tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
 
+    stat_dict = {name: itmdt["missing_stat"][name] for name in itmdt["missing_stat"]}
+
     return {
+        "insights": itmdt["insights"],
+        "tabledata": {"Missing Statistics": stat_dict},
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [panel.title for panel in tabs],
     }
@@ -604,25 +610,18 @@ def render_missing_impact_1vn(
     dfs = itmdt["data"]
     x = itmdt["x"]
     meta = itmdt["meta"]
-    legend_set: Set[str] = set()
     panels = []
     for col, df in dfs.items():
         fig = render_hist(df, col, meta[col], plot_width, plot_height, False)
-        shown, total = meta[col]["partial"]
         fig.frame_height = plot_height
-        if shown != total:
-            fig.title = Title(text=f"Missing impact of {x} by ({shown} out of {total}) {col}")
-        else:
-            fig.title = Title(text=f"Missing impact of {x} by {col}")
+        fig.title = Title(text=f"Missing impact of {x} by {col}")
         panels.append(Panel(child=fig, title=col))
-        legend_set = legend_set.union(set(df["label"].drop_duplicates().to_list()))
-    legend_labels = list(legend_set)
-    legend_colors = [CATEGORY10[count] for count in range(len(legend_labels))]
+    legend_colors = [CATEGORY10[count] for count in range(len(LABELS))]
     return {
         "layout": [panel.child for panel in panels],
         "fig_width": plot_width,
         "legend_labels": [
-            {"label": label, "color": color} for label, color in zip(legend_labels, legend_colors)
+            {"label": label, "color": color} for label, color in zip(LABELS, legend_colors)
         ],
     }
 

@@ -27,6 +27,7 @@ NULL_VALUES = {
     "nan",
     "null",
     "",
+    None,
 }
 
 NEARBYKEYS = {
@@ -70,12 +71,12 @@ def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
     return dd.from_pandas(df, npartitions=npartitions)
 
 
-def create_report(stats: Dict[str, int], nrows: int) -> None:
+def create_report(type_cleaned: str, stats: Dict[str, int], nrows: int) -> None:
     """
     Describe what was done in the cleaning process
     """
     # pylint: disable=line-too-long
-    print("Latitude and Longitude Cleaning Report:")
+    print(f"{type_cleaned} Cleaning Report:")
     if stats["cleaned"] > 0:
         nclnd = stats["cleaned"]
         pclnd = round(nclnd / nrows * 100, 2)

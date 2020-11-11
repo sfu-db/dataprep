@@ -49,14 +49,13 @@ extensions = [
     "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx_autodoc_typehints",
-
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.viewcode',
-    'docs.source.bokeh.theme'
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "docs.source.bokeh.theme",
 ]
 
 # autodoc_typehints = "description"
@@ -98,15 +97,15 @@ master_doc = "index"
 #
 
 html_context = {
-    'AUTHOR': author,
-    'DESCRIPTION': 'DataPrep, documentation site.',
-    'SITEMAP_BASE_URL': 'https://sfu-db.github.io/dataprep/', # Trailing slash is needed
-    'VERSION': release,
+    "AUTHOR": author,
+    "DESCRIPTION": "DataPrep, documentation site.",
+    "SITEMAP_BASE_URL": "https://sfu-db.github.io/dataprep/",  # Trailing slash is needed
+    "VERSION": release,
 }
 
 html_theme = "bokeh"
 
-html_theme_path = ['.']
+html_theme_path = ["."]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
