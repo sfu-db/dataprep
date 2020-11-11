@@ -1075,11 +1075,3 @@ def reset_stats() -> None:
     STATS["cleaned"] = 0
     STATS["null"] = 0
     STATS["unknown"] = 0
-
-import pandas as pd
-import numpy as np
-from clean_date import clean_date
-df = pd.DataFrame({"date":
-                   ['Wed, July 10, 96']})
-cleaned_df = clean_date(df, 'date', fix_empty='auto_minimum')
-cleaned_df
