@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 from copy import deepcopy
 import datetime
 from datetime import timedelta
@@ -9,7 +7,11 @@ from typing import Any, Union
 
 import dask.dataframe as dd
 import dask
+import numpy as np
+import pandas as pd
+
 from .utils import NULL_VALUES, create_report, to_dask
+
 
 JUMP = [" ", ".", ",", ";", "-", "/", "'",
         "st", "nd", "rd", "th",
@@ -157,34 +159,30 @@ TEXT_WEEKDAYS = [("Mon", "Monday"),
 
 STATS = {"cleaned": 0, "null": 0, "unknown": 0}
 
-class parsed_date(object):
-    def __init__(self, year=None, month=None, day=None,
-                 hour=None, minute=None, second=None,
-                 weekday=None, timezone=None,
-                 utc_offset_hours=None, utc_offset_minutes=None, utc_add=None,
-                 valid='cleaned'):
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hour
-        self.minute = minute
-        self.second = second
-        self.weekday = weekday
-        self.timezone = timezone
-        self.utc_offset_hours=utc_offset_hours,
-        self.utc_offset_minutes = utc_offset_minutes,
-        self.utc_add = utc_add,
-        self.valid = valid
+class parsed_date():
+    def __init__(self):
+        self.year = None
+        self.month = None
+        self.day = None
+        self.hour = None
+        self.minute = None
+        self.second = None
+        self.weekday = None
+        self.timezone = None
+        self.utc_offset_hours = None
+        self.utc_offset_minutes = None
+        self.utc_add = None
+        self.valid = 'cleaned'
 
     def set_year(self, year):
-        if ((year >= 1700) and (year <= 2500)):
+        if (year >= 1700 and year <= 2500):
             self.year = year
             return True
         self.valid = 'unknown'
         return False
 
     def set_month(self, month):
-        if ((month >= 1) and (month <= 12)):
+        if (month >= 1 and month <= 12):
             self.month = month
             return True
         self.valid = 'unknown'
@@ -192,41 +190,41 @@ class parsed_date(object):
 
     def set_day(self, day):
         if self.month in [1, 3, 5, 7, 8, 10, 12]:
-            if ((day >= 1) and (day <= 31)):
+            if (day >= 1 and day <= 31):
                 self.day = day
                 return True
         if self.month in [4, 6, 9, 11]:
-            if ((day >= 1) and (day <= 30)):
+            if (day >= 1 and day <= 30):
                 self.day = day
                 return True
         if self.month in [2]:
             if self._is_leap_year():
-                if ((day >= 1) and (day <= 29)):
+                if (day >= 1 and day <= 29):
                     self.day = day
                     return True
             else:
-                if ((day >= 1) and (day <= 28)):
+                if (day >= 1 and day <= 28):
                     self.day = day
                     return True
         self.valid = 'unknown'
         return False
 
     def set_hour(self, hour):
-        if ((hour >= 0) and (hour < 24)):
+        if (hour >= 0 and hour < 24)):
             self.hour = hour
             return True
         self.valid = 'unknown'
         return False
 
     def set_minute(self, minute):
-        if ((minute >= 0) and (minute < 60)):
+        if (minute >= 0 and minute < 60):
             self.minute = minute
             return True
         self.valid = 'unknown'
         return False
 
     def set_second(self, second):
-        if ((second >= 0) and (second < 60)):
+        if (second >= 0 and second < 60):
             self.second = second
             return True
         self.valid = 'unknown'
@@ -240,7 +238,7 @@ class parsed_date(object):
         return False
 
     def set_weekday(self, weekday):
-        if ((weekday >= 1) and (weekday <= 7)):
+        if (weekday >= 1 and weekday <= 7):
             self.weekday = weekday
             return True
         self.valid = 'unknown'
@@ -258,27 +256,22 @@ class parsed_date(object):
         else:
             return False
 
-class parsed_target_format(object):
-    def __init__(self, year_token=None, month_token=None, day_token=None,
-                 hour_token=None, minute_token=None, second_token=None,
-                 weekday_token=None, timezone=None,  timezone_token=None,
-                 utc_offset_hours=None, utc_offset_minutes=None, utc_add=None,
-                 ispm=False, valid=True,
-                 invalid_tokens = []):
-        self.year_token = year_token
-        self.month_token = month_token
-        self.day_token = day_token
-        self.hour_token = hour_token
-        self.minute_token = minute_token
-        self.second_token = second_token
-        self.weekday_token = weekday_token
-        self.timezone = timezone
-        self.timezone_token = timezone_token
-        self.utc_offset_hours = utc_offset_hours,
-        self.utc_offset_minutes = utc_offset_minutes,
-        self.utc_add = utc_add
-        self.ispm = ispm
-        self.valid = valid
+class parsed_target_format():
+    def __init__(self):
+        self.year_token = None
+        self.month_token = None
+        self.day_token = None
+        self.hour_token = None
+        self.minute_token = None
+        self.second_token = None
+        self.weekday_token = None
+        self.timezone = None
+        self.timezone_token = None
+        self.utc_offset_hours = None
+        self.utc_offset_minutes = None
+        self.utc_add = None
+        self.ispm = False
+        self.valid = True
         self.invalid_tokens = []
 
     def set_year_token(self, year_token):
