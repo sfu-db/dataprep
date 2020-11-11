@@ -13,8 +13,8 @@ from .utils import NULL_VALUES, create_report, to_dask
 
 JUMP = [" ", ".", ",", ";", "-", "/", "'",
         "st", "nd", "rd", "th",
-        "at", "on", "and", "ad", "AD", "of",
-        "T", "t"]
+        "at", "on", "and", "ad", "AD", "of"]
+        #"T", "t"
 WEEKDAYS = {"Mon": 1, "Monday": 1,
             "Tue": 2, "Tuesday": 2,
             "Wed": 3, "Wednesday": 3,
@@ -263,7 +263,8 @@ class parsed_target_format(object):
                  hour_token=None, minute_token=None, second_token=None,
                  weekday_token=None, timezone=None,  timezone_token=None,
                  utc_offset_hours=None, utc_offset_minutes=None, utc_add=None,
-                 ispm=False, valid=True, invalid_tokens = []):
+                 ispm=False, valid=True,
+                 invalid_tokens = []):
         self.year_token = year_token
         self.month_token = month_token
         self.day_token = day_token
@@ -332,7 +333,7 @@ class parsed_target_format(object):
 def clean_date(
     df: Union[pd.DataFrame, dd.DataFrame],
     col: str,
-    target_format: str = 'YYYY-MM-DD HH:MM:SS',
+    target_format: str = 'YYYY-MM-DD hh:mm:ss',
     origin_timezone: str = 'UTC',
     target_timezone: str = None,
     fix_empty = 'auto_minimum',
@@ -348,7 +349,7 @@ def clean_date(
         Column name containing phone numbers.
     target_format
         The desired format of the date.
-        Defalut value is 'YYYY-MM-DD HH:MM:SS'
+        Defalut value is 'YYYY-MM-DD hh:mm:ss'
     origin_timezone
         Timezone of origin data
     target_timezone
@@ -654,6 +655,8 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
             remain_tokens.remove(token)
             break
 
+    if len(remain_tokens) == 0:
+        return result, remain_tokens
     num_tokens = []
     for token in remain_tokens:
         if token.isnumeric():
@@ -682,7 +685,10 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
             result.set_year(int(num_tokens[-1]) + 2000)
         elif (len(num_tokens) == 2):
             result.set_year(int(num_tokens[-1]) + 2000)
-            result.set_month(int(num_tokens[0]))
+            if (result.month is None):
+                result.set_month(int(num_tokens[0]))
+            else:
+                result.set_day(int(num_tokens[0]))
         elif (len(num_tokens) == 3):
             result.set_year(int(num_tokens[-1]) + 2000)
             if (int(num_tokens[0]) > 12):
@@ -723,8 +729,12 @@ def ensure_hms(inner_result: Union[parsed_date, Any], remain_tokens: Union[str, 
             break
     if (len(hms_tokens) == 0):
         hms_tokens = split(remain_str, [":"])
+    else:
+        hms_tokens = split(hms_tokens[0], [":"])
     if ispm:
-        if (len(hms_tokens) == 2):
+        if (len(hms_tokens) == 1):
+            result.set_hour(int(hms_tokens[0]) + 12)
+        elif (len(hms_tokens) == 2):
             result.set_hour(int(hms_tokens[0]) + 12)
             result.set_minute(int(hms_tokens[1]))
         elif (len(hms_tokens) == 3):
@@ -732,7 +742,9 @@ def ensure_hms(inner_result: Union[parsed_date, Any], remain_tokens: Union[str, 
             result.set_minute(int(hms_tokens[1]))
             result.set_second(int(hms_tokens[2]))
     else:
-        if (len(hms_tokens) == 2):
+        if (len(hms_tokens) == 1):
+            result.set_hour(int(hms_tokens[0]))
+        elif (len(hms_tokens) == 2):
             result.set_hour(int(hms_tokens[0]))
             result.set_minute(int(hms_tokens[1]))
         elif (len(hms_tokens) == 3):
@@ -1064,3 +1076,10 @@ def reset_stats() -> None:
     STATS["null"] = 0
     STATS["unknown"] = 0
 
+import pandas as pd
+import numpy as np
+from clean_date import clean_date
+df = pd.DataFrame({"date":
+                   ['Wed, July 10, 96']})
+cleaned_df = clean_date(df, 'date', fix_empty='auto_minimum')
+cleaned_df
