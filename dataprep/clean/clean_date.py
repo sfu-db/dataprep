@@ -1433,11 +1433,11 @@ def transform(parsed_date_data: Union[parsed_date, Any],
                              parsed_target_format_data.month_token,
                              parsed_date_data.month)
     # Handle weekday
-    result = transform_month(result,
+    result = transform_weekday(result,
                              parsed_target_format_data.weekday_token,
                              parsed_date_data.weekday)
     # Handle timezone
-    result = transform_month(result,
+    result = transform_timezone(result,
                              parsed_target_format_data.timezone_token,
                              parsed_date_data.timezone,
                              parsed_date_data.utc_add,
