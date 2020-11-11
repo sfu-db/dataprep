@@ -160,7 +160,26 @@ TEXT_WEEKDAYS = [("Mon", "Monday"),
 STATS = {"cleaned": 0, "null": 0, "unknown": 0}
 
 class parsed_date():
+    """Attributes of a parsed date.
+    Attributes:
+        year: Value of year.
+        month: Value of month.
+        day: Value of day.
+        hour: Value of hour.
+        minute: Value of minute.
+        second: Value of second.
+        weekday: Value of weekday.
+        timezone: Value of timezone.
+        utc_offset_hours: Hours of timezone offset.
+        utc_offset_minutes: Minutes of timezone offset.
+        utc_offset_add: Timezone offset is pos or neg.
+        valid: if parsed values are all valid.
+    """
+
     def __init__(self):
+        """
+        This function initiate parse_date
+        """
         self.year = None
         self.month = None
         self.day = None
@@ -175,62 +194,111 @@ class parsed_date():
         self.valid = 'cleaned'
 
     def set_year(self, year):
-        if (year >= 1700 and year <= 2500):
+        """
+        This function set value of year
+        Parameters
+        ----------
+        year
+            year value
+        """
+        if year >= 1700 and year <= 2500:
             self.year = year
             return True
         self.valid = 'unknown'
         return False
 
     def set_month(self, month):
-        if (month >= 1 and month <= 12):
+        """
+        This function set value of month
+        Parameters
+        ----------
+        month
+            month value
+        """
+        if month >= 1 and month <= 12:
             self.month = month
             return True
         self.valid = 'unknown'
         return False
 
     def set_day(self, day):
+        """
+        This function set value of day
+        Parameters
+        ----------
+        day
+            day value
+        """
         if self.month in [1, 3, 5, 7, 8, 10, 12]:
-            if (day >= 1 and day <= 31):
+            if day >= 1 and day <= 31:
                 self.day = day
                 return True
         if self.month in [4, 6, 9, 11]:
-            if (day >= 1 and day <= 30):
+            if day >= 1 and day <= 30:
                 self.day = day
                 return True
         if self.month in [2]:
             if self._is_leap_year():
-                if (day >= 1 and day <= 29):
+                if day >= 1 and day <= 29:
                     self.day = day
                     return True
             else:
-                if (day >= 1 and day <= 28):
+                if day >= 1 and day <= 28:
                     self.day = day
                     return True
         self.valid = 'unknown'
         return False
 
     def set_hour(self, hour):
-        if (hour >= 0 and hour < 24):
+        """
+        This function set value of hour
+        Parameters
+        ----------
+        hour
+            hour value
+        """
+        if hour >= 0 and hour < 24:
             self.hour = hour
             return True
         self.valid = 'unknown'
         return False
 
     def set_minute(self, minute):
-        if (minute >= 0 and minute < 60):
+        """
+        This function set value of minute
+        Parameters
+        ----------
+        minute
+            minute value
+        """
+        if minute >= 0 and minute < 60:
             self.minute = minute
             return True
         self.valid = 'unknown'
         return False
 
     def set_second(self, second):
-        if (second >= 0 and second < 60):
+        """
+        This function set value of second
+        Parameters
+        ----------
+        second
+            second value
+        """
+        if second >= 0 and second < 60:
             self.second = second
             return True
         self.valid = 'unknown'
         return False
 
     def set_timezone(self, timezone):
+        """
+        This function set value of timezone
+        Parameters
+        ----------
+        timezone
+            timezone value
+        """
         if timezone in all_timezones or timezone in ZONE:
             self.timezone = timezone
             return True
@@ -238,13 +306,23 @@ class parsed_date():
         return False
 
     def set_weekday(self, weekday):
-        if (weekday >= 1 and weekday <= 7):
+        """
+        This function set value of weekday
+        Parameters
+        ----------
+        weekday
+            weekday value
+        """
+        if weekday >= 1 and weekday <= 7:
             self.weekday = weekday
             return True
         self.valid = 'unknown'
         return False
 
     def _is_leap_year(self):
+        """
+        This function judge if year is leap year
+        """
         if (self.year % 4) == 0:
             if (self.year % 100) == 0:
                 if (self.year % 400) == 0:
@@ -257,7 +335,29 @@ class parsed_date():
             return False
 
 class parsed_target_format():
+    """Attributes of a parsed target format.
+    Attributes:
+        year_token: Token standing of year.
+        month_token: Token standing of month.
+        day_token: Token standing of day.
+        hour_token: Token standing of hour.
+        minute_token: Token standing of minute.
+        second_token: Token standing of second.
+        weekday_token: Token standing of weekday.
+        timezone_token: Token standing of timezone.
+        timezone: Value of target timezone.
+        utc_offset_hours: Hours of timezone offset.
+        utc_offset_minutes: Minutes of timezone offset.
+        utc_offset_add: Timezone offset is pos or neg.
+        valid: if target format is valid.
+        invalid_tokens: if target format is not valid,
+                        what tokens lead to this result.
+    """
+
     def __init__(self):
+        """
+        This function initiate parsed_target_fomat
+        """
         self.year_token = None
         self.month_token = None
         self.day_token = None
@@ -275,50 +375,136 @@ class parsed_target_format():
         self.invalid_tokens = []
 
     def set_year_token(self, year_token):
+        """
+        This function set value of year_token
+        Parameters
+        ----------
+        year_token
+            token string of year
+        """
         self.year_token = year_token
         return True
 
     def set_month_token(self, month_token):
+        """
+        This function set value of month_token
+        Parameters
+        ----------
+        month_token
+            token string of month
+        """
         self.month_token = month_token
         return True
 
     def set_day_token(self, day_token):
+        """
+        This function set value of day_token
+        Parameters
+        ----------
+        day_token
+            token string of day
+        """
         self.day_token = day_token
         return True
 
     def set_hour_token(self, hour_token):
+        """
+        This function set value of hour_token
+        Parameters
+        ----------
+        hour_token
+            token string of hour
+        """
         self.hour_token = hour_token
         return True
 
     def set_minute_token(self, minute_token):
+        """
+        This function set value of minute_token
+        Parameters
+        ----------
+        minute_token
+            token string of minute
+        """
         self.minute_token = minute_token
         return True
 
     def set_second_token(self, second_token):
+        """
+        This function set value of second_token
+        Parameters
+        ----------
+        second_token
+            token string of second
+        """
         self.second_token = second_token
         return True
 
     def set_weekday_token(self, weekday_token):
+        """
+        This function set value of weekday_token
+        Parameters
+        ----------
+        weekday_token
+            token string of weekday
+        """
         self.weekday_token = weekday_token
         return True
 
     def set_timezone_token(self, timezone_token):
+        """
+        This function set value of timezone_token
+        Parameters
+        ----------
+        timezone_token
+            token string of timezone
+        """
         self.timezone_token = timezone_token
         return True
 
     def set_time_zone(self, timezone):
+        """
+        This function set value of timezone
+        Parameters
+        ----------
+        timezone
+            timezone string
+        """
         self.timezone = timezone
         return True
 
     def set_valid(self, valid):
+        """
+        This function set valid status of target format
+        Parameters
+        ----------
+        valid
+            valid status
+        """
         self.valid = valid
         return True
 
     def set_ispm(self, ispm):
+        """
+        This function set value of judgement
+        of PM status for target format
+        Parameters
+        ----------
+        ispm
+            If is PM, True. If not, False
+        """
         self.ispm = ispm
         return True
 
     def add_invalid_token(self, token):
+        """
+        This function set value of invalid tokens
+        in target format
+        Parameters
+        ----------
+        token
+            invalid token
+        """
         self.invalid_tokens.append(token)
         return True
 
@@ -348,12 +534,20 @@ def clean_date(
     target_timezone
         Timezone of target data
     fix_empty
-        The user can specify the way of fixing empty value from value set: {'empty', 'auto_nearest', 'auto_minimum'}.
-        The default fixed_empty is "auto_minimum": For hours, minutes and seconds, just fill them with zeros.
-                                                   For years, months and days, fill it with the minimum value.
-        "auto_nearest": For hours, minutes and seconds, fill them with nearest hour, minutes and seconds.
-                        For years, months and days, fill it with the nearest value.
-        "empty": Just left the missing component as it is
+        The user can specify the way of fixing empty value from value set:
+            {'empty', 'auto_nearest', 'auto_minimum'}.
+        The default fixed_empty is "auto_minimum":
+            For hours, minutes and seconds:
+                Just fill them with zeros.
+            For years, months and days:
+                Fill it with the minimum value.
+        "auto_nearest":
+            For hours, minutes and seconds:
+                Fill them with nearest hour, minutes and seconds.
+            For years, months and days:
+                Fill it with the nearest value.
+        "empty":
+            Just left the missing component as it is
     report
         If True, output the summary report. Else, no report is outputted.
     """
@@ -362,7 +556,8 @@ def clean_date(
 
     if fix_empty not in {"auto_minimum", "auto_nearest", "empty"}:
         raise ValueError(
-            f'fix_empty {fix_empty} is invalid, it needs to be "auto_minimum", "auto_nearest" or "empty"'
+            f'fix_empty {fix_empty} is invalid. '
+            f'It needs to be "auto_minimum", "auto_nearest" or "empty"'
         )
 
     if origin_timezone not in all_timezones and origin_timezone not in ZONE:
@@ -370,7 +565,9 @@ def clean_date(
             f'origin_timezone {origin_timezone} doesn\'t exist'
         )
 
-    if target_timezone not in all_timezones and target_timezone not in ZONE and not (target_timezone is None):
+    if target_timezone not in all_timezones and \
+       target_timezone not in ZONE and \
+       not target_timezone is None:
         raise ValueError(
             f'target_timezone {target_timezone} doesn\'t exist'
         )
@@ -402,8 +599,7 @@ def format_date(
     target_format: str,
     origin_timezone: str,
     target_timezone: str,
-    fix_empty: str,
-    show_report: bool,
+    fix_empty: str
 ) -> pd.Series:
 
     date = row[col]
@@ -600,7 +796,6 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
                 break
         for token in PM:
             if (token in remain_str):
-                ispm = True
                 hms_tokens = split(remain_str, PM)
                 break
         if (len(hms_tokens) == 0):
