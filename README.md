@@ -102,10 +102,22 @@ Don't forget to checkout the [examples] folder for detailed demonstration!
 
 ### Connector
 
-Connector provides a simple way to collect data from different websites, offering several benefits:
+Connector provides a simple programming interface to collect structured data from different Web APIs (e.g., Twitter API, Yelp Fusion API, Spotify API, DBLP API), making web data collection easy and efficient, without requiring advanced programming skills.
+
+
+Do you want to leverage the growing number of websites that are opening their data through public APIs?.
+
+
+Connector is for you!  
+
+Let's check out the several benefits that Connector offers:
+
 * A unified API: you can fetch data using one or two lines of code to get data from many websites.
+<img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_main.gif"/></a>
 * Auto Pagination: it automatically does the pagination for you so that you can specify the desired count of the returned results without even considering the count-per-request restriction from the API.
+<img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_pagination.gif"/></a>
 * Smart API request strategy: it can issue API requests in parallel while respecting the rate limit policy.
+<img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_concurrency.gif"/></a>
 
 In the following examples, you can download the Yelp business search result into a pandas DataFrame, 
 using only two lines of code, without taking deep looking into the Yelp documentation!
