@@ -9,12 +9,12 @@ Tutorial - Connector for Spotify
 Overview
 ========
 
-Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. The goal is to help the users skip the complex API configuration. In this tutorial, we illustrate how to use connector library with Spotify.
+Connector is a component in the DataPrep library that aims to simplify the data access by providing a standard API set. The goal is to help the users skip the complex API configuration. In this tutorial, we illustrate how to use connector library with Spotify.
 
 
 Preprocessing
 ================
-If you haven't installed dataprep, run command pip install dataprep or execute the following cell.
+If you haven't installed DataPrep, run command pip install dataprep or execute the following cell.
 
 ::
 
@@ -111,7 +111,7 @@ When you click on the log in link, it will send you back to your redirect URI. Y
    	:width: 800
    	:height: 400
 
-Download and store the configuration files in dataprep
+Download and store the configuration files in DataPrep
 ======================================================
 The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_ or automatically downloaded at usage. 
@@ -119,7 +119,7 @@ The configuration files are used to construct the parameters and initial setup f
 
 
 To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files. 
-When you decided on a location, enter the command ``git clone https://github.com/sfu-db/DataConnectorConfigs.git``. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder. 
+When you decided on a location, enter the command ``git clone https://github.com/sfu-db/DataConnectorConfigs.git``. This will clone the git repository to the desired location; as a suggestion store it with the DataPrep folder. 
 
 
 From here you can proceed with the next steps.
@@ -136,7 +136,7 @@ From here you can proceed with the next steps.
    	:height: 125
 
 
-Below the configuration file are stored with dataprep. 
+Below the configuration file are stored with DataPrep. 
 
 .. image:: ../../_static/images/tutorial/Config_destination.png
 	:align: center
@@ -145,44 +145,33 @@ Below the configuration file are stored with dataprep.
 
 
     
-Initialize connector
-=============================
-To initialize the connector, run the following code below. Copy and paste your Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
-
-::
-
-    from dataprep.connector import Connector
-    client_id = “insert_client_id”
-    client_secret = “insert_client_secret”
-    access_token = “insert_token_key”
-    dc = Connector("./DataConnectorConfigs/spotify", _auth={"client_id":client_id, 
-                                                           "client_secret":client_secret, 
-                                                           "access_token":access_token})
-    
-Functionalities
-===================
-Connector has several functions you can perform to gain insight on the data downloaded from Spotify.
-
 Connector.info
 ------------------
-| The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.
+| The info method gives information and guidelines on using the connector. There are 4 sections in the response and they are table, parameters, example and schema.
 |
 | 	a. Table - The table(s) being accessed.
 | 	b. Parameters - Identifies which parameters can be used to call the method. 
 | 	c. Examples - Shows how you can call the methods in the Connector class.
+|   d. Schema - Names and data types of attributes in the response.
 
 ::
 
-    dc.info()
+
+    from dataprep.connector import connect, info
+    info('./DataConnectorConfigs/spotify')
 
 .. image:: ../../_static/images/tutorial/dc_spotify_info.png
 	:align: center
-   	:width: 285
-   	:height: 405
+   	:width: 1159
+   	:height: 473
+   	
+After a connector object has been initialized (see how below), info can also be called using the object::
+
+	dc.info()
 
 Parameters
 **********************
-| A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp's business query can either be required or optional. The required parameter is **q** while the optional parameters are **limit** and **offset**. The parameters are described below.
+| A parameter is a piece of information you supply to a query right as you run it. The parameters for Spotify's album query can either be required or optional. The required parameter is **q** while the optional parameters are **limit** and **offset**. The parameters are described below.
 |
 | 	a. **q** - Required - Search term, for example "Beyonce". 
 | 	b. **limit** - Optional -  It is the maximum number of results to return. By default, it will return 20. Maximum is 50.
@@ -193,19 +182,19 @@ There are additional parameters to query with Spotify. If you are interested in 
 <https://github.com/sfu-db/DataConnectorConfigs>`_.
 
 
-Connector.show_schema
----------------------------
-The show_schema method returns the website data in a Dataframe format. There are two columns in the response. The first column is the column name and the second is the datatype.
-As an example, lets see what is in the artist table.
+Initialize connector
+=============================
+To initialize the connector, run the following code below. Copy and paste your Spotify **access_token**, **client_id**, and **client_secret** in the appropriate variables. Once you have that running, you can use some of the built in functions available in connector.
 
 ::
 
-    dc.show_schema("artist")
+    client_id = “insert_client_id”
+    client_secret = “insert_client_secret”
+    access_token = “insert_token_key”
+    dc = connect("./DataConnectorConfigs/spotify", _auth={"client_id":client_id, 
+                                                           "client_secret":client_secret, 
+                                                           "access_token":access_token})
 
-.. image:: ../../_static/images/tutorial/dc_spotify_show_schema.png
-	:align: center
-   	:width: 285
-   	:height: 320
     
 Connector.query
 ------------------
