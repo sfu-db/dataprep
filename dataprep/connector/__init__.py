@@ -4,8 +4,15 @@ from typing import Any, Dict, Optional
 
 from .connector import Connector
 from .generator import ConfigGenerator, ConfigGeneratorUI
+from .info import info
 
-__all__ = ["Connector", "ConfigGenerator", "ConfigGeneratorUI", "connect"]
+__all__ = [
+    "Connector",
+    "ConfigGenerator",
+    "ConfigGeneratorUI",
+    "connect",
+    "info",
+]
 
 
 def connect(
