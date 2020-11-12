@@ -93,17 +93,17 @@ In [configuration files](https://github.com/sfu-db/DataConnectorConfigs), Connec
 
 Many websites in different domains are currently supported. These are some examples: 
  
-Category | Web API |  Auth Method  | Connector Config File(s) | Jupyter Notebook / Tutorial | Description | 
-|---|---|---|---|---|---|
-| Social Media | [Twitter](https://developer.twitter.com/en)  | `OAuth2` |  [Twitter config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/twitter) |  [Twitter Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Twitter.ipynb) |  API endpoint for Tweets information retrieval. |
-| Music | [Spotify](https://developer.spotify.com/)  | `OAuth2` |  [Spotify config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spotify) |  [Spotify tutorial](https://sfu-db.github.io/dataprep/user_guide/connector/DC_Spotify_tut.html) |  Comprehensive API for retrieving albums, artists, and tracks metadata. |
-| Restaurants | [Yelp](https://www.yelp.com/developers)  | `Bearer Token` |  [Yelp config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/yelp) |  [Yelp Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Yelp.ipynb) |  Leading API to access restaurant information by location.  |
-| Science | [DBLP](https://dblp.org/faq/13501473.html) | No |  [DBLP config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/dblp) |  [DBLP Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_DBLP.ipynb) |   Open bibliographic API for computer science publications.  |
-| Social Media | [Youtube](https://developers.google.com/youtube)  | `API Key` |  [Youtube config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/youtube) |  [Youtube Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Youtube.ipynb) |  API for retrieving Youtube's content information.  |
-| Finance | [Finnhub](https://finnhub.io/)  | `API Key` |  [Finnhub config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/finnhub) |  [Finnhub Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Finnhub.ipynb) |   Comprehensive API for financial, market, and economic data.  |
-| Music | [Musixmatch](https://developer.musixmatch.com/)  | `API Key` |  [Musixmatch config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/musixmatch) | Coming soon |  Leading API for searching music lyrics.  |
-| Weather | [OpenWeatherMap](https://openweathermap.org/api)  | `API Key` |  [OpenWeatherMap config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/openweathermap) | Coming soon |  API for retrieving current and historical weather data. |
-| Lifestyle | [Spoonacular](https://spoonacular.com/food-api)  | `API Key` |  [Spoonacular config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spoonacular) | Coming soon |  Recipe, food, and nutritional information API.  |
+| Category     | Web API                                          | Auth Method    | Connector Config File(s)                                                                                    | Jupyter Notebook / Tutorial                                                                                      | Description                                                            |
+| ------------ | ------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Social Media | [Twitter](https://developer.twitter.com/en)      | `OAuth2`       | [Twitter config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/twitter)               | [Twitter Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Twitter.ipynb) | API endpoint for Tweets information retrieval.                         |
+| Music        | [Spotify](https://developer.spotify.com/)        | `OAuth2`       | [Spotify config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spotify)               | [Spotify tutorial](https://sfu-db.github.io/dataprep/user_guide/connector/DC_Spotify_tut.html)                   | Comprehensive API for retrieving albums, artists, and tracks metadata. |
+| Restaurants  | [Yelp](https://www.yelp.com/developers)          | `Bearer Token` | [Yelp config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/yelp)                     | [Yelp Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Yelp.ipynb)       | Leading API to access restaurant information by location.              |
+| Science      | [DBLP](https://dblp.org/faq/13501473.html)       | No             | [DBLP config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/dblp)                     | [DBLP Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_DBLP.ipynb)       | Open bibliographic API for computer science publications.              |
+| Social Media | [Youtube](https://developers.google.com/youtube) | `API Key`      | [Youtube config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/youtube)               | [Youtube Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Youtube.ipynb) | API for retrieving Youtube's content information.                      |
+| Finance      | [Finnhub](https://finnhub.io/)                   | `API Key`      | [Finnhub config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/finnhub)               | [Finnhub Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Finnhub.ipynb) | Comprehensive API for financial, market, and economic data.            |
+| Music        | [Musixmatch](https://developer.musixmatch.com/)  | `API Key`      | [Musixmatch config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/musixmatch)         | Coming soon                                                                                                      | Leading API for searching music lyrics.                                |
+| Weather      | [OpenWeatherMap](https://openweathermap.org/api) | `API Key`      | [OpenWeatherMap config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/openweathermap) | Coming soon                                                                                                      | API for retrieving current and historical weather data.                |
+| Lifestyle    | [Spoonacular](https://spoonacular.com/food-api)  | `API Key`      | [Spoonacular config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spoonacular)       | Coming soon                                                                                                      | Recipe, food, and nutritional information API.                         |
 
 If you want to connect with a different web API, Connector is designed to be easy to extend. You just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs) to support the new web API. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.  
 
@@ -143,6 +143,44 @@ You can drill down to get more information by given `plot`, `plot_correlation` a
 <a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot.html#Understand-a-column-with-plot(df,-x)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot(df,x)_cat.gif"/></a>
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
+
+### Clean
+
+DataPrep.Clean contains simple functions designed for cleaning and standardizing a column in a DataFrame. It provides
+* A unified API: each function follows the syntax `clean_{type}(df, "column name")` (see an example below)
+* Python Data Science Support: its design for cleaning pandas and Dask DataFrames enables seamless integration into the Python data science workflow
+* Transparency: a report is generated that summarizes the alterations to the data that occured during cleaning
+
+The following example shows how to clean a column containing messy emails:
+<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_1.jpg"/></center>
+<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_2.jpg"/></center>
+
+Type validation is also supported:
+<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_3.jpg"/></center>
+
+Below are the supported semantic types (more are currently being developed).
+<table>
+    <tr>
+      <th>Semantic Types</th>
+    </tr>
+    <tr>
+      <td>longitude/latitude</td>
+    </tr>
+    <tr>
+      <td>country</td>
+    </tr>
+    <tr>
+      <td>email</td>
+    </tr>
+    <tr>
+      <td>url</td>
+    </tr>
+    <tr>
+      <td>phone</td>
+    </tr>
+  </table>
+
+For more information, refer to the [User Guide](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html).
 
 ## Contribute
 
