@@ -156,6 +156,7 @@ def format_phone(
             row["area_code"], row["office_code"], row["station_code"], row["ext_num"] = (
                 np.nan,
             ) * 4
+        else:
             row[f"{col}_clean"] = row[col] if errors == "ignore" else np.nan
         return row
 
