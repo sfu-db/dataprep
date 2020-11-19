@@ -1,0 +1,73 @@
+<html>
+
+<head>
+    <title> {{ context.title }} </title>
+    {% include 'tab_scripts.html' %}
+    {% include 'tab_styles.html' %}
+</head>
+
+<body>
+    <div class="container-{{ context.rnd }}">
+        <div class="tabs-{{ context.rnd }}">
+            {% for title in context.meta %}
+            <input type="radio" name="select" id="tab-{{ context.rnd }}-{{ loop.index }}" {{ 'checked' if loop.first }}
+                onclick="switchTab{{ context.rnd }}(this)">
+            <label for="tab-{{ context.rnd }}-{{ loop.index }}">{{ title }}</label>
+            {% endfor %}
+        </div>
+        <div class="contents-{{ context.rnd }}">
+            {% if context.tabledata %}
+            <div class="plots-{{ context.rnd }}">
+                <div class="stats-{{ context.rnd }}">
+                    <div class="tabledata-{{ context.rnd }}">
+                        <!-- <h3>{{ title }}</h3> -->
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Pearson</th>
+                                    <th scope="col">Spearman</th>
+                                    <th scope="col">KendallTau</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for th, tbs in context.tabledata.items() %}
+                                <tr>
+                                    <th scope="row">{{th}}</th>
+                                    {% for v in tbs.values() %}
+                                    <td>{{v}}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if context.insights[context.meta[0]] %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% for fig in context.components[1] %}
+            <div class="plots-{{ context.rnd }}">
+                {% if context.insights[context.meta[loop.index]] %}
+                <div class="insight-container-{{ context.rnd }}">
+                    <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}"
+                        class="insight-check-{{ context.rnd }}">
+                    <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
+                    <div class="insight-panel-{{ context.rnd }}">
+                        <ul>
+                            {% for insight in context.insights[context.meta[loop.index]] %}
+                            <li class="entry-{{ context.rnd }}">
+                                {{ insight }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                {{ fig }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
