@@ -2,7 +2,7 @@
     This module implements the visualization for
     plot_correlation(df) function
 """
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Any, Dict
 
 import numpy as np
 from bokeh.layouts import column, row
@@ -58,6 +58,8 @@ def render_correlation(
     """
     if itmdt.visual_type is None:
         visual_elem = Figure()
+    elif itmdt.visual_type == "correlation_impact":
+        visual_elem = render_correlation_impact(itmdt, plot_width, plot_height, palette or RDBU)
     elif itmdt.visual_type == "correlation_heatmaps":
         visual_elem = render_correlation_heatmaps(itmdt, plot_width, plot_height, palette or RDBU)
     elif itmdt.visual_type == "correlation_single_heatmaps":
@@ -121,6 +123,61 @@ def tweak_figure(fig: Figure) -> None:
     """
     fig.xaxis.formatter = FuncTickFormatter(code=format_js)
     fig.yaxis.formatter = FuncTickFormatter(code=format_js)
+
+
+def render_correlation_impact(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+) -> Dict[str, Any]:
+    """
+    Render correlation heatmaps in to tabs
+    """
+    tabs: List[Panel] = []
+    tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
+    axis_range = itmdt["axis_range"]
+
+    for method, df in itmdt["data"].items():
+        # in case of numerical column names
+        df = df.copy()
+        df["x"] = df["x"].apply(str)
+        df["y"] = df["y"].apply(str)
+
+        mapper, color_bar = create_color_mapper(palette)
+        x_range = FactorRange(*axis_range)
+        y_range = FactorRange(*reversed(axis_range))
+        fig = Figure(
+            x_range=x_range,
+            y_range=y_range,
+            plot_width=plot_width,
+            plot_height=plot_height,
+            x_axis_location="below",
+            tools="hover",
+            toolbar_location=None,
+            tooltips=tooltips,
+            background_fill_color="#fafafa",
+        )
+
+        tweak_figure(fig)
+
+        fig.rect(
+            x="x",
+            y="y",
+            width=1,
+            height=1,
+            source=df,
+            fill_color={"field": "correlation", "transform": mapper},
+            line_color=None,
+        )
+
+        fig.add_layout(color_bar, "right")
+        tab = Panel(child=fig, title=method)
+        tabs.append(tab)
+
+    return {
+        "insights": itmdt["insights"],
+        "tabledata": itmdt["tabledata"],
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+    }
 
 
 def render_correlation_heatmaps(
