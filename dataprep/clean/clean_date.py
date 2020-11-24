@@ -578,7 +578,10 @@ def clean_date(
 
     df = df.apply(
         format_date,
-        args=(col, target_format, origin_timezone, target_timezone, fix_empty),
+        args=(col,
+              target_format,
+              {'origin_tz': origin_timezone, 'target_tz': target_timezone},
+              fix_empty),
         axis=1,
         meta=meta,
     )
@@ -596,8 +599,7 @@ def format_date(
     row: pd.Series,
     col: str,
     target_format: str,
-    origin_timezone: str,
-    target_timezone: str,
+    tz_info: dict,
     fix_empty: str
 ) -> pd.Series:
     """
@@ -611,10 +613,8 @@ def format_date(
     target_format
         The desired format of the date.
         Defalut value is 'YYYY-MM-DD hh:mm:ss'
-    origin_timezone
-        Timezone of origin data
-    target_timezone
-        Timezone of target data
+    tz_info
+        Timezone of origin data and target data
     fix_empty
         The user can specify the way of fixing empty value from value set:
             {'empty', 'auto_nearest', 'auto_minimum'}.
@@ -633,6 +633,8 @@ def format_date(
     """
 
     date = row[col]
+    origin_timezone = tz_info['origin_tz']
+    target_timezone = tz_info['target_tz']
 
     if check_date(date) == 'null':
         STATS['null'] += 1
@@ -958,12 +960,11 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
             num_tokens.append(token)
     for token in num_tokens:
         remain_tokens.remove(token)
-
     if not result.year is None:
         result = ensure_month_day(result, num_tokens)
     else:
         result = ensure_year_month_day(result, num_tokens)
-        
+
     return result, remain_tokens
 
 def ensure_year(parsed_data: Union[parsed_date, Any],
@@ -1060,7 +1061,8 @@ def ensure_year_month_day(parsed_data: Union[parsed_date, Any],
 
     return parsed_data
 
-def ensure_hms(inner_result: Union[parsed_date, Any], remain_tokens: Union[str, Any]) -> Any:
+def ensure_hms(inner_result: Union[parsed_date, Any],
+               remain_tokens: Union[str, Any]) -> Any:
     """
     This function extract value of hour, minute, second
     Parameters
@@ -1245,12 +1247,9 @@ def change_timezone(parsed_date_data: Union[parsed_date, Any],
         target_tz_offset = timedelta(seconds=ZONE[target_timezone] * 3600)
 
     result = deepcopy(parsed_date_data)
-    if parsed_date_data.year is None or \
-       parsed_date_data.month is None or \
-       parsed_date_data.day is None or \
-       parsed_date_data.hour is None or \
-       parsed_date_data.minute is None or \
-       parsed_date_data.second is None:
+    if None in [parsed_date_data.year, parsed_date_data.mont,
+                parsed_date_data.day, parsed_date_data.hour,
+                parsed_date_data.minute, parsed_date_data.second]:
         return parsed_date_data
     utc_date = datetime.datetime(year=parsed_date_data.year,
                                  month=parsed_date_data.month,
