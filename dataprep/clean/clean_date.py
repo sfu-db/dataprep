@@ -324,12 +324,9 @@ class parsed_date():
         """
         This function judge if year is leap year
         """
-        if (self.year % 4) == 0:
-            if (self.year % 100) == 0:
-                if (self.year % 400) == 0:
-                    return True
-                else:
-                    return False
+        if self.year % 4 == 0:
+            if self.year % 100 == 0:
+                return self.year % 400 == 0
             else:
                 return True
         else:
@@ -786,7 +783,7 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
 
     # Handle hour, minute, second
     result, remain_tokens = \
-        figure_target_format_hms(result, target_tokens, remain_tokens)
+        figure_target_format_hms(result, remain_tokens)
 
     # If len(remain_tokens) = 0, then is valid format
     if len(remain_tokens) > 0:
@@ -816,7 +813,7 @@ def figure_target_format_timezone(parsed_data: Union[parsed_target_format, Any],
             remain_tokens.remove(token)
 
     for token in target_tokens:
-        if token == 'z' or token == 'Z':
+        if token in ('z', 'Z'):
             parsed_data.set_timezone_token(token)
             remain_tokens.remove(token)
 
@@ -876,7 +873,6 @@ def figure_target_format_ampm(parsed_data: Union[parsed_target_format, Any],
     return parsed_data, remain_tokens
 
 def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
-                           target_tokens: Union[list, Any],
                            remain_tokens: Union[list, Any]) -> Any:
     """
     This function figure hour, minute and second token in target format
@@ -884,8 +880,6 @@ def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
     ----------
     parsed_data
         paresed target format
-    target_tokens
-        parsed target tokens
     remain_tokens
         remained tokens after figuring tokens
     """
@@ -954,18 +948,7 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
     """
     result = parsed_date()
     remain_tokens = tokes.copy()
-    for token in tokes:
-        if token in MONTHS:
-            result.set_month(MONTHS[token])
-            remain_tokens.remove(token)
-        if token in WEEKDAYS:
-            result.set_weekday(WEEKDAYS[token])
-            remain_tokens.remove(token)
-    for token in remain_tokens:
-        if len(token) == 4 and token.isnumeric():
-            result.set_year(int(token))
-            remain_tokens.remove(token)
-            break
+    result, remain_tokens = ensure_year(result, tokes, remain_tokens)
 
     if len(remain_tokens) == 0:
         return result, remain_tokens
@@ -977,42 +960,105 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
         remain_tokens.remove(token)
 
     if not result.year is None:
-        if len(num_tokens) == 1:
-            if not (result.month is None):
-                result.set_day(int(num_tokens[0]))
-            else:
-                result.set_month(int(num_tokens[0]))
-        else:
-            if int(num_tokens[0]) > 12:
-                result.set_month(int(num_tokens[1]))
-                result.set_day(int(num_tokens[0]))
-            elif int(num_tokens[1]) > 12:
-                result.set_month(int(num_tokens[0]))
-                result.set_day(int(num_tokens[1]))
-            else:
-                result.set_month(int(num_tokens[0]))
-                result.set_day(int(num_tokens[1]))
+        result = ensure_month_day(result, num_tokens)
     else:
-        if len(num_tokens) == 1:
-            result.set_year(int(num_tokens[-1]) + 2000)
-        elif len(num_tokens) == 2:
-            result.set_year(int(num_tokens[-1]) + 2000)
-            if result.month is None:
-                result.set_month(int(num_tokens[0]))
-            else:
-                result.set_day(int(num_tokens[0]))
-        elif len(num_tokens) == 3:
-            result.set_year(int(num_tokens[-1]) + 2000)
-            if int(num_tokens[0]) > 12:
-                result.set_month(int(num_tokens[1]))
-                result.set_day(int(num_tokens[0]))
-            elif int(num_tokens[1]) > 12:
-                result.set_month(int(num_tokens[0]))
-                result.set_day(int(num_tokens[1]))
-            else:
-                result.set_month(int(num_tokens[0]))
-                result.set_day(int(num_tokens[1]))
+        result = ensure_year_month_day(result, num_tokens)
+        
     return result, remain_tokens
+
+def ensure_year(parsed_data: Union[parsed_date, Any],
+                tokes: Union[str, Any],
+                remain_tokens: Union[list, Any]) -> Any:
+    """
+    This function extract year number whose length is 4
+    Parameters
+    ----------
+    parsed_data
+        parsed date
+    tokes
+        parsed tokens
+    remain_tokens
+        remained tokens
+    """
+
+    for token in tokes:
+        if token in MONTHS:
+            parsed_data.set_month(MONTHS[token])
+            remain_tokens.remove(token)
+        if token in WEEKDAYS:
+            parsed_data.set_weekday(WEEKDAYS[token])
+            remain_tokens.remove(token)
+    for token in remain_tokens:
+        if len(token) == 4 and token.isnumeric():
+            parsed_data.set_year(int(token))
+            remain_tokens.remove(token)
+            break
+
+    return parsed_data, remain_tokens
+
+def ensure_month_day(parsed_data: Union[parsed_date, Any],
+                     num_tokens: Union[list, Any]) -> Any:
+    """
+    This function extract month and day when year is not None.
+    Parameters
+    ----------
+    parsed_data
+        parsed date
+    num_tokens
+        remained numerical tokens
+    """
+
+    if len(num_tokens) == 1:
+        if not parsed_data.month is None:
+            parsed_data.set_day(int(num_tokens[0]))
+        else:
+            parsed_data.set_month(int(num_tokens[0]))
+    else:
+        if int(num_tokens[0]) > 12:
+            parsed_data.set_month(int(num_tokens[1]))
+            parsed_data.set_day(int(num_tokens[0]))
+        elif int(num_tokens[1]) > 12:
+            parsed_data.set_month(int(num_tokens[0]))
+            parsed_data.set_day(int(num_tokens[1]))
+        else:
+            parsed_data.set_month(int(num_tokens[0]))
+            parsed_data.set_day(int(num_tokens[1]))
+
+    return parsed_data
+
+def ensure_year_month_day(parsed_data: Union[parsed_date, Any],
+                          num_tokens: Union[list, Any]) -> Any:
+    """
+    This function extract month and day when year is None.
+    Parameters
+    ----------
+    parsed_data
+        parsed date
+    num_tokens
+        remained numerical tokens
+    """
+
+    if len(num_tokens) == 1:
+        parsed_data.set_year(int(num_tokens[-1]) + 2000)
+    elif len(num_tokens) == 2:
+        parsed_data.set_year(int(num_tokens[-1]) + 2000)
+        if parsed_data.month is None:
+            parsed_data.set_month(int(num_tokens[0]))
+        else:
+            parsed_data.set_day(int(num_tokens[0]))
+    elif len(num_tokens) == 3:
+        parsed_data.set_year(int(num_tokens[-1]) + 2000)
+        if int(num_tokens[0]) > 12:
+            parsed_data.set_month(int(num_tokens[1]))
+            parsed_data.set_day(int(num_tokens[0]))
+        elif int(num_tokens[1]) > 12:
+            parsed_data.set_month(int(num_tokens[0]))
+            parsed_data.set_day(int(num_tokens[1]))
+        else:
+            parsed_data.set_month(int(num_tokens[0]))
+            parsed_data.set_day(int(num_tokens[1]))
+
+    return parsed_data
 
 def ensure_hms(inner_result: Union[parsed_date, Any], remain_tokens: Union[str, Any]) -> Any:
     """
@@ -1095,38 +1141,64 @@ def fix_empty_element(parsed_res: Union[parsed_date, Any], fix_empty: Union[str,
     if parsed_res.valid == 'unknown':
         return parsed_res
     if fix_empty == 'auto_nearest':
-        now_time = datetime.datetime.now()
-        if parsed_res.year is None:
-            parsed_res.set_year(now_time.year)
-        if parsed_res.month is None:
-            parsed_res.set_month(now_time.month)
-        if parsed_res.day is None:
-            parsed_res.set_day(now_time.day)
-        if parsed_res.hour is None:
-            parsed_res.set_hour(now_time.hour)
-        if parsed_res.minute is None:
-            parsed_res.set_minute(now_time.minute)
-        if parsed_res.second is None:
-            parsed_res.set_second(now_time.second)
-        if parsed_res.weekday is None:
-            temp_date = datetime.datetime(parsed_res.year, parsed_res.month, parsed_res.day)
-            parsed_res.set_weekday(temp_date.weekday() + 1)
+        parsed_res = fix_empty_auto_nearest(parsed_res)
     elif fix_empty == 'auto_minimum':
-        if parsed_res.year is None:
-            parsed_res.set_year(2000)
-        if parsed_res.month is None:
-            parsed_res.set_month(1)
-        if parsed_res.day is None:
-            parsed_res.set_day(1)
-        if parsed_res.hour is None:
-            parsed_res.set_hour(0)
-        if parsed_res.minute is None:
-            parsed_res.set_minute(0)
-        if parsed_res.second is None:
-            parsed_res.set_second(0)
-        if parsed_res.weekday is None:
-            temp_date = datetime.datetime(parsed_res.year, parsed_res.month, parsed_res.day)
-            parsed_res.set_weekday(temp_date.weekday() + 1)
+        parsed_res = fix_empty_auto_minimum(parsed_res)
+    return parsed_res
+
+def fix_empty_auto_nearest(parsed_res: Union[parsed_date, Any]) -> Any:
+    """
+    This function fix empty part by nearest time
+    Parameters
+    ----------
+    parsed_res
+        parsed date result
+    """
+
+    now_time = datetime.datetime.now()
+    if parsed_res.year is None:
+        parsed_res.set_year(now_time.year)
+    if parsed_res.month is None:
+        parsed_res.set_month(now_time.month)
+    if parsed_res.day is None:
+        parsed_res.set_day(now_time.day)
+    if parsed_res.hour is None:
+        parsed_res.set_hour(now_time.hour)
+    if parsed_res.minute is None:
+        parsed_res.set_minute(now_time.minute)
+    if parsed_res.second is None:
+        parsed_res.set_second(now_time.second)
+    if parsed_res.weekday is None:
+        temp_date = datetime.datetime(parsed_res.year, parsed_res.month, parsed_res.day)
+        parsed_res.set_weekday(temp_date.weekday() + 1)
+
+    return parsed_res
+
+def fix_empty_auto_minimum(parsed_res: Union[parsed_date, Any]) -> Any:
+    """
+    This function fix empty part by minimum time
+    Parameters
+    ----------
+    parsed_res
+        parsed date result
+    """
+
+    if parsed_res.year is None:
+        parsed_res.set_year(2000)
+    if parsed_res.month is None:
+        parsed_res.set_month(1)
+    if parsed_res.day is None:
+        parsed_res.set_day(1)
+    if parsed_res.hour is None:
+        parsed_res.set_hour(0)
+    if parsed_res.minute is None:
+        parsed_res.set_minute(0)
+    if parsed_res.second is None:
+        parsed_res.set_second(0)
+    if parsed_res.weekday is None:
+        temp_date = datetime.datetime(parsed_res.year, parsed_res.month, parsed_res.day)
+        parsed_res.set_weekday(temp_date.weekday() + 1)
+
     return parsed_res
 
 def parse(date: Union[str, Any], fix_empty: Union[str, Any]) -> Any:
@@ -1254,7 +1326,6 @@ def transform_month(result_str: Union[str, Any],
         value of month
     """
     result = deepcopy(result_str)
-    month_token = month_token
     if not month_token is None:
         if month is None:
             if len(month_token) == 3:
@@ -1443,9 +1514,7 @@ def transform_weekday(result_str: Union[str, Any],
 def transform_timezone(result_str: Union[str, Any],
                    timezone_token: Union[str, Any],
                    timezone: Union[int, Any],
-                   utc_add: Union[str, Any],
-                   utc_offset_hours: Union[int, Any],
-                   utc_offset_minutes: Union[int, Any]) -> Any:
+                   tz_info: Union[dict, Any]) -> Any:
     """
     This function transform parsed month into target format
     Parameters
@@ -1458,6 +1527,9 @@ def transform_timezone(result_str: Union[str, Any],
         value of weekday
     """
     result = deepcopy(result_str)
+    utc_add = tz_info['utc_add']
+    utc_offset_hours = tz_info['utc_offset_hours']
+    utc_offset_minutes = tz_info['utc_offset_minutes']
     if not timezone_token is None:
         if timezone_token == 'z':
             result = result.replace(timezone_token, timezone)
@@ -1527,12 +1599,13 @@ def transform(parsed_date_data: Union[parsed_date, Any],
                              parsed_target_format_data.weekday_token,
                              parsed_date_data.weekday)
     # Handle timezone
+    tz_info = {'utc_add': parsed_date_data.utc_add,
+               'utc_offset_hours': parsed_date_data.utc_offset_hours,
+               'utc_offset_minutes': parsed_date_data.utc_offset_minutes}
     result = transform_timezone(result,
                              parsed_target_format_data.timezone_token,
                              parsed_date_data.timezone,
-                             parsed_date_data.utc_add,
-                             parsed_date_data.utc_offset_hours,
-                             parsed_date_data.utc_offset_minutes)
+                             tz_info)
     return result
 
 def reset_stats() -> None:
