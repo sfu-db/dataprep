@@ -173,11 +173,13 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
     res["has_missing"] = True
     itmdt = completions["miss"](data["miss"])
 
-    rndrd = render_missing(itmdt)["layout"]
+    rndrd = render_missing(itmdt)
     figs.clear()
-    for fig in rndrd:
+    for fig in rndrd["layout"]:
         fig.sizing_mode = "stretch_width"
-        fig.title = Title(text=tab.title, align="center", text_font_size="20px")
+        fig.title = Title(
+            text=rndrd["meta"][rndrd["layout"].index(fig)], align="center", text_font_size="20px"
+        )
         figs.append(fig)
     res["missing"] = components(figs)
 
