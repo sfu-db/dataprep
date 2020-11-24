@@ -3,11 +3,11 @@ import datetime
 from datetime import timedelta
 import pytz
 from pytz import all_timezones
-from typing import Any, Union
 
 import dask.dataframe as dd
 import dask
 import numpy as np
+from typing import Any, Union
 import pandas as pd
 
 from .utils import NULL_VALUES, create_report, to_dask
@@ -159,7 +159,7 @@ TEXT_WEEKDAYS = [("Mon", "Monday"),
 
 STATS = {"cleaned": 0, "null": 0, "unknown": 0}
 
-class parsed_date():
+class ParsedDate():
 
     """Attributes of a parsed date.
     Attributes:
@@ -332,7 +332,7 @@ class parsed_date():
         else:
             return False
 
-class parsed_target_format():
+class ParsedTargetFormat():
 
     """Attributes of a parsed target format.
     Attributes:
@@ -673,7 +673,7 @@ def format_date(
     return row
 
 def set_timezone_offset(timezone: Union[str, Any],
-                        parsed_data: Union[parsed_date, parsed_target_format, Any]) -> Any:
+                        parsed_data: Union[ParsedDate, ParsedTargetFormat, Any]) -> Any:
     """
     This function set timezone information for
     parsed date or parsed target format
@@ -684,9 +684,10 @@ def set_timezone_offset(timezone: Union[str, Any],
     parsed_data
         parsed date or parsed target format
     """
+    example_date = datetime.datetime(2009, 9, 1)
     if timezone in all_timezones:
-        days = pytz.timezone(timezone)._utcoffset.days
-        seconds = pytz.timezone(timezone)._utcoffset.seconds
+        days = pytz.timezone(timezone).utcoffset(example_date).days
+        seconds = pytz.timezone(timezone).utcoffset(example_date).seconds
         parsed_data.utc_offset_hours = abs(days) * 24 + abs(seconds) / 3600
         parsed_data.utc_offset_minutes = \
             int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
@@ -767,7 +768,7 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
     target_format
         target_format string
     """
-    result = parsed_target_format()
+    result = ParsedTargetFormat()
     target_tokens = split(target_format, JUMP)
     remain_tokens = deepcopy(target_tokens)
 
@@ -795,7 +796,7 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
 
     return result
 
-def figure_target_format_timezone(parsed_data: Union[parsed_target_format, Any],
+def figure_target_format_timezone(parsed_data: Union[ParsedTargetFormat, Any],
                            target_tokens: Union[list, Any],
                            remain_tokens: Union[list, Any]) -> Any:
     """
@@ -821,7 +822,7 @@ def figure_target_format_timezone(parsed_data: Union[parsed_target_format, Any],
 
     return parsed_data, remain_tokens
 
-def figure_target_format_ymd(parsed_data: Union[parsed_target_format, Any],
+def figure_target_format_ymd(parsed_data: Union[ParsedTargetFormat, Any],
                            target_tokens: Union[list, Any],
                            remain_tokens: Union[list, Any]) -> Any:
     """
@@ -851,7 +852,7 @@ def figure_target_format_ymd(parsed_data: Union[parsed_target_format, Any],
 
     return parsed_data, remain_tokens
 
-def figure_target_format_ampm(parsed_data: Union[parsed_target_format, Any],
+def figure_target_format_ampm(parsed_data: Union[ParsedTargetFormat, Any],
                            target_tokens: Union[list, Any],
                            remain_tokens: Union[list, Any]) -> Any:
     """
@@ -874,7 +875,7 @@ def figure_target_format_ampm(parsed_data: Union[parsed_target_format, Any],
 
     return parsed_data, remain_tokens
 
-def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
+def figure_target_format_hms(parsed_data: Union[ParsedTargetFormat, Any],
                            remain_tokens: Union[list, Any]) -> Any:
     """
     This function figure hour, minute and second token in target format
@@ -906,7 +907,7 @@ def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
 
     return parsed_data, remain_tokens
 
-def get_target_format_hms_tokens(parsed_data: Union[parsed_target_format, Any],
+def get_target_format_hms_tokens(parsed_data: Union[ParsedTargetFormat, Any],
                                  remain_str: Union[str, Any]) -> Any:
     """
     This function get hour, minute and second token in target format
@@ -948,7 +949,7 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
     tokes
         generated tokens
     """
-    result = parsed_date()
+    result = ParsedDate()
     remain_tokens = tokes.copy()
     result, remain_tokens = ensure_year(result, tokes, remain_tokens)
 
@@ -967,7 +968,7 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
 
     return result, remain_tokens
 
-def ensure_year(parsed_data: Union[parsed_date, Any],
+def ensure_year(parsed_data: Union[ParsedDate, Any],
                 tokes: Union[str, Any],
                 remain_tokens: Union[list, Any]) -> Any:
     """
@@ -997,7 +998,7 @@ def ensure_year(parsed_data: Union[parsed_date, Any],
 
     return parsed_data, remain_tokens
 
-def ensure_month_day(parsed_data: Union[parsed_date, Any],
+def ensure_month_day(parsed_data: Union[ParsedDate, Any],
                      num_tokens: Union[list, Any]) -> Any:
     """
     This function extract month and day when year is not None.
@@ -1027,7 +1028,7 @@ def ensure_month_day(parsed_data: Union[parsed_date, Any],
 
     return parsed_data
 
-def ensure_year_month_day(parsed_data: Union[parsed_date, Any],
+def ensure_year_month_day(parsed_data: Union[ParsedDate, Any],
                           num_tokens: Union[list, Any]) -> Any:
     """
     This function extract month and day when year is None.
@@ -1061,7 +1062,7 @@ def ensure_year_month_day(parsed_data: Union[parsed_date, Any],
 
     return parsed_data
 
-def ensure_hms(inner_result: Union[parsed_date, Any],
+def ensure_hms(inner_result: Union[ParsedDate, Any],
                remain_tokens: Union[str, Any]) -> Any:
     """
     This function extract value of hour, minute, second
@@ -1092,26 +1093,37 @@ def ensure_hms(inner_result: Union[parsed_date, Any],
     else:
         hms_tokens = split(hms_tokens[0], [":"])
     if ispm:
-        if len(hms_tokens) == 1:
-            result.set_hour(int(hms_tokens[0]) + 12)
-        elif len(hms_tokens) == 2:
-            result.set_hour(int(hms_tokens[0]) + 12)
-            result.set_minute(int(hms_tokens[1]))
-        elif len(hms_tokens) == 3:
-            result.set_hour(int(hms_tokens[0]) + 12)
-            result.set_minute(int(hms_tokens[1]))
-            result.set_second(int(hms_tokens[2]))
+        result = ensure_pm(result, hms_tokens, 12)
     else:
-        if len(hms_tokens) == 1:
-            result.set_hour(int(hms_tokens[0]))
-        elif len(hms_tokens) == 2:
-            result.set_hour(int(hms_tokens[0]))
-            result.set_minute(int(hms_tokens[1]))
-        elif len(hms_tokens) == 3:
-            result.set_hour(int(hms_tokens[0]))
-            result.set_minute(int(hms_tokens[1]))
-            result.set_second(int(hms_tokens[2]))
+        result = ensure_pm(result, hms_tokens, 0)
     return result
+
+def ensure_pm(parsed_data: Union[ParsedDate, Any],
+              hms_tokens: Union[list, Any],
+              offset: Union[int, Any]) -> Any:
+    """
+    This function extract values which stand for pm time
+    Parameters
+    ----------
+    parsed_data
+        already generated parsed value
+    hms_tokens
+        tokens of hour, minute, second
+    offset
+        if it is pm time, offset = 12
+        otherwise, offset = 0
+    """
+
+    if len(hms_tokens) == 1:
+        parsed_data.set_hour(int(hms_tokens[0]) + offset)
+    elif len(hms_tokens) == 2:
+        parsed_data.set_hour(int(hms_tokens[0]) + offset)
+        parsed_data.set_minute(int(hms_tokens[1]))
+    elif len(hms_tokens) == 3:
+        parsed_data.set_hour(int(hms_tokens[0]) + offset)
+        parsed_data.set_minute(int(hms_tokens[1]))
+        parsed_data.set_second(int(hms_tokens[2]))
+    return parsed_data
 
 def split(txt: Union[str, Any], seps: Union[str, Any]) -> Any:
     """
@@ -1130,7 +1142,7 @@ def split(txt: Union[str, Any], seps: Union[str, Any]) -> Any:
     result = [value for value in result if value != '']
     return result
 
-def fix_empty_element(parsed_res: Union[parsed_date, Any], fix_empty: Union[str, Any]) -> Any:
+def fix_empty_element(parsed_res: Union[ParsedDate, Any], fix_empty: Union[str, Any]) -> Any:
     """
     This function fix empty part of transformed format
     Parameters
@@ -1148,7 +1160,7 @@ def fix_empty_element(parsed_res: Union[parsed_date, Any], fix_empty: Union[str,
         parsed_res = fix_empty_auto_minimum(parsed_res)
     return parsed_res
 
-def fix_empty_auto_nearest(parsed_res: Union[parsed_date, Any]) -> Any:
+def fix_empty_auto_nearest(parsed_res: Union[ParsedDate, Any]) -> Any:
     """
     This function fix empty part by nearest time
     Parameters
@@ -1176,7 +1188,7 @@ def fix_empty_auto_nearest(parsed_res: Union[parsed_date, Any]) -> Any:
 
     return parsed_res
 
-def fix_empty_auto_minimum(parsed_res: Union[parsed_date, Any]) -> Any:
+def fix_empty_auto_minimum(parsed_res: Union[ParsedDate, Any]) -> Any:
     """
     This function fix empty part by minimum time
     Parameters
@@ -1222,7 +1234,7 @@ def parse(date: Union[str, Any], fix_empty: Union[str, Any]) -> Any:
     parsed_res = fix_empty_element(parsed_time_res, fix_empty)
     return parsed_res
 
-def change_timezone(parsed_date_data: Union[parsed_date, Any],
+def change_timezone(parsed_date_data: Union[ParsedDate, Any],
                     target_timezone: Union[str, Any]) -> Any:
     """
     This function change timezone for already parsed date string
@@ -1235,14 +1247,20 @@ def change_timezone(parsed_date_data: Union[parsed_date, Any],
     """
     origin_tz_offset = None
     target_tz_offset = None
+    origin_date = datetime.datetime(year=parsed_date_data.year,
+                                    month=parsed_date_data.month,
+                                    day=parsed_date_data.day,
+                                    hour=parsed_date_data.hour,
+                                    minute=parsed_date_data.minute,
+                                    second=parsed_date_data.second)
     if parsed_date_data.timezone in all_timezones:
-        origin_tz_offset = pytz.timezone(parsed_date_data.timezone)._utcoffset
+        origin_tz_offset = pytz.timezone(parsed_date_data.timezone).utcoffset(origin_date)
         origin_tz_offset = timedelta(days=-origin_tz_offset.days,
                                               seconds=-origin_tz_offset.seconds)
     elif parsed_date_data.timezone in ZONE:
         origin_tz_offset = timedelta(seconds=-1 * ZONE[parsed_date_data.timezone] *  3600)
     if target_timezone in all_timezones:
-        target_tz_offset = pytz.timezone(target_timezone)._utcoffset
+        target_tz_offset = pytz.timezone(target_timezone).utcoffset(origin_date)
     elif target_timezone in ZONE:
         target_tz_offset = timedelta(seconds=ZONE[target_timezone] * 3600)
 
@@ -1251,12 +1269,7 @@ def change_timezone(parsed_date_data: Union[parsed_date, Any],
                 parsed_date_data.day, parsed_date_data.hour,
                 parsed_date_data.minute, parsed_date_data.second]:
         return parsed_date_data
-    utc_date = datetime.datetime(year=parsed_date_data.year,
-                                 month=parsed_date_data.month,
-                                 day=parsed_date_data.day,
-                                 hour=parsed_date_data.hour,
-                                 minute=parsed_date_data.minute,
-                                 second=parsed_date_data.second) + origin_tz_offset
+    utc_date = origin_date + origin_tz_offset
     target_date = utc_date + target_tz_offset
     result.set_year(target_date.year)
     result.set_month(target_date.month)
@@ -1546,8 +1559,8 @@ def transform_timezone(result_str: Union[str, Any],
 
     return result
 
-def transform(parsed_date_data: Union[parsed_date, Any],
-              parsed_target_format_data: Union[parsed_target_format, Any],
+def transform(parsed_date_data: Union[ParsedDate, Any],
+              parsed_target_format_data: Union[ParsedTargetFormat, Any],
               target_format: Union[str, Any],
               target_timezone: Union[str, Any]) -> Any:
     """
