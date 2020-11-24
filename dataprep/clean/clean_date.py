@@ -160,6 +160,7 @@ TEXT_WEEKDAYS = [("Mon", "Monday"),
 STATS = {"cleaned": 0, "null": 0, "unknown": 0}
 
 class parsed_date():
+
     """Attributes of a parsed date.
     Attributes:
         year: Value of year.
@@ -335,6 +336,7 @@ class parsed_date():
             return False
 
 class parsed_target_format():
+
     """Attributes of a parsed target format.
     Attributes:
         year_token: Token standing of year.
@@ -579,7 +581,7 @@ def clean_date(
 
     df = df.apply(
         format_date,
-        args=(col, target_format, origin_timezone, target_timezone, fix_empty, show_report),
+        args=(col, target_format, origin_timezone, target_timezone, fix_empty),
         axis=1,
         meta=meta,
     )
@@ -771,77 +773,20 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
     remain_tokens = deepcopy(target_tokens)
 
     # Handle Timezone
-    for token in target_tokens:
-        if token in all_timezones:
-            result.set_time_zone(token)
-            remain_tokens.remove(token)
-
-    for token in target_tokens:
-        if token == 'z' or token == 'Z':
-            result.set_timezone_token(token)
-            remain_tokens.remove(token)
+    result, remain_tokens = \
+        figure_target_format_timezone(result, target_tokens, remain_tokens)
 
     # Handle year, month, day
-    for token in target_tokens:
-        if token in TARGET_YEAR:
-            result.set_year_token(token)
-            remain_tokens.remove(token)
-        if token in TARGET_MONTH:
-            result.set_month_token(token)
-            remain_tokens.remove(token)
-        if token in TARGET_DAY:
-            result.set_day_token(token)
-            remain_tokens.remove(token)
-        if token in TARGET_WEEKDAY:
-            result.set_weekday_token(token)
-            remain_tokens.remove(token)
+    result, remain_tokens = \
+        figure_target_format_ymd(result, target_tokens, remain_tokens)
 
     # Handle AM, PM with JUMP seperators
-    for token in target_tokens:
-        if token in AM:
-            remain_tokens.remove(token)
-        if token in PM:
-            result.set_ispm(True)
-            remain_tokens.remove(token)
+    result, remain_tokens = \
+        figure_target_format_ampm(result, target_tokens, remain_tokens)
 
     # Handle hour, minute, second
-    if len(remain_tokens) > 0:
-        remain_str = ''
-        for token in remain_tokens:
-            if not token in TARGET_MONTH and not token in TARGET_WEEKDAY and \
-               not token in AM and not token in PM:
-                remain_str = token
-
-        hms_tokens = []
-        if 'z' in remain_str:
-            result.timezone_token = 'z'
-            hms_tokens = split(remain_str, [":", result.timezone_token])
-        elif 'Z' in remain_str:
-            result.timezone_token = 'Z'
-            hms_tokens = split(remain_str, [":", result.timezone_token])
-        else:
-            hms_tokens = split(remain_str, [":"])
-        # ensure AM, PM tokens without JUMP seperators
-        for token in AM:
-            if token in remain_str:
-                hms_tokens = split(remain_str, AM)
-                break
-        for token in PM:
-            if token in remain_str:
-                hms_tokens = split(remain_str, PM)
-                break
-        if len(hms_tokens) == 0:
-            hms_tokens = split(remain_str, [":"])
-
-        for token in hms_tokens:
-            if token in TARGET_HOUR:
-                result.set_hour_token(token)
-            if token in TARGET_MINUTE:
-                result.set_minute_token(token)
-            if token in TARGET_SECOND:
-                result.set_second_token(token)
-        if len(remain_str) > 0:
-            remain_tokens.remove(remain_str)
+    result, remain_tokens = \
+        figure_target_format_hms(result, target_tokens, remain_tokens)
 
     # If len(remain_tokens) = 0, then is valid format
     if len(remain_tokens) > 0:
@@ -851,6 +796,153 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
 
     return result
 
+def figure_target_format_timezone(parsed_data: Union[parsed_target_format, Any],
+                           target_tokens: Union[list, Any],
+                           remain_tokens: Union[list, Any]) -> Any:
+    """
+    This function figure timezone token in target format
+    Parameters
+    ----------
+    parsed_data
+        paresed target format
+    target_tokens
+        parsed target tokens
+    remain_tokens
+        remained tokens after figuring tokens
+    """
+    for token in target_tokens:
+        if token in all_timezones:
+            parsed_data.set_time_zone(token)
+            remain_tokens.remove(token)
+
+    for token in target_tokens:
+        if token == 'z' or token == 'Z':
+            parsed_data.set_timezone_token(token)
+            remain_tokens.remove(token)
+
+    return parsed_data, remain_tokens
+
+def figure_target_format_ymd(parsed_data: Union[parsed_target_format, Any],
+                           target_tokens: Union[list, Any],
+                           remain_tokens: Union[list, Any]) -> Any:
+    """
+    This function figure year, month and day token in target format
+    Parameters
+    ----------
+    parsed_data
+        paresed target format
+    target_tokens
+        parsed target tokens
+    remain_tokens
+        remained tokens after figuring tokens
+    """
+    for token in target_tokens:
+        if token in TARGET_YEAR:
+            parsed_data.set_year_token(token)
+            remain_tokens.remove(token)
+        if token in TARGET_MONTH:
+            parsed_data.set_month_token(token)
+            remain_tokens.remove(token)
+        if token in TARGET_DAY:
+            parsed_data.set_day_token(token)
+            remain_tokens.remove(token)
+        if token in TARGET_WEEKDAY:
+            parsed_data.set_weekday_token(token)
+            remain_tokens.remove(token)
+
+    return parsed_data, remain_tokens
+
+def figure_target_format_ampm(parsed_data: Union[parsed_target_format, Any],
+                           target_tokens: Union[list, Any],
+                           remain_tokens: Union[list, Any]) -> Any:
+    """
+    This function figure AM or PM token in target format
+    Parameters
+    ----------
+    parsed_data
+        paresed target format
+    target_tokens
+        parsed target tokens
+    remain_tokens
+        remained tokens after figuring tokens
+    """
+    for token in target_tokens:
+        if token in AM:
+            remain_tokens.remove(token)
+        if token in PM:
+            parsed_data.set_ispm(True)
+            remain_tokens.remove(token)
+
+    return parsed_data, remain_tokens
+
+def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
+                           target_tokens: Union[list, Any],
+                           remain_tokens: Union[list, Any]) -> Any:
+    """
+    This function figure hour, minute and second token in target format
+    Parameters
+    ----------
+    parsed_data
+        paresed target format
+    target_tokens
+        parsed target tokens
+    remain_tokens
+        remained tokens after figuring tokens
+    """
+    if len(remain_tokens) > 0:
+        remain_str = ''
+        for token in remain_tokens:
+            if not token in TARGET_MONTH and not token in TARGET_WEEKDAY and \
+               not token in AM and not token in PM:
+                remain_str = token
+
+        parsed_data, hms_tokens = get_target_format_hms_tokens(parsed_data, remain_str)
+
+        for token in hms_tokens:
+            if token in TARGET_HOUR:
+                parsed_data.set_hour_token(token)
+            if token in TARGET_MINUTE:
+                parsed_data.set_minute_token(token)
+            if token in TARGET_SECOND:
+                parsed_data.set_second_token(token)
+        if len(remain_str) > 0:
+            remain_tokens.remove(remain_str)
+
+    return parsed_data, remain_tokens
+
+def get_target_format_hms_tokens(parsed_data: Union[parsed_target_format, Any],
+                                 remain_str: Union[str, Any]) -> Any:
+    """
+    This function get hour, minute and second token in target format
+    Parameters
+    ----------
+    parsed_data
+        paresed target format
+    remain_str
+        remained string after figuring tokens
+    """
+
+    if 'z' in remain_str:
+        parsed_data.timezone_token = 'z'
+        hms_tokens = split(remain_str, [":", parsed_data.timezone_token])
+    elif 'Z' in remain_str:
+        parsed_data.timezone_token = 'Z'
+        hms_tokens = split(remain_str, [":", parsed_data.timezone_token])
+    else:
+        hms_tokens = split(remain_str, [":"])
+    # ensure AM, PM tokens without JUMP seperators
+    for token in AM:
+        if token in remain_str:
+            hms_tokens = split(remain_str, AM)
+            break
+    for token in PM:
+        if token in remain_str:
+            hms_tokens = split(remain_str, PM)
+            break
+    if len(hms_tokens) == 0:
+        hms_tokens = split(remain_str, [":"])
+
+    return parsed_data, hms_tokens
 
 def ensure_ymd(tokes: Union[str, Any]) -> Any:
     """
