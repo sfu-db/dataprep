@@ -1,3 +1,10 @@
+# !/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+# @Time    : 2020/11/25 02:47
+# @Author  : Danrui Qi
+# @FileName: clean_date.py
+
 from copy import deepcopy
 import datetime
 from datetime import timedelta
