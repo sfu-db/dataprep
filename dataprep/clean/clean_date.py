@@ -645,44 +645,11 @@ def format_date(
         # Handle date data and timezone
         parsed_date_data = parse(date=date, fix_empty=fix_empty)
         parsed_date_data.set_timezone(origin_timezone)
-        if origin_timezone in all_timezones:
-            days = pytz.timezone(origin_timezone)._utcoffset.days
-            seconds = pytz.timezone(origin_timezone)._utcoffset.seconds
-            parsed_date_data.utc_offset_hours = abs(days) * 24 + abs(seconds) / 3600
-            parsed_date_data.utc_offset_minutes = int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
-            if days >= 0 and seconds >= 0:
-                parsed_date_data.utc_add = '+'
-            elif days <= 0 and seconds < 0:
-                parsed_date_data.utc_add= '-'
-        elif origin_timezone in ZONE:
-            parsed_date_data.utc_offset_hours = abs(ZONE[origin_timezone])
-            parsed_date_data.utc_offset_minutes = 0
-            if ZONE[origin_timezone] >= 0:
-                parsed_date_data.utc_add = '+'
-            elif ZONE[origin_timezone] < 0:
-                parsed_date_data.utc_add= '-'
+        parsed_date_data = set_timezone_offset(origin_timezone, parsed_date_data)
 
         # Handle target format and timezone
         parsed_target_format_data = check_target_format(target_format=target_format)
-        if target_timezone in all_timezones:
-            days = pytz.timezone(target_timezone)._utcoffset.days
-            seconds = pytz.timezone(target_timezone)._utcoffset.seconds
-            parsed_target_format_data.utc_offset_hours = \
-                abs(days) * 24 + abs(seconds) / 3600
-            parsed_target_format_data.utc_offset_minutes = \
-                int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
-            if days >= 0 and seconds >= 0:
-                parsed_target_format_data.utc_add = '+'
-            elif days <= 0 and seconds < 0:
-                parsed_target_format_data.utc_add= '-'
-        elif target_timezone in ZONE:
-            parsed_target_format_data.utc_offset_hours = abs(ZONE[target_timezone])
-            parsed_target_format_data.utc_offset_minutes = 0
-            if ZONE[target_timezone] >= 0:
-                parsed_target_format_data.utc_add = '+'
-            elif ZONE[target_timezone] < 0:
-                parsed_target_format_data.utc_add= '-'
-
+        parsed_target_format_data = set_timezone_offset(target_timezone, parsed_target_format_data)
         if parsed_target_format_data.valid:
             if parsed_date_data.valid == 'cleaned':
                 transformed_date = transform(parsed_date_data=parsed_date_data,
@@ -703,6 +670,37 @@ def format_date(
             )
 
     return row
+
+def set_timezone_offset(timezone: Union[str, Any],
+                        parsed_data: Union[parsed_date, parsed_target_format, Any]) -> Any:
+    """
+    This function set timezone information for
+    parsed date or parsed target format
+    Parameters
+    ----------
+    timezone
+        string name of timezone
+    parsed_data
+        parsed date or parsed target format
+    """
+    if timezone in all_timezones:
+        days = pytz.timezone(timezone)._utcoffset.days
+        seconds = pytz.timezone(timezone)._utcoffset.seconds
+        parsed_data.utc_offset_hours = abs(days) * 24 + abs(seconds) / 3600
+        parsed_data.utc_offset_minutes = \
+            int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
+        if days >= 0 and seconds >= 0:
+            parsed_data.utc_add = '+'
+        elif days <= 0 and seconds < 0:
+            parsed_data.utc_add= '-'
+    elif timezone in ZONE:
+        parsed_data.utc_offset_hours = abs(ZONE[timezone])
+        parsed_data.utc_offset_minutes = 0
+        if ZONE[timezone] >= 0:
+            parsed_data.utc_add = '+'
+        elif ZONE[timezone] < 0:
+            parsed_data.utc_add= '-'
+    return parsed_data
 
 def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     """
