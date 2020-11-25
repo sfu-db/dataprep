@@ -191,8 +191,8 @@ class ParsedDate():
                     'minute': None,
                     'second': None}
         self.weekday = None
-        self.timezone = None
-        self.tzinfo = {'utc_add': None,
+        self.tzinfo = {'timezone': None,
+                       'utc_add': None,
                        'utc_offset_hours': None,
                        'utc_offset_minutes': None}
         self.valid = 'cleaned'
@@ -235,7 +235,7 @@ class ParsedDate():
         """
         if self.ymd['month'] in [1, 3, 5, 7, 8, 10, 12]:
             if 1 <= day <= 31:
-                self.day = day
+                self.ymd['day'] = day
                 return True
         if self.ymd['month'] in [4, 6, 9, 11]:
             if 1 <= day <= 30:
@@ -295,19 +295,36 @@ class ParsedDate():
         self.valid = 'unknown'
         return False
 
-    def set_timezone(self, timezone):
+    def set_tzinfo(self,
+                   timezone = None,
+                   utc_add = None,
+                   utc_offset_hours = None,
+                   utc_offset_minutes = None):
         """
-        This function set value of timezone
+        This function set timezone info
         Parameters
         ----------
         timezone
             timezone value
+        utc_add
+            the offset is positive or negtive comaring to UTC
+        utc_offset_hours
+            value of offset hours
+        utc_offset_minutes
+            value of offset minutes
         """
-        if timezone in all_timezones or timezone in ZONE:
-            self.timezone = timezone
-            return True
-        self.valid = 'unknown'
-        return False
+        if not timezone is None:
+            if timezone in all_timezones or timezone in ZONE:
+                self.timezone = timezone
+                return True
+            self.valid = 'unknown'
+            return False
+        if not utc_add is None:
+            self.tzinfo['utc_add'] = utc_add
+        if not utc_offset_hours is None:
+            self.tzinfo['utc_offset_hours'] = utc_offset_hours
+        if not utc_offset_minutes is None:
+            self.tzinfo['utc_offset_minutes'] = utc_offset_minutes
 
     def set_weekday(self, weekday):
         """
@@ -360,19 +377,19 @@ class ParsedTargetFormat():
         """
         This function initiate parsed_target_fomat
         """
-        self.year_token = None
-        self.month_token = None
-        self.day_token = None
-        self.hour_token = None
-        self.minute_token = None
-        self.second_token = None
+        self.ymd_token = {'year_token': None,
+                          'month_token': None,
+                          'day_token': None}
+        self.hms_token = {'hour_token': None,
+                          'minute_token': None,
+                          'second_token': None,
+                          'ispm': False}
         self.weekday_token = None
-        self.timezone = None
         self.timezone_token = None
-        self.utc_offset_hours = None
-        self.utc_offset_minutes = None
-        self.utc_add = None
-        self.ispm = False
+        self.tzinfo = {'timezone': None,
+                       'utc_add': None,
+                       'utc_offset_hours': None,
+                       'utc_offset_minutes': None}
         self.valid = True
         self.invalid_tokens = []
 
@@ -384,7 +401,7 @@ class ParsedTargetFormat():
         year_token
             token string of year
         """
-        self.year_token = year_token
+        self.ymd_token['year_token'] = year_token
         return True
 
     def set_month_token(self, month_token):
@@ -395,7 +412,7 @@ class ParsedTargetFormat():
         month_token
             token string of month
         """
-        self.month_token = month_token
+        self.ymd_token['month_token'] = month_token
         return True
 
     def set_day_token(self, day_token):
@@ -406,7 +423,7 @@ class ParsedTargetFormat():
         day_token
             token string of day
         """
-        self.day_token = day_token
+        self.ymd_token['day_token'] = day_token
         return True
 
     def set_hour_token(self, hour_token):
@@ -417,7 +434,7 @@ class ParsedTargetFormat():
         hour_token
             token string of hour
         """
-        self.hour_token = hour_token
+        self.hms_token['hour_token'] = hour_token
         return True
 
     def set_minute_token(self, minute_token):
@@ -428,7 +445,7 @@ class ParsedTargetFormat():
         minute_token
             token string of minute
         """
-        self.minute_token = minute_token
+        self.hms_token['minute_token'] = minute_token
         return True
 
     def set_second_token(self, second_token):
@@ -439,7 +456,7 @@ class ParsedTargetFormat():
         second_token
             token string of second
         """
-        self.second_token = second_token
+        self.hms_token['second_token'] = second_token
         return True
 
     def set_weekday_token(self, weekday_token):
@@ -464,16 +481,32 @@ class ParsedTargetFormat():
         self.timezone_token = timezone_token
         return True
 
-    def set_time_zone(self, timezone):
+    def set_tzinfo(self,
+                   timezone = None,
+                   utc_add = None,
+                   utc_offset_hours = None,
+                   utc_offset_minutes = None):
         """
-        This function set value of timezone
+        This function set timezone info
         Parameters
         ----------
         timezone
-            timezone string
+            name of timezone
+        utc_add
+            the offset is positive or negtive comaring to UTC
+        utc_offset_hours
+            value of offset hours
+        utc_offset_minutes
+            value of offset minutes
         """
-        self.timezone = timezone
-        return True
+        if not timezone is None:
+            self.tzinfo['timezone'] = timezone
+        if not utc_add is None:
+            self.tzinfo['utc_add'] = utc_add
+        if not utc_offset_hours is None:
+            self.tzinfo['utc_offset_hours'] = utc_offset_hours
+        if not utc_offset_minutes is None:
+            self.tzinfo['utc_offset_minutes'] = utc_offset_minutes
 
     def set_valid(self, valid):
         """
@@ -495,7 +528,7 @@ class ParsedTargetFormat():
         ispm
             If is PM, True. If not, False
         """
-        self.ispm = ispm
+        self.hms_token['ispm'] = ispm
         return True
 
     def add_invalid_token(self, token):
@@ -648,7 +681,7 @@ def format_date(
     elif check_date(date) == 'cleaned':
         # Handle date data and timezone
         parsed_date_data = parse(date=date, fix_empty=fix_empty)
-        parsed_date_data.set_timezone(origin_timezone)
+        parsed_date_data.set_tzinfo(timezone=origin_timezone)
         parsed_date_data = set_timezone_offset(origin_timezone, parsed_date_data)
 
         # Handle target format and timezone
@@ -691,20 +724,20 @@ def set_timezone_offset(timezone: Union[str, Any],
     if timezone in all_timezones:
         days = pytz.timezone(timezone).utcoffset(example_date).days
         seconds = pytz.timezone(timezone).utcoffset(example_date).seconds
-        parsed_data.utc_offset_hours = abs(days) * 24 + abs(seconds) / 3600
-        parsed_data.utc_offset_minutes = \
-            int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
+        parsed_data.set_tzinfo(utc_offset_hours=abs(days) * 24 + abs(seconds) / 3600)
+        parsed_data.set_tzinfo(utc_offset_minutes=\
+            int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60))
         if days >= 0 and seconds >= 0:
-            parsed_data.utc_add = '+'
+            parsed_data.set_tzinfo(utc_add='+')
         elif days <= 0 and seconds < 0:
-            parsed_data.utc_add= '-'
+            parsed_data.set_tzinfo(utc_add='-')
     elif timezone in ZONE:
-        parsed_data.utc_offset_hours = abs(ZONE[timezone])
-        parsed_data.utc_offset_minutes = 0
+        parsed_data.set_tzinfo(utc_offset_hours=abs(ZONE[timezone]))
+        parsed_data.set_tzinfo(utc_offset_minutes=0)
         if ZONE[timezone] >= 0:
-            parsed_data.utc_add = '+'
+            parsed_data.set_tzinfo(utc_add='+')
         elif ZONE[timezone] < 0:
-            parsed_data.utc_add= '-'
+            parsed_data.set_tzinfo(utc_add='-')
     return parsed_data
 
 def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
@@ -815,7 +848,7 @@ def figure_target_format_timezone(parsed_data: Union[ParsedTargetFormat, Any],
     """
     for token in target_tokens:
         if token in all_timezones:
-            parsed_data.set_time_zone(token)
+            parsed_data.set_tzinfo(timezone = token)
             remain_tokens.remove(token)
 
     for token in target_tokens:
@@ -1259,7 +1292,7 @@ def change_timezone(parsed_date_data: Union[ParsedDate, Any],
     if parsed_date_data.timezone in all_timezones:
         origin_tz_offset = pytz.timezone(parsed_date_data.timezone).utcoffset(origin_date)
         origin_tz_offset = timedelta(days=-origin_tz_offset.days,
-                                              seconds=-origin_tz_offset.seconds)
+                                     seconds=-origin_tz_offset.seconds)
     elif parsed_date_data.timezone in ZONE:
         origin_tz_offset = timedelta(seconds=-1 * ZONE[parsed_date_data.timezone] *  3600)
     if target_timezone in all_timezones:
@@ -1280,15 +1313,15 @@ def change_timezone(parsed_date_data: Union[ParsedDate, Any],
     result.set_hour(target_date.hour)
     result.set_minute(target_date.minute)
     result.set_second(target_date.second)
-    result.set_timezone(target_timezone)
+    result.set_tzinfo(timezone=target_timezone)
     days = target_tz_offset.days
     seconds = target_tz_offset.seconds
-    result.utc_offset_hours = abs(days) * 24 + abs(seconds) / 3600
-    result.utc_offset_minutes = int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
+    result.set_tzinfo(utc_offset_hours=abs(days) * 24 + abs(seconds) / 3600)
+    result.set_tzinfo(utc_offset_minutes=int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60))
     if days >= 0 and seconds >= 0:
-        result.utc_add = '+'
+        result.set_tzinfo(utc_add='+')
     elif days <= 0 and seconds < 0:
-        result.utc_add= '-'
+        result.set_tzinfo(utc_add='-')
     return result
 
 def transform_year(result_str: Union[str, Any],
@@ -1618,9 +1651,9 @@ def transform(parsed_date_data: Union[ParsedDate, Any],
                'utc_offset_hours': parsed_date_data.utc_offset_hours,
                'utc_offset_minutes': parsed_date_data.utc_offset_minutes}
     result = transform_timezone(result,
-                             parsed_target_format_data.timezone_token,
-                             parsed_date_data.timezone,
-                             tz_info)
+                                parsed_target_format_data.timezone_token,
+                                parsed_date_data.timezone,
+                                tz_info)
     return result
 
 def reset_stats() -> None:
