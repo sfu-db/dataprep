@@ -1,20 +1,16 @@
-# !/usr/bin/env python3
-# -*- coding:utf-8 -*-
-
-# @Time    : 2020/11/25 02:47
-# @Author  : Danrui Qi
-# @FileName: clean_date.py
-
+"""
+Implement clean_date function
+"""
 from copy import deepcopy
-import datetime
 from datetime import timedelta
-import pytz
 from pytz import all_timezones
+from typing import Any, Union
 
 import dask.dataframe as dd
 import dask
+import datetime
+import pytz
 import numpy as np
-from typing import Any, Union
 import pandas as pd
 
 from .utils import NULL_VALUES, create_report, to_dask
@@ -188,17 +184,17 @@ class ParsedDate():
         """
         This function initiate parse_date
         """
-        self.year = None
-        self.month = None
-        self.day = None
-        self.hour = None
-        self.minute = None
-        self.second = None
+        self.ymd = {'year': None,
+                    'month': None,
+                    'day': None}
+        self.hms = {'hour': None,
+                    'minute': None,
+                    'second': None}
         self.weekday = None
         self.timezone = None
-        self.utc_offset_hours = None
-        self.utc_offset_minutes = None
-        self.utc_add = None
+        self.tzinfo = {'utc_add': None,
+                       'utc_offset_hours': None,
+                       'utc_offset_minutes': None}
         self.valid = 'cleaned'
 
     def set_year(self, year):
@@ -210,7 +206,7 @@ class ParsedDate():
             year value
         """
         if 1700 <= year <= 2500:
-            self.year = year
+            self.ymd['year'] = year
             return True
         self.valid = 'unknown'
         return False
@@ -224,7 +220,7 @@ class ParsedDate():
             month value
         """
         if 1 <= month <= 12:
-            self.month = month
+            self.ymd['month'] = month
             return True
         self.valid = 'unknown'
         return False
@@ -237,22 +233,22 @@ class ParsedDate():
         day
             day value
         """
-        if self.month in [1, 3, 5, 7, 8, 10, 12]:
+        if self.ymd['month'] in [1, 3, 5, 7, 8, 10, 12]:
             if 1 <= day <= 31:
                 self.day = day
                 return True
-        if self.month in [4, 6, 9, 11]:
+        if self.ymd['month'] in [4, 6, 9, 11]:
             if 1 <= day <= 30:
-                self.day = day
+                self.ymd['day'] = day
                 return True
-        if self.month in [2]:
+        if self.ymd['month'] in [2]:
             if self._is_leap_year():
                 if 1 <= day <= 29:
-                    self.day = day
+                    self.ymd['day'] = day
                     return True
             else:
                 if 1 <= day <= 28:
-                    self.day = day
+                    self.ymd['day'] = day
                     return True
         self.valid = 'unknown'
         return False
@@ -266,7 +262,7 @@ class ParsedDate():
             hour value
         """
         if 0 <= hour < 24:
-            self.hour = hour
+            self.hms['hour'] = hour
             return True
         self.valid = 'unknown'
         return False
@@ -280,7 +276,7 @@ class ParsedDate():
             minute value
         """
         if 0 <= minute < 60:
-            self.minute = minute
+            self.hms['minute'] = minute
             return True
         self.valid = 'unknown'
         return False
@@ -294,7 +290,7 @@ class ParsedDate():
             second value
         """
         if 0 <= second < 60:
-            self.second = second
+            self.hms['second'] = second
             return True
         self.valid = 'unknown'
         return False
@@ -331,9 +327,9 @@ class ParsedDate():
         """
         This function judge if year is leap year
         """
-        if self.year % 4 == 0:
-            if self.year % 100 == 0:
-                return self.year % 400 == 0
+        if self.ymd['year'] % 4 == 0:
+            if self.ymd['year'] % 100 == 0:
+                return self.ymd['year'] % 400 == 0
             else:
                 return True
         else:
