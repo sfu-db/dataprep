@@ -315,7 +315,7 @@ class ParsedDate():
         """
         if not timezone is None:
             if timezone in all_timezones or timezone in ZONE:
-                self.timezone = timezone
+                self.tzinfo['timezone'] = timezone
                 return True
             self.valid = 'unknown'
             return False
@@ -325,6 +325,7 @@ class ParsedDate():
             self.tzinfo['utc_offset_hours'] = utc_offset_hours
         if not utc_offset_minutes is None:
             self.tzinfo['utc_offset_minutes'] = utc_offset_minutes
+        return True
 
     def set_weekday(self, weekday):
         """
@@ -507,6 +508,7 @@ class ParsedTargetFormat():
             self.tzinfo['utc_offset_hours'] = utc_offset_hours
         if not utc_offset_minutes is None:
             self.tzinfo['utc_offset_minutes'] = utc_offset_minutes
+        return True
 
     def set_valid(self, valid):
         """
