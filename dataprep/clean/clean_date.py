@@ -1,10 +1,10 @@
 """
 Implement clean_date function
 """
+from typing import Any, Union
 from copy import deepcopy
 from datetime import timedelta
 from pytz import all_timezones
-from typing import Any, Union
 
 import dask.dataframe as dd
 import dask

@@ -1,9 +1,9 @@
+"""Common definitions and classes for clean_date function"""
 from pytz import all_timezones
 
 JUMP = [" ", ".", ",", ";", "-", "/", "'",
         "st", "nd", "rd", "th",
         "at", "on", "and", "ad", "AD", "of"]
-        #"T", "t"
 WEEKDAYS = {"Mon": 1, "Monday": 1,
             "Tue": 2, "Tuesday": 2,
             "Wed": 3, "Wednesday": 3,
