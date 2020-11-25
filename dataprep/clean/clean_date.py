@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from .utils import NULL_VALUES, create_report, to_dask
-from .clean_date_utils import JUMP, WEEKDAYS, MONTHS, HMS, AM, PM, ZONE, \
+from .clean_date_utils import JUMP, WEEKDAYS, MONTHS, AM, PM, ZONE, \
                              TARGET_YEAR, TARGET_MONTH, TARGET_DAY, \
                              TARGET_HOUR, TARGET_MINUTE, TARGET_SECOND, \
                              TEXT_MONTHS, TARGET_WEEKDAY, TEXT_WEEKDAYS

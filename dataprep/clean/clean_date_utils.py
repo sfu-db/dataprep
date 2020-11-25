@@ -1,3 +1,5 @@
+from pytz import all_timezones
+
 JUMP = [" ", ".", ",", ";", "-", "/", "'",
         "st", "nd", "rd", "th",
         "at", "on", "and", "ad", "AD", "of"]
