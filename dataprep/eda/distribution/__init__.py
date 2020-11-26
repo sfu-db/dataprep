@@ -10,7 +10,6 @@ import pandas as pd
 from ..container import Container
 from ..dtypes import DTypeDef
 from ..progress_bar import ProgressBar
-from ..report import Report
 from .compute import compute
 from .render import render
 
@@ -39,7 +38,7 @@ def plot(
     tile_size: Optional[float] = None,
     dtype: Optional[DTypeDef] = None,
     progress: bool = True,
-) -> Union[Report, Container]:
+) -> Container:
     """Generates plots for exploratory data analysis.
 
     If no columns are specified, the distribution of
@@ -168,8 +167,5 @@ def plot(
             value_range=value_range,
             dtype=dtype,
         )
-    figure = render(intermediate, yscale=yscale, tile_size=tile_size)
-    if intermediate.visual_type == "distribution_grid" or "_column" in intermediate.visual_type:
-        return Container(figure, intermediate.visual_type)
-    else:
-        return Report(figure)
+    to_render = render(intermediate, yscale=yscale, tile_size=tile_size)
+    return Container(to_render, intermediate.visual_type)

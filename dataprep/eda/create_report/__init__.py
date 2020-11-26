@@ -8,7 +8,7 @@ import pandas as pd
 from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
 from .formatter import format_report
-from .io import Report
+from .report import Report
 
 __all__ = ["create_report"]
 

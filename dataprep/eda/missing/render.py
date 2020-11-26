@@ -37,8 +37,8 @@ __all__ = ["render_missing"]
 
 def render_missing(
     itmdt: Intermediate,
-    plot_width: int = 500,
-    plot_height: int = 500,
+    plot_width: int = 400,
+    plot_height: int = 400,
 ) -> Dict[str, Any]:
     """
     @Jinglin write here
@@ -46,7 +46,7 @@ def render_missing(
     if itmdt.visual_type == "missing_impact":
         return render_missing_impact(itmdt, plot_width, plot_height)
     elif itmdt.visual_type == "missing_impact_1vn":
-        return render_missing_impact_1vn(itmdt, plot_width - 176, plot_height - 200)
+        return render_missing_impact_1vn(itmdt, plot_width - 100, plot_height - 100)
     elif itmdt.visual_type == "missing_impact_1v1":
         return render_missing_impact_1v1(itmdt, plot_width, plot_height)
     else:
@@ -121,7 +121,7 @@ def render_dist(
             legend_label=label,
         )
 
-    relocate_legend(fig, "right")
+    relocate_legend(fig, "left")
 
     return fig
 
@@ -191,7 +191,7 @@ def render_hist(  # pylint: disable=too-many-arguments
             legend_field="label",
         )
 
-        relocate_legend(fig, "right")
+        relocate_legend(fig, "left")
     else:
         shown, total = meta["partial"]
         if shown != total:
@@ -336,6 +336,7 @@ def render_missing_impact(itmdt: Intermediate, plot_width: int, plot_height: int
         "tabledata": {"Missing Statistics": stat_dict},
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 160,
     }
 
 
@@ -392,6 +393,7 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
                 toolbar_location=None,
                 tooltips=tooltips,
                 background_fill_color="#fafafa",
+                title=" ",
             )
 
             fig.rect(
@@ -411,8 +413,8 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
     tweak_figure(fig)
     fig.grid.grid_line_color = None
     fig.axis.axis_line_color = None
-    fig.add_layout(color_bar, "right")
-
+    fig.add_layout(color_bar, "left")
+    fig.frame_width = plot_width
     return fig
 
 
@@ -439,6 +441,7 @@ def render_bar_chart(
         y_axis_type=yscale,
         toolbar_location=None,
         tools=[],
+        title=" ",
     )
 
     rend = fig.vbar_stack(
@@ -480,7 +483,8 @@ def render_bar_chart(
 
     fig.yaxis.axis_label = "Row Count"
     tweak_figure(fig)
-    relocate_legend(fig, "right")
+    relocate_legend(fig, "left")
+    fig.frame_width = plot_width
 
     return fig
 
@@ -530,6 +534,7 @@ def render_missing_spectrum(
             tools="hover",
             toolbar_location=None,
             tooltips=tooltips,
+            title=" ",
         )
     )
     fig.xgrid.grid_line_color = None
@@ -545,7 +550,8 @@ def render_missing_spectrum(
         fill_color={"field": "missing_rate", "transform": mapper},
         line_color=None,
     )
-    fig.add_layout(color_bar, "right")
+    fig.add_layout(color_bar, "left")
+    fig.frame_width = plot_width
     return fig
 
 
@@ -565,6 +571,7 @@ def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int)
         plot_height=plot_height,
         toolbar_location=None,
         tools="",
+        title=" ",
     )
 
     # round the coordinates to integers, and plot the dendrogram
@@ -594,7 +601,7 @@ def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int)
     fig.xaxis.major_label_orientation = np.pi / 3
     fig.yaxis.axis_label = "Average Distance Between Clusters"
     fig.grid.visible = False
-
+    fig.frame_width = plot_width
     return fig
 
 
@@ -619,7 +626,7 @@ def render_missing_impact_1vn(
     legend_colors = [CATEGORY10[count] for count in range(len(LABELS))]
     return {
         "layout": [panel.child for panel in panels],
-        "fig_width": plot_width,
+        "container_width": plot_width * 3,
         "legend_labels": [
             {"label": label, "color": color} for label, color in zip(LABELS, legend_colors)
         ],
@@ -630,7 +637,7 @@ def render_missing_impact_1v1(
     itmdt: Intermediate,
     plot_width: int,
     plot_height: int,
-) -> Dict[str, List[Any]]:
+) -> Dict[str, Any]:
     """
     Render the plot from `plot_missing(df, "x", "y")`
     """
@@ -652,16 +659,20 @@ def render_missing_impact_1v1(
         fig = render_boxwhisker(itmdt["box"], plot_width, plot_height)
         panels.append(Panel(child=fig, title="Box"))
 
+        for panel in panels:
+            panel.child.frame_width = plot_width
+
         return {
             "layout": [panel.child for panel in panels],
             "meta": [panel.title for panel in panels],
+            "container_width": plot_width + 240,
         }
     else:
         fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height, True)
-
+        fig.frame_width = plot_width
         shown, total = meta["partial"]
         if shown != total:
-            fig.title = Title(text=f"Missing impact of {x} by ({shown} out of {total}) {y}")
+            _title = f"Missing impact of {x} by ({shown} out of {total}) {y}"
         else:
-            fig.title = Title(text=f"Missing impact of {x} by {y}")
-        return {"layout": [fig], "meta": [fig.title.text]}
+            _title = f"Missing impact of {x} by {y}"
+        return {"layout": [fig], "meta": [_title], "container_width": plot_width + 240}
