@@ -9,7 +9,6 @@ import pandas as pd
 
 from ..dtypes import DTypeDef
 from ..progress_bar import ProgressBar
-from ..report import Report
 from .compute import compute_missing
 from .render import render_missing
 from ..container import Container
@@ -63,6 +62,6 @@ def plot_missing(
 
     with ProgressBar(minimum=1, disable=not progress):
         itmdt = compute_missing(df, x, y, dtype=dtype, bins=bins, ndist_sample=ndist_sample)
-    fig = render_missing(itmdt)
+    to_render = render_missing(itmdt)
 
-    return Container(fig, itmdt.visual_type)
+    return Container(to_render, itmdt.visual_type)
