@@ -13,56 +13,51 @@ Connector
 
 Overview
 ==========
-Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set. 
+Connector is a component in the DataPrep library that aims to simplify the data access by providing a standard API set. 
 The goal is to help the users skip the complex API configuration.
 We illustrate how to use connector library with Yelp.
 
 
-Initializing a connector class for a website
+Getting the guideline of the connector with `Connector.info`
+=================================================================
+| The info function gives information and guidance for using connector. In the example below, the response shows four things. 
+| 	a. There is one table in Yelp, i.e. businesses.
+| 	b. To query this table, the location parameter is required. The term, latitude, longitude and limit parameters are optional (see Connector.query() section).
+| 	c. Examples of calling functions with the Connector class.
+|   d. Schema of data to be returned in a dataframe. The first column contains attribute names and the second contains the type of data.
+
+
+::
+
+
+    from dataprep.connector import connect, info
+    info('./DataConnectorConfigs/yelp')
+    
+.. image:: ../../_static/images/connector/info.png
+	:align: center
+   	:width: 507
+   	:height: 465
+
+.. image:: ../../_static/images/connector/show_schema.png
+	:align: center
+   	:width: 246
+   	:height: 565
+   	
+After a connector object has been initialized (see how below), info can also be called using the object::
+
+	dc.info()
+
+
+
+Initializing a connector object for a website
 =============================================
-The first step is to initialize a Connector class with the configuration file location and access token specified (`How to get access token?
+The first step is to initialize a Connector object with the configuration file location and access token specified (`How to get access token?
 <https://www.yelp.com/developers/documentation/v3/authentication>`_).
 Available configuration files can be manually downloaded here: `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_ or automatically downloaded at usage.
 To initialize a connector::
 
-    from dataprep.connector import Connector
-    dc = Connector("./DataConnectorConfigs/yelp", auth_params={"access_token":access_token})
-
-
-Getting the guidline of the connector with `Connector.info`
-=================================================================
-| Connector's info method gives information and guideline of using the connector. In the example below, the response shows three things. 
-| 	a. There is one table in Yelp, i.e. Yelp.businesses.
-| 	b. To query this table, the term and location parameters are required and the longitute and latitude parameters are optional (see Connector.query() section).
-| 	c. The examples of calling the methods in the Connector class.
-
-::
-
-    dc.info
-
-.. image:: ../../_static/images/connector/info.png
-	:align: center
-   	:width: 496
-   	:height: 215
-
-
-
-Understand web data with `Connector.show_schema()`
-============================================================
-show_schema(table name) returns the schema of the webdata to be returned in a dataframe.
-There are two columns in the response.
-The first column is the column name and the second is the datatype.
-
-::
-
-    dc.show_schema('businesses')
-
-
-.. image:: ../../_static/images/connector/show_schema.png
-   :align: center
-   :width: 208
-   :height: 458 
+    dc = connect('yelp', _auth={'access_token':{insert_value}})
 
 
 Getting web data with `Connector.query()`
@@ -85,7 +80,7 @@ connector re-format the data in pandas dataframe for the convenience of downstre
 
 Advanced: writing your own connector configuration file
 ==============================================================
-A configuration file defines the infomation neccessary to fetch data from a website, e.g. the request url; the API authorization type; the parameters needed from the uses(API key, search keyword, etc.); the returned data's schema. 
-All the information are reusable.
+A configuration file defines the information necessary to fetch data from a website, e.g. the request URL, API authorization type, parameters needed from the users (API key, search keyword, etc.), the returned data's schema. 
+All the information is reusable.
 To write a configuration file for the your own needs or modify an existing one, please refer to `Configuration Files
 <https://github.com/sfu-db/DataConnectorConfigs>`_.
