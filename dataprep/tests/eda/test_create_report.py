@@ -44,3 +44,14 @@ def test_report(simpledf: pd.DataFrame) -> None:
 
         matplotlib.use("PS")
     create_report(simpledf, mode="basic")
+
+
+def test_report_show(simpledf: pd.DataFrame) -> None:
+    from sys import platform
+
+    if platform == "darwin":
+        import matplotlib
+
+        matplotlib.use("PS")
+    report = create_report(simpledf, mode="basic")
+    report.show()
