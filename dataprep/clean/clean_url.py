@@ -1,17 +1,17 @@
-# pylint: disable=too-many-arguments, global-statement, line-too-long, too-many-locals
 """
-implement clean_url functionality
+Implement clean_url functionality
 """
-
 import re
-from typing import Any, Union, List
+from operator import itemgetter
+from typing import Any, List, Union
 from urllib.parse import unquote, urlparse
 
-import pandas as pd
-import numpy as np
 import dask
 import dask.dataframe as dd
+import numpy as np
+import pandas as pd
 
+from ..eda.progress_bar import ProgressBar
 from .utils import NULL_VALUES, to_dask
 
 # to extract queries
@@ -41,14 +41,6 @@ AUTH_VALUES = {
 # unified_list
 UNIFIED_AUTH_LIST = set()
 
-# STATs count
-# cleaned=number of queries removed,
-# rows=number of rows from which querries were removed
-# correct_format=number of rows in correct format
-# incorrect_format=number of rows in incorrect format
-# first_val is to indicate whether what format is the first values in (more details in `check_first` doc-string), 100 for correct format, 200 for incorrect format
-STATS = {"cleaned": 0, "rows": 0, "correct_format": 0, "incorrect_format": 0, "first_val": 0}
-
 
 def clean_url(
     df: Union[pd.DataFrame, dd.DataFrame],
@@ -58,10 +50,11 @@ def clean_url(
     remove_auth: Union[bool, List[str]] = False,
     report: bool = True,
     errors: str = "coerce",
+    progress: bool = True,
 ) -> Union[pd.DataFrame, dd.DataFrame]:
-
     """
     This function cleans url
+
     Parameters
     ----------
     df
@@ -80,16 +73,16 @@ def clean_url(
         to be removed. By default it is set to False
     report
         Displays how many queries were removed from rows
-    errors
-        Specify ways to deal with broken value
-        {'ignore', 'coerce', 'raise'}, default 'coerce'
-        'raise': raise an exception when there is broken value
-        'coerce': set invalid value to NaN
-        'ignore': just return the initial input
+    errors {‘ignore’, ‘raise’, ‘coerce’}, default 'coerce'
+        * If ‘raise’, then invalid parsing will raise an exception.
+        * If ‘coerce’, then invalid parsing will be set as NaN.
+        * If ‘ignore’, then invalid parsing will return the input.
+    progress
+        If True, enable the progress bar
     """
+    # pylint: disable=too-many-arguments, global-statement
 
-    # reset stats and convert to dask
-    reset_stats()
+    # convert to dask
     df = to_dask(df)
 
     # unified list of auth removal params
@@ -97,216 +90,235 @@ def clean_url(
         global UNIFIED_AUTH_LIST
         UNIFIED_AUTH_LIST = {*AUTH_VALUES, *set(remove_auth)}
 
-    # specify the metadata for dask apply
-    meta = df.dtypes.to_dict()
-
+    # To clean, create a new column "clean_code_tup" which contains
+    # the cleaned values and code indicating how the initial value was
+    # changed in a tuple. Then split the column of tuples and count the
+    # amount of different codes to produce the report
+    df["clean_code_tup"] = df[column].map_partitions(
+        lambda srs: [_format_url(x, column, remove_auth, split, errors) for x in srs],
+        meta=object,
+    )
     if split:
-        meta.update(
-            zip(("scheme", "host", f"{column}_clean", "queries"), (str, str, str, str, str))
+        df = df.assign(
+            scheme=df["clean_code_tup"].map(itemgetter(0)),
+            host=df["clean_code_tup"].map(itemgetter(1)),
+            _temp_=df["clean_code_tup"].map(itemgetter(2)),
+            queries=df["clean_code_tup"].map(itemgetter(3), meta=("queries", object)),
+            _code_=df["clean_code_tup"].map(itemgetter(4), meta=("_code_", object)),
+            _nrem_=df["clean_code_tup"].map(itemgetter(5), meta=("_nrem_", object)),
         )
+        df = df.rename(columns={"_temp_": f"{column}_clean"})
+
     else:
-        meta[f"{column}_details"] = str
+        df = df.assign(
+            _temp_=df["clean_code_tup"].map(itemgetter(0)),
+            _code_=df["clean_code_tup"].map(itemgetter(1)),
+            _nrem_=df["clean_code_tup"].map(itemgetter(2)),
+        )
+        df = df.rename(columns={"_temp_": f"{column}_details"})
 
-    df = df.apply(format_url, args=(column, split, remove_auth, errors), axis=1, meta=meta)
-
-    df, nrows = dask.compute(df, df.shape[0])
+    # counts of codes indicating how values were changed
+    stats = df["_code_"].value_counts(sort=False)
+    # sum of auth tokens that were removed
+    removed_auth_cnt = df["_nrem_"].sum()
+    df = df.drop(columns=["clean_code_tup", "_code_", "_nrem_"])
 
     if inplace:
-        df = df.drop(columns=[column])
+        df = df.drop(columns=column)
 
+    with ProgressBar(minimum=1, disable=not progress):
+        df, stats, removed_auth_cnt = dask.compute(df, stats, removed_auth_cnt)
+
+    # output a report describing the result of clean_url
     if report:
-        report_url(nrows=nrows, errors=errors, split=split, column=column)
+        _report_url(stats, removed_auth_cnt, errors)
 
     return df
-
-
-def format_url(
-    row: pd.Series, column: str, split: bool, remove_auth: Union[bool, List[str]], errors: str
-) -> pd.Series:
-    """
-    This function formats each row of a pd.Series containing the url column
-    """
-    if split:
-        row["scheme"], row["host"], row[f"{column}_clean"], row["queries"] = get_url_params(
-            row[column], split=split, remove_auth=remove_auth, column=column, errors=errors
-        )
-    else:
-        val_dict = get_url_params(
-            row[column], split=split, remove_auth=remove_auth, column=column, errors=errors
-        )
-        row[f"{column}_details"] = val_dict
-
-    return row
-
-
-def get_url_params(
-    url: str, column: str, split: bool, remove_auth: Union[bool, List[str]], errors: str
-) -> Any:
-    """
-    This function extracts all the params from a given url string
-    """
-    if not validate_url(url):
-        # values based on errors
-        if split:
-            return np.nan, np.nan, np.nan, np.nan
-        else:
-            if errors == "raise":
-                raise ValueError(f"Unable to parse value {url}")
-            return url if errors == "ignore" else np.nan
-
-    # regex for finding the query / params and values
-    re_queries = re.findall(QUERY_REGEX, url)
-    all_queries = dict((y, z) for x, y, z in re_queries)
-
-    # removing auth queries
-    if remove_auth:
-        if isinstance(remove_auth, bool):
-            filtered_queries = {k: v for k, v in all_queries.items() if k not in AUTH_VALUES}
-        else:
-            filtered_queries = {k: v for k, v in all_queries.items() if k not in UNIFIED_AUTH_LIST}
-
-        # for stats display
-        diff = len(all_queries) - len(filtered_queries)
-        if diff > 0:
-            STATS["rows"] += 1
-        STATS["cleaned"] += len(all_queries) - len(filtered_queries)
-
-    # parsing the url using urlib
-    parsed = urlparse(url)
-
-    # extracting params
-    formatted_scheme = (parsed.scheme + "://") if parsed.scheme else ""
-    scheme = parsed.scheme
-    host = parsed.hostname if parsed.hostname else ""
-    path = parsed.path if parsed.path else ""
-    cleaned_url = unquote(formatted_scheme + host + path).replace(" ", "")
-    queries = filtered_queries if remove_auth else all_queries
-
-    # returning the type based upon the split parameter.
-    if split:
-        return scheme, host, cleaned_url, queries
-    else:
-        return {"scheme": scheme, "host": host, f"{column}_clean": cleaned_url, "queries": queries}
 
 
 def validate_url(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     """
     This function validates url
+
     Parameters
     ----------
     x
         pandas Series of urls or url instance
     """
+
     if isinstance(x, pd.Series):
-        verfied_series = x.apply(check_url)
-        return verfied_series
-    else:
-        return check_url(x)
+        return x.apply(_check_url, args=(False,))
+    return _check_url(x, False)
 
 
-def check_url(val: Union[str, Any]) -> Any:
+def _format_url(
+    url: Any, col: str, remove_auth: Union[bool, List[str]], split: bool, errors: str
+) -> Any:
+    """
+    This function formats the input value "url"
+
+    The last two components of the returned tuple hold the following codes:
+        the first component: code indicating how the value was transformed (see below)
+        the second component: the count of auth queries removed, if applicable
+    In the first component, there are the following four codes:
+        0 := the value is null
+        1 := the value could not be parsed
+        2 := the value was parsed and DID NOT have authentication queries removed
+        3 := the value was parsed and DID have authentication querires removed
+    """
+    # pylint: disable=too-many-locals
+
+    # check if the url is a valid URL, returns a "status" value "null" (url is null),
+    # "unknwon" (url is not a URL), and "success" (url is a URL)
+    status = _check_url(url, True)
+
+    if status == "null":
+        return (np.nan, np.nan, np.nan, np.nan, 0, 0) if split else (np.nan, 0, 0)
+    if status == "unknown":
+        if errors == "raise":
+            raise ValueError(f"Unable to parse value {url}")
+        result = url if errors == "ignore" else np.nan
+        return (result, np.nan, np.nan, np.nan, 1, 0) if split else (result, 1, 0)
+
+    # regex for finding the query / params and values
+    re_queries = re.findall(QUERY_REGEX, url)
+    all_queries = dict((y, z) for _, y, z in re_queries)
+
+    # initialize the removed authentication code and count for the stats
+    rem_auth_code, rem_auth_cnt = 2, 0
+    # removing auth queries
+    if remove_auth:
+        to_remove = AUTH_VALUES if isinstance(remove_auth, bool) else UNIFIED_AUTH_LIST
+        filtered_queries = {k: v for k, v in all_queries.items() if k not in to_remove}
+
+        # count of removed auth queries
+        rem_auth_cnt = len(all_queries) - len(filtered_queries)
+        # code to indicate whether queries were removed
+        rem_auth_code = 2 if rem_auth_cnt == 0 else 3
+
+    # parse the url using urllib
+    parsed = urlparse(url)
+
+    # extracting params
+    scheme = parsed.scheme
+    host = parsed.hostname if parsed.hostname else ""
+    path = parsed.path if parsed.path else ""
+    cleaned_url = unquote(f"{scheme}://{host}{path}").replace(" ", "")
+    queries = filtered_queries if remove_auth else all_queries
+
+    # returning the type based upon the split parameter.
+    if split:
+        return scheme, host, cleaned_url, queries, rem_auth_code, rem_auth_cnt
+    return (
+        {"scheme": scheme, "host": host, f"{col}_clean": cleaned_url, "queries": queries},
+        rem_auth_code,
+        rem_auth_cnt,
+    )
+
+
+def _check_url(url: Any, clean: bool) -> Any:
     """
     Function to check whether a value is a valid url
     """
     # check if the url is parsable
     try:
-        if val in NULL_VALUES:
-            if check_first():
-                # set first_val = 200, here 200 means incorrect_format
-                STATS["first_val"] = 200
-            STATS["incorrect_format"] += 1
-            return False
-        # for non-string datatypes
-        else:
-            val = str(val)
+        if url in NULL_VALUES:
+            return "null" if clean else False
 
-        val = unquote(val).replace(" ", "")
+        url = unquote(str(url)).replace(" ", "")
 
-        if re.match(VALID_URL_REGEX, val):
-            if check_first():
-                # set first_val = 100, here 100 means incorrect_format
-                STATS["first_val"] = 100
-            STATS["correct_format"] += 1
-            return True
-        else:
-            if check_first():
-                # set first_val = 200, here 200 means incorrect_format
-                STATS["first_val"] = 200
-            STATS["incorrect_format"] += 1
-            return False
+        if re.match(VALID_URL_REGEX, url):
+            return "success" if clean else True
+        return "unknown" if clean else False
+
     except TypeError:
-        if check_first():
-            # set first_val = 200, here 200 means incorrect_format
-            STATS["first_val"] = 200
-        STATS["incorrect_format"] += 1
-        return False
+        return "unknown" if clean else False
 
 
-def report_url(nrows: int, errors: str, split: bool, column: str) -> None:
+def _report_url(stats: pd.Series, removed_auth_cnt: int, errors: str) -> None:
     """
     This function displays the stats report
+
+    In the stats DataFrame, the codes have the following meaning:
+        0 := values that are null
+        1 := values that could not be parsed
+        2 := values that are parsed and DID NOT have authentication queries removed
+        3 := values that are parsed and DID have authentication querires removed
     """
-    correct_format = (
-        STATS["correct_format"] - 1 if (STATS["first_val"] == 100) else STATS["correct_format"]
-    )
-    correct_format_percentage = (correct_format / nrows) * 100
+    print("URL Cleaning Report:")
+    nrows = stats.sum()
 
-    incorrect_format = (
-        STATS["incorrect_format"] - 1 if (STATS["first_val"] == 200) else STATS["incorrect_format"]
-    )
-    incorrect_format_percentage = (incorrect_format / nrows) * 100
+    # count all values that were parsed (2 and 3 in stats)
+    nclnd = (stats.loc[2] if 2 in stats.index else 0) + (stats.loc[3] if 3 in stats.index else 0)
+    pclnd = round(nclnd / nrows * 100, 2)
+    if nclnd > 0:
+        print(f"\t{nclnd} values parsed ({pclnd}%)")
 
-    cleaned_queries = STATS["cleaned"]
-    rows = STATS["rows"]
+    # count all values that could not be parsed
+    nunknown = stats.loc[1] if 1 in stats.index else 0
+    if nunknown > 0:
+        punknown = round(nunknown / nrows * 100, 2)
+        expl = "set to NaN" if errors == "coerce" else "left unchanged"
+        print(f"\t{nunknown} values unable to be parsed ({punknown}%), {expl}")
 
-    rows_string = (
-        f"\nRemoved {cleaned_queries} auth queries from {rows} rows" if STATS["rows"] > 0 else ""
-    )
-    set_to = "NaN" if (errors == "coerce" or split) else "their original values"
-    result_null = "null values" if (errors == "coerce" or split) else "null / not parsable values"
+    # if auth queries were removed
+    if removed_auth_cnt > 0:
+        print(f"Removed {removed_auth_cnt} auth queries from {stats.loc[3]} rows")
 
-    if split:
-        result = (
-            f"Result contains parsed values for {correct_format}"
-            f"({(correct_format / nrows) * 100 :.2f} %) rows and {incorrect_format} {result_null}"
-            f"({(incorrect_format / nrows) * 100:.2f} %)."
-        )
-    else:
-        result = (
-            f"Result contains parsed key-value pairs for {correct_format} "
-            f"({(correct_format / nrows) * 100 :.2f} %) rows (stored in column `{column}_details`) and {incorrect_format} {result_null}"
-            f"({(incorrect_format / nrows) * 100:.2f} %)."
-        )
-
+    # count all null values
+    nnull = stats.loc[0] if 0 in stats.index else 0
+    if errors == "coerce":  # add unknown values that were set to NaN
+        nnull += stats.loc[1] if 1 in stats.index else 0
+    pnull = round(nnull / nrows * 100, 2)
     print(
-        f"""
-Url Cleaning report:
-        {correct_format} values parsed ({correct_format_percentage:.2f} %)
-        {incorrect_format} values unable to be parsed ({incorrect_format_percentage:.2f} %), set to {set_to} {rows_string}
-{result}
-        """
+        f"Result contains {nclnd} ({pclnd}%) parsed key-value pairs "
+        f"and {nnull} null values ({pnull}%)"
     )
 
 
-def reset_stats() -> None:
-    """
-    This function resets the STATS
-    """
-    STATS["cleaned"] = 0
-    STATS["rows"] = 0
-    STATS["correct_format"] = 0
-    STATS["incorrect_format"] = 0
-    STATS["first_val"] = 0
+# def _report_url(nrows: int, errors: str, split: bool, column: str) -> None:
+#     """
+#     This function displays the stats report
+#     """
+#     correct_format = (
+#         STATS["correct_format"] - 1 if (STATS["first_val"] == 100) else STATS["correct_format"]
+#     )
+#     correct_format_percentage = (correct_format / nrows) * 100
 
+#     incorrect_format = (
+#     STATS["incorrect_format"] - 1 if (STATS["first_val"] == 200) else STATS["incorrect_format"]
+#     )
+#     incorrect_format_percentage = (incorrect_format / nrows) * 100
 
-def check_first() -> bool:
-    """
-    Dask runs 2 times for the first value (hence the first value is counted twice),
-    this function checks whether the value we are parsing is the first value,
-    after we find the first value we check whether it is in the correct form or incorrect form
-    we then set STATS["first_val"] according to the following convention
-    100 is the code for correct form and 200 is the code for the incorrect form
-    we will use this value (STATS["first_val"] == 100 or STATS["first_val"] == 200) in our stats
-    report to compensate for the overcounting of the first value by reducing the value.
-    """
-    return STATS["correct_format"] == 0 and STATS["incorrect_format"] == 0
+#     cleaned_queries = STATS["cleaned"]
+#     rows = STATS["rows"]
+
+#     rows_string = (
+#         f"\nRemoved {cleaned_queries} auth queries from {rows} rows" if STATS["rows"] > 0 else ""
+#     )
+#     set_to = "NaN" if (errors == "coerce" or split) else "their original values"
+#     result_null = "null values" if (errors == "coerce" or split) else "null / not parsable values"
+
+#     if split:
+#         result = (
+#             f"Result contains parsed values for {correct_format}"
+#             f"({(correct_format / nrows) * 100 :.2f} %) rows and {incorrect_format} {result_null}"
+#             f"({(incorrect_format / nrows) * 100:.2f} %)."
+#         )
+#     else:
+#         result = (
+#             f"Result contains parsed key-value pairs for {correct_format} "
+#             f"({(correct_format / nrows) * 100 :.2f} %) rows (stored in column "\
+#             f"`{column}_details`) and {incorrect_format} {result_null}"
+#             f"({(incorrect_format / nrows) * 100:.2f} %)."
+#         )
+
+#     print(
+#         f"""
+# Url Cleaning report:
+#         {correct_format} values parsed ({correct_format_percentage:.2f} %)
+#         {incorrect_format} values unable to be parsed ({incorrect_format_percentage:.2f} %), " \
+#         f"set to {set_to} {rows_string}
+# {result}
+#         """
+#     )

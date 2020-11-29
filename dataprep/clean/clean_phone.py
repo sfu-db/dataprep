@@ -1,17 +1,17 @@
 """
 Implement clean_phone function
 """
-
 import re
+from operator import itemgetter
 from typing import Any, Union
 
-import dask.dataframe as dd
 import dask
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
-from .utils import NULL_VALUES, create_report, to_dask
-
+from ..eda.progress_bar import ProgressBar
+from .utils import NULL_VALUES, create_report_new, to_dask
 
 CA_US_PATTERN = re.compile(
     r"""
@@ -23,24 +23,23 @@ CA_US_PATTERN = re.compile(
     (?P<office>\d{3})
     [-. \/]*
     (?P<station>\d{4})
-    (?:[ \t]*(?:\#|x[.:]?|ext[.:]?|extension)[ \t]*(?P<ext>\d+))?
+    (?:[ \t]*(?:\#|x[.:]?|[Ee]xt[.:]?|[Ee]xtension)[ \t]*(?P<ext>\d+))?
     \s*$
     """,
     re.VERBOSE,
 )
 
-STATS = {"cleaned": 0, "null": 0, "unknown": 0}
-
 
 def clean_phone(
     df: Union[pd.DataFrame, dd.DataFrame],
-    col: str,
+    column: str,
     output_format: str = "nanp",
     fix_missing: str = "empty",
     split: bool = False,
     inplace: bool = False,
     report: bool = True,
     errors: str = "coerce",
+    progress: bool = True,
 ) -> pd.DataFrame:
     """
     This function cleans phone numbers.
@@ -49,7 +48,7 @@ def clean_phone(
     ----------
     df
         Pandas or Dask DataFrame.
-    col
+    column
         Column name containing phone numbers.
     output_format
         The desired format of the phone numbers.
@@ -72,9 +71,10 @@ def clean_phone(
         * If 'raise', then invalid parsing will raise an exception.
         * If 'coerce', then invalid parsing will be set as NaN.
         * If 'ignore', then invalid parsing will return the input.
+    progress
+        If True, enable the progress bar
     """
     # pylint: disable=too-many-arguments
-    reset_stats()
 
     if output_format not in {"nanp", "e164", "national"}:
         raise ValueError(
@@ -86,116 +86,120 @@ def clean_phone(
             f'output_format {output_format} is invalid, it needs to be "auto" or "empty"'
         )
 
+    # convert to dask
     df = to_dask(df)
-    # specify the metadata for dask apply
-    meta = df.dtypes.to_dict()
+
+    # To clean, create a new column "clean_code_tup" which contains
+    # the cleaned values and code indicating how the initial value was
+    # changed in a tuple. Then split the column of tuples and count the
+    # amount of different codes to produce the report
+    df["clean_code_tup"] = df[column].map_partitions(
+        lambda srs: [_format_phone(x, output_format, fix_missing, split, errors) for x in srs],
+        meta=object,
+    )
     if split:
-        meta.update(
-            zip(("country_code", "area_code", "office_code", "station_code", "ext_num"), (str,) * 5)
+        # For some reason the meta data for the last 3 components needs to be
+        # set. I think this is a dask bug
+        df = df.assign(
+            country_code=df["clean_code_tup"].map(itemgetter(0)),
+            area_code=df["clean_code_tup"].map(itemgetter(1)),
+            office_code=df["clean_code_tup"].map(itemgetter(2)),
+            station_code=df["clean_code_tup"].map(itemgetter(3), meta=("station_code", object)),
+            ext_num=df["clean_code_tup"].map(itemgetter(4), meta=("ext_num", object)),
+            _code_=df["clean_code_tup"].map(itemgetter(5), meta=("_code_", object)),
         )
     else:
-        meta[f"{col}_clean"] = str
+        df = df.assign(
+            _temp_=df["clean_code_tup"].map(itemgetter(0)),
+            _code_=df["clean_code_tup"].map(itemgetter(1)),
+        )
+        df = df.rename(columns={"_temp_": f"{column}_clean"})
 
-    df = df.apply(
-        format_phone,
-        args=(col, output_format, fix_missing, split, errors),
-        axis=1,
-        meta=meta,
-    )
+    # counts of codes indicating how values were changed
+    stats = df["_code_"].value_counts(sort=False)
+    df = df.drop(columns=["clean_code_tup", "_code_"])
 
     if inplace:
-        df = df.drop(columns=[col])
+        df = df.drop(columns=column)
 
-    df, nrows = dask.compute(df, df.shape[0])
+    with ProgressBar(minimum=1, disable=not progress):
+        df, stats = dask.compute(df, stats)
 
-    # output the report describing the changes to the column
+    # output a report describing the result of clean_phone
     if report:
-        create_report("Phone Number", STATS, nrows)
+        create_report_new("Phone Number", stats, errors)
 
     return df
 
 
-def format_phone(
-    row: pd.Series,
-    col: str,
+def validate_phone(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
+    """
+    Function to validate phone numbers.
+
+    Parameters
+    ----------
+    x
+        String or Pandas Series of phone numbers to be validated.
+    """
+
+    if isinstance(x, pd.Series):
+        return x.apply(_check_phone, clean=False)
+    return _check_phone(x, False)
+
+
+def _format_phone(
+    phone: Any,
     output_format: str,
     fix_missing: str,
     split: bool,
     errors: str,
-) -> pd.Series:
+) -> Any:
     """
-    Function to transform a phone number instance into the
-    desired format.
+    Function to transform a phone number instance into the desired format.
+
+    The last component of the returned tuple contains a code indicating how the
+    input value was changed:
+        0 := the value is null
+        1 := the value could not be parsed
+        2 := the value is cleaned and the cleaned value is DIFFERENT than the input value
+        3 := the value is cleaned and is THE SAME as the input value (no transformation)
     """
-    # pylint: disable=too-many-arguments,too-many-branches
-    country_code, area_code, office_code, station_code, ext_num, status = check_phone(
-        row[col], True
-    )
+    country_code, area_code, office_code, station_code, ext_num, status = _check_phone(phone, True)
 
     if status == "null":
-        STATS["null"] += 1
-        if split:
-            (
-                row["country_code"],
-                row["area_code"],
-                row["office_code"],
-                row["station_code"],
-                row["ext_num"],
-            ) = (np.nan,) * 5
-        else:
-            row[f"{col}_clean"] = np.nan
-        return row
+        return (np.nan, np.nan, np.nan, np.nan, np.nan, 0) if split else (np.nan, 0)
 
     if status == "unknown":
         if errors == "raise":
-            raise ValueError(f"unable to parse value {row[col]}")
-
-        STATS["unknown"] += 1
-        if split:
-            row["country_code"] = row[col] if errors == "ignore" else np.nan
-            row["area_code"], row["office_code"], row["station_code"], row["ext_num"] = (
-                np.nan,
-            ) * 4
-        else:
-            row[f"{col}_clean"] = row[col] if errors == "ignore" else np.nan
-        return row
+            raise ValueError(f"unable to parse value {phone}")
+        result = phone if errors == "ignore" else np.nan
+        return (result, np.nan, np.nan, np.nan, np.nan, 1) if split else (result, 1)
 
     if split:
-        STATS["cleaned"] += 1
-        if fix_missing == "auto" and area_code is not None:
-            country_code = country_code if country_code is not None else "1"
-        else:
-            country_code = country_code if country_code is not None else np.nan
-        area_code = area_code if area_code is not None else np.nan
-        ext_num = ext_num if ext_num is not None else np.nan
-        (
-            row["country_code"],
-            row["area_code"],
-            row["office_code"],
-            row["station_code"],
-            row["ext_num"],
-        ) = (country_code, area_code, office_code, station_code, ext_num)
-    else:
-        if output_format == "nanp":
-            area_code = f"{area_code}-" if area_code is not None else ""
-            ext_num = f" ext. {ext_num}" if ext_num is not None else ""
-            row[f"{col}_clean"] = f"{area_code}{office_code}-{station_code}{ext_num}"
-        elif output_format == "e164":
-            country_code = "+1" if area_code is not None else ""
-            area_code = area_code if area_code is not None else ""
-            ext_num = f" ext. {ext_num}" if ext_num is not None else ""
-            row[f"{col}_clean"] = f"{country_code}{area_code}{office_code}{station_code}{ext_num}"
-        elif output_format == "national":
-            area_code = f"({area_code}) " if area_code is not None else ""
-            ext_num = f" ext. {ext_num}" if ext_num is not None else ""
-            row[f"{col}_clean"] = f"{area_code}{office_code}-{station_code}{ext_num}"
-        if row[col] != row[f"{col}_clean"]:
-            STATS["cleaned"] += 1
+        missing_code = "1" if fix_missing == "auto" and area_code else np.nan
+        country_code = country_code if country_code else missing_code
+        area_code = area_code if area_code else np.nan
+        ext_num = ext_num if ext_num else np.nan
+        return country_code, area_code, office_code, station_code, ext_num, 2
 
-    return row
+    if output_format == "nanp":  # NPA-NXX-XXXX
+        area_code = f"{area_code}-" if area_code else ""
+        ext_num = f" ext. {ext_num}" if ext_num else ""
+        result = f"{area_code}{office_code}-{station_code}{ext_num}"
+    elif output_format == "e164":  # +1NPANXXXXXX
+        country_code = "+1" if area_code else ""
+        area_code = area_code if area_code else ""
+        ext_num = f" ext. {ext_num}" if ext_num else ""
+        result = f"{country_code}{area_code}{office_code}{station_code}{ext_num}"
+    elif output_format == "national":  # (NPA) NXX-XXXX
+        area_code = f"({area_code}) " if area_code else ""
+        ext_num = f" ext. {ext_num}" if ext_num else ""
+        result = f"{area_code}{office_code}-{station_code}{ext_num}"
+
+    return result, 2 if phone != result else 3
 
 
-def check_phone(val: Union[str, int, Any], clean: bool) -> Any:
+def _check_phone(phone: Any, clean: bool) -> Any:
     """
     Function to parse a phone number and return the components if the
     parse is successful.
@@ -211,19 +215,17 @@ def check_phone(val: Union[str, int, Any], clean: bool) -> Any:
         parsed). Else, return False for an unsuccesful parse and True
         for a successful parse.
     """
-    val = str(val)
-
-    # If the value is null, return empty strings for the components
+    # If the value is null, return None for the components
     # and "null" for the "status"
-    if val in NULL_VALUES:
-        return [""] * 5 + ["null"] if clean else False
+    if phone in NULL_VALUES:
+        return (None,) * 5 + ("null",) if clean else False
 
-    mch = re.match(CA_US_PATTERN, re.sub(r"''", r'"', val))
+    mch = re.match(CA_US_PATTERN, re.sub(r"''", r'"', str(phone)))
     # Check if the value was able to be parsed
     if not mch:
-        return [""] * 5 + ["unknown"] if clean else False
+        return (None,) * 5 + ("unknown",) if clean else False
     if mch.group("country") and not mch.group("area"):
-        return [""] * 5 + ["unknown"] if clean else False
+        return (None,) * 5 + ("unknown",) if clean else False
 
     # Components for phone number
     country_code = mch.group("country")
@@ -235,28 +237,3 @@ def check_phone(val: Union[str, int, Any], clean: bool) -> Any:
     return (
         (country_code, area_code, office_code, station_code, ext_num, "success") if clean else True
     )
-
-
-def validate_phone(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
-    """
-    Function to validate phone numbers.
-
-    Parameters
-    ----------
-    x
-        String or Pandas Series of phone numbers to be validated.
-    """
-
-    if isinstance(x, pd.Series):
-        return x.apply(check_phone, clean=False)
-    else:
-        return check_phone(x, False)
-
-
-def reset_stats() -> None:
-    """
-    Reset global statistics dictionary.
-    """
-    STATS["cleaned"] = 0
-    STATS["null"] = 0
-    STATS["unknown"] = 0
