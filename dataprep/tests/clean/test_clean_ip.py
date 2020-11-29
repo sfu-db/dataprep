@@ -35,7 +35,7 @@ def df_ips() -> pd.DataFrame:
 def test_clean_input_ipv4(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip", input_format="ipv4")
     df_check = df_ips.copy()
-    df_check["messy_ip_transformed"] = [
+    df_check["messy_ip_clean"] = [
         np.nan,
         "12.3.4.5",
         "233.5.6.0",
@@ -50,7 +50,7 @@ def test_clean_input_ipv4(df_ips: pd.DataFrame) -> None:
 def test_clean_input_ipv6(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip", input_format="ipv6")
     df_check = df_ips.copy()
-    df_check["messy_ip_transformed"] = [
+    df_check["messy_ip_clean"] = [
         "2001:db8:85a3::8a2e:370:7334",
         np.nan,
         np.nan,
@@ -65,7 +65,7 @@ def test_clean_input_ipv6(df_ips: pd.DataFrame) -> None:
 def test_clean_default(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip")
     df_check = df_ips.copy()
-    df_check["messy_ip_transformed"] = [
+    df_check["messy_ip_clean"] = [
         "2001:db8:85a3::8a2e:370:7334",
         "12.3.4.5",
         "233.5.6.0",
@@ -81,7 +81,7 @@ def test_clean_default(df_ips: pd.DataFrame) -> None:
 def test_clean_output_full(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip", output_format="full")
     df_check = df_ips.copy()
-    df_check["messy_ip_transformed"] = [
+    df_check["messy_ip_clean"] = [
         "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
         "0012.0003.0004.0005",
         "0233.0005.0006.0000",
@@ -96,7 +96,7 @@ def test_clean_output_full(df_ips: pd.DataFrame) -> None:
 def test_clean_output_hexa(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip", output_format="hexa")
     df_check = df_ips.copy()
-    df_check["messy_ip_transformed"] = [
+    df_check["messy_ip_clean"] = [
         "0x20010db885a3000000008a2e03707334",
         "0xc030405",
         "0xe9050600",
@@ -111,7 +111,7 @@ def test_clean_output_hexa(df_ips: pd.DataFrame) -> None:
 def test_clean_output_binary(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip", output_format="integer")
     df_check = df_ips.copy()
-    df_check["messy_ip_transformed"] = [
+    df_check["messy_ip_clean"] = [
         42540766452641154071740215577757643572,
         201524229,
         3909420544,
