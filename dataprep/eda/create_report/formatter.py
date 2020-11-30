@@ -15,12 +15,14 @@ from ..correlation import render_correlation
 from ..correlation.compute.nullivariate import correlation_nxn
 from ..data_array import DataArray
 from ..distribution import render
+from ..distribution.compute.common import _calc_line_dt
 from ..distribution.compute.overview import calc_stats
-from ..distribution.compute.univariate import cont_comps, nom_comps
-from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats
+from ..distribution.compute.univariate import cont_comps, nom_comps, calc_stats_dt
+from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats, stats_viz_dt
 from ..dtypes import (
     CATEGORICAL_DTYPES,
     Continuous,
+    DateTime,
     Nominal,
     detect_dtype,
     is_dtype,
@@ -111,14 +113,21 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
         stats: Any = None  # needed for pylint
         if is_dtype(detect_dtype(df[col]), Continuous()):
             itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
-            rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)["layout"]
             stats = format_num_stats(data[col])
         elif is_dtype(detect_dtype(df[col]), Nominal()):
             itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
-            rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)["layout"]
             stats = format_cat_stats(
                 data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
             )
+        elif is_dtype(detect_dtype(df[col]), DateTime()):
+            itmdt = Intermediate(
+                col=col,
+                data=data[col]["stats"],
+                line=data[col]["line"],
+                visual_type="datetime_column",
+            )
+            stats = stats_viz_dt(data[col]["stats"])
+        rndrd = render(itmdt, plot_height_lrg=250, plot_width_lrg=280)["layout"]
         figs: List[Figure] = []
         for tab in rndrd:
             try:
@@ -214,6 +223,11 @@ def basic_computations(df: dd.DataFrame) -> Tuple[Dict[str, Any], Dict[str, Any]
             data[col] = nom_comps(
                 df.frame[col], first_rows[col], 10, True, 10, 20, True, False, False
             )
+        elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
+            data[col] = {}
+            data[col]["stats"] = calc_stats_dt(df.frame[col])
+            data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
+
     # overview
     data["ov"] = calc_stats(df.frame, None)
     # interactions
