@@ -13,7 +13,7 @@ import dask
 import numpy as np
 import pandas as pd
 
-from .utils import NULL_VALUES, create_report, to_dask
+from .utils import create_report, to_dask
 from .clean_date_utils import (
     JUMP,
     WEEKDAYS,
@@ -30,6 +30,10 @@ from .clean_date_utils import (
     TEXT_MONTHS,
     TARGET_WEEKDAY,
     TEXT_WEEKDAYS,
+    split,
+    check_date,
+    fix_empty_auto_minimum,
+    fix_empty_auto_nearest,
 )
 from .clean_date_utils import ParsedDate, ParsedTargetFormat
 
@@ -91,7 +95,7 @@ def clean_date(
     if (
         target_timezone not in all_timezones
         and target_timezone not in ZONE
-        and not target_timezone == ""
+        and target_timezone != ""
     ):
         raise ValueError(f"target_timezone {target_timezone} doesn't exist")
     df = to_dask(df)
@@ -220,36 +224,6 @@ def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
         return verfied_series
     else:
         return check_date(date)
-
-
-def check_date(date: Union[str, Any]) -> Any:
-    """
-    This function check format of date
-    Parameters
-    ----------
-    date
-        date string
-    """
-    if str(date) in NULL_VALUES:
-        return "null"
-    tokes = split(date, JUMP)
-    remain_tokens = tokes.copy()
-    # Handle timezone
-    for token in tokes:
-        if token in all_timezones or token in ZONE:
-            remain_tokens.remove(token)
-    for token in tokes:
-        if token in MONTHS or token in WEEKDAYS:
-            remain_tokens.remove(token)
-    for token in remain_tokens:
-        if token.isnumeric():
-            remain_tokens.remove(token)
-    for token in remain_tokens:
-        token = split(token, AM + PM + [":"])
-        invalid_judge = False in [temp_token.isnumeric() for temp_token in token]
-        if invalid_judge:
-            return "unknown"
-    return "cleaned"
 
 
 def validate_target_format(target_format: Union[str, Any]) -> Any:
@@ -624,24 +598,6 @@ def ensure_pm(
     return parsed_data
 
 
-def split(txt: Union[str, Any], seps: Union[str, Any]) -> Any:
-    """
-    This function split string into tokens
-    Parameters
-    ----------
-    txt
-        string
-    seps
-        seprators
-    """
-    default_sep = seps[0]
-    for sep in seps[1:]:
-        txt = txt.replace(sep, default_sep)
-    result = [i.strip() for i in txt.split(default_sep)]
-    result = [value for value in result if value != ""]
-    return result
-
-
 def fix_empty_element(parsed_res: Union[ParsedDate, Any], fix_empty: Union[str, Any]) -> Any:
     """
     This function fix empty part of transformed format
@@ -658,63 +614,6 @@ def fix_empty_element(parsed_res: Union[ParsedDate, Any], fix_empty: Union[str, 
         parsed_res = fix_empty_auto_nearest(parsed_res)
     elif fix_empty == "auto_minimum":
         parsed_res = fix_empty_auto_minimum(parsed_res)
-    return parsed_res
-
-
-def fix_empty_auto_nearest(parsed_res: Union[ParsedDate, Any]) -> Any:
-    """
-    This function fix empty part by nearest time
-    Parameters
-    ----------
-    parsed_res
-        parsed date result
-    """
-    now_time = datetime.datetime.now()
-    if parsed_res.ymd["year"] == -1:
-        parsed_res.set_year(now_time.year)
-    if parsed_res.ymd["month"] == -1:
-        parsed_res.set_month(now_time.month)
-    if parsed_res.ymd["day"] == -1:
-        parsed_res.set_day(now_time.day)
-    if parsed_res.hms["hour"] == -1:
-        parsed_res.set_hour(now_time.hour)
-    if parsed_res.hms["minute"] == -1:
-        parsed_res.set_minute(now_time.minute)
-    if parsed_res.hms["second"] == -1:
-        parsed_res.set_second(now_time.second)
-    if parsed_res.weekday == -1:
-        temp_date = datetime.datetime(
-            parsed_res.ymd["year"], parsed_res.ymd["month"], parsed_res.ymd["day"]
-        )
-        parsed_res.set_weekday(temp_date.weekday() + 1)
-    return parsed_res
-
-
-def fix_empty_auto_minimum(parsed_res: Union[ParsedDate, Any]) -> Any:
-    """
-    This function fix empty part by minimum time
-    Parameters
-    ----------
-    parsed_res
-        parsed date result
-    """
-    if parsed_res.ymd["year"] == -1:
-        parsed_res.set_year(2000)
-    if parsed_res.ymd["month"] == -1:
-        parsed_res.set_month(1)
-    if parsed_res.ymd["day"] == -1:
-        parsed_res.set_day(1)
-    if parsed_res.hms["hour"] == -1:
-        parsed_res.set_hour(0)
-    if parsed_res.hms["minute"] == -1:
-        parsed_res.set_minute(0)
-    if parsed_res.hms["second"] == -1:
-        parsed_res.set_second(0)
-    if parsed_res.weekday == -1:
-        temp_date = datetime.datetime(
-            parsed_res.ymd["year"], parsed_res.ymd["month"], parsed_res.ymd["day"]
-        )
-        parsed_res.set_weekday(temp_date.weekday() + 1)
     return parsed_res
 
 
@@ -765,9 +664,8 @@ def change_timezone(
         if not pytz_offset is None:
             origin_tz_offset = timedelta(days=-pytz_offset.days, seconds=-pytz_offset.seconds)
     elif parsed_date_data.tzinfo["timezone"] in ZONE:
-        origin_tz_offset = timedelta(
-            seconds=-1 * ZONE[str(parsed_date_data.tzinfo["timezone"])] * 3600
-        )
+        offset_value = -1 * ZONE[str(parsed_date_data.tzinfo["timezone"])] * 3600
+        origin_tz_offset = timedelta(seconds=offset_value)
     if target_timezone in all_timezones:
         pytz_offset = pytz.timezone(target_timezone).utcoffset(origin_date)
         if not pytz_offset is None:
@@ -819,7 +717,7 @@ def transform_year(
         value of year
     """
     result = deepcopy(result_str)
-    if not year_token == "":
+    if year_token != "":
         if year == -1:
             if len(year_token) == 4:
                 result = result.replace(year_token, str("----"))
@@ -854,7 +752,7 @@ def transform_month(
         value of month
     """
     result = deepcopy(result_str)
-    if not month_token == "":
+    if month_token != "":
         if month == -1:
             if len(month_token) == 3:
                 result = result.replace(month_token, str("---"))
@@ -894,7 +792,7 @@ def transform_day(
         value of day
     """
     result = deepcopy(result_str)
-    if not day_token == "":
+    if day_token != "":
         if day == -1:
             if len(day_token) == 2:
                 result = result.replace(day_token, str("--"))
@@ -929,7 +827,7 @@ def transform_hms(
         value of hour
     """
     result = deepcopy(result_str)
-    if not hms_token == "":
+    if hms_token != "":
         if hms_value == -1:
             if len(hms_token) == 2:
                 result = result.replace(hms_token, str("--"))
@@ -963,7 +861,7 @@ def transform_weekday(
         value of weekday
     """
     result = deepcopy(result_str)
-    if not weekday_token == "":
+    if weekday_token != "":
         if weekday == -1:
             if len(weekday_token) == 3:
                 result = result.replace(weekday_token, str("---"))
@@ -998,7 +896,7 @@ def transform_timezone(
     utc_add = tz_info["utc_add"]
     utc_offset_hours = int(tz_info["utc_offset_hours"])
     utc_offset_minutes = int(tz_info["utc_offset_minutes"])
-    if not timezone_token == "":
+    if timezone_token != "":
         if timezone_token == "z":
             result = result.replace(timezone_token, timezone)
         elif timezone_token == "Z":
@@ -1035,7 +933,7 @@ def transform(
         target timezone string
     """
     result = deepcopy(target_format)
-    if not target_timezone == "":
+    if target_timezone != "":
         parsed_date_data = change_timezone(parsed_date_data, target_timezone)
     # Handle year
     result = transform_year(

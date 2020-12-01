@@ -1,6 +1,9 @@
 """Common definitions and classes for clean_date function"""
+from typing import Any, Union, List
+import datetime
 from pytz import all_timezones
-from typing import List
+
+from .utils import NULL_VALUES
 
 JUMP = [
     " ",
@@ -342,13 +345,13 @@ class ParsedDate:
         utc_offset_minutes
             value of offset minutes
         """
-        if not timezone == "":
+        if timezone != "":
             if timezone in all_timezones or timezone in ZONE:
                 self.tzinfo["timezone"] = timezone
                 return True
             self.valid = "unknown"
             return False
-        if not utc_add == "":
+        if utc_add != "":
             self.tzinfo["utc_add"] = utc_add
         if utc_offset_hours >= 0:
             self.tzinfo["utc_offset_hours"] = utc_offset_hours
@@ -529,9 +532,9 @@ class ParsedTargetFormat:
         utc_offset_minutes
             value of offset minutes
         """
-        if not timezone == "":
+        if timezone != "":
             self.tzinfo["timezone"] = timezone
-        if not utc_add == "":
+        if utc_add != "":
             self.tzinfo["utc_add"] = utc_add
         if utc_offset_hours >= 0:
             self.tzinfo["utc_offset_hours"] = utc_offset_hours
@@ -573,3 +576,108 @@ class ParsedTargetFormat:
         """
         self.invalid_tokens.append(token)
         return True
+
+
+def split(txt: Union[str, Any], seps: Union[str, Any]) -> Any:
+    """
+    This function split string into tokens
+    Parameters
+    ----------
+    txt
+        string
+    seps
+        seprators
+    """
+    default_sep = seps[0]
+    for sep in seps[1:]:
+        txt = txt.replace(sep, default_sep)
+    result = [i.strip() for i in txt.split(default_sep)]
+    result = [value for value in result if value != ""]
+    return result
+
+
+def check_date(date: Union[str, Any]) -> Any:
+    """
+    This function check format of date
+    Parameters
+    ----------
+    date
+        date string
+    """
+    if str(date) in NULL_VALUES:
+        return "null"
+    tokes = split(date, JUMP)
+    remain_tokens = tokes.copy()
+    # Handle timezone
+    for token in tokes:
+        if token in all_timezones or token in ZONE:
+            remain_tokens.remove(token)
+    for token in tokes:
+        if token in MONTHS or token in WEEKDAYS:
+            remain_tokens.remove(token)
+    for token in remain_tokens:
+        if token.isnumeric():
+            remain_tokens.remove(token)
+    for token in remain_tokens:
+        token = split(token, AM + PM + [":"])
+        invalid_judge = False in [temp_token.isnumeric() for temp_token in token]
+        if invalid_judge:
+            return "unknown"
+    return "cleaned"
+
+
+def fix_empty_auto_nearest(parsed_res: Union[ParsedDate, Any]) -> Any:
+    """
+    This function fix empty part by nearest time
+    Parameters
+    ----------
+    parsed_res
+        parsed date result
+    """
+    now_time = datetime.datetime.now()
+    if parsed_res.ymd["year"] == -1:
+        parsed_res.set_year(now_time.year)
+    if parsed_res.ymd["month"] == -1:
+        parsed_res.set_month(now_time.month)
+    if parsed_res.ymd["day"] == -1:
+        parsed_res.set_day(now_time.day)
+    if parsed_res.hms["hour"] == -1:
+        parsed_res.set_hour(now_time.hour)
+    if parsed_res.hms["minute"] == -1:
+        parsed_res.set_minute(now_time.minute)
+    if parsed_res.hms["second"] == -1:
+        parsed_res.set_second(now_time.second)
+    if parsed_res.weekday == -1:
+        temp_date = datetime.datetime(
+            parsed_res.ymd["year"], parsed_res.ymd["month"], parsed_res.ymd["day"]
+        )
+        parsed_res.set_weekday(temp_date.weekday() + 1)
+    return parsed_res
+
+
+def fix_empty_auto_minimum(parsed_res: Union[ParsedDate, Any]) -> Any:
+    """
+    This function fix empty part by minimum time
+    Parameters
+    ----------
+    parsed_res
+        parsed date result
+    """
+    if parsed_res.ymd["year"] == -1:
+        parsed_res.set_year(2000)
+    if parsed_res.ymd["month"] == -1:
+        parsed_res.set_month(1)
+    if parsed_res.ymd["day"] == -1:
+        parsed_res.set_day(1)
+    if parsed_res.hms["hour"] == -1:
+        parsed_res.set_hour(0)
+    if parsed_res.hms["minute"] == -1:
+        parsed_res.set_minute(0)
+    if parsed_res.hms["second"] == -1:
+        parsed_res.set_second(0)
+    if parsed_res.weekday == -1:
+        temp_date = datetime.datetime(
+            parsed_res.ymd["year"], parsed_res.ymd["month"], parsed_res.ymd["day"]
+        )
+        parsed_res.set_weekday(temp_date.weekday() + 1)
+    return parsed_res
