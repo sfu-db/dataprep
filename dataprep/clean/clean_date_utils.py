@@ -1,5 +1,6 @@
 """Common definitions and classes for clean_date function"""
 from pytz import all_timezones
+from typing import List
 
 JUMP = [
     " ",
@@ -208,22 +209,22 @@ class ParsedDate:
         valid: if parsed values are all valid.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This function initiate parse_date
         """
-        self.ymd = {"year": None, "month": None, "day": None}
-        self.hms = {"hour": None, "minute": None, "second": None}
-        self.weekday = None
+        self.ymd = {"year": -1, "month": -1, "day": -1}
+        self.hms = {"hour": -1, "minute": -1, "second": -1}
+        self.weekday = -1
         self.tzinfo = {
-            "timezone": None,
-            "utc_add": None,
-            "utc_offset_hours": None,
-            "utc_offset_minutes": None,
+            "timezone": "",
+            "utc_add": "",
+            "utc_offset_hours": -1,
+            "utc_offset_minutes": -1,
         }
         self.valid = "cleaned"
 
-    def set_year(self, year):
+    def set_year(self, year: int) -> bool:
         """
         This function set value of year
         Parameters
@@ -237,7 +238,7 @@ class ParsedDate:
         self.valid = "unknown"
         return False
 
-    def set_month(self, month):
+    def set_month(self, month: int) -> bool:
         """
         This function set value of month
         Parameters
@@ -251,7 +252,7 @@ class ParsedDate:
         self.valid = "unknown"
         return False
 
-    def set_day(self, day):
+    def set_day(self, day: int) -> bool:
         """
         This function set value of day
         Parameters
@@ -279,7 +280,7 @@ class ParsedDate:
         self.valid = "unknown"
         return False
 
-    def set_hour(self, hour):
+    def set_hour(self, hour: int) -> bool:
         """
         This function set value of hour
         Parameters
@@ -293,7 +294,7 @@ class ParsedDate:
         self.valid = "unknown"
         return False
 
-    def set_minute(self, minute):
+    def set_minute(self, minute: int) -> bool:
         """
         This function set value of minute
         Parameters
@@ -307,7 +308,7 @@ class ParsedDate:
         self.valid = "unknown"
         return False
 
-    def set_second(self, second):
+    def set_second(self, second: int) -> bool:
         """
         This function set value of second
         Parameters
@@ -322,8 +323,12 @@ class ParsedDate:
         return False
 
     def set_tzinfo(
-        self, timezone=None, utc_add=None, utc_offset_hours=None, utc_offset_minutes=None
-    ):
+        self,
+        timezone: str = "",
+        utc_add: str = "",
+        utc_offset_hours: int = -1,
+        utc_offset_minutes: int = -1,
+    ) -> bool:
         """
         This function set timezone info
         Parameters
@@ -337,21 +342,21 @@ class ParsedDate:
         utc_offset_minutes
             value of offset minutes
         """
-        if not timezone is None:
+        if not timezone == "":
             if timezone in all_timezones or timezone in ZONE:
                 self.tzinfo["timezone"] = timezone
                 return True
             self.valid = "unknown"
             return False
-        if not utc_add is None:
+        if not utc_add == "":
             self.tzinfo["utc_add"] = utc_add
-        if not utc_offset_hours is None:
+        if utc_offset_hours >= 0:
             self.tzinfo["utc_offset_hours"] = utc_offset_hours
-        if not utc_offset_minutes is None:
+        if utc_offset_minutes >= 0:
             self.tzinfo["utc_offset_minutes"] = utc_offset_minutes
         return True
 
-    def set_weekday(self, weekday):
+    def set_weekday(self, weekday: int) -> bool:
         """
         This function set value of weekday
         Parameters
@@ -365,7 +370,7 @@ class ParsedDate:
         self.valid = "unknown"
         return False
 
-    def _is_leap_year(self):
+    def _is_leap_year(self) -> bool:
         """
         This function judge if year is leap year
         """
@@ -399,29 +404,24 @@ class ParsedTargetFormat:
                         what tokens lead to this result.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This function initiate parsed_target_fomat
         """
-        self.ymd_token = {"year_token": None, "month_token": None, "day_token": None}
-        self.hms_token = {
-            "hour_token": None,
-            "minute_token": None,
-            "second_token": None,
-            "ispm": False,
-        }
-        self.weekday_token = None
-        self.timezone_token = None
+        self.ymd_token = {"year_token": "", "month_token": "", "day_token": ""}
+        self.hms_token = {"hour_token": "", "minute_token": "", "second_token": "", "ispm": False}
+        self.weekday_token = ""
+        self.timezone_token = ""
         self.tzinfo = {
-            "timezone": None,
-            "utc_add": None,
-            "utc_offset_hours": None,
-            "utc_offset_minutes": None,
+            "timezone": "",
+            "utc_add": "",
+            "utc_offset_hours": -1,
+            "utc_offset_minutes": -1,
         }
         self.valid = True
-        self.invalid_tokens = []
+        self.invalid_tokens: List[str] = []
 
-    def set_year_token(self, year_token):
+    def set_year_token(self, year_token: str) -> bool:
         """
         This function set value of year_token
         Parameters
@@ -432,7 +432,7 @@ class ParsedTargetFormat:
         self.ymd_token["year_token"] = year_token
         return True
 
-    def set_month_token(self, month_token):
+    def set_month_token(self, month_token: str) -> bool:
         """
         This function set value of month_token
         Parameters
@@ -443,7 +443,7 @@ class ParsedTargetFormat:
         self.ymd_token["month_token"] = month_token
         return True
 
-    def set_day_token(self, day_token):
+    def set_day_token(self, day_token: str) -> bool:
         """
         This function set value of day_token
         Parameters
@@ -454,7 +454,7 @@ class ParsedTargetFormat:
         self.ymd_token["day_token"] = day_token
         return True
 
-    def set_hour_token(self, hour_token):
+    def set_hour_token(self, hour_token: str) -> bool:
         """
         This function set value of hour_token
         Parameters
@@ -465,7 +465,7 @@ class ParsedTargetFormat:
         self.hms_token["hour_token"] = hour_token
         return True
 
-    def set_minute_token(self, minute_token):
+    def set_minute_token(self, minute_token: str) -> bool:
         """
         This function set value of minute_token
         Parameters
@@ -476,7 +476,7 @@ class ParsedTargetFormat:
         self.hms_token["minute_token"] = minute_token
         return True
 
-    def set_second_token(self, second_token):
+    def set_second_token(self, second_token: str) -> bool:
         """
         This function set value of second_token
         Parameters
@@ -487,7 +487,7 @@ class ParsedTargetFormat:
         self.hms_token["second_token"] = second_token
         return True
 
-    def set_weekday_token(self, weekday_token):
+    def set_weekday_token(self, weekday_token: str) -> bool:
         """
         This function set value of weekday_token
         Parameters
@@ -498,7 +498,7 @@ class ParsedTargetFormat:
         self.weekday_token = weekday_token
         return True
 
-    def set_timezone_token(self, timezone_token):
+    def set_timezone_token(self, timezone_token: str) -> bool:
         """
         This function set value of timezone_token
         Parameters
@@ -510,8 +510,12 @@ class ParsedTargetFormat:
         return True
 
     def set_tzinfo(
-        self, timezone=None, utc_add=None, utc_offset_hours=None, utc_offset_minutes=None
-    ):
+        self,
+        timezone: str = "",
+        utc_add: str = "",
+        utc_offset_hours: int = -1,
+        utc_offset_minutes: int = -1,
+    ) -> bool:
         """
         This function set timezone info
         Parameters
@@ -525,17 +529,17 @@ class ParsedTargetFormat:
         utc_offset_minutes
             value of offset minutes
         """
-        if not timezone is None:
+        if not timezone == "":
             self.tzinfo["timezone"] = timezone
-        if not utc_add is None:
+        if not utc_add == "":
             self.tzinfo["utc_add"] = utc_add
-        if not utc_offset_hours is None:
+        if utc_offset_hours >= 0:
             self.tzinfo["utc_offset_hours"] = utc_offset_hours
-        if not utc_offset_minutes is None:
+        if utc_offset_minutes >= 0:
             self.tzinfo["utc_offset_minutes"] = utc_offset_minutes
         return True
 
-    def set_valid(self, valid):
+    def set_valid(self, valid: bool) -> bool:
         """
         This function set valid status of target format
         Parameters
@@ -546,7 +550,7 @@ class ParsedTargetFormat:
         self.valid = valid
         return True
 
-    def set_ispm(self, ispm):
+    def set_ispm(self, ispm: bool) -> bool:
         """
         This function set value of judgement
         of PM status for target format
@@ -558,7 +562,7 @@ class ParsedTargetFormat:
         self.hms_token["ispm"] = ispm
         return True
 
-    def add_invalid_token(self, token):
+    def add_invalid_token(self, token: str) -> bool:
         """
         This function set value of invalid tokens
         in target format
