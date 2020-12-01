@@ -20,9 +20,9 @@
   <a href="https://groups.google.com/forum/#!forum/dataprep">Mail List</a>
 </p>
 
-Dataprep lets you prepare your data using a single library with a few lines of code.
+DataPrep lets you prepare your data using a single library with a few lines of code.
 
-Currently, you can use `dataprep` to:
+Currently, you can use DataPrep to:
 * Collect data from common data sources (through `dataprep.connector`)
 * Do your exploratory data analysis (through `dataprep.eda`)
 * ...more modules are coming
@@ -58,12 +58,56 @@ pip install -U dataprep
 
 ## Examples & Usages
 
-The following examples can give you an impression of what dataprep can do:
+The following examples can give you an impression of what DataPrep can do:
 
 * [Documentation: Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
 * [Documentation: EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
 * [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/user_guide/eda/titanic.html)
 * [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/user_guide/eda/house_price.html)
+
+### Connector
+
+Connector is an intuitive, open-source API wrapper that speeds up development by standardizing calls to multiple APIs as a simple workflow.
+
+
+Connector provides a simple wrapper to collect structured data from different Web APIs (e.g., Twitter API, Yelp Fusion API, Spotify API, DBLP API), making web data collection easy and efficient, without requiring advanced programming skills.
+
+
+Do you want to leverage the growing number of websites that are opening their data through public APIs? Connector is for you!  
+
+Let's check out the several benefits that Connector offers:
+
+* <ins>**A unified API:**</ins> You can fetch data using one or two lines of code to get data from many websites.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sfu-db.github.io/dataprep/user_guide/connector/connector.html"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_main.gif"/></a>
+
+* <ins>**Auto Pagination:**</ins> Do you want to invoke a Web API that could return a large result set and need to handle it through pagination? Connector automatically does the pagination for you! Just specify the desired number of returned results (argument `_count`) without getting into unnecessary detail about a specific pagination scheme.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sfu-db.github.io/dataprep/user_guide/connector/connector.html"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_pagination.gif"/></a>
+
+* <ins>**Smart API request strategy:**</ins> Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sfu-db.github.io/dataprep/user_guide/connector/connector.html"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector_concurrency.gif"/></a>
+
+In [configuration files](https://github.com/sfu-db/DataConnectorConfigs), Connector specifies how to connect with each Web API for data gathering. If you want to connect with any of the APIs mentioned in the table below, with one line of code, you can get the most up-to-date version of the config file from our codebase and use it right away!
+
+Many websites in different domains are currently supported. These are some examples: 
+ 
+| Category     | Web API                                          | Auth Method    | Connector Config File(s)                                                                                    | Jupyter Notebook / Tutorial                                                                                      | Description                                                            |
+| ------------ | ------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Social Media | [Twitter](https://developer.twitter.com/en)      | `OAuth2`       | [Twitter config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/twitter)               | [Twitter Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Twitter.ipynb) | API endpoint for Tweets information retrieval.                         |
+| Music        | [Spotify](https://developer.spotify.com/)        | `OAuth2`       | [Spotify config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spotify)               | [Spotify tutorial](https://sfu-db.github.io/dataprep/user_guide/connector/DC_Spotify_tut.html)                   | Comprehensive API for retrieving albums, artists, and tracks metadata. |
+| Restaurants  | [Yelp](https://www.yelp.com/developers)          | `Bearer Token` | [Yelp config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/yelp)                     | [Yelp Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Yelp.ipynb)       | Leading API to access restaurant information by location.              |
+| Science      | [DBLP](https://dblp.org/faq/13501473.html)       | No             | [DBLP config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/dblp)                     | [DBLP Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_DBLP.ipynb)       | Open bibliographic API for computer science publications.              |
+| Social Media | [Youtube](https://developers.google.com/youtube) | `API Key`      | [Youtube config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/youtube)               | [Youtube Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Youtube.ipynb) | API for retrieving Youtube's content information.                      |
+| Finance      | [Finnhub](https://finnhub.io/)                   | `API Key`      | [Finnhub config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/finnhub)               | [Finnhub Jupyter Notebook](https://github.com/sfu-db/dataprep/blob/develop/examples/DataConnector_Finnhub.ipynb) | Comprehensive API for financial, market, and economic data.            |
+| Music        | [Musixmatch](https://developer.musixmatch.com/)  | `API Key`      | [Musixmatch config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/musixmatch)         | Coming soon                                                                                                      | Leading API for searching music lyrics.                                |
+| Weather      | [OpenWeatherMap](https://openweathermap.org/api) | `API Key`      | [OpenWeatherMap config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/openweathermap) | Coming soon                                                                                                      | API for retrieving current and historical weather data.                |
+| Lifestyle    | [Spoonacular](https://spoonacular.com/food-api)  | `API Key`      | [Spoonacular config file(s)](https://github.com/sfu-db/DataConnectorConfigs/tree/develop/spoonacular)       | Coming soon                                                                                                      | Recipe, food, and nutritional information API.                         |
+
+If you want to connect with a different web API, Connector is designed to be easy to extend. You just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs) to support the new web API. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.  
+
+In the following link, you can see detailed examples of how to use Connector for retrieving data from DBLP, Spotify, Yelp, and other sites, without taking an in-depth look into the web APIs documentation!: [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
 ### EDA
 
@@ -71,7 +115,7 @@ There are common tasks during the exploratory data analysis stage,
 like a quick look at the columnar distribution, or understanding the correlations
 between columns. 
 
-The EDA module categorizes these EDA tasks into functions helping you finish EDA
+The EDA (<em>Exploratory Data Analysis</em>) module categorizes these EDA tasks into functions helping you finish EDA
 tasks with a single function call.
 
 * Want to understand the distributions for each DataFrame column? Use `plot`.
@@ -99,20 +143,6 @@ You can drill down to get more information by given `plot`, `plot_correlation` a
 <a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot.html#Understand-a-column-with-plot(df,-x)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot(df,x)_cat.gif"/></a>
 
 Don't forget to checkout the [examples] folder for detailed demonstration!
-
-### Connector
-
-Connector provides a simple way to collect data from different websites, offering several benefits:
-* A unified API: you can fetch data using one or two lines of code to get data from many websites.
-* Auto Pagination: it automatically does the pagination for you so that you can specify the desired count of the returned results without even considering the count-per-request restriction from the API.
-* Smart API request strategy: it can issue API requests in parallel while respecting the rate limit policy.
-
-In the following examples, you can download the Yelp business search result into a pandas DataFrame, 
-using only two lines of code, without taking deep looking into the Yelp documentation!
-More examples can be found here:
-[Examples](https://github.com/sfu-db/dataprep/tree/develop/examples)
-
-<center><a href="https://sfu-db.github.io/dataprep/connector.html#getting-web-data-with-connector-query"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/connector.png"/></a></center>
 
 ### Clean
 
@@ -154,12 +184,12 @@ For more information, refer to the [User Guide](https://sfu-db.github.io/datapre
 
 ## Contribute
 
-There are many ways to contribute to Dataprep.
+There are many ways to contribute to DataPrep.
 
 * Submit bugs and help us verify fixes as they are checked in.
 * Review the source code changes.
-* Engage with other Dataprep users and developers on StackOverflow.
-* Help each other in the [Dataprep Community Discord](https://discord.gg/xwbkFNk) and [Mail list & Forum].
+* Engage with other DataPrep users and developers on StackOverflow.
+* Help each other in the [DataPrep Community Discord](https://discord.gg/xwbkFNk) and [Mail list & Forum].
 * [![Twitter]](https://twitter.com/sfu_db)
 * Contribute bug fixes.
 * Providing use cases and writing down your user experience.
@@ -179,8 +209,8 @@ Please take a look at our [wiki] for development documentations!
   
 - [Pandas Profiling](https://github.com/pandas-profiling/pandas-profiling)
 
-  Inspired the report functionality and insights provided in DataPrep.eda.
+  Inspired the report functionality and insights provided in `dataprep.eda`.
 
 - [missingno](https://github.com/ResidentMario/missingno) 
 
-  Inspired the missing value analysis in DataPrep.eda.
+  Inspired the missing value analysis in `dataprep.eda`.

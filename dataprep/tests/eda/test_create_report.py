@@ -27,7 +27,7 @@ def simpledf() -> pd.DataFrame:
     )
     # df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
     df.columns = ["a", "b", "c", "d", "e", "f"]
-    # df["e"] = pd.to_datetime(df["e"])
+    df["g"] = pd.to_datetime(df["f"])
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
@@ -44,3 +44,14 @@ def test_report(simpledf: pd.DataFrame) -> None:
 
         matplotlib.use("PS")
     create_report(simpledf, mode="basic")
+
+
+def test_report_show(simpledf: pd.DataFrame) -> None:
+    from sys import platform
+
+    if platform == "darwin":
+        import matplotlib
+
+        matplotlib.use("PS")
+    report = create_report(simpledf, mode="basic")
+    report.show()

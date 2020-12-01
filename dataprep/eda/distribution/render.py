@@ -20,7 +20,6 @@ from bokeh.models import (
     LinearColorMapper,
     Panel,
     PrintfTickFormatter,
-    Tabs,
 )
 from bokeh.plotting import Figure, figure
 from bokeh.transform import cumsum, linear_cmap, transform
@@ -847,7 +846,7 @@ def line_viz(
         tooltips = [(f"{x}", f"{grp}"), ("Frequency", "@y"), (f"{y} bin", "@intvls")]
         fig.add_tools(HoverTool(renderers=[lns[grp_name]], tooltips=tooltips))
 
-    fig.add_layout(Legend(items=[(x, [lns[x]]) for x in lns]), "right")
+    fig.add_layout(Legend(items=[(x, [lns[x]]) for x in lns]), "left")
     tweak_figure(fig)
     fig.yaxis.axis_label = "Frequency"
     fig.xaxis.axis_label = y
@@ -952,7 +951,7 @@ def hexbin_viz(
     mapper = LinearColorMapper(palette=palette, low=min(bins.counts), high=max(bins.counts))
     color_bar = ColorBar(color_mapper=mapper, width=8, location=(0, 0))
     color_bar.label_standoff = 8
-    fig.add_layout(color_bar, "right")
+    fig.add_layout(color_bar, "left")
     tweak_figure(fig, "hex")
     _format_axis(fig, xmin, xmax, "x")
     _format_axis(fig, ymin, ymax, "y")
@@ -1460,7 +1459,7 @@ def render_distribution_grid(
         "tabledata": format_ov_stats(itmdt["stats"]),
         "overview_insights": itmdt["overview_insights"],
         "column_insights": itmdt["column_insights"],
-        "fig_width": plot_width,
+        "container_width": plot_width * 3,
     }
 
 
@@ -1518,6 +1517,7 @@ def render_cat(
         "insights": nom_insights(data, col),
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [tab.title for tab in tabs],
+        "container_width": plot_width + 110,
     }
 
 
@@ -1642,6 +1642,7 @@ def render_num(
         "insights": cont_insights(data, col),
         "layout": [panel.child for panel in tabs],
         "meta": [tab.title for tab in tabs],
+        "container_width": plot_width + 110,
     }
 
 
@@ -1727,6 +1728,7 @@ def render_dt(
         "insights": None,
         "layout": [panel.child for panel in tabs],
         "meta": [tab.title for tab in tabs],
+        "container_width": plot_width + 50,
     }
 
 
@@ -1735,7 +1737,7 @@ def render_cat_num(
     yscale: str,
     plot_width: int,
     plot_height: int,
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is a categorical column
     and y is a numerical column
@@ -1763,8 +1765,13 @@ def render_cat_num(
             data["ttl_grps"],
         )
     )
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    for panel in tabs:
+        panel.child.children[0].frame_width = int(plot_width * 0.9)
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 170,
+    }
 
 
 def render_two_num(
@@ -1772,7 +1779,7 @@ def render_two_num(
     plot_width: int,
     plot_height: int,
     tile_size: Optional[float] = None,
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x and y are numerical columns
     """
@@ -1806,16 +1813,23 @@ def render_two_num(
     df.columns = df.columns.get_level_values(1)
     df.columns = ["grp"] + list(df.columns[1:])
     tabs.append(box_viz(df, itmdt["x"], plot_width, plot_height, itmdt["y"]))
-
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    for panel in tabs:
+        try:
+            panel.child.frame_width = int(plot_width * 0.9)
+        except AttributeError:
+            panel.child.children[0].frame_width = int(plot_width * 0.9)
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 80,
+    }
 
 
 def render_two_cat(
     itmdt: Intermediate,
     plot_width: int,
     plot_height: int,
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x and y are categorical columns
     """
@@ -1854,8 +1868,11 @@ def render_two_cat(
     # heat map
     tabs.append(heatmap_viz(df, x, y, stats, plot_width, plot_height))
 
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width,
+    }
 
 
 def render_dt_num(
@@ -1863,7 +1880,7 @@ def render_dt_num(
     yscale: str,
     plot_width: int,
     plot_height: int,
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is dt and y is num
     """
@@ -1894,8 +1911,11 @@ def render_dt_num(
             timeunit=timeunit,
         )
     )
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 220,
+    }
 
 
 def render_dt_cat(
@@ -1903,7 +1923,7 @@ def render_dt_cat(
     yscale: str,
     plot_width: int,
     plot_height: int,
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is dt and y is num
     """
@@ -1925,8 +1945,11 @@ def render_dt_cat(
     tabs.append(
         stacked_viz(df, itmdt["x"], itmdt["y"], grp_cnt_stats, plot_width, plot_height, timeunit)
     )
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width,
+    }
 
 
 def render_dt_num_cat(
@@ -1934,7 +1957,7 @@ def render_dt_num_cat(
     yscale: str,
     plot_width: int,
     plot_height: int,
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is dt and y is num
     """
@@ -1954,8 +1977,11 @@ def render_dt_num_cat(
             agg=itmdt["agg"],
         )
     )
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width,
+    }
 
 
 def render(

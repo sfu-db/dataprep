@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from dask import delayed
 from scipy.cluster import hierarchy
+from ...utils import cut_long_name
 
 from ...data_array import DataArray
 from ...intermediate import Intermediate
@@ -21,7 +22,7 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
     # pylint: disable=too-many-locals
 
     most_show = 5  # the most number of column/row to show in "insight"
-    longest = 5  # the longest length of word to show in "insight"
+    # longest = 5  # the longest length of word to show in "insight"
 
     df.compute()
 
@@ -78,10 +79,10 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
 
     top_miss_col = (
         str(most_col[0])
-        + "-col(s) "
+        + " col(s): "
         + str(
             "("
-            + ", ".join(abbr(df.columns[e], longest) for e in most_col[2][:most_show])
+            + ", ".join(cut_long_name(df.columns[e]) for e in most_col[2][:most_show])
             + suffix_col
             + ")"
         )
@@ -89,7 +90,7 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
 
     top_miss_row = (
         str(most_row[0])
-        + "-row(s) "
+        + " row(s): "
         + str("(" + ", ".join(str(e) for e in most_row[2][:most_show]) + suffix_row + ")")
     )
 
@@ -299,11 +300,3 @@ def missing_most_row(df: DataArray) -> Tuple[int, float, List[Any]]:
     rst = da.where(row_sum == maximum)[0]
 
     return cnt, rate, rst
-
-
-def abbr(name: str, longest: int) -> str:
-    """Cut the name if it is too long."""
-    if len(name) > longest:
-        return str(name[0:longest] + "...")
-    else:
-        return name

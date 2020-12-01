@@ -30,8 +30,6 @@
                         </table>
                     </div>
                     {% endfor %}
-                    {% if context.insights[context.meta[0]] %}
-                    {% endif %}
                 </div>
             </div>
             {% endif %}
@@ -42,13 +40,13 @@
                     <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
                     <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
                     <div class="insight-panel-{{ context.rnd }}">
-                        <ol>
+                        <ul>
                             {% for insight in context.insights[context.meta[loop.index]] %}
-                            <li class="entry-{{ context.rnd }}"><span
-                                class="col-name-{{ context.rnd }}">{{ insight.split(' ')[0] }}</span>{{ insight.replace(insight.split(' ')[0], '') }}
+                            <li class="entry-{{ context.rnd }}">
+                                {{ insight }}
                             </li>
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </div>
                 </div>
                 {% endif %}

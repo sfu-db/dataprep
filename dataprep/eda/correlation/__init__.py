@@ -8,9 +8,9 @@ import dask.dataframe as dd
 import pandas as pd
 
 from ..progress_bar import ProgressBar
-from ..report import Report
 from .compute import compute_correlation
 from .render import render_correlation
+from ..container import Container
 
 __all__ = ["render_correlation", "compute_correlation", "plot_correlation"]
 
@@ -23,7 +23,7 @@ def plot_correlation(
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
     progress: bool = True,
-) -> Report:
+) -> Container:
     """
     This function is designed to calculate the correlation between columns
     There are three functions: plot_correlation(df), plot_correlation(df, x)
@@ -65,7 +65,7 @@ def plot_correlation(
     and it is better to drop None, Nan and Null value before using it
     """
     with ProgressBar(minimum=1, disable=not progress):
-        intermediate = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
-    figure = render_correlation(intermediate)
+        itmdt = compute_correlation(df, x=x, y=y, value_range=value_range, k=k)
+    to_render = render_correlation(itmdt)
 
-    return Report(figure)
+    return Container(to_render, itmdt.visual_type)
