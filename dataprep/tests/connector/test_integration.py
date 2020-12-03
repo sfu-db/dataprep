@@ -19,10 +19,6 @@ def test_connector() -> None:
 
     dc.info()
 
-    schema = dc.show_schema("businesses")
-
-    assert len(schema) > 0
-
     df = asyncio.run(dc.query("businesses", _count=120, term="ramen", location="vancouver"))
 
     assert len(df) == 120
