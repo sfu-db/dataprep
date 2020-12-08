@@ -591,14 +591,20 @@ def split(txt: Union[str, Any], seps: Union[str, Any]) -> Any:
     default_sep = seps[0]
     for sep in seps[1:]:
         txt = txt.replace(sep, default_sep)
-    result = [i.strip() for i in txt.split(default_sep)]
-    result = [value for value in result if value != ""]
+    result = [value for value in [i.strip() for i in txt.split(default_sep)] if value != ""]
     return result
 
 
 def check_date(date: Union[str, Any]) -> Any:
     """
     This function check format of date
+    Firstly, recognize timezone part in date string, and remove it
+    Then, if month and weekdays are in text format, recognize and remove them
+    Third, remove all numerical tokens because they are considered as valid vals
+    Fourth, recognize AM, PM part and remove them
+    Finally, remove all numerical tokens because they are considered as valid vals
+    If there are non-numerical vals, we consider this string includes
+    invalid tokens.
     Parameters
     ----------
     date

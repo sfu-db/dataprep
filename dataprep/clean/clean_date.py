@@ -821,10 +821,10 @@ def transform_hms(
     ----------
     result_str
         result string
-    hour_token
-        token of hour
-    hour
-        value of hour
+    hms_token, ispm
+        token of hour, minute or second, justify whether it is time in P.M.
+    hms_value
+        value of hour, minute or second
     """
     result = deepcopy(result_str)
     if hms_token != "":
@@ -887,10 +887,12 @@ def transform_timezone(
     ----------
     result_str
         result string
-    weekday_token
-        token of weekday
-    weekday
-        value of weekday
+    timezone_token
+        token of timezone in target format
+    timezone
+        value of timezone string
+    tz_info
+        information of timezone, including offset hours and mins comparing to UTC
     """
     result = deepcopy(result_str)
     utc_add = tz_info["utc_add"]
