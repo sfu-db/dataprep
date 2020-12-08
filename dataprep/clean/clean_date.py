@@ -213,28 +213,17 @@ def set_timezone_offset(
 
 def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     """
-    This function validates url
+    This function validates date string
     Parameters
     ----------
     date
-        pandas Series of urls or url instance
+        pandas Series of date string
     """
     if isinstance(date, pd.Series):
         verfied_series = date.apply(check_date)
         return verfied_series
     else:
         return check_date(date)
-
-
-def validate_target_format(target_format: Union[str, Any]) -> Any:
-    """
-    This function check validation of target_format
-    Parameters
-    ----------
-    target_format
-        target_format string
-    """
-    return check_target_format(target_format)
 
 
 def check_target_format(target_format: Union[str, Any]) -> Any:
