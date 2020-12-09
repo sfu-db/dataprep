@@ -35,6 +35,11 @@ def display_html(html_content: str) -> None:
             webbrowser.open_new_tab("file://" + tmpf.name)
 
 
+def display_dataframe(df: pd.DataFrame) -> None:
+    """Styles and displays dataframe in browser."""
+    display_html(get_styled_schema(df))
+
+
 def get_styled_schema(df: pd.DataFrame) -> Any:
     """Adds CSS styling to dataframe."""
     styled_df = df.style.set_table_styles(
