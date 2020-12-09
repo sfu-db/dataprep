@@ -11,11 +11,9 @@ from time import time
 from typing import Any, Dict, List, Optional, Union, Set
 from urllib.parse import parse_qs, urlparse
 import socket
-import re
-import json
-from pydantic import Field, root_validator
+import requests
+from pydantic import Field
 
-from dataprep.connector.utils import Request
 from ...utils import is_notebook
 from .base import BaseDef, BaseDefT
 from ..errors import MissingRequiredAuthParams, InvalidAuthParams
@@ -84,18 +82,10 @@ PaginationDef = Union[OffsetPaginationDef, SeekPaginationDef, PagePaginationDef,
 
 class FieldDef(BaseDef):
     required: bool
-    from_key: Optional[List[str]]
+    from_key: Optional[str]
     to_key: Optional[str]
     template: Optional[str]
     remove_if_empty: bool
-
-    @root_validator(pre=True)
-    # pylint: disable=no-self-argument,no-self-use
-    def from_key_validation(cls, values):
-        if "template" in values:
-            if set(values["fromKey"]) != set(re.findall("{{(\\w+)}}", values["template"])):
-                raise ValueError("template values and fromKey substitutes not matching")
-        return values
 
 
 FieldDefUnion = Union[FieldDef, bool, str]  # Put bool before str
@@ -152,22 +142,20 @@ class OAuth2AuthorizationCodeAuthorizationDef(BaseDef):
             code = self._auth(params["client_id"], port)
 
             validate_auth({"client_id", "client_secret"}, params)
+
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
 
-            headers = {
-                "Authorization": f"Basic {b64cred}",
-                "Content-Type": "application/x-www-form-urlencoded",
-            }
-            params = {
-                "grant_type": "authorization_code",
-                "code": code,
-                "redirect_uri": f"http://localhost:{port}/",
-            }
-            requests = Request(self.token_server_url)
-            response = requests.post(_headers=headers, _data=params)
-            resp: Dict[str, Any] = json.loads(response.read())
+            resp: Dict[str, Any] = requests.post(
+                self.token_server_url,
+                headers={"Authorization": f"Basic {b64cred}"},
+                data={
+                    "grant_type": "authorization_code",
+                    "code": code,
+                    "redirect_uri": f"http://localhost:{port}/",
+                },
+            ).json()
 
             if resp["token_type"].lower() != "bearer":
                 raise RuntimeError("token_type is not bearer")
@@ -239,16 +227,11 @@ class OAuth2ClientCredentialsAuthorizationDef(BaseDef):
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
-
-            headers = {
-                "Authorization": f"Basic {b64cred}",
-                "Content-Type": "application/x-www-form-urlencoded",
-            }
-            params = {"grant_type": "client_credentials"}
-            requests = Request(self.token_server_url)
-            response = requests.post(_headers=headers, _data=params)
-            resp: Dict[str, Any] = json.loads(response.read())
-
+            resp: Dict[str, Any] = requests.post(
+                self.token_server_url,
+                headers={"Authorization": f"Basic {b64cred}"},
+                data={"grant_type": "client_credentials"},
+            ).json()
             if resp["token_type"].lower() != "bearer":
                 raise RuntimeError("token_type is not bearer")
 

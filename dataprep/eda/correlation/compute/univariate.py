@@ -60,11 +60,7 @@ def _calc_univariate(
                 file=sys.stderr,
             )
         df = pd.DataFrame(
-            {
-                "x": np.full(len(indices), x),
-                "y": columns[indices],
-                "correlation": corrs,
-            }
+            {"x": np.full(len(indices), x), "y": columns[indices], "correlation": corrs,}
         )
         dfs[meth.name] = df
 
@@ -115,9 +111,7 @@ def _kendall_tau_1xn(x: da.Array, data: da.Array) -> da.Array:
 
 
 def _corr_filter(
-    corrs: np.ndarray,
-    value_range: Optional[Tuple[float, float]] = None,
-    k: Optional[int] = None,
+    corrs: np.ndarray, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Filter correlation values by k and value_range

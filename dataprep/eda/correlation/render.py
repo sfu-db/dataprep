@@ -400,11 +400,7 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
     x_select.js_on_change(
         "value",
         CustomJS(
-            args=dict(
-                scatter=source_scatter,
-                xy_value=source_xy_value,
-                x_axis=fig.xaxis[0],
-            ),
+            args=dict(scatter=source_scatter, xy_value=source_xy_value, x_axis=fig.xaxis[0],),
             code="""
         let currentSelect = this.value;
         let xyValueData = xy_value.data;
@@ -422,11 +418,7 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
     y_select.js_on_change(
         "value",
         CustomJS(
-            args=dict(
-                scatter=source_scatter,
-                xy_value=source_xy_value,
-                y_axis=fig.yaxis[0],
-            ),
+            args=dict(scatter=source_scatter, xy_value=source_xy_value, y_axis=fig.yaxis[0],),
             code="""
         let currentSelect = this.value;
         let xyValueData = xy_value.data;

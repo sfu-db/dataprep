@@ -102,12 +102,7 @@ class ProgressBar(Callback):  # type: ignore
         self._pbar_runtime += time() - then
 
     def _posttask(
-        self,
-        _key: str,
-        _result: Any,
-        _dsk: Any,
-        _state: Dict[str, Any],
-        _worker_id: Any,
+        self, _key: str, _result: Any, _dsk: Any, _state: Dict[str, Any], _worker_id: Any,
     ) -> None:
         """A hook called after one task gets executed."""
 

@@ -16,9 +16,7 @@ LABELS = ["Orignal data", "After drop missing values"]
 
 
 def uni_histogram(
-    srs: dd.Series,
-    bins: int,
-    dtype: Optional[DTypeDef] = None,
+    srs: dd.Series, bins: int, dtype: Optional[DTypeDef] = None,
 ) -> Tuple[da.Array, ...]:
     """Calculate "histogram" for both numerical and categorical."""
 

@@ -6,8 +6,8 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
 from typing import cast
-import json
-from dataprep.connector.utils import Request
+
+import requests
 
 META_URL = "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/{}/_meta.json"
 TABLE_URL = "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/master/{}/{}.json"
@@ -61,10 +61,7 @@ def get_git_master_hash() -> str:
     """
     Get current config files repo's hash
     """
-    requests = Request(GIT_REF_URL)
-    response = requests.get()
-    refs = json.loads(response.read())
-
+    refs = requests.get(GIT_REF_URL).json()
     (sha,) = [ref["object"]["sha"] for ref in refs if ref["ref"] == "refs/heads/master"]
     return cast(str, sha)
 
@@ -73,9 +70,8 @@ def download_config(impdb: str) -> None:
     """
     Download the config from Github into the temp directory.
     """
-    requests = Request(META_URL.format(impdb))
-    response = requests.get()
-    meta = json.loads(response.read())
+    url = META_URL.format(impdb)
+    meta = requests.get(url).json()
     tables = meta["tables"]
 
     sha = get_git_master_hash()
@@ -83,9 +79,8 @@ def download_config(impdb: str) -> None:
     while True:
         configs = {"_meta": meta}
         for table in tables:
-            requests = Request(TABLE_URL.format(impdb, table))
-            response = requests.get()
-            config = json.loads(response.read())
+            url = TABLE_URL.format(impdb, table)
+            config = requests.get(url).json()
             configs[table] = config
         sha_check = get_git_master_hash()
 
@@ -100,9 +95,9 @@ def download_config(impdb: str) -> None:
         rmtree(path / impdb)
 
     (path / impdb).mkdir(parents=True)
-    for fname, val in configs.items():
+    for fname, json in configs.items():
         with (path / impdb / f"{fname}.json").open("w") as f:
-            jdump(val, f)
+            jdump(json, f)
 
     with (path / impdb / "_hash").open("w") as f:
         f.write(sha)

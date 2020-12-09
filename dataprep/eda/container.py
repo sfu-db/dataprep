@@ -15,9 +15,7 @@ from ..utils import is_notebook
 
 output_notebook(INLINE, hide_banner=True)  # for offline usage
 
-ENV_LOADER = Environment(
-    loader=PackageLoader("dataprep", "eda/templates"),
-)
+ENV_LOADER = Environment(loader=PackageLoader("dataprep", "eda/templates"),)
 
 TAB_VISUAL_TYPES = {
     "missing_impact_1v1",
@@ -44,11 +42,7 @@ class Container:
     This class creates a customized Container object for the plot* function.
     """
 
-    def __init__(
-        self,
-        to_render: Dict[str, Any],
-        visual_type: str,
-    ) -> None:
+    def __init__(self, to_render: Dict[str, Any], visual_type: str,) -> None:
         self.context = Context(**to_render)
         setattr(self.context, "rnd", random.randint(0, 9999))
         if visual_type in GRID_VISUAL_TYPES:

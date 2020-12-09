@@ -36,10 +36,7 @@ __all__ = ["render"]
 
 
 def tweak_figure(
-    fig: Figure,
-    ptype: Optional[str] = None,
-    show_yticks: bool = False,
-    max_lbl_len: int = 15,
+    fig: Figure, ptype: Optional[str] = None, show_yticks: bool = False, max_lbl_len: int = 15,
 ) -> None:
     """
     Set some common attributes for a figure
@@ -235,11 +232,7 @@ def _empty_figure(title: str, plot_height: int, plot_width: int) -> Figure:
     return fig
 
 
-def wordcloud_viz(
-    word_cnts: pd.Series,
-    plot_width: int,
-    plot_height: int,
-) -> Panel:
+def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> Panel:
     """
     Visualize the word cloud
     """  # pylint: disable=unsubscriptable-object
@@ -271,11 +264,7 @@ def wordcloud_viz(
 
 
 def wordfreq_viz(
-    word_cnts: pd.Series,
-    nrows: int,
-    plot_width: int,
-    plot_height: int,
-    show_yticks: bool,
+    word_cnts: pd.Series, nrows: int, plot_width: int, plot_height: int, show_yticks: bool,
 ) -> Figure:
     """
     Visualize the word frequency bar chart
@@ -347,13 +336,7 @@ def bar_viz(
     return fig
 
 
-def pie_viz(
-    df: pd.DataFrame,
-    nrows: int,
-    col: str,
-    plot_width: int,
-    plot_height: int,
-) -> Panel:
+def pie_viz(df: pd.DataFrame, nrows: int, col: str, plot_width: int, plot_height: int,) -> Panel:
     """
     Render a pie chart
     """
@@ -469,14 +452,7 @@ def kde_viz(
     # pylint: disable=too-many-arguments, too-many-locals
     dens, bins = hist
     intvls = _format_bin_intervals(bins)
-    df = pd.DataFrame(
-        {
-            "intvl": intvls,
-            "left": bins[:-1],
-            "right": bins[1:],
-            "dens": dens,
-        }
-    )
+    df = pd.DataFrame({"intvl": intvls, "left": bins[:-1], "right": bins[1:], "dens": dens,})
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
@@ -495,9 +471,7 @@ def kde_viz(
         fill_color="#6baed6",
     )
     hover_hist = HoverTool(
-        renderers=[hist],
-        tooltips=[("Bin", "@intvl"), ("Density", "@dens")],
-        mode="vline",
+        renderers=[hist], tooltips=[("Bin", "@intvl"), ("Density", "@dens")], mode="vline",
     )
     pts_rng = np.linspace(df.loc[0, "left"], df.loc[len(df) - 1, "right"], 1000)
     pdf = kde(pts_rng)
@@ -515,12 +489,7 @@ def kde_viz(
 
 
 def qqnorm_viz(
-    qntls: pd.Series,
-    mean: float,
-    std: float,
-    col: str,
-    plot_width: int,
-    plot_height: int,
+    qntls: pd.Series, mean: float, std: float, col: str, plot_width: int, plot_height: int,
 ) -> Panel:
     """
     Render a qq plot
@@ -537,10 +506,7 @@ def qqnorm_viz(
         tooltips=tooltips,
     )
     fig.circle(
-        x=theory_qntls,
-        y=qntls,
-        size=3,
-        color=CATEGORY20[0],
+        x=theory_qntls, y=qntls, size=3, color=CATEGORY20[0],
     )
     vals = np.concatenate((theory_qntls, qntls))
     fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color="red")
@@ -613,19 +579,9 @@ def box_viz(
     if otlrs:
         gps = [grp for grp, ols in zip(df["grp"], df["otlrs"]) for _ in range(len(ols))]
         circ = fig.circle(
-            x=gps,
-            y=otlrs,
-            size=3,
-            line_color="black",
-            color=CATEGORY20[6],
-            fill_alpha=0.6,
+            x=gps, y=otlrs, size=3, line_color="black", color=CATEGORY20[6], fill_alpha=0.6,
         )
-        fig.add_tools(
-            HoverTool(
-                renderers=[circ],
-                tooltips=[("Outlier", "@y")],
-            )
-        )
+        fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
     tooltips = [
         ("Upper Whisker", "@uw"),
         ("Upper Quartile", "@q3"),
@@ -636,12 +592,7 @@ def box_viz(
     if y:
         lbl = f"{x}" if ttl_grps else "Bin"
         tooltips.insert(0, (lbl, "@grp"))
-    fig.add_tools(
-        HoverTool(
-            renderers=[upw, utail, ubox, lbox, ltail, low],
-            tooltips=tooltips,
-        )
-    )
+    fig.add_tools(HoverTool(renderers=[upw, utail, ubox, lbox, ltail, low], tooltips=tooltips,))
     tweak_figure(fig, "box")
     if y is None:
         fig.xaxis.major_tick_line_color = None
@@ -739,12 +690,7 @@ def box_viz_dt(
         circ = fig.circle(  # pylint: disable=too-many-function-args
             outx, outy, size=3, line_color="black", color=CATEGORY20[6], fill_alpha=0.6
         )
-        fig.add_tools(
-            HoverTool(
-                renderers=[circ],
-                tooltips=[("Outlier", "@y")],
-            )
-        )
+        fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
     tooltips = [
         ("Upper Whisker", "@uw"),
         ("Upper Quartile", "@q3"),
@@ -805,13 +751,7 @@ def box_viz_dt(
 
 
 def line_viz(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
-    ttl_grps: int,
+    df: pd.DataFrame, x: str, y: str, yscale: str, plot_width: int, plot_height: int, ttl_grps: int,
 ) -> Panel:
     """
     Render multi-line chart
@@ -859,12 +799,7 @@ def line_viz(
 
 
 def scatter_viz(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    spl_sz: int,
-    plot_width: int,
-    plot_height: int,
+    df: pd.DataFrame, x: str, y: str, spl_sz: int, plot_width: int, plot_height: int,
 ) -> Any:
     """
     Render a scatter plot
@@ -910,11 +845,7 @@ def hexbin_viz(
     title = f"{y} by {x}"
     aspect_scale = (ymax - ymin) / (xmax - xmin + 1e-9)
     bins = hexbin(
-        x=df[x],
-        y=df[y],
-        size=tile_size,
-        orientation="flattop",
-        aspect_scale=aspect_scale,
+        x=df[x], y=df[y], size=tile_size, orientation="flattop", aspect_scale=aspect_scale,
     )
     fig = figure(
         title=title,
@@ -935,19 +866,11 @@ def hexbin_viz(
         source=bins,
         orientation="flattop",
         fill_color=linear_cmap(
-            field_name="counts",
-            palette=palette,
-            low=min(bins.counts),
-            high=max(bins.counts),
+            field_name="counts", palette=palette, low=min(bins.counts), high=max(bins.counts),
         ),
         aspect_scale=aspect_scale,
     )
-    fig.add_tools(
-        HoverTool(
-            tooltips=[("Count", "@counts")],
-            renderers=[rend],
-        )
-    )
+    fig.add_tools(HoverTool(tooltips=[("Count", "@counts")], renderers=[rend],))
     mapper = LinearColorMapper(palette=palette, low=min(bins.counts), high=max(bins.counts))
     color_bar = ColorBar(color_mapper=mapper, width=8, location=(0, 0))
     color_bar.label_standoff = 8
@@ -988,12 +911,7 @@ def nested_viz(
     )
 
     fig.vbar(
-        x="grp_names",
-        top="cnt",
-        width=1,
-        source=data_source,
-        line_color="white",
-        line_width=3,
+        x="grp_names", top="cnt", width=1, source=data_source, line_color="white", line_width=3,
     )
     tweak_figure(fig, "nested")
     fig.yaxis.axis_label = "Count"
@@ -1044,12 +962,7 @@ def stacked_viz(
         colours = palette[0 : len(grps)]
     source = ColumnDataSource(data=df)
     renderers = fig.vbar_stack(
-        stackers=grps,
-        x="index",
-        width=0.9,
-        source=source,
-        line_width=1,
-        color=colours,
+        stackers=grps, x="index", width=0.9, source=source, line_width=1, color=colours,
     )
     grps = [(grp[:14] + "...") if len(grp) > 15 else grp for grp in grps]
 
@@ -1170,11 +1083,7 @@ def heatmap_viz(
     )
     fig.add_tools(
         HoverTool(
-            tooltips=[
-                (x, f"@{{{x}}}"),
-                (y, f"@{{{y}}}"),
-                ("Count", "@cnt"),
-            ],
+            tooltips=[(x, f"@{{{x}}}"), (y, f"@{{{y}}}"), ("Count", "@cnt"),],
             mode="mouse",
             renderers=[renderer],
         )
@@ -1224,17 +1133,9 @@ def dt_line_viz(
         x_axis_type="datetime",
     )
     fig.line(
-        source=df,
-        x=x,
-        y=agg,
-        line_width=2,
-        line_alpha=0.8,
-        color="#7e9ac8",
+        source=df, x=x, y=agg, line_width=2, line_alpha=0.8, color="#7e9ac8",
     )
-    hover = HoverTool(
-        tooltips=tooltips,
-        mode="vline",
-    )
+    hover = HoverTool(tooltips=tooltips, mode="vline",)
     fig.add_tools(hover)
 
     tweak_figure(fig, "line", show_yticks)
@@ -1294,11 +1195,7 @@ def dt_multiline_viz(
         fig.add_tools(
             HoverTool(
                 renderers=[plot_dict[grp_name]],
-                tooltips=[
-                    (f"{y}", f"{grp}"),
-                    (agg, "@y"),
-                    (timeunit, "@lbl"),
-                ],
+                tooltips=[(f"{y}", f"{grp}"), (agg, "@y"), (timeunit, "@lbl"),],
                 mode="mouse",
             )
         )
@@ -1387,9 +1284,7 @@ def format_num_stats(data: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
 
 
 def format_cat_stats(
-    stats: Dict[str, Any],
-    len_stats: Dict[str, Any],
-    letter_stats: Dict[str, Any],
+    stats: Dict[str, Any], len_stats: Dict[str, Any], letter_stats: Dict[str, Any],
 ) -> Dict[str, Dict[str, str]]:
     """
     Format categorical statistics
@@ -1432,16 +1327,7 @@ def render_distribution_grid(
     for col, dtype, data in itmdt["data"]:
         if is_dtype(dtype, Nominal()):
             df, ttl_grps = data
-            fig = bar_viz(
-                df,
-                ttl_grps,
-                nrows,
-                col,
-                yscale,
-                plot_width,
-                plot_height,
-                False,
-            )
+            fig = bar_viz(df, ttl_grps, nrows, col, yscale, plot_width, plot_height, False,)
         elif is_dtype(dtype, Continuous()):
             fig = hist_viz(data, nrows, col, yscale, plot_width, plot_height, False)
             figs.append(fig)
@@ -1482,16 +1368,7 @@ def render_cat(
     nrows, nuniq = data["nrows"], data["nuniq"]
     # bar chart and pie chart of the categorical values
     bar_data, pie = data["bar"].to_frame(), data["pie"].to_frame()
-    fig = bar_viz(
-        bar_data,
-        nuniq,
-        nrows,
-        col,
-        yscale,
-        plot_width,
-        plot_height,
-        True,
-    )
+    fig = bar_viz(bar_data, nuniq, nrows, col, yscale, plot_width, plot_height, True,)
     tabs.append(Panel(child=row(fig), title="Bar Chart"))
     tabs.append(pie_viz(pie, nrows, col, plot_width, plot_height))
     # word counts and total number of words for the wordcloud and word frequencies bar chart
@@ -1602,15 +1479,7 @@ def render_num(
     col, data = itmdt["col"], itmdt["data"]
 
     tabs: List[Panel] = []
-    fig = hist_viz(
-        data["hist"],
-        data["nrows"],
-        col,
-        yscale,
-        plot_width,
-        plot_height,
-        True,
-    )
+    fig = hist_viz(data["hist"], data["nrows"], col, yscale, plot_width, plot_height, True,)
     tabs.append(Panel(child=row(fig), title="Histogram"))
     # kde and q-q normal
     if data["kde"] is not None:
@@ -1733,10 +1602,7 @@ def render_dt(
 
 
 def render_cat_num(
-    itmdt: Intermediate,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
 ) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is a categorical column
@@ -1754,17 +1620,7 @@ def render_cat_num(
 
     # multiline plot
     df = data["hist"].to_frame()[: itmdt["ngroups"]]
-    tabs.append(
-        line_viz(
-            df,
-            x,
-            y,
-            yscale,
-            plot_width,
-            plot_height,
-            data["ttl_grps"],
-        )
-    )
+    tabs.append(line_viz(df, x, y, yscale, plot_width, plot_height, data["ttl_grps"],))
     for panel in tabs:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
     return {
@@ -1775,10 +1631,7 @@ def render_cat_num(
 
 
 def render_two_num(
-    itmdt: Intermediate,
-    plot_width: int,
-    plot_height: int,
-    tile_size: Optional[float] = None,
+    itmdt: Intermediate, plot_width: int, plot_height: int, tile_size: Optional[float] = None,
 ) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x and y are numerical columns
@@ -1787,25 +1640,11 @@ def render_two_num(
     data = itmdt["data"]
     # scatter plot
     tabs.append(
-        scatter_viz(
-            data["scat"],
-            itmdt["x"],
-            itmdt["y"],
-            itmdt["spl_sz"],
-            plot_width,
-            plot_height,
-        )
+        scatter_viz(data["scat"], itmdt["x"], itmdt["y"], itmdt["spl_sz"], plot_width, plot_height,)
     )
     # hexbin plot
     tabs.append(
-        hexbin_viz(
-            data["hex"],
-            itmdt["x"],
-            itmdt["y"],
-            plot_width,
-            plot_height,
-            tile_size,
-        )
+        hexbin_viz(data["hex"], itmdt["x"], itmdt["y"], plot_width, plot_height, tile_size,)
     )
     # box plot
     df = data["box"].to_frame().reset_index()
@@ -1825,11 +1664,7 @@ def render_two_num(
     }
 
 
-def render_two_cat(
-    itmdt: Intermediate,
-    plot_width: int,
-    plot_height: int,
-) -> Dict[str, Any]:
+def render_two_cat(itmdt: Intermediate, plot_width: int, plot_height: int,) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x and y are categorical columns
     """
@@ -1876,10 +1711,7 @@ def render_two_cat(
 
 
 def render_dt_num(
-    itmdt: Intermediate,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
 ) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is dt and y is num
@@ -1888,27 +1720,13 @@ def render_dt_num(
     linedf, timeunit = itmdt["linedata"]
     tabs.append(
         dt_line_viz(
-            linedf,
-            itmdt["x"],
-            timeunit,
-            yscale,
-            plot_width,
-            plot_height,
-            True,
-            y=itmdt["y"],
+            linedf, itmdt["x"], timeunit, yscale, plot_width, plot_height, True, y=itmdt["y"],
         )
     )
     boxdf, outx, outy, timeunit = itmdt["boxdata"]
     tabs.append(
         box_viz_dt(
-            boxdf,
-            outx,
-            outy,
-            itmdt["x"],
-            plot_width,
-            plot_height,
-            itmdt["y"],
-            timeunit=timeunit,
+            boxdf, outx, outy, itmdt["x"], plot_width, plot_height, itmdt["y"], timeunit=timeunit,
         )
     )
     return {
@@ -1919,10 +1737,7 @@ def render_dt_num(
 
 
 def render_dt_cat(
-    itmdt: Intermediate,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
 ) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is dt and y is num
@@ -1931,14 +1746,7 @@ def render_dt_cat(
     data, grp_cnt_stats, timeunit = itmdt["linedata"]
     tabs.append(
         dt_multiline_viz(
-            data,
-            itmdt["x"],
-            itmdt["y"],
-            timeunit,
-            yscale,
-            plot_width,
-            plot_height,
-            grp_cnt_stats,
+            data, itmdt["x"], itmdt["y"], timeunit, yscale, plot_width, plot_height, grp_cnt_stats,
         )
     )
     df, grp_cnt_stats, timeunit = itmdt["stackdata"]
@@ -1953,10 +1761,7 @@ def render_dt_cat(
 
 
 def render_dt_num_cat(
-    itmdt: Intermediate,
-    yscale: str,
-    plot_width: int,
-    plot_height: int,
+    itmdt: Intermediate, yscale: str, plot_width: int, plot_height: int,
 ) -> Dict[str, Any]:
     """
     Render plots from plot(df, x, y) when x is dt and y is num
