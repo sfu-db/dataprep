@@ -21,12 +21,7 @@ from .common import LABELS, histogram
 
 
 def _compute_missing_bivariate(  # pylint: disable=too-many-locals
-    df: DataArray,
-    x: str,
-    y: str,
-    bins: int,
-    ndist_sample: int,
-    dtype: Optional[DTypeDef] = None,
+    df: DataArray, x: str, y: str, bins: int, ndist_sample: int, dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     # pylint: disable=too-many-arguments
     """Calculate the distribution change on another column y when
@@ -133,11 +128,7 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals
         meta["y", "partial"] = partial
 
         itmdt = Intermediate(
-            hist=df_ret,
-            x=x,
-            y=y,
-            meta=meta["y"],
-            visual_type="missing_impact_1v1",
+            hist=df_ret, x=x, y=y, meta=meta["y"], visual_type="missing_impact_1v1",
         )
         return itmdt
 

@@ -17,10 +17,7 @@ from ...utils import cut_long_name
 
 
 def _calc_nullivariate(
-    df: DataArray,
-    *,
-    value_range: Optional[Tuple[float, float]] = None,
-    k: Optional[int] = None,
+    df: DataArray, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None,
 ) -> Intermediate:
     # pylint: disable=too-many-statements,too-many-locals,too-many-branches
 
@@ -72,11 +69,7 @@ def _calc_nullivariate(
     dfs = {}
     for method, corr in corrs.items():
         ndf = pd.DataFrame(
-            {
-                "x": df.columns[cordx],
-                "y": df.columns[cordy],
-                "correlation": corr.ravel(),
-            }
+            {"x": df.columns[cordx], "y": df.columns[cordy], "correlation": corr.ravel(),}
         )
         ndf = ndf[cordy > cordx]  # Retain only lower triangle (w/o diag)
 

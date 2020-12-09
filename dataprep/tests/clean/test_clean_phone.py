@@ -461,21 +461,7 @@ def test_validate_value() -> None:
 def test_validate_series(df_phone: pd.DataFrame) -> None:
     srs_valid = validate_phone(df_phone["messy_phone"])
     srs_check = pd.Series(
-        [
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            False,
-            False,
-            False,
-            False,
-        ],
+        [True, True, True, True, True, True, True, True, True, False, False, False, False,],
         name="messy_phone",
     )
     assert srs_check.equals(srs_valid)

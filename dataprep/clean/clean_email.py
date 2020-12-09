@@ -263,10 +263,7 @@ def clean_email(
         meta[f"{column}_clean"] = str
 
     df = df.apply(
-        format_email,
-        args=(column, split, pre_clean, fix_domain, errors),
-        axis=1,
-        meta=meta,
+        format_email, args=(column, split, pre_clean, fix_domain, errors), axis=1, meta=meta,
     )
 
     if inplace:
@@ -313,12 +310,7 @@ def fix_domain_name(dom: str) -> str:
 
 
 def format_email(
-    row: pd.Series,
-    col: str,
-    split: bool,
-    pre_clean: bool,
-    fix_domain: bool,
-    errors: str,
+    row: pd.Series, col: str, split: bool, pre_clean: bool, fix_domain: bool, errors: str,
 ) -> pd.Series:
     """
     Function to transform an email address into clean format

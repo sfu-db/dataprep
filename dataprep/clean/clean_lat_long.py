@@ -146,10 +146,7 @@ def clean_lat_long(
             meta[f"{lat_long_col}_clean"] = float if output_format == "dd" else str
 
         df = df.apply(
-            format_lat_long,
-            args=(lat_long_col, output_format, split, errors),
-            axis=1,
-            meta=meta,
+            format_lat_long, args=(lat_long_col, output_format, split, errors), axis=1, meta=meta,
         )
         if inplace:
             df = df.drop(columns=[lat_long_col])
@@ -159,10 +156,7 @@ def clean_lat_long(
             meta = df.dtypes.to_dict()
             meta[f"{lat_col}_clean"] = float if output_format == "dd" else str
             df = df.apply(
-                format_lat_or_long,
-                args=(lat_col, output_format, errors, "lat"),
-                axis=1,
-                meta=meta,
+                format_lat_or_long, args=(lat_col, output_format, errors, "lat"), axis=1, meta=meta,
             )
             if inplace:
                 df = df.drop(columns=[lat_col])
@@ -235,11 +229,7 @@ def validate_lat_long(
 
 
 def format_lat_long(
-    row: pd.Series,
-    col: str,
-    output_format: str,
-    split: bool,
-    errors: str,
+    row: pd.Series, col: str, output_format: str, split: bool, errors: str,
 ) -> pd.Series:
     """
     Function to transform a coordinate instance into the

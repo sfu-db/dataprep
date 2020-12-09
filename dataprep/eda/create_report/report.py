@@ -39,11 +39,7 @@ class Report:
         """
         return ""
 
-    def save(
-        self,
-        filename: Optional[str] = "report",
-        to: Optional[str] = None,
-    ) -> None:
+    def save(self, filename: Optional[str] = "report", to: Optional[str] = None,) -> None:
         """
         Save report to current working directory.
 

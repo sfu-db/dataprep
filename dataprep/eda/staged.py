@@ -11,9 +11,7 @@ Decoratee = Callable[..., Generator[Any, Any, Intermediate]]
 Completion = Callable[[Any], Intermediate]
 
 
-def staged(
-    func: Decoratee,
-) -> Callable[..., Union[Tuple[Any, Completion], Intermediate]]:
+def staged(func: Decoratee,) -> Callable[..., Union[Tuple[Any, Completion], Intermediate]]:
     """Transform a two stage computation into a result and a completion function."""
 
     def staged_imp(

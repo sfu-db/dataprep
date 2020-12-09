@@ -101,11 +101,4 @@ def compute_trivariate(
 
     # line chart
     data = dask.compute(dask.delayed(_calc_line_dt)(df, timeunit, agg, ngroups, largest))
-    return Intermediate(
-        x=x,
-        y=y,
-        z=z,
-        agg=agg,
-        data=data[0],
-        visual_type="dt_cat_num_cols",
-    )
+    return Intermediate(x=x, y=y, z=z, agg=agg, data=data[0], visual_type="dt_cat_num_cols",)
