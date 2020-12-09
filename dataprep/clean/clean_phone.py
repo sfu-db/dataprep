@@ -97,7 +97,10 @@ def clean_phone(
         meta[f"{col}_clean"] = str
 
     df = df.apply(
-        format_phone, args=(col, output_format, fix_missing, split, errors), axis=1, meta=meta,
+        format_phone,
+        args=(col, output_format, fix_missing, split, errors),
+        axis=1,
+        meta=meta,
     )
 
     if inplace:
@@ -113,7 +116,12 @@ def clean_phone(
 
 
 def format_phone(
-    row: pd.Series, col: str, output_format: str, fix_missing: str, split: bool, errors: str,
+    row: pd.Series,
+    col: str,
+    output_format: str,
+    fix_missing: str,
+    split: bool,
+    errors: str,
 ) -> pd.Series:
     """
     Function to transform a phone number instance into the

@@ -130,7 +130,10 @@ class ConfigGenerator:
 
 def _create_config(req: Dict[str, Any], table_path: Optional[str] = None) -> ConfigDef:
     resp = requests.request(
-        req["method"].lower(), req["url"], params=req["params"], headers=req["headers"],
+        req["method"].lower(),
+        req["url"],
+        params=req["params"],
+        headers=req["headers"],
     )
 
     if resp.status_code != 200:

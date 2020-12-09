@@ -12,7 +12,13 @@ import numpy as np
 from ...intermediate import Intermediate
 
 
-def _calc_bivariate(df: dd.DataFrame, x: str, y: str, *, k: Optional[int] = None,) -> Intermediate:
+def _calc_bivariate(
+    df: dd.DataFrame,
+    x: str,
+    y: str,
+    *,
+    k: Optional[int] = None,
+) -> Intermediate:
     if x not in df.columns:
         raise ValueError(f"{x} not in columns names")
     if y not in df.columns:

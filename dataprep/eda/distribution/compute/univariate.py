@@ -95,11 +95,23 @@ def compute_univariate(
             df[x] = df[x].astype(str)
         # all computations for plot(df, Nominal())
         data = nom_comps(
-            df[x], first_rows, ngroups, largest, bins, top_words, stopword, lemmatize, stem,
+            df[x],
+            first_rows,
+            ngroups,
+            largest,
+            bins,
+            top_words,
+            stopword,
+            lemmatize,
+            stem,
         )
         (data,) = dask.compute(data)
 
-        return Intermediate(col=x, data=data, visual_type="categorical_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            visual_type="categorical_column",
+        )
 
     elif is_dtype(col_dtype, Continuous()):
         # extract the column
@@ -111,7 +123,11 @@ def compute_univariate(
         # all computations for plot(df, Continuous())
         (data,) = dask.compute(cont_comps(srs, bins))
 
-        return Intermediate(col=x, data=data, visual_type="numerical_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            visual_type="numerical_column",
+        )
 
     elif is_dtype(col_dtype, DateTime()):
         data_dt: List[Any] = []
@@ -120,7 +136,12 @@ def compute_univariate(
         # line chart
         data_dt.append(dask.delayed(_calc_line_dt)(df[[x]], timeunit))
         data, line = dask.compute(*data_dt)
-        return Intermediate(col=x, data=data, line=line, visual_type="datetime_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            line=line,
+            visual_type="datetime_column",
+        )
     else:
         raise UnreachableError
 
@@ -357,7 +378,11 @@ def calc_word_freq(
 
 
 def calc_cat_stats(
-    srs: dd.Series, df: dd.DataFrame, bins: int, nrows: int, nuniq: Optional[dd.core.Scalar] = None,
+    srs: dd.Series,
+    df: dd.DataFrame,
+    bins: int,
+    nrows: int,
+    nuniq: Optional[dd.core.Scalar] = None,
 ) -> Dict[str, Any]:
     """
     Calculate stats for a categorical column

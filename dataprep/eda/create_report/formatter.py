@@ -94,7 +94,9 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
 
     with catch_warnings():
         filterwarnings(
-            "ignore", "invalid value encountered in true_divide", category=RuntimeWarning,
+            "ignore",
+            "invalid value encountered in true_divide",
+            category=RuntimeWarning,
         )
         (data,) = dask.compute(data)
 
@@ -161,7 +163,9 @@ def format_basic(df: dd.DataFrame) -> Dict[str, Any]:
             )
             dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
         itmdt = Intermediate(
-            data=dfs, axis_range=list(data["num_cols"]), visual_type="correlation_heatmaps",
+            data=dfs,
+            axis_range=list(data["num_cols"]),
+            visual_type="correlation_heatmaps",
         )
         rndrd = render_correlation(itmdt)
         figs.clear()

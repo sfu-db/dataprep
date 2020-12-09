@@ -125,6 +125,16 @@ def test_validate_value() -> None:
 def test_validate_series(df_broken_email: pd.DataFrame) -> None:
     df_valid = validate_email(df_broken_email["messy_email"])
     df_check = pd.Series(
-        [True, True, True, True, True, False, False, False,], name="messy_lat_long",
+        [
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+        ],
+        name="messy_lat_long",
     )
     assert df_check.equals(df_valid)

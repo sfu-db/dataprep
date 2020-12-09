@@ -120,7 +120,17 @@ def compute(
     if sum(v is None for v in (x, y, z)) == 1:
         x, y = (v for v in (x, y, z) if v is not None)
         return compute_bivariate(
-            df, x, y, bins, ngroups, largest, nsubgroups, timeunit, agg, sample_size, dtype,
+            df,
+            x,
+            y,
+            bins,
+            ngroups,
+            largest,
+            nsubgroups,
+            timeunit,
+            agg,
+            sample_size,
+            dtype,
         )
 
     if x is not None and y is not None and z is not None:

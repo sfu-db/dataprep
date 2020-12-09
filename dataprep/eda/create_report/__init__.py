@@ -12,7 +12,9 @@ from .report import Report
 
 __all__ = ["create_report"]
 
-ENV_LOADER = Environment(loader=PackageLoader("dataprep", "eda/create_report/templates"),)
+ENV_LOADER = Environment(
+    loader=PackageLoader("dataprep", "eda/create_report/templates"),
+)
 
 
 def create_report(
