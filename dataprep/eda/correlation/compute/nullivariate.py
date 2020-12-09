@@ -3,7 +3,7 @@
 Currently this boils down to pandas' implementation."""
 
 from functools import partial
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, List, Any
 
 import dask
 import dask.array as da
@@ -13,6 +13,7 @@ import pandas as pd
 from ...data_array import DataArray
 from ...intermediate import Intermediate
 from .common import CorrelationMethod
+from ...utils import cut_long_name
 
 
 def _calc_nullivariate(
@@ -21,6 +22,10 @@ def _calc_nullivariate(
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
 ) -> Intermediate:
+    # pylint: disable=too-many-statements,too-many-locals,too-many-branches
+
+    most_show = 6  # the most number of column/row to show in "insight"
+    # longest = 5  # the longest length of word to show in "insight"
 
     if value_range is not None and k is not None:
         raise ValueError("value_range and k cannot be present in both")
@@ -31,6 +36,38 @@ def _calc_nullivariate(
     # So we do them in pandas
 
     (corrs,) = dask.compute(corrs)
+    pearson_corr, spearman_corr, kendalltau_corr = corrs.values()
+
+    pearson_pos_max, pearson_neg_max, pearson_mean, pearson_pos_cols, pearson_neg_cols = most_corr(
+        pearson_corr
+    )
+    (
+        spearman_pos_max,
+        spearman_neg_max,
+        spearman_mean,
+        spearman_pos_cols,
+        spearman_neg_cols,
+    ) = most_corr(spearman_corr)
+    (
+        kendalltau_pos_max,
+        kendalltau_neg_max,
+        kendalltau_mean,
+        kendalltau_pos_cols,
+        kendalltau_neg_cols,
+    ) = most_corr(kendalltau_corr)
+    pearson_min, pearson_cols = least_corr(pearson_corr)
+    spearman_min, spearman_cols = least_corr(spearman_corr)
+    kendalltau_min, kendalltau_cols = least_corr(kendalltau_corr)
+
+    p_p_corr = create_string("positive", pearson_pos_cols, most_show, df)
+    s_p_corr = create_string("positive", spearman_pos_cols, most_show, df)
+    k_p_corr = create_string("positive", kendalltau_pos_cols, most_show, df)
+    p_n_corr = create_string("negative", pearson_neg_cols, most_show, df)
+    s_n_corr = create_string("negative", spearman_neg_cols, most_show, df)
+    k_n_corr = create_string("negative", kendalltau_neg_cols, most_show, df)
+    p_corr = create_string("least", pearson_cols, most_show, df)
+    s_corr = create_string("least", spearman_cols, most_show, df)
+    k_corr = create_string("least", kendalltau_cols, most_show, df)
 
     dfs = {}
     for method, corr in corrs.items():
@@ -55,7 +92,34 @@ def _calc_nullivariate(
     return Intermediate(
         data=dfs,
         axis_range=list(df.columns.unique()),
-        visual_type="correlation_heatmaps",
+        visual_type="correlation_impact",
+        tabledata={
+            "Highest Positive Correlation": {
+                "Pearson": pearson_pos_max,
+                "Spearman": spearman_pos_max,
+                "KendallTau": kendalltau_pos_max,
+            },
+            "Highest Negative Correlation": {
+                "Pearson": pearson_neg_max,
+                "Spearman": spearman_neg_max,
+                "KendallTau": kendalltau_neg_max,
+            },
+            "Lowest Correlation": {
+                "Pearson": pearson_min,
+                "Spearman": spearman_min,
+                "KendallTau": kendalltau_min,
+            },
+            "Mean Correlation": {
+                "Pearson": pearson_mean,
+                "Spearman": spearman_mean,
+                "KendallTau": kendalltau_mean,
+            },
+        },
+        insights={
+            "Pearson": [p_p_corr, p_n_corr, p_corr],
+            "Spearman": [s_p_corr, s_n_corr, s_corr],
+            "KendallTau": [k_p_corr, k_n_corr, k_corr],
+        },
     )
 
 
@@ -108,6 +172,92 @@ def _kendall_tau_nxn(df: DataArray) -> da.Array:
         .map_partitions(partial(pd.DataFrame.corr, method="kendall"))
         .to_dask_array()
     )
+
+
+def most_corr(corrs: np.ndarray) -> Tuple[float, float, float, List[Any], List[Any]]:
+    """Find the most correlated columns."""
+    positive_col_set = set()
+    negative_col_set = set()
+    corrs_copy = corrs
+    for i in range(corrs_copy.shape[0]):
+        corrs_copy[i, i] = 0
+    mean = corrs_copy.mean()
+    p_maximum = corrs_copy.max()
+    n_maximum = (-corrs_copy).max()
+
+    if p_maximum != 0:
+        p_col1, p_col2 = np.where(corrs_copy == p_maximum)
+    else:
+        p_col1, p_col2 = [], []
+    if n_maximum != 0:
+        n_col1, n_col2 = np.where(corrs_copy == -n_maximum)
+    else:
+        n_col1, n_col2 = [], []
+
+    for i, _ in enumerate(p_col1):
+        if p_col1[i] < p_col2[i]:
+            positive_col_set.add((p_col1[i], p_col2[i]))
+        elif p_col1[i] > p_col2[i]:
+            positive_col_set.add((p_col2[i], p_col1[i]))
+    for i, _ in enumerate(n_col1):
+        if n_col1[i] < n_col2[i]:
+            negative_col_set.add((n_col1[i], n_col2[i]))
+        elif n_col1[i] > n_col2[i]:
+            negative_col_set.add((n_col2[i], n_col1[i]))
+
+    return (
+        round(p_maximum, 3),
+        round(-n_maximum, 3),
+        round(mean, 3),
+        list(positive_col_set),
+        list(negative_col_set),
+    )
+
+
+def least_corr(corrs: np.ndarray) -> Tuple[float, List[Any]]:
+    """Find the least correlated columns."""
+    col_set = set()
+    corrs_copy = corrs
+    for i in range(corrs_copy.shape[0]):
+        corrs_copy[i, i] = 2
+    minimum = abs(corrs_copy).min()
+    col1, col2 = np.where(corrs_copy == minimum)
+
+    for i, _ in enumerate(col1):
+        if col1[i] < col2[i]:
+            col_set.add((col1[i], col2[i]))
+        elif col1[i] > col2[i]:
+            col_set.add((col2[i], col1[i]))
+
+    return round(minimum, 3), list(col_set)
+
+
+def create_string(flag: str, source: List[Any], most_show: int, df: DataArray) -> str:
+    """Create the output string"""
+    suffix = "" if len(source) <= most_show else ", ..."
+    if flag == "positive":
+        prefix = "Most positive correlated: "
+        temp = "Most positive correlated: None"
+    elif flag == "negative":
+        prefix = "Most negative correlated: "
+        temp = "Most negative correlated: None"
+    elif flag == "least":
+        prefix = "Least correlated: "
+        temp = "Least correlated: None"
+
+    if source != []:
+        out = (
+            prefix
+            + ", ".join(
+                "(" + cut_long_name(df.columns[e[0]]) + ", " + cut_long_name(df.columns[e[1]]) + ")"
+                for e in source[:most_show]
+            )
+            + suffix
+        )
+    else:
+        out = temp
+
+    return out
 
 
 ## The code below is the correlation algorithms for array. Since we don't have

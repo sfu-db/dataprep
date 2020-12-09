@@ -451,7 +451,7 @@ def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
     Dict[str, str]
         Dictionary that contains Overview
     """
-    size = len(srs)  # include nan
+    size = srs.shape[0]  # include nan
     count = srs.count()  # exclude nan
     uniq_count = srs.nunique()
     overview_dict = {
@@ -459,7 +459,7 @@ def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
         "Unique (%)": uniq_count / count,
         "Missing": size - count,
         "Missing (%)": 1 - (count / size),
-        "Memory Size": srs.memory_usage(),
+        "Memory Size": srs.memory_usage(deep=True),
         "Minimum": srs.min(),
         "Maximum": srs.max(),
     }

@@ -2,7 +2,7 @@
     This module implements the visualization for
     plot_correlation(df) function
 """
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Any, Dict
 
 import numpy as np
 from bokeh.layouts import column, row
@@ -33,8 +33,8 @@ __all__ = ["render_correlation"]
 
 def render_correlation(
     itmdt: Intermediate,
-    plot_width: int = 500,
-    plot_height: int = 500,
+    plot_width: int = 400,
+    plot_height: int = 400,
     palette: Optional[Sequence[str]] = None,
 ) -> Figure:
     """
@@ -58,6 +58,8 @@ def render_correlation(
     """
     if itmdt.visual_type is None:
         visual_elem = Figure()
+    elif itmdt.visual_type == "correlation_impact":
+        visual_elem = render_correlation_impact(itmdt, plot_width, plot_height, palette or RDBU)
     elif itmdt.visual_type == "correlation_heatmaps":
         visual_elem = render_correlation_heatmaps(itmdt, plot_width, plot_height, palette or RDBU)
     elif itmdt.visual_type == "correlation_single_heatmaps":
@@ -123,6 +125,63 @@ def tweak_figure(fig: Figure) -> None:
     fig.yaxis.formatter = FuncTickFormatter(code=format_js)
 
 
+def render_correlation_impact(
+    itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
+) -> Dict[str, Any]:
+    """
+    Render correlation heatmaps in to tabs
+    """
+    tabs: List[Panel] = []
+    tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
+    axis_range = itmdt["axis_range"]
+
+    for method, df in itmdt["data"].items():
+        # in case of numerical column names
+        df = df.copy()
+        df["x"] = df["x"].apply(str)
+        df["y"] = df["y"].apply(str)
+
+        mapper, color_bar = create_color_mapper(palette)
+        x_range = FactorRange(*axis_range)
+        y_range = FactorRange(*reversed(axis_range))
+        fig = Figure(
+            x_range=x_range,
+            y_range=y_range,
+            plot_width=plot_width,
+            plot_height=plot_height,
+            x_axis_location="below",
+            tools="hover",
+            toolbar_location=None,
+            tooltips=tooltips,
+            background_fill_color="#fafafa",
+            title=" ",
+        )
+
+        tweak_figure(fig)
+
+        fig.rect(
+            x="x",
+            y="y",
+            width=1,
+            height=1,
+            source=df,
+            fill_color={"field": "correlation", "transform": mapper},
+            line_color=None,
+        )
+        fig.frame_width = plot_width
+        fig.add_layout(color_bar, "left")
+        tab = Panel(child=fig, title=method)
+        tabs.append(tab)
+
+    return {
+        "insights": itmdt["insights"],
+        "tabledata": itmdt["tabledata"],
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 150,
+    }
+
+
 def render_correlation_heatmaps(
     itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
 ) -> Tabs:
@@ -176,7 +235,7 @@ def render_correlation_heatmaps(
 
 def render_correlation_single_heatmaps(
     itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
-) -> Tabs:
+) -> Dict[str, Any]:
     """
     Render correlation heatmaps, but with single column
     """
@@ -215,8 +274,11 @@ def render_correlation_single_heatmaps(
         tab = Panel(child=fig, title=method)
         tabs.append(tab)
 
-    tabs = Tabs(tabs=tabs)
-    return tabs
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width,
+    }
 
 
 def create_color_mapper(palette: Sequence[str]) -> Tuple[LinearColorMapper, ColorBar]:
@@ -239,7 +301,7 @@ def create_color_mapper(palette: Sequence[str]) -> Tuple[LinearColorMapper, Colo
 ######### Scatter #########
 def render_scatter(
     itmdt: Intermediate, plot_width: int, plot_height: int, palette: Sequence[str]
-) -> Figure:
+) -> Dict[str, Any]:
     """
     Render scatter plot with a regression line and possible most influencial points
     """
@@ -255,7 +317,6 @@ def render_scatter(
         plot_width=plot_width,
         plot_height=plot_height,
         toolbar_location=None,
-        title=Title(text="Scatter Plot & Regression Line", align="center"),
         tools=[],
         x_axis_label=xcol,
         y_axis_label=ycol,
@@ -293,7 +354,11 @@ def render_scatter(
         )
 
         fig.add_layout(legend, place="right")
-    return fig
+    return {
+        "layout": [fig],
+        "meta": ["Scatter Plot & Regression Line"],
+        "container_width": plot_width,
+    }
 
 
 ######### Interactions for report #########

@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <title> DataPrep.Connector Info </title>
+        <script>
+            function switchTab637(e) {
+                const selectedAreaSuffix = e.parentElement.parentElement.className.split('-')[1];
+                const selectedTabId = e.id.split('-')[2];
+                const selectedTabContent = document.querySelector(`.contents-${selectedAreaSuffix}>div:nth-of-type(${selectedTabId})`);
+                const contentArray = document.getElementsByClassName('info-637')
+                for (let i of contentArray) {
+                    i.style.display = 'none';
+                }
+                selectedTabContent.style.display = 'block';
+            }
+        </script>
+        <style>
+            .container-637 {
+            }
+            .container-637 input[type=radio] {
+            display: none;
+            }
+            .tabs-637 {
+            font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            display: grid;
+            flex-wrap: wrap;
+            gap: 5px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            justify-content: wrap;
+            }
+            .tabs-637 label {
+            word-wrap: break-word;
+            text-align: center;
+            font-size: 12px;
+            border-bottom: 2px solid #9edae5;
+            transition: border 0.3s ease;
+            }
+            .tabs-637 label:hover {
+            background: rgba(0, 0, 0, 0.1);
+            }
+            .tabs-637 input:checked+label {
+            border-bottom: 2px solid #1f77b4;
+            }
+            .contents-637>div:nth-of-type(n+2) {
+            display: none;
+            }
+            h4 {
+            font-size: 14px;
+            font-family: Arial;
+            }
+            p {
+            font-size: 13px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-637">
+            <div class="tabs-637">
+                <input type="radio" name="select" id='tab-637-1' checked onclick="switchTab637(this)">
+                <label for="tab-637-1">{{ tbs | first }}</label>
+                {% for tb in tbs %}
+                {% set tab_id = 'tab-637-' + loop.index|string %}
+                {% if loop.index != 1 %}          
+                <input type="radio" name="select" id={{ tab_id }}  onclick="switchTab637(this)">
+                <label for={{ tab_id }}>{{ tb }}</label>
+                {% endif %}
+                {% endfor %}    		
+            </div>
+            <div class="contents-637">
+                {% for tb in tbs %}
+                <div class="info-637">
+                    <div>
+                        <h4><u>Parameters</u></h4>
+                        {% if tbs[tb].required_params%}
+                        {% for required_param in tbs[tb].required_params %}
+                        <p style="display:wrap"><code>{{ required_param }} (required)</code></p>
+                        {% endfor %}
+                        {% endif %}
+                        {% if tbs[tb].optional_params%}
+                        {% for optional_param in tbs[tb].optional_params %}
+                        <p style="display:wrap"><code>{{ optional_param }}</code></p>
+                        {% endfor %}
+                        {% endif %}
+                        {% if not (tbs[tb].required_params or tbs[tb].optional_params)%}
+                        <p>None</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4><u>Example</u></h4>
+                        {% set connect_example = "dc = connect('" + dbname + "'" %}
+                        {% if tbs[tb].joined_auth_params %}
+                        {% set connect_example = connect_example + ", _auth={'" + tbs[tb].joined_auth_params[0] + "}, _concurrency=3)" %}
+                        {% else %}
+                        {% set connect_example = connect_example + ")" %}
+                        {% endif %}
+                        {% set query_example = "df = await dc.query('" + tb + "'" %}
+                        {% if tbs[tb].joined_query_fields%}
+                        {% set query_example = query_example + ", " + tbs[tb].joined_query_fields[0] %}
+                        {% endif %}
+                        {% if tbs[tb].count == True %}
+                        {% set query_example = query_example + ", _count=20" %}
+                        {% endif %}
+                        {% set query_example = query_example + ")" %}
+                        <p><code>{{ connect_example }}<br>{{ query_example }}</code></p>
+                    </div>
+                    <div>
+                    	<h4><u>Schema</u></h4>
+                    	{{ tbs[tb].schemas }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </body>

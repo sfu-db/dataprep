@@ -5,17 +5,15 @@ Every data fetching action should begin with instantiating this Connector class.
 import math
 import sys
 from asyncio import as_completed
-from pathlib import Path
-from typing import Any, Awaitable, Dict, List, Optional, Tuple, Union
+from typing import Any, Awaitable, Dict, Optional, Tuple, Union
 from warnings import warn
 
 import pandas as pd
 from aiohttp import ClientSession
 from aiohttp.client_reqrep import ClientResponse
-from jinja2 import Environment, StrictUndefined, Template, UndefinedError
+from jinja2 import Environment, StrictUndefined, UndefinedError
 from jsonpath_ng import parse as jparse
 
-from .config_manager import config_directory, ensure_config
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .ref import Ref
@@ -30,26 +28,10 @@ from .schema import (
     TokenPaginationDef,
 )
 from .throttler import OrderedThrottler, ThrottleSession
-
-INFO_TEMPLATE = Template(
-    """{% for tb in tbs.keys() %}
-Table {{dbname}}.{{tb}}
-
-Parameters
-----------
-{% if tbs[tb].required_params %}{{", ".join(tbs[tb].required_params)}} required {% endif %}
-{% if tbs[tb].optional_params %}{{", ".join(tbs[tb].optional_params)}} optional {% endif %}
-
-Examples
---------
->>> dc.query({{", ".join(["\\\"{}\\\"".format(tb)] + tbs[tb].joined_query_fields)}})
->>> dc.show_schema("{{tb}}")
-{% endfor %}
-"""
-)
+from .info import info, initialize_path
 
 
-class Connector:
+class Connector:  # pylint: disable=too-many-instance-attributes
     """This is the main class of the connector component.
     Initialize Connector class as the example code.
 
@@ -80,6 +62,7 @@ class Connector:
     # storage for authorization
     _storage: Dict[str, Any]
     _concurrency: int
+    _update: bool
     _jenv: Environment
 
     def __init__(
@@ -91,16 +74,7 @@ class Connector:
         _concurrency: int = 1,
         **kwargs: Any,
     ) -> None:
-        if (
-            config_path.startswith(".")
-            or config_path.startswith("/")
-            or config_path.startswith("~")
-        ):
-            path = Path(config_path).resolve()
-        else:
-            # From Github!
-            ensure_config(config_path, update)
-            path = config_directory() / config_path
+        path = initialize_path(config_path, update)
 
         self._impdb = ImplicitDatabase(path)
 
@@ -108,6 +82,7 @@ class Connector:
         self._auth = _auth or {}
         self._storage = {}
         self._concurrency = _concurrency
+        self._update = update
         self._jenv = Environment(undefined=StrictUndefined)
         self._throttler = OrderedThrottler(_concurrency)
 
@@ -151,74 +126,10 @@ class Connector:
 
         return await self._query_imp(table, where, _auth=_auth, _q=_q, _count=_count)
 
-    @property
-    def table_names(self) -> List[str]:
-        """
-        Return all the names of the available tables in a list.
-
-        Note
-        ----
-        We abstract each website as a database containing several tables.
-        For example in Spotify, we have artist and album table.
-        """
-        return list(self._impdb.tables.keys())
-
     def info(self) -> None:
         """Show the basic information and provide guidance for users
         to issue queries."""
-
-        # get info
-        tbs: Dict[str, Any] = {}
-        for cur_table in self._impdb.tables:
-            table_config_content: ConfigDef = self._impdb.tables[cur_table].config
-            params_required = []
-            params_optional = []
-            example_query_fields = []
-            count = 1
-            for k, val in table_config_content.request.params.items():
-                if isinstance(val, bool) and val:
-                    params_required.append(k)
-                    example_query_fields.append(f"""{k}="word{count}\"""")
-                    count += 1
-                elif isinstance(val, bool):
-                    params_optional.append(k)
-            tbs[cur_table] = {}
-            tbs[cur_table]["required_params"] = params_required
-            tbs[cur_table]["optional_params"] = params_optional
-            tbs[cur_table]["joined_query_fields"] = example_query_fields
-
-        # show table info
-        print(INFO_TEMPLATE.render(ntables=len(self.table_names), dbname=self._impdb.name, tbs=tbs))
-
-    def show_schema(self, table_name: str) -> pd.DataFrame:
-        """This method shows the schema of the table that will be returned,
-        so that the user knows what information to expect.
-
-        Parameters
-        ----------
-        table_name
-            The table name.
-
-        Returns
-        -------
-        pd.DataFrame
-            The returned data's schema.
-
-        Note
-        ----
-        The schema is defined in the configuration file.
-        The user can either use the default one or change it by editing the configuration file.
-        """
-        print(f"table: {table_name}")
-        table_config_content: ConfigDef = self._impdb.tables[table_name].config
-        schema = table_config_content.response.schema_
-        new_schema_dict: Dict[str, List[Any]] = {}
-        new_schema_dict["column_name"] = []
-        new_schema_dict["data_type"] = []
-        for k in schema.keys():
-            new_schema_dict["column_name"].append(k)
-            new_schema_dict["data_type"].append(schema[k].type)
-        return pd.DataFrame.from_dict(new_schema_dict)
+        info(self._impdb.name)
 
     async def _query_imp(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,

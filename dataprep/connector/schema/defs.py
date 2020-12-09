@@ -417,4 +417,5 @@ class ResponseDef(BaseDef):
 class ConfigDef(BaseDef):
     version: int = Field(1, const=True)
     request: RequestDef
+    examples: Optional[Dict[str, str]]
     response: ResponseDef

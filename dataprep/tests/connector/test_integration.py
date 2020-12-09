@@ -5,6 +5,7 @@ import pytest
 
 from ...connector import Connector
 from ...connector.utils import Request
+from ...utils import display_dataframe
 
 
 @pytest.mark.skipif(
@@ -20,9 +21,7 @@ def test_connector() -> None:
 
     dc.info()
 
-    schema = dc.show_schema("businesses")
-
-    assert len(schema) > 0
+    display_dataframe(df)
 
     df = asyncio.run(dc.query("businesses", _count=120, term="ramen", location="vancouver"))
 
