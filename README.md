@@ -25,6 +25,7 @@ DataPrep lets you prepare your data using a single library with a few lines of c
 Currently, you can use DataPrep to:
 * Collect data from common data sources (through `dataprep.connector`)
 * Do your exploratory data analysis (through `dataprep.eda`)
+* Clean and standardize data (through `dataprep.clean`)
 * ...more modules are coming
 
 ## Releases
@@ -62,8 +63,7 @@ The following examples can give you an impression of what DataPrep can do:
 
 * [Documentation: Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
 * [Documentation: EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
-* [EDA Case Study: Titanic](https://sfu-db.github.io/dataprep/user_guide/eda/titanic.html)
-* [EDA Case Study: House Price](https://sfu-db.github.io/dataprep/user_guide/eda/house_price.html)
+* [Documentation: Clean](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html)
 
 ### Connector
 
@@ -109,40 +109,42 @@ If you want to connect with a different web API, Connector is designed to be eas
 
 In the following link, you can see detailed examples of how to use Connector for retrieving data from DBLP, Spotify, Yelp, and other sites, without taking an in-depth look into the web APIs documentation!: [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
+
 ### EDA
+DataPrep.EDA is the fastest and the easiest EDA (Exploratory Data Analysis) tool in Python. It allows you to understand a Pandas/Dask DataFrame with a few lines of code in seconds.
 
-There are common tasks during the exploratory data analysis stage, 
-like a quick look at the columnar distribution, or understanding the correlations
-between columns. 
+#### Create Profile Reports, Fast
+You can create a beautiful profile report from a Pandas/Dask DataFrame with the `create_report` function. DataPrep.EDA has the following advantages compared to other tools:
 
-The EDA (<em>Exploratory Data Analysis</em>) module categorizes these EDA tasks into functions helping you finish EDA
-tasks with a single function call.
+ * **10-100X Faster**: DataPrep.EDA is 10-100X faster than Pandas-based profiling tools due to its highly optimized Dask-based computing module.
+ * **Interactive Visualization**: DataPrep.EDA generates interactive visualizations in a report, which makes the report look more appealing to end users.
+ * **Big Data Support**: DataPrep.EDA naturally supports big data stored in a Dask cluster by accepting a Dask dataframe as input.
 
-* Want to understand the distributions for each DataFrame column? Use `plot`.
+The following code demonstrates how to use DataPrep.EDA to create a profile report for the titanic dataset.
 
-<a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot.html#Get-an-overview-of-the-dataset-with-plot(df)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot(df).gif"/></a>
+```python
+import pandas as pd
+from dataprep.eda import create_report
+df = pd.read_csv("titanic.csv")
+create_report(df).show_browser()
+```
 
-* Want to understand the correlation between columns? Use `plot_correlation`.
+Click [here](https://sfu-db.github.io/dataprep/_downloads/c9bf292ac949ebcf9b65bb2a2bc5a149/titanic_dp.html) to see the generated report of the above code.
 
-<a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot_correlation.html#Get-an-overview-of-the-correlations-with-plot_correlation(df)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot_correlation(df).gif"/></a>
+#### Innovative System Design
+DataPrep.EDA is the ***only*** task-centric EDA system in Python. It is carefully designed to improve usability.
+* **Task-Centric API Design**: You can declaratively specify a wide range of EDA tasks in different granularities with a single function call. All needed visualizations will be automatically and intelligently generated for you.
+* **Auto-Insights**: DataPrep.EDA automatically detects and highlights the insights (e.g., a column has many outliers) to facilitate pattern discovery about the data.
+* **How-to Guide** (available soon): A how-to guide is provided to show the configuration of each plot function. With this feature, you can easily customize the generated visualizations.
 
-* Or, if you want to understand the impact of the missing values for each column, use `plot_missing`.
+#### Understand the Titanic dataset with Task-Centric API:
+<a href="assets/eda_demo.gif"><img src="assets/eda_demo.gif"/></a>
 
-<a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot_missing.html#Get-an-overview-of-the-missing-values-with-plot_missing(df)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot_missing(df).gif"/></a>
+Click [here](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html) to check all the supported tasks.
 
-You can drill down to get more information by given `plot`, `plot_correlation` and `plot_missing` a column name.: E.g. for `plot_missing`
+Check [plot](https://sfu-db.github.io/dataprep/user_guide/eda/plot.html), [plot_correlation](https://sfu-db.github.io/dataprep/user_guide/eda/plot_correlation.html), [plot_missing](https://sfu-db.github.io/dataprep/user_guide/eda/plot_missing.html) and [create_report](https://sfu-db.github.io/dataprep/user_guide/eda/create_report.html) to see how each function works.
 
-<a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot_missing.html#Understand-the-impact-of-the-missing-values-in-column-x-with-plot_missing(df,-x)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot_missing(df, x).gif"/></a>
 
-&nbsp;&nbsp;&nbsp;&nbsp;for numerical column using`plot`:
-
-<a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot.html#Understand-a-column-with-plot(df,-x)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot(df,x)_num.gif"/></a>
-
-&nbsp;&nbsp;&nbsp;&nbsp;for categorical column using`plot`:
-
-<a href="https://sfu-db.github.io/dataprep/user_guide/eda/plot.html#Understand-a-column-with-plot(df,-x)"><img src="https://github.com/sfu-db/dataprep/raw/develop/assets/plot(df,x)_cat.gif"/></a>
-
-Don't forget to checkout the [examples] folder for detailed demonstration!
 
 ### Clean
 
