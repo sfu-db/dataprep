@@ -648,19 +648,25 @@ def change_timezone(
         minute=parsed_date_data.hms["minute"],
         second=parsed_date_data.hms["second"],
     )
+    origin_add, target_add = 0, 0
     if parsed_date_data.tzinfo["timezone"] in all_timezones:
         pytz_offset = pytz.timezone(str(parsed_date_data.tzinfo["timezone"])).utcoffset(origin_date)
         if not pytz_offset is None:
-            origin_tz_offset = timedelta(days=-pytz_offset.days, seconds=-pytz_offset.seconds)
+            origin_add = -1 if pytz_offset.days > 0 and pytz_offset.seconds > 0 else 1
+            origin_tz_offset = timedelta(days=abs(pytz_offset.days), seconds=abs(pytz_offset.seconds))
     elif parsed_date_data.tzinfo["timezone"] in ZONE:
-        offset_value = -1 * ZONE[str(parsed_date_data.tzinfo["timezone"])] * 3600
-        origin_tz_offset = timedelta(seconds=offset_value)
+        origin_add = -1 if ZONE[str(parsed_date_data.tzinfo["timezone"])] > 0 else 1
+        offset_value = abs(ZONE[str(parsed_date_data.tzinfo["timezone"])]) * 3600
+        origin_tz_offset = timedelta(days=0, seconds=offset_value)
     if target_timezone in all_timezones:
         pytz_offset = pytz.timezone(target_timezone).utcoffset(origin_date)
         if not pytz_offset is None:
-            target_tz_offset = pytz_offset
+            target_add = 1 if pytz_offset.days >= 0 and pytz_offset.seconds >= 0 else -1
+            target_tz_offset = timedelta(days=abs(pytz_offset.days), seconds=abs(pytz_offset.seconds))
     elif target_timezone in ZONE:
-        target_tz_offset = timedelta(seconds=ZONE[target_timezone] * 3600)
+        target_add = 1 if ZONE[target_timezone] >= 0 else -1
+        offset_value = abs(ZONE[target_timezone]) * 3600
+        target_tz_offset = timedelta(days=0, seconds=offset_value)
     result = deepcopy(parsed_date_data)
     if -1 in [
         parsed_date_data.ymd["year"],
@@ -671,8 +677,8 @@ def change_timezone(
         parsed_date_data.hms["second"],
     ]:
         return parsed_date_data
-    utc_date = origin_date + origin_tz_offset
-    target_date = utc_date + target_tz_offset
+    utc_date = origin_date + origin_tz_offset if origin_add == 1 else origin_date - origin_tz_offset
+    target_date = utc_date + target_tz_offset if target_add == 1 else utc_date - target_tz_offset
     result.set_year(target_date.year)
     result.set_month(target_date.month)
     result.set_day(target_date.day)
@@ -684,9 +690,9 @@ def change_timezone(
     seconds = target_tz_offset.seconds
     result.set_tzinfo(utc_offset_hours=int(abs(days) * 24 + abs(seconds) / 3600))
     result.set_tzinfo(utc_offset_minutes=int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60))
-    if days >= 0 and seconds >= 0:
+    if target_add >= 0:
         result.set_tzinfo(utc_add="+")
-    elif days <= 0 and seconds < 0:
+    elif target_add < 0:
         result.set_tzinfo(utc_add="-")
     return result
 
@@ -985,3 +991,47 @@ def reset_stats() -> None:
     STATS["cleaned"] = 0
     STATS["null"] = 0
     STATS["unknown"] = 0
+
+import pandas as pd
+import numpy as np
+df = pd.DataFrame({"date":
+                   ['1996.07.10 AD at 15:08:56 PDT',
+                    'Thu Sep 25 10:36:28 2003',
+                    'Thu Sep 25 10:36:28 BRST 2003',
+                    '2003 10:36:28 BRST 25 Sep Thu',
+                    'Thu Sep 25 10:36:28 2003',
+                    'Thu 10:36:28',
+                    'Thu 10:36',
+                    '10:36',
+                    'Thu Sep 25 2003',
+                    'Sep 25 2003',
+                    'Sep 2003',
+                    'Sep',
+                    '2003',
+                    '2003-09-25',
+                    '2003-Sep-25',
+                    '25-Sep-2003',
+                    'Sep-25-2003',
+                    '09-25-2003',
+                    '25-09-2003',
+                    '10-09-2003',
+                    '10-09-03',
+                    '2003.Sep.25',
+                    '2003/09/25',
+                    '2003 Sep 25',
+                    '2003 09 25',
+                    '10pm',
+                    '12:00am',
+                    'Sep 03',
+                    'Sep of 03',
+                    'Wed, July 10, 96',
+                    '1996.07.10 AD at 15:08:56 PDT',
+                    'Tuesday, April 12, 1952 AD 3:30:42pm PST',
+                    'November 5, 1994, 8:15:30 am EST',
+                    '3rd of May 2001',
+                    '5:50 AM on June 13, 1990',
+                    'NULL',
+                    'nan',
+                    'I\'m a little cat',
+                    'This is Sep.']})
+clean_date(df, 'date', origin_timezone='GMT', target_timezone='EDT',target_format='yyyy.MM.dd AD at HH:mm:ss Z')
