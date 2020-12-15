@@ -644,9 +644,9 @@ def change_timezone(
         year=parsed_date_data.ymd["year"],
         month=parsed_date_data.ymd["month"],
         day=parsed_date_data.ymd["day"],
-        hour=parsed_date_data.ymd["hour"],
-        minute=parsed_date_data.ymd["minute"],
-        second=parsed_date_data.ymd["second"],
+        hour=parsed_date_data.hms["hour"],
+        minute=parsed_date_data.hms["minute"],
+        second=parsed_date_data.hms["second"],
     )
     if parsed_date_data.tzinfo["timezone"] in all_timezones:
         pytz_offset = pytz.timezone(str(parsed_date_data.tzinfo["timezone"])).utcoffset(origin_date)
