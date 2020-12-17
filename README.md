@@ -23,9 +23,9 @@
 DataPrep lets you prepare your data using a single library with a few lines of code.
 
 Currently, you can use DataPrep to:
-* Collect data from common data sources (through `dataprep.connector`)
-* Do your exploratory data analysis (through `dataprep.eda`)
-* Clean and standardize data (through `dataprep.clean`)
+* Collect data from common data sources (through [`dataprep.connector`](#connector))
+* Do your exploratory data analysis (through [`dataprep.eda`](#eda))
+* Clean and standardize data (through [`dataprep.clean`](#clean))
 * ...more modules are coming
 
 ## Releases
@@ -57,15 +57,8 @@ Currently, you can use DataPrep to:
 pip install -U dataprep
 ```
 
-## Examples & Usages
 
-The following examples can give you an impression of what DataPrep can do:
-
-* [Documentation: Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
-* [Documentation: EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
-* [Documentation: Clean](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html)
-
-### Connector
+## Connector
 
 Connector is an intuitive, open-source API wrapper that speeds up development by standardizing calls to multiple APIs as a simple workflow.
 
@@ -110,7 +103,7 @@ If you want to connect with a different web API, Connector is designed to be eas
 In the following link, you can see detailed examples of how to use Connector for retrieving data from DBLP, Spotify, Yelp, and other sites, without taking an in-depth look into the web APIs documentation!: [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
 
-### EDA
+## EDA
 DataPrep.EDA is the fastest and the easiest EDA (Exploratory Data Analysis) tool in Python. It allows you to understand a Pandas/Dask DataFrame with a few lines of code in seconds.
 
 #### Create Profile Reports, Fast
@@ -146,7 +139,7 @@ Check [plot](https://sfu-db.github.io/dataprep/user_guide/eda/plot.html), [plot_
 
 
 
-### Clean
+## Clean
 
 DataPrep.Clean contains simple functions designed for cleaning and standardizing a column in a DataFrame. It provides
 * A unified API: each function follows the syntax `clean_{type}(df, "column name")` (see an example below)
@@ -183,6 +176,16 @@ Below are the supported semantic types (more are currently being developed).
   </table>
 
 For more information, refer to the [User Guide](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html).
+
+
+## Documentation
+
+The following documentation can give you an impression of what DataPrep can do:
+
+* [Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
+* [EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
+* [Clean](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html)
+
 
 ## Contribute
 
