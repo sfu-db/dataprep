@@ -62,6 +62,13 @@ def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
     compute_missing(simpledf, y="b")
 
 
+def test_sanity_compute_7() -> None:
+    df = pd.DataFrame([[1, 2, 3]])
+    simpledf = to_dask(df)
+    itmdt = compute_missing(simpledf)
+    render_missing(itmdt)
+
+
 def test_no_missing() -> None:
     from sys import platform
 
