@@ -63,7 +63,7 @@ class Report:
         if not path.is_dir():
             raise ValueError("The second parameter is not a valid path.")
 
-        with open(path / f"{filename}.html", "w") as file:
+        with open(path / f"{filename}.html", "w", encoding="utf-8") as file:
             file.write(self.report)
         print(f"Report has been saved to {path}/{filename}.html!")
 
