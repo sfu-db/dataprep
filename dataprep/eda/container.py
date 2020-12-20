@@ -67,7 +67,7 @@ class Container:
         """
         save function
         """
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(self.template_base.render(context=self.context))
 
     def _repr_html_(self) -> str:
@@ -107,7 +107,7 @@ class Container:
         # set delete = False to avoid early delete when user open multiple plots.
         with NamedTemporaryFile(suffix=".html", delete=False) as tmpf:
             pass
-        with open(tmpf.name, "w") as file:
+        with open(tmpf.name, "w", encoding="utf-8") as file:
             file.write(self.template_base.render(context=self.context))
         webbrowser.open_new_tab(f"file://{tmpf.name}")
 
