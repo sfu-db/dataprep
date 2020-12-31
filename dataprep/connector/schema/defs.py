@@ -1,6 +1,8 @@
 """Strong typed schema definition."""
 import http.server
+import json
 import random
+import socket
 import socketserver
 import string
 from base64 import b64encode
@@ -8,15 +10,16 @@ from enum import Enum
 from pathlib import Path
 from threading import Thread
 from time import time
-from typing import Any, Dict, List, Optional, Union, Set
+from typing import Any, Dict, List, Optional, Set, Union
 from urllib.parse import parse_qs, urlparse
-import socket
-import requests
-from pydantic import Field
+
+from jinja2 import Environment, meta
+from pydantic import Field, root_validator
 
 from ...utils import is_notebook
+from ..errors import InvalidAuthParams, MissingRequiredAuthParams
+from ..utils import Request
 from .base import BaseDef, BaseDefT
-from ..errors import MissingRequiredAuthParams, InvalidAuthParams
 
 # pylint: disable=missing-class-docstring,missing-function-docstring
 FILE_PATH: Path = Path(__file__).resolve().parent
@@ -82,10 +85,35 @@ PaginationDef = Union[OffsetPaginationDef, SeekPaginationDef, PagePaginationDef,
 
 class FieldDef(BaseDef):
     required: bool
-    from_key: Optional[str]
+    from_key: Union[List[str], str, None]
     to_key: Optional[str]
     template: Optional[str]
     remove_if_empty: bool
+
+    @root_validator(pre=True)
+    # pylint: disable=no-self-argument,no-self-use
+    def from_key_validation(cls, values: Dict[str, Any]) -> Any:
+        if "template" in values:
+            parsed_content = Environment().parse(values["template"])
+            variables = meta.find_undeclared_variables(parsed_content)  # type: ignore
+
+            from_key = values.get("fromKey")
+            if isinstance(from_key, str):
+                from_key = {from_key}
+            elif from_key is None:
+                from_key = set()
+            elif isinstance(from_key, list):
+                from_key = set(from_key)
+            else:
+                raise NotImplementedError("Unreachable")
+
+            if len(set(variables) - from_key) != 0:
+                raise ValueError(f"template requires {variables} exist in fromKey, got {from_key}")
+        else:
+            if isinstance(values.get("fromKey"), list):
+                raise ValueError("from_key cannot be a list if template is not used.")
+
+        return values
 
 
 FieldDefUnion = Union[FieldDef, bool, str]  # Put bool before str
@@ -142,20 +170,22 @@ class OAuth2AuthorizationCodeAuthorizationDef(BaseDef):
             code = self._auth(params["client_id"], port)
 
             validate_auth({"client_id", "client_secret"}, params)
-
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
 
-            resp: Dict[str, Any] = requests.post(
-                self.token_server_url,
-                headers={"Authorization": f"Basic {b64cred}"},
-                data={
-                    "grant_type": "authorization_code",
-                    "code": code,
-                    "redirect_uri": f"http://localhost:{port}/",
-                },
-            ).json()
+            headers = {
+                "Authorization": f"Basic {b64cred}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+            params = {
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": f"http://localhost:{port}/",
+            }
+            requests = Request(self.token_server_url)
+            response = requests.post(_headers=headers, _data=params)
+            resp: Dict[str, Any] = json.loads(response.read())
 
             if resp["token_type"].lower() != "bearer":
                 raise RuntimeError("token_type is not bearer")
@@ -227,11 +257,16 @@ class OAuth2ClientCredentialsAuthorizationDef(BaseDef):
             ckey = params["client_id"]
             csecret = params["client_secret"]
             b64cred = b64encode(f"{ckey}:{csecret}".encode("ascii")).decode()
-            resp: Dict[str, Any] = requests.post(
-                self.token_server_url,
-                headers={"Authorization": f"Basic {b64cred}"},
-                data={"grant_type": "client_credentials"},
-            ).json()
+
+            headers = {
+                "Authorization": f"Basic {b64cred}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+            params = {"grant_type": "client_credentials"}
+            requests = Request(self.token_server_url)
+            response = requests.post(_headers=headers, _data=params)
+            resp: Dict[str, Any] = json.loads(response.read())
+
             if resp["token_type"].lower() != "bearer":
                 raise RuntimeError("token_type is not bearer")
 
