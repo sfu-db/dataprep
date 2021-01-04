@@ -16,6 +16,7 @@ GIT_REF_URL = "https://api.github.com/repos/sfu-db/DataConnectorConfigs/git/refs
 
 
 def separate_branch(config_path: str) -> Tuple[str, str]:
+    """Separate the config path into db name and branch"""
     segments = config_path.split("@")
     if len(segments) == 1:
         return segments[0], "master"
@@ -32,9 +33,9 @@ def initialize_path(config_path: str, update: bool) -> Path:
         path = Path(config_path).resolve()
     else:
         # From GitHub!
-        db, branch = separate_branch(config_path)
-        ensure_config(db, branch, update)
-        path = config_directory() / branch / db
+        impdb, branch = separate_branch(config_path)
+        ensure_config(impdb, branch, update)
+        path = config_directory() / branch / impdb
     return path
 
 
