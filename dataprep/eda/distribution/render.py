@@ -24,7 +24,6 @@ from bokeh.models import (
 from bokeh.plotting import Figure, figure
 from bokeh.transform import cumsum, linear_cmap, transform
 from bokeh.util.hex import hexbin
-from PIL import Image
 from scipy.stats import norm
 from wordcloud import WordCloud
 
@@ -243,7 +242,7 @@ def wordcloud_viz(
     """
     Visualize the word cloud
     """  # pylint: disable=unsubscriptable-object
-    ellipse_mask = np.array(Image.open(f"{Path(__file__).parent.parent.parent}/assets/ellipse.jpg"))
+    ellipse_mask = np.load(f"{Path(__file__).parent.parent.parent}/assets/ellipse.npz").get("image")
     wordcloud = WordCloud(background_color="white", mask=ellipse_mask)
     wordcloud.generate_from_frequencies(word_cnts)
     wcarr = wordcloud.to_array().astype(np.uint8)
