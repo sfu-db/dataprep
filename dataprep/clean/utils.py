@@ -92,3 +92,40 @@ def create_report(type_cleaned: str, stats: Dict[str, int], nrows: int) -> None:
     print(
         f"""Result contains {ncorrect} ({pcorrect}%) values in the correct format and {nnull} null values ({pnull}%)"""
     )
+
+
+def create_report_new(type_cleaned: str, stats: pd.Series, errors: str) -> None:
+    """
+    Describe what was done in the cleaning process
+
+    The stats series contains the following codes in its index
+        0 := the number of null values
+        1 := the number of values that could not be parsed
+        2 := the number of values that were transformed during cleaning
+        3 := the number of values that were already in the correct format
+    """
+    print(f"{type_cleaned} Cleaning Report:")
+    nrows = stats.sum()
+
+    nclnd = stats.loc[2] if 2 in stats.index else 0
+    if nclnd > 0:
+        pclnd = round(nclnd / nrows * 100, 2)
+        print(f"\t{nclnd} values cleaned ({pclnd}%)")
+
+    nunknown = stats.loc[1] if 1 in stats.index else 0
+    if nunknown > 0:
+        punknown = round(nunknown / nrows * 100, 2)
+        expl = "set to NaN" if errors == "coerce" else "left unchanged"
+        print(f"\t{nunknown} values unable to be parsed ({punknown}%), {expl}")
+
+    nnull = stats.loc[0] if 0 in stats.index else 0
+    if errors == "coerce":
+        nnull += stats.loc[1] if 1 in stats.index else 0
+    pnull = round(nnull / nrows * 100, 2)
+
+    ncorrect = nclnd + (stats.loc[3] if 3 in stats.index else 0)
+    pcorrect = round(ncorrect / nrows * 100, 2)
+    print(
+        f"Result contains {ncorrect} ({pcorrect}%) values in the correct format "
+        f"and {nnull} null values ({pnull}%)"
+    )
