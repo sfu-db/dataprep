@@ -1,14 +1,13 @@
 """This module contains back end functions helping developers use data connector."""
-from pathlib import Path
 from typing import Any, Dict, List
-import pandas as pd
-from .implicit_database import ImplicitDatabase
-from .schema import ConfigDef
-from .config_manager import config_directory, ensure_config
-from .info_ui import info_ui
-from ..utils import get_styled_schema
 
-GIT_REF_URL = "https://api.github.com/repos/sfu-db/DataConnectorConfigs/contents"
+import pandas as pd
+
+from ..utils import get_styled_schema
+from .implicit_database import ImplicitDatabase
+from .info_ui import info_ui
+from .schema import ConfigDef
+from .config_manager import initialize_path
 
 
 def info(config_path: str, update: bool = False) -> None:  # pylint: disable=too-many-locals
@@ -83,18 +82,6 @@ def info(config_path: str, update: bool = False) -> None:  # pylint: disable=too
 
     # show table info
     info_ui(impdb.name, tbs)
-
-
-def initialize_path(config_path: str, update: bool) -> Path:
-    """Determines if the given config_path is local or in GitHub.
-    Fetches the full path."""
-    if config_path.startswith(".") or config_path.startswith("/") or config_path.startswith("~"):
-        path = Path(config_path).resolve()
-    else:
-        # From GitHub!
-        ensure_config(config_path, update)
-        path = config_directory() / config_path
-    return path
 
 
 def get_schema(schema: Dict[str, Any]) -> pd.DataFrame:
