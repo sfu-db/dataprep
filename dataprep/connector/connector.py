@@ -16,7 +16,8 @@ from jsonpath_ng import parse as jparse
 
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
-from .info import info, initialize_path
+from .info import info
+from .config_manager import initialize_path
 from .ref import Ref
 from .schema import (
     FieldDef,
