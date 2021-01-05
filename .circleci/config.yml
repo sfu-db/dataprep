@@ -4,7 +4,7 @@ orbs:
 executors:
   python37:
     docker:
-      - image: circleci/python:3.7.8
+      - image: circleci/python:3.7.9
 commands:
   bootstrap:
     steps:
@@ -13,7 +13,7 @@ commands:
           command: echo "export PATH=$PATH:$HOME/.local/bin" >> $BASH_ENV
       - run: 
           name: Install python tools
-          command: pip install --user poetry==1.0.0b9
+          command: pip install --user poetry
       - run:
           name: Set venv inproject
           command: poetry config virtualenvs.in-project true
