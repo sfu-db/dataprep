@@ -70,9 +70,12 @@ def _compute_missing_nullivariate(df: DataArray, bins: int) -> Generator[Any, An
     ### Eager Region Begin
 
     sel = ~((null_perc == 0) | (null_perc == 1))
-    heatmap = pd.DataFrame(
-        data=heatmap[:, sel][sel, :], columns=df.columns[sel], index=df.columns[sel]
-    )
+    if nrows != 1:
+        heatmap = pd.DataFrame(
+            data=heatmap[:, sel][sel, :], columns=df.columns[sel], index=df.columns[sel]
+        )
+    else:
+        heatmap = pd.DataFrame(data=heatmap, columns=df.columns[sel], index=df.columns[sel])
 
     suffix_col = "" if most_col[0] <= most_show else ", ..."
     suffix_row = "" if most_row[0] <= most_show else ", ..."
@@ -156,16 +159,23 @@ def missing_spectrum(  # pylint: disable=too-many-locals
     nrows, ncols = df.shape
     data = df.nulls
 
-    num_bins = min(bins, nrows - 1)
-    bin_size = nrows // num_bins
-    chunk_size = min(1024 * 1024 * 128, nrows * ncols)  # max 1024 x 1024 x 128 Bytes bool values
-    nbins_per_chunk = max(chunk_size // (bin_size * data.shape[1]), 1)
-
-    chunk_size = nbins_per_chunk * bin_size
-
-    data = data.rechunk((chunk_size, None))
-
-    sep = nrows // chunk_size * chunk_size
+    if nrows > 1:
+        num_bins = min(bins, nrows - 1)
+        bin_size = nrows // num_bins
+        chunk_size = min(
+            1024 * 1024 * 128, nrows * ncols
+        )  # max 1024 x 1024 x 128 Bytes bool values
+        nbins_per_chunk = max(chunk_size // (bin_size * data.shape[1]), 1)
+        chunk_size = nbins_per_chunk * bin_size
+        data = data.rechunk((chunk_size, None))
+        sep = nrows // chunk_size * chunk_size
+    else:
+        # avoid division or module by zero
+        bin_size = 1
+        nbins_per_chunk = 1
+        chunk_size = 1
+        data = data.rechunk((chunk_size, None))
+        sep = 1
 
     spectrum_missing_percs = data[:sep].map_blocks(
         missing_perc_blockwise(bin_size),
