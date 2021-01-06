@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.connector.connector &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.connector.connector &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -156,22 +155,22 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">as_completed</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">ClientSession</span>
 <span class="kn">from</span> <span class="nn">aiohttp.client_reqrep</span> <span class="kn">import</span> <span class="n">ClientResponse</span>
-<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">Template</span><span class="p">,</span> <span class="n">UndefinedError</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">UndefinedError</span>
 <span class="kn">from</span> <span class="nn">jsonpath_ng</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">jparse</span>
 
-<span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">config_directory</span><span class="p">,</span> <span class="n">ensure_config</span>
 <span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">InvalidParameterError</span><span class="p">,</span> <span class="n">RequestError</span><span class="p">,</span> <span class="n">UniversalParameterOverridden</span>
 <span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span><span class="p">,</span> <span class="n">ImplicitTable</span>
+<span class="kn">from</span> <span class="nn">.info</span> <span class="kn">import</span> <span class="n">info</span>
+<span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">initialize_path</span>
 <span class="kn">from</span> <span class="nn">.ref</span> <span class="kn">import</span> <span class="n">Ref</span>
 <span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ConfigDef</span><span class="p">,</span>
+    <span class="n">FieldDef</span><span class="p">,</span>
     <span class="n">FieldDefUnion</span><span class="p">,</span>
     <span class="n">OffsetPaginationDef</span><span class="p">,</span>
     <span class="n">PagePaginationDef</span><span class="p">,</span>
@@ -181,25 +180,8 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.throttler</span> <span class="kn">import</span> <span class="n">OrderedThrottler</span><span class="p">,</span> <span class="n">ThrottleSession</span>
 
-<span class="n">INFO_TEMPLATE</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
-    <span class="sd">&quot;&quot;&quot;{% for tb in tbs.keys() %}</span>
-<span class="sd">Table {{dbname}}.{{tb}}</span>
 
-<span class="sd">Parameters</span>
-<span class="sd">----------</span>
-<span class="sd">{% if tbs[tb].required_params %}{{&quot;, &quot;.join(tbs[tb].required_params)}} required {% endif %}</span>
-<span class="sd">{% if tbs[tb].optional_params %}{{&quot;, &quot;.join(tbs[tb].optional_params)}} optional {% endif %}</span>
-
-<span class="sd">Examples</span>
-<span class="sd">--------</span>
-<span class="sd">&gt;&gt;&gt; dc.query({{&quot;, &quot;.join([&quot;\\\&quot;{}\\\&quot;&quot;.format(tb)] + tbs[tb].joined_query_fields)}})</span>
-<span class="sd">&gt;&gt;&gt; dc.show_schema(&quot;{{tb}}&quot;)</span>
-<span class="sd">{% endfor %}</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
-
-
-<div class="viewcode-block" id="Connector"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector">[docs]</a><span class="k">class</span> <span class="nc">Connector</span><span class="p">:</span>
+<div class="viewcode-block" id="Connector"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector">[docs]</a><span class="k">class</span> <span class="nc">Connector</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-many-instance-attributes</span>
     <span class="sd">&quot;&quot;&quot;This is the main class of the connector component.</span>
 <span class="sd">    Initialize Connector class as the example code.</span>
 
@@ -230,6 +212,7 @@
     <span class="c1"># storage for authorization</span>
     <span class="n">_storage</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">_concurrency</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_update</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">_jenv</span><span class="p">:</span> <span class="n">Environment</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -241,16 +224,7 @@
         <span class="n">_concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">config_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">config_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">config_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># From Github!</span>
-            <span class="n">ensure_config</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">config_directory</span><span class="p">()</span> <span class="o">/</span> <span class="n">config_path</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">initialize_path</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span> <span class="o">=</span> <span class="n">ImplicitDatabase</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -258,6 +232,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">_auth</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_concurrency</span> <span class="o">=</span> <span class="n">_concurrency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span> <span class="o">=</span> <span class="n">update</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">undefined</span><span class="o">=</span><span class="n">StrictUndefined</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_throttler</span> <span class="o">=</span> <span class="n">OrderedThrottler</span><span class="p">(</span><span class="n">_concurrency</span><span class="p">)</span>
 
@@ -289,81 +264,29 @@
 <span class="sd">        **where</span>
 <span class="sd">            The additional parameters required for the query.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">allowed_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">params</span>
+        <span class="n">allowed_params</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">FieldDef</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">from_key</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">allowed_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">from_key</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">from_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">allowed_params</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">from_key</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">allowed_params</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">allowed_params</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">where</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_params</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidParameterError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_imp</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="n">_auth</span><span class="p">,</span> <span class="n">_q</span><span class="o">=</span><span class="n">_q</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="n">_count</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">table_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return all the names of the available tables in a list.</span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        We abstract each website as a database containing several tables.</span>
-<span class="sd">        For example in Spotify, we have artist and album table.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-
 <div class="viewcode-block" id="Connector.info"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Show the basic information and provide guidance for users</span>
 <span class="sd">        to issue queries.&quot;&quot;&quot;</span>
-
-        <span class="c1"># get info</span>
-        <span class="n">tbs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">cur_table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
-            <span class="n">table_config_content</span><span class="p">:</span> <span class="n">ConfigDef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
-            <span class="n">params_required</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">params_optional</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">example_query_fields</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="p">:</span>
-                    <span class="n">params_required</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                    <span class="n">example_query_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&quot;word</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-                    <span class="n">params_optional</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;required_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_required</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;optional_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_optional</span>
-            <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;joined_query_fields&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">example_query_fields</span>
-
-        <span class="c1"># show table info</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">INFO_TEMPLATE</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">ntables</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_names</span><span class="p">),</span> <span class="n">dbname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tbs</span><span class="o">=</span><span class="n">tbs</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="Connector.show_schema"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.Connector.show_schema">[docs]</a>    <span class="k">def</span> <span class="nf">show_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;This method shows the schema of the table that will be returned,</span>
-<span class="sd">        so that the user knows what information to expect.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        table_name</span>
-<span class="sd">            The table name.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        pd.DataFrame</span>
-<span class="sd">            The returned data&#39;s schema.</span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        The schema is defined in the configuration file.</span>
-<span class="sd">        The user can either use the default one or change it by editing the configuration file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;table: </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">table_config_content</span><span class="p">:</span> <span class="n">ConfigDef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
-        <span class="n">schema</span> <span class="o">=</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">schema_</span>
-        <span class="n">new_schema_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">new_schema_dict</span><span class="p">)</span></div>
+        <span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_query_imp</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-locals,too-many-branches,too-many-statements</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -640,20 +563,19 @@
     <span class="sd">&quot;&quot;&quot;Check required fields are provided.&quot;&quot;&quot;</span>
 
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">def_</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">from_key</span><span class="p">,</span> <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span>
+        <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="n">required</span> <span class="o">=</span> <span class="n">def_</span>
             <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">to_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">from_key</span><span class="si">}</span><span class="s2">&#39; is required but not provided&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">to_key</span><span class="si">}</span><span class="s2">&#39; is required but not provided&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">to_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">to_key</span> <span class="ow">or</span> <span class="n">to_key</span>
-            <span class="n">from_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">from_key</span> <span class="ow">or</span> <span class="n">from_key</span>
             <span class="n">required</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">required</span>
             <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">to_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">from_key</span><span class="si">}</span><span class="s2">&#39; is required but not provided&quot;</span><span class="p">)</span></div>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">to_key</span><span class="si">}</span><span class="s2">&#39; is required but not provided&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="populate_field"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.connector.populate_field">[docs]</a><span class="k">def</span> <span class="nf">populate_field</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches</span>
@@ -665,10 +587,10 @@
     <span class="n">ret</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">def_</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">from_key</span><span class="p">,</span> <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span>
+        <span class="n">to_key</span> <span class="o">=</span> <span class="n">key</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">to_key</span><span class="p">)</span>
             <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">def_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="c1"># is a template</span>
@@ -679,10 +601,9 @@
             <span class="n">template</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">template</span>
             <span class="n">remove_if_empty</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">remove_if_empty</span>
             <span class="n">to_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">to_key</span> <span class="ow">or</span> <span class="n">to_key</span>
-            <span class="n">from_key</span> <span class="o">=</span> <span class="n">def_</span><span class="o">.</span><span class="n">from_key</span> <span class="ow">or</span> <span class="n">from_key</span>
 
             <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_key</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">to_key</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tmplt</span> <span class="o">=</span> <span class="n">jenv</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>

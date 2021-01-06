@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.create_report.formatter &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.eda.create_report.formatter &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -166,12 +165,14 @@
 <span class="kn">from</span> <span class="nn">..correlation.compute.nullivariate</span> <span class="kn">import</span> <span class="n">correlation_nxn</span>
 <span class="kn">from</span> <span class="nn">..data_array</span> <span class="kn">import</span> <span class="n">DataArray</span>
 <span class="kn">from</span> <span class="nn">..distribution</span> <span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">..distribution.compute.common</span> <span class="kn">import</span> <span class="n">_calc_line_dt</span>
 <span class="kn">from</span> <span class="nn">..distribution.compute.overview</span> <span class="kn">import</span> <span class="n">calc_stats</span>
-<span class="kn">from</span> <span class="nn">..distribution.compute.univariate</span> <span class="kn">import</span> <span class="n">cont_comps</span><span class="p">,</span> <span class="n">nom_comps</span>
-<span class="kn">from</span> <span class="nn">..distribution.render</span> <span class="kn">import</span> <span class="n">format_cat_stats</span><span class="p">,</span> <span class="n">format_num_stats</span><span class="p">,</span> <span class="n">format_ov_stats</span>
+<span class="kn">from</span> <span class="nn">..distribution.compute.univariate</span> <span class="kn">import</span> <span class="n">cont_comps</span><span class="p">,</span> <span class="n">nom_comps</span><span class="p">,</span> <span class="n">calc_stats_dt</span>
+<span class="kn">from</span> <span class="nn">..distribution.render</span> <span class="kn">import</span> <span class="n">format_cat_stats</span><span class="p">,</span> <span class="n">format_num_stats</span><span class="p">,</span> <span class="n">format_ov_stats</span><span class="p">,</span> <span class="n">stats_viz_dt</span>
 <span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CATEGORICAL_DTYPES</span><span class="p">,</span>
     <span class="n">Continuous</span><span class="p">,</span>
+    <span class="n">DateTime</span><span class="p">,</span>
     <span class="n">Nominal</span><span class="p">,</span>
     <span class="n">detect_dtype</span><span class="p">,</span>
     <span class="n">is_dtype</span><span class="p">,</span>
@@ -262,14 +263,21 @@
         <span class="n">stats</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># needed for pylint</span>
         <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Continuous</span><span class="p">()):</span>
             <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;numerical_column&quot;</span><span class="p">)</span>
-            <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">format_num_stats</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">Nominal</span><span class="p">()):</span>
             <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;categorical_column&quot;</span><span class="p">)</span>
-            <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">format_cat_stats</span><span class="p">(</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;len_stats&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;letter_stats&quot;</span><span class="p">]</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">DateTime</span><span class="p">()):</span>
+            <span class="n">itmdt</span> <span class="o">=</span> <span class="n">Intermediate</span><span class="p">(</span>
+                <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">],</span>
+                <span class="n">line</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;line&quot;</span><span class="p">],</span>
+                <span class="n">visual_type</span><span class="o">=</span><span class="s2">&quot;datetime_column&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">stats_viz_dt</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">])</span>
+        <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_height_lrg</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">plot_width_lrg</span><span class="o">=</span><span class="mi">280</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
         <span class="n">figs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Figure</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -324,11 +332,13 @@
     <span class="n">res</span><span class="p">[</span><span class="s2">&quot;has_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">itmdt</span> <span class="o">=</span> <span class="n">completions</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">](</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;miss&quot;</span><span class="p">])</span>
 
-    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span>
+    <span class="n">rndrd</span> <span class="o">=</span> <span class="n">render_missing</span><span class="p">(</span><span class="n">itmdt</span><span class="p">)</span>
     <span class="n">figs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">rndrd</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">]:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">sizing_mode</span> <span class="o">=</span> <span class="s2">&quot;stretch_width&quot;</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">Title</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">rndrd</span><span class="p">[</span><span class="s2">&quot;meta&quot;</span><span class="p">][</span><span class="n">rndrd</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">fig</span><span class="p">)],</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">text_font_size</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span>
+        <span class="p">)</span>
         <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">res</span><span class="p">[</span><span class="s2">&quot;missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">(</span><span class="n">figs</span><span class="p">)</span>
 
@@ -363,6 +373,11 @@
             <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">nom_comps</span><span class="p">(</span>
                 <span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">first_rows</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">detect_dtype</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]),</span> <span class="n">DateTime</span><span class="p">()):</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_stats_dt</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;line&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_calc_line_dt</span><span class="p">)(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">[[</span><span class="n">col</span><span class="p">]],</span> <span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+
     <span class="c1"># overview</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_stats</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="c1"># interactions</span>

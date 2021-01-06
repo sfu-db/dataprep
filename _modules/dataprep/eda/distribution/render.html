@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.distribution.render &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.eda.distribution.render &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -171,12 +170,10 @@
     <span class="n">LinearColorMapper</span><span class="p">,</span>
     <span class="n">Panel</span><span class="p">,</span>
     <span class="n">PrintfTickFormatter</span><span class="p">,</span>
-    <span class="n">Tabs</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">Figure</span><span class="p">,</span> <span class="n">figure</span>
 <span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="kn">import</span> <span class="n">cumsum</span><span class="p">,</span> <span class="n">linear_cmap</span><span class="p">,</span> <span class="n">transform</span>
 <span class="kn">from</span> <span class="nn">bokeh.util.hex</span> <span class="kn">import</span> <span class="n">hexbin</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
 <span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span>
 
@@ -395,7 +392,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Visualize the word cloud</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-    <span class="n">ellipse_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">/assets/ellipse.jpg&quot;</span><span class="p">))</span>
+    <span class="n">ellipse_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">/assets/ellipse.npz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
     <span class="n">wordcloud</span> <span class="o">=</span> <span class="n">WordCloud</span><span class="p">(</span><span class="n">background_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">ellipse_mask</span><span class="p">)</span>
     <span class="n">wordcloud</span><span class="o">.</span><span class="n">generate_from_frequencies</span><span class="p">(</span><span class="n">word_cnts</span><span class="p">)</span>
     <span class="n">wcarr</span> <span class="o">=</span> <span class="n">wordcloud</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
@@ -998,7 +995,7 @@
         <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@y&quot;</span><span class="p">),</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> bin&quot;</span><span class="p">,</span> <span class="s2">&quot;@intvls&quot;</span><span class="p">)]</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">HoverTool</span><span class="p">(</span><span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">lns</span><span class="p">[</span><span class="n">grp_name</span><span class="p">]],</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">))</span>
 
-    <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">lns</span><span class="p">[</span><span class="n">x</span><span class="p">]])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lns</span><span class="p">]),</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">lns</span><span class="p">[</span><span class="n">x</span><span class="p">]])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lns</span><span class="p">]),</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Frequency&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">y</span>
@@ -1103,7 +1100,7 @@
     <span class="n">mapper</span> <span class="o">=</span> <span class="n">LinearColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">bins</span><span class="o">.</span><span class="n">counts</span><span class="p">),</span> <span class="n">high</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">bins</span><span class="o">.</span><span class="n">counts</span><span class="p">))</span>
     <span class="n">color_bar</span> <span class="o">=</span> <span class="n">ColorBar</span><span class="p">(</span><span class="n">color_mapper</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">color_bar</span><span class="o">.</span><span class="n">label_standoff</span> <span class="o">=</span> <span class="mi">8</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;hex&quot;</span><span class="p">)</span>
     <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
     <span class="n">_format_axis</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
@@ -1611,7 +1608,7 @@
         <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="n">format_ov_stats</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">]),</span>
         <span class="s2">&quot;overview_insights&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;overview_insights&quot;</span><span class="p">],</span>
         <span class="s2">&quot;column_insights&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;column_insights&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;fig_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span><span class="p">,</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
     <span class="p">}</span>
 
 
@@ -1669,6 +1666,7 @@
         <span class="s2">&quot;insights&quot;</span><span class="p">:</span> <span class="n">nom_insights</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col</span><span class="p">),</span>
         <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
         <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">110</span><span class="p">,</span>
     <span class="p">}</span>
 
 
@@ -1793,6 +1791,7 @@
         <span class="s2">&quot;insights&quot;</span><span class="p">:</span> <span class="n">cont_insights</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col</span><span class="p">),</span>
         <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
         <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">110</span><span class="p">,</span>
     <span class="p">}</span>
 
 
@@ -1878,6 +1877,7 @@
         <span class="s2">&quot;insights&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
         <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
         <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">tab</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">50</span><span class="p">,</span>
     <span class="p">}</span>
 
 
@@ -1886,7 +1886,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x is a categorical column</span>
 <span class="sd">    and y is a numerical column</span>
@@ -1914,8 +1914,13 @@
             <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ttl_grps&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">:</span>
+        <span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">170</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">render_two_num</span><span class="p">(</span>
@@ -1923,7 +1928,7 @@
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x and y are numerical columns</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1957,16 +1962,23 @@
     <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;grp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">box_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]))</span>
-
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">80</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">render_two_cat</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x and y are categorical columns</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2005,8 +2017,11 @@
     <span class="c1"># heat map</span>
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">heatmap_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">))</span>
 
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">render_dt_num</span><span class="p">(</span>
@@ -2014,7 +2029,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x is dt and y is num</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2045,8 +2060,11 @@
             <span class="n">timeunit</span><span class="o">=</span><span class="n">timeunit</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">220</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">render_dt_cat</span><span class="p">(</span>
@@ -2054,7 +2072,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x is dt and y is num</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2076,8 +2094,11 @@
     <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
         <span class="n">stacked_viz</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">grp_cnt_stats</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">render_dt_num_cat</span><span class="p">(</span>
@@ -2085,7 +2106,7 @@
     <span class="n">yscale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plots from plot(df, x, y) when x is dt and y is num</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2105,8 +2126,11 @@
             <span class="n">agg</span><span class="o">=</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;agg&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <div class="viewcode-block" id="render"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.distribution.html#dataprep.eda.distribution.render.render">[docs]</a><span class="k">def</span> <span class="nf">render</span><span class="p">(</span>

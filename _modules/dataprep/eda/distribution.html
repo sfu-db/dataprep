@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.eda.distribution &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -161,7 +160,6 @@
 <span class="kn">from</span> <span class="nn">..container</span> <span class="kn">import</span> <span class="n">Container</span>
 <span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span>
 <span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-<span class="kn">from</span> <span class="nn">..report</span> <span class="kn">import</span> <span class="n">Report</span>
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render</span>
 
@@ -190,7 +188,7 @@
     <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Report</span><span class="p">,</span> <span class="n">Container</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Container</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Generates plots for exploratory data analysis.</span>
 
 <span class="sd">    If no columns are specified, the distribution of</span>
@@ -319,11 +317,8 @@
             <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="n">figure</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;distribution_grid&quot;</span> <span class="ow">or</span> <span class="s2">&quot;_column&quot;</span> <span class="ow">in</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span></div>
+    <span class="n">to_render</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="n">yscale</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">to_render</span><span class="p">,</span> <span class="n">intermediate</span><span class="o">.</span><span class="n">visual_type</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

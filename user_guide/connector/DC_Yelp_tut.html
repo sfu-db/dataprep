@@ -6,23 +6,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Tutorial - Connector for Yelp &#8212; DataPrep 0.2.14 documentation</title>
+  <title>Tutorial - Connector for Yelp &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Clean" href="../clean/introduction.html" />
-    <link rel="prev" title="Tutorial - Connector for Spotify" href="DC_Spotify_tut.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
   <meta name="author" content="SFU Database Systems Lab">
@@ -64,7 +61,7 @@
         <a class="nav-link" href="../../installation.html">Installation</a>
       </li>
       
-      <li class="nav-item active">
+      <li class="nav-item ">
         <a class="nav-link" href="../user_guide.html">User Guide</a>
       </li>
       
@@ -128,41 +125,6 @@
         
       
         
-          
-            
-              <li class="">
-                  <a href="../eda/introduction.html">EDA</a>
-              </li>
-            
-          
-            
-              <li class="active">
-                  <a href="connector.html">Connector</a>
-                  <ul>
-                  
-                      <li class="">
-                          <a href="DC_DBLP_tut.html">Tutorial - Connector for DBLP</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="DC_Spotify_tut.html">Tutorial - Connector for Spotify</a>
-                      </li>
-                  
-                      <li class="active">
-                          <a href="">Tutorial - Connector for Yelp</a>
-                      </li>
-                  
-                  </ul>
-              </li>
-            
-          
-            
-              <li class="">
-                  <a href="../clean/introduction.html">Clean</a>
-              </li>
-            
-          
-        
       
         
       
@@ -192,15 +154,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#download-and-store-the-configuration-files-in-dataprep" class="nav-link">Download and store the configuration files in dataprep</a>
-        </li>
-      
-        <li class="nav-item toc-entry toc-h2">
-          <a href="#initialize-connector" class="nav-link">Initialize connector</a>
-        </li>
-      
-        <li class="nav-item toc-entry toc-h2">
-          <a href="#functionalities" class="nav-link">Functionalities</a><ul class="nav section-nav flex-column">
+          <a href="#download-and-store-the-configuration-files-in-dataprep" class="nav-link">Download and store the configuration files in DataPrep</a><ul class="nav section-nav flex-column">
             
         <li class="nav-item toc-entry toc-h3">
           <a href="#connector-info" class="nav-link">Connector.info</a><ul class="nav section-nav flex-column">
@@ -212,10 +166,12 @@
           </ul>
         </li>
       
-        <li class="nav-item toc-entry toc-h3">
-          <a href="#connector-show-schema" class="nav-link">Connector.show_schema</a>
+          </ul>
         </li>
       
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#initialize-connector" class="nav-link">Initialize connector</a><ul class="nav section-nav flex-column">
+            
         <li class="nav-item toc-entry toc-h3">
           <a href="#connector-query" class="nav-link">Connector.query</a>
         </li>
@@ -243,13 +199,13 @@
 </div>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set.
+<p>Connector is a component in the DataPrep library that aims to simplify the data access by providing a standard API set.
 The goal is to help the users skip the complex API configuration. In this tutorial, we demonstrate how to use
 connector library with Yelp.</p>
 </div>
 <div class="section" id="preprocessing">
 <h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
-<p>If you haven’t installed dataprep, run command pip install dataprep or execute the following cell.</p>
+<p>If you haven’t installed DataPrep, run command pip install dataprep or execute the following cell.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!pip install dataprep
 </pre></div>
 </div>
@@ -265,67 +221,62 @@ visiting the <a class="reference external" href="https://www.yelp.com/developers
 <a class="reference internal image-reference" href="../../_images/Yelp_API_Key.png"><img alt="../../_images/Yelp_API_Key.png" class="align-center" src="../../_images/Yelp_API_Key.png" style="width: 700px; height: 400px;" /></a>
 </div>
 <div class="section" id="download-and-store-the-configuration-files-in-dataprep">
-<h2>Download and store the configuration files in dataprep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
+<h2>Download and store the configuration files in DataPrep<a class="headerlink" href="#download-and-store-the-configuration-files-in-dataprep" title="Permalink to this headline">¶</a></h2>
 <p>The configuration files are used to construct the parameters and initial setup for the API. The available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.</p>
 <p>To automatically download at usage, click on the clipboard button, unsure you are cloning with HTTPS. Go into your terminal, and find an appropriate locate to store the configuration files.
-When you decided on a location, enter the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/sfu-db/DataConnectorConfigs.git</span></code>. This will clone the git repository to the desired location; as a suggestion store it with the dataprep folder.</p>
+When you decided on a location, enter the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/sfu-db/DataConnectorConfigs.git</span></code>. This will clone the git repository to the desired location; as a suggestion store it with the DataPrep folder.</p>
 <p>From here you can proceed with the next steps.</p>
 <a class="reference internal image-reference" href="../../_images/dc_git.png"><img alt="../../_images/dc_git.png" class="align-center" src="../../_images/dc_git.png" style="width: 1000px; height: 500px;" /></a>
 <a class="reference internal image-reference" href="../../_images/dc_git_clone.png"><img alt="../../_images/dc_git_clone.png" class="align-center" src="../../_images/dc_git_clone.png" style="width: 725px; height: 125px;" /></a>
-<p>Below the configuration file are stored with dataprep.</p>
+<p>Below the configuration file are stored with DataPrep.</p>
 <a class="reference internal image-reference" href="../../_images/Config_destination.png"><img alt="../../_images/Config_destination.png" class="align-center" src="../../_images/Config_destination.png" style="width: 586px; height: 132px;" /></a>
-</div>
-<div class="section" id="initialize-connector">
-<h2>Initialize connector<a class="headerlink" href="#initialize-connector" title="Permalink to this headline">¶</a></h2>
-<p>To initialize run the following code. Copy and paste the Yelp API key into the <strong>access_token</strong> variable and ensure the connector path is correct. Once you have that running, you can use the built in functions available in connector.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>from dataprep.connector import Connector
-access_token = “insert_token_key”
-dc = Connector(&quot;./DataConnectorConfigs/yelp&quot;, _auth={&quot;access_token&quot;:access_token})
-</pre></div>
-</div>
-</div>
-<div class="section" id="functionalities">
-<h2>Functionalities<a class="headerlink" href="#functionalities" title="Permalink to this headline">¶</a></h2>
-<p>Connector has several functions you can perform to gain insight on the data downloaded from Yelp.</p>
 <div class="section" id="connector-info">
 <h3>Connector.info<a class="headerlink" href="#connector-info" title="Permalink to this headline">¶</a></h3>
 <div class="line-block">
-<div class="line">The info method gives information and guidelines on using the connector. There are 3 sections in the response and they are table, parameters and examples.</div>
+<div class="line">The info method gives information and guidelines on using the connector. There are 4 sections in the response and they are table, parameters, example and schema.</div>
 <div class="line"><br /></div>
+<div class="line-block">
 <div class="line-block">
 <div class="line">a. Table - The table(s) being accessed.</div>
 <div class="line">b. Parameters - Identifies which parameters can be used to call the method.</div>
 <div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
 </div>
+<div class="line">d. Schema - Names and data types of attributes in the response.</div>
 </div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">info</span>
+<span class="n">info</span><span class="p">(</span><span class="s1">&#39;./DataConnectorConfigs/yelp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/info.png"><img alt="../../_images/info.png" class="align-center" src="../../_images/info.png" style="width: 507px; height: 465px;" /></a>
+<a class="reference internal image-reference" href="../../_images/show_schema.png"><img alt="../../_images/show_schema.png" class="align-center" src="../../_images/show_schema.png" style="width: 246px; height: 565px;" /></a>
+<p>After a connector object has been initialized (see how below), info can also be called using the object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../../_images/dc_show.png"><img alt="../../_images/dc_show.png" class="align-center" src="../../_images/dc_show.png" style="width: 400px; height: 165px;" /></a>
 <div class="section" id="parameters">
 <h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
 <div class="line-block">
-<div class="line">A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp’s business query can either be required or optional. The required parameters are <strong>term</strong> and <strong>location</strong> while the optional parameters are <strong>latitude</strong>, <strong>longitude</strong> and <strong>limit</strong>. The parameters are described below.</div>
+<div class="line">A parameter is a piece of information you supply to a query right as you run it. The parameters for Yelp’s business query can either be required or optional. The required parameters is <strong>location</strong> while the optional parameters are <strong>term</strong>, <strong>latitude</strong>, <strong>longitude</strong> and <strong>limit</strong>. The parameters are described below.</div>
 <div class="line"><br /></div>
 <div class="line-block">
-<div class="line">a. <strong>term</strong> - Required - Search term, for example “food” or “restaurants”. The term may also be business names, such as “Starbucks”.</div>
-<div class="line">b. <strong>location</strong> - Required - Maximum number of search results (hits) to return.</div>
+<div class="line">a. <strong>location</strong> - Required - Maximum number of search results (hits) to return.</div>
+<div class="line">b. <strong>term</strong> - Optional - Search term, for example “food” or “restaurants”. The term may also be business names, such as “Starbucks”.</div>
 <div class="line">c. <strong>latitude</strong> - Optional - Latitude of the location you want to search nearby.</div>
 <div class="line">d. <strong>longitude</strong> - Optional - Longitude of the location you want to search nearby.</div>
-<div class="line">e. <strong>limit</strong> - Number of business results to return. By default, it will return 20. Maximum is 50.</div>
+<div class="line">e. <strong>limit</strong> - Optional - Number of business results to return. By default, it will return 20. Maximum is 50.</div>
 </div>
 </div>
 <p>There are additional parameters to query with Yelp. If you are interested in reading up the other available parameters and setting up your own config files, please read this <a class="reference external" href="https://www.yelp.ca/developers/documentation/v3/business_search3">Yelp link</a> and this <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files link</a>.</p>
 </div>
 </div>
-<div class="section" id="connector-show-schema">
-<h3>Connector.show_schema<a class="headerlink" href="#connector-show-schema" title="Permalink to this headline">¶</a></h3>
-<p>The show_schema method returns the website data in a Dataframe format. There are two columns in the response. The first column is the name and the second is the datatype.
-As an example, lets see what is in the publication table.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s2">&quot;business&quot;</span><span class="p">)</span>
-</pre></div>
 </div>
-<a class="reference internal image-reference" href="../../_images/dc_schema.png"><img alt="../../_images/dc_schema.png" class="align-center" src="../../_images/dc_schema.png" style="width: 202px; height: 404px;" /></a>
+<div class="section" id="initialize-connector">
+<h2>Initialize connector<a class="headerlink" href="#initialize-connector" title="Permalink to this headline">¶</a></h2>
+<p>To initialize run the following code. Copy and paste the Yelp API key into the <strong>access_token</strong> variable and ensure the connector path is correct. Once you have that running, you can use the built in functions available in connector.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>access_token = “insert_token_key”
+dc = connect(&quot;./DataConnectorConfigs/yelp&quot;, _auth={&quot;access_token&quot;:access_token})
+</pre></div>
 </div>
 <div class="section" id="connector-query">
 <h3>Connector.query<a class="headerlink" href="#connector-query" title="Permalink to this headline">¶</a></h3>

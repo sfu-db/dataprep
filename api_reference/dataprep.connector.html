@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.data_connector &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.data_connector &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -230,18 +229,18 @@
 
 <dl class="py function">
 <dt id="dataprep.connector.config_manager.download_config">
-<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">download_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">impdb</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#download_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.download_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">download_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">impdb</span></em>, <em class="sig-param"><span class="n">branch</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#download_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.download_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the config from Github into the temp directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="dataprep.connector.config_manager.ensure_config">
-<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">ensure_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">impdb</span></em>, <em class="sig-param"><span class="n">update</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#ensure_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.ensure_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">ensure_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">impdb</span></em>, <em class="sig-param"><span class="n">branch</span></em>, <em class="sig-param"><span class="n">update</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#ensure_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.ensure_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure the config for <cite>impdb</cite> is downloaded</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -251,8 +250,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="dataprep.connector.config_manager.get_git_master_hash">
-<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">get_git_master_hash</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#get_git_master_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.get_git_master_hash" title="Permalink to this definition">¶</a></dt>
+<dt id="dataprep.connector.config_manager.get_git_branch_hash">
+<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">get_git_branch_hash</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branch</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#get_git_branch_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.get_git_branch_hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get current config files repo’s hash</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -262,13 +261,35 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="dataprep.connector.config_manager.initialize_path">
+<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">initialize_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_path</span></em>, <em class="sig-param"><span class="n">update</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#initialize_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.initialize_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if the given config_path is local or in GitHub.
+Fetches the full path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="dataprep.connector.config_manager.is_obsolete">
-<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">is_obsolete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">impdb</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#is_obsolete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.is_obsolete" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test if the implicit db config files are obsolete
-and need to be re-downloaded.</p>
+<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">is_obsolete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">impdb</span></em>, <em class="sig-param"><span class="n">branch</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#is_obsolete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.is_obsolete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if the implicit db config files are obsolete and need to be re-downloaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.connector.config_manager.separate_branch">
+<code class="sig-prename descclassname">dataprep.connector.config_manager.</code><code class="sig-name descname">separate_branch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/config_manager.html#separate_branch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.config_manager.separate_branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Separate the config path into db name and branch</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,7 +329,7 @@ local filesystem, e.g. “./yelp”</p></li>
 to issue queries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -336,45 +357,6 @@ This parameter will override the one from Connector if passed.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="dataprep.connector.connector.Connector.show_schema">
-<code class="sig-name descname">show_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/connector.html#Connector.show_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.connector.Connector.show_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method shows the schema of the table that will be returned,
-so that the user knows what information to expect.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>table_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The table name.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The returned data’s schema.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
-<div class="alert alert-info">
-<p class="admonition-title">Note</p>
-<p>The schema is defined in the configuration file.
-The user can either use the default one or change it by editing the configuration file.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="dataprep.connector.connector.Connector.table_names">
-<em class="property">property </em><code class="sig-name descname">table_names</code><a class="headerlink" href="#dataprep.connector.connector.Connector.table_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all the names of the available tables in a list.</p>
-<div class="alert alert-info">
-<p class="admonition-title">Note</p>
-<p>We abstract each website as a database containing several tables.
-For example in Spotify, we have artist and album table.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py function">
@@ -394,7 +376,7 @@ For example in Spotify, we have artist and album table.</p>
 <dd><p>Check required fields are provided.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -476,6 +458,18 @@ table.</p>
 <span id="errors"></span><h2>Errors<a class="headerlink" href="#module-dataprep.connector.errors" title="Permalink to this headline">¶</a></h2>
 <p>Module defines errors used in this library.</p>
 <dl class="py exception">
+<dt id="dataprep.connector.errors.InvalidAuthParams">
+<em class="property">exception </em><code class="sig-prename descclassname">dataprep.connector.errors.</code><code class="sig-name descname">InvalidAuthParams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/errors.html#InvalidAuthParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.errors.InvalidAuthParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>The parameters used for Authorization are invalid.</p>
+<dl class="py attribute">
+<dt id="dataprep.connector.errors.InvalidAuthParams.params">
+<code class="sig-name descname">params</code><em class="property">: Set<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#dataprep.connector.errors.InvalidAuthParams.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
 <dt id="dataprep.connector.errors.InvalidParameterError">
 <em class="property">exception </em><code class="sig-prename descclassname">dataprep.connector.errors.</code><code class="sig-name descname">InvalidParameterError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/errors.html#InvalidParameterError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.errors.InvalidParameterError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
@@ -483,6 +477,18 @@ table.</p>
 <dl class="py attribute">
 <dt id="dataprep.connector.errors.InvalidParameterError.param">
 <code class="sig-name descname">param</code><em class="property">: str</em><a class="headerlink" href="#dataprep.connector.errors.InvalidParameterError.param" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="dataprep.connector.errors.MissingRequiredAuthParams">
+<em class="property">exception </em><code class="sig-prename descclassname">dataprep.connector.errors.</code><code class="sig-name descname">MissingRequiredAuthParams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/errors.html#MissingRequiredAuthParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.connector.errors.MissingRequiredAuthParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Some parameters for Authorization are missing.</p>
+<dl class="py attribute">
+<dt id="dataprep.connector.errors.MissingRequiredAuthParams.params">
+<code class="sig-name descname">params</code><em class="property">: Set<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#dataprep.connector.errors.MissingRequiredAuthParams.params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

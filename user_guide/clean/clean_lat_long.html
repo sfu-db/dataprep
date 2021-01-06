@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>clean_lat_long(): Clean and validate geographical coordinates &#8212; DataPrep 0.2.14 documentation</title>
+  <title>clean_lat_long(): Clean and validate geographical coordinates &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -152,6 +151,18 @@
                   
                       <li class="">
                           <a href="clean_email.html">clean_email(): email addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_country.html">clean_country(): countries</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_phone.html">clean_phone(): phone numbers</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_url.html">clean_url() : urls</a>
                       </li>
                   
                   </ul>
@@ -1707,22 +1718,7 @@ Result contains 3 (50.0%) values in the correct format and 3 null values (50.0%)
 <div class="highlight"><pre>
 Latitude and Longitude Cleaning Report:
         6 values cleaned (100.0%)
-        4 values unable to be parsed (66.67%), set to NaN
-Result contains 0 (0.0%) values in the correct format and 6 null values (100.0%)
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/ryandale/code/tmp/dataprep/.venv/lib/python3.7/site-packages/dask/dataframe/core.py:4315: UserWarning:
-You did not provide metadata, so Dask is running your function on a small dataset to guess output types. It is possible that Dask will guess incorrectly.
-To provide an explicit output types or to silence this message, please provide the `meta=` keyword, as described in the map or apply function that you are using.
-  Before: .apply(func)
-  After:  .apply(func, meta=(None, &#39;object&#39;))
-
-  warnings.warn(meta_warning(meta))
+Result contains 6 (100.0%) values in the correct format and 0 null values (0.0%)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1812,9 +1808,9 @@ To provide an explicit output types or to silence this message, please provide t
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Latitude and Longitude Cleaning Report:
-        6 values cleaned (100.0%)
-        4 values unable to be parsed (66.67%), set to NaN
-Result contains 0 (0.0%) values in the correct format and 6 null values (100.0%)
+        3 values cleaned (50.0%)
+        2 values unable to be parsed (33.33%), set to NaN
+Result contains 3 (50.0%) values in the correct format and 3 null values (50.0%)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

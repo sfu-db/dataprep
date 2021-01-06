@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -195,7 +194,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#module-dataprep.eda.report" class="nav-link">Report</a>
+          <a href="#report" class="nav-link">Report</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -450,7 +449,7 @@ This is immutable.</p>
 <dl class="py class">
 <dt id="dataprep.eda.intermediate.Intermediate">
 <em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.intermediate.</code><code class="sig-name descname">Intermediate</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#Intermediate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 <p>This class contains intermediate results.</p>
 <dl class="py attribute">
 <dt id="dataprep.eda.intermediate.Intermediate.visual_type">
@@ -464,55 +463,8 @@ This is immutable.</p>
 <span id="palette"></span><h2>Palette<a class="headerlink" href="#module-dataprep.eda.palette" title="Permalink to this headline">¶</a></h2>
 <p>This file defines palettes used for EDA.</p>
 </div>
-<div class="section" id="module-dataprep.eda.report">
-<span id="report"></span><h2>Report<a class="headerlink" href="#module-dataprep.eda.report" title="Permalink to this headline">¶</a></h2>
-<p>This module implements the Report class.</p>
-<dl class="py class">
-<dt id="dataprep.eda.report.Report">
-<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.report.</code><code class="sig-name descname">Report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_render</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class creates a customized Report object for the plot* functions.</p>
-<dl class="py method">
-<dt id="dataprep.eda.report.Report.save">
-<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>save function</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="dataprep.eda.report.Report.show">
-<code class="sig-name descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.show" title="Permalink to this definition">¶</a></dt>
-<dd><p>Render the report. This is useful when calling plot in a for loop.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="dataprep.eda.report.Report.show_browser">
-<code class="sig-name descname">show_browser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/report.html#Report.show_browser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.report.Report.show_browser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Open the report in the browser. This is useful when plotting
-from terminmal or when the fig is very large in notebook.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="dataprep.eda.report.Report.to_render">
-<code class="sig-name descname">to_render</code><em class="property">: bokeh.models.layouts.LayoutDOM</em><a class="headerlink" href="#dataprep.eda.report.Report.to_render" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="report">
+<h2>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-dataprep.eda.utils">
 <span id="utils"></span><h2>Utils<a class="headerlink" href="#module-dataprep.eda.utils" title="Permalink to this headline">¶</a></h2>

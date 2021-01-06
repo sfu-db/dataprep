@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Pagination in Connector &#8212; DataPrep 0.2.15 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Clean" href="../clean/introduction.html" />
+    <link rel="prev" title="Concurrency in Connector" href="connector_concurrency.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/connector/connector_pagination.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="connector.html">Connector</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="connector_authorization.html">Authorization schemes supported by Connector</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="connector_concurrency.html">Concurrency in Connector</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">Pagination in Connector</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../clean/introduction.html">Clean</a>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#overview" class="nav-link">Overview</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#auto-pagination" class="nav-link">Auto-pagination</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#offset-based-pagination" class="nav-link">Offset-based pagination</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#offset-limit" class="nav-link">Offset & Limit</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#page-perpage" class="nav-link">Page & Perpage</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#cursor-based-pagination" class="nav-link">Cursor-based pagination</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="pagination-in-connector">
+<span id="connector-pagination"></span><h1>Pagination in Connector<a class="headerlink" href="#pagination-in-connector" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>pagination feature</strong> in Connector allows you to retrieve more results from Web APIs that support pagination.</p>
+<p>Connector supports two mainstream pagination schemes:</p>
+<ul class="simple">
+<li><p><strong>Offset-based</strong></p></li>
+<li><p><strong>Cursor-based</strong></p></li>
+</ul>
+<p>Additionally, Connector’s <strong>auto-pagination feature</strong> enables you to implement pagination without getting into unnecessary detail about a specific pagination scheme.</p>
+<p>Let’s review how Connector supports pagination in the sections below.</p>
+</div>
+<div class="section" id="auto-pagination">
+<h2>Auto-pagination<a class="headerlink" href="#auto-pagination" title="Permalink to this headline">¶</a></h2>
+<p>Connector automatically handles pagination for you and follows the Web API’s concurrency policy. You can directly specify the number of records to be collected without detailing a specific pagination scheme. Let’s review an example:</p>
+<p><a class="reference external" href="https://dblp.org/">DBLP</a> is a Computer Science bibliography website that exposes several Web APIs, including the <a class="reference external" href="https://dblp.org/faq/13501473.html">publication search</a> Web API. DBLP restricts to <strong>30</strong> the maximum number of search results to return for each request. Therefore, in order to retrieve more information from this Web API using Connector’s auto-pagination feature, you can execute the <code class="docutils literal notranslate"><span class="pre">query</span></code> function with the parameter <code class="docutils literal notranslate"><span class="pre">_count</span></code> as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">dblp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dblp&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">dblp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SIGMOD&quot;</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/connector_auto_pagination_on.png"><img alt="../../_images/connector_auto_pagination_on.png" class="align-center" src="../../_images/connector_auto_pagination_on.png" style="width: 1017px; height: 222px;" /></a>
+<p>Employing the <code class="docutils literal notranslate"><span class="pre">_count</span></code> parameter, you define the maximum number of results to retrieve, in this case: <strong>500</strong>. Thus, your query is not limited to obtain a maximum of 30 results per invocation. The remaining parameters of the query function define the name of the endpoint (<code class="docutils literal notranslate"><span class="pre">publication</span></code>) and the search criteria (<code class="docutils literal notranslate"><span class="pre">q=&quot;SIGMOD&quot;</span></code>).</p>
+<p>In contrast, when auto-pagination is not used, only <strong>30</strong> records are retrieved (DBLP’s search results limit):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">dblp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dblp&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">dblp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SIGMOD&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../../_images/connector_auto_pagination_off.png"><img alt="../../_images/connector_auto_pagination_off.png" class="align-center" src="../../_images/connector_auto_pagination_off.png" style="width: 995px; height: 215px;" /></a>
+</div>
+<div class="section" id="offset-based-pagination">
+<h2>Offset-based pagination<a class="headerlink" href="#offset-based-pagination" title="Permalink to this headline">¶</a></h2>
+<p><strong>Offset-based pagination</strong> scheme has two variants: <strong>Offset &amp; Limit</strong> and <strong>Page &amp; Perpage</strong>, as follows:</p>
+<div class="section" id="offset-limit">
+<h3>Offset &amp; Limit<a class="headerlink" href="#offset-limit" title="Permalink to this headline">¶</a></h3>
+<p><strong>Offset</strong> and <strong>limit</strong> parameters allow you to specify the number of rows to skip before selecting the actual rows. For example when parameters <code class="docutils literal notranslate"><span class="pre">offset</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">limit</span> <span class="pre">=</span> <span class="pre">20</span></code> are used, the first 20 items are fetched. Then, by sending <code class="docutils literal notranslate"><span class="pre">offset</span> <span class="pre">=</span> <span class="pre">20</span></code> and <code class="docutils literal notranslate"><span class="pre">limit</span> <span class="pre">=</span> <span class="pre">20</span></code>, the next 20 items are fetched, and so on.</p>
+<p>Continuing with the DBLP example, below you can find how to use offset-based pagination in Connector:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">dblp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dblp&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">dblp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SIGMOD&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, the DBLP endpoint specification defines that the name of the offset parameter is <code class="docutils literal notranslate"><span class="pre">f</span></code> and the name of the limit parameter is <code class="docutils literal notranslate"><span class="pre">h</span></code>. For that reason, parameters with names <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">h</span></code> are used in the <code class="docutils literal notranslate"><span class="pre">query</span></code> function. These parameter names are also defined in the DBLP’s <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/blob/develop/dblp/publication.json">configuration file</a> for the publication endpoint.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;offsetKey&quot;</span><span class="p">:</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;limitKey&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;maxCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>After the execution of this query, 10 results are retrieved:</p>
+<a class="reference internal image-reference" href="../../_images/connector_pagination_offset_offset_limit.png"><img alt="../../_images/connector_pagination_offset_offset_limit.png" class="align-center" src="../../_images/connector_pagination_offset_offset_limit.png" style="width: 1049px; height: 309px;" /></a>
+</div>
+<div class="section" id="page-perpage">
+<h3>Page &amp; Perpage<a class="headerlink" href="#page-perpage" title="Permalink to this headline">¶</a></h3>
+<p>Instead of specifying offset and limit values, a <strong>page number (“Page”)</strong> and the <strong>amount of each page (“Perpage”)</strong> are used as parameters within the request.
+In the following example, you can see how this pagination method works using as an example the <a class="reference external" href="https://developer.mapquest.com/">MapQuest Web API</a> - “place” endpoint:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">mapquest_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;mapquest&quot;</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;Your MapQuest access token&gt;&quot;</span><span class="p">})</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">mapquest_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;place&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;Vancouver, BC&quot;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;relevance&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">pageSize</span><span class="o">=</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, the specification of the MapQuest - “place” endpoint defines that the name of the “Page” parameter is <code class="docutils literal notranslate"><span class="pre">page</span></code> and the name of the “Perpage” parameter is <code class="docutils literal notranslate"><span class="pre">pageSize</span></code>. For that reason, parameters with names <code class="docutils literal notranslate"><span class="pre">page</span></code> and <code class="docutils literal notranslate"><span class="pre">pageSize</span></code> are used into the <code class="docutils literal notranslate"><span class="pre">query</span></code> function. These parameter names are also defined into the MapQuest’s <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/blob/develop/mapquest/place.json">configuration file</a> for the place endpoint.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;page&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pageKey&quot;</span><span class="p">:</span> <span class="s2">&quot;page&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;limitKey&quot;</span><span class="p">:</span> <span class="s2">&quot;pageSize&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;maxCount&quot;</span><span class="p">:</span> <span class="mi">50</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After the execution of this query, 10 results are retrieved:</p>
+<a class="reference internal image-reference" href="../../_images/connector_pagination_offset_page_perpage.png"><img alt="../../_images/connector_pagination_offset_page_perpage.png" class="align-center" src="../../_images/connector_pagination_offset_page_perpage.png" style="width: 1067px; height: 457px;" /></a>
+</div>
+</div>
+<div class="section" id="cursor-based-pagination">
+<h2>Cursor-based pagination<a class="headerlink" href="#cursor-based-pagination" title="Permalink to this headline">¶</a></h2>
+<p><strong>Cursor-based pagination</strong> uses a <strong>“cursor”</strong> within each response to fetch the next block of data. Connector supports this type of pagination through the <strong>auto-pagination</strong> feature (see details above). That is, if a Web API implements cursor-based pagination, you can use the auto-pagination feature to retrieve data without requiring to write code for handling cursor-based pagination explicitly.</p>
+<p>Connector supports the two main variations of cursor-based pagination, as follows: <strong>Header Cursor</strong> and <strong>Item Cursor</strong>. Under the “Header Cursor” option, a token for the next “page” will be included in each response’s metadata. On the other hand, for the “Item Cursor” option, there will be multiple items within each response, where each item represents a valid data record. At the end of the item set of each response, a cursor of the next page will be included, which can be passed as a parameter for the subsequent request.</p>
+<p>However, remember that you just need to use Connector’s auto-pagination feature to fetch data from a Web API that implements cursor-based pagination.</p>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

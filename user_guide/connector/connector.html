@@ -6,22 +6,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Connector &#8212; DataPrep 0.2.14 documentation</title>
+  <title>Connector &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial - Connector for DBLP" href="DC_DBLP_tut.html" />
+    <link rel="next" title="Authorization schemes supported by Connector" href="connector_authorization.html" />
     <link rel="prev" title="EDA Case Study: House Price" href="../eda/house_price.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
@@ -141,15 +140,15 @@
                   <ul>
                   
                       <li class="">
-                          <a href="DC_DBLP_tut.html">Tutorial - Connector for DBLP</a>
+                          <a href="connector_authorization.html">Authorization schemes supported by Connector</a>
                       </li>
                   
                       <li class="">
-                          <a href="DC_Spotify_tut.html">Tutorial - Connector for Spotify</a>
+                          <a href="connector_concurrency.html">Concurrency in Connector</a>
                       </li>
                   
                       <li class="">
-                          <a href="DC_Yelp_tut.html">Tutorial - Connector for Yelp</a>
+                          <a href="connector_pagination.html">Pagination in Connector</a>
                       </li>
                   
                   </ul>
@@ -184,23 +183,23 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#initializing-a-connector-class-for-a-website" class="nav-link">Initializing a connector class for a website</a>
+          <a href="#fetching-data-in-a-nutshell" class="nav-link">Fetching data in a nutshell</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#getting-the-guidline-of-the-connector-with-connector-info" class="nav-link">Getting the guidline of the connector with Connector.info</a>
+          <a href="#authorization" class="nav-link">Authorization</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#understand-web-data-with-connector-show-schema" class="nav-link">Understand web data with Connector.show_schema()</a>
+          <a href="#pagination" class="nav-link">Pagination</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#getting-web-data-with-connector-query" class="nav-link">Getting web data with Connector.query()</a>
+          <a href="#concurrency" class="nav-link">Concurrency</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#advanced-writing-your-own-connector-configuration-file" class="nav-link">Advanced: writing your own connector configuration file</a>
+          <a href="#id4" class="nav-link">Configuration Files</a>
         </li>
       
     </ul>
@@ -213,69 +212,115 @@
 <span id="dataconnector"></span><h1>Connector<a class="headerlink" href="#connector" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="DC_DBLP_tut.html">Tutorial - Connector for DBLP</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DC_Spotify_tut.html">Tutorial - Connector for Spotify</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DC_Yelp_tut.html">Tutorial - Connector for Yelp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connector_authorization.html">Authorization schemes supported by Connector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connector_concurrency.html">Concurrency in Connector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connector_pagination.html">Pagination in Connector</a></li>
 </ul>
 </div>
+<p>To see detailed examples of how to use Connector, check out our Jupyter Notebooks repository <a class="reference external" href="https://github.com/sfu-db/dataprep/tree/develop/examples">here</a>.</p>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>Connector is a component in the dataprep library that aims to simplify the data access by providing a standard API set.
-The goal is to help the users skip the complex API configuration.
-We illustrate how to use connector library with Yelp.</p>
+<p>Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector’s full documentation <a class="reference external" href="https://sfu-db.github.io/dataprep/">here</a>.</p>
+<p>Connector wraps-up complex API calls into a set of easy-to-use Python functions. By using Connector, you can skip the complex API configuration process and rapidly query different Web APIs in few steps, enabling you to execute the analysis workflow you are familiar with in a direct way.</p>
+<p>Connector offers essential features to facilitate the process of collecting data, for example:</p>
+<ul class="simple">
+<li><p><strong>Concurrency:</strong> Collect data from websites, in parallel, in a fast way!</p></li>
+<li><p><strong>Pagination:</strong> Retrieve more rows of a particular query without getting into unnecessary detail about pagination schemes!</p></li>
+<li><p><strong>Authorization:</strong> Access more Web APIs quickly! even the ones that implement authorization!</p></li>
+</ul>
+<p>In the following sections, this guide will walk you through Connector’s main features in a hands-on way, using as a case study the <a class="reference external" href="https://www.yelp.com/developers">Yelp API</a>.</p>
 </div>
-<div class="section" id="initializing-a-connector-class-for-a-website">
-<h2>Initializing a connector class for a website<a class="headerlink" href="#initializing-a-connector-class-for-a-website" title="Permalink to this headline">¶</a></h2>
-<p>The first step is to initialize a Connector class with the configuration file location and access token specified (<a class="reference external" href="https://www.yelp.com/developers/documentation/v3/authentication">How to get access token?</a>).
-Available configuration files can be manually downloaded here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> or automatically downloaded at usage.
-To initialize a connector:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">Connector</span>
-<span class="n">dc</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="s2">&quot;./DataConnectorConfigs/yelp&quot;</span><span class="p">,</span> <span class="n">auth_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="n">access_token</span><span class="p">})</span>
+<div class="section" id="fetching-data-in-a-nutshell">
+<h2>Fetching data in a nutshell<a class="headerlink" href="#fetching-data-in-a-nutshell" title="Permalink to this headline">¶</a></h2>
+<p>With Connector, you can collect data from one of the top recommendations’ sites online: <strong>Yelp</strong>. Let’s see how:</p>
+<p>First, import the <code class="docutils literal notranslate"><span class="pre">connect</span></code> function from the DataPrep package into your Python source code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
 </pre></div>
 </div>
+<p>Then, use the <code class="docutils literal notranslate"><span class="pre">connect</span></code> function with the <code class="docutils literal notranslate"><span class="pre">&quot;yelp&quot;</span></code> string and your Yelp access token, both specified as parameters. This action allows you to create a Connector to the Yelp Web API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yelp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;yelp&quot;</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;Your Yelp access token&gt;&quot;</span><span class="p">})</span>
+</pre></div>
 </div>
-<div class="section" id="getting-the-guidline-of-the-connector-with-connector-info">
-<h2>Getting the guidline of the connector with <cite>Connector.info</cite><a class="headerlink" href="#getting-the-guidline-of-the-connector-with-connector-info" title="Permalink to this headline">¶</a></h2>
+<p>Click <a class="reference external" href="https://www.yelp.com/developers/documentation/v3/authentication">here</a> to request a Yelp access token. You can use it by replacing the <code class="docutils literal notranslate"><span class="pre">&lt;Your</span> <span class="pre">Yelp</span> <span class="pre">access</span> <span class="pre">token&gt;</span></code> string.</p>
+<p>In this step, by using the <code class="docutils literal notranslate"><span class="pre">info()</span></code> function, you can get more information about Yelp’s endpoints currently supported by Connector:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yelp_connector</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">info</span></code> function gives information and guidelines on using Connector over a particular Web API. The output of the <code class="docutils literal notranslate"><span class="pre">info</span></code> function is composed of four sections, as follows:</p>
 <div class="line-block">
-<div class="line">Connector’s info method gives information and guideline of using the connector. In the example below, the response shows three things.</div>
-<div class="line-block">
-<div class="line">a. There is one table in Yelp, i.e. Yelp.businesses.</div>
-<div class="line">b. To query this table, the term and location parameters are required and the longitute and latitude parameters are optional (see Connector.query() section).</div>
-<div class="line">c. The examples of calling the methods in the Connector class.</div>
+<div class="line">a. Table - The table(s)/endpoint being accessed.</div>
+<div class="line">b. Parameters - Identifies which parameters can be used to call the method.</div>
+<div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
+<div class="line">d. Schema - Names and data types of attributes in the response.</div>
 </div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">info</span>
+<a class="reference internal image-reference" href="../../_images/info.png"><img alt="../../_images/info.png" class="align-center" src="../../_images/info.png" style="width: 1249px; height: 319px;" /></a>
+<p>As you can see in the image above, in this example, there is only one endpoint available for Yelp: <code class="docutils literal notranslate"><span class="pre">businesses</span></code>. However, if you want to connect to a different Yelp endpoint, you can build a new configuration file. See: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a>.</p>
+<p>Now you can explore the “businesses” endpoint schema according to its configuration file definition. For this purpose, you can use the <code class="docutils literal notranslate"><span class="pre">show_schema()</span></code> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yelp_connector</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s2">&quot;business&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../../_images/info.png"><img alt="../../_images/info.png" class="align-center" src="../../_images/info.png" style="width: 496px; height: 215px;" /></a>
-</div>
-<div class="section" id="understand-web-data-with-connector-show-schema">
-<h2>Understand web data with <cite>Connector.show_schema()</cite><a class="headerlink" href="#understand-web-data-with-connector-show-schema" title="Permalink to this headline">¶</a></h2>
-<p>show_schema(table name) returns the schema of the webdata to be returned in a dataframe.
-There are two columns in the response.
-The first column is the column name and the second is the datatype.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s1">&#39;businesses&#39;</span><span class="p">)</span>
+<a class="reference internal image-reference" href="../../_images/connector_yelp_show_schema.png"><img alt="../../_images/connector_yelp_show_schema.png" class="align-center" src="../../_images/connector_yelp_show_schema.png" style="width: 221px; height: 302px;" /></a>
+<p>Finally, use the <code class="docutils literal notranslate"><span class="pre">query</span></code> function on this Connector object with the parameter <code class="docutils literal notranslate"><span class="pre">&quot;businesses&quot;</span></code> which indicates you want to query the <code class="docutils literal notranslate"><span class="pre">&quot;businesses&quot;</span></code> endpoint by providing the term <code class="docutils literal notranslate"><span class="pre">&quot;sushi&quot;</span></code> and location <code class="docutils literal notranslate"><span class="pre">&quot;Vancouver&quot;</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">yelp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;businesses&quot;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;sushi&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;Vancouver&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../../_images/show_schema.png"><img alt="../../_images/show_schema.png" class="align-center" src="../../_images/show_schema.png" style="width: 208px; height: 458px;" /></a>
-</div>
-<div class="section" id="getting-web-data-with-connector-query">
-<h2>Getting web data with <cite>Connector.query()</cite><a class="headerlink" href="#getting-web-data-with-connector-query" title="Permalink to this headline">¶</a></h2>
-<p>the <cite>query()</cite> method downloads the website data.
-The parameters should meet the requriement in <cite>Connector.info</cite>
-Usually the raw data is returned in JSON or xml format.
-connector re-format the data in pandas dataframe for the convenience of downstream operations.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;businesses&#39;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;korean&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;seattle&quot;</span><span class="p">)</span>
-<span class="n">df</span>
+<p>To see more details about the technical specification of the Yelp business search endpoint, click <a class="reference external" href="https://www.yelp.ca/developers/documentation/v3/business_search">here</a>.</p>
+<p>Note the highlighted <code class="docutils literal notranslate"><span class="pre">await</span></code> keyword at the beginning of the <code class="docutils literal notranslate"><span class="pre">query</span></code> instruction. Connector uses the <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">Asyncio</a> feature from The Python Standard Library to achieve parallelism (see “Concurrency” section below). Hence, you must import the Asyncio library as well.
+The final block of code is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">yelp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;yelp&quot;</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;Your Yelp access token&gt;&quot;</span><span class="p">})</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">yelp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;businesses&quot;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;sushi&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;Vancouver&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../../_images/query.png"><img alt="../../_images/query.png" class="align-center" src="../../_images/query.png" style="width: 870px; height: 491px;" /></a>
+<p>You can store these results in a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/frame.html">Pandas Dataframe</a> (named <code class="docutils literal notranslate"><span class="pre">df</span></code> in the example). Let’s review the results obtained:</p>
+<a class="reference internal image-reference" href="../../_images/connector_yelp_query.png"><img alt="../../_images/connector_yelp_query.png" class="align-center" src="../../_images/connector_yelp_query.png" style="width: 850px; height: 582px;" /></a>
 </div>
-<div class="section" id="advanced-writing-your-own-connector-configuration-file">
-<h2>Advanced: writing your own connector configuration file<a class="headerlink" href="#advanced-writing-your-own-connector-configuration-file" title="Permalink to this headline">¶</a></h2>
-<p>A configuration file defines the infomation neccessary to fetch data from a website, e.g. the request url; the API authorization type; the parameters needed from the uses(API key, search keyword, etc.); the returned data’s schema.
-All the information are reusable.
-To write a configuration file for the your own needs or modify an existing one, please refer to <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a>.</p>
+<div class="section" id="authorization">
+<h2>Authorization<a class="headerlink" href="#authorization" title="Permalink to this headline">¶</a></h2>
+<p>Connector supports the most used authorization methods in Web APIs:</p>
+<ul class="simple">
+<li><p>API Key</p></li>
+<li><p>OAuth 2.0 “Client Credentials” and “Authorization Code” grants.</p></li>
+</ul>
+<p>Yelp API uses the <code class="docutils literal notranslate"><span class="pre">API</span> <span class="pre">Key</span></code> authorization method for the <code class="docutils literal notranslate"><span class="pre">businesses</span></code> endpoint. As you noted in the last section, you merely have to pass the credentials (in the Yelp case, the API key) as a <code class="docutils literal notranslate"><span class="pre">connect</span></code> function parameter.
+Specifically, you have to define the value of the <code class="docutils literal notranslate"><span class="pre">_auth</span></code> parameter by using the <code class="docutils literal notranslate"><span class="pre">access_token</span></code> variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yelp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;yelp&quot;</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;Your Yelp access token&gt;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<p>Connector implements pagination more smartly! This feature allows you to get more results from the same query on a Web API endpoint. In that sense, with Connector’s auto-pagination feature, you don’t need to code how to handle result pages because Connector does that for you!</p>
+<p>Continuing with the Yelp example, this Web API, by default, only returns 20 records per request (see results image above). However, with Connector, you can specify the desired number of records you want to obtain. To achieve this, you must use the <code class="docutils literal notranslate"><span class="pre">_count</span></code> argument.</p>
+<p>Thus, let’s add the <code class="docutils literal notranslate"><span class="pre">_count</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">query</span></code> function and give it <code class="docutils literal notranslate"><span class="pre">1000</span></code> as a value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">yelp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;yelp&quot;</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;Your Yelp access token&gt;&quot;</span><span class="p">})</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">yelp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;businesses&quot;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;sushi&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;Vancouver&quot;</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By this, you get specifically up to 1000 records (in this case: 682), instead of 20.</p>
+<a class="reference internal image-reference" href="../../_images/connector_yelp_query_2.png"><img alt="../../_images/connector_yelp_query_2.png" class="align-center" src="../../_images/connector_yelp_query_2.png" style="width: 889px; height: 372px;" /></a>
+<p>Nevertheless, the side effect of incrementing the <code class="docutils literal notranslate"><span class="pre">_count</span></code> argument is that Dataprep needs to issue more requests to the Web API, and this can cause that the whole query could execute slower than expected.
+To alleviate this problem, Connector implements <strong>concurrency</strong>! Let’s see the details below.</p>
+</div>
+<div class="section" id="concurrency">
+<h2>Concurrency<a class="headerlink" href="#concurrency" title="Permalink to this headline">¶</a></h2>
+<p>Another great feature of Connector is concurrency. Through this feature, you can retrieve data, in parallel, in less time!</p>
+<p>Next, you can see a code example where the <code class="docutils literal notranslate"><span class="pre">_concurrency</span></code> parameter is used on the <code class="docutils literal notranslate"><span class="pre">connect</span></code> function. This parameter allows you to define the number of requests per second to be sent out to the Web API. In that sense, when the <code class="docutils literal notranslate"><span class="pre">_concurrency</span></code> parameter is used jointly with the pagination feature (<code class="docutils literal notranslate"><span class="pre">_count</span></code> parameter), Connector accelerates the data request process, and, therefore, the total request time is improved:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">yelp_connector</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;yelp&quot;</span><span class="p">,</span> <span class="n">_auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;Your Yelp access token&gt;&quot;</span><span class="p">},</span> <span class="n">_concurrency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">yelp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;businesses&quot;</span><span class="p">,</span> <span class="n">term</span><span class="o">=</span><span class="s2">&quot;sushi&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;Vancouver&quot;</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>Configuration Files<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>A configuration file defines the information needed to fetch data from a website, e.g., the request URL, the API authorization type, the required parameters from the user (API key, search keyword, etc.), and the returned data’s schema.</p>
+<p>All the information is reusable.
+To write a configuration file for your own needs or to modify an existing one, please visit our <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> repository.</p>
 </div>
 </div>
 

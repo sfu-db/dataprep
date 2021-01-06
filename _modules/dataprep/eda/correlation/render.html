@@ -6,18 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.correlation.render &#8212; DataPrep 0.2.14 documentation</title>
+  <title>dataprep.eda.correlation.render &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../../../_static/sphinx-bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/sphinx-bootstrap.css" type="text/css" />
   <link href="../../../../_static/custom.css" rel="stylesheet">
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -153,7 +152,7 @@
 <span class="sd">    This module implements the visualization for</span>
 <span class="sd">    plot_correlation(df) function</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">column</span><span class="p">,</span> <span class="n">row</span>
@@ -184,8 +183,8 @@
 
 <div class="viewcode-block" id="render_correlation"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.correlation.html#dataprep.eda.correlation.render.render_correlation">[docs]</a><span class="k">def</span> <span class="nf">render_correlation</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span>
-    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
+    <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
     <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -209,6 +208,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_impact&quot;</span><span class="p">:</span>
+        <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_impact</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">RDBU</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_heatmaps&quot;</span><span class="p">:</span>
         <span class="n">visual_elem</span> <span class="o">=</span> <span class="n">render_correlation_heatmaps</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="n">palette</span> <span class="ow">or</span> <span class="n">RDBU</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_single_heatmaps&quot;</span><span class="p">:</span>
@@ -274,6 +275,63 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">FuncTickFormatter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">format_js</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">render_correlation_impact</span><span class="p">(</span>
+    <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render correlation heatmaps in to tabs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;@x&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;@y&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;@correlation</span><span class="si">{1.11}</span><span class="s2">&quot;</span><span class="p">)]</span>
+    <span class="n">axis_range</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;axis_range&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># in case of numerical column names</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+        <span class="n">mapper</span><span class="p">,</span> <span class="n">color_bar</span> <span class="o">=</span> <span class="n">create_color_mapper</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
+        <span class="n">x_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">axis_range</span><span class="p">)</span>
+        <span class="n">y_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="nb">reversed</span><span class="p">(</span><span class="n">axis_range</span><span class="p">))</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">x_axis_location</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span>
+            <span class="n">background_fill_color</span><span class="o">=</span><span class="s2">&quot;#fafafa&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">fill_color</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">mapper</span><span class="p">},</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">plot_width</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;insights&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;insights&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;tabledata&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">150</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
 <span class="k">def</span> <span class="nf">render_correlation_heatmaps</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
@@ -327,7 +385,7 @@
 
 <span class="k">def</span> <span class="nf">render_correlation_single_heatmaps</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tabs</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render correlation heatmaps, but with single column</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -366,8 +424,11 @@
         <span class="n">tab</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
         <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab</span><span class="p">)</span>
 
-    <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tabs</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">create_color_mapper</span><span class="p">(</span><span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LinearColorMapper</span><span class="p">,</span> <span class="n">ColorBar</span><span class="p">]:</span>
@@ -390,7 +451,7 @@
 <span class="c1">######### Scatter #########</span>
 <span class="k">def</span> <span class="nf">render_scatter</span><span class="p">(</span>
     <span class="n">itmdt</span><span class="p">:</span> <span class="n">Intermediate</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render scatter plot with a regression line and possible most influencial points</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -406,7 +467,6 @@
         <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
         <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
         <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Scatter Plot &amp; Regression Line&quot;</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
         <span class="n">tools</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">x_axis_label</span><span class="o">=</span><span class="n">xcol</span><span class="p">,</span>
         <span class="n">y_axis_label</span><span class="o">=</span><span class="n">ycol</span><span class="p">,</span>
@@ -444,7 +504,11 @@
         <span class="p">)</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="n">place</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fig</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">fig</span><span class="p">],</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Scatter Plot &amp; Regression Line&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="c1">######### Interactions for report #########</span>
