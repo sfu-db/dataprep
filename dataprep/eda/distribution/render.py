@@ -563,6 +563,8 @@ def box_viz(
     Render a box plot visualization
     """
     # pylint: disable=too-many-arguments,too-many-locals,too-many-statements
+    df["grp"] = df["grp"].astype(str)
+
     if y and ttl_grps:
         width = 0.7
         grp_cnt_stats = {f"{x}_ttl": ttl_grps, f"{x}_shw": len(df)}
@@ -570,7 +572,6 @@ def box_viz(
     elif y:
         width, title = 0.93, f"{y} by {x}"
         endpts = [grp.left for grp in df["grp"]] + [df["grp"][len(df) - 1].right]
-        df["grp"] = df["grp"].astype(str)
     else:
         width, title = 0.7, f"{x}"
     df["x0"], df["x1"] = df.index + 0.2, df.index + 0.8
@@ -580,7 +581,7 @@ def box_viz(
         plot_height=plot_height,
         title=title,
         toolbar_location=None,
-        x_range=list(df["grp"].astype(str)),
+        x_range=df["grp"],
     )
     low = fig.segment(x0="x0", y0="lw", x1="x1", y1="lw", line_color="black", source=df)
     ltail = fig.segment(x0="grp", y0="lw", x1="grp", y1="q1", line_color="black", source=df)
