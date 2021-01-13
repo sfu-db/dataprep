@@ -126,45 +126,43 @@ Check [plot](https://sfu-db.github.io/dataprep/user_guide/eda/plot.html), [plot_
 
 ## Clean
 
-DataPrep.Clean contains simple functions designed for cleaning and standardizing a column in a DataFrame. It provides
+DataPrep.Clean contains simple functions designed for cleaning and validating data in a DataFrame. It provides
 
-- A unified API: each function follows the syntax `clean_{type}(df, "column name")` (see an example below)
-- Python Data Science Support: its design for cleaning pandas and Dask DataFrames enables seamless integration into the Python data science workflow
-- Transparency: a report is generated that summarizes the alterations to the data that occured during cleaning
+- **A Unified API**: each function follows the syntax `clean_{type}(df, 'column name')` (see an example below).
+- **Speed**: the computations are parallelized using Dask. It can clean **50K rows per second** on a dual-core laptop (that means cleaning 1 million rows in only 20 seconds).
+- **Transparency**: a report is generated that summarizes the alterations to the data that occured during cleaning.
 
-The following example shows how to clean a column containing messy emails:
+The following example shows how to clean and standardize a column of country names.
 
-<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_1.jpg"/></center>
-<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_2.jpg"/></center>
+``` python
+from dataprep.clean import clean_country
+import pandas as pd
+df = pd.DataFrame({'country': ['USA', 'country: Canada', '233', ' tr ', 'NA']})
+df2 = clean_country(df, 'country')
+df2
+           country  country_clean
+0              USA  United States
+1  country: Canada         Canada
+2              233        Estonia
+3              tr          Turkey
+4               NA            NaN
+```
 
 Type validation is also supported:
 
-<center><img src="https://github.com/sfu-db/dataprep/blob/develop/assets/clean_example_3.jpg"/></center>
+``` python
+from dataprep.clean import validate_country
+series = validate_country(df['country'])
+series
+0     True
+1    False
+2     True
+3     True
+4    False
+Name: country, dtype: bool
+```
 
-Below are the supported semantic types (more are currently being developed).
-
-<table>
-    <tr>
-      <th>Semantic Types</th>
-    </tr>
-    <tr>
-      <td>longitude/latitude</td>
-    </tr>
-    <tr>
-      <td>country</td>
-    </tr>
-    <tr>
-      <td>email</td>
-    </tr>
-    <tr>
-      <td>url</td>
-    </tr>
-    <tr>
-      <td>phone</td>
-    </tr>
-  </table>
-
-For more information, refer to the [User Guide](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html).
+**Currently supports functions for:** Column Headers | Country Names | Dates and Times | Email Addresses | Geographic Coordinates | IP Addresses | Phone Numbers | URLs | US Street Addresses
 
 ## Documentation
 
