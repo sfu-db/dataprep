@@ -1,9 +1,9 @@
 """
-Implement clean_country function
+Clean and validate a DataFrame column containing country names.
 """
-import os
 from functools import lru_cache
 from operator import itemgetter
+from os import path
 from typing import Any, Union
 
 import dask
@@ -15,7 +15,7 @@ import regex as re
 from ..eda.progress_bar import ProgressBar
 from .utils import NULL_VALUES, create_report_new, to_dask
 
-COUNTRY_DATA_FILE = os.path.join(os.path.split(os.path.abspath(__file__))[0], "country_data.tsv")
+COUNTRY_DATA_FILE = path.join(path.split(path.abspath(__file__))[0], "country_data.tsv")
 
 DATA = pd.read_csv(COUNTRY_DATA_FILE, sep="\t", encoding="utf-8", dtype=str)
 
@@ -32,47 +32,82 @@ def clean_country(
     fuzzy_dist: int = 0,
     strict: bool = False,
     inplace: bool = False,
-    report: bool = True,
     errors: str = "coerce",
+    report: bool = True,
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    This function cleans countries
+    Clean and standardize country names.
+
+    Read more in the :ref:`User Guide <country_userguide>`.
 
     Parameters
     ----------
     df
-        pandas or Dask DataFrame
+        A pandas or Dask DataFrame containing the data to be cleaned.
     column
-        column name containing messy country data
+        The name of the column containing country names.
     input_format
-        the ISO 3166 input format of the country:
-        "auto" (infers the input format), country name ("name"),
-        official state name ("official"), alpha-2 code ("alpha-2"),
-        alpha-3 code ("alpha-3"), numeric code ("numeric")
+        The ISO 3166 input format of the country.
+            - 'auto': infer the input format
+            - 'name': country name ('United States')
+            - 'official': official state name ('United States of America')
+            - 'alpha-2': alpha-2 code ('US')
+            - 'alpha-3': alpha-3 code ('USA')
+            - 'numeric': numeric code (840)
+
+        (default: 'auto')
     output_format
-        the desired format of the country:
-        country name ("name"), official state name ("official"), alpha-2 code ("alpha-2"),
-        alpha-3 code ("alpha-3"), numeric code ("numeric")
+        The desired ISO 3166 format of the country:
+            - 'name': country name ('United States')
+            - 'official': official state name ('United States of America')
+            - 'alpha-2': alpha-2 code ('US')
+            - 'alpha-3': alpha-3 code ('USA')
+            - 'numeric': numeric code (840)
+
+        (default: 'name')
     fuzzy_dist
         The maximum edit distance (number of single character insertions, deletions
         or substitutions required to change one word into the other) between a country value
-        and input that will count as a match. Only applies to "auto", "name" and "official" formats.
+        and input that will count as a match. Only applies to 'auto', 'name' and 'official'
+        input formats.
+
+        (default: 0)
     strict
-        If True, matching for input formats "name" and "official" are done by looking
-        for a direct match, if False, matching is done by searching the input for a
-        regex match
+        If True, matching for input formats 'name' and 'official' are done by looking
+        for a direct match. If False, matching is done by searching the input for a
+        regex match.
+
+        (default: False)
     inplace
-        If True, delete the given column with dirty data, else, create a new
-        column with cleaned data.
+        If True, delete the column containing the data that was cleaned. Otherwise,
+        keep the original column.
+
+        (default: False)
+    errors
+        How to handle parsing errors.
+            - ‘raise’: invalid parsing will raise an exception.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: then invalid parsing will return the input.
+
+        (default: 'coerce')
     report
         If True, output the summary report. Otherwise, no report is outputted.
-    errors {‘ignore’, ‘raise’, ‘coerce’}, default 'coerce'
-        * If ‘raise’, then invalid parsing will raise an exception.
-        * If ‘coerce’, then invalid parsing will be set as NaN.
-        * If ‘ignore’, then invalid parsing will return the input.
+
+        (default: True)
     progress
-        If True, enable the progress bar
+        If True, display a progress bar.
+
+        (default: True)
+
+    Examples
+    --------
+
+    >>> df = pd.DataFrame({'country': [' Canada ', 'US']})
+    >>> clean_country(df, 'country')
+        country  country_clean
+    0   Canada          Canada
+    1        US  United States
     """
     # pylint: disable=too-many-arguments
 
@@ -134,21 +169,41 @@ def validate_country(
     x: Union[str, int, pd.Series], input_format: str = "auto", strict: bool = True
 ) -> Union[bool, pd.Series]:
     """
-    This function validates countries
+    Validate country names.
+
+    Read more in the :ref:`User Guide <country_userguide>`.
 
     Parameters
     ----------
     x
         pandas Series of countries or str/int country value
     input_format
-        the ISO 3166 input format of the country:
-        "auto" (infers the input format), country name ("name"),
-        official state name ("official"), alpha-2 code ("alpha-2"),
-        alpha-3 code ("alpha-3"), numeric code ("numeric")
+        The ISO 3166 input format of the country.
+            - 'auto': infer the input format
+            - 'name': country name ('United States')
+            - 'official': official state name ('United States of America')
+            - 'alpha-2': alpha-2 code ('US')
+            - 'alpha-3': alpha-3 code ('USA')
+            - 'numeric': numeric code (840)
+
+        (default: 'auto')
     strict
-        If True, matching for input formats "name" and "official" are done by
+        If True, matching for input formats 'name' and 'official' are done by
         looking for a direct match, if False, matching is done by searching
-        the input for a regex match
+        the input for a regex match.
+
+        (default: False)
+
+    Examples
+    --------
+
+    >>> validate_country('United States')
+    True
+    >>> df = pd.DataFrame({'country': ['Canada', 'NaN']})
+    >>> validate_country(df['country'])
+    0     True
+    1    False
+    Name: country, dtype: bool
     """
 
     if isinstance(x, pd.Series):
