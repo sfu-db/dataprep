@@ -1,5 +1,5 @@
 """
-Implement clean_lat_long function
+Clean and validate a DataFrame column containing geographic coordinates.
 """
 import re
 from operator import itemgetter
@@ -86,43 +86,74 @@ def clean_lat_long(
     output_format: str = "dd",
     split: bool = False,
     inplace: bool = False,
-    report: bool = True,
     errors: str = "coerce",
+    report: bool = True,
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    This function cleans latitdinal and longitudinal coordinates
+    Clean and standardize latitude and longitude coordinates.
+
+    Read more in the :ref:`User Guide <clean_lat_long_user_guide>`.
 
     Parameters
     ----------
     df
-        pandas or Dask DataFrame
+        A pandas or Dask DataFrame containing the data to be cleaned.
     lat_long
-        column name containing latitudinal and longitudinal coordinates
+        The name of the column containing latitude and longitude coordinates.
     lat_col
-        column name containing latitudinal coordinates. If specified, lat_long
-        must be None
+        The name of the column containing latitude coordinates.
+
+        If specified, the parameter lat_long must be None.
     long_col
-        column name containing longitudinal coordinates. If specified, lat_long
-        must be None
+        The name of the column containing longitude coordinates.
+
+        If specified, the parameter lat_long must be None.
     output_format
-        the desired format of the coordinates: decimal degrees ("dd"),
-        decimal degrees with hemisphere ("ddh"), degrees minutes ("dm"),
-        degrees minutes seconds ("dms")
+        The desired format of the coordinates.
+            - 'dd': decimal degrees (51.4934, 0.0098)
+            - 'ddh': decimal degrees with hemisphere ('51.4934° N, 0.0098° E')
+            - 'dm': degrees minutes ('51° 29.604′ N, 0° 0.588′ E')
+            - 'dms': degrees minutes seconds ('51° 29′ 36.24″ N, 0° 0′ 35.28″ E')
+
+        (default: 'dd')
     split
-        if True, split a column containing latitudinal and longitudinal
-        coordinates into one column for latitude and one column for longitude
+        If True, split the latitude and longitude coordinates into one column
+        for latitude and a separate column for longitude. Otherwise, merge
+        the latitude and longitude coordinates into one column.
+
+        (default: False)
     inplace
-        If True, delete the given column with dirty data, else, create a new
-        column with cleaned data.
+        If True, delete the column(s) containing the data that was cleaned. Otherwise,
+        keep the original column(s).
+
+        (default: False)
+    errors
+        How to handle parsing errors.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: then invalid parsing will return the input.
+            - ‘raise’: invalid parsing will raise an exception.
+
+        (default: 'coerce')
     report
         If True, output the summary report. Otherwise, no report is outputted.
-    errors {‘ignore’, ‘raise’, ‘coerce’}, default 'coerce'
-        * If ‘raise’, then invalid parsing will raise an exception.
-        * If ‘coerce’, then invalid parsing will be set as NaT.
-        * If ‘ignore’, then invalid parsing will return the input.
+
+        (default: True)
     progress
-        If True, enable the progress bar
+        If True, display a progress bar.
+
+        (default: True)
+
+    Examples
+    --------
+    Split a column containing latitude and longitude strings into separate
+    columns in decimal degrees format.
+
+    >>> df = pd.DataFrame({'coord': ['51° 29′ 36.24″ N, 0° 0′ 35.28″ E', '51.4934° N, 0.0098° E']})
+    >>> clean_lat_long(df, 'coord', split=True)
+                            coord  latitude  longitude
+    0  51° 29′ 36.24″ N, 0° 0′ 35.28″ E   51.4934     0.0098
+    1             51.4934° N, 0.0098° E   51.4934     0.0098
     """
     # pylint: disable=too-many-branches
 
@@ -216,25 +247,49 @@ def clean_lat_long(
 
 
 def validate_lat_long(
-    x: Union[str, float, pd.Series, Tuple[float, float]],
+    x: Union[pd.Series, str, float, Tuple[float, float]],
     *,
-    lat_long: Optional[bool] = True,
-    lat: Optional[bool] = False,
-    lon: Optional[bool] = False,
+    lat_long: bool = True,
+    lat: bool = False,
+    lon: bool = False,
 ) -> Union[bool, pd.Series]:
     """
-    This function validates latitdinal and longitudinal coordinates
+    Validate latitude and longitude coordinates.
+
+    Read more in the :ref:`User Guide <clean_lat_long_user_guide>`.
 
     Parameters
     ----------
     x
-        pandas Series of coordinates or str/float coordinate to be validated
+        A pandas Series, string, float, or tuple of floats, containing the latitude
+        and/or longitude coordinates to be validated.
     lat_long
-        latitudinal and longitudinal coordinates
+        If True, valid values contain latitude and longitude coordinates. Parameters
+        lat and lon must be False if lat_long is True.
+
+        (default: True)
     lat
-        only latitudinal coordinates
+        If True, valid values contain only latitude coordinates. Parameters
+        lat_long and lon must be False if lat is True.
+
+       (default: False)
     lon
-        only longitudinal coordinates
+        If True, valid values contain only longitude coordinates. Parameters
+        lat_long and lat must be False if lon is True.
+
+        (default: False)
+
+    Examples
+    --------
+    Validate a coordinate string or series of coordinates.
+
+    >>> validate_lat_long('51° 29′ 36.24″ N, 0° 0′ 35.28″ E')
+    True
+    >>> df = pd.DataFrame({'coordinates', ['51° 29′ 36.24″ N, 0° 0′ 35.28″ E', 'NaN']})
+    >>> validate_lat_long(df['coordinates'])
+    0     True
+    1    False
+    Name: coordinates, dtype: bool
     """
 
     if lat or lon:
@@ -250,12 +305,7 @@ def validate_lat_long(
     return None
 
 
-def _format_lat_long(
-    val: Any,
-    output_format: str,
-    split: bool,
-    errors: str,
-) -> Any:
+def _format_lat_long(val: Any, output_format: str, split: bool, errors: str) -> Any:
     """
     Function to transform a coordinate instance into the desired format
 
