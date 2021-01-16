@@ -1,0 +1,11 @@
+build:
+  mkdir -p build
+  # I needed to add --without-hashes to the command below on 2021/01/10 to avoid an error
+  # poetry export --without-hashes -f requirements.txt > build/requirements.txt
+  docker build -t wooya/dataprep-profiling .
+
+bench to="/dev/null":
+  python profiling.py | tee -a {{to}}
+
+docker:
+  docker run -it --rm -v$PWD/../dataprep:/workdir/dataprep -v$PWD/data:/workdir/data -m 3G wooya/dataprep-profiling bash

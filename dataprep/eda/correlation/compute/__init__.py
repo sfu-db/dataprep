@@ -40,7 +40,7 @@ def compute_correlation(
     k
         Choose top-k element
     """
-    if x is not None and y is not None:
+    if x and y or not x and not y:
         df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))
     else:
         df = DataArray(df).select_num_columns()

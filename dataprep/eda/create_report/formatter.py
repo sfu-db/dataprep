@@ -2,6 +2,7 @@
 for create_report(df) function."""
 
 from typing import Any, Dict, List, Optional, Tuple, Union
+from itertools import combinations
 from warnings import catch_warnings, filterwarnings
 
 import dask
@@ -112,7 +113,7 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
     res: Dict[str, Any] = {}
 
     # overview
-    data["ov"].pop("ks_tests")
+    data["ov"].pop("ks_tests", None)
     res["overview"] = format_ov_stats(data["ov"])
 
     # variables
@@ -162,14 +163,9 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         res["has_correlation"] = True
         dfs: Dict[str, pd.DataFrame] = {}
         for method, corr in data["corrs"].items():
-            ndf = pd.DataFrame(
-                {
-                    "x": data["num_cols"][data["cordx"]],
-                    "y": data["num_cols"][data["cordy"]],
-                    "correlation": corr.ravel(),
-                }
-            )
-            dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
+            ndf = pd.DataFrame({"correlation": [x.loc[0] for x in corr]})
+            ndf[["x", "y"]] = list(combinations(df.columns, 2))
+            dfs[method.name] = ndf
         itmdt = Intermediate(
             data=dfs,
             axis_range=list(data["num_cols"]),
@@ -246,7 +242,7 @@ def basic_computations(df: dd.DataFrame, cfg: Config) -> Tuple[Dict[str, Any], D
         lambda x: x.sample(min(1000, x.shape[0])), meta=df_num.frame
     )
     # correlations
-    data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))
+    data["corrs"] = correlation_nxn(df_num.frame, cfg)
     # missing values
     (delayed, completion,) = compute_missing_nullivariate(  # pylint: disable=unexpected-keyword-arg
         df, cfg, _staged=True

@@ -1355,8 +1355,8 @@ def format_num_stats(data: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
         "Maximum": data["max"],
         "Zeros": data["nzero"],
         "Zeros (%)": data["nzero"] / data["nrows"],
-        "Negatives": data["nneg"],
-        "Negatives (%)": data["nneg"] / data["nrows"],
+        # "Negatives": data["nneg"],
+        # "Negatives (%)": data["nneg"] / data["nrows"],
     }
     data["qntls"].index = np.round(data["qntls"].index, 2)
     quantile = {
@@ -1718,20 +1718,20 @@ def cont_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List
         if pmiss > cfg.insight.missing__threshold:
             nmiss = data["nrows"] - data["npres"]
             ins["Stats"].append(f"{col} has {nmiss} ({pmiss}%) missing values")
-        pneg = round(data["nneg"] / data["nrows"] * 100, 2)
-        if pneg > cfg.insight.negatives__threshold:
-            nneg = data["nneg"]
-            ins["Stats"].append(f"{col} has {nneg} ({pneg}%) negatives")
+        # pneg = round(data["nneg"] / data["nrows"] * 100, 2)
+        # if pneg > cfg.insight.negatives__threshold:
+        #     nneg = data["nneg"]
+        #     ins["Stats"].append(f"{col} has {nneg} ({pneg}%) negatives")
         pzero = round(data["nzero"] / data["nrows"] * 100, 2)
         if pzero > cfg.insight.zeros__threshold:
             nzero = data["nzero"]
             ins["Stats"].append(f"{col} has {nzero} ({pzero}%) zeros")
 
     if cfg.hist.enable:
-        if data["norm"][1] > cfg.insight.normal__threshold:
-            ins["Histogram"].append(f"{col} is normally distributed")
-        if data["chisq"][1] > cfg.insight.uniform__threshold:
-            ins["Histogram"].append(f"{col} is uniformly distributed")
+        # if data["norm"][1] > cfg.insight.normal__threshold:
+        #     ins["Histogram"].append(f"{col} is normally distributed")
+        # if data["chisq"][1] > cfg.insight.uniform__threshold:
+        #     ins["Histogram"].append(f"{col} is uniformly distributed")
         skw = np.round(data["skew"], 4)
         if skw >= cfg.insight.skewed__threshold:
             ins["Histogram"].append(f"{col} is skewed right (\u03B31 = {skw})")
