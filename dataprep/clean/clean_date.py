@@ -653,8 +653,9 @@ def change_timezone(
         pytz_offset = pytz.timezone(str(parsed_date_data.tzinfo["timezone"])).utcoffset(origin_date)
         if not pytz_offset is None:
             origin_add = -1 if pytz_offset.days > 0 and pytz_offset.seconds > 0 else 1
-            origin_tz_offset = timedelta(days=abs(pytz_offset.days), 
-                                         seconds=abs(pytz_offset.seconds))
+            origin_tz_offset = timedelta(
+                days=abs(pytz_offset.days), seconds=abs(pytz_offset.seconds)
+            )
     elif parsed_date_data.tzinfo["timezone"] in ZONE:
         origin_add = -1 if ZONE[str(parsed_date_data.tzinfo["timezone"])] > 0 else 1
         offset_value = abs(ZONE[str(parsed_date_data.tzinfo["timezone"])]) * 3600
@@ -663,8 +664,9 @@ def change_timezone(
         pytz_offset = pytz.timezone(target_timezone).utcoffset(origin_date)
         if not pytz_offset is None:
             target_add = 1 if pytz_offset.days >= 0 and pytz_offset.seconds >= 0 else -1
-            target_tz_offset = timedelta(days=abs(pytz_offset.days), 
-                                         seconds=abs(pytz_offset.seconds))
+            target_tz_offset = timedelta(
+                days=abs(pytz_offset.days), seconds=abs(pytz_offset.seconds)
+            )
     elif target_timezone in ZONE:
         target_add = 1 if ZONE[target_timezone] >= 0 else -1
         offset_value = abs(ZONE[target_timezone]) * 3600
