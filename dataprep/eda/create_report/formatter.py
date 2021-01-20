@@ -163,8 +163,14 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         res["has_correlation"] = True
         dfs: Dict[str, pd.DataFrame] = {}
         for method, corr in data["corrs"].items():
-            ndf = pd.DataFrame({"correlation": [x.loc[0] for x in corr]})
-            ndf[["x", "y"]] = list(combinations(df.columns, 2))
+            ndf = pd.DataFrame(
+                {
+                    "correlation": [x.loc[0] for x in corr],
+                    "x": [x for x, _ in combinations(df.columns, 2)],
+                    "y": [y for _, y in combinations(df.columns, 2)],
+                }
+            )
+
             dfs[method.name] = ndf
         itmdt = Intermediate(
             data=dfs,
