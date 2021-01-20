@@ -119,8 +119,13 @@ def _calc_nullivariate(
         ):
             continue
 
-        ndf = pd.DataFrame({"correlation": [x.loc[0] for x in corr]})
-        ndf[["x", "y"]] = list(combinations(df.columns, 2))
+        ndf = pd.DataFrame(
+            {
+                "correlation": [x.loc[0] for x in corr],
+                "x": [x for x, _ in combinations(df.columns, 2)],
+                "y": [y for _, y in combinations(df.columns, 2)],
+            }
+        )
 
         if k is not None:
             thresh = ndf["correlation"].abs().nlargest(k).iloc[-1]
