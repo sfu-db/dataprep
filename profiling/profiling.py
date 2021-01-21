@@ -43,7 +43,8 @@ def grid() -> ParameterGrid:
     return ParameterGrid(
         {
             "dataset": [
-                "bitcoin5g",
+                "diabetes",
+                # "bitcoin5g",
                 # "automobile",
                 # "titanic",
                 # "suicide",
@@ -60,7 +61,7 @@ def grid() -> ParameterGrid:
                 # "diabetes",
                 # "heart",
             ],
-            "memory": [64 * G],
+            "memory": [4 * G],
             "cpu": [8],
             "fname": fnames,
             "nrow": [0],
@@ -125,9 +126,7 @@ def main() -> None:
                     if ret is not None:
                         print(jdumps({**this_args, **ret}, cls=NumpyEncoder))
                     else:
-                        print(
-                            jdumps({**this_args, "status": "failed"}, cls=NumpyEncoder)
-                        )
+                        print(jdumps({**this_args, "status": "failed"}, cls=NumpyEncoder))
                     sys.stdout.flush()
 
                     this_mem = this_args["memory"]
@@ -158,13 +157,17 @@ def main() -> None:
                     "bind": "/workdir/dataprep",
                     "mode": "ro",
                 },
-                str(PWD / "benchmarks"): {"bind": "/workdir/benchmarks", "mode": "ro",},
-                str(PWD / "data" / "cache2"): {"bind": "/workdir/data", "mode": "ro"},
+                str(PWD / "benchmarks"): {
+                    "bind": "/workdir/benchmarks",
+                    "mode": "ro",
+                },
+                str(PWD / "data" / "cache"): {"bind": "/workdir/data", "mode": "ro"},
             },
             environment=["PYTHONPATH=/workdir:$PYTHONPATH"],
             mem_limit=mem,
             cpu_period=100000,
             cpu_quota=cpu * 100000,
+            network="dsl",
         )
         running_jobs[job] = args
 
@@ -220,7 +223,7 @@ def create_dataset(
 ) -> Tuple[str, float]:
     logger.info(f"Dataset: {dataset}")
     fname = f"{dataset}_{nrow}_{ncol}_{partition}.{format}"
-    fpath = PWD / "data" / "cache2" / fname
+    fpath = PWD / "data" / "cache" / fname
 
     if skip and fpath.exists():
         if format == "csv":

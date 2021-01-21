@@ -9,16 +9,17 @@ from dask.distributed import Client, LocalCluster
 
 class DataPrepReport(Benchmark):
     def init(self) -> None:
-        pass
+        Client("dask-scheduler:8786")
 
     def bench(self) -> None:
-        if self.dpath.suffix == ".parquet":
-            df = dd.read_parquet(self.dpath)
+        if self.dpath.suffix == ".pq":
+            df = pd.read_parquet(self.dpath)
         elif self.dpath.suffix == ".csv":
-            df = dd.read_csv(self.dpath, error_bad_lines=False)
+            df = pd.read_csv(self.dpath, error_bad_lines=False)
 
         with TemporaryDirectory() as tdir:
-            create_report(df, 
+            create_report(
+                df,
                 progress=False,
                 config={
                     "kde.enable": False,
@@ -26,8 +27,8 @@ class DataPrepReport(Benchmark):
                     "box.enable": False,
                     "wordcloud.enable": False,
                     "wordlen.enable": False,
-                    "pie.enable": False
-                }
+                    "pie.enable": False,
+                },
             ).save(f"{tdir}/report.html")
 
 
