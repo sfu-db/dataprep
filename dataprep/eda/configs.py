@@ -74,6 +74,15 @@ class Plot(BaseModel):
     report: bool = False
 
 
+class Diff(BaseModel):
+    """
+    Define the parameters in the plot_diff
+    """
+
+    label: Union[List[str], None] = None
+    baseline: int = 0
+
+
 class Stats(BaseModel):
     """
     enable: bool, default True
@@ -1117,6 +1126,7 @@ class Config(BaseModel):
     interactions: Interactions = Field(default_factory=Interactions)
     correlations: Correlations = Field(default_factory=Correlations)
     missingvalues: MissingValues = Field(default_factory=MissingValues)
+    diff: Diff = Field(default_factory=Diff)
 
     @classmethod
     def from_dict(
@@ -1129,8 +1139,8 @@ class Config(BaseModel):
         if display:
             try:
                 display = [DISPLAY_MAP[disp] for disp in display]
-                # set all plots not in display list to enable=False except for Plot class
-                for plot in set(vars(cfg).keys()) - set(display) - {"plot"}:
+                # set all plots not in display list to enable=False except for Plot and Diff class
+                for plot in set(vars(cfg).keys()) - set(display) - {"plot"} - {"diff"}:
                     setattr(getattr(cfg, plot), "enable", False)
             except KeyError:
                 display = [DISPLAY_REPORT_MAP[disp] for disp in display]

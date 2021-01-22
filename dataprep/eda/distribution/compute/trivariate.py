@@ -8,7 +8,7 @@ import dask.dataframe as dd
 from ...configs import Config
 from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, drop_null, is_dtype
 from ...intermediate import Intermediate
-from .common import _calc_line_dt
+from ...utils import _calc_line_dt
 
 
 def compute_trivariate(

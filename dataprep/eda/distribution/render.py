@@ -32,49 +32,9 @@ from ..configs import KDE, Bar, Box, Config, Pie, QQNorm, WordFrequency
 from ..dtypes import Continuous, DateTime, Nominal, is_dtype
 from ..intermediate import Intermediate
 from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS
+from ..utils import tweak_figure, _format_ticks, _format_axis, _format_bin_intervals
 
 __all__ = ["render"]
-
-
-def tweak_figure(
-    fig: Figure,
-    ptype: Optional[str] = None,
-    show_yticks: bool = False,
-    max_lbl_len: int = 15,
-) -> None:
-    """
-    Set some common attributes for a figure
-    """
-    fig.axis.major_label_text_font_size = "9pt"
-    fig.title.text_font_size = "10pt"
-    fig.axis.minor_tick_line_color = "white"
-    if ptype in ["pie", "qq", "heatmap"]:
-        fig.ygrid.grid_line_color = None
-    if ptype in ["bar", "pie", "hist", "kde", "qq", "heatmap", "line"]:
-        fig.xgrid.grid_line_color = None
-    if ptype in ["bar", "hist", "line"] and not show_yticks:
-        fig.ygrid.grid_line_color = None
-        fig.yaxis.major_label_text_font_size = "0pt"
-        fig.yaxis.major_tick_line_color = None
-    if ptype in ["bar", "nested", "stacked", "heatmap", "box"]:
-        fig.xaxis.major_label_orientation = np.pi / 3
-        fig.xaxis.formatter = FuncTickFormatter(
-            code="""
-            if (tick.length > %d) return tick.substring(0, %d-2) + '...';
-            else return tick;
-        """
-            % (max_lbl_len, max_lbl_len)
-        )
-    if ptype in ["nested", "stacked", "box"]:
-        fig.xgrid.grid_line_color = None
-    if ptype in ["nested", "stacked"]:
-        fig.y_range.start = 0
-        fig.x_range.range_padding = 0.03
-    if ptype in ["line", "boxnum"]:
-        fig.min_border_right = 20
-        fig.xaxis.major_label_standoff = 7
-        fig.xaxis.major_label_orientation = 0
-        fig.xaxis.major_tick_line_color = None
 
 
 def _make_title(grp_cnt_stats: Dict[str, int], x: str, y: str) -> str:
@@ -98,84 +58,6 @@ def _make_title(grp_cnt_stats: Dict[str, int], x: str, y: str) -> str:
         if y_ttl > y_shw:
             return f"(top {y_shw} out of {y_ttl}) {y} by {x}"
     return f"{y} by {x}"
-
-
-def _format_ticks(ticks: List[float]) -> List[str]:
-    """
-    Format the tick values
-    """
-    formatted_ticks = []
-    for tick in ticks:  # format the tick values
-        before, after = f"{tick:e}".split("e")
-        if float(after) > 1e15 or abs(tick) < 1e4:
-            formatted_ticks.append(str(tick))
-            continue
-        mod_exp = int(after) % 3
-        factor = 1 if mod_exp == 0 else 10 if mod_exp == 1 else 100
-        value = np.round(float(before) * factor, len(str(before)))
-        value = int(value) if value.is_integer() else value
-        if abs(tick) >= 1e12:
-            formatted_ticks.append(str(value) + "T")
-        elif abs(tick) >= 1e9:
-            formatted_ticks.append(str(value) + "B")
-        elif abs(tick) >= 1e6:
-            formatted_ticks.append(str(value) + "M")
-        elif abs(tick) >= 1e4:
-            formatted_ticks.append(str(value) + "K")
-
-    return formatted_ticks
-
-
-def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
-    """
-    Format the axis ticks
-    """  # pylint: disable=too-many-locals
-    # divisor for 5 ticks (5 results in ticks that are too close together)
-    divisor = 4.5
-    # interval
-    gap = (maxv - minv) / divisor
-    # get exponent from scientific notation
-    _, after = f"{gap:.0e}".split("e")
-    # round to this amount
-    round_to = -1 * int(after)
-    # round the first x tick
-    minv = np.round(minv, round_to)
-    # round value between ticks
-    gap = np.round(gap, round_to)
-
-    # make the tick values
-    ticks = [float(minv)]
-    while max(ticks) + gap < maxv:
-        ticks.append(max(ticks) + gap)
-    ticks = np.round(ticks, round_to)
-    ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
-    formatted_ticks = _format_ticks(ticks)
-
-    if axis == "x":
-        fig.xgrid.ticker = ticks
-        fig.xaxis.ticker = ticks
-        fig.xaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
-        fig.xaxis.major_label_text_font_size = "10pt"
-        fig.xaxis.major_label_standoff = 7
-        # fig.xaxis.major_label_orientation = 0
-        fig.xaxis.major_tick_line_color = None
-    elif axis == "y":
-        fig.ygrid.ticker = ticks
-        fig.yaxis.ticker = ticks
-        fig.yaxis.major_label_overrides = dict(zip(ticks, formatted_ticks))
-        fig.yaxis.major_label_text_font_size = "10pt"
-        fig.yaxis.major_label_standoff = 5
-
-
-def _format_bin_intervals(bins_arr: np.ndarray) -> List[str]:
-    """
-    Auxillary function to format bin intervals in a histogram
-    """
-    bins_arr = np.round(bins_arr, 3)
-    bins_arr = [int(val) if float(val).is_integer() else val for val in bins_arr]
-    intervals = [f"[{bins_arr[i]}, {bins_arr[i + 1]})" for i in range(len(bins_arr) - 2)]
-    intervals.append(f"[{bins_arr[-2]},{bins_arr[-1]}]")
-    return intervals
 
 
 def _format_values(key: str, value: Any) -> str:

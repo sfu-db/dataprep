@@ -21,8 +21,8 @@ from ...dtypes import (
     get_dtype_cnts_and_num_cols,
     is_dtype,
 )
+from ...utils import _calc_line_dt, ks_2samp, normaltest, skewtest
 from ...intermediate import Intermediate
-from .common import _calc_line_dt, ks_2samp, normaltest, skewtest
 
 
 def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -> Intermediate:
