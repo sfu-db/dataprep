@@ -14,7 +14,7 @@ from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
 from ..data_array import DataArray
 from ..distribution import render
-from ..distribution.compute.common import _calc_line_dt
+from ..utils import _calc_line_dt
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import calc_stats_dt, cont_comps, nom_comps
 from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats, stats_viz_dt

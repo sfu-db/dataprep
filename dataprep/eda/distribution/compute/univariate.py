@@ -17,7 +17,7 @@ from ....errors import UnreachableError
 from ...configs import Config
 from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, is_dtype
 from ...intermediate import Intermediate
-from .common import _calc_line_dt, gaussian_kde, normaltest
+from ...utils import _calc_line_dt, gaussian_kde, normaltest
 
 
 def compute_univariate(

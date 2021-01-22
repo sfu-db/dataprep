@@ -39,7 +39,7 @@ TAB_VISUAL_TYPES = {
     "correlation_scatter",
 }
 
-GRID_VISUAL_TYPES = {"distribution_grid", "missing_impact_1vn"}
+GRID_VISUAL_TYPES = {"distribution_grid", "missing_impact_1vn", "comparison_grid"}
 
 
 class Container:
