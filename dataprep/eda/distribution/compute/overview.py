@@ -166,7 +166,7 @@ def calc_stats(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -> Dict
     if cfg.stats.enable:
         stats["ncols"] = df.shape[1]
         stats["npresent_cells"] = df.count().sum()
-        stats["nrows_wo_dups"] = df.drop_duplicates().shape[0]
+        stats["nrows_wo_dups"] = df.map_partitions(lambda x: x.drop_duplicates()).shape[0]
         stats["mem_use"] = df.memory_usage(deep=True).sum()
         stats["dtype_cnts"] = dtype_cnts
 
