@@ -14,6 +14,7 @@ class CorrelationMethod(Enum):
     Pearson = auto()
     Spearman = auto()
     KendallTau = auto()
+    CramerV = auto()
 
 
 @dask.delayed(name="rankdata-bottleneck", pure=True)  # pylint: disable=no-value-for-parameter

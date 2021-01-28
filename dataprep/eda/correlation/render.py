@@ -133,13 +133,19 @@ def render_correlation_impact(
     """
     tabs: List[Panel] = []
     tooltips = [("x", "@x"), ("y", "@y"), ("correlation", "@correlation{1.11}")]
-    axis_range = itmdt["axis_range"]
+    num_df_axis_range = itmdt["axis_range"]["num_df"]
+    cat_df_axis_range = itmdt["axis_range"]["cat_df"]
 
     for method, df in itmdt["data"].items():
         # in case of numerical column names
         df = df.copy()
         df["x"] = df["x"].apply(str)
         df["y"] = df["y"].apply(str)
+
+        if "cramer" in method.lower():
+            axis_range = cat_df_axis_range
+        else:
+            axis_range = num_df_axis_range
 
         mapper, color_bar = create_color_mapper(palette)
         x_range = FactorRange(*axis_range)
@@ -400,11 +406,7 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
     x_select.js_on_change(
         "value",
         CustomJS(
-            args=dict(
-                scatter=source_scatter,
-                xy_value=source_xy_value,
-                x_axis=fig.xaxis[0],
-            ),
+            args=dict(scatter=source_scatter, xy_value=source_xy_value, x_axis=fig.xaxis[0],),
             code="""
         let currentSelect = this.value;
         let xyValueData = xy_value.data;
@@ -422,11 +424,7 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
     y_select.js_on_change(
         "value",
         CustomJS(
-            args=dict(
-                scatter=source_scatter,
-                xy_value=source_xy_value,
-                y_axis=fig.yaxis[0],
-            ),
+            args=dict(scatter=source_scatter, xy_value=source_xy_value, y_axis=fig.yaxis[0],),
             code="""
         let currentSelect = this.value;
         let xyValueData = xy_value.data;

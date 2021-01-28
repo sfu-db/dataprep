@@ -9,6 +9,7 @@ import dask
 import dask.array as da
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 from ...data_array import DataArray
 from ...intermediate import Intermediate
@@ -17,10 +18,7 @@ from ...utils import cut_long_name
 
 
 def _calc_nullivariate(
-    df: DataArray,
-    *,
-    value_range: Optional[Tuple[float, float]] = None,
-    k: Optional[int] = None,
+    df: DataArray, *, value_range: Optional[Tuple[float, float]] = None, k: Optional[int] = None,
 ) -> Intermediate:
     # pylint: disable=too-many-statements,too-many-locals,too-many-branches
 
@@ -30,17 +28,33 @@ def _calc_nullivariate(
     if value_range is not None and k is not None:
         raise ValueError("value_range and k cannot be present in both")
 
-    cordx, cordy, corrs = correlation_nxn(df)
+    num_df = DataArray(df).select_num_columns()
+    cat_df = DataArray(df).select_cat_columns()
+
+    num_df_cordx, num_df_cordy, num_df_corrs = correlation_nxn(num_df)
+
+    cat_df_ncols = len(cat_df.columns)
+    cat_df_cordx, cat_df_cordy = np.meshgrid(range(cat_df_ncols), range(cat_df_ncols))
+    cat_df_cordx, cat_df_cordy = cat_df_cordy.ravel(), cat_df_cordx.ravel()
+
+    cat_df_corrs = {
+        CorrelationMethod.CramerV: _cramerv_nxn(cat_df),
+    }
 
     # The computations below is not expensive (scales with # of columns)
     # So we do them in pandas
 
-    (corrs,) = dask.compute(corrs)
-    pearson_corr, spearman_corr, kendalltau_corr = corrs.values()
+    (num_df_corrs,) = dask.compute(num_df_corrs)
+    pearson_corr, spearman_corr, kendalltau_corr = num_df_corrs.values()
 
-    pearson_pos_max, pearson_neg_max, pearson_mean, pearson_pos_cols, pearson_neg_cols = most_corr(
-        pearson_corr
-    )
+    (
+        pearson_pos_max,
+        pearson_neg_max,
+        pearson_mean,
+        pearson_pos_cols,
+        pearson_neg_cols,
+    ) = most_corr(pearson_corr)
+
     (
         spearman_pos_max,
         spearman_neg_max,
@@ -48,6 +62,7 @@ def _calc_nullivariate(
         spearman_pos_cols,
         spearman_neg_cols,
     ) = most_corr(spearman_corr)
+
     (
         kendalltau_pos_max,
         kendalltau_neg_max,
@@ -55,30 +70,66 @@ def _calc_nullivariate(
         kendalltau_pos_cols,
         kendalltau_neg_cols,
     ) = most_corr(kendalltau_corr)
+
+    (cat_df_corrs,) = dask.compute(cat_df_corrs)
+    (cramerv_corr,) = cat_df_corrs.values()
+    (
+        cramerv_pos_max,
+        cramerv_neg_max,
+        cramerv_mean,
+        cramerv_pos_cols,
+        cramerv_neg_cols,
+    ) = most_corr(cramerv_corr)
+
     pearson_min, pearson_cols = least_corr(pearson_corr)
     spearman_min, spearman_cols = least_corr(spearman_corr)
     kendalltau_min, kendalltau_cols = least_corr(kendalltau_corr)
+    cramerv_min, cramerv_cols = least_corr(cramerv_corr)
 
-    p_p_corr = create_string("positive", pearson_pos_cols, most_show, df)
-    s_p_corr = create_string("positive", spearman_pos_cols, most_show, df)
-    k_p_corr = create_string("positive", kendalltau_pos_cols, most_show, df)
-    p_n_corr = create_string("negative", pearson_neg_cols, most_show, df)
-    s_n_corr = create_string("negative", spearman_neg_cols, most_show, df)
-    k_n_corr = create_string("negative", kendalltau_neg_cols, most_show, df)
-    p_corr = create_string("least", pearson_cols, most_show, df)
-    s_corr = create_string("least", spearman_cols, most_show, df)
-    k_corr = create_string("least", kendalltau_cols, most_show, df)
+    p_p_corr = create_string("positive", pearson_pos_cols, most_show, num_df)
+    s_p_corr = create_string("positive", spearman_pos_cols, most_show, num_df)
+    k_p_corr = create_string("positive", kendalltau_pos_cols, most_show, num_df)
+    c_p_corr = create_string("positive", cramerv_pos_cols, most_show, cat_df)
+
+    p_n_corr = create_string("negative", pearson_neg_cols, most_show, num_df)
+    s_n_corr = create_string("negative", spearman_neg_cols, most_show, num_df)
+    k_n_corr = create_string("negative", kendalltau_neg_cols, most_show, num_df)
+    c_n_corr = create_string("negative", cramerv_neg_cols, most_show, cat_df)
+
+    p_corr = create_string("least", pearson_cols, most_show, num_df)
+    s_corr = create_string("least", spearman_cols, most_show, num_df)
+    k_corr = create_string("least", kendalltau_cols, most_show, num_df)
+    c_corr = create_string("least", cramerv_cols, most_show, cat_df)
 
     dfs = {}
-    for method, corr in corrs.items():
+    for method, corr in num_df_corrs.items():
         ndf = pd.DataFrame(
             {
-                "x": df.columns[cordx],
-                "y": df.columns[cordy],
+                "x": num_df.columns[num_df_cordx],
+                "y": num_df.columns[num_df_cordy],
                 "correlation": corr.ravel(),
             }
         )
-        ndf = ndf[cordy > cordx]  # Retain only lower triangle (w/o diag)
+        ndf = ndf[num_df_cordy > num_df_cordx]  # Retain only lower triangle (w/o diag)
+
+        if k is not None:
+            thresh = ndf["correlation"].abs().nlargest(k).iloc[-1]
+            ndf = ndf[(ndf["correlation"] >= thresh) | (ndf["correlation"] <= -thresh)]
+        elif value_range is not None:
+            mask = (value_range[0] <= ndf["correlation"]) & (ndf["correlation"] <= value_range[1])
+            ndf = ndf[mask]
+
+        dfs[method.name] = ndf
+
+    for method, corr in cat_df_corrs.items():
+        ndf = pd.DataFrame(
+            {
+                "x": cat_df.columns[cat_df_cordx],
+                "y": cat_df.columns[cat_df_cordy],
+                "correlation": corr.ravel(),
+            }
+        )
+        ndf = ndf[cat_df_cordy > cat_df_cordx]  # Retain only lower triangle (w/o diag)
 
         if k is not None:
             thresh = ndf["correlation"].abs().nlargest(k).iloc[-1]
@@ -91,34 +142,42 @@ def _calc_nullivariate(
 
     return Intermediate(
         data=dfs,
-        axis_range=list(df.columns.unique()),
+        axis_range={
+            "num_df": list(num_df.columns.unique()),
+            "cat_df": list(cat_df.columns.unique()),
+        },
         visual_type="correlation_impact",
         tabledata={
             "Highest Positive Correlation": {
                 "Pearson": pearson_pos_max,
                 "Spearman": spearman_pos_max,
                 "KendallTau": kendalltau_pos_max,
+                "Cramer's V": cramerv_pos_max,
             },
             "Highest Negative Correlation": {
                 "Pearson": pearson_neg_max,
                 "Spearman": spearman_neg_max,
                 "KendallTau": kendalltau_neg_max,
+                "Cramer's V": cramerv_neg_max,
             },
             "Lowest Correlation": {
                 "Pearson": pearson_min,
                 "Spearman": spearman_min,
                 "KendallTau": kendalltau_min,
+                "Cramer's V": cramerv_min,
             },
             "Mean Correlation": {
                 "Pearson": pearson_mean,
                 "Spearman": spearman_mean,
                 "KendallTau": kendalltau_mean,
+                "Cramer's V": cramerv_mean,
             },
         },
         insights={
             "Pearson": [p_p_corr, p_n_corr, p_corr],
             "Spearman": [s_p_corr, s_n_corr, s_corr],
             "KendallTau": [k_p_corr, k_n_corr, k_corr],
+            "Cramer's V": [c_p_corr, c_n_corr, c_corr],
         },
     )
 
@@ -172,6 +231,47 @@ def _kendall_tau_nxn(df: DataArray) -> da.Array:
         .map_partitions(partial(pd.DataFrame.corr, method="kendall"))
         .to_dask_array()
     )
+
+
+def calc_cramerv_pair(col1: pd.Series, col2: pd.Series) -> float:
+    confusion_matrix = pd.crosstab(col1, col2)
+    chi2 = stats.chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum().sum()
+    phi2 = chi2 / n
+    r = confusion_matrix.shape[0]
+    k = confusion_matrix.shape[1] if len(confusion_matrix.shape) > 1 else 1
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        phi2corr = max(0.0, phi2 - ((k - 1.0) * (r - 1.0)) / (n - 1.0))
+        rcorr = r - ((r - 1.0) ** 2.0) / (n - 1.0)
+        kcorr = k - ((k - 1.0) ** 2.0) / (n - 1.0)
+        rkcorr = min((kcorr - 1.0), (rcorr - 1.0))
+        if rkcorr == 0.0:
+            corr = 1.0
+        else:
+            corr = np.sqrt(phi2corr / rkcorr)
+    return corr
+
+
+def calc_cramerv(df: pd.DataFrame) -> pd.DataFrame:
+    cat_df = df.select_dtypes(exclude=["number"])
+    cols = cat_df.columns
+    idx = cols.copy()
+    nc = len(cols)
+    correl = np.empty((nc, nc), dtype=float)
+    for i in range(nc):
+        for j in range(nc):
+            if i > j:
+                continue
+            c = calc_cramerv_pair(cat_df[cols[i]], cat_df[cols[j]])
+            correl[i, j] = c
+            correl[j, i] = c
+    return pd.DataFrame(correl, index=idx, columns=cols)
+
+
+def _cramerv_nxn(df: DataArray) -> da.Array:
+    """Calculate column-wise cramer'v correlation."""
+    return df.frame.repartition(npartitions=1).map_partitions(calc_cramerv).to_dask_array()
 
 
 def most_corr(corrs: np.ndarray) -> Tuple[float, float, float, List[Any], List[Any]]:

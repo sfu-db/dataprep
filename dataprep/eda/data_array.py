@@ -184,10 +184,7 @@ class DataArray:
     _head: Optional[pd.DataFrame] = None
 
     def __init__(
-        self,
-        df: DataFrame,
-        value_length: bool = False,
-        repartition: bool = True,
+        self, df: DataFrame, value_length: bool = False, repartition: bool = True,
     ) -> None:
         if isinstance(df, (dd.Series, pd.Series)):
             df = df.to_frame()
@@ -322,6 +319,11 @@ class DataArray:
         """Return a new DataArray with numerical dtype columns."""
         df = self.select_dtypes(NUMERICAL_DTYPES)
         return df
+
+    def select_cat_columns(self) -> "DataArray":
+        """Return a new DataArray with categorical dtype columns."""
+        cols = self._ddf.select_dtypes(exclude="number").columns
+        return self[cols]
 
     def __getitem__(self, indexer: Union[Sequence[str], str]) -> "DataArray":
         """Return a new DataArray select by column names."""

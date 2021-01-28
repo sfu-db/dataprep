@@ -36,18 +36,16 @@ def compute_correlation(
     k
         Choose top-k element
     """
-    if x is not None and y is not None:
-        df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))
-    else:
-        df = DataArray(df).select_num_columns()
-
     if x is None and y is None:  # pylint: disable=no-else-return
         return _calc_nullivariate(df, value_range=value_range, k=k)
     elif x is not None and y is None:
+        df = DataArray(df).select_num_columns()
         return _calc_univariate(df, x=x, value_range=value_range, k=k)
     elif x is None and y is not None:
+        df = DataArray(df).select_num_columns()
         raise ValueError("Please give the column name to x instead of y")
     elif x is not None and y is not None:
+        df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))
         return _calc_bivariate(df, x=x, y=y, k=k)
 
     raise ValueError("Not Possible")
