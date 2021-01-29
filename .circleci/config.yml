@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  coverage-reporter: codacy/coverage-reporter@11.3.8
 executors:
   python37:
     docker:
@@ -55,9 +53,9 @@ jobs:
       - run:
           name: Upload coverage data to codecov
           command: poetry run codecov
-      - coverage-reporter/send_report:
-          coverage-reports: 'coverage.xml'
-          project-token: $CODACY_PROJECT_TOKEN
+      - run:
+          name: Upload coverage data to codacy
+          command: bash <(curl -Ls https://coverage.codacy.com/get.sh) report --coverage-reports coverage.xml -t $CODACY_PROJECT_TOKEN
   docs-build:
     executor: python37
     steps:

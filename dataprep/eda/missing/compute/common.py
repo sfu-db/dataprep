@@ -4,27 +4,22 @@ from typing import Optional, Tuple
 import dask.array as da
 import dask.dataframe as dd
 
-from ...dtypes import (
-    Continuous,
-    DTypeDef,
-    Nominal,
-    detect_dtype,
-    is_dtype,
-)
+from ...configs import Config
+from ...dtypes import Continuous, DTypeDef, Nominal, detect_dtype, is_dtype
 
 LABELS = ["Orignal data", "After drop missing values"]
 
 
 def uni_histogram(
     srs: dd.Series,
-    bins: int,
+    cfg: Config,
     dtype: Optional[DTypeDef] = None,
 ) -> Tuple[da.Array, ...]:
     """Calculate "histogram" for both numerical and categorical."""
 
     if is_dtype(detect_dtype(srs, dtype), Continuous()):
 
-        counts, edges = da.histogram(srs, bins, range=[srs.min(), srs.max()])
+        counts, edges = da.histogram(srs, cfg.hist.bins, (srs.min(), srs.max()))
         centers = (edges[:-1] + edges[1:]) / 2
 
         return counts, centers, edges

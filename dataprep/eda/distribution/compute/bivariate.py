@@ -7,22 +7,16 @@ import numpy as np
 import pandas as pd
 
 from ....errors import UnreachableError
+from ...configs import Config
+from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, is_dtype
 from ...intermediate import Intermediate
-from ...dtypes import (
-    Continuous,
-    DateTime,
-    DTypeDef,
-    Nominal,
-    detect_dtype,
-    is_dtype,
-)
 from .common import (
     DTMAP,
-    _get_timeunit,
-    _calc_line_dt,
-    _calc_groups,
     _calc_box_otlrs,
     _calc_box_stats,
+    _calc_groups,
+    _calc_line_dt,
+    _get_timeunit,
 )
 
 
@@ -30,59 +24,30 @@ def compute_bivariate(
     df: dd.DataFrame,
     x: str,
     y: str,
-    bins: int,
-    ngroups: int,
-    largest: bool,
-    nsubgroups: int,
-    timeunit: str,
-    agg: str,
-    sample_size: int,
-    dtype: Optional[DTypeDef] = None,
+    cfg: Config,
+    dtype: Optional[DTypeDef],
 ) -> Intermediate:
     """Compute functions for plot(df, x, y).
 
     Parameters
     ----------
     df
-        Dataframe from which plots are to be generated
+        DataFrame from which visualizations are generated
     x
-        A valid column name from the dataframe
+        A column name from the DataFrame
     y
-        A valid column name from the dataframe
-    bins
-        For a histogram or box plot with numerical x axis, it defines
-        the number of equal-width bins to use when grouping.
-    ngroups
-        When grouping over a categorical column, it defines the
-        number of groups to show in the plot. Ie, the number of
-        bars to show in a bar chart.
-    largest
-        If true, when grouping over a categorical column, the groups
-        with the largest count will be output. If false, the groups
-        with the smallest count will be output.
-    nsubgroups
-        If x and y are categorical columns, ngroups refers to
-        how many groups to show from column x, and nsubgroups refers to
-        how many subgroups to show from column y in each group in column x.
-    timeunit
-        Defines the time unit to group values over for a datetime column.
-        It can be "year", "quarter", "month", "week", "day", "hour",
-        "minute", "second". With default value "auto", it will use the
-        time unit such that the resulting number of groups is closest to 15.
-    agg
-        Specify the aggregate to use when aggregating over a numeric column
-    sample_size
-        Sample size for the scatter plot
+        A column name from the DataFrame
+    cfg
+        Config instance
     dtype: str or DType or dict of str or dict of DType, default None
         Specify Data Types for designated column or all columns.
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
-    # pylint: disable=too-many-arguments,too-many-locals
+    # pylint: disable=too-many-branches,too-many-statements
+    xtype, ytype = detect_dtype(df[x], dtype), detect_dtype(df[y], dtype)
 
-    xtype = detect_dtype(df[x], dtype)
-    ytype = detect_dtype(df[y], dtype)
     if (
         is_dtype(xtype, Nominal())
         and is_dtype(ytype, Continuous())
@@ -91,15 +56,19 @@ def compute_bivariate(
     ):
         x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
         df = df[[x, y]]
-        first_rows = df.head()
         try:
-            first_rows[x].apply(hash)
+            df.head()[x].apply(hash)
         except TypeError:
             df[x] = df[x].astype(str)
 
-        (comps,) = dask.compute(nom_cont_comps(df.dropna(), bins, ngroups, largest))
+        (comps,) = dask.compute(_nom_cont_comps(df.dropna(), cfg))
 
-        return Intermediate(x=x, y=y, data=comps, ngroups=ngroups, visual_type="cat_and_num_cols")
+        return Intermediate(
+            x=x,
+            y=y,
+            data=comps,
+            visual_type="cat_and_num_cols",
+        )
     elif (
         is_dtype(xtype, DateTime())
         and is_dtype(ytype, Continuous())
@@ -110,15 +79,29 @@ def compute_bivariate(
         df = df[[x, y]].dropna()
         dtnum: List[Any] = []
         # line chart
-        dtnum.append(dask.delayed(_calc_line_dt)(df, timeunit, agg))
+        if cfg.line.enable:
+            dtnum.append(dask.delayed(_calc_line_dt)(df, cfg.line.unit, cfg.line.agg))
         # box plot
-        dtnum.append(dask.delayed(calc_box_dt)(df, timeunit))
+        if cfg.box.enable:
+            dtnum.append(dask.delayed(_calc_box_dt)(df, cfg.box.unit))
+
         dtnum = dask.compute(*dtnum)
+
+        if len(dtnum) == 2:
+            linedata = dtnum[0]
+            boxdata = dtnum[1]
+        elif cfg.line.enable:
+            linedata = dtnum[0]
+            boxdata = []
+        else:
+            boxdata = dtnum[0]
+            linedata = []
+
         return Intermediate(
             x=x,
             y=y,
-            linedata=dtnum[0],
-            boxdata=dtnum[1],
+            linedata=linedata,
+            boxdata=boxdata,
             visual_type="dt_and_num_cols",
         )
     elif (
@@ -131,51 +114,80 @@ def compute_bivariate(
         df = df[[x, y]].dropna()
         df[y] = df[y].apply(str, meta=(y, str))
         dtcat: List[Any] = []
-        # line chart
-        dtcat.append(dask.delayed(_calc_line_dt)(df, timeunit, ngroups=ngroups, largest=largest))
-        # stacked bar chart
-        dtcat.append(dask.delayed(calc_stacked_dt)(df, timeunit, ngroups, largest))
+        if cfg.line.enable:
+            # line chart
+            dtcat.append(
+                dask.delayed(_calc_line_dt)(
+                    df,
+                    cfg.line.unit,
+                    ngroups=cfg.line.ngroups,
+                    largest=cfg.line.sort_descending,
+                )
+            )
+        if cfg.stacked.enable:
+            # stacked bar chart
+            dtcat.append(
+                dask.delayed(_calc_stacked_dt)(
+                    df,
+                    cfg.stacked.unit,
+                    cfg.stacked.ngroups,
+                    cfg.stacked.sort_descending,
+                )
+            )
         dtcat = dask.compute(*dtcat)
+
+        if len(dtcat) == 2:
+            linedata = dtcat[0]
+            stackdata = dtcat[1]
+        elif cfg.line.enable:
+            linedata = dtcat[0]
+            stackdata = []
+        else:
+            stackdata = dtcat[0]
+            linedata = []
+
         return Intermediate(
             x=x,
             y=y,
-            linedata=dtcat[0],
-            stackdata=dtcat[1],
+            linedata=linedata,
+            stackdata=stackdata,
             visual_type="dt_and_cat_cols",
         )
     elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
         df = df[[x, y]]
-        first_rows = df.head()
+        head = df.head()
         try:
-            first_rows[x].apply(hash)
+            head[x].apply(hash)
         except TypeError:
             df[x] = df[x].astype(str)
         try:
-            first_rows[y].apply(hash)
+            head[y].apply(hash)
         except TypeError:
             df[y] = df[y].astype(str)
 
         (comps,) = dask.compute(df.dropna().groupby([x, y]).size())
-
         return Intermediate(
             x=x,
             y=y,
             data=comps,
-            ngroups=ngroups,
-            nsubgroups=nsubgroups,
             visual_type="two_cat_cols",
         )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
-        # one partition required for apply(pd.cut) in calc_box_num
+        # one partition required for apply(pd.cut) in _calc_box_cont
         df = df[[x, y]].dropna().repartition(npartitions=1)
 
         data: Dict[str, Any] = {}
-        # scatter plot data
-        data["scat"] = df.map_partitions(lambda x: x.sample(min(100, x.shape[0])), meta=df)
-        # hexbin plot data
-        data["hex"] = df
-        # box plot
-        data["box"] = calc_box_num(df, bins)
+        if cfg.scatter.enable:
+            # scatter plot data
+            data["scat"] = df.map_partitions(
+                lambda x: x.sample(min(cfg.scatter.sample_size, x.shape[0])), meta=df
+            )
+        if cfg.hexbin.enable:
+            # hexbin plot data
+            data["hex"] = df
+        if cfg.box.enable:
+            # box plot
+            data["box"] = _calc_box_cont(df, cfg)
 
         (data,) = dask.compute(data)
 
@@ -183,83 +195,78 @@ def compute_bivariate(
             x=x,
             y=y,
             data=data,
-            spl_sz=sample_size,
             visual_type="two_num_cols",
         )
     else:
         raise UnreachableError
 
 
-def nom_cont_comps(df: dd.DataFrame, bins: int, ngroups: int, largest: bool) -> Dict[str, Any]:
+def _nom_cont_comps(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
     """
     Computations for a nominal and continuous column
-
-    Parameters
-    ----------
-    df
-        Dask dataframe with one categorical and one numerical column
-    bins
-        Number of bins to use in the histogram
-    ngroups
-        Number of groups to show from the categorical column
-    largest
-        Select the largest or smallest groups
     """
     data: Dict[str, Any] = {}
-
-    x, y = df.columns[0], df.columns[1]
+    x, y = df.columns
 
     # filter the dataframe to consist of ngroup groups
     # https://stackoverflow.com/questions/46927174/filtering-grouped-df-in-dask
     cnts = df[x].value_counts(sort=False)
     data["ttl_grps"] = cnts.shape[0]
-    thresh = cnts.nlargest(ngroups).min() if largest else cnts.nsmallest(ngroups).max()
-    df = df[df[x].map(cnts) >= thresh] if largest else df[df[x].map(cnts) <= thresh]
 
-    # group the data to compute a box plot and histogram for each group
-    grps = df.groupby(x)[y]
-    data["box"] = grps.apply(box_comps, meta="object")
-
-    minv, maxv = df[y].min(), df[y].max()
-    # TODO when are minv and maxv computed? This may not be optimal if
-    # minv and maxv are computed ngroups times for each histogram
-    data["hist"] = grps.apply(hist, bins, minv, maxv, meta="object")
+    if cfg.box.enable:
+        if cfg.box.sort_descending:
+            thresh = cnts.nlargest(cfg.box.ngroups).min()
+            df_box = df[df[x].map(cnts) >= thresh]
+        else:
+            thresh = cnts.nsmallest(cfg.box.ngroups).max()
+            df_box = df[df[x].map(cnts) <= thresh]
+        grps_box = df_box.groupby(x)[y]
+        data["box"] = grps_box.apply(_box_comps, meta=object)
+        if (
+            cfg.line.enable
+            and cfg.box.sort_descending == cfg.line.sort_descending
+            and cfg.box.ngroups == cfg.line.ngroups
+        ):
+            data["hist"] = grps_box.apply(
+                _hist, cfg.line.bins, df_box[y].min(), df_box[y].max(), meta=object
+            )
+    if cfg.line.enable and (
+        cfg.box.sort_descending != cfg.line.sort_descending or cfg.box.ngroups != cfg.line.ngroups
+    ):
+        if cfg.line.sort_descending:
+            thresh = cnts.nlargest(cfg.line.ngroups).min()
+            df_hist = df[df[x].map(cnts) >= thresh]
+        else:
+            thresh = cnts.nsmallest(cfg.line.ngroups).max()
+            df_hist = df[df[x].map(cnts) <= thresh]
+        grps_hist = df_hist.groupby(x)[y]
+        data["hist"] = grps_hist.apply(
+            _hist, cfg.line.bins, df_hist[y].min(), df_hist[y].max(), meta=object
+        )
 
     return data
 
 
-def calc_box_num(df: dd.DataFrame, bins: int) -> dd.Series:
+def _calc_box_cont(df: dd.DataFrame, cfg: Config) -> dd.Series:
     """
-    Box plot for a binned numerical variable
-
-    Parameters
-    ----------
-    df
-        dask dataframe
-    bins
-        number of bins to compute a box plot
+    Box plot for a binned continuous variable
     """
-    x, y = df.columns[0], df.columns[1]
+    x, y = df.columns
     # group the data into intervals
     # https://stackoverflow.com/questions/42442043/how-to-use-pandas-cut-or-equivalent-in-dask-efficiently
-    df["grp"] = df[x].map_partitions(pd.cut, bins=bins, include_lowest=True)
+    df["grp"] = df[x].map_partitions(pd.cut, bins=cfg.box.bins, include_lowest=True)
     # TODO is this calculating the box plot stats for each group in parallel?
     # https://examples.dask.org/dataframes/02-groupby.html#Groupby-Apply
     # https://github.com/dask/dask/issues/4239
     # https://github.com/dask/dask/issues/5124
-    srs = df.groupby("grp")[y].apply(box_comps, meta="object")
+    srs = df.groupby("grp")[y].apply(_box_comps, meta=object)
 
     return srs
 
 
-def box_comps(srs: pd.Series) -> Dict[str, Union[float, np.array]]:
+def _box_comps(srs: pd.Series) -> Dict[str, Union[float, np.array]]:
     """
     Box plot computations
-
-    Parameters
-    ----------
-    srs
-        pandas series
     """
     data: Dict[str, Any] = {}
 
@@ -277,26 +284,15 @@ def box_comps(srs: pd.Series) -> Dict[str, Union[float, np.array]]:
     return data
 
 
-def hist(srs: pd.Series, bins: int, minv: float, maxv: float) -> Any:
+def _hist(srs: pd.Series, bins: int, minv: float, maxv: float) -> Any:
     """
     Compute a histogram on a given series
-
-    Parameters
-    ----------
-    srs
-        pandas Series of values for the histogram
-    bins
-        number of bins
-    minv
-        lowest bin endpoint
-    maxv
-        highest bin endpoint
     """
 
-    return np.histogram(srs, bins=bins, range=[minv, maxv])
+    return np.histogram(srs, bins=bins, range=(minv, maxv))
 
 
-def calc_box_dt(df: dd.DataFrame, unit: str) -> Tuple[pd.DataFrame, List[str], List[float], str]:
+def _calc_box_dt(df: dd.DataFrame, unit: str) -> Tuple[pd.DataFrame, List[str], List[float], str]:
     """
     Calculate a box plot with date on the x axis.
     Parameters
@@ -334,7 +330,7 @@ def calc_box_dt(df: dd.DataFrame, unit: str) -> Tuple[pd.DataFrame, List[str], L
     return df, outx, outy, DTMAP[unit][3]
 
 
-def calc_stacked_dt(
+def _calc_stacked_dt(
     df: dd.DataFrame,
     unit: str,
     ngroups: int,

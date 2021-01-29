@@ -4,10 +4,9 @@ In this module lives the type tree.
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Type, Union
 
-
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
 
 from ..errors import UnreachableError
 

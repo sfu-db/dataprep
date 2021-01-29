@@ -62,4 +62,31 @@
             }
         }
     }
+
+    function copyParam(e) {
+        const buttonText = e.innerText;
+        const paramElement = e.parentElement.childNodes;
+        let param = '';
+        for (let i of paramElement) {
+            if (i.nodeName === 'DIV') {
+                const nodeParam = i.firstElementChild.innerText;
+                param = param + nodeParam + ', ';
+            }
+        }
+        navigator.clipboard.writeText(param).then(
+            () => {
+                e.innerText = 'Copied to Clipboard!';
+                setTimeout(() => {
+                    e.innerText = buttonText;
+                }, 1500);
+            }
+        ).catch(
+            error => {
+                e.innerText = error;
+                setTimeout(() => {
+                    e.innerText = buttonText;
+                }, 1500);
+            }
+        )
+    }
 </script>
