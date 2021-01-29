@@ -2,11 +2,12 @@
 This module implements the plot(df) function.
 """
 
-from typing import Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import dask.dataframe as dd
 import pandas as pd
 
+from ..configs import Config
 from ..container import Container
 from ..dtypes import DTypeDef
 from ..progress_bar import ProgressBar
@@ -22,20 +23,8 @@ def plot(
     y: Optional[str] = None,
     z: Optional[str] = None,
     *,
-    bins: int = 50,
-    ngroups: int = 20,
-    largest: bool = True,
-    nsubgroups: int = 5,
-    timeunit: str = "auto",
-    agg: str = "mean",
-    sample_size: int = 1000,
-    top_words: int = 30,
-    stopword: bool = True,
-    lemmatize: bool = False,
-    stem: bool = False,
-    value_range: Optional[Tuple[float, float]] = None,
-    yscale: str = "linear",
-    tile_size: Optional[float] = None,
+    config: Optional[Dict[str, Any]] = None,
+    display: Optional[List[str]] = None,
     dtype: Optional[DTypeDef] = None,
     progress: bool = True,
 ) -> Container:
@@ -76,63 +65,24 @@ def plot(
     Parameters
     ----------
     df
-        Dataframe from which plots are to be generated
+        DataFrame from which visualizations are generated
     x: Optional[str], default None
         A valid column name from the dataframe
     y: Optional[str], default None
         A valid column name from the dataframe
     z: Optional[str], default None
         A valid column name from the dataframe
-    bins: int, default 10
-        For a histogram or box plot with numerical x axis, it defines
-        the number of equal-width bins to use when grouping.
-    ngroups: int, default 10
-        When grouping over a categorical column, it defines the
-        number of groups to show in the plot. Ie, the number of
-        bars to show in a bar chart.
-    largest: bool, default True
-        If true, when grouping over a categorical column, the groups
-        with the largest count will be output. If false, the groups
-        with the smallest count will be output.
-    nsubgroups: int, default 5
-        If x and y are categorical columns, ngroups refers to
-        how many groups to show from column x, and nsubgroups refers to
-        how many subgroups to show from column y in each group in column x.
-    timeunit: str, default "auto"
-        Defines the time unit to group values over for a datetime column.
-        It can be "year", "quarter", "month", "week", "day", "hour",
-        "minute", or "second". With default value "auto", it will use the
-        time unit such that the resulting number of groups is closest to 15.
-    agg: str, default "mean"
-        Specify the aggregate to use when aggregating over a numerical
-        column
-    sample_size: int, default 1000
-        Sample size for the scatter plot
-    top_words: int, default 30
-        Specify the amount of words to show in the wordcloud and
-        word frequency bar chart
-    stopword: bool, default True
-        Eliminate the stopwords in the text data for plotting wordcloud and
-        word frequency bar chart
-    lemmatize: bool, default False
-        Lemmatize the words in the text data for plotting wordcloud and
-        word frequency bar chart
-    stem: bool, default False
-        Apply Potter Stem on the text data for plotting wordcloud and
-        word frequency bar chart
-    value_range: Optional[Tuple[float, float]], default None
-        The lower and upper bounds on the range of a numerical column.
-        Applies when column x is specified and column y is unspecified.
-    yscale
-        The scale to show on the y axis. Can be "linear" or "log".
-    tile_size: Optional[float], default None
-        Size of the tile for the hexbin plot. Measured from the middle
-        of a hexagon to its left or right corner.
+    config
+        A dictionary for configuring the visualizations
+        E.g. config={"hist.bins": 20}
+    display
+        A list containing the names of the visualizations to display
+        E.g. display=["Histogram"]
     dtype: str or DType or dict of str or dict of DType, default None
         Specify Data Types for designated column or all columns.
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
-        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+        or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous().
     progress
         Enable the progress bar.
 
@@ -142,30 +92,14 @@ def plot(
     >>> from dataprep.eda import *
     >>> iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
     >>> plot(iris)
-    >>> plot(iris, "petal_length", bins=20, value_range=(1,5))
+    >>> plot(iris, "petal_length")
     >>> plot(iris, "petal_width", "species")
     """
-    # pylint: disable=too-many-locals,line-too-long
+    cfg = Config.from_dict(display, config)
 
     with ProgressBar(minimum=1, disable=not progress):
-        intermediate = compute(
-            df,
-            x=x,
-            y=y,
-            z=z,
-            bins=bins,
-            ngroups=ngroups,
-            largest=largest,
-            nsubgroups=nsubgroups,
-            timeunit=timeunit.lower(),
-            agg=agg,
-            sample_size=sample_size,
-            top_words=top_words,
-            stopword=stopword,
-            lemmatize=lemmatize,
-            stem=stem,
-            value_range=value_range,
-            dtype=dtype,
-        )
-    to_render = render(intermediate, yscale=yscale, tile_size=tile_size)
-    return Container(to_render, intermediate.visual_type)
+        itmdt = compute(df, x, y, z, cfg=cfg, dtype=dtype)
+
+    to_render = render(itmdt, cfg)
+
+    return Container(to_render, itmdt.visual_type, cfg)

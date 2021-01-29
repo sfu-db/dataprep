@@ -1,49 +1,43 @@
 """This module implements the plot_missing(df) function's
 calculating intermediate part."""
 
-from typing import List, Optional, Generator, Any
+from typing import Any, Generator, List, Optional
 
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 from scipy.stats import rv_histogram
 
+from ...configs import Config
 from ...data_array import DataArray
-from ...dtypes import (
-    Continuous,
-    DTypeDef,
-    detect_dtype,
-    is_dtype,
-)
+from ...dtypes import Continuous, DTypeDef, Nominal, detect_dtype, is_dtype
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, histogram
 
 
-def _compute_missing_bivariate(  # pylint: disable=too-many-locals
+def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-statements
     df: DataArray,
     x: str,
     y: str,
-    bins: int,
-    ndist_sample: int,
+    cfg: Config,
     dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
-    # pylint: disable=too-many-arguments
     """Calculate the distribution change on another column y when
     the missing values in x is dropped."""
 
-    xloc = df.columns.get_loc(x)
-    yloc = df.columns.get_loc(y)
+    xloc, yloc = df.columns.get_loc(x), df.columns.get_loc(y)
 
     col0 = df.values[~df.nulls[:, yloc], yloc].astype(df.dtypes[y])
     col1 = df.values[~(df.nulls[:, xloc] | df.nulls[:, yloc]), yloc].astype(df.dtypes[y])
 
     minimum, maximum = col0.min(), col0.max()
+    bins = cfg.bar.bars if is_dtype(detect_dtype(df.frame[y], dtype), Nominal()) else cfg.hist.bins
 
-    hists = [histogram(col, dtype=dtype, bins=bins, return_edges=True) for col in [col0, col1]]
+    hists = [histogram(col, bins, return_edges=True, dtype=dtype) for col in [col0, col1]]
 
     quantiles = None
-    if is_dtype(detect_dtype(df.frame[y], dtype), Continuous()):
+    if is_dtype(detect_dtype(df.frame[y], dtype), Continuous()) and cfg.box.enable:
         quantiles = [
             dd.from_dask_array(col).quantile([0, 0.25, 0.5, 0.75, 1]) for col in [col0, col1]
         ]
@@ -56,60 +50,66 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals
     meta["y", "dtype"] = detect_dtype(df.frame[y], dtype)
 
     if is_dtype(detect_dtype(df.frame[y], dtype), Continuous()):
-        dists = [rv_histogram((hist[0], hist[2])) for hist in hists]  # type: ignore
-        xs = np.linspace(minimum, maximum, ndist_sample)
 
-        pdfs = [dist.pdf(xs) for dist in dists]
-        cdfs = [dist.cdf(xs) for dist in dists]
+        if cfg.pdf.enable or cfg.cdf.enable:
+            dists = [rv_histogram((hist[0], hist[2])) for hist in hists]  # type: ignore
+            distdf = pd.DataFrame({})
 
-        distdf = pd.DataFrame(
-            {
-                "x": np.tile(xs, 2),
-                "pdf": np.concatenate(pdfs),
-                "cdf": np.concatenate(cdfs),
-                "label": np.repeat(LABELS, ndist_sample),
-            }
-        )
+        if cfg.pdf.enable:
+            xs_pdf = np.linspace(minimum, maximum, cfg.pdf.sample_size)
+            pdfs = [dist.pdf(xs_pdf) for dist in dists]
+            distdf["x_pdf"] = np.tile(xs_pdf, 2)
+            distdf["pdf"] = np.concatenate(pdfs)
+            distdf["pdf_label"] = np.repeat(LABELS, cfg.pdf.sample_size)
 
-        counts, xs, edges = zip(*hists)
+        if cfg.cdf.enable:
+            xs_cdf = np.linspace(minimum, maximum, cfg.cdf.sample_size)
+            cdfs = [dist.cdf(xs_cdf) for dist in dists]
+            distdf["x_cdf"] = np.tile(xs_cdf, 2)
+            distdf["cdf"] = np.concatenate(cdfs)
+            distdf["cdf_label"] = np.repeat(LABELS, cfg.cdf.sample_size)
 
-        lower_bounds: List[float] = []
-        upper_bounds: List[float] = []
+        if cfg.hist.enable:
+            counts, xs, edges = zip(*hists)
 
-        for edge in edges:
-            lower_bounds.extend(edge[:-1])
-            upper_bounds.extend(edge[1:])
+            lower_bounds: List[float] = []
+            upper_bounds: List[float] = []
 
-        histdf = pd.DataFrame(
-            {
-                "x": np.concatenate(xs),
-                "count": np.concatenate(counts),
-                "label": np.repeat(LABELS, [len(count) for count in counts]),
-                "lower_bound": lower_bounds,
-                "upper_bound": upper_bounds,
-            }
-        )
+            for edge in edges:
+                lower_bounds.extend(edge[:-1])
+                upper_bounds.extend(edge[1:])
 
-        boxdf = pd.DataFrame(quantiles)
-        boxdf.columns = ["min", "q1", "q2", "q3", "max"]
+            histdf = pd.DataFrame(
+                {
+                    "x": np.concatenate(xs),
+                    "count": np.concatenate(counts),
+                    "label": np.repeat(LABELS, [len(count) for count in counts]),
+                    "lower_bound": lower_bounds,
+                    "upper_bound": upper_bounds,
+                }
+            )
 
-        iqr = boxdf["q3"] - boxdf["q1"]
-        boxdf["upper"] = np.minimum(boxdf["q3"] + 1.5 * iqr, boxdf["max"])
-        boxdf["lower"] = np.maximum(boxdf["q3"] - 1.5 * iqr, boxdf["min"])
-        boxdf["label"] = LABELS
+        if cfg.box.enable:
+            boxdf = pd.DataFrame(quantiles)
+            boxdf.columns = ["min", "q1", "q2", "q3", "max"]
+
+            iqr = boxdf["q3"] - boxdf["q1"]
+            boxdf["upper"] = np.minimum(boxdf["q3"] + 1.5 * iqr, boxdf["max"])
+            boxdf["lower"] = np.maximum(boxdf["q3"] - 1.5 * iqr, boxdf["min"])
+            boxdf["label"] = LABELS
 
         itmdt = Intermediate(
-            dist=distdf,
-            hist=histdf,
-            box=boxdf,
+            dist=distdf if cfg.pdf.enable or cfg.cdf.enable else pd.DataFrame({}),
+            hist=histdf if cfg.hist.enable else pd.DataFrame({}),
+            box=boxdf if cfg.box.enable else pd.DataFrame({}),
             meta=meta["y"],
             x=x,
             y=y,
             visual_type="missing_impact_1v1",
         )
         return itmdt
-    else:
 
+    else:
         counts, xs = zip(*hists)
 
         df_ret = pd.DataFrame(
@@ -126,12 +126,12 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[:bins]]
             df_ret = df_ret[df_ret["x"].isin(selected_xs)]
-            partial = (bins, len(counts[0]))
+            shown = bins
         else:
-            partial = (len(counts[0]), len(counts[0]))
+            shown = len(counts[0])
 
-        meta["y", "partial"] = partial
-
+        meta["y", "shown"] = shown
+        meta["y", "total"] = len(counts[0])
         itmdt = Intermediate(
             hist=df_ret,
             x=x,

@@ -25,6 +25,7 @@ from ...eda.correlation.compute.nullivariate import (
 )
 from ...eda.utils import to_dask
 from ...eda.data_array import DataArray
+from ...eda.configs import Config
 
 
 @pytest.fixture(scope="module")  # type: ignore
@@ -38,83 +39,103 @@ def simpledf() -> dd.DataFrame:
 
 
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf)
+    display = ["Stats", "Pearson"]
+    config = {
+        "height": 500,
+        "width": 500,
+    }
+    cfg = Config.from_dict(display=display, config=config)
+    compute_correlation(simpledf, cfg=cfg)
     plot_correlation(simpledf)
 
 
 def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, k=1)
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, cfg=cfg, k=1)
     plot_correlation(simpledf, k=1)
 
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="a")
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="a", cfg=cfg)
     plot_correlation(simpledf, x="a")
 
 
 def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="a", value_range=(0.5, 0.8))
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="a", cfg=cfg, value_range=(0.5, 0.8))
     plot_correlation(simpledf, x="a", value_range=(0.5, 0.8))
 
 
 def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="a", k=1)
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="a", cfg=cfg, k=1)
     plot_correlation(simpledf, x="a", k=1)
 
 
 def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="a", k=0)
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="a", cfg=cfg, k=0)
     plot_correlation(simpledf, x="a", k=0)
 
 
 def test_sanity_compute_7(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="b", y="a")
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="b", cfg=cfg, y="a")
     plot_correlation(simpledf, x="b", y="a")
 
 
 def test_sanity_compute_8(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="b", y="a", k=1)
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="b", cfg=cfg, y="a", k=1)
     plot_correlation(simpledf, x="b", y="a", k=1)
 
 
 def test_sanity_compute_9(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, value_range=(0.3, 0.7))
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, cfg=cfg, value_range=(0.3, 0.7))
     plot_correlation(simpledf, value_range=(0.3, 0.7))
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_2(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, k=3, value_range=(0.3, 0.7))
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, cfg=cfg, k=3, value_range=(0.3, 0.7))
     plot_correlation(simpledf, k=3, value_range=(0.3, 0.7))
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_3(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3)
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="a", cfg=cfg, value_range=(0.5, 0.8), k=3)
     plot_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3)
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_4(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, y="a")
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, y="a", cfg=cfg)
     plot_correlation(simpledf, y="a")
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_5(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="d")
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="d", cfg=cfg)
     plot_correlation(simpledf, x="d")
 
 
 @pytest.mark.xfail  # type: ignore
 def test_test_sanity_compute_fail_6(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8))
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="b", y="a", cfg=cfg, value_range=(0.5, 0.8))
     plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8))
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
-    compute_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3)
+    cfg = Config.from_dict()
+    compute_correlation(simpledf, x="b", y="a", cfg=cfg, value_range=(0.5, 0.8), k=3)
     plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3)
 
 

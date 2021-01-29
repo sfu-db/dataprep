@@ -1,12 +1,13 @@
 """
     This module implements the create_report(df) function.
 """
+from typing import Any, Dict, List, Optional
 
-from typing import Optional
-from pathlib import Path
 import pandas as pd
 from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
+
+from ..configs import Config
 from .formatter import format_report
 from .report import Report
 
@@ -19,6 +20,9 @@ ENV_LOADER = Environment(
 
 def create_report(
     df: pd.DataFrame,
+    *,
+    config: Optional[Dict[str, Any]] = None,
+    display: Optional[List[str]] = None,
     title: Optional[str] = "DataPrep Report",
     mode: Optional[str] = "basic",
     progress: bool = True,
@@ -30,6 +34,13 @@ def create_report(
     ----------
     df
         The DataFrame for which data are calculated.
+    config
+        A dictionary for configuring the visualizations
+        E.g. config={"hist.bins": 20}
+    display
+        The list that contains the names of plots user wants to display,
+        E.g. display =  ["bar", "hist"]
+        Without user's specifications, the default is "auto"
     title: Optional[str], default "DataPrep Report"
         The title of the report, which will be shown on the navigation bar.
     mode: Optional[str], default "basic"
@@ -48,10 +59,11 @@ def create_report(
     >>> report.save('My Fantastic Report') # save report to local disk
     >>> report.show_browser() # show report in the browser
     """
+    cfg = Config.from_dict(display, config)
     context = {
         "resources": INLINE.render(),
         "title": title,
-        "components": format_report(df, mode, progress),
+        "components": format_report(df, cfg, mode, progress),
     }
     template_base = ENV_LOADER.get_template("base.html")
     report = template_base.render(context=context)

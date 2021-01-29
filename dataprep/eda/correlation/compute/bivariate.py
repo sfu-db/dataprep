@@ -5,15 +5,17 @@ from operator import itruediv
 from typing import Optional, Tuple
 
 import dask
-import dask.dataframe as dd
 import dask.array as da
+import dask.dataframe as dd
 import numpy as np
 
+from ...configs import Config
 from ...intermediate import Intermediate
 
 
 def _calc_bivariate(
     df: dd.DataFrame,
+    cfg: Config,
     x: str,
     y: str,
     *,
@@ -25,7 +27,7 @@ def _calc_bivariate(
         raise ValueError(f"{y} not in columns names")
 
     df = df[[x, y]].dropna()
-    coeffs, df_smp, influences = scatter_with_regression(df, sample_size=1000, k=k)
+    coeffs, df_smp, influences = scatter_with_regression(df, cfg, k=k)
 
     coeffs, df_smp, influences = dask.compute(coeffs, df_smp, influences)
 
@@ -47,26 +49,18 @@ def _calc_bivariate(
 
 
 def scatter_with_regression(
-    df: dd.DataFrame, sample_size: int, k: Optional[int] = None
+    df: dd.DataFrame, cfg: Config, k: Optional[int] = None
 ) -> Tuple[Tuple[da.Array, da.Array], Tuple[da.Array, da.Array], Optional[da.Array]]:
-    """Calculate pearson correlation on 2 given arrays.
-
-    Parameters
-    ----------
-    df
-        dataframe
-    sample_size
-        Number of points to show in the scatter plot
-    k : Optional[int] = None
-        Highlight k points which influence pearson correlation most
-    """
+    """Sample and compute regression line"""
     df["ones"] = 1
     arr = df.to_dask_array(lengths=True)
 
     (coeffa, coeffb), _, _, _ = da.linalg.lstsq(arr[:, [0, 2]], arr[:, 1])
 
     df = df.drop(columns=["ones"])
-    df_smp = df.map_partitions(lambda x: x.sample(min(sample_size, x.shape[0])), meta=df)
+    df_smp = df.map_partitions(
+        lambda x: x.sample(min(cfg.scatter.sample_size, x.shape[0])), meta=df
+    )
     # TODO influences should not be computed on a sample
     influences = (
         pearson_influence(
