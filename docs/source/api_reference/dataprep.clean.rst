@@ -50,3 +50,11 @@ URLs
    :members:
    :undoc-members:
    :show-inheritance:
+   
+Column Headers
+--------------------------------------
+
+.. automodule:: dataprep.clean.clean_headers
+   :members:
+   :undoc-members:
+   :show-inheritance:
