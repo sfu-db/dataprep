@@ -44,6 +44,8 @@ def clean_phone(
     """
     This function cleans phone numbers.
 
+    Read more in the :ref:`User Guide <phone_userguide>`.
+
     Parameters
     ----------
     df
@@ -52,9 +54,9 @@ def clean_phone(
         Column name containing phone numbers.
     output_format
         The desired format of the phone numbers.
-        "nanp": NPA-NXX-XXXX
-        "e164": +1NPANXXXXXX
-        "national": (NPA) NXX-XXXX
+         * "nanp": NPA-NXX-XXXX
+         * "e164": +1NPANXXXXXX
+         * "national": (NPA) NXX-XXXX
     fix_missing
         Fix the missing country code of a parsed phone number. If "empty",
         leave the missing component as is. If "auto", set the country
@@ -148,11 +150,7 @@ def validate_phone(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
 
 
 def _format_phone(
-    phone: Any,
-    output_format: str,
-    fix_missing: str,
-    split: bool,
-    errors: str,
+    phone: Any, output_format: str, fix_missing: str, split: bool, errors: str
 ) -> Any:
     """
     Function to transform a phone number instance into the desired format.

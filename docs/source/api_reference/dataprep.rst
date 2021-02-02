@@ -20,6 +20,7 @@ auto-generated from the docstrings in the project source code.
    dataprep.eda.create_report
    dataprep.eda
    dataprep.connector
+   dataprep.clean
 
 
 
@@ -42,3 +43,11 @@ Connector Documentation
    :maxdepth: 2
 
    dataprep.connector
+
+Clean Documentation
+============================
+
+.. toctree::
+   :maxdepth: 2
+
+   dataprep.clean

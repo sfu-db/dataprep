@@ -1,5 +1,5 @@
 """
-Implement clean_ip functionality
+Clean and validate a DataFrame column containing IP addresses.
 """
 from ipaddress import ip_address
 from operator import itemgetter
@@ -20,50 +20,66 @@ def clean_ip(
     input_format: str = "auto",
     output_format: str = "compressed",
     inplace: bool = False,
-    report: bool = True,
     errors: str = "coerce",
+    report: bool = True,
     progress: bool = True,
 ) -> Union[pd.DataFrame, dd.DataFrame]:
     """
-    This function cleans a column of ip addresses in a Dataframe and formats them
-    into the desired format
+    Clean and standardize IP addresses.
+
+    Read more in the :ref:`User Guide <ip_userguide>`.
 
     Parameters
     ----------
     df
-        Pandas or Dask DataFrame
+        A pandas or Dask DataFrame containing the data to be cleaned.
     column
-        Column name where the ip address are stored
+        The name of the column containing IP addresses.
     input_format
-        Specify what format the data is in {'ipv4', 'ipv6', 'auto'}, default 'auto',
-            'ipv4': will only parse ipv4 addresses
-            'ipv6': will only parse ipv6 addresses
-            'auto': will parse both ipv4 and ipv6 addresses
-    output_format
-        Desired output format,
-        {'compressed', 'full', 'binary', 'hexa', 'integer'}, default is 'compressed'
-            'compressed': provides a compressed version of the ip address,
-            'full': provides full version of the ip address,
-            'binary': provides binary representation of the ip address,
-            'hexa': provides hexadecimal representation of the ip address,
-            'integer': provides integer representation of the ip address.
-    inplace
-        If True, deletes the given column with dirty data, else, creates a new
-        column with cleaned data.
-        Default value is set to `False`
-    report
-        Displays the cleaning report for ip addresses
-        Default value is set to `True`
-    errors {‘ignore’, ‘raise’, ‘coerce’}, default 'coerce'
-        * If ‘raise’, then invalid parsing will raise an exception.
-        * If ‘coerce’, then invalid parsing will be set as NaN.
-        * If ‘ignore’, then invalid parsing will return the input.
-    progress
-        If True, enable the progress bar
+        The input format of the IP addresses.
+            - 'auto': parse both ipv4 and ipv6 addresses.
+            - 'ipv4': only parse ipv4 addresses.
+            - 'ipv6': only parse ipv6 addresses.
 
-    Returns
-    ----------
-    A new Dataframe with the new relavant columns
+        (default: 'auto')
+    output_format
+        The desired output format of the IP addresses.
+            - 'compressed': compressed representation (12.3.4.5)
+            - 'full': full representation (0012.0003.0004.0005)
+            - 'binary': binary representation (00001100000000110000010000000101)
+            - 'hexa': hexadecimal representation (0xc030405)
+            - 'integer': integer representation (201524229)
+
+        (default: 'compressed')
+    inplace
+        If True, delete the column containing the data that was cleaned. Otherwise,
+        keep the original column.
+
+        (default: False)
+    errors
+        How to handle parsing errors.
+            - ‘raise’: invalid parsing will raise an exception.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: then invalid parsing will return the input.
+
+        (default: 'coerce')
+    report
+        If True, output the summary report. Otherwise, no report is outputted.
+
+        (default: True)
+    progress
+        If True, display a progress bar.
+
+        (default: True)
+
+    Examples
+    --------
+
+    >>> df = pd.DataFrame({'ip': ['2001:0db8:85a3:0000:0000:8a2e:0370:7334', '233.5.6.000']})
+    >>> clean_ip(df, 'ip')
+                                            ip                      ip_clean
+    0  2001:0db8:85a3:0000:0000:8a2e:0370:7334  2001:db8:85a3::8a2e:370:7334
+    1                              233.5.6.000                     233.5.6.0
     """
     # pylint: disable=too-many-arguments
 
@@ -130,17 +146,32 @@ def clean_ip(
 
 def validate_ip(x: Union[str, pd.Series], input_format: str = "auto") -> Union[bool, pd.Series]:
     """
-    This function validates ip address, can be a series or a single value
+    Validate IP addresses.
+
+    Read more in the :ref:`User Guide <ip_userguide>`.
 
     Parameters
     ----------
     x
-        pandas Series of ip addresses or an ip address value
+        pandas Series of IP addresses or a str ip address value
     input_format
-        Specify what format the data is in {'ipv4', 'ipv6', 'auto'}, default 'auto',
-            'ipv4': will only parse ipv4 addresses
-            'ipv6': will only parse ipv6 addresses
-            'auto': will parse both ipv4 and ipv6 addresses
+        The IP address format to validate.
+            - 'auto': validate both ipv4 and ipv6 addresses.
+            - 'ipv4': only validate ipv4 addresses.
+            - 'ipv6': only validate ipv6 addresses.
+
+        (default: 'auto')
+
+    Examples
+    --------
+
+    >>> validate_ip('fdf8:f53b:82e4::53')
+    True
+    >>> df = pd.DataFrame({'ip': ['fdf8:f53b:82e4::53', None]})
+    >>> validate_country(df['country'])
+    0     True
+    1    False
+    Name: ip, dtype: bool
     """
     if isinstance(x, pd.Series):
         return x.apply(_check_ip, args=(input_format, False))
@@ -190,7 +221,7 @@ def _format_ip(val: Any, input_format: str, output_format: str, errors: str) -> 
     # convert to full representation
     else:
         dlm = "." if address.version == 4 else ":"  # delimiter
-        result = "".join(f"{'0' * (4 - len(x))}{x}{dlm}" for x in address.exploded.split(dlm))[:-1]
+        result = f"{dlm}".join(f"{'0' * (4 - len(x))}{x}" for x in address.exploded.split(dlm))
 
     return result, 2 if result != val else 3
 

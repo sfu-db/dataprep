@@ -1,5 +1,5 @@
 """
-Implement clean_url functionality
+Clean and validate a DataFrame column containing URLs.
 """
 import re
 from operator import itemgetter
@@ -45,40 +45,66 @@ UNIFIED_AUTH_LIST = set()
 def clean_url(
     df: Union[pd.DataFrame, dd.DataFrame],
     column: str,
+    remove_auth: Union[bool, List[str]] = False,
     inplace: bool = False,
     split: bool = False,
-    remove_auth: Union[bool, List[str]] = False,
-    report: bool = True,
     errors: str = "coerce",
+    report: bool = True,
     progress: bool = True,
 ) -> Union[pd.DataFrame, dd.DataFrame]:
     """
-    This function cleans url
+    Clean and standardize URLs.
+
+    Read more in the :ref:`User Guide <url_userguide>`.
 
     Parameters
     ----------
     df
-        pandas or Dask DataFrame
+        A pandas or Dask DataFrame containing the data to be cleaned.
     column
-        column name
-    split
-        If True, split a column containing into the scheme, hostname, queries, cleaned_url columns
-        if set to False would return a new column of dictionaries with the relavant
-        information (scheme, host, etc.) in form of key-value pairs
-    inplace
-        If True, delete the given column with dirty data, else, create a new
-        column with cleaned data.
+        The name of the column containing URL addresses.
     remove_auth
-        can be a bool, or list of string representing the names of Auth queries
-        to be removed. By default it is set to False
+        Can be a boolean value or list of strings representing the names of
+        Auth queries to be removed. If True, remove default Auth values. If
+        False, do not remove Auth values.
+
+        (default: False)
+    split
+        If True, split the URL into the scheme, hostname, queries, cleaned_url columns.
+        If False, return a column of dictionaries with the relavant
+        information (e.g., scheme, hostname, etc.) as key-value pairs.
+
+        (default: False)
+    inplace
+        If True, delete the column containing the data that was cleaned. Otherwise,
+        keep the original column.
+
+        (default: False)
+    errors
+        How to handle parsing errors.
+            - ‘raise’: invalid parsing will raise an exception.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: then invalid parsing will return the input.
+
+        (default: 'coerce')
     report
-        Displays how many queries were removed from rows
-    errors {‘ignore’, ‘raise’, ‘coerce’}, default 'coerce'
-        * If ‘raise’, then invalid parsing will raise an exception.
-        * If ‘coerce’, then invalid parsing will be set as NaN.
-        * If ‘ignore’, then invalid parsing will return the input.
+        If True, output the summary report. Otherwise, no report is outputted.
+
+        (default: True)
     progress
-        If True, enable the progress bar
+        If True, display a progress bar.
+
+        (default: True)
+
+    Examples
+    --------
+    Split a URL into its components.
+
+    >>> df = pd.DataFrame({'url': ['https://github.com/sfu-db/dataprep','https://www.google.com/']})
+    >>> clean_url(df, 'url')
+                                    url                                        url_details
+    0  https://github.com/sfu-db/dataprep  {'scheme': 'https', 'host': 'github.com', 'url...
+    1             https://www.google.com/  {'scheme': 'https', 'host': 'www.google.com', ...
     """
     # pylint: disable=too-many-arguments, global-statement
 
@@ -138,12 +164,25 @@ def clean_url(
 
 def validate_url(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     """
-    This function validates url
+    Validate URLs.
+
+    Read more in the :ref:`User Guide <url_userguide>`.
 
     Parameters
     ----------
     x
-        pandas Series of urls or url instance
+        pandas Series of URLs or str/int URL value
+
+    Examples
+    --------
+
+    >>> validate_url('https://github.com/sfu-db/dataprep')
+    True
+    >>> df = pd.DataFrame({'url': ['https://www.google.com/', 'NaN']})
+    >>> validate_url(df['url'])
+    0     True
+    1    False
+    Name: url, dtype: bool
     """
 
     if isinstance(x, pd.Series):
