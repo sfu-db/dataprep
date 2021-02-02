@@ -15,6 +15,8 @@ from .clean_phone import clean_phone, validate_phone
 
 from .clean_ip import clean_ip, validate_ip
 
+from .clean_date import clean_date, validate_date
+
 
 __all__ = [
     "clean_lat_long",
@@ -29,4 +31,6 @@ __all__ = [
     "validate_phone",
     "clean_ip",
     "validate_ip",
+    "clean_date",
+    "validate_date",
 ]
