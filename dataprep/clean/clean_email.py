@@ -223,6 +223,9 @@ def clean_email(
 ) -> pd.DataFrame:
     """
     This function cleans emails
+
+    Read more in the :ref:`User Guide <email_userguide>`.
+
     Parameters
     ----------
     df
