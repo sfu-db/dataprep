@@ -1,0 +1,31 @@
+from lib import Benchmark
+from dataprep.eda.missing import plot_missing
+from tempfile import TemporaryDirectory
+import dask.dataframe as dd
+import pandas as pd
+
+
+class PlotMissingNew(Benchmark):
+    def init(self) -> None:
+        if self.reader == "dask":
+            if self.dpath.suffix == ".parquet":
+                df = dd.read_parquet(self.dpath)
+            elif self.dpath.suffix == ".csv":
+                df = dd.read_csv(self.dpath)
+        elif self.reader == "pandas":
+            if self.dpath.suffix == ".parquet":
+                df = pd.read_parquet(self.dpath)
+            elif self.dpath.suffix == ".csv":
+                df = pd.read_csv(self.dpath)
+        else:
+            raise NotImplementedError(f"Reader {self.reader} not implemented")
+
+        self.df = df
+
+    def bench(self) -> None:
+        with TemporaryDirectory() as tdir:
+            plot_missing(self.df, progress=False).save(f"{tdir}/report.html")
+
+
+if __name__ == "__main__":
+    PlotMissingNew().run()

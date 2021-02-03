@@ -1,0 +1,21 @@
+build:
+  mkdir -p build
+  poetry export --without-hashes -f requirements.txt > build/requirements.txt
+  docker build -t wooya/dataprep-profiling-hadoop -f docker/Dockerfile .
+
+push:
+  docker push wooya/dataprep-profiling-hadoop
+
+bench to="/dev/null":
+  python profiling.py | tee -a {{to}}
+
+docker +ARGS="":
+  docker run -it --rm -v$PWD:/workdir/profiling -v$PWD/../dataprep:/workdir/dataprep -v$PWD/data:/workdir/data -p8889:8888 -p9999:9999 --network dsl wooya/dataprep-profiling-hadoop {{ARGS}}
+
+lab:
+  just docker jupyter lab --ip 0.0.0.0 --allow-root
+
+play +ARGS="":
+  docker run -it --rm -v$PWD:/workdir/profiling -v$PWD/../dataprep:/workdir/dataprep -v$PWD/data:/workdir/data --network dsl wooya/dataprep-profiling-hadoop {{ARGS}}
+
+
