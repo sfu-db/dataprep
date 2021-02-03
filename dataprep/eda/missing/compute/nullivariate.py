@@ -41,14 +41,14 @@ def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, 
         missing_bars(null_cnts, df.columns.values, nrows) if cfg.bar.enable else None,
         missing_heatmap(df) if cfg.heatmap.enable else None,
         missing_dendrogram(df) if cfg.dendro.enable else None,
-        nullity.sum() if cfg.stats.enable else None,
-        missing_col_cnt(df) if cfg.stats.enable else None,
-        missing_row_cnt(df) if cfg.stats.enable else None,
-        missing_most_col(df) if cfg.insight.enable else None,
-        missing_most_row(df) if cfg.insight.enable else None,
-        miss_perc if cfg.stats.enable else None,
-        avg_row if cfg.stats.enable else None,
-        avg_col if cfg.stats.enable else None,
+        None, #nullity.sum() if cfg.stats.enable else None,
+        None,#missing_col_cnt(df) if cfg.stats.enable else None,
+        None, #missing_row_cnt(df) if cfg.stats.enable else None,
+        None, #missing_most_col(df) if cfg.insight.enable else None,
+        None, #missing_most_row(df) if cfg.insight.enable else None,
+        None, #miss_perc if cfg.stats.enable else None,
+        None, #avg_row if cfg.stats.enable else None,
+        None #avg_col if cfg.stats.enable else None,
     )
 
     ### Lazy Region End
@@ -78,51 +78,51 @@ def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, 
         else:
             heatmap = pd.DataFrame(data=heatmap, columns=df.columns[sel], index=df.columns[sel])
 
-    if cfg.stats.enable:
-        missing_stat = {
-            "Missing Cells": cnt,
-            "Missing Cells (%)": str(round(miss_perc * 100, 1)) + "%",
-            "Missing Columns": col_cnt,
-            "Missing Rows": row_cnt,
-            "Avg Missing Cells per Column": round(avg_col, 2),
-            "Avg Missing Cells per Row": round(avg_row, 2),
-        }
+    # if cfg.stats.enable:
+    #     missing_stat = {
+    #         "Missing Cells": cnt,
+    #         "Missing Cells (%)": str(round(miss_perc * 100, 1)) + "%",
+    #         "Missing Columns": col_cnt,
+    #         "Missing Rows": row_cnt,
+    #         "Avg Missing Cells per Column": round(avg_col, 2),
+    #         "Avg Missing Cells per Row": round(avg_row, 2),
+    #     }
 
-    if cfg.insight.enable:
-        suffix_col = "" if most_col[0] <= most_show else ", ..."
-        suffix_row = "" if most_row[0] <= most_show else ", ..."
+    # if cfg.insight.enable:
+    #     suffix_col = "" if most_col[0] <= most_show else ", ..."
+    #     suffix_row = "" if most_row[0] <= most_show else ", ..."
 
-        top_miss_col = (
-            str(most_col[0])
-            + " col(s): "
-            + str(
-                "("
-                + ", ".join(cut_long_name(df.columns[e]) for e in most_col[2][:most_show])
-                + suffix_col
-                + ")"
-            )
-        )
+    #     top_miss_col = (
+    #         str(most_col[0])
+    #         + " col(s): "
+    #         + str(
+    #             "("
+    #             + ", ".join(cut_long_name(df.columns[e]) for e in most_col[2][:most_show])
+    #             + suffix_col
+    #             + ")"
+    #         )
+    #     )
 
-        top_miss_row = (
-            str(most_row[0])
-            + " row(s): "
-            + str("(" + ", ".join(str(e) for e in most_row[2][:most_show]) + suffix_row + ")")
-        )
+    #     top_miss_row = (
+    #         str(most_row[0])
+    #         + " row(s): "
+    #         + str("(" + ", ".join(str(e) for e in most_row[2][:most_show]) + suffix_row + ")")
+    #     )
 
-        insights = (
-            {
-                "Bar Chart": [
-                    top_miss_col
-                    + " contain the most missing values with rate "
-                    + str(round(most_col[1] * 100, 1))
-                    + "%",
-                    top_miss_row
-                    + " contain the most missing columns with rate "
-                    + str(round(most_row[1] * 100, 1))
-                    + "%",
-                ]
-            },
-        )
+    #     insights = (
+    #         {
+    #             "Bar Chart": [
+    #                 top_miss_col
+    #                 + " contain the most missing values with rate "
+    #                 + str(round(most_col[1] * 100, 1))
+    #                 + "%",
+    #                 top_miss_row
+    #                 + " contain the most missing columns with rate "
+    #                 + str(round(most_row[1] * 100, 1))
+    #                 + "%",
+    #             ]
+    #         },
+    #     )
 
     data_total_missing = {}
     if cfg.spectrum.enable:
@@ -135,8 +135,8 @@ def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, 
         data_heatmap=heatmap,
         data_dendrogram=dendrogram,
         visual_type="missing_impact",
-        missing_stat=missing_stat if cfg.stats.enable else {},
-        insights=insights if cfg.insight.enable else {},
+        missing_stat={},#missing_stat if cfg.stats.enable else {},
+        insights={}#insights if cfg.insight.enable else {},
     )
 
 

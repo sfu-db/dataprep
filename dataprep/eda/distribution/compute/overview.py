@@ -170,15 +170,15 @@ def calc_stats(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -> Dict
         stats["mem_use"] = df.memory_usage(deep=True).sum()
         stats["dtype_cnts"] = dtype_cnts
 
-    if not cfg.stats.enable and cfg.insight.enable:
-        stats["nrows_wo_dups"] = df.drop_duplicates().shape[0]
+    # if not cfg.stats.enable and cfg.insight.enable:
+    #     stats["nrows_wo_dups"] = df.drop_duplicates().shape[0]
 
-    if cfg.insight.enable:
-        # compute distribution similarity on a data sample
-        df_smp = df.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=df)
-        stats["ks_tests"] = []
-        for col1, col2 in combinations(num_cols, 2):
-            stats["ks_tests"].append((col1, col2, ks_2samp(df_smp[col1], df_smp[col2])[1]))
+    # if cfg.insight.enable:
+    #     # compute distribution similarity on a data sample
+    #     df_smp = df.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=df)
+    #     stats["ks_tests"] = []
+    #     for col1, col2 in combinations(num_cols, 2):
+    #         stats["ks_tests"].append((col1, col2, ks_2samp(df_smp[col1], df_smp[col2])[1]))
 
     return stats
 

@@ -118,17 +118,17 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
 
     df = grps.reset_index()  # dataframe with group names and counts
 
-    if cfg.stats.enable or cfg.wordlen.enable:
-        if not head.apply(lambda x: isinstance(x, str)).all():
-            srs = srs.astype(str)  # srs must be a string to compute the value lengths
-    if cfg.stats.enable or cfg.wordcloud.enable or cfg.wordfreq.enable:
-        if not head.apply(lambda x: isinstance(x, str)).all():
-            df[df.columns[0]] = df[df.columns[0]].astype(str)
+    # if cfg.stats.enable or cfg.wordlen.enable:
+    #     if not head.apply(lambda x: isinstance(x, str)).all():
+    #         srs = srs.astype(str)  # srs must be a string to compute the value lengths
+    # if cfg.stats.enable or cfg.wordcloud.enable or cfg.wordfreq.enable:
+    #     if not head.apply(lambda x: isinstance(x, str)).all():
+    #         df[df.columns[0]] = df[df.columns[0]].astype(str)
 
     if cfg.stats.enable:
         data.update(_calc_nom_stats(srs, df, data["nrows"], data["nuniq"]))
-    elif cfg.wordfreq.enable and cfg.insight.enable:
-        data["len_stats"] = {"Minimum": srs.str.len().min(), "Maximum": srs.str.len().max()}
+    # elif cfg.wordfreq.enable and cfg.insight.enable:
+    #     data["len_stats"] = {"Minimum": srs.str.len().min(), "Maximum": srs.str.len().max()}
     if cfg.wordlen.enable:
         lens = srs.str.len()
         data["len_hist"] = da.histogram(lens, cfg.wordlen.bins, (lens.min(), lens.max()))
@@ -144,8 +144,8 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
                 cfg.wordfreq.lemmatize,
                 cfg.wordfreq.stem,
             )
-            data["word_cnts_cloud"] = word_freqs["word_cnts"]
-            data["nuniq_words_cloud"] = word_freqs["nuniq_words"]
+            # data["word_cnts_cloud"] = word_freqs["word_cnts"]
+            # data["nuniq_words_cloud"] = word_freqs["nuniq_words"]
         else:
             word_freqs = _calc_word_freq(
                 df.copy(),
@@ -189,19 +189,19 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
 
     if cfg.hist.enable or cfg.qqnorm.enable and cfg.insight.enable:
         data["hist"] = da.histogram(srs, cfg.hist.bins, (srs.min(), srs.max()))
-        if cfg.insight.enable:
-            data["norm"] = normaltest(data["hist"][0])
+        # if cfg.insight.enable:
+        #     data["norm"] = normaltest(data["hist"][0])
 
-    if cfg.hist.enable and cfg.insight.enable:
-        data["chisq"] = chisquare(data["hist"][0])
+    # if cfg.hist.enable and cfg.insight.enable:
+    #     data["chisq"] = chisquare(data["hist"][0])
 
     # compute only the required amount of quantiles
-    if cfg.qqnorm.enable:
-        data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
-    elif cfg.stats.enable:
-        data["qntls"] = srs.quantile([0.05, 0.25, 0.5, 0.75, 0.95])
-    elif cfg.box.enable:
-        data["qntls"] = srs.quantile([0.25, 0.5, 0.75])
+    # if cfg.qqnorm.enable:
+    #     data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
+    # elif cfg.stats.enable:
+    data["qntls"] = srs.quantile([0.05, 0.25, 0.5, 0.75, 0.95])
+    # elif cfg.box.enable:
+    #     data["qntls"] = srs.quantile([0.25, 0.5, 0.75])
 
     if cfg.stats.enable or cfg.hist.enable and cfg.insight.enable:
         data["skew"] = skew(srs)
@@ -216,20 +216,20 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data["nuniq"] = srs.nunique()
         data["nreals"] = srs.shape[0]
         data["nzero"] = (srs == 0).sum()
-        data["nneg"] = (srs < 0).sum()
+        # data["nneg"] = (srs < 0).sum()
         data["kurt"] = kurtosis(srs)
         data["mem_use"] = srs.memory_usage(deep=True)
 
     # compute the density histogram
-    if cfg.kde.enable:
-        data["dens"] = da.histogram(srs, cfg.kde.bins, (srs.min(), srs.max()), density=True)
-        # gaussian kernel density estimate
-        data["kde"] = gaussian_kde(
-            srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
-        )
+    # if cfg.kde.enable:
+    #     data["dens"] = da.histogram(srs, cfg.kde.bins, (srs.min(), srs.max()), density=True)
+    #     # gaussian kernel density estimate
+    #     data["kde"] = gaussian_kde(
+    #         srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
+    #     )
 
-    if cfg.box.enable:
-        data.update(_calc_box(srs, data["qntls"], cfg))
+    # if cfg.box.enable:
+    #     data.update(_calc_box(srs, data["qntls"], cfg))
 
     return data
 
@@ -271,9 +271,9 @@ def _calc_word_freq(
     """
     col = df.columns[0]
 
-    regex = fr"\b(?:{'|'.join(ess)})\b|[^\w+ ]" if stopword else r"[^\w+ ]"
+    # regex = fr"\b(?:{'|'.join(ess)})\b|[^\w+ ]" if stopword else r"[^\w+ ]"
     # use a regex to replace stop words and non-alphanumeric characters with empty string
-    df[col] = df[col].str.replace(regex, "").str.lower().str.split()
+    df[col] = df[col].str.lower().str.split() #.str.replace(regex, "")
 
     # ".explode()" to "stack" all the words in a list into a new column
     df = df.explode(col)
@@ -288,10 +288,10 @@ def _calc_word_freq(
 
     word_cnts = df.groupby(col)[df.columns[1]].sum()  # counts of words, excludes null values
     nwords = word_cnts.sum()  # total number of words
-    nuniq_words = word_cnts.shape[0]  # total unique words
+    # nuniq_words = word_cnts.shape[0]  # total unique words
     fnl_word_cnts = word_cnts.nlargest(top_words)  # words with the highest frequency
 
-    return {"word_cnts": fnl_word_cnts, "nwords": nwords, "nuniq_words": nuniq_words}
+    return {"word_cnts": fnl_word_cnts, "nwords": nwords} #, "nuniq_words": #nuniq_words}
 
 
 def _calc_nom_stats(
@@ -314,7 +314,7 @@ def _calc_nom_stats(
     # length stats
     leng = {
         "Mean": srs.str.len().mean(),
-        "Standard Deviation": srs.str.len().std(),
+        # "Standard Deviation": srs.str.len().std(),
         "Median": srs.str.len().quantile(0.5),
         "Minimum": srs.str.len().min(),
         "Maximum": srs.str.len().max(),
@@ -322,19 +322,19 @@ def _calc_nom_stats(
     # letter stats
     # computed on groupby-count:
     # compute the statistic for each group then multiply by the count of the group
-    grp, col = df.columns
-    lc_cnt = (df[grp].str.count(r"[a-z]") * df[col]).sum()
-    uc_cnt = (df[grp].str.count(r"[A-Z]") * df[col]).sum()
-    letter = {
-        "Count": lc_cnt + uc_cnt,
-        "Lowercase Letter": lc_cnt,
-        "Space Separator": (df[grp].str.count(r"[ ]") * df[col]).sum(),
-        "Uppercase Letter": uc_cnt,
-        "Dash Punctuation": (df[grp].str.count(r"[-]") * df[col]).sum(),
-        "Decimal Number": (df[grp].str.count(r"[0-9]") * df[col]).sum(),
-    }
+    # grp, col = df.columns
+    # lc_cnt = (df[grp].str.count(r"[a-z]") * df[col]).sum()
+    # uc_cnt = (df[grp].str.count(r"[A-Z]") * df[col]).sum()
+    # letter = {
+    #     "Count": lc_cnt + uc_cnt,
+    #     "Lowercase Letter": lc_cnt,
+    #     "Space Separator": (df[grp].str.count(r"[ ]") * df[col]).sum(),
+    #     "Uppercase Letter": uc_cnt,
+    #     "Dash Punctuation": (df[grp].str.count(r"[-]") * df[col]).sum(),
+    #     "Decimal Number": (df[grp].str.count(r"[0-9]") * df[col]).sum(),
+    # }
 
-    return {"stats": stats, "len_stats": leng, "letter_stats": letter}
+    return {"stats": stats, "len_stats": leng, "letter_stats": {}}#letter}
 
 
 def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
