@@ -50,7 +50,15 @@ URLs
    :members:
    :undoc-members:
    :show-inheritance:
-   
+
+US Street Addresses
+-----------------------------------------------
+
+.. automodule:: dataprep.clean.clean_address
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Column Headers
 --------------------------------------
 
