@@ -2,8 +2,9 @@
 from typing import Any, Dict, List
 
 import pandas as pd
+from IPython.display import display
 
-from ..utils import get_styled_schema
+from ..utils import get_styled_schema, is_notebook
 from .implicit_database import ImplicitDatabase
 from .info_ui import info_ui
 from .schema import ConfigDef
@@ -111,3 +112,35 @@ def get_schema(schema: Dict[str, Any]) -> pd.DataFrame:
         new_schema_dict["data_type"].append(schema[k].type)
 
     return pd.DataFrame.from_dict(new_schema_dict)
+
+
+def websites() -> None:
+    """Displays names of websites supported by data connector."""
+    websites = {
+        "business": ["yelp"],
+        "finance": ["finnhub"],
+        "geocoding": ["mapquest"],
+        "lifestyle": ["spoonacular"],
+        "music": ["musixmatch", "spotify"],
+        "news": ["guardian", "times"],
+        "science": ["dblp"],
+        "shopping": ["etsy"],
+        "social": ["twitch", "twitter"],
+        "video": ["youtube"],
+        "weather": ["openweathermap"],
+    }
+
+    supported_websites = pd.DataFrame.from_dict(websites, orient="index")
+    supported_websites = supported_websites.transpose()
+    supported_websites.columns = supported_websites.columns.str.upper()
+
+    # replace "None" values with empty string
+    mask = supported_websites.applymap(lambda x: x is None)
+    cols = supported_websites.columns[(mask).any()]
+    for col in supported_websites[cols]:
+        supported_websites.loc[mask[col], col] = ""
+
+    if is_notebook():
+        display(supported_websites)
+    else:
+        print(supported_websites.to_string(index=False))

@@ -30,6 +30,7 @@ DISPLAY_MAP = {
     "Word Cloud": "wordcloud",
     "Word Frequency": "wordfreq",
     "Word Length": "wordlen",
+    "N Gram": "ngram",
     "Histogram": "hist",
     "KDE Plot": "kde",
     "Normal Q-Q Plot": "qqnorm",
@@ -480,6 +481,57 @@ class WordFrequency(BaseModel):
         ]
         descs = [
             "Maximum number of most frequent words to display",
+            "Whether to remove stopwords",
+            "Whether to lemmatize the words",
+            "Whether to apply Potter Stem on the words",
+            "Height of the plot",
+            "Width of the plot",
+        ]
+        return [(f"'{name}': {val}", desc) for name, val, desc in zip(names, vals, descs)]
+
+
+class NGram(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    top_grams: int, default 30
+        Maximum number of most frequent words to display
+    grams: int, default 3
+        Number of grams in the histogram
+    stopword: bool, default True
+        Whether to remove stopwords
+    lemmatize: bool, default False
+        Whether to lemmatize the words
+    stem: bool, default False
+        Whether to apply Potter Stem on the words
+    """
+
+    enable: bool = True
+    top_grams: int = 30
+    grams: int = 3
+    stopword: bool = True
+    lemmatize: bool = False
+    stem: bool = False
+    width: Union[int, None] = None
+    height: Union[int, None] = None
+
+    def how_to_guide(self, height: int, width: int) -> List[Tuple[str, str]]:
+        """
+        how-to guide for plot(df, x)
+        """
+        vals = [self.top_grams, self.grams, self.stopword, self.lemmatize, self.stem, height, width]
+        names = [
+            "ngram.top_grams",
+            "ngram.grams",
+            "ngram.stopword",
+            "ngram.lemmatize",
+            "ngram.stem",
+            "height",
+            "width",
+        ]
+        descs = [
+            "Maximum number of most frequent words to display",
+            "Number of grams in the histogram",
             "Whether to remove stopwords",
             "Whether to lemmatize the words",
             "Whether to apply Potter Stem on the words",
@@ -974,6 +1026,7 @@ class Config(BaseModel):
     wordcloud: WordCloud = Field(default_factory=WordCloud)
     wordfreq: WordFrequency = Field(default_factory=WordFrequency)
     wordlen: WordLength = Field(default_factory=WordLength)
+    ngram: NGram = Field(default_factory=NGram)
     qqnorm: QQNorm = Field(default_factory=QQNorm)
     kde: KDE = Field(default_factory=KDE)
     box: Box = Field(default_factory=Box)

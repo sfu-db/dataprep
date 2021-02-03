@@ -21,10 +21,7 @@ from .common import _calc_line_dt, gaussian_kde, normaltest
 
 
 def compute_univariate(
-    df: dd.DataFrame,
-    x: Optional[str],
-    cfg: Config,
-    dtype: Optional[DTypeDef],
+    df: dd.DataFrame, x: Optional[str], cfg: Config, dtype: Optional[DTypeDef],
 ) -> Intermediate:
     """
     Compute functions for plot(df, x)
@@ -75,12 +72,7 @@ def compute_univariate(
         else:
             data = dask.compute(*data_dt)[0]
             line = []
-        return Intermediate(
-            col=x,
-            data=data,
-            line=line,
-            visual_type="datetime_column",
-        )
+        return Intermediate(col=x, data=data, line=line, visual_type="datetime_column",)
     else:
         raise UnreachableError
 
@@ -166,6 +158,19 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
 
         data["word_cnts_freq"] = word_freqs["word_cnts"]
         data["nwords_freq"] = word_freqs["nwords"]
+    if cfg.ngram.enable:
+        ngram_freqs = _calc_n_grams(
+            df,
+            cfg.ngram.top_grams,
+            cfg.ngram.grams,
+            cfg.ngram.stopword,
+            cfg.ngram.lemmatize,
+            cfg.ngram.stem,
+        )
+
+        data["nuniq_grams"] = ngram_freqs["nuniq_grams"]
+        data["gram_cnts_freq"] = ngram_freqs["gram_cnts"]
+        data["ngrams_freq"] = ngram_freqs["ngrams"]
 
     return data
 
@@ -259,11 +264,7 @@ def _calc_box(srs: dd.Series, qntls: da.Array, cfg: Config) -> Dict[str, Any]:
 
 
 def _calc_word_freq(
-    df: dd.DataFrame,
-    top_words: int,
-    stopword: bool,
-    lemmatize: bool,
-    stem: bool,
+    df: dd.DataFrame, top_words: int, stopword: bool, lemmatize: bool, stem: bool,
 ) -> Dict[str, Any]:
     """
     Parse a categorical column of text data into words, then compute
@@ -294,11 +295,40 @@ def _calc_word_freq(
     return {"word_cnts": fnl_word_cnts, "nwords": nwords, "nuniq_words": nuniq_words}
 
 
+def _calc_n_grams(
+    df: dd.DataFrame, top_grams: int, grams: int, stopword: bool, lemmatize: bool, stem: bool,
+) -> Dict[str, Any]:
+    """
+        Parse a categorical column of text data into words, then compute
+        the frequency distribution of n-grams.
+    """
+    col = df.columns[0]
+
+    # ".explode()" to "stack" all the words in a list into a new column
+    df = df.explode(col)
+
+    df_copy = df.copy()
+    for i in range(1, grams):
+        df[col] += " " + df_copy[col].shift(-i)
+
+    # lemmatize and stem
+    if lemmatize or stem:
+        df[col] = df[col].dropna()
+    if lemmatize:
+        df[col] = df[col].apply(WordNetLemmatizer().lemmatize, meta=object)
+    if stem:
+        df[col] = df[col].apply(PorterStemmer().stem, meta=object)
+
+    gram_cnts = df.groupby(col)[df.columns[1]].sum()  # counts of n-grams, excludes null values
+    ngrams = gram_cnts.sum()  # total number of grams
+    nuniq_grams = gram_cnts.shape[0]  # total unique grams
+    fnl_gram_cnts = gram_cnts.nlargest(top_grams)  # grams with the highest frequency
+
+    return {"gram_cnts": fnl_gram_cnts, "ngrams": ngrams, "nuniq_grams": nuniq_grams}
+
+
 def _calc_nom_stats(
-    srs: dd.Series,
-    df: dd.DataFrame,
-    nrows: int,
-    nuniq: dd.core.Scalar,
+    srs: dd.Series, df: dd.DataFrame, nrows: int, nuniq: dd.core.Scalar,
 ) -> Dict[str, Any]:
     """
     Calculate statistics for a nominal column
