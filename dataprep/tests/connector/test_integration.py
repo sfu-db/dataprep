@@ -3,7 +3,7 @@ from os import environ
 import asyncio
 import pytest
 
-from ...connector import Connector
+from ...connector import Connector, websites
 from ...utils import display_dataframe
 from ...connector.utils import Request
 
@@ -18,6 +18,8 @@ def test_connector() -> None:
     df = asyncio.run(dc.query("businesses", term="ramen", location="vancouver"))
 
     assert len(df) > 0
+
+    websites()
 
     dc.info()
 
