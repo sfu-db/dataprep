@@ -9,25 +9,31 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 
+from ...utils import to_dask
+from ...data_array import DataFrame
+from ...dtypes import NUMERICAL_DTYPES
 from ...configs import Config
 from ...intermediate import Intermediate
 
 
 def _calc_bivariate(
-    df: dd.DataFrame,
+    df: DataFrame,
     cfg: Config,
     x: str,
     y: str,
     *,
     k: Optional[int] = None,
 ) -> Intermediate:
-    if x not in df.columns:
+
+    num_df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))
+
+    if x not in num_df.columns:
         raise ValueError(f"{x} not in columns names")
-    if y not in df.columns:
+    if y not in num_df.columns:
         raise ValueError(f"{y} not in columns names")
 
-    df = df[[x, y]].dropna()
-    coeffs, df_smp, influences = scatter_with_regression(df, cfg, k=k)
+    num_df = num_df[[x, y]].dropna()
+    coeffs, df_smp, influences = scatter_with_regression(num_df, cfg, k=k)
 
     coeffs, df_smp, influences = dask.compute(coeffs, df_smp, influences)
 
