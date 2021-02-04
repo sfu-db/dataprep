@@ -13,7 +13,7 @@ from bokeh.plotting import Figure
 
 from ..configs import Config
 from ..correlation import render_correlation
-from ..correlation.compute.nullivariate import correlation_nxn
+from ..correlation.compute.overview import correlation_nxn
 from ..data_array import DataArray
 from ..distribution import render
 from ..distribution.compute.common import _calc_line_dt
