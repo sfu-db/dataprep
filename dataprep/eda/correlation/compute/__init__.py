@@ -5,11 +5,9 @@ from typing import Optional, Tuple, List, Dict, Union, Any
 
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
-from ...dtypes import NUMERICAL_DTYPES
 from ...intermediate import Intermediate
-from ...utils import to_dask
 from .bivariate import _calc_bivariate
-from .nullivariate import _calc_nullivariate
+from .overview import _calc_overview
 from .univariate import _calc_univariate
 
 __all__ = ["compute_correlation"]
@@ -55,13 +53,9 @@ def compute_correlation(
         cfg = Config.from_dict(display, cfg)
     elif not cfg:
         cfg = Config()
-    if x is not None and y is not None:
-        df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))
-    else:
-        df = DataArray(df).select_num_columns()
 
     if x is None and y is None:  # pylint: disable=no-else-return
-        return _calc_nullivariate(df, cfg, value_range=value_range, k=k)
+        return _calc_overview(df, cfg, value_range=value_range, k=k)
     elif x is not None and y is None:
         return _calc_univariate(df, x, cfg, value_range=value_range, k=k)
     elif x is None and y is not None:

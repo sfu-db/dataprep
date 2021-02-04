@@ -11,14 +11,14 @@ import numpy as np
 import pandas as pd
 
 from ...configs import Config
-from ...data_array import DataArray
+from ...data_array import DataArray, DataFrame
 from ...intermediate import Intermediate
 from ...utils import cut_long_name
 from .common import CorrelationMethod
 
 
-def _calc_nullivariate(
-    df: DataArray,
+def _calc_overview(
+    df: DataFrame,
     cfg: Config,
     *,
     value_range: Optional[Tuple[float, float]] = None,
@@ -31,7 +31,9 @@ def _calc_nullivariate(
     if value_range is not None and k is not None:
         raise ValueError("value_range and k cannot be present in both")
 
-    cordx, cordy, corrs = correlation_nxn(df, cfg)
+    num_df = DataArray(df).select_num_columns()
+
+    cordx, cordy, corrs = correlation_nxn(num_df, cfg)
 
     # The computations below is not expensive (scales with # of columns)
     # So we do them in pandas
@@ -94,19 +96,19 @@ def _calc_nullivariate(
     if cfg.insight.enable:
         insights: Dict[str, List[Any]] = {}
         if cfg.pearson.enable:
-            p_p_corr = create_string("positive", pearson_pos_cols, most_show, df)
-            p_n_corr = create_string("negative", pearson_neg_cols, most_show, df)
-            p_corr = create_string("least", pearson_cols, most_show, df)
+            p_p_corr = create_string("positive", pearson_pos_cols, most_show, num_df)
+            p_n_corr = create_string("negative", pearson_neg_cols, most_show, num_df)
+            p_corr = create_string("least", pearson_cols, most_show, num_df)
             insights["Pearson"] = [p_p_corr, p_n_corr, p_corr]
         if cfg.spearman.enable:
-            s_p_corr = create_string("positive", spearman_pos_cols, most_show, df)
-            s_n_corr = create_string("negative", spearman_neg_cols, most_show, df)
-            s_corr = create_string("least", spearman_cols, most_show, df)
+            s_p_corr = create_string("positive", spearman_pos_cols, most_show, num_df)
+            s_n_corr = create_string("negative", spearman_neg_cols, most_show, num_df)
+            s_corr = create_string("least", spearman_cols, most_show, num_df)
             insights["Spearman"] = [s_p_corr, s_n_corr, s_corr]
         if cfg.kendall.enable:
-            k_p_corr = create_string("positive", kendalltau_pos_cols, most_show, df)
-            k_n_corr = create_string("negative", kendalltau_neg_cols, most_show, df)
-            k_corr = create_string("least", kendalltau_cols, most_show, df)
+            k_p_corr = create_string("positive", kendalltau_pos_cols, most_show, num_df)
+            k_n_corr = create_string("negative", kendalltau_neg_cols, most_show, num_df)
+            k_corr = create_string("least", kendalltau_cols, most_show, num_df)
             insights["KendallTau"] = [k_p_corr, k_n_corr, k_corr]
 
     dfs = {}
@@ -123,8 +125,8 @@ def _calc_nullivariate(
 
         ndf = pd.DataFrame(
             {
-                "x": df.columns[cordx],
-                "y": df.columns[cordy],
+                "x": num_df.columns[cordx],
+                "y": num_df.columns[cordy],
                 "correlation": corr.ravel(),
             }
         )
@@ -141,7 +143,7 @@ def _calc_nullivariate(
 
     return Intermediate(
         data=dfs,
-        axis_range=list(df.columns.unique()),
+        axis_range=list(num_df.columns.unique()),
         visual_type="correlation_impact",
         tabledata=tabledata if cfg.stats.enable else {},
         insights=insights if cfg.insight.enable else {},

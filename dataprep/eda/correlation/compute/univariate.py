@@ -10,13 +10,13 @@ import numpy as np
 import pandas as pd
 
 from ...configs import Config
-from ...data_array import DataArray
+from ...data_array import DataArray, DataFrame
 from ...intermediate import Intermediate
 from .common import CorrelationMethod, corrcoef, kendalltau, nanrankdata
 
 
 def _calc_univariate(
-    df: DataArray,
+    df: DataFrame,
     x: str,
     cfg: Config,
     *,
@@ -38,16 +38,18 @@ def _calc_univariate(
         Choose top-k element
     """
 
-    if len(df.columns) == 0:
+    num_df = DataArray(df).select_num_columns()
+
+    if len(num_df.columns) == 0:
         return Intermediate(visual_type=None)
 
-    if x not in df.columns:
+    if x not in num_df.columns:
         raise ValueError(f"{x} not in numerical column names")
 
-    df.compute()
-    columns = df.columns[df.columns != x]
-    xarr = df.values[:, df.columns == x]
-    data = df.values[:, df.columns != x]
+    num_df.compute()
+    columns = num_df.columns[num_df.columns != x]
+    xarr = num_df.values[:, num_df.columns == x]
+    data = num_df.values[:, num_df.columns != x]
 
     funcs = []
     if cfg.pearson.enable:
@@ -69,14 +71,14 @@ def _calc_univariate(
                 f"Correlation for {meth.name} is empty, try to broaden the value_range.",
                 file=sys.stderr,
             )
-        df = pd.DataFrame(
+        num_df = pd.DataFrame(
             {
                 "x": np.full(len(indices), x),
                 "y": columns[indices],
                 "correlation": corrs,
             }
         )
-        dfs[meth.name] = df
+        dfs[meth.name] = num_df
 
     return Intermediate(data=dfs, visual_type="correlation_single_heatmaps")
 

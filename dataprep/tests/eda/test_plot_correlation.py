@@ -18,7 +18,7 @@ from ...eda.correlation.compute.univariate import (
     _spearman_1xn,
     _corr_filter,
 )
-from ...eda.correlation.compute.nullivariate import (
+from ...eda.correlation.compute.overview import (
     _spearman_nxn,
     _pearson_nxn,
     _kendall_tau_nxn,
