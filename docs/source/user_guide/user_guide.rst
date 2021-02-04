@@ -9,6 +9,7 @@ The User Guide introduces the components of the DataPrep library.
     :maxdepth: 2
     :titlesonly:
 
+    datasets/introduction
     eda/introduction
     connector/connector
     clean/introduction
