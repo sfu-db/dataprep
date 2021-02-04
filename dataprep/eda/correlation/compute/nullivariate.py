@@ -119,7 +119,7 @@ def _calc_nullivariate(
             mask = (value_range[0] <= ndf["correlation"]) & (ndf["correlation"] <= value_range[1])
             ndf = ndf[mask]
 
-        dfs[method.name] = ndf
+        dfs[method.value] = ndf
 
     for method, corr in cat_df_corrs.items():
         ndf = pd.DataFrame(
@@ -138,7 +138,7 @@ def _calc_nullivariate(
             mask = (value_range[0] <= ndf["correlation"]) & (ndf["correlation"] <= value_range[1])
             ndf = ndf[mask]
 
-        dfs[method.name] = ndf
+        dfs[method.value] = ndf
 
     return Intermediate(
         data=dfs,

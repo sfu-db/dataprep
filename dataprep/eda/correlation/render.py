@@ -184,7 +184,7 @@ def render_correlation_impact(
         "tabledata": itmdt["tabledata"],
         "layout": [panel.child for panel in tabs],
         "meta": [panel.title for panel in tabs],
-        "container_width": plot_width + 150,
+        "container_width": plot_width + 200,
     }
 
 

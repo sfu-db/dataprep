@@ -11,10 +11,10 @@ from scipy.stats import kendalltau as kendalltau_
 class CorrelationMethod(Enum):
     """Supported correlation methods"""
 
-    Pearson = auto()
-    Spearman = auto()
-    KendallTau = auto()
-    CramerV = auto()
+    Pearson = "Pearson"
+    Spearman = "Spearman"
+    KendallTau = "KendallTau"
+    CramerV = "Cramer's V"
 
 
 @dask.delayed(name="rankdata-bottleneck", pure=True)  # pylint: disable=no-value-for-parameter
