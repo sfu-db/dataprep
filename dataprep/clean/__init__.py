@@ -17,6 +17,8 @@ from .clean_ip import clean_ip, validate_ip
 
 from .clean_headers import clean_headers
 
+from .clean_address import clean_address, validate_address
+
 
 __all__ = [
     "clean_lat_long",
@@ -32,4 +34,6 @@ __all__ = [
     "clean_ip",
     "validate_ip",
     "clean_headers",
+    "clean_address",
+    "validate_address",
 ]
