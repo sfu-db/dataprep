@@ -44,10 +44,10 @@ def clean_ip(
         (default: 'auto')
     output_format
         The desired output format of the IP addresses.
-            - 'compressed': compressed representation (12.3.4.5)
-            - 'full': full representation (0012.0003.0004.0005)
-            - 'binary': binary representation (00001100000000110000010000000101)
-            - 'hexa': hexadecimal representation (0xc030405)
+            - 'compressed': compressed representation ('12.3.4.5')
+            - 'full': full representation ('0012.0003.0004.0005')
+            - 'binary': binary representation ('00001100000000110000010000000101')
+            - 'hexa': hexadecimal representation ('0xc030405')
             - 'integer': integer representation (201524229)
 
         (default: 'compressed')
@@ -77,6 +77,9 @@ def clean_ip(
 
     >>> df = pd.DataFrame({'ip': ['2001:0db8:85a3:0000:0000:8a2e:0370:7334', '233.5.6.000']})
     >>> clean_ip(df, 'ip')
+    IP Cleaning Report:
+        2 values cleaned (100.0%)
+    Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)
                                             ip                      ip_clean
     0  2001:0db8:85a3:0000:0000:8a2e:0370:7334  2001:db8:85a3::8a2e:370:7334
     1                              233.5.6.000                     233.5.6.0
@@ -168,7 +171,7 @@ def validate_ip(x: Union[str, pd.Series], input_format: str = "auto") -> Union[b
     >>> validate_ip('fdf8:f53b:82e4::53')
     True
     >>> df = pd.DataFrame({'ip': ['fdf8:f53b:82e4::53', None]})
-    >>> validate_country(df['country'])
+    >>> validate_ip(df['ip'])
     0     True
     1    False
     Name: ip, dtype: bool
@@ -221,7 +224,7 @@ def _format_ip(val: Any, input_format: str, output_format: str, errors: str) -> 
     # convert to full representation
     else:
         dlm = "." if address.version == 4 else ":"  # delimiter
-        result = f"{dlm}".join(f"{'0' * (4 - len(x))}{x}" for x in address.exploded.split(dlm))
+        result = dlm.join(f"{'0' * (4 - len(x))}{x}" for x in address.exploded.split(dlm))
 
     return result, 2 if result != val else 3
 

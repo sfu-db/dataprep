@@ -38,7 +38,7 @@ def clean_address(
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    Clean US street addresses.
+    Clean and standardize US street addresses.
 
     Parameters
     ----------
@@ -48,61 +48,52 @@ def clean_address(
         The name of the column containing addresses.
     output_format
         The output format can be specified using the following keywords.
-            - 'house_number': ('1234')
-            - 'street_prefix_abbr': ('N', 'S', 'E', or 'W')
-            - 'street_prefix_full': ('North', 'South', 'East', or 'West')
-            - 'street_name': ('Main')
-            - 'street_suffix_abbr': ('St', 'Ave')
-            - 'street_suffix_full': ('Street', 'Avenue')
-            - 'apartment': ('Apt 1')
-            - 'building': ('Staples Center')
-            - 'city': ('Los Angeles')
-            - 'state_abbr': ('CA')
-            - 'state_full': ('California')
-            - 'zipcode': ('57903')
+            - 'house_number': '1234'
+            - 'street_prefix_abbr': 'N', 'S', 'E', or 'W'
+            - 'street_prefix_full': 'North', 'South', 'East', or 'West'
+            - 'street_name': 'Main'
+            - 'street_suffix_abbr': 'St', 'Ave'
+            - 'street_suffix_full': 'Street', 'Avenue'
+            - 'apartment': 'Apt 1'
+            - 'building': 'Staples Center'
+            - 'city': 'Los Angeles'
+            - 'state_abbr': 'CA'
+            - 'state_full': 'California'
+            - 'zipcode': '57903'
 
-        The output_format can contain "\t" characters to specify how to split the output into
+        The output_format can contain '\\\\t' characters to specify how to split the output into
         columns.
 
-     (default: '(building) house_number street_prefix_abbr street_name street_suffix_abbr apartment,
-     city, state_abbr zipcode')
-
+        (default: '(building) house_number street_prefix_abbr street_name street_suffix_abbr
+        apartment, city, state_abbr zipcode')
     must_contain
         A tuple containing parts of the address that must be included for the address to be
         successfully cleaned.
-            - 'house_number': ('1234')
-            - 'street_prefix': ('N', 'North')
-            - 'street_name': ('Main')
-            - 'street_suffix': ('St', 'Avenue')
-            - 'apartment': ('Apt 1')
-            - 'building': ('Staples Center')
-            - 'city': ('Los Angeles')
-            - 'state': ('CA', 'California')
-            - 'zipcode': ('57903')
+
+            - 'house_number': '1234'
+            - 'street_prefix': 'N', 'North'
+            - 'street_name': 'Main'
+            - 'street_suffix': 'St', 'Avenue'
+            - 'apartment': 'Apt 1'
+            - 'building': 'Staples Center'
+            - 'city': 'Los Angeles'
+            - 'state': 'CA', 'California'
+            - 'zipcode': '57903'
 
         (default: ('house_number', 'street_name'))
-
     split
-        If True, each part of the address specified by the output_format parameter will be split
+        If True, each component of the address specified by the output_format parameter will be put
         into it's own column.
 
         For example if output_format = "house_number street_name" and split = True, then there
-        will be one column
-        for house_number and another for street_name.
+        will be one column for house_number and another for street_name.
 
         (default: False)
-
     inplace
         If True, delete the column containing the data that was cleaned. Otherwise,
         keep the original column.
 
         (default: False)
-
-    report
-        If True, output the summary report. Otherwise, no report is outputted.
-
-        (default: True)
-
     errors
         How to handle parsing errors.
             - ‘raise’: invalid parsing will raise an exception.
@@ -110,25 +101,27 @@ def clean_address(
             - ‘ignore’: then invalid parsing will return the input.
 
         (default: 'coerce')
+    report
+        If True, output the summary report. Otherwise, no report is outputted.
 
+        (default: True)
     progress
         If True, display a progress bar.
 
         (default: True)
 
-     Examples
-     --------
-     Clean addresses and add the house number and street name to separate columns.
+    Examples
+    --------
+    Clean addresses and add the house number and street name to separate columns.
 
-     >>> df = pd.DataFrame({"address":["123 pine avenue", "1234 w main st 57033"]})
-     >>> clean_address(df, "address", output_format="house_number \t street_name")
-     Address Cleaning Report:
+    >>> df = pd.DataFrame({'address': ['123 pine avenue', '1234 w main st 57033']})
+    >>> clean_address(df, 'address', output_format='house_number \\t street_name')
+    Address Cleaning Report:
             2 values cleaned (100.0%)
-     Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)
-         address                house_number      street_name
-     0    123 pine avenue           123             Pine
-     1   1234 w main st 57033       1234            Main
-
+    Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)
+        address                house_number      street_name
+    0    123 pine avenue           123             Pine
+    1   1234 w main st 57033       1234            Main
     """
     # pylint: disable=too-many-arguments
 
@@ -180,33 +173,33 @@ def validate_address(
     Validate US street addresses.
 
     Parameters
-     ----------
-     x
-         pandas Series of addresses or a string containing an address
+    ----------
+    x
+        pandas Series of addresses or a string containing an address.
+    must_contain
+        A tuple containing parts of the address that must be included for the
+        address to be successfully cleaned.
 
-     must_contain
-            A tuple containing parts of the address that must be included for the
-            address to be successfully cleaned.
-                - 'house_number': ('1234')
-                - 'street_prefix': ('N', 'North')
-                - 'street_name': ('Main')
-                - 'street_suffix': ('St', 'Avenue')
-                - 'apartment': ('Apt 1')
-                - 'building': ('Staples Center')
-                - 'city': ('Los Angeles')
-                - 'state': ('CA', 'California')
-                - 'zipcode': ('57903')
+            - 'house_number': '1234'
+            - 'street_prefix': 'N', 'North'
+            - 'street_name': 'Main'
+            - 'street_suffix': 'St', 'Avenue'
+            - 'apartment': 'Apt 1'
+            - 'building': 'Staples Center'
+            - 'city': 'Los Angeles'
+            - 'state': 'CA', 'California'
+            - 'zipcode': '57903'
 
-            (default: ("house_number", "street_name"))
+        (default: ('house_number', 'street_name'))
 
-     Examples
-     --------
+    Examples
+    --------
 
-     >>> df = pd.DataFrame({"address":["123 pine avenue", "NULL"]})
-     >>> validate_address(df["address"])
-     0    True
-     1    False
-     Name: address, dtype: bool
+    >>> df = pd.DataFrame({'address': ['123 pine avenue', 'NULL']})
+    >>> validate_address(df['address'])
+    0    True
+    1    False
+    Name: address, dtype: bool
     """
 
     if isinstance(x, pd.Series):
