@@ -1,10 +1,18 @@
 DataPrep.Clean
-================================
+==============
 
 API reference for the DataPrep.Clean subpackage.
 
+Column Headers
+--------------
+
+.. automodule:: dataprep.clean.clean_headers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Country Names
------------------------------------------------
+-------------
 
 .. automodule:: dataprep.clean.clean_country
    :members:
@@ -12,7 +20,7 @@ Country Names
    :show-inheritance:
 
 Email Addresses
------------------------------------------
+---------------
 
 .. automodule:: dataprep.clean.clean_email
    :members:
@@ -20,7 +28,7 @@ Email Addresses
    :show-inheritance:
 
 Geographic Coordinates
--------------------------------------
+----------------------
 
 .. automodule:: dataprep.clean.clean_lat_long
    :members:
@@ -28,7 +36,7 @@ Geographic Coordinates
    :show-inheritance:
 
 IP Addresses
---------------------------------------
+------------
 
 .. automodule:: dataprep.clean.clean_ip
    :members:
@@ -36,7 +44,7 @@ IP Addresses
    :show-inheritance:
 
 Phone Numbers
---------------------------------------------------
+-------------
 
 .. automodule:: dataprep.clean.clean_phone
    :members:
@@ -44,7 +52,7 @@ Phone Numbers
    :show-inheritance:
 
 URLs
---------------------------------------
+----
 
 .. automodule:: dataprep.clean.clean_url
    :members:
@@ -52,17 +60,9 @@ URLs
    :show-inheritance:
 
 US Street Addresses
------------------------------------------------
+-------------------
 
 .. automodule:: dataprep.clean.clean_address
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Column Headers
---------------------------------------
-
-.. automodule:: dataprep.clean.clean_headers
    :members:
    :undoc-members:
    :show-inheritance:

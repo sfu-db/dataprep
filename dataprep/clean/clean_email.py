@@ -1,5 +1,5 @@
 """
-Implement clean_email function
+Clean and validate a DataFrame column containing email addresses.
 """
 # pylint: disable=too-many-boolean-expressions
 import re
@@ -214,47 +214,71 @@ STATS = {
 def clean_email(
     df: Union[pd.DataFrame, dd.DataFrame],
     column: str,
-    split: bool = False,
-    inplace: bool = False,
     pre_clean: bool = False,
     fix_domain: bool = False,
-    report: bool = True,
+    split: bool = False,
+    inplace: bool = False,
     errors: str = "coerce",
+    report: bool = True,
 ) -> pd.DataFrame:
     """
-    This function cleans emails
+    Clean and standardize email address.
 
     Read more in the :ref:`User Guide <email_userguide>`.
 
     Parameters
     ----------
     df
-        pandas or Dask DataFrame
+        A pandas or Dask DataFrame containing the data to be cleaned.
     column
-        column name
-    split
-        If True, split a column containing username and domain name
-        into one column for username and one column for domain name
-    inplace
-        If True, delete the given column with dirty data, else, create a new
-        column with cleaned data.
+        The name of the column containing email addresses.
     pre_clean
-        If True, apply basic text clean(like removing whitespaces) before
+        If True, apply basic text clean (like removing whitespaces) before
         verifying and clean values.
+
+        (default: False)
     fix_domain
-        If True, fix small typos in domain input
-    report
-        If True, generate cleaning report for Emails
+        If True, fix small typos in domain input.
+
+        (default: False)
+    split
+        If True, split a column containing email address into different
+        columns containing individual components.
+
+        (default: False)
+    inplace
+        If True, delete the column containing the data that was cleaned. Otherwise,
+        keep the original column.
+
+        (default: False)
     errors
-        Specify ways to deal with broken value
-        {'ignore', 'coerce', 'raise'}, default 'coerce'
-        'raise': raise an exception when there is broken value
-        'coerce': set invalid value to NaN
-        'ignore': just return the initial input
+        How to handle parsing errors.
+            - ‘raise’: invalid parsing will raise an exception.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: then invalid parsing will return the input.
+
+        (default: 'coerce')
+    report
+        If True, output the summary report. Else, no report is outputted.
+
+        (default: True)
+
+    Examples
+    --------
+
+    >>> df = pd.DataFrame({'email': ['Abc.example.com', 'Abc@example.com', 'H ELLO@hotmal.COM']})
+    >>> clean_email(df, 'email')
+    Email Cleaning Report:
+        2 values with bad format (66.67%)
+    Result contains 1 (33.33%) values in the correct format and 2 null values (66.67%)
+                email      email_clean
+    0    Abc.example.com             None
+    1    Abc@example.com  abc@example.com
+    2  H ELLO@hotmal.COM             None
     """
     # pylint: disable=too-many-arguments
 
-    reset_stats()
+    _reset_stats()
 
     df = to_dask(df)
 
@@ -266,7 +290,7 @@ def clean_email(
         meta[f"{column}_clean"] = str
 
     df = df.apply(
-        format_email,
+        _format_email,
         args=(column, split, pre_clean, fix_domain, errors),
         axis=1,
         meta=meta,
@@ -278,12 +302,12 @@ def clean_email(
     df, nrows = dask.compute(df, df.shape[0])
 
     if report:
-        report_email(nrows)
+        _report_email(nrows)
 
     return df
 
 
-def fix_domain_name(dom: str) -> str:
+def _fix_domain_name(dom: str) -> str:
     """
     Function to fix domain name with frequent typo
     """
@@ -315,7 +339,7 @@ def fix_domain_name(dom: str) -> str:
     return dom
 
 
-def format_email(
+def _format_email(
     row: pd.Series,
     col: str,
     split: bool,
@@ -324,7 +348,8 @@ def format_email(
     errors: str,
 ) -> pd.Series:
     """
-    Function to transform an email address into clean format
+    Function to transform an email address into clean format.
+
     """
     # pylint: disable=too-many-nested-blocks, too-many-locals,too-many-branches,too-many-statements,too-many-return-statements, too-many-arguments
 
@@ -332,16 +357,16 @@ def format_email(
     if pre_clean:
         row[col] = re.sub(r"(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+", "", str(row[col]))
 
-    valid_type = check_email(row[col], True)
+    valid_type = _check_email(row[col], True)
 
     if valid_type != "valid":
-        return not_email(row, col, split, valid_type, errors)
+        return _not_email(row, col, split, valid_type, errors)
 
     user_part, domain_part = str(row[col]).rsplit("@", 1)
 
     # fix domain by detecting minor typos in advance
     if fix_domain:
-        domain_part = fix_domain_name(domain_part)
+        domain_part = _fix_domain_name(domain_part)
 
     if split:
         row["username"], row["domain"] = (
@@ -356,22 +381,36 @@ def format_email(
 
 def validate_email(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     """
-    This function validates emails
+    Validate email addresses.
+
+    Read more in the :ref:`User Guide <email_userguide>`.
+
     Parameters
     ----------
     x
-        pandas Series of emails or email instance
+        pandas Series of emails or a string containing an email.
+
+    Examples
+    --------
+
+    >>> validate_email('Abc.example@com')
+    False
+    >>> df = pd.DataFrame({'email': ['abc.example.com', 'HELLO@HOTMAIL.COM']})
+    >>> validate_email(df['email'])
+    0    False
+    1     True
+    Name: email, dtype: bool
     """
 
     if isinstance(x, pd.Series):
-        return x.apply(check_email, clean=False)
+        return x.apply(_check_email, clean=False)
     else:
-        return check_email(x, False)
+        return _check_email(x, False)
 
 
-def check_email(val: Union[str, Any], clean: bool) -> Any:
+def _check_email(val: Union[str, Any], clean: bool) -> Any:
     """
-    Function to check whether a value is a valid email
+    Function to check whether a value is a valid email.
     """
     # pylint: disable=too-many-return-statements, too-many-branches
     if val in NULL_VALUES:
@@ -400,9 +439,9 @@ def check_email(val: Union[str, Any], clean: bool) -> Any:
     return "valid" if clean else True
 
 
-def not_email(row: pd.Series, col: str, split: bool, errtype: str, processtype: str) -> pd.Series:
+def _not_email(row: pd.Series, col: str, split: bool, errtype: str, processtype: str) -> pd.Series:
     """
-    Return result when value unable to be parsed
+    Return result when value unable to be parsed.
     """
 
     if processtype == "coerce":
@@ -424,9 +463,9 @@ def not_email(row: pd.Series, col: str, split: bool, errtype: str, processtype: 
     return row
 
 
-def reset_stats() -> None:
+def _reset_stats() -> None:
     """
-    Reset global statistics dictionary
+    Reset global statistics dictionary.
     """
     STATS["cleaned"] = 0
     STATS["null"] = 0
@@ -435,9 +474,9 @@ def reset_stats() -> None:
     STATS["overflow"] = 0
 
 
-def report_email(nrows: int) -> None:
+def _report_email(nrows: int) -> None:
     """
-    Describe what was done in the cleaning process
+    Describe what was done in the cleaning process.
     """
     print("Email Cleaning Report:")
     if STATS["cleaned"] > 0:

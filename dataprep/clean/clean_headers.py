@@ -39,7 +39,6 @@ def clean_headers(
     ----------
     df
         Dataframe from which column names are to be cleaned.
-
     case
         The desired case style of the column name.
             - 'snake': 'column_name'
@@ -53,32 +52,28 @@ def clean_headers(
             - 'upper': 'COLUMN NAME'
 
         (default: 'snake')
-
     replace
         Values to replace in the column names.
-            - {"old_value": "new_value"}
+            - {'old_value': 'new_value'}
 
         (default: None)
-
     remove_accents
         If True, strip accents from the column names.
 
         (default: True)
-
     report
         If True, output the summary report. Otherwise, no report is outputted.
 
         (default: True)
-
 
     Examples
     --------
     Clean column names by converting the names to camel case style, removing accents,
     and correcting a mispelling.
 
-    >>> df = pd.DataFrame({"FirstNom":["Philip", "Turanga"], "lastName": ["Fry", "Leela"],
-                           "Téléphone":["555-234-5678", "(604) 111-2335"]})
-    >>> clean_headers(df, case='camel', replace={"Nom": "Name"})
+    >>> df = pd.DataFrame({'FirstNom': ['Philip', 'Turanga'], 'lastName': ['Fry', 'Leela'], \
+'Téléphone': ['555-234-5678', '(604) 111-2335']})
+    >>> clean_headers(df, case='camel', replace={'Nom': 'Name'})
     Column Headers Cleaning Report:
         2 values cleaned (66.67%)
       firstName lastName       telephone
