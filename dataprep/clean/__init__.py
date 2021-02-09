@@ -39,5 +39,5 @@ __all__ = [
     "clean_address",
     "validate_address",
     "clean_date",
-    "validate_date"
+    "validate_date",
 ]
