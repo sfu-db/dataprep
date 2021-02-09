@@ -102,6 +102,9 @@ def clean_url(
 
     >>> df = pd.DataFrame({'url': ['https://github.com/sfu-db/dataprep','https://www.google.com/']})
     >>> clean_url(df, 'url')
+    URL Cleaning Report:
+        2 values parsed (100.0%)
+    Result contains 2 (100.0%) parsed key-value pairs and 0 null values (0.0%)
                                     url                                        url_details
     0  https://github.com/sfu-db/dataprep  {'scheme': 'https', 'host': 'github.com', 'url...
     1             https://www.google.com/  {'scheme': 'https', 'host': 'www.google.com', ...
@@ -171,7 +174,7 @@ def validate_url(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     Parameters
     ----------
     x
-        pandas Series of URLs or str/int URL value
+        pandas Series of URLs or string URL.
 
     Examples
     --------
