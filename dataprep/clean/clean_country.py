@@ -105,6 +105,9 @@ def clean_country(
 
     >>> df = pd.DataFrame({'country': [' Canada ', 'US']})
     >>> clean_country(df, 'country')
+    Country Cleaning Report:
+        2 values cleaned (100.0%)
+    Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)
         country  country_clean
     0   Canada          Canada
     1        US  United States
@@ -176,7 +179,7 @@ def validate_country(
     Parameters
     ----------
     x
-        pandas Series of countries or str/int country value
+        pandas Series of countries or str/int country value.
     input_format
         The ISO 3166 input format of the country.
             - 'auto': infer the input format

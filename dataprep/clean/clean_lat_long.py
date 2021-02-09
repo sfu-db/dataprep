@@ -151,6 +151,9 @@ def clean_lat_long(
 
     >>> df = pd.DataFrame({'coord': ['51° 29′ 36.24″ N, 0° 0′ 35.28″ E', '51.4934° N, 0.0098° E']})
     >>> clean_lat_long(df, 'coord', split=True)
+    Latitude and Longitude Cleaning Report:
+        2 values cleaned (100.0%)
+    Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)
                             coord  latitude  longitude
     0  51° 29′ 36.24″ N, 0° 0′ 35.28″ E   51.4934     0.0098
     1             51.4934° N, 0.0098° E   51.4934     0.0098

@@ -1,5 +1,5 @@
 """
-Implement clean_phone function
+Clean and validate a DataFrame column containing phone numbers.
 """
 import re
 from operator import itemgetter
@@ -37,44 +37,72 @@ def clean_phone(
     fix_missing: str = "empty",
     split: bool = False,
     inplace: bool = False,
-    report: bool = True,
     errors: str = "coerce",
+    report: bool = True,
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    This function cleans phone numbers.
+    Clean and standardize phone numbers.
 
     Read more in the :ref:`User Guide <phone_userguide>`.
 
     Parameters
     ----------
     df
-        Pandas or Dask DataFrame.
+        A pandas or Dask DataFrame containing the data to be cleaned.
     column
-        Column name containing phone numbers.
+        The name of the column containing phone numbers.
     output_format
         The desired format of the phone numbers.
-         * "nanp": NPA-NXX-XXXX
-         * "e164": +1NPANXXXXXX
-         * "national": (NPA) NXX-XXXX
+            - 'nanp': 'NPA-NXX-XXXX'
+            - 'e164': '+1NPANXXXXXX'
+            - 'national': '(NPA) NXX-XXXX'
+
+        (default: 'nanp')
     fix_missing
-        Fix the missing country code of a parsed phone number. If "empty",
-        leave the missing component as is. If "auto", set the country
-        code to a default value.
+        Fix the missing country code of a parsed phone number.
+            - 'empty': leave the missing component as is.
+            - 'auto': set the country code to a default value (1).
+
+        (default: 'empty')
     split
         If True, split a column containing a phone number into different
         columns containing individual components.
+
+        (default: False)
     inplace
-        If True, delete the given column with dirty data. Else, create a new
-        column with cleaned data.
+        If True, delete the column containing the data that was cleaned. Otherwise,
+        keep the original column.
+
+        (default: False)
+    errors
+        How to handle parsing errors.
+            - ‘raise’: invalid parsing will raise an exception.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: then invalid parsing will return the input.
+
+        (default: 'coerce')
     report
         If True, output the summary report. Else, no report is outputted.
-    errors {'ignore', 'raise', 'coerce'}, default 'coerce'.
-        * If 'raise', then invalid parsing will raise an exception.
-        * If 'coerce', then invalid parsing will be set as NaN.
-        * If 'ignore', then invalid parsing will return the input.
+
+        (default: True)
     progress
-        If True, enable the progress bar
+        If True, enable the progress bar.
+
+        (default: True)
+
+    Examples
+    --------
+
+    >>> df = pd.DataFrame({'phone': ['555-234-5678', '(555) 234-5678', '555.234.5678']})
+    >>> clean_phone(df, 'phone')
+    Phone Number Cleaning Report:
+        2 values cleaned (66.67%)
+    Result contains 3 (100.0%) values in the correct format and 0 null values (0.0%)
+                phone   phone_clean
+    0    555-234-5678  555-234-5678
+    1  (555) 234-5678  555-234-5678
+    2    555.234.5678  555-234-5678
     """
     # pylint: disable=too-many-arguments
 
@@ -136,12 +164,25 @@ def clean_phone(
 
 def validate_phone(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     """
-    Function to validate phone numbers.
+    Validate phone numbers.
+
+    Read more in the :ref:`User Guide <phone_userguide>`.
 
     Parameters
     ----------
     x
-        String or Pandas Series of phone numbers to be validated.
+        pandas Series of phone numbers or a string/int containing a phone number.
+
+    Examples
+    --------
+
+    >>> validate_phone('1 800 234 6789')
+    True
+    >>> df = pd.DataFrame({'phone': [1234567, '1234']})
+    >>> validate_phone(df['phone'])
+    0     True
+    1    False
+    Name: phone, dtype: bool
     """
 
     if isinstance(x, pd.Series):
