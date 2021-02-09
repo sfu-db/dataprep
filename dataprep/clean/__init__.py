@@ -19,6 +19,8 @@ from .clean_headers import clean_headers
 
 from .clean_address import clean_address, validate_address
 
+from .clean_date import clean_date, validate_date
+
 
 __all__ = [
     "clean_lat_long",
@@ -36,4 +38,6 @@ __all__ = [
     "clean_headers",
     "clean_address",
     "validate_address",
+    "clean_date",
+    "validate_date"
 ]
