@@ -37,7 +37,7 @@ from ..dtypes import (
 from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
-from ..progress_bar import ProgressBar
+from ...progress_bar import ProgressBar
 from ..utils import preprocess_dataframe
 
 

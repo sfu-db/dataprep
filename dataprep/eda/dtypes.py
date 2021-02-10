@@ -7,7 +7,7 @@ from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Type, Union
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-
+from ..clean import validate_country, validate_lat_long
 from ..errors import UnreachableError
 
 CATEGORICAL_NUMPY_DTYPES = [np.bool, np.object]
@@ -105,6 +105,28 @@ class Text(Nominal):
     """
 
 
+class GeoGraphy(Categorical):
+    """
+    Type GeoGraphy, Subtype of Categorical
+    """
+
+
+class GeoPoint(DType):
+    """
+    Type GeoPoint
+    """
+
+
+class LatLong(GeoPoint):
+    """
+    Type LatLong, Tuple
+    """
+
+    def __init__(self, lat_col: str, long_col: str) -> None:
+        self.lat = lat_col
+        self.long = long_col
+
+
 ############## End of the Type Tree ##############
 
 DTypeOrStr = Union[DType, Type[DType], str, None]
@@ -169,7 +191,12 @@ def detect_without_known(col: dd.Series) -> DType:
     This function detects dtypes of column when users didn't specify.
     """
     if is_nominal(col.dtype):
-        return Nominal()
+        if is_geography(col):
+            return GeoGraphy()
+        if is_geopoint(col):
+            return GeoPoint()
+        else:
+            return Nominal()
 
     elif is_continuous(col.dtype):
         return Continuous()
@@ -180,7 +207,7 @@ def detect_without_known(col: dd.Series) -> DType:
         raise UnreachableError
 
 
-def is_dtype(dtype1: DType, dtype2: DType) -> bool:
+def is_dtype(dtype1: Any, dtype2: DType) -> bool:
     """
     This function detects if dtype2 is dtype1.
     """
@@ -233,6 +260,24 @@ def is_nominal(dtype: Any) -> bool:
         return any(issubclass(dtype, c) for c in CATEGORICAL_NUMPY_DTYPES)
     else:
         return any(isinstance(dtype, c) for c in CATEGORICAL_PANDAS_DTYPES)
+
+
+def is_geography(col: dd.Series) -> bool:
+    """
+    Given a column, return if its type is a geography type
+    """
+    geo = col.compute()[:100]
+    geo_ratio: float = np.sum(validate_country(geo)) / geo.shape[0]
+    return geo_ratio > 0.8
+
+
+def is_geopoint(col: dd.Series) -> bool:
+    """
+    Given a column, return if its type is a geopoint type
+    """
+    lat_long = pd.Series(col.compute()[:100], dtype="string")
+    lat_long_ratio: float = np.sum(validate_lat_long(lat_long)) / lat_long.shape[0]
+    return lat_long_ratio > 0.8
 
 
 def is_continuous(dtype: Any) -> bool:
@@ -314,6 +359,8 @@ def get_dtype_cnts_and_num_cols(
             num_cols.append(col)
         elif is_dtype(col_dtype, DateTime()):
             dtype_cnts["DateTime"] += 1
+        elif is_dtype(col_dtype, GeoGraphy()):
+            dtype_cnts["GeoGraphy"] += 1
         else:
             raise NotImplementedError
     return dtype_cnts, num_cols

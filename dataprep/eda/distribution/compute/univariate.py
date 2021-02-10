@@ -15,7 +15,16 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from ....assets.english_stopwords import english_stopwords as ess
 from ....errors import UnreachableError
 from ...configs import Config
-from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, is_dtype
+from ...dtypes import (
+    Continuous,
+    DateTime,
+    DTypeDef,
+    Nominal,
+    GeoGraphy,
+    GeoPoint,
+    detect_dtype,
+    is_dtype,
+)
 from ...intermediate import Intermediate
 from ...utils import _calc_line_dt, gaussian_kde, normaltest
 
@@ -44,9 +53,10 @@ def compute_univariate(
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     col_dtype = detect_dtype(df[x], dtype)
-
-    if is_dtype(col_dtype, Nominal()):
+    if is_dtype(col_dtype, Nominal()) or is_dtype(col_dtype, GeoPoint()):
         head = df[x].head()  # dd.Series.head() triggers a (small) data read
+        if is_dtype(col_dtype, GeoPoint()):
+            df[x] = df[x].astype(str)
 
         # Since it will throw error if column is object while some cells are
         # numerical, we transform column to string first.
@@ -79,6 +89,16 @@ def compute_univariate(
             line=line,
             visual_type="datetime_column",
         )
+    elif is_dtype(col_dtype, GeoGraphy()):
+        head = df[x].head()  # dd.Series.head() triggers a (small) data read
+
+        # Since it will throw error if column is object while some cells are
+        # numerical, we transform column to string first.
+        df[x] = df[x].astype(str)
+        # all computations for plot(df, Nominal())
+        (data,) = dask.compute(nom_comps(df[x], head, cfg))
+
+        return Intermediate(col=x, data=data, visual_type="geography_column")
     else:
         raise UnreachableError
 
@@ -93,6 +113,7 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
     data["nrows"] = srs.shape[0]  # total rows
     srs = srs.dropna()  # drop null values
     grps = srs.value_counts(sort=False)  # counts of unique values in the series
+    data["geo"] = grps
 
     if cfg.stats.enable or cfg.bar.enable or cfg.pie.enable:
         data["nuniq"] = grps.shape[0]  # total number of groups
