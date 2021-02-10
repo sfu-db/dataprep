@@ -99,6 +99,31 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
     )
 
 
+def _natural_bins(srs: pd.Series, bins: int) -> pd.Series:
+    """
+    Compute natural bin endpoints.
+    """
+    minv, maxv = srs.min(), srs.max()  # compute the min and max of the column
+    gap = abs((maxv - minv) / bins)  # calculate the gap (interval)
+    _, after = f"{gap:.0e}".split("e")  # get the exponent from scientific notation
+    round_to = -1 * int(after)  # round to this amount
+    gap = np.round(gap, round_to)  # round the gap
+
+    if minv <= 0 <= maxv:  # center the bins at 0 if possible
+        ticks = [0.0]
+        while min(ticks) > minv:  # iterate from 0 to minv
+            ticks.insert(0, min(ticks) - gap)
+        while max(ticks) < maxv:  # iterate from 0 to maxv
+            ticks.append(max(ticks) + gap)
+    else:
+        rounded_minv = np.round(minv, round_to)  # round the first x tick
+        ticks = [rounded_minv - gap] if rounded_minv > minv else [rounded_minv]
+        while max(ticks) < maxv:
+            ticks.append(max(ticks) + gap)
+
+    return pd.Series(ticks)
+
+
 def _cont_calcs(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     """
     Computations for a continuous column in plot(df)
@@ -112,8 +137,14 @@ def _cont_calcs(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     # drop infinite values
     srs = srs[~srs.isin({np.inf, -np.inf})]
 
+    min_max = srs.map_partitions(
+        lambda x: pd.Series([x.max(), x.min()]), meta=pd.Series([], dtype=float)
+    )
+    min_max = min_max.repartition(npartitions=1)
+    bins = min_max.map_partitions(_natural_bins, 30, meta=pd.Series([], dtype=float))
+
     # histogram
-    data["hist"] = da.histogram(srs, bins=cfg.hist.bins, range=(srs.min(), srs.max()))
+    data["hist"] = da.histogram(srs, bins=bins.values)
 
     if cfg.insight.enable:
         data["chisq"] = chisquare(data["hist"][0])
