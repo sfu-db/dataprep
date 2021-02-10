@@ -8,7 +8,16 @@ import pandas as pd
 
 from ....errors import UnreachableError
 from ...configs import Config
-from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, is_dtype
+from ...dtypes import (
+    Continuous,
+    DateTime,
+    DTypeDef,
+    Nominal,
+    GeoGraphy,
+    GeoPoint,
+    detect_dtype,
+    is_dtype,
+)
 from ...intermediate import Intermediate
 from ...utils import (
     DTMAP,
@@ -45,14 +54,12 @@ def compute_bivariate(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
-    # pylint: disable=too-many-branches,too-many-statements
+    # pylint: disable=too-many-branches,too-many-statements,too-many-boolean-expressions
+    # pylint: disable = too-many-return-statements
     xtype, ytype = detect_dtype(df[x], dtype), detect_dtype(df[y], dtype)
 
-    if (
-        is_dtype(xtype, Nominal())
-        and is_dtype(ytype, Continuous())
-        or is_dtype(xtype, Continuous())
-        and is_dtype(ytype, Nominal())
+    if (is_dtype(xtype, Nominal()) and is_dtype(ytype, Continuous())) or (
+        is_dtype(xtype, Continuous()) and is_dtype(ytype, Nominal())
     ):
         x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
         df = df[[x, y]]
@@ -68,11 +75,8 @@ def compute_bivariate(
             data=comps,
             visual_type="cat_and_num_cols",
         )
-    elif (
-        is_dtype(xtype, DateTime())
-        and is_dtype(ytype, Continuous())
-        or is_dtype(xtype, Continuous())
-        and is_dtype(ytype, DateTime())
+    elif (is_dtype(xtype, DateTime()) and is_dtype(ytype, Continuous())) or (
+        is_dtype(xtype, Continuous()) and is_dtype(ytype, DateTime())
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
         df = df[[x, y]].dropna()
@@ -103,11 +107,8 @@ def compute_bivariate(
             boxdata=boxdata,
             visual_type="dt_and_num_cols",
         )
-    elif (
-        is_dtype(xtype, DateTime())
-        and is_dtype(ytype, Nominal())
-        or is_dtype(xtype, Nominal())
-        and is_dtype(ytype, DateTime())
+    elif (is_dtype(xtype, DateTime()) and is_dtype(ytype, Nominal())) or (
+        is_dtype(xtype, Nominal()) and is_dtype(ytype, DateTime())
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
         df = df[[x, y]].dropna()
@@ -152,12 +153,49 @@ def compute_bivariate(
             stackdata=stackdata,
             visual_type="dt_and_cat_cols",
         )
-    elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
+    elif (is_dtype(xtype, GeoGraphy()) and is_dtype(ytype, Continuous())) or (
+        is_dtype(xtype, Continuous()) and is_dtype(ytype, GeoGraphy())
+    ):
+        x, y = (x, y) if is_dtype(xtype, GeoGraphy()) else (y, x)
+        df = df[[x, y]]
+        first_rows = df.head()
+        try:
+            first_rows[x].apply(hash)
+        except TypeError:
+            df[x] = df[x].astype(str)
+
+        (comps,) = dask.compute(geo_cont_comps(df.dropna(), cfg))
+
+        return Intermediate(x=x, y=y, data=comps, visual_type="geo_and_num_cols")
+    elif (is_dtype(xtype, GeoPoint()) and is_dtype(ytype, Continuous())) or (
+        is_dtype(xtype, Continuous()) and is_dtype(ytype, GeoPoint())
+    ):
+        x, y = (x, y) if is_dtype(xtype, GeoPoint()) else (y, x)
+        df = df[[x, y]]
+        first_rows = df.head()
+        try:
+            first_rows[x].apply(hash)
+        except TypeError:
+            df[x] = df[x].astype(str)
+
+        (comps,) = dask.compute(geop_cont_comps(df.dropna()))
+
+        return Intermediate(x=x, y=y, data=comps, visual_type="latlong_and_num_cols")
+    elif (
+        is_dtype(xtype, Nominal()) or is_dtype(xtype, GeoGraphy()) or is_dtype(xtype, GeoPoint())
+    ) and (
+        is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()) or is_dtype(ytype, GeoPoint())
+    ):
         df = df[[x, y]]
         # Since it will throw error if column is object while some cells are
         # numerical, we transform column to string first.
         df[x] = df[x].astype(str)
         df[y] = df[y].astype(str)
+
+        if is_dtype(xtype, GeoPoint()):
+            df[x] = df[x].astype(str)
+        if is_dtype(ytype, GeoPoint()):
+            df[y] = df[y].astype(str)
 
         (comps,) = dask.compute(df.dropna().groupby([x, y]).size())
         return Intermediate(
@@ -237,6 +275,73 @@ def _nom_cont_comps(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         data["hist"] = grps_hist.apply(
             _hist, cfg.line.bins, df_hist[y].min(), df_hist[y].max(), meta=object
         )
+
+    return data
+
+
+def geo_cont_comps(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
+    """
+    Computations for a geography and continuous column
+
+    Parameters
+    ----------
+    df
+        Dask dataframe with one geography and one numerical column
+    """
+    data: Dict[str, Any] = {}
+    x, y = df.columns
+    cnts = df[x].value_counts(sort=False)
+    data["ttl_grps"] = cnts.shape[0]
+
+    if cfg.box.enable:
+        if cfg.box.sort_descending:
+            thresh = cnts.nlargest(cfg.box.ngroups).min()
+            df_box = df[df[x].map(cnts) >= thresh]
+        else:
+            thresh = cnts.nsmallest(cfg.box.ngroups).max()
+            df_box = df[df[x].map(cnts) <= thresh]
+        grps_box = df_box.groupby(x)[y]
+        data["box"] = grps_box.apply(_box_comps, meta=object)
+        if (
+            cfg.line.enable
+            and cfg.box.sort_descending == cfg.line.sort_descending
+            and cfg.box.ngroups == cfg.line.ngroups
+        ):
+            data["hist"] = grps_box.apply(
+                _hist, cfg.line.bins, df_box[y].min(), df_box[y].max(), meta=object
+            )
+    if cfg.line.enable and (
+        cfg.box.sort_descending != cfg.line.sort_descending or cfg.box.ngroups != cfg.line.ngroups
+    ):
+        if cfg.line.sort_descending:
+            thresh = cnts.nlargest(cfg.line.ngroups).min()
+            df_hist = df[df[x].map(cnts) >= thresh]
+        else:
+            thresh = cnts.nsmallest(cfg.line.ngroups).max()
+            df_hist = df[df[x].map(cnts) <= thresh]
+        grps_hist = df_hist.groupby(x)[y]
+        data["hist"] = grps_hist.apply(
+            _hist, cfg.line.bins, df_hist[y].min(), df_hist[y].max(), meta=object
+        )
+    # group the data to compute the mean
+    data["value"] = df.groupby(x)[y].mean()
+
+    return data
+
+
+def geop_cont_comps(df: dd.DataFrame) -> Dict[str, Any]:
+    """
+    Computations for a geography and continuous column
+
+    Parameters
+    ----------
+    df
+        Dask dataframe with one geography and one numerical column
+    """
+    data: Dict[str, Any] = {}
+    x, y = df.columns
+    # group the data to compute the mean
+    data["value"] = df.groupby(x)[y].mean()
 
     return data
 

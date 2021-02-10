@@ -15,7 +15,7 @@ import pandas as pd
 import pytz
 from pytz import all_timezones
 
-from ..eda.progress_bar import ProgressBar
+from ..progress_bar import ProgressBar
 from .clean_date_utils import (
     AM,
     JUMP,

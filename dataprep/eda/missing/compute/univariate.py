@@ -8,7 +8,7 @@ import pandas as pd
 
 from ...configs import Config
 from ...data_array import DataArray
-from ...dtypes import DTypeDef, Continuous, Nominal, detect_dtype, is_dtype
+from ...dtypes import DTypeDef, Continuous, Nominal, GeoGraphy, detect_dtype, is_dtype
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, uni_histogram
@@ -22,6 +22,7 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on other columns when
     the missing values in x is dropped."""
+    # pylint: disable = too-many-boolean-expressions
 
     # dataframe with all rows where column x is null removed
     ddf = df.frame[~df.frame[x].isna()]
@@ -31,7 +32,10 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
     for col in df.columns:
         if (
             col == x
-            or is_dtype(detect_dtype(df.frame[col]), Nominal())
+            or (
+                is_dtype(detect_dtype(df.frame[col]), Nominal())
+                or is_dtype(detect_dtype(df.frame[col]), GeoGraphy())
+            )
             and not cfg.bar.enable
             or is_dtype(detect_dtype(df.frame[col]), Continuous())
             and not cfg.hist.enable
@@ -77,8 +81,9 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
-        if len(counts[0]) > cfg.bar.bars and is_dtype(
-            detect_dtype(df.frame[col_name], dtype), Nominal()
+        if len(counts[0]) > cfg.bar.bars and (
+            is_dtype(detect_dtype(df.frame[col_name], dtype), Nominal())
+            or is_dtype(detect_dtype(df.frame[col_name], dtype), GeoGraphy())
         ):
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[: cfg.bar.bars]]

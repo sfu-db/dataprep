@@ -17,6 +17,7 @@ from ...dtypes import (
     DType,
     DTypeDef,
     Nominal,
+    GeoGraphy,
     detect_dtype,
     get_dtype_cnts_and_num_cols,
     is_dtype,
@@ -57,6 +58,13 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
             # numerical, we transform column to string first.
             df[col] = df[col].astype(str)
             data.append((col, Nominal(), _nom_calcs(df[col].dropna(), head[col], cfg)))
+        elif is_dtype(col_dtype, GeoGraphy()) and (cfg.bar.enable or cfg.insight.enable):
+            # cast the column as string type if it contains a mutable type
+            try:
+                head[col].apply(hash)
+            except TypeError:
+                df[col] = df[col].astype(str)
+            data.append((col, GeoGraphy(), _nom_calcs(df[col].dropna(), head[col], cfg)))
         elif is_dtype(col_dtype, DateTime()) and (cfg.line.enable or cfg.insight.enable):
             data.append((col, DateTime(), dask.delayed(_calc_line_dt)(df[[col]], cfg.line.unit)))
 
@@ -74,7 +82,7 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
                 col_ins, ins = _format_cont_ins(col, dat, ov_stats["nrows"], cfg)
             if cfg.hist.enable:
                 plot_data.append((col, dtp, dat["hist"]))
-        elif is_dtype(dtp, Nominal()):
+        elif is_dtype(dtp, Nominal()) or is_dtype(dtp, GeoGraphy()):
             if cfg.insight.enable:
                 col_ins, ins = _format_nom_ins(col, dat, ov_stats["nrows"], cfg)
             if cfg.bar.enable:

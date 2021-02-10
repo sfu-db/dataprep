@@ -11,6 +11,8 @@ from .distribution import compute, plot, render
 from .dtypes import (
     Categorical,
     Continuous,
+    GeoGraphy,
+    GeoPoint,
     DateTime,
     Discrete,
     DType,

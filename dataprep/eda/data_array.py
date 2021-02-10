@@ -305,7 +305,6 @@ class DataArray:
                 c.append(tuple(chunk_shapes[s]))
 
             chunks_, nulls = dask.compute(tuple(c), self.nulls)
-
             chunks = tuple([tuple([int(chunk) for chunk in chunks]) for chunks in chunks_])
             # pylint: enable=invalid-name
             self._nulls = nulls

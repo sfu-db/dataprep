@@ -22,7 +22,7 @@ from ..errors import InvalidAuthParams, MissingRequiredAuthParams
 from ..utils import Request
 from .base import BaseDef, BaseDefT
 
-# pylint: disable=missing-class-docstring,missing-function-docstring
+# pylint: disable=missing-class-docstring,missing-function-docstring,invalid-name
 FILE_PATH: Path = Path(__file__).resolve().parent
 
 with open(f"{FILE_PATH}/oauth2.html", "rb") as f:

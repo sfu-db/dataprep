@@ -3,6 +3,8 @@ This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+import json
+import os
 
 import numpy as np
 import pandas as pd
@@ -14,6 +16,7 @@ from bokeh.models import (
     CustomJSHover,
     FactorRange,
     FuncTickFormatter,
+    Range1d,
     HoverTool,
     LayoutDOM,
     Legend,
@@ -29,10 +32,17 @@ from scipy.stats import norm
 from wordcloud import WordCloud
 
 from ..configs import KDE, Bar, Box, Config, Pie, QQNorm, WordFrequency
-from ..dtypes import Continuous, DateTime, Nominal, is_dtype
+from ..dtypes import Continuous, DateTime, Nominal, is_dtype, GeoGraphy
 from ..intermediate import Intermediate
 from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS
 from ..utils import tweak_figure, _format_ticks, _format_axis, _format_bin_intervals
+
+COUNTRY_MAP_FILE = os.path.join(os.path.split(os.path.abspath(__file__))[0], "country.json")
+COUNTRY_NAME_FILE = os.path.join(os.path.split(os.path.abspath(__file__))[0], "name_dict.json")
+with open(COUNTRY_MAP_FILE, "r") as fp:
+    MAPS = json.load(fp)
+with open(COUNTRY_NAME_FILE, "r") as fp:
+    NAME_DICT = json.load(fp)
 
 __all__ = ["render"]
 
@@ -585,6 +595,122 @@ def box_viz(
         fig.xaxis.major_label_text_font_size = "10pt"
 
     return Panel(child=row(fig), title="Box Plot")
+
+
+def latlong_viz(
+    df: pd.DataFrame,
+    plot_width: int,
+    y: Optional[str] = None,
+) -> Panel:
+    """
+    Render a latlong plot visualization
+    """
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-statements
+    # pylint: disable=too-many-function-args
+    # title = f"{y} by {x}"
+
+    # no_name=[]
+    tooltip_1 = [("Name", "@name"), ("(Long, Lat)", "($x, $y)")]
+    tooltip_2 = [(y, "@sizes_ori")]
+
+    fig = Figure(
+        plot_width=plot_width,
+        plot_height=plot_width // 10 * 7,
+        # tools=tools,
+    )
+    fig.grid.grid_line_color = None
+    fig.hover.point_policy = "follow_mouse"
+    fig.background_fill_color = "white"
+    fig.x_range = Range1d(start=-180, end=180)
+    fig.y_range = Range1d(start=-90, end=90)
+    world_map = fig.patches("xs", "ys", line_color="white", source=MAPS, line_width=0.5)
+    fig.add_tools(HoverTool(renderers=[world_map], tooltips=tooltip_1))
+    lat = [item[0] for item in df.index]
+    lon = [item[1] for item in df.index]
+    minimum = min(df[y])
+    maximum = max(df[y])
+    num_col = (df[y] - minimum) / (maximum - minimum) * 20
+    num_col = num_col.apply(lambda a: a + 5 if a > 0 else a)  # Normalization to {0, [5,25]}
+    source = ColumnDataSource(data=dict(lat=lat, lon=lon, sizes=num_col, sizes_ori=df[y]))
+    my_dots = fig.circle(
+        x="lon", y="lat", size="sizes", fill_color="red", fill_alpha=0.8, source=source
+    )
+    fig.add_tools(HoverTool(renderers=[my_dots], tooltips=tooltip_2))
+
+    return Panel(child=row(fig), title="Geo_point Plot")
+
+
+def geo_viz(
+    df: pd.DataFrame,
+    plot_width: int,
+    y: Optional[str] = None,
+) -> Panel:
+    """
+    Render a geo plot visualization
+    """
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-statements
+    # pylint: disable=too-many-function-args
+
+    # title = f"{y} by {x}"
+
+    minimum = min(df[y])
+    maximum = max(df[y])
+
+    # no_name=[]
+    value = {}
+    names = NAME_DICT.keys()
+    for i in range(df[y].shape[0]):
+        if df.index[i].lower().strip() in names:
+            value[NAME_DICT[df.index[i].lower().strip()]] = df[y][i]
+        # else:
+        #     no_name.append(df.index[i])
+
+    temp_list = []
+    for itr in range(len(MAPS["name"])):
+        temp_list.append(value.get(MAPS["fip"][itr], "unknown"))
+    MAPS["value"] = temp_list
+
+    # palette = RDBU[(len(RDBU) // 2 - 1) :]  # or VIRIDIS
+    mapper = LinearColorMapper(palette=VIRIDIS, low=minimum, high=maximum)
+    tools = "pan,wheel_zoom,box_zoom,reset,hover"
+
+    fig = Figure(
+        plot_width=plot_width,
+        plot_height=plot_width // 10 * 7,
+        tools=tools,
+        tooltips=[
+            ("Name", "@name"),
+            (y, "@value"),
+            ("(Long, Lat)", "($x, $y)"),
+        ],
+    )
+    fig.grid.grid_line_color = None
+    fig.hover.point_policy = "follow_mouse"
+    fig.background_fill_color = "white"
+    fig.x_range = Range1d(start=-180, end=180)
+    fig.y_range = Range1d(start=-90, end=90)
+    fig.patches(
+        "xs",
+        "ys",
+        line_color="white",
+        source=MAPS,
+        fill_color={"field": "value", "transform": mapper},
+        line_width=0.5,
+    )
+
+    color_bar = ColorBar(
+        color_mapper=mapper,
+        major_label_text_font_size="7px",
+        ticker=BasicTicker(desired_num_ticks=11),
+        formatter=PrintfTickFormatter(format="%10.2f"),
+        label_standoff=6,
+        border_line_color=None,
+        location=(0, 0),
+    )
+    if minimum < maximum:
+        fig.add_layout(color_bar, "right")
+
+    return Panel(child=row(fig), title="World Map")
 
 
 # this function should be removed when datetime is refactored
@@ -1339,7 +1465,7 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
     nrows = itmdt["stats"]["nrows"]
     titles: List[str] = []
     for col, dtp, data in itmdt["data"]:
-        if is_dtype(dtp, Nominal()):
+        if is_dtype(dtp, Nominal()) or is_dtype(dtp, GeoGraphy()):
             df, ttl_grps = data
             fig = bar_viz(
                 df,
@@ -1459,6 +1585,94 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         )
         tabs.append(Panel(child=row(length_dist), title="Word Length"))
         htgs["Word Length"] = cfg.wordlen.how_to_guide(plot_height, plot_width)
+
+    if cfg.value_table.enable:
+        htgs["Value Table"] = cfg.value_table.how_to_guide()
+        value_table = _value_table(
+            data["value_table"], stats["nrows"], stats["npres"], stats["nuniq"]
+        )
+    else:
+        value_table = []
+
+    # panel.child.children[0] is a figure
+    for panel in tabs[0:]:
+        panel.child.children[0].frame_width = int(plot_width * 0.9)
+    tabs[0].child.children[0].frame_width = int(plot_width_bar * 0.9)
+    return {
+        "tabledata": format_cat_stats(stats, len_stats, letter_stats) if cfg.stats.enable else [],
+        "value_table": value_table,
+        "insights": nom_insights(data, col, cfg) if cfg.insight.enable else [],
+        "layout": [panel.child.children[0] for panel in tabs],
+        "meta": [tab.title for tab in tabs],
+        "container_width": plot_width + 110,
+        "how_to_guide": htgs,
+    }
+
+
+def render_geo(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
+    """
+    Create visualizations for plot(df, GeoGraphy)
+    """
+    # pylint: disable=too-many-locals,too-many-branches
+
+    if cfg.plot.report:
+        plot_width = 450
+        plot_height = 400
+        plot_width_bar = 280
+        plot_height_bar = 248
+    else:
+        plot_width = cfg.plot.width if cfg.plot.width is not None else 450
+        plot_height = cfg.plot.height if cfg.plot.height is not None else 400
+        plot_width_bar = plot_width
+        plot_height_bar = plot_height
+    tabs: List[Panel] = []
+    htgs: Dict[str, List[Tuple[str, str]]] = {}
+    col, data = itmdt["col"], itmdt["data"]
+    # overview, word length, and charater level statistcs
+    if cfg.stats.enable:
+        stats, len_stats, letter_stats = (
+            data["stats"],
+            data["len_stats"],
+            data["letter_stats"],
+        )
+    if cfg.bar.enable:
+        fig = bar_viz(
+            data["bar"].to_frame(),
+            data["nuniq"],
+            data["nrows"],
+            col,
+            plot_width_bar,
+            plot_height_bar,
+            True,
+            cfg.bar,
+        )
+        tabs.append(Panel(child=row(fig), title="Bar Chart"))
+        htgs["Bar Chart"] = cfg.bar.how_to_guide(plot_height, plot_width)
+    if cfg.pie.enable:
+        fig, color_list = pie_viz(
+            data["pie"].to_frame(), data["nrows"], col, plot_width, plot_height, cfg.pie
+        )
+        tabs.append(fig)
+        htgs["Pie Chart"] = cfg.pie.how_to_guide(color_list, plot_height, plot_width)
+    if cfg.wordcloud.enable:
+        if data["nuniq_words_cloud"] > 0:
+            tabs.append(wordcloud_viz(data["word_cnts_cloud"], plot_width, plot_height))
+            htgs["Word Cloud"] = cfg.wordcloud.how_to_guide(plot_height, plot_width)
+    if cfg.wordfreq.enable:
+        if data["nwords_freq"] > 0:
+            tabs.append(
+                wordfreq_viz(
+                    data["word_cnts_freq"],
+                    data["nwords_freq"],
+                    plot_width,
+                    plot_height,
+                    cfg.wordfreq,
+                )
+            )
+            htgs["Word Frequency"] = cfg.wordfreq.how_to_guide(plot_height, plot_width)
+
+    geo_df = geo_viz(data["geo"].to_frame().rename(columns={col: "count"}), plot_width, "count")
+    tabs.append(geo_df)
 
     if cfg.value_table.enable:
         htgs["Value Table"] = cfg.value_table.how_to_guide()
@@ -1819,6 +2033,80 @@ def render_cat_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     }
 
 
+def render_geo_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
+    """
+    Render plots from plot(df, x, y) when x is a geography column
+    and y is a numerical column
+    """
+    plot_width = cfg.plot.width if cfg.plot.width is not None else 450
+    plot_height = cfg.plot.height if cfg.plot.height is not None else 400
+
+    tabs: List[Panel] = []
+    htgs: Dict[str, List[Tuple[str, str]]] = {}
+    data, x, y = itmdt["data"], itmdt["x"], itmdt["y"]
+
+    if cfg.box.enable:
+        # box plot
+        df = data["box"].to_frame().reset_index()[: 5 * cfg.box.ngroups]
+        df = df.pivot(index=x, columns="level_1", values=[0]).reset_index()
+        df.columns = df.columns.get_level_values(1)
+        df.columns = ["grp"] + list(df.columns[1:])
+        tabs.append(box_viz(df, x, plot_width, plot_height, cfg.box, y, data["ttl_grps"]))
+        htgs["Box Plot"] = cfg.box.nom_cont_how_to_guide(plot_height, plot_width)
+
+    if cfg.line.enable:
+        # multiline plot
+        df = data["hist"].to_frame()[: cfg.line.ngroups]
+        tabs.append(
+            line_viz(
+                df,
+                x,
+                y,
+                cfg.line.yscale,
+                plot_width,
+                plot_height,
+                data["ttl_grps"],
+            )
+        )
+        htgs["Line Chart"] = cfg.line.nom_cont_how_to_guide(plot_height, plot_width)
+
+    df = data["value"].to_frame()
+    tabs.append(geo_viz(df, plot_width, y))
+
+    for panel in tabs:
+        panel.child.children[0].frame_width = int(plot_width * 0.9)
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 170,
+        "how_to_guide": htgs,
+    }
+
+
+def render_latlong_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
+    """
+    Render plots from plot(df, x, y) when x is a latlong column
+    and y is a numerical column
+    """
+    plot_width = cfg.plot.width if cfg.plot.width is not None else 450
+
+    tabs: List[Panel] = []
+    data, y = itmdt["data"], itmdt["y"]
+
+    df = data["value"].to_frame()
+
+    # latlong statstic plot
+    tabs.append(latlong_viz(df, plot_width, y))
+
+    for panel in tabs:
+        panel.child.children[0].frame_width = int(plot_width * 0.9)
+    return {
+        "layout": [panel.child for panel in tabs],
+        "meta": [panel.title for panel in tabs],
+        "container_width": plot_width + 170,
+    }
+
+
 def render_two_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Create visualizations for plot(df, Continuous, Continuous)
@@ -2109,17 +2397,24 @@ def render(itmdt: Intermediate, cfg: Config) -> Union[LayoutDOM, Dict[str, Any]]
     cfg
         Config instance
     """
+    # pylint: disable = too-many-branches
 
     if itmdt.visual_type == "distribution_grid":
         visual_elem = render_distribution_grid(itmdt, cfg)
     elif itmdt.visual_type == "categorical_column":
         visual_elem = render_cat(itmdt, cfg)
+    elif itmdt.visual_type == "geography_column":
+        visual_elem = render_geo(itmdt, cfg)
     elif itmdt.visual_type == "numerical_column":
         visual_elem = render_num(itmdt, cfg)
     elif itmdt.visual_type == "datetime_column":
         visual_elem = render_dt(itmdt, cfg)
     elif itmdt.visual_type == "cat_and_num_cols":
         visual_elem = render_cat_num(itmdt, cfg)
+    elif itmdt.visual_type == "geo_and_num_cols":
+        visual_elem = render_geo_num(itmdt, cfg)
+    elif itmdt.visual_type == "latlong_and_num_cols":
+        visual_elem = render_latlong_num(itmdt, cfg)
     elif itmdt.visual_type == "two_num_cols":
         visual_elem = render_two_num(itmdt, cfg)
     elif itmdt.visual_type == "two_cat_cols":

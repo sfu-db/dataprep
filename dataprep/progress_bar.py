@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 from dask.callbacks import Callback
 
-from ..utils import is_notebook
+from .utils import is_notebook
 
 if is_notebook():
     from tqdm.notebook import tqdm
