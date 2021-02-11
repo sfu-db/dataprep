@@ -1,16 +1,16 @@
 """
 Clean and validate a DataFrame column containing email addresses.
 """
-# pylint: disable=too-many-boolean-expressions
 import re
+from operator import itemgetter
 from typing import Any, Union
 
-import dask.dataframe as dd
 import dask
+import dask.dataframe as dd
 import pandas as pd
 
-from .utils import NULL_VALUES, to_dask, NEARBYKEYS
-
+from ..eda.progress_bar import ProgressBar
+from .utils import NEARBYKEYS, NULL_VALUES, create_report_new, to_dask
 
 USER_REGEX = re.compile(
     # dot-atom
@@ -28,7 +28,7 @@ DOMAIN_REGEX = re.compile(
     re.IGNORECASE,
 )
 
-DOMAIN_WHITELIST = ["localhost"]
+DOMAIN_WHITELIST = {"localhost"}
 
 DOMAINS = {
     # Default domains included#
@@ -165,7 +165,7 @@ DOMAINS = {
     "voo.be",
     "tvcablenet.be",
     "telenet.be",
-    # rgentinian ISP domains
+    # Argentinian ISP domains
     "hotmail.com.ar",
     "live.com.ar",
     "yahoo.com.ar",
@@ -201,25 +201,17 @@ DOMAINS = {
     "oi.com.br",
 }
 
-STATS = {
-    "cleaned": 0,
-    "null": 0,
-    "overflow": 0,
-    "bad_format": 0,
-    "unknown": 0,
-    "valid": 0,
-}
-
 
 def clean_email(
     df: Union[pd.DataFrame, dd.DataFrame],
     column: str,
-    pre_clean: bool = False,
+    remove_whitespace: bool = False,
     fix_domain: bool = False,
     split: bool = False,
     inplace: bool = False,
     errors: str = "coerce",
     report: bool = True,
+    progress: bool = True,
 ) -> pd.DataFrame:
     """
     Clean and standardize email address.
@@ -232,18 +224,24 @@ def clean_email(
         A pandas or Dask DataFrame containing the data to be cleaned.
     column
         The name of the column containing email addresses.
-    pre_clean
-        If True, apply basic text clean (like removing whitespaces) before
-        verifying and clean values.
+    remove_whitespace
+        If True, remove all whitespace from the input value before
+        verifying and cleaning it.
 
         (default: False)
     fix_domain
-        If True, fix small typos in domain input.
+        If True, for invalid email domains, try to fix it using 4 strategies:
+            - Swap neighboring characters.
+            - Add a single character.
+            - Remove a single character.
+            - Swap each character with its nearby keys on the qwerty keyboard.
+
+        The first valid domain found will be returned.
 
         (default: False)
     split
-        If True, split a column containing email address into different
-        columns containing individual components.
+        If True, split a column containing email addresses into one column
+        for the usernames and another column for the domains.
 
         (default: False)
     inplace
@@ -263,6 +261,11 @@ def clean_email(
 
         (default: True)
 
+    progress
+        If True, display a progress bar.
+
+        (default: True)
+
     Examples
     --------
 
@@ -278,105 +281,72 @@ def clean_email(
     """
     # pylint: disable=too-many-arguments
 
-    _reset_stats()
+    # check if the parameters are of correct processing types and values
+    if not isinstance(df, (pd.DataFrame, dd.DataFrame)):
+        raise ValueError("df is invalid, it needs to be a pandas or Dask DataFrame.")
 
+    if not isinstance(column, str):
+        raise ValueError(f"column {column} is invalid.")
+
+    if not isinstance(remove_whitespace, bool):
+        raise ValueError(
+            f"remove_whitespace {remove_whitespace} is invalid, it needs to be True or False."
+        )
+
+    if not isinstance(fix_domain, bool):
+        raise ValueError(f"fix_domain {fix_domain} is invalid, it needs to be True or False.")
+
+    if not isinstance(inplace, bool):
+        raise ValueError(f"inplace {inplace} is invalid, it needs to be True or False.")
+
+    if not isinstance(report, bool):
+        raise ValueError(f"report {report} is invalid, it needs to be True or False.")
+
+    if errors not in {"coerce", "ignore", "raise"}:
+        raise ValueError(
+            f'errors {errors} is invalid, it needs to be "coerce", "ignore", or "raise".'
+        )
+
+    # convert to dask
     df = to_dask(df)
 
-    # specify the metadata for dask apply
-    meta = df.dtypes.to_dict()
-    if split:
-        meta.update(zip(("username", "domain"), (str, str)))
-    else:
-        meta[f"{column}_clean"] = str
-
-    df = df.apply(
-        _format_email,
-        args=(column, split, pre_clean, fix_domain, errors),
-        axis=1,
-        meta=meta,
+    # To clean, create a new column "clean_code_tup" which contains
+    # the cleaned values and code indicating how the initial value was
+    # changed in a tuple. Then split the column of tuples and count the
+    # amount of different codes to produce the report
+    df["clean_code_tup"] = df[column].map_partitions(
+        lambda srs: [_format_email(x, split, remove_whitespace, fix_domain, errors) for x in srs],
+        meta=object,
     )
 
-    if inplace:
-        df = df.drop(columns=[column])
-
-    df, nrows = dask.compute(df, df.shape[0])
-
-    if report:
-        _report_email(nrows)
-
-    return df
-
-
-def _fix_domain_name(dom: str) -> str:
-    """
-    Function to fix domain name with frequent typo
-    """
-    if dom.lower() not in DOMAINS:
-        for i, curr_c in enumerate(dom):
-            # two neighbor chars in reverse order
-            if (dom[:i] + dom[i + 1 :]).lower() in DOMAINS:
-                dom = (dom[:i] + dom[i + 1 :]).lower()
-                break
-
-            # missing single char
-            for new_c in "abcdefghijklmnopqrstuvwxyz":
-                if (dom[0 : i + 1] + new_c + dom[i + 1 :]).lower() in DOMAINS:
-                    dom = (dom[0 : i + 1] + new_c + dom[i + 1 :]).lower()
-                    break
-
-            # redundant single char
-            if i < len(dom) - 1:
-                if (dom[:i] + dom[i + 1] + curr_c + dom[i + 2 :]).lower() in DOMAINS:
-                    dom = (dom[:i] + dom[i + 1] + curr_c + dom[i + 2 :]).lower()
-                    break
-
-            # misspelled single char
-            if curr_c in NEARBYKEYS:
-                for c_p in NEARBYKEYS[curr_c]:
-                    if (dom[:i] + c_p + dom[i + 1 :]).lower() in DOMAINS:
-                        dom = (dom[:i] + c_p + dom[i + 1 :]).lower()
-                        break
-    return dom
-
-
-def _format_email(
-    row: pd.Series,
-    col: str,
-    split: bool,
-    pre_clean: bool,
-    fix_domain: bool,
-    errors: str,
-) -> pd.Series:
-    """
-    Function to transform an email address into clean format.
-
-    """
-    # pylint: disable=too-many-nested-blocks, too-many-locals,too-many-branches,too-many-statements,too-many-return-statements, too-many-arguments
-
-    # pre-cleaning email text by removing all whitespaces
-    if pre_clean:
-        row[col] = re.sub(r"(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+", "", str(row[col]))
-
-    valid_type = _check_email(row[col], True)
-
-    if valid_type != "valid":
-        return _not_email(row, col, split, valid_type, errors)
-
-    user_part, domain_part = str(row[col]).rsplit("@", 1)
-
-    # fix domain by detecting minor typos in advance
-    if fix_domain:
-        domain_part = _fix_domain_name(domain_part)
-
     if split:
-        row["username"], row["domain"] = (
-            str(user_part).lower(),
-            str(domain_part).lower(),
+        df = df.assign(
+            username=df["clean_code_tup"].map(itemgetter(0)),
+            domain=df["clean_code_tup"].map(itemgetter(1)),
+            _code_=df["clean_code_tup"].map(itemgetter(2), meta=("_code_", object)),
         )
     else:
-        row[f"{col}_clean"] = str(user_part).lower() + "@" + str(domain_part).lower()
+        df = df.assign(
+            _temp_=df["clean_code_tup"].map(itemgetter(0)),
+            _code_=df["clean_code_tup"].map(itemgetter(1)),
+        )
+        df = df.rename(columns={"_temp_": f"{column}_clean"})
 
-    return row
+    # counts of codes indicating how values were changed
+    stats = df["_code_"].value_counts(sort=False)
+    df = df.drop(columns=["clean_code_tup", "_code_"])
+
+    if inplace:
+        df = df.drop(columns=column)
+
+    with ProgressBar(minimum=1, disable=not progress):
+        df, stats = dask.compute(df, stats)
+
+    # output a report describing the result of clean_email
+    if report:
+        create_report_new("email", stats, errors)
+
+    return df
 
 
 def validate_email(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
@@ -404,15 +374,43 @@ def validate_email(x: Union[str, pd.Series]) -> Union[bool, pd.Series]:
 
     if isinstance(x, pd.Series):
         return x.apply(_check_email, clean=False)
-    else:
-        return _check_email(x, False)
+    return _check_email(x, False)
 
 
-def _check_email(val: Union[str, Any], clean: bool) -> Any:
+def _format_email(
+    val: Any, split: bool, remove_whitespace: bool, fix_domain: bool, errors: str
+) -> Any:
+    """
+    Function to transform an email address into a clean format.
+    """
+    # pre-cleaning email text by removing all whitespaces
+    if remove_whitespace:
+        val = re.sub(r"(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+", "", str(val))
+
+    valid_type = _check_email(val, True)
+
+    if valid_type != "valid":
+        return _not_email(val, split, valid_type, errors)
+
+    user_part, domain_part = str(val).lower().rsplit("@", 1)
+
+    # fix domain by detecting minor typos in advance
+    if fix_domain:
+        domain_part = _fix_domain_name(domain_part)
+
+    code = 3 if f"{user_part}@{domain_part}" == val else 2
+
+    if split:
+        return user_part, domain_part, code
+
+    return f"{user_part}@{domain_part}", code
+
+
+def _check_email(val: Any, clean: bool) -> Any:
     """
     Function to check whether a value is a valid email.
     """
-    # pylint: disable=too-many-return-statements, too-many-branches
+    # pylint: disable=too-many-return-statements
     if val in NULL_VALUES:
         return "null" if clean else False
 
@@ -436,70 +434,51 @@ def _check_email(val: Union[str, Any], clean: bool) -> Any:
             return "unknown" if clean else False
         except UnicodeError:
             return "unknown" if clean else False
+
     return "valid" if clean else True
 
 
-def _not_email(row: pd.Series, col: str, split: bool, errtype: str, processtype: str) -> pd.Series:
+def _fix_domain_name(dom: str) -> str:
+    """
+    Function to fix domain name with frequent typo
+    """
+    if dom not in DOMAINS:
+        for i, curr_c in enumerate(dom):
+            # two neighbor chars in reverse order
+            if dom[:i] + dom[i + 1 :] in DOMAINS:
+                return dom[:i] + dom[i + 1 :]
+
+            # missing single char
+            for new_c in "abcdefghijklmnopqrstuvwxyz":
+                if dom[: i + 1] + new_c + dom[i + 1 :] in DOMAINS:
+                    return dom[: i + 1] + new_c + dom[i + 1 :]
+
+            # redundant single char
+            if i < len(dom) - 1:
+                if dom[:i] + dom[i + 1] + curr_c + dom[i + 2 :] in DOMAINS:
+                    return dom[:i] + dom[i + 1] + curr_c + dom[i + 2 :]
+
+            # misspelled single char
+            if curr_c in NEARBYKEYS:
+                for c_p in NEARBYKEYS[curr_c]:
+                    if dom[:i] + c_p + dom[i + 1 :] in DOMAINS:
+                        return dom[:i] + c_p + dom[i + 1 :]
+    return dom
+
+
+def _not_email(val: Any, split: bool, errtype: str, processtype: str) -> Any:
     """
     Return result when value unable to be parsed.
     """
-
     if processtype == "coerce":
-        STATS[errtype] += 1
         if split:
-            row["username"], row["domain"] = "None", "None"
-        else:
-            row[f"{col}_clean"] = "None"
+            return (None, None, 0) if errtype == "null" else (None, None, 1)
+        return (None, 0) if errtype == "null" else (None, 1)
     elif processtype == "ignore":
-        STATS[errtype] += 1
         if split:
-            row["username"], row["domain"] = row[col], "None"
-        else:
-            row[f"{col}_clean"] = row[col]
+            return (val, None, 0) if errtype == "null" else (val, None, 1)
+        return (val, 0) if errtype == "null" else (val, 1)
     elif processtype == "raise":
-        raise ValueError(f"unable to parse value {row[col]}")
+        raise ValueError(f"unable to parse value {val}")
     else:
         raise ValueError("invalid error processing type")
-    return row
-
-
-def _reset_stats() -> None:
-    """
-    Reset global statistics dictionary.
-    """
-    STATS["cleaned"] = 0
-    STATS["null"] = 0
-    STATS["unknown"] = 0
-    STATS["bad_format"] = 0
-    STATS["overflow"] = 0
-
-
-def _report_email(nrows: int) -> None:
-    """
-    Describe what was done in the cleaning process.
-    """
-    print("Email Cleaning Report:")
-    if STATS["cleaned"] > 0:
-        nclnd = STATS["cleaned"]
-        pclnd = round(nclnd / nrows * 100, 2)
-        print(f"\t{nclnd} values cleaned ({pclnd}%)")
-    if STATS["bad_format"] > 0:
-        n_bf = STATS["bad_format"]
-        p_bf = round(n_bf / nrows * 100, 2)
-        print(f"\t{n_bf} values with bad format ({p_bf}%)")
-    if STATS["overflow"] > 0:
-        n_of = STATS["overflow"]
-        p_of = round(n_of / nrows * 100, 2)
-        print(f"\t{n_of} values with too long username ({p_of}%)")
-    if STATS["unknown"] > 0:
-        n_uk = STATS["unknown"]
-        p_uk = round(n_uk / nrows * 100, 2)
-        print(f"\t{n_uk} values unable to be parsed ({p_uk}%)")
-    nnull = STATS["null"] + STATS["unknown"] + STATS["bad_format"] + STATS["overflow"]
-    pnull = round(nnull / nrows * 100, 2)
-    ncorrect = nrows - nnull
-    pcorrect = round(100 - pnull, 2)
-    print(
-        f"""Result contains {ncorrect} ({pcorrect}%) values in \
-the correct format and {nnull} null values ({pnull}%)"""
-    )
