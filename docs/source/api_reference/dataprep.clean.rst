@@ -19,6 +19,14 @@ Country Names
    :undoc-members:
    :show-inheritance:
 
+Dates and Times
+---------------
+
+.. automodule:: dataprep.clean.clean_date
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Email Addresses
 ---------------
 
