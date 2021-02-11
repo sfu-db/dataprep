@@ -37,12 +37,12 @@ def test_clean_default(df_broken_email: pd.DataFrame) -> None:
     df_check["messy_email_clean"] = [
         "yi@gmali.com",
         "yi@sfu.ca",
-        "None",
+        None,
         "yi@gmail.com",
-        "None",
-        "None",
-        "None",
-        "None",
+        None,
+        None,
+        None,
+        None,
     ]
     assert df_check.equals(df_clean)
 
@@ -50,22 +50,22 @@ def test_clean_default(df_broken_email: pd.DataFrame) -> None:
 def test_clean_split(df_broken_email: pd.DataFrame) -> None:
     df_clean = clean_email(df_broken_email, "messy_email", split=True)
     df_check = df_broken_email.copy()
-    df_check["username"] = ["yi", "yi", "None", "yi", "None", "None", "None", "None"]
+    df_check["username"] = ["yi", "yi", None, "yi", None, None, None, None]
     df_check["domain"] = [
         "gmali.com",
         "sfu.ca",
-        "None",
+        None,
         "gmail.com",
-        "None",
-        "None",
-        "None",
-        "None",
+        None,
+        None,
+        None,
+        None,
     ]
     assert df_check.equals(df_clean)
 
 
-def test_clean_pre_clean(df_broken_email: pd.DataFrame) -> None:
-    df_clean = clean_email(df_broken_email, "messy_email", pre_clean=True)
+def test_clean_remove_whitespace(df_broken_email: pd.DataFrame) -> None:
+    df_clean = clean_email(df_broken_email, "messy_email", remove_whitespace=True)
     df_check = df_broken_email.copy()
     df_check["messy_email_clean"] = [
         "yi@gmali.com",
@@ -73,9 +73,9 @@ def test_clean_pre_clean(df_broken_email: pd.DataFrame) -> None:
         "yi@sfu.ca",
         "yi@gmail.com",
         "hello@hotmal.com",
-        "None",
-        "None",
-        "None",
+        None,
+        None,
+        None,
     ]
     assert df_check.equals(df_clean)
 
@@ -86,12 +86,12 @@ def test_clean_fix_domain(df_broken_email: pd.DataFrame) -> None:
     df_check["messy_email_clean"] = [
         "yi@gmail.com",
         "yi@sfu.ca",
-        "yi@sfu.ca",
+        None,
         "yi@gmail.com",
-        "hello@hotmail.com",
-        "None",
-        "None",
-        "None",
+        None,
+        None,
+        None,
+        None,
     ]
     assert df_check.equals(df_clean)
 
@@ -103,12 +103,12 @@ def test_clean_inplace(df_broken_email: pd.DataFrame) -> None:
             "messy_email_clean": [
                 "yi@gmali.com",
                 "yi@sfu.ca",
-                "yi@sfu.ca",
+                None,
                 "yi@gmail.com",
-                "hello@hotmal.com",
-                "None",
-                "None",
-                "None",
+                None,
+                None,
+                None,
+                None,
             ]
         }
     )
@@ -128,9 +128,9 @@ def test_validate_series(df_broken_email: pd.DataFrame) -> None:
         [
             True,
             True,
+            False,
             True,
-            True,
-            True,
+            False,
             False,
             False,
             False,
