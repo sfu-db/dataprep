@@ -1,182 +1,252 @@
 """
-Implement clean_date function
+Clean and validate a DataFrame column containing dates and times.
 """
-from typing import Any, Union, Dict, List
+# pylint: disable=too-many-lines
 import datetime
-from datetime import timedelta
 from copy import deepcopy
+from datetime import timedelta
+from operator import itemgetter
+from typing import Any, List, Tuple, Union
+
+import dask
+import dask.dataframe as dd
+import numpy as np
+import pandas as pd
 import pytz
 from pytz import all_timezones
 
-import dask.dataframe as dd
-import dask
-import numpy as np
-import pandas as pd
-
-from .utils import create_report, to_dask
+from ..eda.progress_bar import ProgressBar
 from .clean_date_utils import (
-    JUMP,
-    WEEKDAYS,
-    MONTHS,
     AM,
+    JUMP,
+    MONTHS,
     PM,
-    ZONE,
-    TARGET_YEAR,
-    TARGET_MONTH,
     TARGET_DAY,
     TARGET_HOUR,
     TARGET_MINUTE,
+    TARGET_MONTH,
     TARGET_SECOND,
-    TEXT_MONTHS,
     TARGET_WEEKDAY,
+    TARGET_YEAR,
+    TEXT_MONTHS,
     TEXT_WEEKDAYS,
-    split,
+    WEEKDAYS,
+    ZONE,
+    ParsedDate,
+    ParsedTargetFormat,
     check_date,
-    fix_empty_auto_minimum,
-    fix_empty_auto_nearest,
+    fix_missing_current,
+    fix_missing_minimum,
+    split,
 )
-from .clean_date_utils import ParsedDate, ParsedTargetFormat
-
-STATS = {"cleaned": 0, "null": 0, "unknown": 0}
+from .utils import create_report_new, to_dask
 
 
 def clean_date(
     df: Union[pd.DataFrame, dd.DataFrame],
-    col: str,
-    target_format: str = "YYYY-MM-DD hh:mm:ss",
-    origin_timezone: str = "UTC",
-    target_timezone: str = "",
-    fix_empty: str = "auto_minimum",
-    show_report: bool = True,
+    column: str,
+    output_format: str = "YYYY-MM-DD hh:mm:ss",
+    input_timezone: str = "UTC",
+    output_timezone: str = "",
+    fix_missing: str = "minimum",
+    inplace: bool = False,
+    errors: str = "coerce",
+    report: bool = True,
+    progress: bool = True,
 ) -> pd.DataFrame:
     """
-    This function cleans date string.
+    Clean and standardize dates and times.
+
     Parameters
     ----------
     df
-        Pandas or Dask DataFrame.
-    col
-        Column name containing phone numbers.
-    target_format
+        A pandas or Dask DataFrame containing the data to be cleaned.
+    column
+        The name of the column containing dates.
+    output_format
         The desired format of the date.
-        Defalut value is 'YYYY-MM-DD hh:mm:ss'
-    origin_timezone
-        Timezone of origin data
-    target_timezone
-        Timezone of target data
-    fix_empty
-        The user can specify the way of fixing empty value from value set:
-            {'empty', 'auto_nearest', 'auto_minimum'}.
-        The default fixed_empty is "auto_minimum":
-            For hours, minutes and seconds:
-                Just fill them with zeros.
-            For years, months and days:
-                Fill it with the minimum value.
-        "auto_nearest":
-            For hours, minutes and seconds:
-                Fill them with nearest hour, minutes and seconds.
-            For years, months and days:
-                Fill it with the nearest value.
-        "empty":
-            Just left the missing component as it is
-    show_report
-        If True, output the summary report. Else, no report is outputted.
+
+        (default: 'YYYY-MM-DD hh:mm:ss')
+    input_timezone
+        Time zone of the input date.
+
+        (default: 'UTC')
+    output_timezone
+        The desired time zone of the date.
+
+        (default: '')
+    fix_missing
+        Specify how to fill missing components of a date value.
+            - 'minimum': fill hours, minutes, seconds with zeros, and month, day, year with \
+            January 1st, 2000.
+            - 'current': fill with the current date and time.
+            - 'empty': don't fill missing components.
+
+        (default: 'minimum')
+    inplace
+        If True, delete the column containing the data that was cleaned. Otherwise,
+        keep the original column.
+
+        (default: False)
+    errors
+        How to handle parsing errors.
+            - ‘coerce’: invalid parsing will be set to null.
+            - ‘ignore’: invalid parsing will return the input.
+            - ‘raise’: invalid parsing will raise an exception.
+
+        (default: 'coerce')
+    report
+        If True, output the summary report. Otherwise, no report is outputted.
+
+        (default: True)
+    progress
+        If True, display a progress bar.
+
+        (default: True)
+
+    Examples
+    --------
+
+    >>> df = pd.DataFrame({'date': ['Thu Sep 25 2003', 'Thu 10:36:28', '2003 09 25']})
+    >>> clean_date(df, 'date')
+    Dates Cleaning Report:
+        3 values cleaned (100.0%)
+    Result contains 3 (100.0%) values in the correct format and 0 null values (0.0%)
+                date           date_clean
+    0  Thu Sep 25 2003  2003-09-25 00:00:00
+    1     Thu 10:36:28  2000-01-01 10:36:28
+    2       2003 09 25  2003-09-25 00:00:00
     """
     # pylint: disable=too-many-arguments
-    reset_stats()
 
-    if fix_empty not in {"auto_minimum", "auto_nearest", "empty"}:
+    if fix_missing not in {"minimum", "current", "empty"}:
         raise ValueError(
-            f"fix_empty {fix_empty} is invalid. "
-            f'It needs to be "auto_minimum", "auto_nearest" or "empty"'
+            f"fix_missing {fix_missing} is invalid. "
+            'It needs to be "minimum", "current" or "empty".'
         )
-    if origin_timezone not in all_timezones and origin_timezone not in ZONE:
-        raise ValueError(f"origin_timezone {origin_timezone} doesn't exist")
+    if input_timezone not in all_timezones and input_timezone not in ZONE:
+        raise ValueError(f"origin_timezone {input_timezone} does not exist")
     if (
-        target_timezone not in all_timezones
-        and target_timezone not in ZONE
-        and target_timezone != ""
+        output_timezone not in all_timezones
+        and output_timezone not in ZONE
+        and output_timezone != ""
     ):
-        raise ValueError(f"target_timezone {target_timezone} doesn't exist")
+        raise ValueError(f"output_timezone {output_timezone} is invalid.")
+
+    # convert to dask
     df = to_dask(df)
-    # specify the metadata for dask apply
-    meta = df.dtypes.to_dict()
-    meta[f"{col}_clean"] = str
-    df = df.apply(
-        format_date,
-        args=(
-            col,
-            target_format,
-            {"origin_tz": origin_timezone, "target_tz": target_timezone},
-            fix_empty,
-        ),
-        axis=1,
-        meta=meta,
+
+    # To clean, create a new column "clean_code_tup" which contains
+    # the cleaned values and code indicating how the initial value was
+    # changed in a tuple. Then split the column of tuples and count the
+    # amount of different codes to produce the report
+    df["clean_code_tup"] = df[column].map_partitions(
+        lambda srs: [
+            _format_date(x, output_format, input_timezone, output_timezone, fix_missing, errors)
+            for x in srs
+        ],
+        meta=object,
     )
-    df, nrows = dask.compute(df, df.shape[0])
-    # output the report describing the changes to the column
-    if show_report:
-        create_report("Date", STATS, nrows)
+    df = df.assign(
+        _temp_=df["clean_code_tup"].map(itemgetter(0)),
+        _code_=df["clean_code_tup"].map(itemgetter(1)),
+    )
+    df = df.rename(columns={"_temp_": f"{column}_clean"})
+
+    # counts of codes indicating how values were changed
+    stats = df["_code_"].value_counts(sort=False)
+    df = df.drop(columns=["clean_code_tup", "_code_"])
+
+    if inplace:
+        df = df.drop(columns=column)
+
+    with ProgressBar(minimum=1, disable=not progress):
+        df, stats = dask.compute(df, stats)
+
+    # output a report describing the result of clean_country
+    if report:
+        create_report_new("Dates", stats, errors)
+
     return df
 
 
-def format_date(
-    row: pd.Series,
-    col: str,
-    target_format: str,
-    tz_info: Dict[str, Union[str, int]],
-    fix_empty: str,
-) -> pd.Series:
+def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
+    """
+    Validate dates and times.
+
+    Parameters
+    ----------
+    date
+        pandas Series of dates or a date string
+
+    Examples
+    --------
+
+    >>> validate_date('3rd of May 2001')
+    True
+    >>> df = pd.DataFrame({'date': ['2003/09/25', 'This is Sep.']})
+    >>> validate_date(df['date'])
+    0     True
+    1    False
+    Name: date, dtype: bool
+    """
+    if isinstance(date, pd.Series):
+        return date.apply(check_date, args=(False,))
+    return check_date(date, False)
+
+
+def _format_date(
+    val: Any,
+    output_format: str,
+    input_timezone: str,
+    output_timezone: str,
+    fix_missing: str,
+    errors: str,
+) -> Tuple[Any, int]:
     """
     This function cleans date string.
     Parameters
     ----------
-    df, col, target_format, tz_info, fix_empty
+    df, col, target_format, tz_info, fix_missing
         same as explained in clean_date function
     """
-    date = row[col]
-    origin_timezone = tz_info["origin_tz"]
-    target_timezone = tz_info["target_tz"]
-    if check_date(date) == "null":
-        STATS["null"] += 1
-        row[f"{col}_clean"] = np.nan
-    elif check_date(date) == "unknown":
-        STATS["unknown"] += 1
-        row[f"{col}_clean"] = np.nan
-    elif check_date(date) == "cleaned":
+    # pylint: disable=too-many-arguments
+    date = str(val)
+    status = check_date(date, True)
+    if status == "null":
+        return np.nan, 0
+    elif status == "unknown":
+        if errors == "raise":
+            raise ValueError(f"unable to parse value {val}")
+        return val if errors == "ignore" else np.nan, 1
+    else:
         # Handle date data and timezone
-        parsed_date_data = parse(date=date, fix_empty=fix_empty)
-        parsed_date_data.set_tzinfo(timezone=origin_timezone)
-        parsed_date_data = set_timezone_offset(origin_timezone, parsed_date_data)
+        parsed_date_data = _parse(date, fix_missing)
+        parsed_date_data.set_tzinfo(timezone=input_timezone)
+        parsed_date_data = _set_parseddate_timezone_offset(input_timezone, parsed_date_data)
         # Handle target format and timezone
-        parsed_target_format_data = check_target_format(target_format=target_format)
-        parsed_target_format_data = set_timezone_offset(target_timezone, parsed_target_format_data)
-        if parsed_target_format_data.valid:
+        parsed_output_format_data = _check_output_format(output_format)
+        parsed_output_format_data = _set_parsedtargetformat_timezone_offset(
+            output_timezone, parsed_output_format_data
+        )
+        if parsed_output_format_data.valid:
             if parsed_date_data.valid == "cleaned":
-                transformed_date = transform(
-                    parsed_date_data=parsed_date_data,
-                    parsed_target_format_data=parsed_target_format_data,
-                    target_format=target_format,
-                    target_timezone=target_timezone,
+                transformed_date = _transform(
+                    parsed_date_data, parsed_output_format_data, output_format, output_timezone
                 )
-                row[f"{col}_clean"] = f"{transformed_date}"
-                if row[col] != row[f"{col}_clean"]:
-                    STATS["cleaned"] += 1
+                return transformed_date, 2 if val != transformed_date else 3
             else:
-                STATS["unknown"] += 1
-                row[f"{col}_clean"] = np.nan
+                if errors == "raise":
+                    raise ValueError(f"unable to parse value {val}")
+                return val if errors == "ignore" else np.nan, 1
         else:
             raise ValueError(
-                f"target_format {target_format} is invalid. "
-                f"Invalid tokens are {parsed_target_format_data.invalid_tokens}. "
-                f"Please retype it."
+                f"output_format {output_format} is invalid. "
+                f"Invalid tokens are {parsed_output_format_data.invalid_tokens}."
             )
-    return row
 
 
-def set_timezone_offset(
-    timezone: Union[str, Any], parsed_data: Union[ParsedDate, ParsedTargetFormat, Any]
-) -> Any:
+def _set_parseddate_timezone_offset(timezone: str, parsed_data: ParsedDate) -> ParsedDate:
     """
     This function set timezone information for parsed date or parsed target format
     Parameters
@@ -190,7 +260,43 @@ def set_timezone_offset(
     if timezone in all_timezones:
         days, seconds = 0, 0
         pytz_offset = pytz.timezone(timezone).utcoffset(example_date)
-        if not pytz_offset is None:
+        if pytz_offset is not None:
+            days = pytz_offset.days
+            seconds = pytz_offset.seconds
+        parsed_data.set_tzinfo(utc_offset_hours=int(abs(days) * 24 + abs(seconds) / 3600))
+        parsed_data.set_tzinfo(
+            utc_offset_minutes=int((abs(seconds) - (abs(seconds) / 3600) * 3600) / 60)
+        )
+        if days >= 0 and seconds >= 0:
+            parsed_data.set_tzinfo(utc_add="+")
+        elif days <= 0 and seconds < 0:
+            parsed_data.set_tzinfo(utc_add="-")
+    elif timezone in ZONE:
+        parsed_data.set_tzinfo(utc_offset_hours=abs(ZONE[timezone]), utc_offset_minutes=0)
+        if ZONE[timezone] >= 0:
+            parsed_data.set_tzinfo(utc_add="+")
+        elif ZONE[timezone] < 0:
+            parsed_data.set_tzinfo(utc_add="-")
+    return parsed_data
+
+
+def _set_parsedtargetformat_timezone_offset(
+    timezone: str, parsed_data: ParsedTargetFormat
+) -> ParsedTargetFormat:
+    """
+    This function set timezone information for parsed date or parsed target format
+    Parameters
+    ----------
+    timezone
+        string name of timezone
+    parsed_data
+        parsed date or parsed target format
+    """
+    example_date = datetime.datetime(2009, 9, 1)
+    if timezone in all_timezones:
+        days, seconds = 0, 0
+        pytz_offset = pytz.timezone(timezone).utcoffset(example_date)
+        if pytz_offset is not None:
             days = pytz_offset.days
             seconds = pytz_offset.seconds
         parsed_data.set_tzinfo(utc_offset_hours=int(abs(days) * 24 + abs(seconds) / 3600))
@@ -211,40 +317,25 @@ def set_timezone_offset(
     return parsed_data
 
 
-def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
+def _check_output_format(output_format: str) -> ParsedTargetFormat:
     """
-    This function validates date string
+    This function check validation of output_format.
     Parameters
     ----------
-    date
-        pandas Series of date string
-    """
-    if isinstance(date, pd.Series):
-        verfied_series = date.apply(check_date)
-        return verfied_series
-    else:
-        return check_date(date)
-
-
-def check_target_format(target_format: Union[str, Any]) -> Any:
-    """
-    This function check validation of target_format
-    Parameters
-    ----------
-    target_format
-        target_format string
+    output_format
+        output_format string
     """
     result = ParsedTargetFormat()
-    target_tokens = split(target_format, JUMP)
+    target_tokens = split(output_format, JUMP)
     remain_tokens = deepcopy(target_tokens)
     # Handle Timezone
-    result, remain_tokens = figure_target_format_timezone(result, target_tokens, remain_tokens)
+    result, remain_tokens = _figure_output_format_timezone(result, target_tokens, remain_tokens)
     # Handle year, month, day
-    result, remain_tokens = figure_target_format_ymd(result, target_tokens, remain_tokens)
+    result, remain_tokens = _figure_output_format_ymd(result, target_tokens, remain_tokens)
     # Handle AM, PM with JUMP seperators
-    result, remain_tokens = figure_target_format_ampm(result, target_tokens, remain_tokens)
+    result, remain_tokens = _figure_output_format_ampm(result, target_tokens, remain_tokens)
     # Handle hour, minute, second
-    result, remain_tokens = figure_target_format_hms(result, remain_tokens)
+    result, remain_tokens = _figure_output_format_hms(result, remain_tokens)
     # If len(remain_tokens) = 0, then is valid format
     if len(remain_tokens) > 0:
         result.set_valid(False)
@@ -253,11 +344,11 @@ def check_target_format(target_format: Union[str, Any]) -> Any:
     return result
 
 
-def figure_target_format_timezone(
-    parsed_data: Union[ParsedTargetFormat, Any],
-    target_tokens: Union[List[str], Any],
-    remain_tokens: Union[List[str], Any],
-) -> Any:
+def _figure_output_format_timezone(
+    parsed_data: ParsedTargetFormat,
+    target_tokens: List[str],
+    remain_tokens: List[str],
+) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure timezone token in target format
     Parameters
@@ -280,11 +371,11 @@ def figure_target_format_timezone(
     return parsed_data, remain_tokens
 
 
-def figure_target_format_ymd(
-    parsed_data: Union[ParsedTargetFormat, Any],
-    target_tokens: Union[List[str], Any],
-    remain_tokens: Union[List[str], Any],
-) -> Any:
+def _figure_output_format_ymd(
+    parsed_data: ParsedTargetFormat,
+    target_tokens: List[str],
+    remain_tokens: List[str],
+) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure year, month and day token in target format
     Parameters
@@ -312,11 +403,11 @@ def figure_target_format_ymd(
     return parsed_data, remain_tokens
 
 
-def figure_target_format_ampm(
-    parsed_data: Union[ParsedTargetFormat, Any],
-    target_tokens: Union[List[str], Any],
-    remain_tokens: Union[List[str], Any],
-) -> Any:
+def _figure_output_format_ampm(
+    parsed_data: ParsedTargetFormat,
+    target_tokens: List[str],
+    remain_tokens: List[str],
+) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure AM or PM token in target format
     Parameters
@@ -337,15 +428,15 @@ def figure_target_format_ampm(
     return parsed_data, remain_tokens
 
 
-def figure_target_format_hms(
-    parsed_data: Union[ParsedTargetFormat, Any], remain_tokens: Union[List[str], Any]
-) -> Any:
+def _figure_output_format_hms(
+    parsed_data: ParsedTargetFormat, remain_tokens: List[str]
+) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure hour, minute and second token in target format
     Parameters
     ----------
     parsed_data
-        paresed target format
+        parsed target format
     remain_tokens
         remained tokens after figuring tokens
     """
@@ -359,7 +450,7 @@ def figure_target_format_hms(
                 and not token in PM
             ):
                 remain_str = token
-        parsed_data, hms_tokens = get_target_format_hms_tokens(parsed_data, remain_str)
+        parsed_data, hms_tokens = _get_output_format_hms_tokens(parsed_data, remain_str)
         for token in hms_tokens:
             if token in TARGET_HOUR:
                 parsed_data.set_hour_token(token)
@@ -372,9 +463,9 @@ def figure_target_format_hms(
     return parsed_data, remain_tokens
 
 
-def get_target_format_hms_tokens(
-    parsed_data: Union[ParsedTargetFormat, Any], remain_str: Union[str, Any]
-) -> Any:
+def _get_output_format_hms_tokens(
+    parsed_data: ParsedTargetFormat, remain_str: str
+) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function get hour, minute and second token in target format
     Parameters
@@ -406,7 +497,7 @@ def get_target_format_hms_tokens(
     return parsed_data, hms_tokens
 
 
-def ensure_ymd(tokes: Union[str, Any]) -> Any:
+def _ensure_ymd(tokes: List[str]) -> Tuple[ParsedDate, List[str]]:
     """
     This function extract value of year, month, day
     Parameters
@@ -415,8 +506,7 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
         generated tokens
     """
     result = ParsedDate()
-    remain_tokens = deepcopy(tokes)
-    result, remain_tokens = ensure_year(result, tokes, remain_tokens)
+    result, remain_tokens = _ensure_year(result, tokes, deepcopy(tokes))
     if len(remain_tokens) == 0:
         return result, remain_tokens
     num_tokens = []
@@ -426,17 +516,17 @@ def ensure_ymd(tokes: Union[str, Any]) -> Any:
     for token in num_tokens:
         remain_tokens.remove(token)
     if result.ymd["year"] != -1:
-        result = ensure_month_day(result, num_tokens)
+        result = _ensure_month_day(result, num_tokens)
     else:
-        result = ensure_year_month_day(result, num_tokens)
+        result = _ensure_year_month_day(result, num_tokens)
     return result, remain_tokens
 
 
-def ensure_year(
-    parsed_data: Union[ParsedDate, Any],
-    tokes: Union[str, Any],
-    remain_tokens: Union[List[str], Any],
-) -> Any:
+def _ensure_year(
+    parsed_data: ParsedDate,
+    tokes: List[str],
+    remain_tokens: List[str],
+) -> Tuple[ParsedDate, List[str]]:
     """
     This function extract year number whose length is 4
     Parameters
@@ -463,7 +553,7 @@ def ensure_year(
     return parsed_data, remain_tokens
 
 
-def ensure_month_day(parsed_data: Union[ParsedDate, Any], num_tokens: Union[List[str], Any]) -> Any:
+def _ensure_month_day(parsed_data: ParsedDate, num_tokens: List[str]) -> ParsedDate:
     """
     This function extract month and day when year is not None.
     Parameters
@@ -491,9 +581,7 @@ def ensure_month_day(parsed_data: Union[ParsedDate, Any], num_tokens: Union[List
     return parsed_data
 
 
-def ensure_year_month_day(
-    parsed_data: Union[ParsedDate, Any], num_tokens: Union[List[str], Any]
-) -> Any:
+def _ensure_year_month_day(parsed_data: ParsedDate, num_tokens: List[str]) -> ParsedDate:
     """
     This function extract month and day when year is None.
     Parameters
@@ -525,7 +613,7 @@ def ensure_year_month_day(
     return parsed_data
 
 
-def ensure_hms(inner_result: Union[ParsedDate, Any], remain_tokens: Union[str, Any]) -> Any:
+def _ensure_hms(inner_result: ParsedDate, remain_tokens: List[str]) -> ParsedDate:
     """
     This function extract value of hour, minute, second
     Parameters
@@ -554,15 +642,13 @@ def ensure_hms(inner_result: Union[ParsedDate, Any], remain_tokens: Union[str, A
     else:
         hms_tokens = split(hms_tokens[0], [":"])
     if ispm:
-        result = ensure_pm(result, hms_tokens, 12)
+        result = _ensure_pm(result, hms_tokens, 12)
     else:
-        result = ensure_pm(result, hms_tokens, 0)
+        result = _ensure_pm(result, hms_tokens, 0)
     return result
 
 
-def ensure_pm(
-    parsed_data: Union[ParsedDate, Any], hms_tokens: Union[List[str], Any], offset: Union[int, Any]
-) -> Any:
+def _ensure_pm(parsed_data: ParsedDate, hms_tokens: List[str], offset: int) -> ParsedDate:
     """
     This function extract values which stand for pm time
     Parameters
@@ -587,55 +673,53 @@ def ensure_pm(
     return parsed_data
 
 
-def fix_empty_element(parsed_res: Union[ParsedDate, Any], fix_empty: Union[str, Any]) -> Any:
+def _fix_missing_element(parsed_res: ParsedDate, fix_missing: str) -> ParsedDate:
     """
     This function fix empty part of transformed format
     Parameters
     ----------
     parsed_res
         generated year, month, day, hour, minute, second
-    fix_empty
+    fix_missing
         the format of fixing empty part
     """
     if parsed_res.valid == "unknown":
         return parsed_res
-    if fix_empty == "auto_nearest":
-        parsed_res = fix_empty_auto_nearest(parsed_res)
-    elif fix_empty == "auto_minimum":
-        parsed_res = fix_empty_auto_minimum(parsed_res)
+    if fix_missing == "current":
+        parsed_res = fix_missing_current(parsed_res)
+    elif fix_missing == "minimum":
+        parsed_res = fix_missing_minimum(parsed_res)
     return parsed_res
 
 
-def parse(date: Union[str, Any], fix_empty: Union[str, Any]) -> Any:
+def _parse(date: str, fix_missing: str) -> ParsedDate:
     """
     This function parse string into tokens
     Parameters
     ----------
     date
         date string
-    fix_empty
+    fix_missing
         format of fixing empty
     """
     tokens = split(date, JUMP)
-    parsed_date_res, remain_tokens = ensure_ymd(tokens)
+    parsed_date_res, remain_tokens = _ensure_ymd(tokens)
     if len(remain_tokens) > 0:
-        parsed_time_res = ensure_hms(parsed_date_res, remain_tokens)
+        parsed_time_res = _ensure_hms(parsed_date_res, remain_tokens)
     else:
         parsed_time_res = parsed_date_res
-    parsed_res = fix_empty_element(parsed_time_res, fix_empty)
+    parsed_res = _fix_missing_element(parsed_time_res, fix_missing)
     return parsed_res
 
 
-def change_timezone(
-    parsed_date_data: Union[ParsedDate, Any], target_timezone: Union[str, Any]
-) -> Any:
+def _change_timezone(parsed_date_data: ParsedDate, output_timezone: str) -> ParsedDate:
     """
     This function change timezone for already parsed date string
     Parameters
     ----------
     parsed_date_data
         parsed date string
-    target_timezone
+    output_timezone
         target timezone string
     """
     origin_tz_offset = timedelta(days=0, seconds=0)
@@ -660,16 +744,16 @@ def change_timezone(
         origin_add = -1 if ZONE[str(parsed_date_data.tzinfo["timezone"])] > 0 else 1
         offset_value = abs(ZONE[str(parsed_date_data.tzinfo["timezone"])]) * 3600
         origin_tz_offset = timedelta(days=0, seconds=offset_value)
-    if target_timezone in all_timezones:
-        pytz_offset = pytz.timezone(target_timezone).utcoffset(origin_date)
+    if output_timezone in all_timezones:
+        pytz_offset = pytz.timezone(output_timezone).utcoffset(origin_date)
         if not pytz_offset is None:
             target_add = 1 if pytz_offset.days >= 0 and pytz_offset.seconds >= 0 else -1
             target_tz_offset = timedelta(
                 days=abs(pytz_offset.days), seconds=abs(pytz_offset.seconds)
             )
-    elif target_timezone in ZONE:
-        target_add = 1 if ZONE[target_timezone] >= 0 else -1
-        offset_value = abs(ZONE[target_timezone]) * 3600
+    elif output_timezone in ZONE:
+        target_add = 1 if ZONE[output_timezone] >= 0 else -1
+        offset_value = abs(ZONE[output_timezone]) * 3600
         target_tz_offset = timedelta(days=0, seconds=offset_value)
     result = deepcopy(parsed_date_data)
     if -1 in [
@@ -689,7 +773,7 @@ def change_timezone(
     result.set_hour(target_date.hour)
     result.set_minute(target_date.minute)
     result.set_second(target_date.second)
-    result.set_tzinfo(timezone=target_timezone)
+    result.set_tzinfo(timezone=output_timezone)
     days = target_tz_offset.days
     seconds = target_tz_offset.seconds
     result.set_tzinfo(utc_offset_hours=int(abs(days) * 24 + abs(seconds) / 3600))
@@ -701,9 +785,7 @@ def change_timezone(
     return result
 
 
-def transform_year(
-    result_str: Union[str, Any], year_token: Union[str, Any], year: Union[int, Any]
-) -> Any:
+def _transform_year(result_str: str, year_token: str, year: int) -> str:
     """
     This function transform parsed year into target format
     Parameters
@@ -719,26 +801,24 @@ def transform_year(
     if year_token != "":
         if year == -1:
             if len(year_token) == 4:
-                result = result.replace(year_token, str("----"))
+                result = result.replace(year_token, "----")
             elif len(year_token) == 2:
-                result = result.replace(year_token, str("--"))
+                result = result.replace(year_token, "--")
             elif len(year_token) == 1:
-                result = result.replace(year_token, str("-"))
+                result = result.replace(year_token, "-")
         else:
             if len(year_token) == 4:
                 result = result.replace(year_token, str(year))
             else:
                 year = year - 2000
                 if year < 10:
-                    result = result.replace(year_token, "0" + str(year))
+                    result = result.replace(year_token, f"{0}{year}")
                 else:
                     result = result.replace(year_token, str(year))
     return result
 
 
-def transform_month(
-    result_str: Union[str, Any], month_token: Union[str, Any], month: Union[int, Any]
-) -> Any:
+def _transform_month(result_str: str, month_token: str, month: int) -> str:
     """
     This function transform parsed month into target format
     Parameters
@@ -754,17 +834,17 @@ def transform_month(
     if month_token != "":
         if month == -1:
             if len(month_token) == 3:
-                result = result.replace(month_token, str("---"))
+                result = result.replace(month_token, "---")
             elif len(month_token) == 5:
-                result = result.replace(month_token, str("-----"))
+                result = result.replace(month_token, "-----")
             elif len(month_token) == 2:
-                result = result.replace(month_token, str("--"))
+                result = result.replace(month_token, "--")
             elif len(month_token) == 1:
-                result = result.replace(month_token, str("-"))
+                result = result.replace(month_token, "-")
         else:
             if len(month_token) == 2:
                 if month < 10:
-                    result = result.replace(month_token, "0" + str(month), 1)
+                    result = result.replace(month_token, f"{0}{month}", 1)
                 else:
                     result = result.replace(month_token, str(month), 1)
             elif len(month_token) == 3:
@@ -776,9 +856,7 @@ def transform_month(
     return result
 
 
-def transform_day(
-    result_str: Union[str, Any], day_token: Union[str, Any], day: Union[int, Any]
-) -> Any:
+def _transform_day(result_str: str, day_token: str, day: int) -> str:
     """
     This function transform parsed month into target format
     Parameters
@@ -794,13 +872,13 @@ def transform_day(
     if day_token != "":
         if day == -1:
             if len(day_token) == 2:
-                result = result.replace(day_token, str("--"))
+                result = result.replace(day_token, "--")
             elif len(day_token) == 1:
-                result = result.replace(day_token, str("-"))
+                result = result.replace(day_token, "-")
         else:
             if len(day_token) == 2:
                 if day < 10:
-                    result = result.replace(day_token, "0" + str(day), 1)
+                    result = result.replace(day_token, f"{0}{day}", 1)
                 else:
                     result = result.replace(day_token, str(day), 1)
             else:
@@ -808,12 +886,7 @@ def transform_day(
     return result
 
 
-def transform_hms(
-    result_str: Union[str, Any],
-    hms_token: Union[str, Any],
-    ispm: Union[bool, Any],
-    hms_value: Union[int, Any],
-) -> Any:
+def _transform_hms(result_str: str, hms_token: str, ispm: bool, hms_value: int) -> str:
     """
     This function transform parsed month into target format
     Parameters
@@ -829,15 +902,15 @@ def transform_hms(
     if hms_token != "":
         if hms_value == -1:
             if len(hms_token) == 2:
-                result = result.replace(hms_token, str("--"))
+                result = result.replace(hms_token, "--")
             elif len(hms_token) == 1:
-                result = result.replace(hms_token, str("-"))
+                result = result.replace(hms_token, "-")
         else:
-            if not ispm is None and ispm:
+            if ispm:
                 hms_value = hms_value - 12
             if len(hms_token) == 2:
                 if hms_value < 10:
-                    result = result.replace(hms_token, "0" + str(hms_value), 1)
+                    result = result.replace(hms_token, f"{0}{hms_value}", 1)
                 else:
                     result = result.replace(hms_token, str(hms_value), 1)
             else:
@@ -845,9 +918,7 @@ def transform_hms(
     return result
 
 
-def transform_weekday(
-    result_str: Union[str, Any], weekday_token: Union[str, Any], weekday: Union[int, Any]
-) -> Any:
+def _transform_weekday(result_str: str, weekday_token: str, weekday: int) -> str:
     """
     This function transform parsed month into target format
     Parameters
@@ -863,9 +934,9 @@ def transform_weekday(
     if weekday_token != "":
         if weekday == -1:
             if len(weekday_token) == 3:
-                result = result.replace(weekday_token, str("---"))
+                result = result.replace(weekday_token, "---")
             elif len(weekday_token) == 5:
-                result = result.replace(weekday_token, str("-----"))
+                result = result.replace(weekday_token, "-----")
         else:
             if len(weekday_token) == 3:
                 result = result.replace(weekday_token, TEXT_WEEKDAYS[weekday - 1][0])
@@ -874,12 +945,14 @@ def transform_weekday(
     return result
 
 
-def transform_timezone(
-    result_str: Union[str, Any],
-    timezone_token: Union[str, Any],
-    timezone: Union[str, Any],
-    tz_info: Union[Dict[str, str], Any],
-) -> Any:
+def _transform_timezone(
+    result_str: str,
+    timezone_token: str,
+    timezone: str,
+    utc_add: str,
+    utc_offset_hours: int,
+    utc_offset_minutes: int,
+) -> str:
     """
     This function transform parsed month into target format
     Parameters
@@ -893,105 +966,91 @@ def transform_timezone(
     tz_info
         information of timezone, including offset hours and mins comparing to UTC
     """
+    # pylint: disable=too-many-arguments
     result = deepcopy(result_str)
-    utc_add = tz_info["utc_add"]
-    utc_offset_hours = int(tz_info["utc_offset_hours"])
-    utc_offset_minutes = int(tz_info["utc_offset_minutes"])
     if timezone_token != "":
         if timezone_token == "z":
             result = result.replace(timezone_token, timezone)
         elif timezone_token == "Z":
             offset_hours_str = str(int(utc_offset_hours))
             if len(offset_hours_str) == 1:
-                offset_hours_str = "0" + offset_hours_str
+                offset_hours_str = f"{0}{offset_hours_str}"
             offset_minutes_str = str(int(utc_offset_minutes))
             if len(offset_minutes_str) == 1:
-                offset_minutes_str = "0" + offset_minutes_str
+                offset_minutes_str = f"{0}{offset_minutes_str}"
             result = result.replace(
-                timezone_token, "UTC" + utc_add + offset_hours_str + ":" + offset_minutes_str
+                timezone_token, f"UTC{utc_add}{offset_hours_str}:{offset_minutes_str}"
             )
     return result
 
 
-def transform(
-    parsed_date_data: Union[ParsedDate, Any],
-    parsed_target_format_data: Union[ParsedTargetFormat, Any],
-    target_format: Union[str, Any],
-    target_timezone: Union[str, Any],
-) -> Any:
+def _transform(
+    parsed_date_data: ParsedDate,
+    parsed_output_format_data: ParsedTargetFormat,
+    output_format: str,
+    output_timezone: str,
+) -> str:
     """
     This function transform parsed result into target format
     Parameters
     ----------
     parsed_date_data
         generated year, month, day, hour, minute, second
-    parsed_target_format_data
+    parsed_output_format_data
         generated year token, month token, day token, hour token,
         minute token, second token of target format
-    target_format
+    output_format
         target format string
-    target_timezone
+    output_timezone
         target timezone string
     """
-    result = deepcopy(target_format)
-    if target_timezone != "":
-        parsed_date_data = change_timezone(parsed_date_data, target_timezone)
+    result = deepcopy(output_format)
+    if output_timezone != "":
+        parsed_date_data = _change_timezone(parsed_date_data, output_timezone)
     # Handle year
-    result = transform_year(
-        result, parsed_target_format_data.ymd_token["year_token"], parsed_date_data.ymd["year"]
+    result = _transform_year(
+        result, parsed_output_format_data.ymd_token["year_token"], parsed_date_data.ymd["year"]
     )
     # Handle day
-    result = transform_day(
-        result, parsed_target_format_data.ymd_token["day_token"], parsed_date_data.ymd["day"]
+    result = _transform_day(
+        result, parsed_output_format_data.ymd_token["day_token"], parsed_date_data.ymd["day"]
     )
     # Handle hours
-    result = transform_hms(
+    result = _transform_hms(
         result,
-        parsed_target_format_data.hms_token["hour_token"],
-        parsed_target_format_data.hms_token["ispm"],
+        str(parsed_output_format_data.hms_token["hour_token"]),
+        bool(parsed_output_format_data.hms_token["ispm"]),
         parsed_date_data.hms["hour"],
     )
     # Handle minutes
-    result = transform_hms(
+    result = _transform_hms(
         result,
-        parsed_target_format_data.hms_token["minute_token"],
-        None,
+        str(parsed_output_format_data.hms_token["minute_token"]),
+        False,
         parsed_date_data.hms["minute"],
     )
     # Handle seconds
-    result = transform_hms(
+    result = _transform_hms(
         result,
-        parsed_target_format_data.hms_token["second_token"],
-        None,
+        str(parsed_output_format_data.hms_token["second_token"]),
+        False,
         parsed_date_data.hms["second"],
     )
     # Handle month
-    result = transform_month(
-        result, parsed_target_format_data.ymd_token["month_token"], parsed_date_data.ymd["month"]
+    result = _transform_month(
+        result, parsed_output_format_data.ymd_token["month_token"], parsed_date_data.ymd["month"]
     )
     # Handle weekday
-    result = transform_weekday(
-        result, parsed_target_format_data.weekday_token, parsed_date_data.weekday
+    result = _transform_weekday(
+        result, parsed_output_format_data.weekday_token, parsed_date_data.weekday
     )
     # Handle timezone
-    tz_info = {
-        "utc_add": parsed_date_data.tzinfo["utc_add"],
-        "utc_offset_hours": str(parsed_date_data.tzinfo["utc_offset_hours"]),
-        "utc_offset_minutes": str(parsed_date_data.tzinfo["utc_offset_minutes"]),
-    }
-    result = transform_timezone(
+    result = _transform_timezone(
         result,
-        parsed_target_format_data.timezone_token,
-        parsed_date_data.tzinfo["timezone"],
-        tz_info,
+        parsed_output_format_data.timezone_token,
+        str(parsed_date_data.tzinfo["timezone"]),
+        str(parsed_date_data.tzinfo["utc_add"]),
+        int(parsed_date_data.tzinfo["utc_offset_hours"]),
+        int(parsed_date_data.tzinfo["utc_offset_minutes"]),
     )
     return result
-
-
-def reset_stats() -> None:
-    """
-    Reset global statistics dictionary.
-    """
-    STATS["cleaned"] = 0
-    STATS["null"] = 0
-    STATS["unknown"] = 0

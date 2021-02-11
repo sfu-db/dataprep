@@ -134,11 +134,11 @@ def test_clean_default(df_dates: pd.DataFrame) -> None:
     assert df_check.equals(df_clean)
 
 
-def test_clean_target_format(df_dates: pd.DataFrame) -> None:
-    df_clean1 = clean_date(df_dates, "date", target_format="YYYY-MM-DD")
-    df_clean2 = clean_date(df_dates, "date", target_format="yyyy.MM.dd AD at HH:mm:ss Z")
-    df_clean3 = clean_date(df_dates, "date", target_format="yyyy.MM.dd AD at HH:mm:ss z")
-    df_clean4 = clean_date(df_dates, "date", target_format="EEE, d MMM yyyy HH:mm:ss Z")
+def test_clean_output_format(df_dates: pd.DataFrame) -> None:
+    df_clean1 = clean_date(df_dates, "date", output_format="YYYY-MM-DD")
+    df_clean2 = clean_date(df_dates, "date", output_format="yyyy.MM.dd AD at HH:mm:ss Z")
+    df_clean3 = clean_date(df_dates, "date", output_format="yyyy.MM.dd AD at HH:mm:ss z")
+    df_clean4 = clean_date(df_dates, "date", output_format="EEE, d MMM yyyy HH:mm:ss Z")
 
     df_check1 = df_dates.copy()
     df_check1["date_clean"] = [
@@ -318,27 +318,27 @@ def test_clean_target_format(df_dates: pd.DataFrame) -> None:
     assert df_clean4.equals(df_check4)
 
 
-def test_origin_timezone_target_timezone(df_dates: pd.DataFrame) -> None:
+def test_input_timezone_output_timezone(df_dates: pd.DataFrame) -> None:
     df_clean1 = clean_date(
         df_dates,
         "date",
-        origin_timezone="PDT",
-        target_timezone="ChinaST",
-        target_format="yyyy.MM.dd AD at HH:mm:ss Z",
+        input_timezone="PDT",
+        output_timezone="ChinaST",
+        output_format="yyyy.MM.dd AD at HH:mm:ss Z",
     )
     df_clean2 = clean_date(
         df_dates,
         "date",
-        origin_timezone="EST",
-        target_timezone="PDT",
-        target_format="yyyy.MM.dd AD at HH:mm:ss Z",
+        input_timezone="EST",
+        output_timezone="PDT",
+        output_format="yyyy.MM.dd AD at HH:mm:ss Z",
     )
     df_clean3 = clean_date(
         df_dates,
         "date",
-        origin_timezone="PST",
-        target_timezone="GMT",
-        target_format="yyyy.MM.dd AD at HH:mm:ss Z",
+        input_timezone="PST",
+        output_timezone="GMT",
+        output_format="yyyy.MM.dd AD at HH:mm:ss Z",
     )
     df_check1 = df_dates.copy()
     df_check1["date_clean"] = [
@@ -474,11 +474,11 @@ def test_origin_timezone_target_timezone(df_dates: pd.DataFrame) -> None:
     assert df_clean3.equals(df_check3)
 
 
-def test_clean_fix_empty(df_dates: pd.DataFrame) -> None:
-    df_clean_auto_minimum = clean_date(df_dates, "date", fix_empty="auto_minimum")
-    df_clean_empty = clean_date(df_dates, "date", fix_empty="empty")
-    df_check_auto_minimum = df_dates.copy()
-    df_check_auto_minimum["date_clean"] = [
+def test_clean_fix_missing(df_dates: pd.DataFrame) -> None:
+    df_clean_minimum = clean_date(df_dates, "date", fix_missing="minimum")
+    df_clean_empty = clean_date(df_dates, "date", fix_missing="empty")
+    df_check_minimum = df_dates.copy()
+    df_check_minimum["date_clean"] = [
         "1996-07-10 15:08:56",
         "2003-09-25 10:36:28",
         "2003-09-25 10:36:28",
@@ -563,33 +563,33 @@ def test_clean_fix_empty(df_dates: pd.DataFrame) -> None:
         np.nan,
     ]
 
-    assert df_clean_auto_minimum.equals(df_check_auto_minimum)
+    assert df_clean_minimum.equals(df_check_minimum)
     assert df_clean_empty.equals(df_check_empty)
 
 
 def test_validate_value() -> None:
-    assert validate_date("Novvvvvvvvember 5, 1994, 8:15:30 am EST hahaha") == "unknown"
-    assert validate_date("1994, 8:15:30") == "cleaned"
-    assert validate_date("Hello.") == "unknown"
+    assert validate_date("Novvvvvvvvember 5, 1994, 8:15:30 am EST hahaha") == False
+    assert validate_date("1994, 8:15:30") == True
+    assert validate_date("Hello.") == False
 
 
 def test_validate_series(df_messy_date: pd.DataFrame) -> None:
     srs_valid = validate_date(df_messy_date["messy_date"])
     srs_check = pd.Series(
         [
-            "unknown",
-            "cleaned",
-            "cleaned",
-            "cleaned",
-            "cleaned",
-            "cleaned",
-            "cleaned",
-            "unknown",
-            "cleaned",
-            "cleaned",
-            "unknown",
-            "null",
-            "null",
+            False,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            False,
+            False,
+            False,
         ],
         name="valid",
     )

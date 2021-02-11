@@ -86,9 +86,9 @@ def clean_country(
         (default: False)
     errors
         How to handle parsing errors.
-            - ‘raise’: invalid parsing will raise an exception.
             - ‘coerce’: invalid parsing will be set to null.
-            - ‘ignore’: then invalid parsing will return the input.
+            - ‘ignore’: invalid parsing will return the input.
+            - ‘raise’: invalid parsing will raise an exception.
 
         (default: 'coerce')
     report
