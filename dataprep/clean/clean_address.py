@@ -2,27 +2,27 @@
 Clean and validate a DataFrame column containing US street addresses.
 """
 
-from operator import itemgetter
-from typing import Union, Any, Tuple, List, Dict
 import re
+from operator import itemgetter
+from typing import Any, Dict, List, Tuple, Union
 
-import pandas as pd
+import dask
 import dask.dataframe as dd
 import numpy as np
-import dask
+import pandas as pd
 import usaddress
 
 from ..eda.progress_bar import ProgressBar
-from .utils import NULL_VALUES, to_dask, create_report_new
 from .address_utils import (
-    PREFIXES,
-    FULL_PREFIX,
-    SUFFIXES,
-    FULL_STATES,
     ABBR_STATES,
-    TAG_MAPPING,
+    FULL_PREFIX,
+    FULL_STATES,
     KEYWORDS,
+    PREFIXES,
+    SUFFIXES,
+    TAG_MAPPING,
 )
+from .utils import NULL_VALUES, create_report_new, to_dask
 
 
 def clean_address(
@@ -96,9 +96,9 @@ def clean_address(
         (default: False)
     errors
         How to handle parsing errors.
-            - ‘raise’: invalid parsing will raise an exception.
             - ‘coerce’: invalid parsing will be set to null.
-            - ‘ignore’: then invalid parsing will return the input.
+            - ‘ignore’: invalid parsing will return the input.
+            - ‘raise’: invalid parsing will raise an exception.
 
         (default: 'coerce')
     report
