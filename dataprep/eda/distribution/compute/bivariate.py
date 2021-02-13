@@ -56,10 +56,9 @@ def compute_bivariate(
     ):
         x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
         df = df[[x, y]]
-        try:
-            df.head()[x].apply(hash)
-        except TypeError:
-            df[x] = df[x].astype(str)
+        # Since it will throw error if column is object while some cells are
+        # numerical, we transform column to string first.
+        df[x] = df[x].astype(str)
 
         (comps,) = dask.compute(_nom_cont_comps(df.dropna(), cfg))
 
@@ -155,15 +154,10 @@ def compute_bivariate(
         )
     elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
         df = df[[x, y]]
-        head = df.head()
-        try:
-            head[x].apply(hash)
-        except TypeError:
-            df[x] = df[x].astype(str)
-        try:
-            head[y].apply(hash)
-        except TypeError:
-            df[y] = df[y].astype(str)
+        # Since it will throw error if column is object while some cells are
+        # numerical, we transform column to string first.
+        df[x] = df[x].astype(str)
+        df[y] = df[y].astype(str)
 
         (comps,) = dask.compute(df.dropna().groupby([x, y]).size())
         return Intermediate(
