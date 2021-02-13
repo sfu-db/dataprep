@@ -25,9 +25,10 @@ def simpledf() -> pd.DataFrame:
         ],
         axis=1,
     )
-    # df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
     df.columns = ["a", "b", "c", "d", "e", "f"]
     df["g"] = pd.to_datetime(df["f"])
+    # test when column is object but some cells are numerical
+    df["h"] = pd.Series([0, "x"] * 500)
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
