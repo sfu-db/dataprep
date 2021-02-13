@@ -228,11 +228,9 @@ def basic_computations(df: dd.DataFrame, cfg: Config) -> Tuple[Dict[str, Any], D
         if is_dtype(detect_dtype(df.frame[col]), Continuous()):
             data[col] = cont_comps(df.frame[col], cfg)
         elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
-            # cast the column as string type if it contains a mutable type
-            try:
-                first_rows[col].apply(hash)
-            except TypeError:
-                df.frame[col] = df.frame[col].astype(str)
+            # Since it will throw error if column is object while some cells are
+            # numerical, we transform column to string first.
+            df.frame[col] = df.frame[col].astype(str)
             data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
         elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
             data[col] = {}
