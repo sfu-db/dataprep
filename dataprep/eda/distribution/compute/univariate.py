@@ -44,12 +44,10 @@ def compute_univariate(
 
     if is_dtype(col_dtype, Nominal()):
         head = df[x].head()  # dd.Series.head() triggers a (small) data read
-        # cast the column as string type if it contains a mutable type
-        try:
-            head.apply(hash)
-        except TypeError:
-            df[x] = df[x].astype(str)
 
+        # Since it will throw error if column is object while some cells are
+        # numerical, we transform column to string first.
+        df[x] = df[x].astype(str)
         # all computations for plot(df, Nominal())
         (data,) = dask.compute(nom_comps(df[x], head, cfg))
 
