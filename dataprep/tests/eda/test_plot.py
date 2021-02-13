@@ -32,6 +32,8 @@ def simpledf() -> dd.DataFrame:
     df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
     df.columns = ["a", "b", "c", "d", "e", "f"]
     df["e"] = pd.to_datetime(df["e"])
+    # test when column is object but some cells are numerical
+    df["g"] = pd.Series([0, "x"] * 500)
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
@@ -42,28 +44,21 @@ def simpledf() -> dd.DataFrame:
     return ddf
 
 
-def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
+def test_sanity_compute_univariate(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "a")
-
-
-def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "e")
+    plot(simpledf, "g")
 
 
-def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
+def test_sanity_compute_overview(simpledf: dd.DataFrame) -> None:
     plot(simpledf)
 
 
-def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
-    plot(simpledf, "d", "e")
-
-
-def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
+def test_sanity_compute_bivariate(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "a", "e")
-
-
-# def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
-#     plot(simpledf, "f")
+    plot(simpledf, "d", "e")
+    plot(simpledf, "a", "g")
+    plot(simpledf, "d", "g")
 
 
 def test_specify_column_type(simpledf: dd.DataFrame) -> None:
