@@ -210,8 +210,10 @@ def _rename_duplicates(names: pd.Index, case: str) -> Any:
     """
     Rename duplicated column names to append a number at the end.
     """
-    if case in {"snake", "camel", "pascal", "const"}:
+    if case in {"snake", "const"}:
         sep = "_"
+    elif case in {"camel", "pascal"}:
+        sep = ""
     elif case == "kebab":
         sep = "-"
     else:
