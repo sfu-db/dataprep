@@ -164,11 +164,13 @@ def calc_stats(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -> Dict
         dtype_cnts, num_cols = get_dtype_cnts_and_num_cols(df, dtype)
 
     if cfg.stats.enable:
+
         stats["ncols"] = df.shape[1]
         stats["npresent_cells"] = df.count().sum()
-        stats["nrows_wo_dups"] = (
-            df.map_partitions(lambda x: drop_duplicates()).drop_duplicates().shape[0]
-        )
+        stats["nrows_wo_dups"] = da.minimum(
+            da.from_delayed(df.nunique_approx().to_delayed(), shape=(), dtype=float),
+            da.from_delayed(df.shape[0], shape=(), dtype=int),
+        )  # avoid num of estimated rows larger than the true value
         stats["mem_use"] = df.memory_usage(deep=True).sum()
         stats["dtype_cnts"] = dtype_cnts
 
