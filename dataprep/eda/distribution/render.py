@@ -28,7 +28,7 @@ from bokeh.util.hex import hexbin
 from scipy.stats import norm
 from wordcloud import WordCloud
 
-from ..configs import Config
+from ..configs import KDE, Bar, Box, Config, Pie, QQNorm, WordFrequency
 from ..dtypes import Continuous, DateTime, Nominal, is_dtype
 from ..intermediate import Intermediate
 from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS
@@ -276,7 +276,7 @@ def wordfreq_viz(
     nrows: int,
     plot_width: int,
     plot_height: int,
-    show_yticks: bool,
+    wordfreq: WordFrequency,
 ) -> Figure:
     """
     Visualize the word frequency bar chart
@@ -299,9 +299,16 @@ def wordfreq_viz(
         tooltips=tooltips,
         x_range=list(df.index),
     )
-    fig.vbar(x="index", top=col, width=0.9, source=df)
+    fig.vbar(
+        x="index",
+        top=col,
+        fill_color=wordfreq.color,
+        line_color=wordfreq.color,
+        width=0.9,
+        source=df,
+    )
     fig.yaxis.axis_label = "Count"
-    tweak_figure(fig, "bar", show_yticks)
+    tweak_figure(fig, "bar", True)
     _format_axis(fig, 0, df[col].max(), "y")
     return Panel(child=row(fig), title="Word Frequency")
 
@@ -311,10 +318,10 @@ def bar_viz(
     ttl_grps: int,
     nrows: int,
     col: str,
-    yscale: str,
     plot_width: int,
     plot_height: int,
     show_yticks: bool,
+    bar_cfg: Bar,
 ) -> Figure:
     """
     Render a bar chart
@@ -335,15 +342,23 @@ def bar_viz(
         tooltips=tooltips,
         tools="hover",
         x_range=list(df.index),
-        y_axis_type=yscale,
+        y_axis_type=bar_cfg.yscale,
     )
-    fig.vbar(x="index", width=0.9, top=col, bottom=0.01, source=df)
+    fig.vbar(
+        x="index",
+        width=0.9,
+        top=col,
+        fill_color=bar_cfg.color,
+        line_color=bar_cfg.color,
+        bottom=0.01,
+        source=df,
+    )
     tweak_figure(fig, "bar", show_yticks)
     fig.yaxis.axis_label = "Count"
     if ttl_grps > len(df):
         fig.xaxis.axis_label = f"Top {len(df)} of {ttl_grps} {col}"
         fig.xaxis.axis_label_standoff = 0
-    if show_yticks and yscale == "linear":
+    if show_yticks and bar_cfg.yscale == "linear":
         _format_axis(fig, 0, df[col].max(), "y")
     return fig
 
@@ -354,10 +369,12 @@ def pie_viz(
     col: str,
     plot_width: int,
     plot_height: int,
-) -> Panel:
+    pie: Pie,
+) -> Tuple[Panel, List[str]]:
     """
     Render a pie chart
     """
+    # pylint: disable=too-many-arguments
     npresent = df[col].sum()
     df.index = list(df.index)  # for CategoricalIndex to normal Index
     if nrows > npresent:
@@ -374,8 +391,11 @@ def pie_viz(
         tools="hover",
         tooltips=tooltips,
     )
-    color_list = CATEGORY20 * (len(df) // len(CATEGORY20) + 1)
-    df["colour"] = color_list[0 : len(df)]
+    if pie.colors is None:
+        color_list = list((CATEGORY20 * (len(df) // len(CATEGORY20) + 1))[0 : len(df)])
+    else:
+        color_list = list(pie.colors[0 : len(df)])
+    df["colour"] = color_list
     df.index = df.index.astype(str)
     df.index = df.index.map(lambda x: x[:13] + "..." if len(x) > 13 else x)
 
@@ -395,7 +415,7 @@ def pie_viz(
     tweak_figure(fig, "pie")
     fig.axis.major_label_text_font_size = "0pt"
     fig.axis.major_tick_line_color = None
-    return Panel(child=row(fig), title="Pie Chart")
+    return Panel(child=row(fig), title="Pie Chart"), color_list
 
 
 def hist_viz(
@@ -403,6 +423,7 @@ def hist_viz(
     nrows: int,
     col: str,
     yscale: str,
+    color: str,
     plot_width: int,
     plot_height: int,
     show_yticks: bool,
@@ -439,9 +460,9 @@ def hist_viz(
         left="left",
         right="right",
         bottom=bottom,
-        alpha=0.5,
         top="freq",
-        fill_color="#6baed6",
+        fill_color=color,
+        line_color=color,
     )
     hover = HoverTool(tooltips=tooltips, mode="vline")
     fig.add_tools(hover)
@@ -460,9 +481,9 @@ def kde_viz(
     hist: Tuple[np.ndarray, np.ndarray],
     kde: np.ndarray,
     col: str,
-    yscale: str,
     plot_width: int,
     plot_height: int,
+    kde_cfg: KDE,
 ) -> Panel:
     """
     Render histogram with overlayed kde
@@ -483,17 +504,17 @@ def kde_viz(
         plot_height=plot_height,
         title=col,
         toolbar_location=None,
-        y_axis_type=yscale,
+        y_axis_type=kde_cfg.yscale,
     )
-    bottom = 0 if yscale == "linear" or df.empty else df["dens"].min() / 2
+    bottom = 0 if kde_cfg.yscale == "linear" or df.empty else df["dens"].min() / 2
     hist = fig.quad(
         source=df,
         left="left",
         right="right",
         bottom=bottom,
-        alpha=0.5,
         top="dens",
-        fill_color="#6baed6",
+        fill_color=kde_cfg.hist_color,
+        line_color=kde_cfg.hist_color,
     )
     hover_hist = HoverTool(
         renderers=[hist],
@@ -502,7 +523,7 @@ def kde_viz(
     )
     pts_rng = np.linspace(df.loc[0, "left"], df.loc[len(df) - 1, "right"], 1000)
     pdf = kde(pts_rng)
-    line = fig.line(x=pts_rng, y=pdf, line_color="#9467bd", line_width=2, alpha=0.5)
+    line = fig.line(x=pts_rng, y=pdf, line_color=kde_cfg.line_color, line_width=2, alpha=0.5)
     hover_dist = HoverTool(renderers=[line], tooltips=[("x", "@x"), ("y", "@y")])
     fig.add_tools(hover_hist)
     fig.add_tools(hover_dist)
@@ -510,7 +531,7 @@ def kde_viz(
     fig.yaxis.axis_label = "Density"
     fig.xaxis.axis_label = col
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
-    if yscale == "linear":
+    if kde_cfg.yscale == "linear":
         _format_axis(fig, 0, max(df["dens"].max(), pdf.max()), "y")
     return Panel(child=row(fig), title="KDE Plot")
 
@@ -522,6 +543,7 @@ def qqnorm_viz(
     col: str,
     plot_width: int,
     plot_height: int,
+    qqnorm: QQNorm,
 ) -> Panel:
     """
     Render a qq plot
@@ -541,10 +563,10 @@ def qqnorm_viz(
         x=theory_qntls,
         y=qntls,
         size=3,
-        color=CATEGORY20[0],
+        color=qqnorm.point_color,
     )
     vals = np.concatenate((theory_qntls, qntls))
-    fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color="red")
+    fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color=qqnorm.line_color)
     tweak_figure(fig, "qq")
     fig.xaxis.axis_label = "Normal Quantiles"
     fig.yaxis.axis_label = f"Quantiles of {col}"
@@ -558,6 +580,7 @@ def box_viz(
     x: str,
     plot_width: int,
     plot_height: int,
+    box: Box,
     y: Optional[str] = None,
     ttl_grps: Optional[int] = None,
 ) -> Panel:
@@ -592,7 +615,7 @@ def box_viz(
         width=width,
         top="q2",
         bottom="q1",
-        fill_color=CATEGORY20[0],
+        fill_color=box.color,
         line_color="black",
         source=df,
     )
@@ -601,7 +624,7 @@ def box_viz(
         width=width,
         top="q3",
         bottom="q2",
-        fill_color=CATEGORY20[0],
+        fill_color=box.color,
         line_color="black",
         source=df,
     )
@@ -619,7 +642,7 @@ def box_viz(
             y=otlrs,
             size=3,
             line_color="black",
-            color=CATEGORY20[6],
+            color="black",
             fill_alpha=0.6,
         )
         fig.add_tools(
@@ -1441,14 +1464,16 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
                 ttl_grps,
                 nrows,
                 col,
-                cfg.bar.yscale,
                 plot_width,
                 plot_height,
                 False,
+                cfg.bar,
             )
             htgs[col] = cfg.bar.grid_how_to_guide()
         elif is_dtype(dtp, Continuous()):
-            fig = hist_viz(data, nrows, col, cfg.hist.yscale, plot_width, plot_height, False)
+            fig = hist_viz(
+                data, nrows, col, cfg.hist.yscale, cfg.hist.color, plot_width, plot_height, False
+            )
             htgs[col] = cfg.hist.grid_how_to_guide()
         elif is_dtype(dtp, DateTime()):
             df, timeunit, miss_pct = data
@@ -1482,6 +1507,7 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Create visualizations for plot(df, Nominal)
     """
+
     if cfg.plot.report:
         plot_width = 280
         plot_height = 250
@@ -1505,17 +1531,19 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
             data["nuniq"],
             data["nrows"],
             col,
-            cfg.bar.yscale,
             plot_width,
             plot_height,
             True,
+            cfg.bar,
         )
         tabs.append(Panel(child=row(fig), title="Bar Chart"))
         htgs["Bar Chart"] = cfg.bar.how_to_guide(plot_height, plot_width)
     if cfg.pie.enable:
-        pie = data["pie"].to_frame()
-        tabs.append(pie_viz(pie, data["nrows"], col, plot_width, plot_height))
-        htgs["Pie Chart"] = cfg.pie.how_to_guide(plot_height, plot_width)
+        fig, color_list = pie_viz(
+            data["pie"].to_frame(), data["nrows"], col, plot_width, plot_height, cfg.pie
+        )
+        tabs.append(fig)
+        htgs["Pie Chart"] = cfg.pie.how_to_guide(color_list, plot_height, plot_width)
     if cfg.wordcloud.enable:
         if data["nuniq_words_cloud"] > 0:
             tabs.append(wordcloud_viz(data["word_cnts_cloud"], plot_width, plot_height))
@@ -1528,7 +1556,7 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
                     data["nwords_freq"],
                     plot_width,
                     plot_height,
-                    True,
+                    cfg.wordfreq,
                 )
             )
             htgs["Word Frequency"] = cfg.wordfreq.how_to_guide(plot_height, plot_width)
@@ -1538,6 +1566,7 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
             data["nrows"],
             "Word Length",
             cfg.wordlen.yscale,
+            cfg.wordlen.color,
             plot_width,
             plot_height,
             True,
@@ -1651,6 +1680,7 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
             data["nrows"],
             col,
             cfg.hist.yscale,
+            cfg.hist.color,
             plot_width,
             plot_height,
             True,
@@ -1660,12 +1690,12 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     if cfg.kde.enable:
         if data["kde"] is not None:
             dens, kde = data["dens"], data["kde"]
-            tabs.append(kde_viz(dens, kde, col, cfg.kde.yscale, plot_width, plot_height))
+            tabs.append(kde_viz(dens, kde, col, plot_width, plot_height, cfg.kde))
             htgs["KDE Plot"] = cfg.kde.how_to_guide(plot_height, plot_width)
     if cfg.qqnorm.enable:
         if data["qntls"].any():
             qntls, mean, std = data["qntls"], data["mean"], data["std"]
-            tabs.append(qqnorm_viz(qntls, mean, std, col, plot_width, plot_height))
+            tabs.append(qqnorm_viz(qntls, mean, std, col, plot_width, plot_height, cfg.qqnorm))
             htgs["Normal Q-Q Plot"] = cfg.qqnorm.how_to_guide(plot_height, plot_width)
     if cfg.box.enable:
         box_data = {
@@ -1678,7 +1708,7 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
             "otlrs": [data["otlrs"]],
         }
         df = pd.DataFrame(box_data, index=[0])
-        tabs.append(box_viz(df, col, plot_width, plot_height))
+        tabs.append(box_viz(df, col, plot_width, plot_height, cfg.box))
         htgs["Box Plot"] = cfg.box.univar_how_to_guide(plot_height, plot_width)
 
     # panel.child.children[0] is a figure
@@ -1792,7 +1822,7 @@ def render_cat_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         df = df.pivot(index=x, columns="level_1", values=[0]).reset_index()
         df.columns = df.columns.get_level_values(1)
         df.columns = ["grp"] + list(df.columns[1:])
-        tabs.append(box_viz(df, x, plot_width, plot_height, y, data["ttl_grps"]))
+        tabs.append(box_viz(df, x, plot_width, plot_height, cfg.box, y, data["ttl_grps"]))
         htgs["Box Plot"] = cfg.box.nom_cont_how_to_guide(plot_height, plot_width)
 
     if cfg.line.enable:
@@ -1868,7 +1898,7 @@ def render_two_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         df = df.pivot(index="grp", columns="level_1", values=[0]).reset_index()
         df.columns = df.columns.get_level_values(1)
         df.columns = ["grp"] + list(df.columns[1:])
-        tabs.append(box_viz(df, x, plot_width, plot_height, y))
+        tabs.append(box_viz(df, x, plot_width, plot_height, cfg.box, y))
         htgs["Box Plot"] = cfg.box.two_cont_how_to_guide(plot_height, plot_width)
 
     for panel in tabs:
