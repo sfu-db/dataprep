@@ -2,6 +2,7 @@
 for plot_correlation(df) function."""
 
 from typing import Optional, Tuple, List, Dict, Union, Any
+from warnings import catch_warnings, filterwarnings
 
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
@@ -55,9 +56,21 @@ def compute_correlation(
         cfg = Config()
 
     if x is None and y is None:  # pylint: disable=no-else-return
-        return _calc_overview(df, cfg, value_range=value_range, k=k)
+        with catch_warnings():
+            filterwarnings(
+                "ignore",
+                "overflow encountered in long_scalars",
+                category=RuntimeWarning,
+            )
+            return _calc_overview(df, cfg, value_range=value_range, k=k)
     elif x is not None and y is None:
-        return _calc_univariate(df, x, cfg, value_range=value_range, k=k)
+        with catch_warnings():
+            filterwarnings(
+                "ignore",
+                "overflow encountered in long_scalars",
+                category=RuntimeWarning,
+            )
+            return _calc_univariate(df, x, cfg, value_range=value_range, k=k)
     elif x is None and y is not None:
         raise ValueError("Please give the column name to x instead of y")
     elif x is not None and y is not None:
