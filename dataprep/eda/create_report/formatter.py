@@ -106,6 +106,11 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
             "invalid value encountered in true_divide",
             category=RuntimeWarning,
         )
+        filterwarnings(
+            "ignore",
+            "overflow encountered in long_scalars",
+            category=RuntimeWarning,
+        )
         (data,) = dask.compute(data)
 
     # results dictionary
