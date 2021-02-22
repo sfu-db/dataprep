@@ -7,6 +7,7 @@ from typing import Any, Union
 
 import dask
 import dask.dataframe as dd
+import numpy as np
 import pandas as pd
 
 from ..eda.progress_bar import ProgressBar
@@ -251,7 +252,7 @@ def clean_email(
         (default: False)
     errors
         How to handle parsing errors.
-            - ‘coerce’: invalid parsing will be set to null.
+            - ‘coerce’: invalid parsing will be set to NaN.
             - ‘ignore’: invalid parsing will return the input.
             - ‘raise’: invalid parsing will raise an exception.
 
@@ -275,9 +276,9 @@ def clean_email(
         2 values with bad format (66.67%)
     Result contains 1 (33.33%) values in the correct format and 2 null values (66.67%)
                 email      email_clean
-    0    Abc.example.com             None
+    0    Abc.example.com              NaN
     1    Abc@example.com  abc@example.com
-    2  H ELLO@hotmal.COM             None
+    2  H ELLO@hotmal.COM              NaN
     """
     # pylint: disable=too-many-arguments
 
@@ -472,11 +473,11 @@ def _not_email(val: Any, split: bool, errtype: str, processtype: str) -> Any:
     """
     if processtype == "coerce":
         if split:
-            return (None, None, 0) if errtype == "null" else (None, None, 1)
-        return (None, 0) if errtype == "null" else (None, 1)
+            return (np.nan, np.nan, 0) if errtype == "null" else (np.nan, np.nan, 1)
+        return (np.nan, 0) if errtype == "null" else (np.nan, 1)
     elif processtype == "ignore":
         if split:
-            return (val, None, 0) if errtype == "null" else (val, None, 1)
+            return (val, np.nan, 0) if errtype == "null" else (val, np.nan, 1)
         return (val, 0) if errtype == "null" else (val, 1)
     elif processtype == "raise":
         raise ValueError(f"unable to parse value {val}")
