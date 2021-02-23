@@ -34,6 +34,8 @@ def clean_headers(
     """
     Function to clean column headers (column names).
 
+    Read more in the :ref:`User Guide <clean_headers_user_guide>`.
+
     Parameters
     ----------
     df
@@ -85,7 +87,7 @@ def clean_headers(
         )
 
     # Store original column names for creating cleaning report
-    orig_columns = df.columns
+    orig_columns = df.columns.astype(str).tolist()
 
     if replace:
         df = df.rename(columns=lambda col: _replace_values(col, replace))
@@ -98,8 +100,9 @@ def clean_headers(
     df.columns = _rename_duplicates(df.columns, case)
 
     # Count the number of changed column names
-    stats = {}
-    stats["cleaned"] = len(df.columns.astype(str).difference(orig_columns.astype(str)))
+    new_columns = df.columns.astype(str).tolist()
+    cleaned = [1 if new_columns[i] != orig_columns[i] else 0 for i in range(len(orig_columns))]
+    stats = {"cleaned": sum(cleaned)}
 
     # Output a report describing the result of clean_headers
     if report:
