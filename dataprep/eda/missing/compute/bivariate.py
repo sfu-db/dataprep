@@ -17,11 +17,7 @@ from .common import LABELS, histogram
 
 
 def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-statements
-    df: DataArray,
-    x: str,
-    y: str,
-    cfg: Config,
-    dtype: Optional[DTypeDef] = None,
+    df: DataArray, x: str, y: str, cfg: Config, dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on another column y when
     the missing values in x is dropped."""
@@ -133,11 +129,7 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-stat
         meta["y", "shown"] = shown
         meta["y", "total"] = len(counts[0])
         itmdt = Intermediate(
-            hist=df_ret,
-            x=x,
-            y=y,
-            meta=meta["y"],
-            visual_type="missing_impact_1v1",
+            hist=df_ret, x=x, y=y, meta=meta["y"], visual_type="missing_impact_1v1",
         )
         return itmdt
 

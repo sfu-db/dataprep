@@ -12,12 +12,7 @@ from .common import _calc_line_dt
 
 
 def compute_trivariate(
-    df: dd.DataFrame,
-    x: str,
-    y: str,
-    z: str,
-    cfg: Config,
-    dtype: Optional[DTypeDef] = None,
+    df: dd.DataFrame, x: str, y: str, z: str, cfg: Config, dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
     """Compute functions for plot(df, x, y, z).
 
@@ -81,10 +76,5 @@ def compute_trivariate(
         )
     )
     return Intermediate(
-        x=x,
-        y=y,
-        z=z,
-        agg=cfg.line.agg,
-        data=data[0],
-        visual_type="dt_cat_num_cols",
+        x=x, y=y, z=z, agg=cfg.line.agg, data=data[0], visual_type="dt_cat_num_cols",
     )

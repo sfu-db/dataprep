@@ -124,8 +124,7 @@ def clean_url(
     # changed in a tuple. Then split the column of tuples and count the
     # amount of different codes to produce the report
     df["clean_code_tup"] = df[column].map_partitions(
-        lambda srs: [_format_url(x, column, remove_auth, split, errors) for x in srs],
-        meta=object,
+        lambda srs: [_format_url(x, column, remove_auth, split, errors) for x in srs], meta=object,
     )
     if split:
         df = df.assign(

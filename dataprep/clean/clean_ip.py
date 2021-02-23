@@ -121,8 +121,7 @@ def clean_ip(
     # changed in a tuple. Then split the column of tuples and count the
     # amount of different codes to produce the report
     df["clean_code_tup"] = df[column].map_partitions(
-        lambda srs: [_format_ip(x, input_format, output_format, errors) for x in srs],
-        meta=object,
+        lambda srs: [_format_ip(x, input_format, output_format, errors) for x in srs], meta=object,
     )
     df = df.assign(
         _temp_=df["clean_code_tup"].map(itemgetter(0)),

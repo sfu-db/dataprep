@@ -57,10 +57,7 @@ class ConfigGeneratorUI:  # pylint: disable=too-many-instance-attributes
     table_path_box: Text
     output: Output
 
-    def __init__(
-        self,
-        existing: Optional[Dict[str, Any]] = None,
-    ) -> None:
+    def __init__(self, existing: Optional[Dict[str, Any]] = None,) -> None:
         self.existing = existing
         self.output = Output()
 

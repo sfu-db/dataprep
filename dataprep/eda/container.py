@@ -18,9 +18,7 @@ from .configs import Config
 
 output_notebook(INLINE, hide_banner=True)  # for offline usage
 
-ENV_LOADER = Environment(
-    loader=PackageLoader("dataprep", "eda/templates"),
-)
+ENV_LOADER = Environment(loader=PackageLoader("dataprep", "eda/templates"),)
 
 TAB_VISUAL_TYPES = {
     "missing_impact_1v1",

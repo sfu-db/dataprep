@@ -379,20 +379,6 @@ def test_validate_value() -> None:
 def test_validate_series(df_urls: pd.DataFrame) -> None:
     df_valid = validate_url(df_urls["messy_url"])
     df_check = pd.Series(
-        [
-            False,
-            True,
-            True,
-            False,
-            False,
-            False,
-            True,
-            False,
-            False,
-            False,
-            False,
-            True,
-            True,
-        ]
+        [False, True, True, False, False, False, True, False, False, False, False, True, True,]
     )
     assert df_check.equals(df_valid)

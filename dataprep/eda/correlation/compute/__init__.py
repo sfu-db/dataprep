@@ -58,17 +58,13 @@ def compute_correlation(
     if x is None and y is None:  # pylint: disable=no-else-return
         with catch_warnings():
             filterwarnings(
-                "ignore",
-                "overflow encountered in long_scalars",
-                category=RuntimeWarning,
+                "ignore", "overflow encountered in long_scalars", category=RuntimeWarning,
             )
             return _calc_overview(df, cfg, value_range=value_range, k=k)
     elif x is not None and y is None:
         with catch_warnings():
             filterwarnings(
-                "ignore",
-                "overflow encountered in long_scalars",
-                category=RuntimeWarning,
+                "ignore", "overflow encountered in long_scalars", category=RuntimeWarning,
             )
             return _calc_univariate(df, x, cfg, value_range=value_range, k=k)
     elif x is None and y is not None:
