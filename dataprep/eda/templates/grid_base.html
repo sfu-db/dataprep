@@ -49,8 +49,7 @@
                         {% for ins_type, insight in entry.items() %}
                         <tr>
                             <th id="des-{{ context.rnd }}">
-                                <span title="{{ col_name }}" class="col-name-{{ context.rnd }}">{{ insight.split(' ')[0] }}</span>
-                                {{ insight.replace(insight.split(' ')[0], '') }}
+                                {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
                             </th>
                             <td><span class="ins-type-{{ context.rnd }}">{{ ins_type }}</span></td>
                         </tr>
@@ -113,8 +112,8 @@
                     <h4>Column Insights</h3>
                         <ol>
                             {% for insight in context.column_insights[context.meta[loop.index0]] %}
-                            <li class="entry-{{ context.rnd }}"><span
-                                    class="col-name-{{ context.rnd }}">{{ insight.split(' ')[0] }}</span>{{ insight.replace(insight.split(' ')[0], '') }}
+                            <li class="entry-{{ context.rnd }}">
+                                {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
                             </li>
                             {% endfor %}
                         </ol>
@@ -122,7 +121,7 @@
                 {% endif %}
             </div>
             {% endif %}
-            
+
             {{ fig }}
         </div>
         {% endfor %}
