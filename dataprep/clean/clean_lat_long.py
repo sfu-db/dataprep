@@ -15,7 +15,7 @@ from .utils import NULL_VALUES, create_report_new, to_dask
 
 LAT_LONG_PATTERN = re.compile(
     r"""
-    .*?[(]?
+    [^/]*?[(]?
       (?P<dir_front>[NS])?[ ]*
         (?P<deg>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
         (?:(?P<min>%(FLOAT)s)[%(PRIME)s'm]?[ ]*)?
