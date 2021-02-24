@@ -40,6 +40,8 @@ def clean_address(
     """
     Clean and standardize US street addresses.
 
+    Read more in the :ref:`User Guide <address_userguide>`.
+
     Parameters
     ----------
     df
@@ -171,6 +173,8 @@ def validate_address(
 ) -> Union[bool, pd.Series]:
     """
     Validate US street addresses.
+
+    Read more in the :ref:`User Guide <address_userguide>`.
 
     Parameters
     ----------
