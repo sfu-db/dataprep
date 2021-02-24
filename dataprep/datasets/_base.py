@@ -50,7 +50,7 @@ def load_dataset(name: str) -> pd.DataFrame:
     Get all available dataset names:
     >>> from dataprep.datasets import get_dataset_names
     >>> get_dataset_names()
-    ['iris', 'titanic']
+    ['iris', 'titanic', 'adult', 'house_prices_train', 'house_prices_test']
     """
 
     # Remove suffix 'csv' and transform to lower case
