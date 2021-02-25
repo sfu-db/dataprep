@@ -345,7 +345,9 @@ def _check_output_format(output_format: str) -> ParsedTargetFormat:
 
 
 def _figure_output_format_timezone(
-    parsed_data: ParsedTargetFormat, target_tokens: List[str], remain_tokens: List[str],
+    parsed_data: ParsedTargetFormat,
+    target_tokens: List[str],
+    remain_tokens: List[str],
 ) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure timezone token in target format
@@ -370,7 +372,9 @@ def _figure_output_format_timezone(
 
 
 def _figure_output_format_ymd(
-    parsed_data: ParsedTargetFormat, target_tokens: List[str], remain_tokens: List[str],
+    parsed_data: ParsedTargetFormat,
+    target_tokens: List[str],
+    remain_tokens: List[str],
 ) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure year, month and day token in target format
@@ -400,7 +404,9 @@ def _figure_output_format_ymd(
 
 
 def _figure_output_format_ampm(
-    parsed_data: ParsedTargetFormat, target_tokens: List[str], remain_tokens: List[str],
+    parsed_data: ParsedTargetFormat,
+    target_tokens: List[str],
+    remain_tokens: List[str],
 ) -> Tuple[ParsedTargetFormat, List[str]]:
     """
     This function figure AM or PM token in target format
@@ -517,7 +523,9 @@ def _ensure_ymd(tokes: List[str]) -> Tuple[ParsedDate, List[str]]:
 
 
 def _ensure_year(
-    parsed_data: ParsedDate, tokes: List[str], remain_tokens: List[str],
+    parsed_data: ParsedDate,
+    tokes: List[str],
+    remain_tokens: List[str],
 ) -> Tuple[ParsedDate, List[str]]:
     """
     This function extract year number whose length is 4

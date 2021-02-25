@@ -124,7 +124,11 @@ def _calc_overview(
             continue
 
         ndf = pd.DataFrame(
-            {"x": num_df.columns[cordx], "y": num_df.columns[cordy], "correlation": corr.ravel(),}
+            {
+                "x": num_df.columns[cordx],
+                "y": num_df.columns[cordy],
+                "correlation": corr.ravel(),
+            }
         )
         ndf = ndf[cordy > cordx]  # Retain only lower triangle (w/o diag)
 

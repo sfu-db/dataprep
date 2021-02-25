@@ -218,7 +218,12 @@ def validate_country(
 
 
 def _format_country(
-    val: Any, input_format: str, output_format: str, fuzzy_dist: int, strict: bool, errors: str,
+    val: Any,
+    input_format: str,
+    output_format: str,
+    fuzzy_dist: int,
+    strict: bool,
+    errors: str,
 ) -> Any:
     """
     Function to transform a country instance into the desired format

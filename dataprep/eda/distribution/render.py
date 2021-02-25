@@ -37,7 +37,10 @@ __all__ = ["render"]
 
 
 def tweak_figure(
-    fig: Figure, ptype: Optional[str] = None, show_yticks: bool = False, max_lbl_len: int = 15,
+    fig: Figure,
+    ptype: Optional[str] = None,
+    show_yticks: bool = False,
+    max_lbl_len: int = 15,
 ) -> None:
     """
     Set some common attributes for a figure
@@ -233,7 +236,11 @@ def _empty_figure(title: str, plot_height: int, plot_width: int) -> Figure:
     return fig
 
 
-def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> Panel:
+def wordcloud_viz(
+    word_cnts: pd.Series,
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
     """
     Visualize the word cloud
     """  # pylint: disable=unsubscriptable-object
@@ -265,7 +272,11 @@ def wordcloud_viz(word_cnts: pd.Series, plot_width: int, plot_height: int,) -> P
 
 
 def wordfreq_viz(
-    word_cnts: pd.Series, nrows: int, plot_width: int, plot_height: int, show_yticks: bool,
+    word_cnts: pd.Series,
+    nrows: int,
+    plot_width: int,
+    plot_height: int,
+    show_yticks: bool,
 ) -> Figure:
     """
     Visualize the word frequency bar chart
@@ -296,7 +307,11 @@ def wordfreq_viz(
 
 
 def ngram_viz(
-    gram_cnts: pd.Series, nrows: int, plot_width: int, plot_height: int, show_yticks: bool,
+    gram_cnts: pd.Series,
+    nrows: int,
+    plot_width: int,
+    plot_height: int,
+    show_yticks: bool,
 ) -> Figure:
     """
     Visualize the word frequency bar chart
@@ -368,7 +383,13 @@ def bar_viz(
     return fig
 
 
-def pie_viz(df: pd.DataFrame, nrows: int, col: str, plot_width: int, plot_height: int,) -> Panel:
+def pie_viz(
+    df: pd.DataFrame,
+    nrows: int,
+    col: str,
+    plot_width: int,
+    plot_height: int,
+) -> Panel:
     """
     Render a pie chart
     """
@@ -484,7 +505,14 @@ def kde_viz(
     # pylint: disable=too-many-arguments, too-many-locals
     dens, bins = hist
     intvls = _format_bin_intervals(bins)
-    df = pd.DataFrame({"intvl": intvls, "left": bins[:-1], "right": bins[1:], "dens": dens,})
+    df = pd.DataFrame(
+        {
+            "intvl": intvls,
+            "left": bins[:-1],
+            "right": bins[1:],
+            "dens": dens,
+        }
+    )
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
@@ -503,7 +531,9 @@ def kde_viz(
         fill_color="#6baed6",
     )
     hover_hist = HoverTool(
-        renderers=[hist], tooltips=[("Bin", "@intvl"), ("Density", "@dens")], mode="vline",
+        renderers=[hist],
+        tooltips=[("Bin", "@intvl"), ("Density", "@dens")],
+        mode="vline",
     )
     pts_rng = np.linspace(df.loc[0, "left"], df.loc[len(df) - 1, "right"], 1000)
     pdf = kde(pts_rng)
@@ -521,7 +551,12 @@ def kde_viz(
 
 
 def qqnorm_viz(
-    qntls: pd.Series, mean: float, std: float, col: str, plot_width: int, plot_height: int,
+    qntls: pd.Series,
+    mean: float,
+    std: float,
+    col: str,
+    plot_width: int,
+    plot_height: int,
 ) -> Panel:
     """
     Render a qq plot
@@ -538,7 +573,10 @@ def qqnorm_viz(
         tooltips=tooltips,
     )
     fig.circle(
-        x=theory_qntls, y=qntls, size=3, color=CATEGORY20[0],
+        x=theory_qntls,
+        y=qntls,
+        size=3,
+        color=CATEGORY20[0],
     )
     vals = np.concatenate((theory_qntls, qntls))
     fig.line(x=[vals.min(), vals.max()], y=[vals.min(), vals.max()], color="red")
@@ -612,9 +650,19 @@ def box_viz(
     if otlrs:
         gps = [grp for grp, ols in zip(df["grp"], df["otlrs"]) for _ in range(len(ols))]
         circ = fig.circle(
-            x=gps, y=otlrs, size=3, line_color="black", color=CATEGORY20[6], fill_alpha=0.6,
+            x=gps,
+            y=otlrs,
+            size=3,
+            line_color="black",
+            color=CATEGORY20[6],
+            fill_alpha=0.6,
         )
-        fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
+        fig.add_tools(
+            HoverTool(
+                renderers=[circ],
+                tooltips=[("Outlier", "@y")],
+            )
+        )
     tooltips = [
         ("Upper Whisker", "@uw"),
         ("Upper Quartile", "@q3"),
@@ -625,7 +673,12 @@ def box_viz(
     if y:
         lbl = f"{x}" if ttl_grps else "Bin"
         tooltips.insert(0, (lbl, "@grp"))
-    fig.add_tools(HoverTool(renderers=[upw, utail, ubox, lbox, ltail, low], tooltips=tooltips,))
+    fig.add_tools(
+        HoverTool(
+            renderers=[upw, utail, ubox, lbox, ltail, low],
+            tooltips=tooltips,
+        )
+    )
     tweak_figure(fig, "box")
     if y is None:
         fig.xaxis.major_tick_line_color = None
@@ -723,7 +776,12 @@ def box_viz_dt(
         circ = fig.circle(  # pylint: disable=too-many-function-args
             outx, outy, size=3, line_color="black", color=CATEGORY20[6], fill_alpha=0.6
         )
-        fig.add_tools(HoverTool(renderers=[circ], tooltips=[("Outlier", "@y")],))
+        fig.add_tools(
+            HoverTool(
+                renderers=[circ],
+                tooltips=[("Outlier", "@y")],
+            )
+        )
     tooltips = [
         ("Upper Whisker", "@uw"),
         ("Upper Quartile", "@q3"),
@@ -784,7 +842,13 @@ def box_viz_dt(
 
 
 def line_viz(
-    df: pd.DataFrame, x: str, y: str, yscale: str, plot_width: int, plot_height: int, ttl_grps: int,
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
+    ttl_grps: int,
 ) -> Panel:
     """
     Render multi-line chart
@@ -832,7 +896,12 @@ def line_viz(
 
 
 def scatter_viz(
-    df: pd.DataFrame, x: str, y: str, spl_sz: int, plot_width: int, plot_height: int,
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    spl_sz: int,
+    plot_width: int,
+    plot_height: int,
 ) -> Any:
     """
     Render a scatter plot
@@ -877,7 +946,11 @@ def hexbin_viz(
     title = f"{y} by {x}"
     aspect_scale = (ymax - ymin) / (xmax - xmin + 1e-9)
     bins = hexbin(
-        x=df[x], y=df[y], size=tile_size, orientation="flattop", aspect_scale=aspect_scale,
+        x=df[x],
+        y=df[y],
+        size=tile_size,
+        orientation="flattop",
+        aspect_scale=aspect_scale,
     )
     fig = figure(
         title=title,
@@ -898,11 +971,19 @@ def hexbin_viz(
         source=bins,
         orientation="flattop",
         fill_color=linear_cmap(
-            field_name="counts", palette=palette, low=min(bins.counts), high=max(bins.counts),
+            field_name="counts",
+            palette=palette,
+            low=min(bins.counts),
+            high=max(bins.counts),
         ),
         aspect_scale=aspect_scale,
     )
-    fig.add_tools(HoverTool(tooltips=[("Count", "@counts")], renderers=[rend],))
+    fig.add_tools(
+        HoverTool(
+            tooltips=[("Count", "@counts")],
+            renderers=[rend],
+        )
+    )
     mapper = LinearColorMapper(palette=palette, low=min(bins.counts), high=max(bins.counts))
     color_bar = ColorBar(color_mapper=mapper, width=8, location=(0, 0))
     color_bar.label_standoff = 8
@@ -943,7 +1024,12 @@ def nested_viz(
     )
 
     fig.vbar(
-        x="grp_names", top="cnt", width=1, source=data_source, line_color="white", line_width=3,
+        x="grp_names",
+        top="cnt",
+        width=1,
+        source=data_source,
+        line_color="white",
+        line_width=3,
     )
     tweak_figure(fig, "nested")
     fig.yaxis.axis_label = "Count"
@@ -994,7 +1080,12 @@ def stacked_viz(
         colours = palette[0 : len(grps)]
     source = ColumnDataSource(data=df)
     renderers = fig.vbar_stack(
-        stackers=grps, x="index", width=0.9, source=source, line_width=1, color=colours,
+        stackers=grps,
+        x="index",
+        width=0.9,
+        source=source,
+        line_width=1,
+        color=colours,
     )
     grps = [(grp[:14] + "...") if len(grp) > 15 else grp for grp in grps]
 
@@ -1115,7 +1206,11 @@ def heatmap_viz(
     )
     fig.add_tools(
         HoverTool(
-            tooltips=[(x, f"@{{{x}}}"), (y, f"@{{{y}}}"), ("Count", "@cnt"),],
+            tooltips=[
+                (x, f"@{{{x}}}"),
+                (y, f"@{{{y}}}"),
+                ("Count", "@cnt"),
+            ],
             mode="mouse",
             renderers=[renderer],
         )
@@ -1165,9 +1260,17 @@ def dt_line_viz(
         x_axis_type="datetime",
     )
     fig.line(
-        source=df, x=x, y=agg, line_width=2, line_alpha=0.8, color="#7e9ac8",
+        source=df,
+        x=x,
+        y=agg,
+        line_width=2,
+        line_alpha=0.8,
+        color="#7e9ac8",
     )
-    hover = HoverTool(tooltips=tooltips, mode="vline",)
+    hover = HoverTool(
+        tooltips=tooltips,
+        mode="vline",
+    )
     fig.add_tools(hover)
 
     tweak_figure(fig, "line", show_yticks)
@@ -1227,7 +1330,11 @@ def dt_multiline_viz(
         fig.add_tools(
             HoverTool(
                 renderers=[plot_dict[grp_name]],
-                tooltips=[(f"{y}", f"{grp}"), (agg, "@y"), (timeunit, "@lbl"),],
+                tooltips=[
+                    (f"{y}", f"{grp}"),
+                    (agg, "@y"),
+                    (timeunit, "@lbl"),
+                ],
                 mode="mouse",
             )
         )
@@ -1316,7 +1423,9 @@ def format_num_stats(data: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
 
 
 def format_cat_stats(
-    stats: Dict[str, Any], len_stats: Dict[str, Any], letter_stats: Dict[str, Any],
+    stats: Dict[str, Any],
+    len_stats: Dict[str, Any],
+    letter_stats: Dict[str, Any],
 ) -> Dict[str, Dict[str, str]]:
     """
     Format categorical statistics
@@ -1362,7 +1471,16 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
     for col, dtp, data in itmdt["data"]:
         if is_dtype(dtp, Nominal()):
             df, ttl_grps = data
-            fig = bar_viz(df, ttl_grps, nrows, col, cfg.bar.yscale, plot_width, plot_height, False,)
+            fig = bar_viz(
+                df,
+                ttl_grps,
+                nrows,
+                col,
+                cfg.bar.yscale,
+                plot_width,
+                plot_height,
+                False,
+            )
             htgs[col] = cfg.bar.grid_how_to_guide()
         elif is_dtype(dtp, Continuous()):
             fig = hist_viz(data, nrows, col, cfg.hist.yscale, plot_width, plot_height, False)
@@ -1399,6 +1517,7 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Create visualizations for plot(df, Nominal)
     """
+    # pylint: disable=too-many-branches
     if cfg.plot.report:
         plot_width = 280
         plot_height = 250
@@ -1441,7 +1560,11 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         if data["nwords_freq"] > 0:
             tabs.append(
                 wordfreq_viz(
-                    data["word_cnts_freq"], data["nwords_freq"], plot_width, plot_height, True,
+                    data["word_cnts_freq"],
+                    data["nwords_freq"],
+                    plot_width,
+                    plot_height,
+                    True,
                 )
             )
             htgs["Word Frequency"] = cfg.wordfreq.how_to_guide(plot_height, plot_width)
@@ -1449,7 +1572,11 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         if data["ngrams_freq"] > 0:
             tabs.append(
                 ngram_viz(
-                    data["gram_cnts_freq"], data["ngrams_freq"], plot_width, plot_height, True,
+                    data["gram_cnts_freq"],
+                    data["ngrams_freq"],
+                    plot_width,
+                    plot_height,
+                    True,
                 )
             )
             htgs["NGram Frequency"] = cfg.ngram.how_to_guide(plot_height, plot_width)
@@ -1568,7 +1695,13 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 
     if cfg.hist.enable:
         fig = hist_viz(
-            data["hist"], data["nrows"], col, cfg.hist.yscale, plot_width, plot_height, True,
+            data["hist"],
+            data["nrows"],
+            col,
+            cfg.hist.yscale,
+            plot_width,
+            plot_height,
+            True,
         )
         tabs.append(Panel(child=row(fig), title="Histogram"))
         htgs["Histogram"] = cfg.hist.how_to_guide(plot_height, plot_width)
@@ -1713,7 +1846,17 @@ def render_cat_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     if cfg.line.enable:
         # multiline plot
         df = data["hist"].to_frame()[: cfg.line.ngroups]
-        tabs.append(line_viz(df, x, y, cfg.line.yscale, plot_width, plot_height, data["ttl_grps"],))
+        tabs.append(
+            line_viz(
+                df,
+                x,
+                y,
+                cfg.line.yscale,
+                plot_width,
+                plot_height,
+                data["ttl_grps"],
+            )
+        )
         htgs["Line Chart"] = cfg.line.nom_cont_how_to_guide(plot_height, plot_width)
     for panel in tabs:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
@@ -1739,7 +1882,14 @@ def render_two_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     if cfg.scatter.enable:
         # scatter plot
         tabs.append(
-            scatter_viz(data["scat"], x, y, cfg.scatter.sample_size, plot_width, plot_height,)
+            scatter_viz(
+                data["scat"],
+                x,
+                y,
+                cfg.scatter.sample_size,
+                plot_width,
+                plot_height,
+            )
         )
         htgs["Scatter Plot"] = cfg.scatter.how_to_guide(plot_height, plot_width)
     tile_size = None
@@ -1749,7 +1899,15 @@ def render_two_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tile_size = cfg.hexbin.tile_size if cfg.hexbin.tile_size != "auto" else x_diff / 25
         aspect_scale = (data["hex"][y].max() - data["hex"][y].min()) / (x_diff + 1e-9)
         tabs.append(
-            hexbin_viz(data["hex"], x, y, plot_width, plot_height, tile_size, aspect_scale,)
+            hexbin_viz(
+                data["hex"],
+                x,
+                y,
+                plot_width,
+                plot_height,
+                tile_size,
+                aspect_scale,
+            )
         )
         htgs["Hexbin Plot"] = cfg.hexbin.how_to_guide(tile_size, plot_height, plot_width)
     if cfg.box.enable:
@@ -1942,7 +2100,13 @@ def render_dt_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         df, grp_cnt_stats, timeunit = itmdt["stackdata"]
         tabs.append(
             stacked_viz(
-                df, itmdt["x"], itmdt["y"], grp_cnt_stats, plot_width, plot_height, timeunit,
+                df,
+                itmdt["x"],
+                itmdt["y"],
+                grp_cnt_stats,
+                plot_width,
+                plot_height,
+                timeunit,
             )
         )
 

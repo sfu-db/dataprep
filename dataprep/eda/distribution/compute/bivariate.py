@@ -21,7 +21,11 @@ from .common import (
 
 
 def compute_bivariate(
-    df: dd.DataFrame, x: str, y: str, cfg: Config, dtype: Optional[DTypeDef],
+    df: dd.DataFrame,
+    x: str,
+    y: str,
+    cfg: Config,
+    dtype: Optional[DTypeDef],
 ) -> Intermediate:
     """Compute functions for plot(df, x, y).
 
@@ -58,7 +62,12 @@ def compute_bivariate(
 
         (comps,) = dask.compute(_nom_cont_comps(df.dropna(), cfg))
 
-        return Intermediate(x=x, y=y, data=comps, visual_type="cat_and_num_cols",)
+        return Intermediate(
+            x=x,
+            y=y,
+            data=comps,
+            visual_type="cat_and_num_cols",
+        )
     elif (
         is_dtype(xtype, DateTime())
         and is_dtype(ytype, Continuous())
@@ -88,7 +97,11 @@ def compute_bivariate(
             linedata = []
 
         return Intermediate(
-            x=x, y=y, linedata=linedata, boxdata=boxdata, visual_type="dt_and_num_cols",
+            x=x,
+            y=y,
+            linedata=linedata,
+            boxdata=boxdata,
+            visual_type="dt_and_num_cols",
         )
     elif (
         is_dtype(xtype, DateTime())
@@ -104,14 +117,20 @@ def compute_bivariate(
             # line chart
             dtcat.append(
                 dask.delayed(_calc_line_dt)(
-                    df, cfg.line.unit, ngroups=cfg.line.ngroups, largest=cfg.line.sort_descending,
+                    df,
+                    cfg.line.unit,
+                    ngroups=cfg.line.ngroups,
+                    largest=cfg.line.sort_descending,
                 )
             )
         if cfg.stacked.enable:
             # stacked bar chart
             dtcat.append(
                 dask.delayed(_calc_stacked_dt)(
-                    df, cfg.stacked.unit, cfg.stacked.ngroups, cfg.stacked.sort_descending,
+                    df,
+                    cfg.stacked.unit,
+                    cfg.stacked.ngroups,
+                    cfg.stacked.sort_descending,
                 )
             )
         dtcat = dask.compute(*dtcat)
@@ -127,7 +146,11 @@ def compute_bivariate(
             linedata = []
 
         return Intermediate(
-            x=x, y=y, linedata=linedata, stackdata=stackdata, visual_type="dt_and_cat_cols",
+            x=x,
+            y=y,
+            linedata=linedata,
+            stackdata=stackdata,
+            visual_type="dt_and_cat_cols",
         )
     elif is_dtype(xtype, Nominal()) and is_dtype(ytype, Nominal()):
         df = df[[x, y]]
@@ -137,7 +160,12 @@ def compute_bivariate(
         df[y] = df[y].astype(str)
 
         (comps,) = dask.compute(df.dropna().groupby([x, y]).size())
-        return Intermediate(x=x, y=y, data=comps, visual_type="two_cat_cols",)
+        return Intermediate(
+            x=x,
+            y=y,
+            data=comps,
+            visual_type="two_cat_cols",
+        )
     elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
         # one partition required for apply(pd.cut) in _calc_box_cont
         df = df[[x, y]].dropna().repartition(npartitions=1)
@@ -157,7 +185,12 @@ def compute_bivariate(
 
         (data,) = dask.compute(data)
 
-        return Intermediate(x=x, y=y, data=data, visual_type="two_num_cols",)
+        return Intermediate(
+            x=x,
+            y=y,
+            data=data,
+            visual_type="two_num_cols",
+        )
     else:
         raise UnreachableError
 
@@ -270,8 +303,16 @@ def _calc_box_dt(df: dd.DataFrame, unit: str) -> Tuple[pd.DataFrame, List[str], 
         raise ValueError
     grps = df.groupby(pd.Grouper(key=x, freq=DTMAP[unit][0]))  # time groups
     # box plot for the values in each time group
-    df = pd.concat([_calc_box_stats(g[1][y], g[0], True) for g in grps], axis=1,)
-    df = df.append(pd.Series({c: i + 1 for i, c in enumerate(df.columns)}, name="x",)).T
+    df = pd.concat(
+        [_calc_box_stats(g[1][y], g[0], True) for g in grps],
+        axis=1,
+    )
+    df = df.append(
+        pd.Series(
+            {c: i + 1 for i, c in enumerate(df.columns)},
+            name="x",
+        )
+    ).T
     # If grouping by week, make the label for the week the beginning Sunday
     df.index = df.index - pd.to_timedelta(6, unit="d") if unit == "week" else df.index
     df.index.name = "grp"
@@ -284,7 +325,10 @@ def _calc_box_dt(df: dd.DataFrame, unit: str) -> Tuple[pd.DataFrame, List[str], 
 
 
 def _calc_stacked_dt(
-    df: dd.DataFrame, unit: str, ngroups: int, largest: bool,
+    df: dd.DataFrame,
+    unit: str,
+    ngroups: int,
+    largest: bool,
 ) -> Tuple[pd.DataFrame, Dict[str, int], str]:
     """
     Calculate a stacked bar chart with date on the x axis
@@ -310,9 +354,13 @@ def _calc_stacked_dt(
     df_grps, grp_cnt_stats, _ = _calc_groups(df, y, ngroups, largest)
     grouper = (pd.Grouper(key=x, freq=DTMAP[unit][0]),)  # time grouper
     # pivot table of counts with date groups as index and categorical values as column names
-    dfr = pd.pivot_table(df_grps, index=grouper, columns=y, aggfunc=len, fill_value=0,).rename_axis(
-        None
-    )
+    dfr = pd.pivot_table(
+        df_grps,
+        index=grouper,
+        columns=y,
+        aggfunc=len,
+        fill_value=0,
+    ).rename_axis(None)
 
     # if more than ngroups categorical values, aggregate the smallest groups into "Others"
     if grp_cnt_stats[f"{y}_ttl"] > grp_cnt_stats[f"{y}_shw"]:

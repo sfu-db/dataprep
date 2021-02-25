@@ -15,7 +15,10 @@ from .common import LABELS, uni_histogram
 
 
 def _compute_missing_univariate(  # pylint: disable=too-many-locals
-    df: DataArray, x: str, cfg: Config, dtype: Optional[DTypeDef] = None,
+    df: DataArray,
+    x: str,
+    cfg: Config,
+    dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on other columns when
     the missing values in x is dropped."""

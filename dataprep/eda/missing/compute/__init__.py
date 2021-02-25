@@ -79,7 +79,9 @@ def compute_missing(
         # supress divide by 0 error due to heatmap
         with catch_warnings():
             filterwarnings(
-                "ignore", "invalid value encountered in true_divide", category=RuntimeWarning,
+                "ignore",
+                "invalid value encountered in true_divide",
+                category=RuntimeWarning,
             )
             ret = compute_missing_nullivariate(df, cfg)
 

@@ -72,7 +72,10 @@ class BaseDef(BaseModel):
             else:
 
                 merged = merge_values(
-                    cur_value, rhs_value, attr, self.__merge_policy__.get(attr, Policy()),
+                    cur_value,
+                    rhs_value,
+                    attr,
+                    self.__merge_policy__.get(attr, Policy()),
                 )
                 setattr(cur, attr, merged)
 

@@ -21,7 +21,10 @@ from .common import _calc_line_dt, gaussian_kde, normaltest
 
 
 def compute_univariate(
-    df: dd.DataFrame, x: Optional[str], cfg: Config, dtype: Optional[DTypeDef],
+    df: dd.DataFrame,
+    x: Optional[str],
+    cfg: Config,
+    dtype: Optional[DTypeDef],
 ) -> Intermediate:
     """
     Compute functions for plot(df, x)
@@ -70,7 +73,12 @@ def compute_univariate(
         else:
             data = dask.compute(*data_dt)[0]
             line = []
-        return Intermediate(col=x, data=data, line=line, visual_type="datetime_column",)
+        return Intermediate(
+            col=x,
+            data=data,
+            line=line,
+            visual_type="datetime_column",
+        )
     else:
         raise UnreachableError
 
@@ -161,7 +169,6 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
             df,
             cfg.ngram.top_grams,
             cfg.ngram.grams,
-            cfg.ngram.stopword,
             cfg.ngram.lemmatize,
             cfg.ngram.stem,
         )
@@ -262,7 +269,11 @@ def _calc_box(srs: dd.Series, qntls: da.Array, cfg: Config) -> Dict[str, Any]:
 
 
 def _calc_word_freq(
-    df: dd.DataFrame, top_words: int, stopword: bool, lemmatize: bool, stem: bool,
+    df: dd.DataFrame,
+    top_words: int,
+    stopword: bool,
+    lemmatize: bool,
+    stem: bool,
 ) -> Dict[str, Any]:
     """
     Parse a categorical column of text data into words, then compute
@@ -294,11 +305,15 @@ def _calc_word_freq(
 
 
 def _calc_n_grams(
-    df: dd.DataFrame, top_grams: int, grams: int, stopword: bool, lemmatize: bool, stem: bool,
+    df: dd.DataFrame,
+    top_grams: int,
+    grams: int,
+    lemmatize: bool,
+    stem: bool,
 ) -> Dict[str, Any]:
     """
-        Parse a categorical column of text data into words, then compute
-        the frequency distribution of n-grams.
+    Parse a categorical column of text data into words, then compute
+    the frequency distribution of n-grams.
     """
     col = df.columns[0]
 
@@ -326,7 +341,10 @@ def _calc_n_grams(
 
 
 def _calc_nom_stats(
-    srs: dd.Series, df: dd.DataFrame, nrows: int, nuniq: dd.core.Scalar,
+    srs: dd.Series,
+    df: dd.DataFrame,
+    nrows: int,
+    nuniq: dd.core.Scalar,
 ) -> Dict[str, Any]:
     """
     Calculate statistics for a nominal column

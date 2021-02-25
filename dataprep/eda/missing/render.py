@@ -78,7 +78,13 @@ def tweak_figure(fig: Figure) -> Figure:
     return fig
 
 
-def render_dist(df: pd.DataFrame, x: str, typ: str, plot_width: int, plot_height: int,) -> Figure:
+def render_dist(
+    df: pd.DataFrame,
+    x: str,
+    typ: str,
+    plot_width: int,
+    plot_height: int,
+) -> Figure:
     """
     Render a distribution, CDF or PDF
     """
@@ -106,7 +112,11 @@ def render_dist(df: pd.DataFrame, x: str, typ: str, plot_width: int, plot_height
     for idx, label in enumerate(LABELS):
         group = df[df[f"{typ}_label"] == label]
         fig.line(
-            x=f"x_{typ}", y=typ, source=group, color=CATEGORY10[idx], legend_label=label,
+            x=f"x_{typ}",
+            y=typ,
+            source=group,
+            color=CATEGORY10[idx],
+            legend_label=label,
         )
 
     relocate_legend(fig, "left")
@@ -233,10 +243,22 @@ def render_boxwhisker(df: pd.DataFrame, plot_width: int, plot_height: int) -> Fi
 
     # boxes
     fig.vbar(  # pylint: disable=too-many-function-args
-        "label", 0.7, "q2", "q3", source=df, fill_color=CATEGORY20[0], line_color="black",
+        "label",
+        0.7,
+        "q2",
+        "q3",
+        source=df,
+        fill_color=CATEGORY20[0],
+        line_color="black",
     )
     fig.vbar(  # pylint: disable=too-many-function-args
-        "label", 0.7, "q2", "q1", source=df, fill_color=CATEGORY20[0], line_color="black",
+        "label",
+        0.7,
+        "q2",
+        "q1",
+        source=df,
+        fill_color=CATEGORY20[0],
+        line_color="black",
     )
     # whiskers (almost-0 height rects simpler than segments)
     fig.rect(  # pylint: disable=too-many-function-args
@@ -269,7 +291,9 @@ def create_color_mapper() -> Tuple[LinearColorMapper, ColorBar]:
     return mapper, colorbar
 
 
-def create_color_mapper_heatmap(palette: Sequence[str],) -> Tuple[LinearColorMapper, ColorBar]:
+def create_color_mapper_heatmap(
+    palette: Sequence[str],
+) -> Tuple[LinearColorMapper, ColorBar]:
     """
     Create a color mapper and a colorbar for heatmap
     """
@@ -411,7 +435,10 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
 
 
 def render_bar_chart(
-    data: Tuple[np.ndarray, np.ndarray, np.ndarray], yscale: str, plot_width: int, plot_height: int,
+    data: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    yscale: str,
+    plot_width: int,
+    plot_height: int,
 ) -> Figure:
     """
     Render a bar chart for the missing and present values
@@ -556,7 +583,11 @@ def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int)
         plot_width = 28 * len(cols)
 
     fig = Figure(
-        plot_width=plot_width, plot_height=plot_height, toolbar_location=None, tools="", title=" ",
+        plot_width=plot_width,
+        plot_height=plot_height,
+        toolbar_location=None,
+        tools="",
+        title=" ",
     )
 
     # round the coordinates to integers, and plot the dendrogram
@@ -571,7 +602,9 @@ def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int)
     source = ColumnDataSource(dict(x=h_lns_x, y=h_lns_y, n=null_mismatch_vals))
     h_lns = fig.multi_line(xs="x", ys="y", source=source, line_color="#8073ac")
     hover_pts = HoverTool(
-        renderers=[h_lns], tooltips=[("Average distance", "@n{0.1f}")], line_policy="interp",
+        renderers=[h_lns],
+        tooltips=[("Average distance", "@n{0.1f}")],
+        line_policy="interp",
     )
     fig.add_tools(hover_pts)
 

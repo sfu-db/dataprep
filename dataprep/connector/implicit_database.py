@@ -57,7 +57,10 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         if respdef.orient == "records":  # pylint: disable=no-member
             data_rows = [match.value for match in table_expr.find(data)]
 
-            for (column_name, column_def,) in respdef.schema_.items():
+            for (
+                column_name,
+                column_def,
+            ) in respdef.schema_.items():
                 column_target = column_def.target
                 column_type = column_def.type
 

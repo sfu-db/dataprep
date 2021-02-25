@@ -576,7 +576,21 @@ def test_validate_value() -> None:
 def test_validate_series(df_messy_date: pd.DataFrame) -> None:
     srs_valid = validate_date(df_messy_date["messy_date"])
     srs_check = pd.Series(
-        [False, True, True, True, True, True, True, False, True, True, False, False, False,],
+        [
+            False,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            False,
+            False,
+            False,
+        ],
         name="valid",
     )
     assert srs_check.equals(srs_valid)

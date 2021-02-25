@@ -17,7 +17,12 @@ from ...intermediate import Intermediate
 
 
 def _calc_bivariate(
-    df: DataFrame, cfg: Config, x: str, y: str, *, k: Optional[int] = None,
+    df: DataFrame,
+    cfg: Config,
+    x: str,
+    y: str,
+    *,
+    k: Optional[int] = None,
 ) -> Intermediate:
 
     num_df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))

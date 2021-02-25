@@ -263,7 +263,21 @@ def test_validate_value() -> None:
 def test_validate_series_lat_long(df_lat_long_column: pd.DataFrame) -> None:
     srs_valid = validate_lat_long(df_lat_long_column["messy_lat_long"])
     srs_check = pd.Series(
-        [True, True, True, True, True, True, False, True, True, True, False, False, False,],
+        [
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+        ],
         name="messy_lat_long",
     )
     assert srs_check.equals(srs_valid)
@@ -273,5 +287,15 @@ def test_validate_series_lat(df_separate_lat_long_columns: pd.DataFrame) -> None
     srs_valid = validate_lat_long(
         df_separate_lat_long_columns["messy_lat"], lat_long=False, lat=True
     )
-    srs_check = pd.Series([False, True, True, True, False, False,], name="messy_lat_clean",)
+    srs_check = pd.Series(
+        [
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+        ],
+        name="messy_lat_clean",
+    )
     assert srs_check.equals(srs_valid)

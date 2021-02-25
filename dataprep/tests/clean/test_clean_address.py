@@ -279,7 +279,19 @@ def test_validate_series(df_addresses: pd.DataFrame) -> None:
     srs_valid = validate_address(df_addresses["messy_address"])
 
     srs_check = pd.Series(
-        [True, True, False, True, True, True, False, False, False, False,], name="messy_address",
+        [
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+        ],
+        name="messy_address",
     )
 
     assert srs_check.equals(srs_valid)

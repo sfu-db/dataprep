@@ -37,7 +37,10 @@ from ..utils import to_dask
 
 
 def format_report(
-    df: Union[pd.DataFrame, dd.DataFrame], cfg: Config, mode: Optional[str], progress: bool = True,
+    df: Union[pd.DataFrame, dd.DataFrame],
+    cfg: Config,
+    mode: Optional[str],
+    progress: bool = True,
 ) -> Dict[str, Any]:
     """
     Format the data and figures needed by report
@@ -99,10 +102,14 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
 
     with catch_warnings():
         filterwarnings(
-            "ignore", "invalid value encountered in true_divide", category=RuntimeWarning,
+            "ignore",
+            "invalid value encountered in true_divide",
+            category=RuntimeWarning,
         )
         filterwarnings(
-            "ignore", "overflow encountered in long_scalars", category=RuntimeWarning,
+            "ignore",
+            "overflow encountered in long_scalars",
+            category=RuntimeWarning,
         )
         (data,) = dask.compute(data)
 
@@ -169,7 +176,9 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
             )
             dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
         itmdt = Intermediate(
-            data=dfs, axis_range=list(data["num_cols"]), visual_type="correlation_heatmaps",
+            data=dfs,
+            axis_range=list(data["num_cols"]),
+            visual_type="correlation_heatmaps",
         )
         rndrd = render_correlation(itmdt, cfg)
         figs.clear()
@@ -191,7 +200,9 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
     for fig in rndrd["layout"]:
         fig.sizing_mode = "stretch_width"
         fig.title = Title(
-            text=rndrd["meta"][rndrd["layout"].index(fig)], align="center", text_font_size="20px",
+            text=rndrd["meta"][rndrd["layout"].index(fig)],
+            align="center",
+            text_font_size="20px",
         )
         figs.append(fig)
     res["missing"] = components(figs)

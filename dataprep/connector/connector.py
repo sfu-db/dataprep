@@ -155,7 +155,8 @@ class Connector:  # pylint: disable=too-many-instance-attributes
 
         if reqconf.pagination is None and _count is not None:
             print(
-                f"ignoring _count since {table} has no pagination settings", file=sys.stderr,
+                f"ignoring _count since {table} has no pagination settings",
+                file=sys.stderr,
             )
 
         if _count is not None and _count <= 0:
@@ -167,7 +168,12 @@ class Connector:  # pylint: disable=too-many-instance-attributes
 
             if reqconf.pagination is None or _count is None:
                 df = await self._fetch(
-                    itable, kwargs, _client=client, _throttler=throttler, _auth=_auth, _q=_q,
+                    itable,
+                    kwargs,
+                    _client=client,
+                    _throttler=throttler,
+                    _auth=_auth,
+                    _q=_q,
                 )
                 return df
 
@@ -353,7 +359,11 @@ class Connector:  # pylint: disable=too-many-instance-attributes
         for key in ["headers", "params", "cookies"]:
             field_def = getattr(reqdef, key, None)
             if field_def is not None:
-                instantiated_fields = populate_field(field_def, self._jenv, merged_vars,)
+                instantiated_fields = populate_field(
+                    field_def,
+                    self._jenv,
+                    merged_vars,
+                )
                 for ikey in instantiated_fields:
                     if ikey in req_data[key]:
                         warn(
@@ -419,7 +429,9 @@ def validate_fields(fields: Dict[str, FieldDefUnion], data: Dict[str, Any]) -> N
 
 
 def populate_field(  # pylint: disable=too-many-branches
-    fields: Dict[str, FieldDefUnion], jenv: Environment, params: Dict[str, Any],
+    fields: Dict[str, FieldDefUnion],
+    jenv: Environment,
+    params: Dict[str, Any],
 ) -> Dict[str, str]:
     """Populate a dict based on the fields definition and provided vars."""
     ret: Dict[str, str] = {}
@@ -454,7 +466,8 @@ def populate_field(  # pylint: disable=too-many-branches
             if not remove_if_empty or str_value:
                 if to_key in ret:
                     warn(
-                        f"{to_key}={ret[to_key]} overriden by {to_key}={str_value}", RuntimeWarning,
+                        f"{to_key}={ret[to_key]} overriden by {to_key}={str_value}",
+                        RuntimeWarning,
                     )
                 ret[to_key] = str_value
                 continue
