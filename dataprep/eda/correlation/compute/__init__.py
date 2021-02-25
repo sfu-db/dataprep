@@ -39,7 +39,6 @@ def compute_correlation(
     if x is None and y is None:  # pylint: disable=no-else-return
         return _calc_nullivariate(df, value_range=value_range, k=k)
     elif x is not None and y is None:
-        df = DataArray(df).select_num_columns()
         return _calc_univariate(df, x=x, value_range=value_range, k=k)
     elif x is None and y is not None:
         df = DataArray(df).select_num_columns()
