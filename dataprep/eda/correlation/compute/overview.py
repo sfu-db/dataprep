@@ -30,89 +30,90 @@ def _calc_overview(
 
     if value_range is not None and k is not None:
         raise ValueError("value_range and k cannot be present in both")
+    dadf = DataArray(df)
 
-    num_df = DataArray(df).select_num_columns()
+    # num_df: df of num columns. Used for numerical correlation such as pearson.
+    num_df = dadf.select_num_columns()
 
-    cordx, cordy, corrs = correlation_nxn(num_df, cfg)
+    # cordx, cordy are used to locate a cell in correlation matrix.
+    num_cordx, num_cordy = _get_cord(len(num_df.columns))
+
+    # The below variables are dict since some methods are applied to numerical columns
+    # and some methods are applied to categorical columns.
+    # columns: used column names
+    # cordx, cordy: used to locate a cell in correlation matrix.
+    # corrs: correlation matrix.
+    method2columns: Dict[CorrelationMethod, str] = {}
+    method2cordx: Dict[CorrelationMethod, np.ndarray] = {}
+    method2cordy: Dict[CorrelationMethod, np.ndarray] = {}
+    method2corrs: Dict[CorrelationMethod, da.Array] = {}
+
+    if cfg.pearson.enable or cfg.stats.enable:
+        method2columns[CorrelationMethod.Pearson] = num_df.columns
+        method2cordx[CorrelationMethod.Pearson] = num_cordx
+        method2cordy[CorrelationMethod.Pearson] = num_cordy
+        method2corrs[CorrelationMethod.Pearson] = _pearson_nxn(num_df)
+    if cfg.spearman.enable or cfg.stats.enable:
+        method2columns[CorrelationMethod.Spearman] = num_df.columns
+        method2cordx[CorrelationMethod.Spearman] = num_cordx
+        method2cordy[CorrelationMethod.Spearman] = num_cordy
+        method2corrs[CorrelationMethod.Spearman] = _spearman_nxn(num_df)
+    if cfg.kendall.enable or cfg.stats.enable:
+        method2columns[CorrelationMethod.KendallTau] = num_df.columns
+        method2cordx[CorrelationMethod.KendallTau] = num_cordx
+        method2cordy[CorrelationMethod.KendallTau] = num_cordy
+        method2corrs[CorrelationMethod.KendallTau] = _kendall_tau_nxn(num_df)
 
     # The computations below is not expensive (scales with # of columns)
     # So we do them in pandas
 
-    (corrs,) = dask.compute(corrs)
+    (method2corrs,) = dask.compute(method2corrs)
 
+    # compute stat information such as hightest correlation value and columns.
     if cfg.stats.enable or cfg.insight.enable:
-        if cfg.stats.enable or cfg.pearson.enable:
+        positive_max_corr_value = {}
+        negative_max_corr_value = {}
+        mean_corr_value = {}
+        positive_max_corr_cols = {}
+        negative_max_corr_cols = {}
+        min_corr_value = {}
+        min_corr_cols = {}
+        for method in method2corrs.keys():
             (
-                pearson_pos_max,
-                pearson_neg_max,
-                pearson_mean,
-                pearson_pos_cols,
-                pearson_neg_cols,
-            ) = most_corr(corrs[CorrelationMethod.Pearson])
-            pearson_min, pearson_cols = least_corr(corrs[CorrelationMethod.Pearson])
-        if cfg.stats.enable or cfg.spearman.enable:
-            (
-                spearman_pos_max,
-                spearman_neg_max,
-                spearman_mean,
-                spearman_pos_cols,
-                spearman_neg_cols,
-            ) = most_corr(corrs[CorrelationMethod.Spearman])
-            spearman_min, spearman_cols = least_corr(corrs[CorrelationMethod.Spearman])
-        if cfg.stats.enable or cfg.kendall.enable:
-            (
-                kendalltau_pos_max,
-                kendalltau_neg_max,
-                kendalltau_mean,
-                kendalltau_pos_cols,
-                kendalltau_neg_cols,
-            ) = most_corr(corrs[CorrelationMethod.KendallTau])
-            kendalltau_min, kendalltau_cols = least_corr(corrs[CorrelationMethod.KendallTau])
+                positive_max_corr_value[method.value],
+                negative_max_corr_value[method.value],
+                mean_corr_value[method.value],
+                positive_max_corr_cols[method.value],
+                negative_max_corr_cols[method.value],
+            ) = most_corr(method2corrs[method])
+            min_corr_value[method.value], min_corr_cols[method.value] = least_corr(
+                method2corrs[method]
+            )
 
+    # create stat table
     if cfg.stats.enable:
         tabledata = {
-            "Highest Positive Correlation": {
-                "Pearson": pearson_pos_max,
-                "Spearman": spearman_pos_max,
-                "KendallTau": kendalltau_pos_max,
-            },
-            "Highest Negative Correlation": {
-                "Pearson": pearson_neg_max,
-                "Spearman": spearman_neg_max,
-                "KendallTau": kendalltau_neg_max,
-            },
-            "Lowest Correlation": {
-                "Pearson": pearson_min,
-                "Spearman": spearman_min,
-                "KendallTau": kendalltau_min,
-            },
-            "Mean Correlation": {
-                "Pearson": pearson_mean,
-                "Spearman": spearman_mean,
-                "KendallTau": kendalltau_mean,
-            },
+            "Highest Positive Correlation": positive_max_corr_value,
+            "Highest Negative Correlation": negative_max_corr_value,
+            "Lowest Correlation": min_corr_value,
+            "Mean Correlation": mean_corr_value,
         }
 
+    # create insight. E.g., most correlated columns.
     if cfg.insight.enable:
         insights: Dict[str, List[Any]] = {}
-        if cfg.pearson.enable:
-            p_p_corr = create_string("positive", pearson_pos_cols, most_show, num_df)
-            p_n_corr = create_string("negative", pearson_neg_cols, most_show, num_df)
-            p_corr = create_string("least", pearson_cols, most_show, num_df)
-            insights["Pearson"] = [p_p_corr, p_n_corr, p_corr]
-        if cfg.spearman.enable:
-            s_p_corr = create_string("positive", spearman_pos_cols, most_show, num_df)
-            s_n_corr = create_string("negative", spearman_neg_cols, most_show, num_df)
-            s_corr = create_string("least", spearman_cols, most_show, num_df)
-            insights["Spearman"] = [s_p_corr, s_n_corr, s_corr]
-        if cfg.kendall.enable:
-            k_p_corr = create_string("positive", kendalltau_pos_cols, most_show, num_df)
-            k_n_corr = create_string("negative", kendalltau_neg_cols, most_show, num_df)
-            k_corr = create_string("least", kendalltau_cols, most_show, num_df)
-            insights["KendallTau"] = [k_p_corr, k_n_corr, k_corr]
+        for method in method2corrs.keys():
+            pos_str = create_string(
+                "positive", positive_max_corr_cols[method.value], most_show, num_df
+            )
+            neg_str = create_string(
+                "negative", negative_max_corr_cols[method.value], most_show, num_df
+            )
+            least_str = create_string("least", min_corr_cols[method.value], most_show, num_df)
+            insights[method.value] = [pos_str, neg_str, least_str]
 
     dfs = {}
-    for method, corr in corrs.items():
+    for method, corr in method2corrs.items():
         if (  # pylint: disable=too-many-boolean-expressions
             method == CorrelationMethod.Pearson
             and not cfg.pearson.enable
@@ -122,16 +123,21 @@ def _calc_overview(
             and not cfg.kendall.enable
         ):
             continue
+        cordx = method2cordx[method]
+        cordy = method2cordy[method]
+        columns = method2columns[method]
 
+        # create correlation df from correlation matrix.
         ndf = pd.DataFrame(
             {
-                "x": num_df.columns[cordx],
-                "y": num_df.columns[cordy],
+                "x": columns[cordx],
+                "y": columns[cordy],
                 "correlation": corr.ravel(),
             }
         )
         ndf = ndf[cordy > cordx]  # Retain only lower triangle (w/o diag)
 
+        # filter correlation df by top-k or value_range.
         if k is not None:
             thresh = ndf["correlation"].abs().nlargest(k).iloc[-1]
             ndf = ndf[(ndf["correlation"] >= thresh) | (ndf["correlation"] <= -thresh)]
@@ -148,6 +154,21 @@ def _calc_overview(
         tabledata=tabledata if cfg.stats.enable else {},
         insights=insights if cfg.insight.enable else {},
     )
+
+
+def _get_cord(ncols: int) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Get the coordinate of the correlation matrix. (cordx[i], cordy[i]) represents
+    a cell in the correlation matrix.
+
+    Returns
+    -------
+        cordx: the x axis, e.g., [0 0 0 1 1 1 2 2 2]
+        cordy: the y axis, e.g., [0 1 2 0 1 2 0 1 2]
+    """
+    cordx, cordy = np.meshgrid(range(ncols), range(ncols))
+    cordx, cordy = cordy.ravel(), cordx.ravel()
+    return cordx, cordy
 
 
 def correlation_nxn(

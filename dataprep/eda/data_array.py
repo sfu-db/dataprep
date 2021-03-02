@@ -318,6 +318,11 @@ class DataArray:
         subdf = self._ddf.select_dtypes(include)  # pylint: disable=W0212
         return self[subdf.columns]
 
+    def select_cat_columns(self) -> "DataArray":
+        """Return a new DataArray with categorical dtype columns."""
+        cols = self._ddf.select_dtypes(exclude="number").columns
+        return self[cols]
+
     def select_num_columns(self) -> "DataArray":
         """Return a new DataArray with numerical dtype columns."""
         df = self.select_dtypes(NUMERICAL_DTYPES)
