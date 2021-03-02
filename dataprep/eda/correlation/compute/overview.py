@@ -9,6 +9,8 @@ import dask
 import dask.array as da
 import numpy as np
 import pandas as pd
+from scipy import stats
+
 
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
@@ -24,7 +26,7 @@ def _calc_overview(
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
 ) -> Intermediate:
-    # pylint: disable=too-many-statements,too-many-locals,too-many-branches
+    # pylint: disable=too-many-statements,too-many-locals,too-many-branches,too-many-boolean-expressions
 
     most_show = 6  # the most number of column/row to show in "insight"
 
@@ -34,35 +36,49 @@ def _calc_overview(
 
     # num_df: df of num columns. Used for numerical correlation such as pearson.
     num_df = dadf.select_num_columns()
+    # cat_df: df of cat columns. Used for categorical correlation such as Cramer's V.
+    cat_df = dadf.select_cat_columns()
+
+    # whether data contains numerical column and categorical column.
+    contains_num = len(num_df.columns) > 0
+    contains_cat = len(cat_df.columns) > 0
 
     # cordx, cordy are used to locate a cell in correlation matrix.
-    num_cordx, num_cordy = _get_cord(len(num_df.columns))
+    if contains_num:
+        num_cordx, num_cordy = _get_cord(len(num_df.columns))
+    if contains_cat:
+        cat_cordx, cat_cordy = _get_cord(len(cat_df.columns))
 
     # The below variables are dict since some methods are applied to numerical columns
     # and some methods are applied to categorical columns.
     # columns: used column names
     # cordx, cordy: used to locate a cell in correlation matrix.
     # corrs: correlation matrix.
-    method2columns: Dict[CorrelationMethod, str] = {}
+    method2columns: Dict[CorrelationMethod, pd.Index] = {}
     method2cordx: Dict[CorrelationMethod, np.ndarray] = {}
     method2cordy: Dict[CorrelationMethod, np.ndarray] = {}
     method2corrs: Dict[CorrelationMethod, da.Array] = {}
 
-    if cfg.pearson.enable or cfg.stats.enable:
+    if contains_num and (cfg.pearson.enable or cfg.stats.enable):
         method2columns[CorrelationMethod.Pearson] = num_df.columns
         method2cordx[CorrelationMethod.Pearson] = num_cordx
         method2cordy[CorrelationMethod.Pearson] = num_cordy
         method2corrs[CorrelationMethod.Pearson] = _pearson_nxn(num_df)
-    if cfg.spearman.enable or cfg.stats.enable:
+    if contains_num and (cfg.spearman.enable or cfg.stats.enable):
         method2columns[CorrelationMethod.Spearman] = num_df.columns
         method2cordx[CorrelationMethod.Spearman] = num_cordx
         method2cordy[CorrelationMethod.Spearman] = num_cordy
         method2corrs[CorrelationMethod.Spearman] = _spearman_nxn(num_df)
-    if cfg.kendall.enable or cfg.stats.enable:
+    if contains_num and (cfg.kendall.enable or cfg.stats.enable):
         method2columns[CorrelationMethod.KendallTau] = num_df.columns
         method2cordx[CorrelationMethod.KendallTau] = num_cordx
         method2cordy[CorrelationMethod.KendallTau] = num_cordy
         method2corrs[CorrelationMethod.KendallTau] = _kendall_tau_nxn(num_df)
+    if contains_cat and (cfg.cramerv.enable or cfg.stats.enable):
+        method2columns[CorrelationMethod.CramerV] = cat_df.columns
+        method2cordx[CorrelationMethod.CramerV] = cat_cordx
+        method2cordy[CorrelationMethod.CramerV] = cat_cordy
+        method2corrs[CorrelationMethod.CramerV] = _cramerv_nxn(cat_df)
 
     # The computations below is not expensive (scales with # of columns)
     # So we do them in pandas
@@ -78,7 +94,7 @@ def _calc_overview(
         negative_max_corr_cols = {}
         min_corr_value = {}
         min_corr_cols = {}
-        for method in method2corrs.keys():
+        for method in method2corrs:
             (
                 positive_max_corr_value[method.value],
                 negative_max_corr_value[method.value],
@@ -102,27 +118,21 @@ def _calc_overview(
     # create insight. E.g., most correlated columns.
     if cfg.insight.enable:
         insights: Dict[str, List[Any]] = {}
-        for method in method2corrs.keys():
+        for method in method2corrs:
             pos_str = create_string(
-                "positive", positive_max_corr_cols[method.value], most_show, num_df
+                "positive", positive_max_corr_cols[method.value], most_show, method2columns[method]
             )
             neg_str = create_string(
-                "negative", negative_max_corr_cols[method.value], most_show, num_df
+                "negative", negative_max_corr_cols[method.value], most_show, method2columns[method]
             )
-            least_str = create_string("least", min_corr_cols[method.value], most_show, num_df)
+            least_str = create_string(
+                "least", min_corr_cols[method.value], most_show, method2columns[method]
+            )
             insights[method.value] = [pos_str, neg_str, least_str]
 
     dfs = {}
+    axis_ranges = {}
     for method, corr in method2corrs.items():
-        if (  # pylint: disable=too-many-boolean-expressions
-            method == CorrelationMethod.Pearson
-            and not cfg.pearson.enable
-            or method == CorrelationMethod.Spearman
-            and not cfg.spearman.enable
-            or method == CorrelationMethod.KendallTau
-            and not cfg.kendall.enable
-        ):
-            continue
         cordx = method2cordx[method]
         cordy = method2cordy[method]
         columns = method2columns[method]
@@ -138,18 +148,19 @@ def _calc_overview(
         ndf = ndf[cordy > cordx]  # Retain only lower triangle (w/o diag)
 
         # filter correlation df by top-k or value_range.
-        if k is not None:
+        if len(ndf) > 0 and k is not None:
             thresh = ndf["correlation"].abs().nlargest(k).iloc[-1]
             ndf = ndf[(ndf["correlation"] >= thresh) | (ndf["correlation"] <= -thresh)]
         elif value_range is not None:
             mask = (value_range[0] <= ndf["correlation"]) & (ndf["correlation"] <= value_range[1])
             ndf = ndf[mask]
 
-        dfs[method.name] = ndf
+        dfs[method.value] = ndf
+        axis_ranges[method.value] = list(columns.unique())
 
     return Intermediate(
         data=dfs,
-        axis_range=list(num_df.columns.unique()),
+        axis_range=axis_ranges,
         visual_type="correlation_impact",
         tabledata=tabledata if cfg.stats.enable else {},
         insights=insights if cfg.insight.enable else {},
@@ -199,7 +210,9 @@ def correlation_nxn(
 
 
 def _pearson_nxn(df: DataArray) -> da.Array:
-    """Calculate column-wise pearson correlation."""
+    """
+    Calculate column-wise pearson correlation.
+    """
     return (
         df.frame.repartition(npartitions=1)
         .map_partitions(partial(pd.DataFrame.corr, method="pearson"))
@@ -208,7 +221,9 @@ def _pearson_nxn(df: DataArray) -> da.Array:
 
 
 def _spearman_nxn(df: DataArray) -> da.Array:
-    """Calculate column-wise spearman correlation."""
+    """
+    Calculate column-wise spearman correlation.
+    """
     return (
         df.frame.repartition(npartitions=1)
         .map_partitions(partial(pd.DataFrame.corr, method="spearman"))
@@ -217,12 +232,65 @@ def _spearman_nxn(df: DataArray) -> da.Array:
 
 
 def _kendall_tau_nxn(df: DataArray) -> da.Array:
-    """Calculate column-wise kendalltau correlation."""
+    """
+    Calculate column-wise kendalltau correlation.
+    """
     return (
         df.frame.repartition(npartitions=1)
         .map_partitions(partial(pd.DataFrame.corr, method="kendall"))
         .to_dask_array()
     )
+
+
+def _cramerv_nxn(df: DataArray) -> da.Array:
+    """
+    Calculate column-wise Cramer'V correlation for categorical column.
+    Input df should only contain categorical column.
+    """
+    return df.frame.repartition(npartitions=1).map_partitions(_calc_cramerv).to_dask_array()
+
+
+def _calc_cramerv_pair(col1: pd.Series, col2: pd.Series) -> float:
+    """
+    Calculate the Cramer'V correlation for a pair of columns.
+    Input columns should be categorical columns.
+    """
+    confusion_matrix = pd.crosstab(col1, col2)
+    chi2 = stats.chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum().sum()
+    phi2 = chi2 / n
+    shape0 = confusion_matrix.shape[0]
+    shape1 = confusion_matrix.shape[1] if len(confusion_matrix.shape) > 1 else 1
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        phi2corr = max(0.0, phi2 - ((shape1 - 1.0) * (shape0 - 1.0)) / (n - 1.0))
+        rcorr = shape0 - ((shape0 - 1.0) ** 2.0) / (n - 1.0)
+        kcorr = shape1 - ((shape1 - 1.0) ** 2.0) / (n - 1.0)
+        rkcorr = min((kcorr - 1.0), (rcorr - 1.0))
+        if rkcorr == 0.0:
+            corr = 1.0
+        else:
+            corr = np.sqrt(phi2corr / rkcorr)
+    return corr
+
+
+def _calc_cramerv(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate the Cramer'V correlation matrix.
+    Input df should contain only categorical column.
+    """
+    cols = df.columns
+    idx = cols.copy()
+    ncols = len(cols)
+    correl = np.empty((ncols, ncols), dtype=float)
+    for i in range(ncols):
+        for j in range(ncols):
+            if i > j:
+                continue
+            value = _calc_cramerv_pair(df[cols[i]], df[cols[j]])
+            correl[i, j] = value
+            correl[j, i] = value
+    return pd.DataFrame(correl, index=idx, columns=cols)
 
 
 def most_corr(corrs: np.ndarray) -> Tuple[float, float, float, List[Any], List[Any]]:
@@ -283,7 +351,7 @@ def least_corr(corrs: np.ndarray) -> Tuple[float, List[Any]]:
     return round(minimum, 3), list(col_set)
 
 
-def create_string(flag: str, source: List[Any], most_show: int, df: DataArray) -> str:
+def create_string(flag: str, source: List[Any], most_show: int, columns: pd.Index) -> str:
     """Create the output string"""
     suffix = "" if len(source) <= most_show else ", ..."
     if flag == "positive":
@@ -300,7 +368,7 @@ def create_string(flag: str, source: List[Any], most_show: int, df: DataArray) -
         out = (
             prefix
             + ", ".join(
-                "(" + cut_long_name(df.columns[e[0]]) + ", " + cut_long_name(df.columns[e[1]]) + ")"
+                "(" + cut_long_name(columns[e[0]]) + ", " + cut_long_name(columns[e[1]]) + ")"
                 for e in source[:most_show]
             )
             + suffix

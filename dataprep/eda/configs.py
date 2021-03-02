@@ -838,6 +838,30 @@ class KendallTau(BaseModel):
         return [(f"'{name}': {val}", desc) for name, val, desc in zip(names, vals, descs)]
 
 
+class CramerV(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    height: int, default "auto"
+        Height of the plot
+    width: int, default "auto"
+        Width of the plot
+    """
+
+    enable: bool = True
+    height: Union[int, None] = None
+    width: Union[int, None] = None
+
+    def how_to_guide(self, height: int, width: int) -> List[Tuple[str, str]]:
+        """
+        how-to guide
+        """
+        vals = [height, width]
+        names = ["height", "width"]
+        descs = ["Height of the plot", "Width of the plot"]
+        return [(f"'{name}': {val}", desc) for name, val, desc in zip(names, vals, descs)]
+
+
 class Spectrum(BaseModel):
     """
     enable: bool, default True
@@ -986,6 +1010,7 @@ class Config(BaseModel):
     pearson: Pearson = Field(default_factory=Pearson)
     spearman: Spearman = Field(default_factory=Spearman)
     kendall: KendallTau = Field(default_factory=KendallTau)
+    cramerv: CramerV = Field(default_factory=CramerV)
     spectrum: Spectrum = Field(default_factory=Spectrum)
     dendro: Dendrogram = Field(default_factory=Dendrogram)
     pdf: PDF = Field(default_factory=PDF)

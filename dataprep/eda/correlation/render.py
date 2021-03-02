@@ -129,8 +129,8 @@ def render_correlation_impact(
         df["y"] = df["y"].apply(str)
 
         mapper, color_bar = create_color_mapper(RDBU)
-        x_range = FactorRange(*itmdt["axis_range"])
-        y_range = FactorRange(*reversed(itmdt["axis_range"]))
+        x_range = FactorRange(*itmdt["axis_range"][method])
+        y_range = FactorRange(*reversed(itmdt["axis_range"][method]))
         fig = Figure(
             x_range=x_range,
             y_range=y_range,
@@ -165,7 +165,7 @@ def render_correlation_impact(
         "tabledata": itmdt["tabledata"],
         "layout": [panel.child for panel in tabs],
         "meta": [panel.title for panel in tabs],
-        "container_width": plot_width + 150,
+        "container_width": plot_width + 200,
         "how_to_guide": corr_how_to_guides(cfg, plot_height, plot_width),
     }
 
@@ -182,6 +182,8 @@ def corr_how_to_guides(cfg: Config, height: int, width: int) -> Dict[str, List[T
         htgs["Spearman"] = cfg.spearman.how_to_guide(height, width)
     if cfg.pearson.enable:
         htgs["KendallTau"] = cfg.kendall.how_to_guide(height, width)
+    if cfg.cramerv.enable:
+        htgs["Cramer's V"] = cfg.cramerv.how_to_guide(height, width)
 
     return htgs
 

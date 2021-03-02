@@ -38,6 +38,31 @@ def simpledf() -> dd.DataFrame:
     return df
 
 
+@pytest.fixture(scope="module")  # type: ignore
+def simpledf_mixed() -> dd.DataFrame:
+    df = pd.DataFrame(np.random.rand(100, 3), columns=["col1", "col2", "col3"])
+    for col in ["col4", "col5", "col6"]:
+        df[col] = pd.Series(np.random.choice(["a", "b", "c"], 100, replace=True))
+    df = to_dask(df)
+    return df
+
+
+@pytest.fixture(scope="module")  # type: ignore
+def simpledf_num() -> dd.DataFrame:
+    df = pd.DataFrame(np.random.rand(100, 3), columns=["col1", "col2", "col3"])
+    df = to_dask(df)
+    return df
+
+
+@pytest.fixture(scope="module")  # type: ignore
+def simpledf_cat() -> dd.DataFrame:
+    df = pd.DataFrame()
+    for col in ["col1", "col2", "col3"]:
+        df[col] = pd.Series(np.random.choice(["a", "b", "c"], 100, replace=True))
+    df = to_dask(df)
+    return df
+
+
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
     display = ["Stats", "Pearson"]
     config = {
@@ -53,6 +78,14 @@ def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
     compute_correlation(simpledf, cfg=cfg, k=1)
     plot_correlation(simpledf, k=1)
+
+
+def test_overview(
+    simpledf_num: dd.DataFrame, simpledf_cat: dd.DataFrame, simpledf_mixed: dd.DataFrame
+) -> None:
+    plot_correlation(simpledf_num)
+    plot_correlation(simpledf_cat)
+    plot_correlation(simpledf_mixed)
 
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
