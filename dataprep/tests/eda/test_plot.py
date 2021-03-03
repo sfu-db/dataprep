@@ -7,6 +7,8 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import pytest
+import random
+import string
 
 from ...eda import plot
 from ...eda.dtypes import Nominal
@@ -30,10 +32,27 @@ def simpledf() -> dd.DataFrame:
         axis=1,
     )
     df = pd.concat([df, pd.Series(np.zeros(1000))], axis=1)
-    df.columns = ["a", "b", "c", "d", "e", "f"]
+    # test word frequency and n-gram frequency
+    df = pd.concat(
+        [
+            df,
+            pd.Series(
+                "".join(
+                    [
+                        random.choice(string.digits + string.ascii_letters + "")
+                        for _ in range(random.randint(1, 100))
+                    ]
+                )
+                for _ in range(1000)
+            ),
+        ],
+        axis=1,
+    )
+
+    df.columns = ["a", "b", "c", "d", "e", "f", "g"]
     df["e"] = pd.to_datetime(df["e"])
     # test when column is object but some cells are numerical
-    df["g"] = pd.Series([0, "x"] * 500)
+    df["h"] = pd.Series([0, "x"] * 500)
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
@@ -48,6 +67,7 @@ def test_sanity_compute_univariate(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "a")
     plot(simpledf, "e")
     plot(simpledf, "g")
+    plot(simpledf, "h")
 
 
 def test_sanity_compute_overview(simpledf: dd.DataFrame) -> None:
