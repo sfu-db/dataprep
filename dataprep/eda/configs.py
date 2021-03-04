@@ -51,6 +51,15 @@ DISPLAY_MAP = {
     "CDF": "cdf",
 }
 
+# This dictionary map is used for session control in create_report
+DISPLAY_REPORT_MAP = {
+    "Overview": "overview",
+    "Variables": "variables",
+    "Interactions": "interactions",
+    "Correlations": "correlations",
+    "Missing Values": "missingvalues",
+}
+
 
 class Plot(BaseModel):
     """
@@ -61,7 +70,6 @@ class Plot(BaseModel):
     height: Union[int, None] = None
     bins: Union[int, None] = None
     ngroups: Union[int, None] = None
-    grid_column: int = 3
     report: bool = False
 
 
@@ -79,32 +87,33 @@ class Insight(BaseModel):
     enable: bool, default True
         Whether to create this element
     duplicates__threshold: int, default 1
-        The threshold for duplicated row counts
-    similar_distribution__threshold:int, default 0.05
+        Warn if the percent of duplicated values is above this threshold
+    similar_distribution__threshold:float, default 0.05
         The significance level for Kolmogorov–Smirnov test
-    uniform__threshold: int, default 0.999
+    uniform__threshold: float, default 0.999
         The p-value threshold for chi-square test
     missing__threshold: int, default 1
-        The threshold for missing values count
-    skewed__threshold: int, default 1e-5
-        The threshold for skewness statistics
+         Warn if the percent of missing values is above this threshold
+    skewed__threshold: float, default 1e-5
+        The p-value for the scipy.skewtest which test whether the skew is
+        different from the normal distributionin
     infinity__threshold: int, default 1
-        The threshold for infinity count
+         Warn if the percent of infinites is above this threshold
     zeros__threshold: int, default 5
-        The threshold for zeros count
+         Warn if the percent of zeros is above this threshold
     negatives__threshold: int, default 1
-        The threshold for negatives count
-    normal__threshold: int, default 0.99
-        The p-value threshold for normaltest, it is based on D’Agostino and Pearson’s test that
+         Warn if the percent of negatives is above this threshold
+    normal__threshold: float, default 0.99
+        The p-value threshold for normal test, it is based on D’Agostino and Pearson’s test that
         combines skew and kurtosis to produce an omnibus test of normality
     high_cardinality__threshold: int, default 50
         The threshold for unique values count, count larger than threshold yields high cardinality
     constant__threshold: int, default 1
         The threshold for unique values count, count equals to threshold yields constant value
-    outstanding_no1__threshold: int, default 1.5
+    outstanding_no1__threshold: float, default 1.5
         The threshold for outstanding no1 insight, measures the ratio of the largest category count
         to the second-largest category count
-    attribution__threshold: int, default 0.5
+    attribution__threshold: float, default 0.5
         The threshold for the attribution insight, measures the percentage of the top 2 categories
     high_word_cardinality__threshold: int, default 1000
         The threshold for the high word cardinality insight, which measures the number of words of
@@ -113,7 +122,7 @@ class Insight(BaseModel):
         The threshold for the outstanding no1 word threshold, which measures the ratio of the most
         frequent word count to the second most frequent word count
     outlier__threshold: int, default 0
-        The threshold for the outlier count in the box plot, default 0
+        The threshold for the outlier count in the box plot
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -893,7 +902,7 @@ class PDF(BaseModel):
     """
     enable: bool, default True
         Whether to create this element
-    sample_size:
+    sample_size: int, default 100
         Number of evenly spaced samples between the minimum and maximum values to compute the pdf at
     height: int, default "auto"
         Height of the plot
@@ -960,6 +969,52 @@ def _form(val: Any) -> Any:
     return f"'{val}'" if isinstance(val, str) else val
 
 
+# The following five classes are for create_report
+class Overview(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    """
+
+    enable: bool = True
+
+
+class Variables(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    """
+
+    enable: bool = True
+
+
+class Interactions(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    """
+
+    enable: bool = True
+
+
+class Correlations(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    """
+
+    enable: bool = True
+
+
+class MissingValues(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    """
+
+    enable: bool = True
+
+
 class Config(BaseModel):
     """
     Configuration class
@@ -991,6 +1046,11 @@ class Config(BaseModel):
     pdf: PDF = Field(default_factory=PDF)
     cdf: CDF = Field(default_factory=CDF)
     plot: Plot = Field(default_factory=Plot)
+    overview: Overview = Field(default_factory=Overview)
+    variables: Variables = Field(default_factory=Variables)
+    interactions: Interactions = Field(default_factory=Interactions)
+    correlations: Correlations = Field(default_factory=Correlations)
+    missingvalues: MissingValues = Field(default_factory=MissingValues)
 
     @classmethod
     def from_dict(
@@ -1000,12 +1060,16 @@ class Config(BaseModel):
         Converts an dictionary instance into a config class
         """
         cfg = cls()
-
         if display:
-            display = [DISPLAY_MAP[disp] for disp in display]
-            # set all plots not in display list to enable=False except for Plot class
-            for plot in set(vars(cfg).keys()) - set(display) - {"plot"}:
-                setattr(getattr(cfg, plot), "enable", False)
+            try:
+                display = [DISPLAY_MAP[disp] for disp in display]
+                # set all plots not in display list to enable=False except for Plot class
+                for plot in set(vars(cfg).keys()) - set(display) - {"plot"}:
+                    setattr(getattr(cfg, plot), "enable", False)
+            except KeyError:
+                display = [DISPLAY_REPORT_MAP[disp] for disp in display]
+                for plot in set(DISPLAY_REPORT_MAP.values()) - set(display):
+                    setattr(getattr(cfg, plot), "enable", False)
 
         if config:
             # get the global parameters from config

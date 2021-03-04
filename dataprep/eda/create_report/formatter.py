@@ -1,5 +1,5 @@
 """This module implements the formatting
-for create_report(df) function."""
+for create_report(df) function."""  # pylint: disable=line-too-long,
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 from warnings import catch_warnings, filterwarnings
@@ -63,7 +63,6 @@ def format_report(
         A dictionary in which formatted data will be stored.
         This variable acts like an API in passing data to the template engine.
     """
-
     with ProgressBar(minimum=1, disable=not progress):
         df = to_dask(df)
         df = string_dtype_to_object(df)
@@ -95,10 +94,13 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         A dictionary in which formatted data is stored.
         This variable acts like an API in passing data to the template engine.
     """
-    # pylint: disable=too-many-locals,too-many-statements
+    # pylint: disable=too-many-locals,too-many-statements,too-many-branches
     # aggregate all computations
     setattr(getattr(cfg, "plot"), "report", True)
-    data, completions = basic_computations(df, cfg)
+    if cfg.missingvalues.enable:
+        data, completions = basic_computations(df, cfg)
+    else:
+        data = basic_computations(df, cfg)
 
     with catch_warnings():
         filterwarnings(
@@ -115,102 +117,115 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
 
     # results dictionary
     res: Dict[str, Any] = {}
-
+    # figure list
+    figs: List[Figure] = []
     # overview
-    data["ov"].pop("ks_tests")
-    res["overview"] = format_ov_stats(data["ov"])
+    if cfg.overview.enable:
+        data["ov"].pop("ks_tests")
+        res["overview"] = format_ov_stats(data["ov"])
+        res["has_overview"] = True
+    else:
+        res["has_overview"] = False
 
     # variables
-    res["variables"] = {}
-    for col in df.columns:
-        stats: Any = None  # needed for pylint
-        if is_dtype(detect_dtype(df[col]), Continuous()):
-            itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
-            stats = format_num_stats(data[col])
-        elif is_dtype(detect_dtype(df[col]), Nominal()):
-            itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
-            stats = format_cat_stats(
-                data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
-            )
-        elif is_dtype(detect_dtype(df[col]), DateTime()):
-            itmdt = Intermediate(
-                col=col,
-                data=data[col]["stats"],
-                line=data[col]["line"],
-                visual_type="datetime_column",
-            )
-            stats = stats_viz_dt(data[col]["stats"])
-        rndrd = render(itmdt, cfg)["layout"]
-        figs: List[Figure] = []
-        for tab in rndrd:
-            try:
-                fig = tab.children[0]
-            except AttributeError:
-                fig = tab
-            # fig.title = Title(text=tab.title, align="center")
-            figs.append(fig)
-        res["variables"][col] = {
-            "tabledata": stats,
-            "plots": components(figs),
-            "col_type": itmdt.visual_type.replace("_column", ""),
-        }
+    if cfg.variables.enable:
+        res["variables"] = {}
+        res["has_variables"] = True
+        for col in df.columns:
+            stats: Any = None  # needed for pylint
+            if is_dtype(detect_dtype(df[col]), Continuous()):
+                itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
+                stats = format_num_stats(data[col])
+            elif is_dtype(detect_dtype(df[col]), Nominal()):
+                itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
+                stats = format_cat_stats(
+                    data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
+                )
+            elif is_dtype(detect_dtype(df[col]), DateTime()):
+                itmdt = Intermediate(
+                    col=col,
+                    data=data[col]["stats"],
+                    line=data[col]["line"],
+                    visual_type="datetime_column",
+                )
+                stats = stats_viz_dt(data[col]["stats"])
+            rndrd = render(itmdt, cfg)["layout"]
+            for tab in rndrd:
+                try:
+                    fig = tab.children[0]
+                except AttributeError:
+                    fig = tab
+                # fig.title = Title(text=tab.title, align="center")
+                figs.append(fig)
+            res["variables"][col] = {
+                "tabledata": stats,
+                "plots": components(figs),
+                "col_type": itmdt.visual_type.replace("_column", ""),
+            }
+    else:
+        res["has_variables"] = False
 
     if len(data["num_cols"]) > 0:
         # interactions
-        res["has_interaction"] = True
-        itmdt = Intermediate(data=data["scat"], visual_type="correlation_crossfilter")
-        rndrd = render_correlation(itmdt, cfg)
-        rndrd.sizing_mode = "stretch_width"
-        res["interactions"] = components(rndrd)
+        if cfg.interactions.enable:
+            res["has_interaction"] = True
+            itmdt = Intermediate(data=data["scat"], visual_type="correlation_crossfilter")
+            rndrd = render_correlation(itmdt, cfg)
+            rndrd.sizing_mode = "stretch_width"
+            res["interactions"] = components(rndrd)
 
         # correlations
-        res["has_correlation"] = True
-        dfs: Dict[str, pd.DataFrame] = {}
-        for method, corr in data["corrs"].items():
-            ndf = pd.DataFrame(
-                {
-                    "x": data["num_cols"][data["cordx"]],
-                    "y": data["num_cols"][data["cordy"]],
-                    "correlation": corr.ravel(),
-                }
+        if cfg.correlations.enable:
+            res["has_correlation"] = True
+            dfs: Dict[str, pd.DataFrame] = {}
+            for method, corr in data["corrs"].items():
+                ndf = pd.DataFrame(
+                    {
+                        "x": data["num_cols"][data["cordx"]],
+                        "y": data["num_cols"][data["cordy"]],
+                        "correlation": corr.ravel(),
+                    }
+                )
+                dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
+            itmdt = Intermediate(
+                data=dfs,
+                axis_range=list(data["num_cols"]),
+                visual_type="correlation_heatmaps",
             )
-            dfs[method.name] = ndf[data["cordy"] > data["cordx"]]
-        itmdt = Intermediate(
-            data=dfs,
-            axis_range=list(data["num_cols"]),
-            visual_type="correlation_heatmaps",
-        )
-        rndrd = render_correlation(itmdt, cfg)
-        figs.clear()
-        for tab in rndrd.tabs:
-            fig = tab.child
-            fig.sizing_mode = "stretch_width"
-            fig.title = Title(text=tab.title, align="center", text_font_size="20px")
-            figs.append(fig)
-        res["correlations"] = components(figs)
+            rndrd = render_correlation(itmdt, cfg)
+            figs.clear()
+            for tab in rndrd.tabs:
+                fig = tab.child
+                fig.sizing_mode = "stretch_width"
+                fig.title = Title(text=tab.title, align="center", text_font_size="20px")
+                figs.append(fig)
+            res["correlations"] = components(figs)
     else:
         res["has_interaction"], res["has_correlation"] = False, False
 
     # missing
-    res["has_missing"] = True
-    itmdt = completions["miss"](data["miss"])
+    if cfg.missingvalues.enable:
+        res["has_missing"] = True
+        itmdt = completions["miss"](data["miss"])
 
-    rndrd = render_missing(itmdt, cfg)
-    figs.clear()
-    for fig in rndrd["layout"]:
-        fig.sizing_mode = "stretch_width"
-        fig.title = Title(
-            text=rndrd["meta"][rndrd["layout"].index(fig)],
-            align="center",
-            text_font_size="20px",
-        )
-        figs.append(fig)
-    res["missing"] = components(figs)
+        rndrd = render_missing(itmdt, cfg)
+        figs.clear()
+        for fig in rndrd["layout"]:
+            fig.sizing_mode = "stretch_width"
+            fig.title = Title(
+                text=rndrd["meta"][rndrd["layout"].index(fig)],
+                align="center",
+                text_font_size="20px",
+            )
+            figs.append(fig)
+        res["missing"] = components(figs)
 
     return res
 
 
-def basic_computations(df: dd.DataFrame, cfg: Config) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+def basic_computations(
+    df: dd.DataFrame, cfg: Config
+) -> Union[Tuple[Dict[str, Any], Dict[str, Any]], Any]:
     """Computations for the basic version.
 
     Parameters
@@ -227,34 +242,42 @@ def basic_computations(df: dd.DataFrame, cfg: Config) -> Tuple[Dict[str, Any], D
     df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
     first_rows = df.select_dtypes(CATEGORICAL_DTYPES).head
-
     # variables
-    for col in df.columns:
-        if is_dtype(detect_dtype(df.frame[col]), Continuous()):
-            data[col] = cont_comps(df.frame[col], cfg)
-        elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
-            # Since it will throw error if column is object while some cells are
-            # numerical, we transform column to string first.
-            df.frame[col] = df.frame[col].astype(str)
-            data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
-        elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
-            data[col] = {}
-            data[col]["stats"] = calc_stats_dt(df.frame[col])
-            data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
-
+    if cfg.variables.enable:
+        for col in df.columns:
+            if is_dtype(detect_dtype(df.frame[col]), Continuous()):
+                data[col] = cont_comps(df.frame[col], cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
+                # Since it will throw error if column is object while some cells are
+                # numerical, we transform column to string first.
+                df.frame[col] = df.frame[col].astype(str)
+                data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
+                data[col] = {}
+                data[col]["stats"] = calc_stats_dt(df.frame[col])
+                data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
     # overview
-    data["ov"] = calc_stats(df.frame, cfg, None)
+    if cfg.overview.enable:
+        data["ov"] = calc_stats(df.frame.astype(str), cfg, None)
     # interactions
-    data["scat"] = df_num.frame.map_partitions(
-        lambda x: x.sample(min(1000, x.shape[0])), meta=df_num.frame
-    )
+    if cfg.interactions.enable:
+        data["scat"] = df_num.frame.map_partitions(
+            lambda x: x.sample(min(1000, x.shape[0])), meta=df_num.frame
+        )
     # correlations
-    data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))
+    if cfg.correlations.enable:
+        data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))
     # missing values
-    (delayed, completion,) = compute_missing_nullivariate(  # pylint: disable=unexpected-keyword-arg
-        df, cfg, _staged=True
-    )
-    data["miss"] = delayed
-    completions = {"miss": completion}
+    if cfg.missingvalues.enable:
+        (
+            delayed,
+            completion,
+        ) = compute_missing_nullivariate(  # pylint: disable=unexpected-keyword-arg
+            df, cfg, _staged=True
+        )
+        data["miss"] = delayed
+        completions = {"miss": completion}
+        return data, completions
 
-    return data, completions
+    else:
+        return data

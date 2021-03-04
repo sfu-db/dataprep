@@ -26,14 +26,6 @@ Schema
    :undoc-members:
    :show-inheritance:
 
-Types
--------------------------------------
-
-.. automodule:: dataprep.connector.types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Implicit database
 --------------------------------------------------
 
