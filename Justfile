@@ -1,3 +1,7 @@
+#### Documentations ####
+doc-clean-notebooks:
+    fd ".*\.ipynb" -t f docs/source/ -x jupyter nbconvert --clear-output
+
 build-docs:
   poetry run sphinx-build -M html docs/source docs/build
 
@@ -8,6 +12,7 @@ publish-docs: build-docs
 gen-apidocs:
   poetry run sphinx-apidoc --ext-doctest --ext-autodoc --ext-mathjax -f -o docs/source dataprep
 
+#### CI ####
 black:
   poetry run black dataprep
   
