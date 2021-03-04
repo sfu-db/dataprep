@@ -11,11 +11,11 @@ Connector
     connector_concurrency
     connector_pagination
 
-To see detailed examples of how to use Connector, check out our Jupyter Notebooks repository `here  <https://github.com/sfu-db/dataprep/tree/develop/examples>`_.
+To see detailed examples of how to use Connector, check out our `Jupyter Notebooks repository <https://github.com/sfu-db/dataprep/tree/develop/examples>`_.
 
 Overview
 ==========
-Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector's full documentation `here  <https://sfu-db.github.io/dataprep/>`_.
+Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector's `full documentation <https://sfu-db.github.io/dataprep/>`_.
 
 Connector wraps-up complex API calls into a set of easy-to-use Python functions. By using Connector, you can skip the complex API configuration process and rapidly query different Web APIs in few steps, enabling you to execute the analysis workflow you are familiar with in a direct way.
 
