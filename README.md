@@ -114,7 +114,7 @@ DataPrep.EDA is the **_only_** task-centric EDA system in Python. It is carefull
 
 - **Task-Centric API Design**: You can declaratively specify a wide range of EDA tasks in different granularities with a single function call. All needed visualizations will be automatically and intelligently generated for you.
 - **Auto-Insights**: DataPrep.EDA automatically detects and highlights the insights (e.g., a column has many outliers) to facilitate pattern discovery about the data.
-- **How-to Guide** (available soon): A how-to guide is provided to show the configuration of each plot function. With this feature, you can easily customize the generated visualizations.
+- **[How-to Guide](https://sfu-db.github.io/dataprep/user_guide/eda/how_to_guide.html)** : A how-to guide is provided to show the configuration of each plot function. With this feature, you can easily customize the generated visualizations.
 
 #### Understand the Titanic dataset with Task-Centric API:
 

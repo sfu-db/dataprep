@@ -61,6 +61,10 @@ def test_sanity_compute_bivariate(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "d", "g")
 
 
+def test_sanity_compute_7(simpledf: dd.DataFrame) -> None:
+    plot(simpledf, "a", "b")
+
+
 def test_specify_column_type(simpledf: dd.DataFrame) -> None:
     plot(simpledf, dtype={"a": Nominal()})
     plot(simpledf, dtype=Nominal())

@@ -1,4 +1,3 @@
-
 ==============================
 dataprep.eda auxiliary modules
 ==============================
@@ -29,10 +28,10 @@ Palette
    :undoc-members:
    :show-inheritance:
 
-Report
-------
+Container
+---------
 
-.. automodule:: dataprep.eda.report
+.. automodule:: dataprep.eda.container
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,3 +44,11 @@ Utils
    :undoc-members:
    :show-inheritance:
 
+
+Config
+------
+
+.. automodule:: dataprep.eda.configs
+   :members:
+   :undoc-members:
+   :show-inheritance:
