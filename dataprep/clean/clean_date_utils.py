@@ -604,6 +604,7 @@ def check_date(date: str, clean: bool) -> Union[str, bool]:
     """
     if date in NULL_VALUES:
         return "null" if clean else False
+    date = str(date)
     tokens = split(date, JUMP)
     remain_tokens = tokens.copy()
     # Handle timezone
