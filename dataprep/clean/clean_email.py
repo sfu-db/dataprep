@@ -415,6 +415,7 @@ def _check_email(val: Any, clean: bool) -> Any:
     if val in NULL_VALUES:
         return "null" if clean else False
 
+    val = str(val)
     if "@" not in val:
         return "bad_format" if clean else False
 
