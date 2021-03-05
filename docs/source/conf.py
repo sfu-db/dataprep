@@ -117,7 +117,5 @@ nbsphinx_allow_errors = True
 
 nbsphinx_execute_arguments = []
 
-nbsphinx_kernel_name = "dataprep"
-
-print(os.environ["PWD"])
-sys.path.insert(0, os.environ["PWD"])
+if "DATAPREP_DOC_KERNEL" in os.environ:
+    nbsphinx_kernel_name = os.environ["DATAPREP_DOC_KERNEL"]
