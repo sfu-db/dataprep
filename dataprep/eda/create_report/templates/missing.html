@@ -1,13 +1,24 @@
 <div class="missing-container">
-    {% for div in context.components.missing[1] %}
-    {% if div.error %}
-    {% with error_message = div.error %}
-    {% include 'error.html' %}
-    {% endwith %}
-    {% else %}
-    <div class="miss-plot">
-        {{ div }}
+  <div class="miss-plot">
+    <div class="report-tab">
+      <button class="missing-tablinks active" onclick="openTab(event, '{{context.components.missing_tabs[0]}}')" >{{context.components.missing_tabs[0]}}</button>
+      <button class="missing-tablinks" onclick="openTab(event, '{{context.components.missing_tabs[1]}}')">{{context.components.missing_tabs[1]}}</button>
+      <button class="missing-tablinks" onclick="openTab(event, '{{context.components.missing_tabs[2]}}')">{{context.components.missing_tabs[2]}}</button>
+      <button class="missing-tablinks" onclick="openTab(event, '{{context.components.missing_tabs[3]}}')">{{context.components.missing_tabs[3]}}</button>
     </div>
-    {% endif %}
-    {% endfor %}
+
+    <div id="{{context.components.missing_tabs[0]}}" class="missing-tabcontent">
+      {{ context.components.missing[1][0]}}
+    </div>
+    <div id="{{context.components.missing_tabs[1]}}" style="display:none" class="missing-tabcontent">
+      {{ context.components.missing[1][1]}}
+    </div>
+    <div id="{{context.components.missing_tabs[2]}}" style="display:none" class="missing-tabcontent">
+      {{ context.components.missing[1][2]}}
+    </div>
+    <div id="{{context.components.missing_tabs[3]}}" style="display:none" class="missing-tabcontent">
+      {{ context.components.missing[1][3]}}
+    </div>
+
+  </div>
 </div>
