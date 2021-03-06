@@ -71,7 +71,7 @@ Continuing with the DBLP example, below you can find how to use offset-based pag
     dblp_connector = connect("dblp")
     df = await dblp_connector.query("publication", q="SIGMOD", f="0", h="10")
 
-In this case, the DBLP endpoint specification defines that the name of the offset parameter is ``f`` and the name of the limit parameter is ``h``. For that reason, parameters with names ``f`` and ``h`` are used in the ``query`` function. These parameter names are also defined in the DBLP's `configuration file <https://github.com/sfu-db/DataConnectorConfigs/blob/develop/dblp/publication.json>`_ for the publication endpoint.::
+In this case, the DBLP endpoint specification defines that the name of the offset parameter is ``f`` and the name of the limit parameter is ``h``. For that reason, parameters with names ``f`` and ``h`` are used in the ``query`` function. These parameter names are also defined in the `DBLP's configuration file <https://github.com/sfu-db/DataConnectorConfigs/blob/develop/dblp/publication.json>`_ for the publication endpoint.::
 
     "pagination": {
         "type": "offset",
@@ -99,7 +99,7 @@ In the following example, you can see how this pagination method works using as 
     mapquest_connector = connect("mapquest", _auth={"access_token":"<Your MapQuest access token>"})
     df = await mapquest_connector.query("place", q="Vancouver, BC", sort="relevance", page="1", pageSize="10")
 
-In this case, the specification of the MapQuest - "place" endpoint defines that the name of the "Page" parameter is ``page`` and the name of the "Perpage" parameter is ``pageSize``. For that reason, parameters with names ``page`` and ``pageSize`` are used into the ``query`` function. These parameter names are also defined into the MapQuest's `configuration file <https://github.com/sfu-db/DataConnectorConfigs/blob/develop/mapquest/place.json>`_ for the place endpoint.::
+In this case, the specification of the MapQuest - "place" endpoint defines that the name of the "Page" parameter is ``page`` and the name of the "Perpage" parameter is ``pageSize``. For that reason, parameters with names ``page`` and ``pageSize`` are used into the ``query`` function. These parameter names are also defined into the `MapQuest's configuration file <https://github.com/sfu-db/DataConnectorConfigs/blob/develop/mapquest/place.json>`_ for the place endpoint.::
 
     "pagination": {
         "type": "page",

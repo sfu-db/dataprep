@@ -1,0 +1,371 @@
+{
+ "cells": [
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. _address_userguide:\n",
+    "\n",
+    "US Street Addresses\n",
+    "==================="
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "Introduction\n",
+    "------------\n",
+    "\n",
+    "The function :func:`clean_address() <dataprep.clean.clean_address.clean_address>` cleans a column containing United States street addresses and standardizes them in a desired format. The function :func:`validate_address() <dataprep.clean.clean_address.validate_address>` validates either a single address or a column of addresses, returning True if the value is valid, and False otherwise. Address parsing is done using the `usaddress library <https://github.com/datamade/usaddress>`_."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Addresses can be converted to a specific format via the `output_format` parameter, the following keywords are supported. Any missing attributes are omitted.\n",
+    "\n",
+    "* house_number: ('1234')\n",
+    "* street_prefix_abbr: ('N', 'S', 'E', or 'W')\n",
+    "* street_prefix_full: ('North', 'South', 'East', or 'West')\n",
+    "* street_name: ('Main')\n",
+    "* street_suffix_abbr: ('St', 'Ave')\n",
+    "* street_suffix_full: ('Street', 'Avenue')\n",
+    "* apartment: ('Apt 1')\n",
+    "* building: ('Staples Center')\n",
+    "* city: ('Los Angeles')\n",
+    "* state_abbr: ('CA')\n",
+    "* state_full: ('California')\n",
+    "* zipcode: ('57903')\n",
+    "\n",
+    "The default `output_format` is \"(building) house_number street_prefix_abbr street_name street_suffix_abbr apartment,\n",
+    "     city, state_abbr zipcode\"\n",
+    "     \n",
+    "The `must_contain` parameter takes a tuple containing parts of the address that must be included for the address to be successfully cleaned, the following keywords are supported.\n",
+    "        \n",
+    "* house_number: ('1234')\n",
+    "* street_prefix: ('N', 'North')\n",
+    "* street_name: ('Main')\n",
+    "* street_suffix: ('St', 'Avenue')\n",
+    "* apartment: ('Apt 1')\n",
+    "* building: ('Staples Center')\n",
+    "* city: ('Los Angeles')\n",
+    "* state: ('CA', 'California')\n",
+    "* zipcode: ('57903')\n",
+    "     \n",
+    "The default value for `must_contain` is `(\"house_number\", \"street_name\")`. Therefore, by default addresses must contain a house number and street name to be successfully cleaned.\n",
+    "\n",
+    "Invalid parsing is handled with the `errors` parameter:\n",
+    "\n",
+    "* \"coerce\" (default): invalid parsing will be set to NaN\n",
+    "* \"ignore\": invalid parsing will return the input\n",
+    "* \"raise\": invalid parsing will raise an exception\n",
+    "\n",
+    "After cleaning, a **report** is printed that provides the following information:\n",
+    "\n",
+    "* How many values were cleaned (the value must have been transformed).\n",
+    "* How many values could not be parsed.\n",
+    "* A summary of the cleaned data: how many values are in the correct format, and how many values are NaN.\n",
+    "  \n",
+    "The following sections demonstrate the functionality of `clean_address()` and `validate_address()`. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## An example dirty dataset"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "df = pd.DataFrame(\n",
+    "    {\n",
+    "        \"address\": [\n",
+    "            \"123 Pine Ave.\",\n",
+    "            \"main st\",\n",
+    "            \"1234 west main heights 57033\",\n",
+    "            \"apt 1 789 s maple rd manhattan\",\n",
+    "            \"robie house, 789 north main street\",\n",
+    "            \"1111 S Figueroa St, Los Angeles, CA 90015\",\n",
+    "            \"(staples center) 1111 S Figueroa St, Los Angeles\",\n",
+    "            \"hello\",\n",
+    "            np.nan,\n",
+    "            \"NULL\"\n",
+    "        ]\n",
+    "    }\n",
+    ")\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1. Default `clean_address()`"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By default the `output_format` parameter is set to \"(building) house_number street_prefix_abbr street_name street_suffix_abbr apartment, city, state_abbr zipcode\" and the `must_contain` parameter is set `(\"house_number\", \"street_name\")`. The errors parameter is set to \"coerce\" (set NaN when parsing is invalid)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from dataprep.clean import clean_address\n",
+    "clean_address(df, \"address\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note that \"123 Pine Ave.\" is considered not cleaned in the report since its resulting format is the same as the input. Also, \"main st\" is invalid since it does not contain a house number."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Output formats"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(\n",
+    "    df, \n",
+    "    \"address\", \n",
+    "    output_format=\"(zipcode) street_prefix_full street_name ~state_full~\"\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(\n",
+    "    df,\n",
+    "    \"address\",\n",
+    "    output_format=\"house_number street_name street_suffix_full (building)\",\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Splitting The Output\n",
+    "\n",
+    "A tab character can be placed between address keywords to split the output into separate columns. The column names are taken from the output format."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(\n",
+    "    df, \n",
+    "    \"address\", \n",
+    "    output_format=\"house_number street_name \\t state_full\"\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. `must_contain` parameter\n",
+    "This parameter takes a tuple containing parts of the address that must be included for the address to be successfully cleaned.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(\n",
+    "    df, \"address\", must_contain=(\"house_number\", \"zipcode\")\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 4. `split` parameter\n",
+    "\n",
+    "The `split` parameter adds individual columns containing the cleaned address values to the given DataFrame."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(df, \"address\", split=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Setting split to True is equivalent to placing tabs between each word in the `output_format` and removing all characters that are not part of an address keyword (ie. commas). Column names are taken from the address keywords in the `output_format`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(\n",
+    "    df, \n",
+    "    \"address\", \n",
+    "    split=True, \n",
+    "    output_format=\"house_number, street_name, building\"\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 5. `inplace` parameter\n",
+    "This just deletes the given column from the returned dataframe. \n",
+    "A new column containing cleaned addresses is added with a title in the format `\"{original title}_clean\"`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(df, \"address\", inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### `inplace` and `split`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clean_address(df, \"address\", inplace=True, split=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 6. `validate_address()`\n",
+    "\n",
+    "`validate_address()` returns True when the input is a valid address value otherwise it returns False. Valid types are the same as `clean_address()`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from dataprep.clean import validate_address\n",
+    "\n",
+    "print(validate_address(\"123 main st\"))\n",
+    "print(validate_address(\"main st\"))\n",
+    "print(validate_address(\"apt 1 s maple rd manhattan\", must_contain=(\"apartment\",)))\n",
+    "print(validate_address(\"(staples center) 1111 S Figueroa St, Los Angeles\"))\n",
+    "print(validate_address(\"789 North Maple Way Boston, MA\"))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### `validate_address()` on a pandas series"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df[\"valid\"] = validate_address(df[\"address\"])\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### `must_contain`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df[\"valid\"] = validate_address(df[\"address\"], must_contain=(\"building\", \"city\"))\n",
+    "df"
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Raw Cell Format",
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

@@ -1,0 +1,143 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Customize your output"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Overview"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Dataprep supports customizability for `plot()`, `plot_missing()`, `plot_correlation()` and `create_report()`. There are mainly two settings,\n",
+    "`display` and `config`. \n",
+    "\n",
+    "1. `display` is a list of names which controls the Tabs, Sections and Sessions you want to show.\n",
+    "2. `config` is a dictionary that contains the customizable parameters and designated values.\n",
+    "\n",
+    "For your convenience, the input for `display` can directly be copied from the Tabs. You can save the computations by diaplaying less contents. \n",
+    "\n",
+    "And for `config`, we developed the `how-to guide` function to help you mange the frequently-use parameters. Click the `question mark icon` in the upper right corner of each plot, in the pop-up you will see the customizable parameters for that plot, parameters' brief descriptions and parameters' default settings. You can easily use the `Copy All Parameters` button to copy the parameters with their default settings into a dictionary. Then customize the settings and pass to the `config` argument.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Global and local parameter"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are two types of parameters, global and local.\n",
+    "\n",
+    "1. Local parameters are plot-specified and the names are separated  by `.`. The portion before the first `.` is plot name and the portion after the `.` is parameter name. e.g. `bar.bars`. \n",
+    "2. Global parameter applies to all the plots which has that parameter. It is single-word. e.g. `ngroups` .\n",
+    "\n",
+    "When global and local parameter are both given, the global parameter will be overwrote by local parameters for specific plots. You can find more details about parameters in [parameter_configurations](parameter_configurations.ipynb)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Exmaple 1: Choose the Tabs, Sections and Sessions you want"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from dataprep.eda import plot,create_report\n",
+    "from dataprep.datasets import load_dataset\n",
+    "df = load_dataset('titanic')\n",
+    "plot(df, 'Pclass', display=['Stats', 'Bar Chart', 'Pie Chart'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "create_report(df,display=[\"Overview\",\"Interactions\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(df, display=[\"Stats\", \"Insights\"])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Example 2: Customize your plot"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(df, \"Pclass\", config={'bar.bars': 10, 'bar.sort_descending': True, 'bar.yscale': 'linear', 'height': 400, 'width': 450, })"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Example 3: Customize your Insights\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(df,config={'insight.missing.threshold':20, 'insight.duplicates.threshold':20})"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

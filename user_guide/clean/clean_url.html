@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>clean_url(): Clean and validate urls &#8212; DataPrep 0.2.15 documentation</title>
+  <title>URLs &#8212; DataPrep 0.2.15 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -18,10 +18,11 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="API Reference" href="../../api_reference/dataprep.html" />
-    <link rel="prev" title="clean_phone(): Clean and validate phone numbers" href="clean_phone.html" />
+    <link rel="next" title="US Street Addresses" href="clean_address.html" />
+    <link rel="prev" title="Phone Numbers" href="clean_phone.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
   <meta name="author" content="SFU Database Systems Lab">
@@ -130,6 +131,12 @@
           
             
               <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
                   <a href="../eda/introduction.html">EDA</a>
               </li>
             
@@ -146,23 +153,35 @@
                   <ul>
                   
                       <li class="">
-                          <a href="clean_lat_long.html">clean_lat_long(): geographic coordinates</a>
+                          <a href="clean_headers.html">Column Headers</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_email.html">clean_email(): email addresses</a>
+                          <a href="clean_country.html">Country Names</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_country.html">clean_country(): countries</a>
+                          <a href="clean_email.html">Email Addresses</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_phone.html">clean_phone(): phone numbers</a>
+                          <a href="clean_lat_long.html">Geographic Goordinates</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ip.html">IP Addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_phone.html">Phone Numbers</a>
                       </li>
                   
                       <li class="active">
-                          <a href="">clean_url() : urls</a>
+                          <a href="">URLs</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_address.html">US Street Addresses</a>
                       </li>
                   
                   </ul>
@@ -209,7 +228,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#3.-split-Parameter" class="nav-link">3. split Parameter</a>
+          <a href="#3.-split-parameter" class="nav-link">3. split parameter</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -239,11 +258,11 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#7.-Report-Parameter" class="nav-link">7. Report Parameter</a>
+          <a href="#7.-report-parameter" class="nav-link">7. report parameter</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#8.-Validate_url" class="nav-link">8. Validate_url</a>
+          <a href="#8.-validate_url()" class="nav-link">8. validate_url()</a>
         </li>
       
     </ul>
@@ -485,796 +504,185 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="clean_url():-Clean-and-validate-urls">
-<h1><code class="docutils literal notranslate"><span class="pre">clean_url()</span></code>: Clean and validate urls<a class="headerlink" href="#clean_url():-Clean-and-validate-urls" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="URLs">
+<span id="url-userguide"></span><h1>URLs<a class="headerlink" href="#URLs" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
-<p>The function <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> cleans a column containing urls, and extracts the important parameters including cleaned path, queries, scheme,etc. The function <code class="docutils literal notranslate"><span class="pre">validate_url()</span></code> validates either a single url or a column of urls, returning True if the value is valid, and False otherwise.</p>
-<p><code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> function extracts all the important features of the url and creates an additional column containing key value pairs of the parameters, following are the features it extracts:</p>
+<p>The function <a class="reference internal" href="../../api_reference/dataprep.clean.html#dataprep.clean.clean_url.clean_url" title="dataprep.clean.clean_url.clean_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">clean_url()</span></code></a> cleans a DataFrame column containing urls, and extracts the important parameters including cleaned path, queries, scheme, etc. The function <a class="reference internal" href="../../api_reference/dataprep.clean.html#dataprep.clean.clean_url.validate_url" title="dataprep.clean.clean_url.validate_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_url()</span></code></a> validates either a single url or a column of urls, returning True if the value is valid, and False otherwise.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> extracts the important features of the url and creates an additional column containing key value pairs of the parameters. It extracts the following features:</p>
 <ul class="simple">
 <li><p>scheme (string)</p></li>
 <li><p>host (string)</p></li>
 <li><p>cleaned path (string)</p></li>
 <li><p>queries (key-value pairs)</p></li>
 </ul>
-<p>Remove Auth tokens: Sometimes we would like to remove certain sensitive information which is usually contained in a url for e.g. access_tokens, user information, etc. <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> provides us with an option to remove this information with <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> parameter. The usage of all parameters is explained in depth in the sections below.</p>
+<p>Remove authentication tokens: Sometimes we would like to remove certain sensitive information which is usually contained in a url for e.g. access_tokens, user information, etc. <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> provides us with an option to remove this information with the <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> parameter. The usage of all parameters is explained in depth in the sections below.</p>
 <p>Invalid parsing is handled with the <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter:</p>
 <ul class="simple">
-<li><p>“coerce” (default), then invalid parsing will be set as NaN</p></li>
-<li><p>“ignore”, then invalid parsing will return the input</p></li>
-<li><p>“raise”, then invalid parsing will raise an exception</p></li>
+<li><p>“coerce” (default): invalid parsing will be set to NaN</p></li>
+<li><p>“ignore”: invalid parsing will return the input</p></li>
+<li><p>“raise”: invalid parsing will raise an exception</p></li>
 </ul>
 <p>After cleaning, a <strong>report</strong> is printed that provides the following information:</p>
 <ul class="simple">
-<li><p>How many values were cleaned (the value must be transformed)</p></li>
-<li><p>How many values could not be parsed</p></li>
-<li><p>If <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> is specified, then displays how many queries were removed from how many rows</p></li>
-<li><p>And the data summary: how many values are in the correct format, and how many values are null</p></li>
+<li><p>How many values were cleaned (the value must have been transformed).</p></li>
+<li><p>How many values could not be parsed.</p></li>
+<li><p>A summary of the cleaned data: how many values are in the correct format, and how many values are NaN.</p></li>
 </ul>
 <p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> and <code class="docutils literal notranslate"><span class="pre">validate_url()</span></code>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;messy_url&quot;</span><span class="p">:</span>
-                   <span class="p">[</span><span class="s2">&quot;random text which is not a url&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;http://www.facebookee.com/otherpath?auth=facebookeeauth&amp;token=iwusdkc&amp;not_token=hiThere&amp;another_token=12323423&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1234&amp;loc=van&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;notaurl&quot;</span><span class="p">,</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                    <span class="kc">None</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken2&amp;studentid=1230&amp;loc=bur&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                    <span class="p">{</span><span class="s2">&quot;not_a_url&quot;</span> <span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-                    <span class="s2">&quot;2345678&quot;</span><span class="p">,</span>
-                    <span class="mi">345345345</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken3&amp;studentid=1231&amp;loc=sur&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1232&amp;loc=van&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>
-                  <span class="p">})</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;random text which is not a url&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;http://www.facebookee.com/otherpath?auth=facebookeeauth&amp;token=iwusdkc&amp;not_token=hiThere&amp;another_token=12323423&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1234&amp;loc=van&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;notaurl&quot;</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken2&amp;studentid=1230&amp;loc=bur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;not_a_url&quot;</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;2345678&quot;</span><span class="p">,</span>
+        <span class="mi">345345345</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken3&amp;studentid=1231&amp;loc=sur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1232&amp;loc=van&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">})</span>
 <span class="n">df</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
 </div>
 <div class="section" id="1.-default:-clean_url()">
 <h2>1. default: <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code><a class="headerlink" href="#1.-default:-clean_url()" title="Permalink to this headline">¶</a></h2>
-<p>By default, all the parameters are set to default, <code class="docutils literal notranslate"><span class="pre">inplace</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">split</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_auth</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">report</span> <span class="pre">=</span> <span class="pre">True</span></code>,<code class="docutils literal notranslate"><span class="pre">errors</span> <span class="pre">=</span> <span class="pre">coerce</span></code>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<p>By default, the parameteres are set as <code class="docutils literal notranslate"><span class="pre">inplace</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">split</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_auth</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">report</span> <span class="pre">=</span> <span class="pre">True</span></code>,<code class="docutils literal notranslate"><span class="pre">errors</span> <span class="pre">=</span> <span class="pre">coerce</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">clean_url</span>
-<span class="n">df_default</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">)</span>
+<span class="n">df_default</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
 <span class="n">df_default</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-      <th>messy_url_details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-      <td>{'scheme': 'http', 'host': 'www.facebookee.com...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<p>We can see that in the new dataframe <code class="docutils literal notranslate"><span class="pre">df_default</span></code> a new column is created <code class="docutils literal notranslate"><span class="pre">messy_url_details</span></code>, this follows the naming convention of <code class="docutils literal notranslate"><span class="pre">orginal_column_name</span></code>**_details** (<code class="docutils literal notranslate"><span class="pre">messy_url_details</span></code> in our case).</p>
-<p>Now let us see what one of the cells in <code class="docutils literal notranslate"><span class="pre">messy_url_details</span></code> looks like.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<p>We can see that in the new dataframe <code class="docutils literal notranslate"><span class="pre">df_default</span></code> a new column is created <code class="docutils literal notranslate"><span class="pre">url_details</span></code>, this follows the naming convention of <code class="docutils literal notranslate"><span class="pre">orginal_column_name</span></code>**_details** (<code class="docutils literal notranslate"><span class="pre">url_details</span></code> in our case).</p>
+<p>Now let us see what one of the cells in <code class="docutils literal notranslate"><span class="pre">url_details</span></code> looks like.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_default</span><span class="p">[</span><span class="s2">&quot;messy_url_details&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span></span><span class="n">df_default</span><span class="p">[</span><span class="s2">&quot;url_details&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-{&#39;scheme&#39;: &#39;http&#39;,
- &#39;host&#39;: &#39;www.facebookee.com&#39;,
- &#39;messy_url_clean&#39;: &#39;http://www.facebookee.com/otherpath&#39;,
- &#39;queries&#39;: {&#39;auth&#39;: &#39;facebookeeauth&#39;,
-  &#39;token&#39;: &#39;iwusdkc&#39;,
-  &#39;not_token&#39;: &#39;hiThere&#39;,
-  &#39;another_token&#39;: &#39;12323423&#39;}}
-</pre></div></div>
 </div>
 </div>
 <div class="section" id="2.-remove_auth-parameter">
 <h2>2. <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> parameter<a class="headerlink" href="#2.-remove_auth-parameter" title="Permalink to this headline">¶</a></h2>
 <p>Sometimes we need to remove sensitive information when parsing a url, we can do this in the <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> function by specifying the <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> parameter to be True or we can can specify a list of parameters to removed. Hence <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> can be a <code class="docutils literal notranslate"><span class="pre">boolean</span></code> value or list of strings.</p>
 <p>When <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> is set to the boolean value of <code class="docutils literal notranslate"><span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">clean_url()</span></code> looks for auth tokens based on the default list of token names (provided below) and removes them. When <code class="docutils literal notranslate"><span class="pre">remove_auth</span></code> is set to list of strings it creates a union of the user provided list and default list to create a new set of token words to be removed.</p>
-<p><code class="docutils literal notranslate"><span class="pre">default_list</span> <span class="pre">=</span> <span class="pre">{</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;access_token&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;auth_key&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;auth&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;password&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;username&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;login&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;token&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;passcode&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;access-token&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;auth-key&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;authentication&quot;,</span>&#160;&#160;&#160;&#160; <span class="pre">&quot;authentication-key&quot;,</span> <span class="pre">}</span></code></p>
-<p>Lets have a look at the same dataframe and the two scenerios described above (by looking at the second row).</p>
-<div class="section" id="a.-remove_auth-=-True-(boolean)">
-<h3>a. <code class="docutils literal notranslate"><span class="pre">remove_auth</span> <span class="pre">=</span> <span class="pre">True</span></code> (boolean)<a class="headerlink" href="#a.-remove_auth-=-True-(boolean)" title="Permalink to this headline">¶</a></h3>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_auth_boolean</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">remove_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">df_remove_auth_boolean</span><span class="p">[</span><span class="s2">&quot;messy_url_details&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span></span><span class="n">default_list</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;access_token&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;auth_key&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;auth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;password&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;username&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;login&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;token&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;passcode&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;access-token&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;auth-key&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;authentication&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;authentication-key&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Removed 6 auth queries from 5 rows
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<p>Lets have a look at the same dataframe and the two scenerios described above (by looking at the second row).</p>
+<div class="section" id="a.-remove_auth-=-True-(boolean)">
+<h3>a. <code class="docutils literal notranslate"><span class="pre">remove_auth</span> <span class="pre">=</span> <span class="pre">True</span></code> (boolean)<a class="headerlink" href="#a.-remove_auth-=-True-(boolean)" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-{&#39;scheme&#39;: &#39;http&#39;,
- &#39;host&#39;: &#39;www.facebookee.com&#39;,
- &#39;messy_url_clean&#39;: &#39;http://www.facebookee.com/otherpath&#39;,
- &#39;queries&#39;: {&#39;not_token&#39;: &#39;hiThere&#39;, &#39;another_token&#39;: &#39;12323423&#39;}}
-</pre></div></div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_remove_auth_boolean</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">remove_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df_remove_auth_boolean</span><span class="p">[</span><span class="s2">&quot;url_details&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
 </div>
 <p>As we can see queries <code class="docutils literal notranslate"><span class="pre">auth</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">token</span></code> were removed from the result but <code class="docutils literal notranslate"><span class="pre">not_token</span></code> and <code class="docutils literal notranslate"><span class="pre">another_token</span></code> were included, this is because <code class="docutils literal notranslate"><span class="pre">auth</span></code> and <code class="docutils literal notranslate"><span class="pre">token</span></code> were specified in <code class="docutils literal notranslate"><span class="pre">default_list</span></code>. Also notice the <strong>additional line</strong> giving the stats on how many queries were removed from how many rows.</p>
 </div>
 <div class="section" id="b.-remove_auth-=-list-of-string">
 <h3>b. remove_auth = list of string<a class="headerlink" href="#b.-remove_auth-=-list-of-string" title="Permalink to this headline">¶</a></h3>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_auth_list</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">remove_auth</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;another_token&quot;</span><span class="p">])</span>
-<span class="n">df_remove_auth_list</span><span class="p">[</span><span class="s2">&quot;messy_url_details&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span></span><span class="n">df_remove_auth_list</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">remove_auth</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;another_token&quot;</span><span class="p">])</span>
+<span class="n">df_remove_auth_list</span><span class="p">[</span><span class="s2">&quot;url_details&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Removed 7 auth queries from 5 rows
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-{&#39;scheme&#39;: &#39;http&#39;,
- &#39;host&#39;: &#39;www.facebookee.com&#39;,
- &#39;messy_url_clean&#39;: &#39;http://www.facebookee.com/otherpath&#39;,
- &#39;queries&#39;: {&#39;not_token&#39;: &#39;hiThere&#39;}}
-</pre></div></div>
 </div>
 <p>As we can see queries <code class="docutils literal notranslate"><span class="pre">auth</span></code>, <code class="docutils literal notranslate"><span class="pre">token</span></code> and <code class="docutils literal notranslate"><span class="pre">another_token</span></code> were removed but <code class="docutils literal notranslate"><span class="pre">not_token</span></code> was included in the result, this is because a new list was created by creating a union of <code class="docutils literal notranslate"><span class="pre">default_list</span></code> and user defined list and queries were removed based on the new combined list</p>
 </div>
 </div>
-<div class="section" id="3.-split-Parameter">
-<h2>3. <code class="docutils literal notranslate"><span class="pre">split</span></code> Parameter<a class="headerlink" href="#3.-split-Parameter" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="3.-split-parameter">
+<h2>3. <code class="docutils literal notranslate"><span class="pre">split</span></code> parameter<a class="headerlink" href="#3.-split-parameter" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">split</span></code> parameter adds individual columns containing the containing all the extracted features to the given DataFrame.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_split</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="n">df_remove_split</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">df_remove_split</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-      <th>scheme</th>
-      <th>host</th>
-      <th>messy_url_clean</th>
-      <th>queries</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-      <td>http</td>
-      <td>www.facebookee.com</td>
-      <td>http://www.facebookee.com/otherpath</td>
-      <td>{'auth': 'facebookeeauth', 'token': 'iwusdkc',...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken1', 'studentid': '1234', ...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken2', 'studentid': '1230', ...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken3', 'studentid': '1231', ...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken1', 'studentid': '1232', ...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 </div>
 <div class="section" id="4.-inplace-parameter">
 <h2>4. <code class="docutils literal notranslate"><span class="pre">inplace</span></code> parameter<a class="headerlink" href="#4.-inplace-parameter" title="Permalink to this headline">¶</a></h2>
 <p>Replaces the original column with <code class="docutils literal notranslate"><span class="pre">orginal_column_name</span></code>_details.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_inplace</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="n">df_remove_inplace</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">df_remove_inplace</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url_details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>{'scheme': 'http', 'host': 'www.facebookee.com...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 </div>
 <div class="section" id="5.-split-and-inplace">
 <h2>5. <code class="docutils literal notranslate"><span class="pre">split</span></code> and <code class="docutils literal notranslate"><span class="pre">inplace</span></code><a class="headerlink" href="#5.-split-and-inplace" title="Permalink to this headline">¶</a></h2>
 <p>Replaces the original column with other columns based on the split parameters.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_inplace_split</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="n">df_remove_inplace_split</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">df_remove_inplace_split</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>scheme</th>
-      <th>host</th>
-      <th>messy_url_clean</th>
-      <th>queries</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http</td>
-      <td>www.facebookee.com</td>
-      <td>http://www.facebookee.com/otherpath</td>
-      <td>{'auth': 'facebookeeauth', 'token': 'iwusdkc',...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken1', 'studentid': '1234', ...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken2', 'studentid': '1230', ...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken3', 'studentid': '1231', ...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https</td>
-      <td>www.sfu.ca</td>
-      <td>https://www.sfu.ca/ficticiouspath</td>
-      <td>{'auth': 'sampletoken1', 'studentid': '1232', ...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 </div>
 <div class="section" id="6.-errors-parameter">
@@ -1287,259 +695,49 @@ Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
 <div class="section" id="a.-“coerce”-(default)">
 <h3>a. “coerce” (default)<a class="headerlink" href="#a.-“coerce”-(default)" title="Permalink to this headline">¶</a></h3>
 <p>This is the default value of the parameters, this sets the invalid parsing to NaN.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_errors_default</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">)</span>
+<span></span><span class="n">df_remove_errors_default</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
 <span class="n">df_remove_errors_default</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), set to NaN
-Result contains 5 (38.46%) parsed key-value pairs and 8 null values (61.54%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-      <th>messy_url_details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-      <td>{'scheme': 'http', 'host': 'www.facebookee.com...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 </div>
 <div class="section" id="b.-“ignore”">
 <h3>b. “ignore”<a class="headerlink" href="#b.-“ignore”" title="Permalink to this headline">¶</a></h3>
 <p>This sets the value of invalid parsing as the input.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_errors_ignore</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+<span></span><span class="n">df_remove_errors_ignore</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 <span class="n">df_remove_errors_ignore</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-URL Cleaning Report:
-        5 values parsed (38.46%)
-        5 values unable to be parsed (38.46%), left unchanged
-Result contains 5 (38.46%) parsed key-value pairs and 3 null values (23.08%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-      <th>messy_url_details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-      <td>random text which is not a url</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-      <td>{'scheme': 'http', 'host': 'www.facebookee.com...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-      <td>notaurl</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-      <td>{'not_a_url': True}</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-      <td>2345678</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-      <td>345345345</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 </div>
 <div class="section" id="c. “raise”">
 <h3>c. “raise”<a class="headerlink" href="#c. “raise”" title="Permalink to this headline">¶</a></h3>
 <p>This will raise a value error when it encounters an invalid parsing value.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_errors_raise</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+<span></span><span class="n">df_remove_errors_raise</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
 <span class="n">df_remove_errors_raise</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "17d29f9c48b240adbb320418669c1bd1", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
@@ -1548,250 +746,153 @@ Result contains 5 (38.46%) parsed key-value pairs and 3 null values (23.08%)
 <div class="highlight"><pre>
 <span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-11-fcf497836cf7&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>df_remove_errors_raise <span class="ansi-blue-fg">=</span> clean_url<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">,</span> column<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;messy_url&#34;</span><span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;raise&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">&lt;ipython-input-13-c75f2daff9e0&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>df_remove_errors_raise <span class="ansi-blue-fg">=</span> clean_url<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">,</span> column<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;url&#34;</span><span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;raise&#34;</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">      2</span> df_remove_errors_raise
 
-<span class="ansi-green-fg">~/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">clean_url</span><span class="ansi-blue-fg">(df, column, inplace, split, remove_auth, report, errors)</span>
-<span class="ansi-green-intense-fg ansi-bold">    124</span>         df <span class="ansi-blue-fg">=</span> df<span class="ansi-blue-fg">.</span>drop<span class="ansi-blue-fg">(</span>columns<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span>column<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    125</span>
-<span class="ansi-green-fg">--&gt; 126</span><span class="ansi-red-fg">     </span>df<span class="ansi-blue-fg">,</span> stats<span class="ansi-blue-fg">,</span> removed_auth_cnt <span class="ansi-blue-fg">=</span> dask<span class="ansi-blue-fg">.</span>compute<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">,</span> stats<span class="ansi-blue-fg">,</span> removed_auth_cnt<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    127</span>
-<span class="ansi-green-intense-fg ansi-bold">    128</span>     <span class="ansi-red-fg"># output a report describing the result of clean_url</span>
+<span class="ansi-green-fg">~/projects/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">clean_url</span><span class="ansi-blue-fg">(df, column, remove_auth, inplace, split, errors, report, progress)</span>
+<span class="ansi-green-intense-fg ansi-bold">    157</span>
+<span class="ansi-green-intense-fg ansi-bold">    158</span>     <span class="ansi-green-fg">with</span> ProgressBar<span class="ansi-blue-fg">(</span>minimum<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> disable<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">not</span> progress<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 159</span><span class="ansi-red-fg">         </span>df<span class="ansi-blue-fg">,</span> stats<span class="ansi-blue-fg">,</span> removed_auth_cnt <span class="ansi-blue-fg">=</span> dask<span class="ansi-blue-fg">.</span>compute<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">,</span> stats<span class="ansi-blue-fg">,</span> removed_auth_cnt<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    160</span>
+<span class="ansi-green-intense-fg ansi-bold">    161</span>     <span class="ansi-red-fg"># output a report describing the result of clean_url</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/base.py</span> in <span class="ansi-cyan-fg">compute</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    565</span>         postcomputes<span class="ansi-blue-fg">.</span>append<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">.</span>__dask_postcompute__<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    566</span>
-<span class="ansi-green-fg">--&gt; 567</span><span class="ansi-red-fg">     </span>results <span class="ansi-blue-fg">=</span> schedule<span class="ansi-blue-fg">(</span>dsk<span class="ansi-blue-fg">,</span> keys<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    568</span>     <span class="ansi-green-fg">return</span> repack<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>f<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>a<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> r<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">(</span>f<span class="ansi-blue-fg">,</span> a<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">in</span> zip<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">,</span> postcomputes<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    569</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/base.py</span> in <span class="ansi-cyan-fg">compute</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    450</span>         postcomputes<span class="ansi-blue-fg">.</span>append<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">.</span>__dask_postcompute__<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    451</span>
+<span class="ansi-green-fg">--&gt; 452</span><span class="ansi-red-fg">     </span>results <span class="ansi-blue-fg">=</span> schedule<span class="ansi-blue-fg">(</span>dsk<span class="ansi-blue-fg">,</span> keys<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    453</span>     <span class="ansi-green-fg">return</span> repack<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>f<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>a<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> r<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">(</span>f<span class="ansi-blue-fg">,</span> a<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">in</span> zip<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">,</span> postcomputes<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    454</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/threaded.py</span> in <span class="ansi-cyan-fg">get</span><span class="ansi-blue-fg">(dsk, result, cache, num_workers, pool, **kwargs)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/threaded.py</span> in <span class="ansi-cyan-fg">get</span><span class="ansi-blue-fg">(dsk, result, cache, num_workers, pool, **kwargs)</span>
 <span class="ansi-green-intense-fg ansi-bold">     74</span>                 pools<span class="ansi-blue-fg">[</span>thread<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">[</span>num_workers<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> pool
 <span class="ansi-green-intense-fg ansi-bold">     75</span>
 <span class="ansi-green-fg">---&gt; 76</span><span class="ansi-red-fg">     results = get_async(
 </span><span class="ansi-green-intense-fg ansi-bold">     77</span>         pool<span class="ansi-blue-fg">.</span>apply_async<span class="ansi-blue-fg">,</span>
 <span class="ansi-green-intense-fg ansi-bold">     78</span>         len<span class="ansi-blue-fg">(</span>pool<span class="ansi-blue-fg">.</span>_pool<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">get_async</span><span class="ansi-blue-fg">(apply_async, num_workers, dsk, result, cache, get_id, rerun_exceptions_locally, pack_exception, raise_exception, callbacks, dumps, loads, **kwargs)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">get_async</span><span class="ansi-blue-fg">(apply_async, num_workers, dsk, result, cache, get_id, rerun_exceptions_locally, pack_exception, raise_exception, callbacks, dumps, loads, **kwargs)</span>
 <span class="ansi-green-intense-fg ansi-bold">    484</span>                         _execute_task<span class="ansi-blue-fg">(</span>task<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>  <span class="ansi-red-fg"># Re-execute locally</span>
 <span class="ansi-green-intense-fg ansi-bold">    485</span>                     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-fg">--&gt; 486</span><span class="ansi-red-fg">                         </span>raise_exception<span class="ansi-blue-fg">(</span>exc<span class="ansi-blue-fg">,</span> tb<span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    487</span>                 res<span class="ansi-blue-fg">,</span> worker_id <span class="ansi-blue-fg">=</span> loads<span class="ansi-blue-fg">(</span>res_info<span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    488</span>                 state<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;cache&#34;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">[</span>key<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> res
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">reraise</span><span class="ansi-blue-fg">(exc, tb)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">reraise</span><span class="ansi-blue-fg">(exc, tb)</span>
 <span class="ansi-green-intense-fg ansi-bold">    314</span>     <span class="ansi-green-fg">if</span> exc<span class="ansi-blue-fg">.</span>__traceback__ <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> tb<span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    315</span>         <span class="ansi-green-fg">raise</span> exc<span class="ansi-blue-fg">.</span>with_traceback<span class="ansi-blue-fg">(</span>tb<span class="ansi-blue-fg">)</span>
 <span class="ansi-green-fg">--&gt; 316</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">raise</span> exc
 <span class="ansi-green-intense-fg ansi-bold">    317</span>
 <span class="ansi-green-intense-fg ansi-bold">    318</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">execute_task</span><span class="ansi-blue-fg">(key, task_info, dumps, loads, get_id, pack_exception)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/local.py</span> in <span class="ansi-cyan-fg">execute_task</span><span class="ansi-blue-fg">(key, task_info, dumps, loads, get_id, pack_exception)</span>
 <span class="ansi-green-intense-fg ansi-bold">    220</span>     <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    221</span>         task<span class="ansi-blue-fg">,</span> data <span class="ansi-blue-fg">=</span> loads<span class="ansi-blue-fg">(</span>task_info<span class="ansi-blue-fg">)</span>
 <span class="ansi-green-fg">--&gt; 222</span><span class="ansi-red-fg">         </span>result <span class="ansi-blue-fg">=</span> _execute_task<span class="ansi-blue-fg">(</span>task<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    223</span>         id <span class="ansi-blue-fg">=</span> get_id<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    224</span>         result <span class="ansi-blue-fg">=</span> dumps<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> id<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
 <span class="ansi-green-intense-fg ansi-bold">    119</span>         <span class="ansi-red-fg"># temporaries by their reference count and can execute certain</span>
 <span class="ansi-green-intense-fg ansi-bold">    120</span>         <span class="ansi-red-fg"># operations in-place.</span>
 <span class="ansi-green-fg">--&gt; 121</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>_execute_task<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> a <span class="ansi-green-fg">in</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> ishashable<span class="ansi-blue-fg">(</span>arg<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    123</span>         <span class="ansi-green-fg">return</span> arg
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/optimization.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, *args)</span>
-<span class="ansi-green-intense-fg ansi-bold">    961</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> len<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">==</span> len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    962</span>             <span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Expected %d args, got %d&#34;</span> <span class="ansi-blue-fg">%</span> <span class="ansi-blue-fg">(</span>len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> len<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 963</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> core<span class="ansi-blue-fg">.</span>get<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>dsk<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>outkey<span class="ansi-blue-fg">,</span> dict<span class="ansi-blue-fg">(</span>zip<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    964</span>
-<span class="ansi-green-intense-fg ansi-bold">    965</span>     <span class="ansi-green-fg">def</span> __reduce__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/optimization.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, *args)</span>
+<span class="ansi-green-intense-fg ansi-bold">    959</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> len<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">==</span> len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    960</span>             <span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Expected %d args, got %d&#34;</span> <span class="ansi-blue-fg">%</span> <span class="ansi-blue-fg">(</span>len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> len<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 961</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> core<span class="ansi-blue-fg">.</span>get<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>dsk<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>outkey<span class="ansi-blue-fg">,</span> dict<span class="ansi-blue-fg">(</span>zip<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>inkeys<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    962</span>
+<span class="ansi-green-intense-fg ansi-bold">    963</span>     <span class="ansi-green-fg">def</span> __reduce__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">get</span><span class="ansi-blue-fg">(dsk, out, cache)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">get</span><span class="ansi-blue-fg">(dsk, out, cache)</span>
 <span class="ansi-green-intense-fg ansi-bold">    149</span>     <span class="ansi-green-fg">for</span> key <span class="ansi-green-fg">in</span> toposort<span class="ansi-blue-fg">(</span>dsk<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    150</span>         task <span class="ansi-blue-fg">=</span> dsk<span class="ansi-blue-fg">[</span>key<span class="ansi-blue-fg">]</span>
 <span class="ansi-green-fg">--&gt; 151</span><span class="ansi-red-fg">         </span>result <span class="ansi-blue-fg">=</span> _execute_task<span class="ansi-blue-fg">(</span>task<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    152</span>         cache<span class="ansi-blue-fg">[</span>key<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> result
 <span class="ansi-green-intense-fg ansi-bold">    153</span>     result <span class="ansi-blue-fg">=</span> _execute_task<span class="ansi-blue-fg">(</span>out<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
 <span class="ansi-green-intense-fg ansi-bold">    119</span>         <span class="ansi-red-fg"># temporaries by their reference count and can execute certain</span>
 <span class="ansi-green-intense-fg ansi-bold">    120</span>         <span class="ansi-red-fg"># operations in-place.</span>
 <span class="ansi-green-fg">--&gt; 121</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>_execute_task<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> a <span class="ansi-green-fg">in</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> ishashable<span class="ansi-blue-fg">(</span>arg<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    123</span>         <span class="ansi-green-fg">return</span> arg
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">&lt;genexpr&gt;</span><span class="ansi-blue-fg">(.0)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">&lt;genexpr&gt;</span><span class="ansi-blue-fg">(.0)</span>
 <span class="ansi-green-intense-fg ansi-bold">    119</span>         <span class="ansi-red-fg"># temporaries by their reference count and can execute certain</span>
 <span class="ansi-green-intense-fg ansi-bold">    120</span>         <span class="ansi-red-fg"># operations in-place.</span>
 <span class="ansi-green-fg">--&gt; 121</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>_execute_task<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> a <span class="ansi-green-fg">in</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> ishashable<span class="ansi-blue-fg">(</span>arg<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    123</span>         <span class="ansi-green-fg">return</span> arg
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/core.py</span> in <span class="ansi-cyan-fg">_execute_task</span><span class="ansi-blue-fg">(arg, cache, dsk)</span>
 <span class="ansi-green-intense-fg ansi-bold">    119</span>         <span class="ansi-red-fg"># temporaries by their reference count and can execute certain</span>
 <span class="ansi-green-intense-fg ansi-bold">    120</span>         <span class="ansi-red-fg"># operations in-place.</span>
 <span class="ansi-green-fg">--&gt; 121</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>_execute_task<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> cache<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> a <span class="ansi-green-fg">in</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> ishashable<span class="ansi-blue-fg">(</span>arg<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 <span class="ansi-green-intense-fg ansi-bold">    123</span>         <span class="ansi-green-fg">return</span> arg
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/utils.py</span> in <span class="ansi-cyan-fg">apply</span><span class="ansi-blue-fg">(func, args, kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-green-fg">def</span> apply<span class="ansi-blue-fg">(</span>func<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">,</span> kwargs<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span class="ansi-green-fg">if</span> kwargs<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 30</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     32</span>         <span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/utils.py</span> in <span class="ansi-cyan-fg">apply</span><span class="ansi-blue-fg">(func, args, kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     27</span> <span class="ansi-green-fg">def</span> apply<span class="ansi-blue-fg">(</span>func<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">,</span> kwargs<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     28</span>     <span class="ansi-green-fg">if</span> kwargs<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 29</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     30</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     31</span>         <span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">)</span>
 
-<span class="ansi-green-fg">~/dataprep/.venv/lib/python3.9/site-packages/dask/dataframe/core.py</span> in <span class="ansi-cyan-fg">apply_and_enforce</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">   5399</span>     func <span class="ansi-blue-fg">=</span> kwargs<span class="ansi-blue-fg">.</span>pop<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;_func&#34;</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">   5400</span>     meta <span class="ansi-blue-fg">=</span> kwargs<span class="ansi-blue-fg">.</span>pop<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;_meta&#34;</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">-&gt; 5401</span><span class="ansi-red-fg">     </span>df <span class="ansi-blue-fg">=</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">   5402</span>     <span class="ansi-green-fg">if</span> is_dataframe_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> is_series_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> is_index_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">   5403</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> len<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">~/projects/dataprep/.venv/lib/python3.8/site-packages/dask/dataframe/core.py</span> in <span class="ansi-cyan-fg">apply_and_enforce</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">   5296</span>     func <span class="ansi-blue-fg">=</span> kwargs<span class="ansi-blue-fg">.</span>pop<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;_func&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   5297</span>     meta <span class="ansi-blue-fg">=</span> kwargs<span class="ansi-blue-fg">.</span>pop<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;_meta&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">-&gt; 5298</span><span class="ansi-red-fg">     </span>df <span class="ansi-blue-fg">=</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   5299</span>     <span class="ansi-green-fg">if</span> is_dataframe_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> is_series_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> is_index_like<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">   5300</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> len<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 
-<span class="ansi-green-fg">~/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">&lt;lambda&gt;</span><span class="ansi-blue-fg">(srs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     93</span>     <span class="ansi-red-fg"># amount of different codes to produce the report</span>
-<span class="ansi-green-intense-fg ansi-bold">     94</span>     df[&#34;clean_code_tup&#34;] = df[column].map_partitions(
-<span class="ansi-green-fg">---&gt; 95</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">lambda</span> srs<span class="ansi-blue-fg">:</span> <span class="ansi-blue-fg">[</span>_format_url<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> column<span class="ansi-blue-fg">,</span> remove_auth<span class="ansi-blue-fg">,</span> split<span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> x <span class="ansi-green-fg">in</span> srs<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">     96</span>         meta<span class="ansi-blue-fg">=</span>object<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">     97</span>     )
+<span class="ansi-green-fg">~/projects/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">&lt;lambda&gt;</span><span class="ansi-blue-fg">(srs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    125</span>     <span class="ansi-red-fg"># amount of different codes to produce the report</span>
+<span class="ansi-green-intense-fg ansi-bold">    126</span>     df[&#34;clean_code_tup&#34;] = df[column].map_partitions(
+<span class="ansi-green-fg">--&gt; 127</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">lambda</span> srs<span class="ansi-blue-fg">:</span> <span class="ansi-blue-fg">[</span>_format_url<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> column<span class="ansi-blue-fg">,</span> remove_auth<span class="ansi-blue-fg">,</span> split<span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> x <span class="ansi-green-fg">in</span> srs<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    128</span>         meta<span class="ansi-blue-fg">=</span>object<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    129</span>     )
 
-<span class="ansi-green-fg">~/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">&lt;listcomp&gt;</span><span class="ansi-blue-fg">(.0)</span>
-<span class="ansi-green-intense-fg ansi-bold">     93</span>     <span class="ansi-red-fg"># amount of different codes to produce the report</span>
-<span class="ansi-green-intense-fg ansi-bold">     94</span>     df[&#34;clean_code_tup&#34;] = df[column].map_partitions(
-<span class="ansi-green-fg">---&gt; 95</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">lambda</span> srs<span class="ansi-blue-fg">:</span> <span class="ansi-blue-fg">[</span>_format_url<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> column<span class="ansi-blue-fg">,</span> remove_auth<span class="ansi-blue-fg">,</span> split<span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> x <span class="ansi-green-fg">in</span> srs<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">     96</span>         meta<span class="ansi-blue-fg">=</span>object<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">     97</span>     )
+<span class="ansi-green-fg">~/projects/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">&lt;listcomp&gt;</span><span class="ansi-blue-fg">(.0)</span>
+<span class="ansi-green-intense-fg ansi-bold">    125</span>     <span class="ansi-red-fg"># amount of different codes to produce the report</span>
+<span class="ansi-green-intense-fg ansi-bold">    126</span>     df[&#34;clean_code_tup&#34;] = df[column].map_partitions(
+<span class="ansi-green-fg">--&gt; 127</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">lambda</span> srs<span class="ansi-blue-fg">:</span> <span class="ansi-blue-fg">[</span>_format_url<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> column<span class="ansi-blue-fg">,</span> remove_auth<span class="ansi-blue-fg">,</span> split<span class="ansi-blue-fg">,</span> errors<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> x <span class="ansi-green-fg">in</span> srs<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    128</span>         meta<span class="ansi-blue-fg">=</span>object<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    129</span>     )
 
-<span class="ansi-green-fg">~/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">_format_url</span><span class="ansi-blue-fg">(url, col, remove_auth, split, errors)</span>
-<span class="ansi-green-intense-fg ansi-bold">    173</span>     <span class="ansi-green-fg">if</span> status <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;unknown&#34;</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    174</span>         <span class="ansi-green-fg">if</span> errors <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;raise&#34;</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 175</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;Unable to parse value {url}&#34;</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    176</span>         result <span class="ansi-blue-fg">=</span> url <span class="ansi-green-fg">if</span> errors <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;ignore&#34;</span> <span class="ansi-green-fg">else</span> np<span class="ansi-blue-fg">.</span>nan
-<span class="ansi-green-intense-fg ansi-bold">    177</span>         <span class="ansi-green-fg">return</span> <span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> np<span class="ansi-blue-fg">.</span>nan<span class="ansi-blue-fg">,</span> np<span class="ansi-blue-fg">.</span>nan<span class="ansi-blue-fg">,</span> np<span class="ansi-blue-fg">.</span>nan<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">if</span> split <span class="ansi-green-fg">else</span> <span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">~/projects/dataprep/dataprep/clean/clean_url.py</span> in <span class="ansi-cyan-fg">_format_url</span><span class="ansi-blue-fg">(url, col, remove_auth, split, errors)</span>
+<span class="ansi-green-intense-fg ansi-bold">    219</span>     <span class="ansi-green-fg">if</span> status <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;unknown&#34;</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    220</span>         <span class="ansi-green-fg">if</span> errors <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;raise&#34;</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 221</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;Unable to parse value {url}&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    222</span>         result <span class="ansi-blue-fg">=</span> url <span class="ansi-green-fg">if</span> errors <span class="ansi-blue-fg">==</span> <span class="ansi-blue-fg">&#34;ignore&#34;</span> <span class="ansi-green-fg">else</span> np<span class="ansi-blue-fg">.</span>nan
+<span class="ansi-green-intense-fg ansi-bold">    223</span>         <span class="ansi-green-fg">return</span> <span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> np<span class="ansi-blue-fg">.</span>nan<span class="ansi-blue-fg">,</span> np<span class="ansi-blue-fg">.</span>nan<span class="ansi-blue-fg">,</span> np<span class="ansi-blue-fg">.</span>nan<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">if</span> split <span class="ansi-green-fg">else</span> <span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">)</span>
 
 <span class="ansi-red-fg">ValueError</span>: Unable to parse value random text which is not a url
 </pre></div></div>
 </div>
 </div>
 </div>
-<div class="section" id="7.-Report-Parameter">
-<h2>7. Report Parameter<a class="headerlink" href="#7.-Report-Parameter" title="Permalink to this headline">¶</a></h2>
-<p>By default it is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, when set to <code class="docutils literal notranslate"><span class="pre">False</span></code> - will not display the stats pertaining to the cleaned operations performed.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="section" id="7.-report-parameter">
+<h2>7. <code class="docutils literal notranslate"><span class="pre">report</span></code> parameter<a class="headerlink" href="#7.-report-parameter" title="Permalink to this headline">¶</a></h2>
+<p>By default it is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, when set to <code class="docutils literal notranslate"><span class="pre">False</span></code> it will not display the stats pertaining to the cleaned operations performed.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_remove_auth_boolean</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;messy_url&quot;</span><span class="p">,</span> <span class="n">remove_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span></span><span class="n">df_remove_auth_boolean</span> <span class="o">=</span> <span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">remove_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">df_remove_auth_boolean</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-      <th>messy_url_details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-      <td>{'scheme': 'http', 'host': 'www.facebookee.com...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>{'scheme': 'https', 'host': 'www.sfu.ca', 'mes...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-</div>
-<div class="section" id="8.-Validate_url">
-<h2>8. Validate_url<a class="headerlink" href="#8.-Validate_url" title="Permalink to this headline">¶</a></h2>
-<p>validate_url() returns True when the input is a valid url. Otherwise it returns False.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="section" id="8.-validate_url()">
+<h2>8. <code class="docutils literal notranslate"><span class="pre">validate_url()</span></code><a class="headerlink" href="#8.-validate_url()" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">validate_url()</span></code> returns True when the input is a valid url. Otherwise it returns False.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1804,140 +905,35 @@ Result contains 5 (38.46%) parsed key-value pairs and 3 null values (23.08%)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-False
-False
-True
-True
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;messy_url&quot;</span><span class="p">:</span>
-                   <span class="p">[</span><span class="s2">&quot;random text which is not a url&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;http://www.facebookee.com/otherpath?auth=facebookeeauth&amp;token=iwusdkc&amp;nottoken=hiThere&amp;another_token=12323423&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1234&amp;loc=van&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;notaurl&quot;</span><span class="p">,</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                    <span class="kc">None</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken2&amp;studentid=1230&amp;loc=bur&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                    <span class="p">{</span><span class="s2">&quot;not_a_url&quot;</span> <span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-                    <span class="s2">&quot;2345678&quot;</span><span class="p">,</span>
-                    <span class="mi">345345345</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken3&amp;studentid=1231&amp;loc=sur&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1232&amp;loc=van&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>
-                  <span class="p">})</span>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;random text which is not a url&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;http://www.facebookee.com/otherpath?auth=facebookeeauth&amp;token=iwusdkc&amp;nottoken=hiThere&amp;another_token=12323423&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1234&amp;loc=van&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;notaurl&quot;</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken2&amp;studentid=1230&amp;loc=bur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;not_a_url&quot;</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;2345678&quot;</span><span class="p">,</span>
+        <span class="mi">345345345</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken3&amp;studentid=1231&amp;loc=sur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://www.sfu.ca/ficticiouspath?auth=sampletoken1&amp;studentid=1232&amp;loc=van&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">})</span>
 
-<span class="n">df</span><span class="p">[</span><span class="s2">&quot;validate_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validate_url</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;messy_url&quot;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;validate_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validate_url</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">])</span>
 <span class="n">df</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>messy_url</th>
-      <th>validate_url</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>random text which is not a url</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>http://www.facebookee.com/otherpath?auth=faceb...</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>notaurl</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>None</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td></td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>{'not_a_url': True}</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>2345678</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>345345345</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>https://www.sfu.ca/ficticiouspath?auth=samplet...</td>
-      <td>True</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 </div>
 </div>

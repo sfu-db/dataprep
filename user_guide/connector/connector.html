@@ -18,6 +18,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Authorization schemes supported by Connector" href="connector_authorization.html" />
@@ -130,6 +131,12 @@
           
             
               <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
                   <a href="../eda/introduction.html">EDA</a>
               </li>
             
@@ -199,7 +206,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#id4" class="nav-link">Configuration Files</a>
+          <a href="#id2" class="nav-link">Configuration Files</a>
         </li>
       
     </ul>
@@ -209,7 +216,7 @@
           <div>
             
   <div class="section" id="connector">
-<span id="dataconnector"></span><h1>Connector<a class="headerlink" href="#connector" title="Permalink to this headline">¶</a></h1>
+<span id="userguide-connector"></span><h1>Connector<a class="headerlink" href="#connector" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="connector_authorization.html">Authorization schemes supported by Connector</a></li>
@@ -217,10 +224,10 @@
 <li class="toctree-l1"><a class="reference internal" href="connector_pagination.html">Pagination in Connector</a></li>
 </ul>
 </div>
-<p>To see detailed examples of how to use Connector, check out our Jupyter Notebooks repository <a class="reference external" href="https://github.com/sfu-db/dataprep/tree/develop/examples">here</a>.</p>
+<p>To see detailed examples of how to use Connector, check out our <a class="reference external" href="https://github.com/sfu-db/dataprep/tree/develop/examples">Jupyter Notebooks repository</a>.</p>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector’s full documentation <a class="reference external" href="https://sfu-db.github.io/dataprep/">here</a>.</p>
+<p>Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector’s <a class="reference external" href="https://sfu-db.github.io/dataprep/">full documentation</a>.</p>
 <p>Connector wraps-up complex API calls into a set of easy-to-use Python functions. By using Connector, you can skip the complex API configuration process and rapidly query different Web APIs in few steps, enabling you to execute the analysis workflow you are familiar with in a direct way.</p>
 <p>Connector offers essential features to facilitate the process of collecting data, for example:</p>
 <ul class="simple">
@@ -253,7 +260,7 @@
 <div class="line">c. Examples - Shows how you can call the methods in the Connector class.</div>
 <div class="line">d. Schema - Names and data types of attributes in the response.</div>
 </div>
-<a class="reference internal image-reference" href="../../_images/info.png"><img alt="../../_images/info.png" class="align-center" src="../../_images/info.png" style="width: 1249px; height: 319px;" /></a>
+<a class="reference internal image-reference" href="../../_images/info.png"><img alt="../../_images/info.png" class="align-center" src="../../_images/info.png" style="width: 720px; height: 320px;" /></a>
 <p>As you can see in the image above, in this example, there is only one endpoint available for Yelp: <code class="docutils literal notranslate"><span class="pre">businesses</span></code>. However, if you want to connect to a different Yelp endpoint, you can build a new configuration file. See: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a>.</p>
 <p>Now you can explore the “businesses” endpoint schema according to its configuration file definition. For this purpose, you can use the <code class="docutils literal notranslate"><span class="pre">show_schema()</span></code> function:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yelp_connector</span><span class="o">.</span><span class="n">show_schema</span><span class="p">(</span><span class="s2">&quot;business&quot;</span><span class="p">)</span>
@@ -316,8 +323,8 @@ To alleviate this problem, Connector implements <strong>concurrency</strong>! Le
 </pre></div>
 </div>
 </div>
-<div class="section" id="id4">
-<h2>Configuration Files<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>Configuration Files<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>A configuration file defines the information needed to fetch data from a website, e.g., the request URL, the API authorization type, the required parameters from the user (API key, search keyword, etc.), and the returned data’s schema.</p>
 <p>All the information is reusable.
 To write a configuration file for your own needs or to modify an existing one, please visit our <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs">Configuration Files</a> repository.</p>

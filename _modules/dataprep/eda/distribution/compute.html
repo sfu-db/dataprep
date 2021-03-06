@@ -18,6 +18,7 @@
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
   <meta charset="utf-8">
@@ -148,13 +149,17 @@
           <div>
             
   <h1>Source code for dataprep.eda.distribution.compute</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Computations for plot(df, ...).&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Computations for plot(df, ...)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+<span class="kn">from</span> <span class="nn">...configs</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">...dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span><span class="p">,</span> <span class="n">string_dtype_to_object</span>
 <span class="kn">from</span> <span class="nn">...intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
 <span class="kn">from</span> <span class="nn">...utils</span> <span class="kn">import</span> <span class="n">to_dask</span>
@@ -172,119 +177,62 @@
     <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-    <span class="n">largest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">nsubgroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="n">timeunit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-    <span class="n">agg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-    <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-    <span class="n">top_words</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-    <span class="n">stopword</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">lemmatize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">stem</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Config</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Intermediate</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;All in one compute function.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All in one compute function.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
-<span class="sd">        Dataframe from which plots are to be generated</span>
+<span class="sd">        DataFrame from which visualizations are generated</span>
+<span class="sd">    cfg: Union[Config, Dict[str, Any], None], default None</span>
+<span class="sd">        When a user call plot(), the created Config object will be passed to compute().</span>
+<span class="sd">        When a user call compute() directly, if he/she wants to customize the output,</span>
+<span class="sd">        cfg is a dictionary for configuring. If not, cfg is None and</span>
+<span class="sd">        default values will be used for parameters.</span>
+<span class="sd">    display: Optional[List[str]], default None</span>
+<span class="sd">        A list containing the names of the visualizations to display. Only exist when</span>
+<span class="sd">        a user call compute() directly and want to customize the output</span>
 <span class="sd">    x: Optional[str], default None</span>
 <span class="sd">        A valid column name from the dataframe</span>
 <span class="sd">    y: Optional[str], default None</span>
 <span class="sd">        A valid column name from the dataframe</span>
 <span class="sd">    z: Optional[str], default None</span>
 <span class="sd">        A valid column name from the dataframe</span>
-<span class="sd">    bins: int, default 10</span>
-<span class="sd">        For a histogram or box plot with numerical x axis, it defines</span>
-<span class="sd">        the number of equal-width bins to use when grouping.</span>
-<span class="sd">    ngroups: int, default 10</span>
-<span class="sd">        When grouping over a categorical column, it defines the</span>
-<span class="sd">        number of groups to show in the plot. Ie, the number of</span>
-<span class="sd">        bars to show in a bar chart.</span>
-<span class="sd">    largest: bool, default True</span>
-<span class="sd">        If true, when grouping over a categorical column, the groups</span>
-<span class="sd">        with the largest count will be output. If false, the groups</span>
-<span class="sd">        with the smallest count will be output.</span>
-<span class="sd">    nsubgroups: int, default 5</span>
-<span class="sd">        If x and y are categorical columns, ngroups refers to</span>
-<span class="sd">        how many groups to show from column x, and nsubgroups refers to</span>
-<span class="sd">        how many subgroups to show from column y in each group in column x.</span>
-<span class="sd">    timeunit: str, default &quot;auto&quot;</span>
-<span class="sd">        Defines the time unit to group values over for a datetime column.</span>
-<span class="sd">        It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;,</span>
-<span class="sd">        &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the</span>
-<span class="sd">        time unit such that the resulting number of groups is closest to 15.</span>
-<span class="sd">    agg: str, default &quot;mean&quot;</span>
-<span class="sd">        Specify the aggregate to use when aggregating over a numeric column</span>
-<span class="sd">    sample_size: int, default 1000</span>
-<span class="sd">        Sample size for the scatter plot</span>
-<span class="sd">    top_words: int, default 30</span>
-<span class="sd">        Specify the amount of words to show in the wordcloud and</span>
-<span class="sd">        word frequency bar chart</span>
-<span class="sd">    stopword: bool, default True</span>
-<span class="sd">        Eliminate the stopwords in the text data for plotting wordcloud and</span>
-<span class="sd">        word frequency bar chart</span>
-<span class="sd">    lemmatize: bool, default False</span>
-<span class="sd">        Lemmatize the words in the text data for plotting wordcloud and</span>
-<span class="sd">        word frequency bar chart</span>
-<span class="sd">    stem: bool, default False</span>
-<span class="sd">        Apply Potter Stem on the text data for plotting wordcloud and</span>
-<span class="sd">        word frequency bar chart</span>
-<span class="sd">    value_range: Optional[Tuple[float, float]], default None</span>
-<span class="sd">        The lower and upper bounds on the range of a numerical column.</span>
-<span class="sd">        Applies when column x is specified and column y is unspecified.</span>
 <span class="sd">    dtype: str or DType or dict of str or dict of DType, default None</span>
 <span class="sd">        Specify Data Types for designated column or all columns.</span>
 <span class="sd">        E.g.  dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># pylint: disable=too-many-locals</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+
     <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">string_dtype_to_object</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">cfg</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">compute_overview</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compute_overview</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">or</span> <span class="n">z</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">compute_univariate</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span>
-            <span class="n">col</span><span class="p">,</span>
-            <span class="n">bins</span><span class="p">,</span>
-            <span class="n">ngroups</span><span class="p">,</span>
-            <span class="n">largest</span><span class="p">,</span>
-            <span class="n">timeunit</span><span class="p">,</span>
-            <span class="n">top_words</span><span class="p">,</span>
-            <span class="n">stopword</span><span class="p">,</span>
-            <span class="n">lemmatize</span><span class="p">,</span>
-            <span class="n">stem</span><span class="p">,</span>
-            <span class="n">value_range</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">or</span> <span class="n">z</span>
+        <span class="k">return</span> <span class="n">compute_univariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">compute_bivariate</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span>
-            <span class="n">x</span><span class="p">,</span>
-            <span class="n">y</span><span class="p">,</span>
-            <span class="n">bins</span><span class="p">,</span>
-            <span class="n">ngroups</span><span class="p">,</span>
-            <span class="n">largest</span><span class="p">,</span>
-            <span class="n">nsubgroups</span><span class="p">,</span>
-            <span class="n">timeunit</span><span class="p">,</span>
-            <span class="n">agg</span><span class="p">,</span>
-            <span class="n">sample_size</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">compute_bivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">compute_trivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">largest</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">,</span> <span class="n">agg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compute_trivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not possible&quot;</span><span class="p">)</span></div>
 </pre></div>

@@ -1,0 +1,683 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>dataprep.clean.clean_email &#8212; DataPrep 0.2.15 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/_modules/dataprep/clean/clean_email.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <h1>Source code for dataprep.clean.clean_email</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Clean and validate a DataFrame column containing email addresses.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">..eda.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NEARBYKEYS</span><span class="p">,</span> <span class="n">NULL_VALUES</span><span class="p">,</span> <span class="n">create_report_new</span><span class="p">,</span> <span class="n">to_dask</span>
+
+<span class="n">USER_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="c1"># dot-atom</span>
+    <span class="sa">r</span><span class="s2">&quot;(^[-!#$%&amp;&#39;*+/=?^_`</span><span class="si">{}</span><span class="s2">|~0-9A-Z]+&quot;</span> <span class="sa">r</span><span class="s2">&quot;(\.[-!#$%&amp;&#39;*+/=?^_`</span><span class="si">{}</span><span class="s2">|~0-9A-Z]+)*$&quot;</span>
+    <span class="c1"># quoted-string</span>
+    <span class="sa">r</span><span class="s1">&#39;|^&quot;([\001-\010\013\014\016-\037!#-\[\]-\177]|&#39;</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;\\[\001-\011\013\014\016-\177])*&quot;$)&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">DOMAIN_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="c1"># domain</span>
+    <span class="sa">r</span><span class="s2">&quot;(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+&quot;</span> <span class="sa">r</span><span class="s2">&quot;(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?$)&quot;</span>
+    <span class="c1"># literal form, ipv4 address (SMTP 4.1.3)</span>
+    <span class="sa">r</span><span class="s2">&quot;|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)&quot;</span> <span class="sa">r</span><span class="s2">&quot;(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d))</span><span class="si">{3}</span><span class="s2">\]$&quot;</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">DOMAIN_WHITELIST</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;localhost&quot;</span><span class="p">}</span>
+
+<span class="n">DOMAINS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Default domains included#</span>
+    <span class="s2">&quot;aol.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;att.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comcast.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;facebook.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gmail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gmx.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;googlemail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;google.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mac.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;me.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;msn.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sbcglobal.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;verizon.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.co.uk&quot;</span><span class="p">,</span>
+    <span class="c1"># Other global domains</span>
+    <span class="s2">&quot;email.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fastmail.fm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;games.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gmx.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hush.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hushmail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;icloud.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iname.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;inbox.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lavabit.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;love.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;outlook.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pobox.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;protonmail.ch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;protonmail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tutanota.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tutanota.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tutamail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tuta.io&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;keemail.me&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rocketmail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;safe-mail.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wow.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ygm.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ymail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zoho.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yandex.com&quot;</span><span class="p">,</span>
+    <span class="c1"># United States ISP domains</span>
+    <span class="s2">&quot;bellsouth.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;charter.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cox.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;earthlink.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;juno.com&quot;</span><span class="p">,</span>
+    <span class="c1"># British ISP domains</span>
+    <span class="s2">&quot;btinternet.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;virginmedia.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;blueyonder.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;freeserve.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ntlworld.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;o2.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;orange.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sky.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;talktalk.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tiscali.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;virgin.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wanadoo.co.uk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bt.com&quot;</span><span class="p">,</span>
+    <span class="c1"># Domains used in Asia</span>
+    <span class="s2">&quot;sina.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sina.cn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;qq.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;naver.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hanmail.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;daum.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nate.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.co.jp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.co.kr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.co.id&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.co.in&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.com.sg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.com.ph&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;163.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yeah.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;126.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;21cn.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;aliyun.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;foxmail.com&quot;</span><span class="p">,</span>
+    <span class="c1"># French ISP domains</span>
+    <span class="s2">&quot;hotmail.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;laposte.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wanadoo.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;orange.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gmx.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sfr.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;neuf.fr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;free.fr&quot;</span><span class="p">,</span>
+    <span class="c1"># German ISP domains</span>
+    <span class="s2">&quot;gmx.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;online.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;t-online.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;web.de&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.de&quot;</span><span class="p">,</span>
+    <span class="c1"># Italian ISP domains</span>
+    <span class="s2">&quot;libero.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;virgilio.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;aol.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tiscali.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;alice.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;email.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tin.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;poste.it&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;teletu.it&quot;</span><span class="p">,</span>
+    <span class="c1"># Russian ISP domains</span>
+    <span class="s2">&quot;mail.ru&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rambler.ru&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yandex.ru&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ya.ru&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;list.ru&quot;</span><span class="p">,</span>
+    <span class="c1"># Belgian ISP domains</span>
+    <span class="s2">&quot;hotmail.be&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.be&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;skynet.be&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;voo.be&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tvcablenet.be&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;telenet.be&quot;</span><span class="p">,</span>
+    <span class="c1"># Argentinian ISP domains</span>
+    <span class="s2">&quot;hotmail.com.ar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.com.ar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yahoo.com.ar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fibertel.com.ar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;speedy.com.ar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arnet.com.ar&quot;</span><span class="p">,</span>
+    <span class="c1"># Domains used in Mexico</span>
+    <span class="s2">&quot;yahoo.com.mx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;live.com.mx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.es&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.com.mx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;prodigy.net.mx&quot;</span><span class="p">,</span>
+    <span class="c1"># Domains used in Canada</span>
+    <span class="s2">&quot;yahoo.ca&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.ca&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bell.net&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;shaw.ca&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sympatico.ca&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rogers.com&quot;</span><span class="p">,</span>
+    <span class="c1"># Domains used in Brazil</span>
+    <span class="s2">&quot;yahoo.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hotmail.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;outlook.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;uol.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bol.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;terra.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ig.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;itelefonica.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;r7.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zipmail.com.br&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;globo.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;globomail.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;oi.com.br&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="clean_email"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_email.clean_email">[docs]</a><span class="k">def</span> <span class="nf">clean_email</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">remove_whitespace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">fix_domain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;coerce&quot;</span><span class="p">,</span>
+    <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean and standardize email address.</span>
+
+<span class="sd">    Read more in the :ref:`User Guide &lt;email_userguide&gt;`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        A pandas or Dask DataFrame containing the data to be cleaned.</span>
+<span class="sd">    column</span>
+<span class="sd">        The name of the column containing email addresses.</span>
+<span class="sd">    remove_whitespace</span>
+<span class="sd">        If True, remove all whitespace from the input value before</span>
+<span class="sd">        verifying and cleaning it.</span>
+
+<span class="sd">        (default: False)</span>
+<span class="sd">    fix_domain</span>
+<span class="sd">        If True, for invalid email domains, try to fix it using 4 strategies:</span>
+<span class="sd">            - Swap neighboring characters.</span>
+<span class="sd">            - Add a single character.</span>
+<span class="sd">            - Remove a single character.</span>
+<span class="sd">            - Swap each character with its nearby keys on the qwerty keyboard.</span>
+
+<span class="sd">        The first valid domain found will be returned.</span>
+
+<span class="sd">        (default: False)</span>
+<span class="sd">    split</span>
+<span class="sd">        If True, split a column containing email addresses into one column</span>
+<span class="sd">        for the usernames and another column for the domains.</span>
+
+<span class="sd">        (default: False)</span>
+<span class="sd">    inplace</span>
+<span class="sd">        If True, delete the column containing the data that was cleaned. Otherwise,</span>
+<span class="sd">        keep the original column.</span>
+
+<span class="sd">        (default: False)</span>
+<span class="sd">    errors</span>
+<span class="sd">        How to handle parsing errors.</span>
+<span class="sd">            - ‘coerce’: invalid parsing will be set to NaN.</span>
+<span class="sd">            - ‘ignore’: invalid parsing will return the input.</span>
+<span class="sd">            - ‘raise’: invalid parsing will raise an exception.</span>
+
+<span class="sd">        (default: &#39;coerce&#39;)</span>
+<span class="sd">    report</span>
+<span class="sd">        If True, output the summary report. Else, no report is outputted.</span>
+
+<span class="sd">        (default: True)</span>
+
+<span class="sd">    progress</span>
+<span class="sd">        If True, display a progress bar.</span>
+
+<span class="sd">        (default: True)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;email&#39;: [&#39;Abc.example.com&#39;, &#39;Abc@example.com&#39;, &#39;H ELLO@hotmal.COM&#39;]})</span>
+<span class="sd">    &gt;&gt;&gt; clean_email(df, &#39;email&#39;)</span>
+<span class="sd">    Email Cleaning Report:</span>
+<span class="sd">        2 values with bad format (66.67%)</span>
+<span class="sd">    Result contains 1 (33.33%) values in the correct format and 2 null values (66.67%)</span>
+<span class="sd">                email      email_clean</span>
+<span class="sd">    0    Abc.example.com              NaN</span>
+<span class="sd">    1    Abc@example.com  abc@example.com</span>
+<span class="sd">    2  H ELLO@hotmal.COM              NaN</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+
+    <span class="c1"># check if the parameters are of correct processing types and values</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;df is invalid, it needs to be a pandas or Dask DataFrame.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;column </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"> is invalid.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">remove_whitespace</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;remove_whitespace </span><span class="si">{</span><span class="n">remove_whitespace</span><span class="si">}</span><span class="s2"> is invalid, it needs to be True or False.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fix_domain</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fix_domain </span><span class="si">{</span><span class="n">fix_domain</span><span class="si">}</span><span class="s2"> is invalid, it needs to be True or False.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inplace</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;inplace </span><span class="si">{</span><span class="n">inplace</span><span class="si">}</span><span class="s2"> is invalid, it needs to be True or False.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;report </span><span class="si">{</span><span class="n">report</span><span class="si">}</span><span class="s2"> is invalid, it needs to be True or False.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;coerce&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;raise&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;errors </span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s1"> is invalid, it needs to be &quot;coerce&quot;, &quot;ignore&quot;, or &quot;raise&quot;.&#39;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># convert to dask</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="c1"># To clean, create a new column &quot;clean_code_tup&quot; which contains</span>
+    <span class="c1"># the cleaned values and code indicating how the initial value was</span>
+    <span class="c1"># changed in a tuple. Then split the column of tuples and count the</span>
+    <span class="c1"># amount of different codes to produce the report</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">srs</span><span class="p">:</span> <span class="p">[</span><span class="n">_format_email</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">remove_whitespace</span><span class="p">,</span> <span class="n">fix_domain</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span><span class="p">],</span>
+        <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="n">_code_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;_code_&quot;</span><span class="p">,</span> <span class="nb">object</span><span class="p">)),</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+            <span class="n">_temp_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+            <span class="n">_code_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;_temp_&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">})</span>
+
+    <span class="c1"># counts of codes indicating how values were changed</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;_code_&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">,</span> <span class="s2">&quot;_code_&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">column</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+
+    <span class="c1"># output a report describing the result of clean_email</span>
+    <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+        <span class="n">create_report_new</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="validate_email"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_email.validate_email">[docs]</a><span class="k">def</span> <span class="nf">validate_email</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate email addresses.</span>
+
+<span class="sd">    Read more in the :ref:`User Guide &lt;email_userguide&gt;`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x</span>
+<span class="sd">        pandas Series of emails or a string containing an email.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; validate_email(&#39;Abc.example@com&#39;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;email&#39;: [&#39;abc.example.com&#39;, &#39;HELLO@HOTMAIL.COM&#39;]})</span>
+<span class="sd">    &gt;&gt;&gt; validate_email(df[&#39;email&#39;])</span>
+<span class="sd">    0    False</span>
+<span class="sd">    1     True</span>
+<span class="sd">    Name: email, dtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_check_email</span><span class="p">,</span> <span class="n">clean</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_check_email</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_format_email</span><span class="p">(</span>
+    <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">remove_whitespace</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">fix_domain</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to transform an email address into a clean format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pre-cleaning email text by removing all whitespaces</span>
+    <span class="k">if</span> <span class="n">remove_whitespace</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+    <span class="n">valid_type</span> <span class="o">=</span> <span class="n">_check_email</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">valid_type</span> <span class="o">!=</span> <span class="s2">&quot;valid&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_not_email</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">valid_type</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+
+    <span class="n">user_part</span><span class="p">,</span> <span class="n">domain_part</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># fix domain by detecting minor typos in advance</span>
+    <span class="k">if</span> <span class="n">fix_domain</span><span class="p">:</span>
+        <span class="n">domain_part</span> <span class="o">=</span> <span class="n">_fix_domain_name</span><span class="p">(</span><span class="n">domain_part</span><span class="p">)</span>
+
+    <span class="n">code</span> <span class="o">=</span> <span class="mi">3</span> <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">user_part</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">domain_part</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="n">val</span> <span class="k">else</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">user_part</span><span class="p">,</span> <span class="n">domain_part</span><span class="p">,</span> <span class="n">code</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">user_part</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">domain_part</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">code</span>
+
+
+<span class="k">def</span> <span class="nf">_check_email</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to check whether a value is a valid email.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-return-statements</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;null&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="s2">&quot;@&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;bad_format&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="n">user_part</span><span class="p">,</span> <span class="n">domain_part</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">USER_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">user_part</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;bad_format&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_part</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">64</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;overflow&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">domain_part</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DOMAIN_WHITELIST</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">DOMAIN_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">domain_part</span><span class="p">):</span>
+        <span class="c1"># Try for possible IDN domain-part</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">domain_part</span> <span class="o">=</span> <span class="n">domain_part</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;idna&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">DOMAIN_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">domain_part</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s2">&quot;valid&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="s2">&quot;unknown&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">UnicodeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;unknown&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="s2">&quot;valid&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_fix_domain_name</span><span class="p">(</span><span class="n">dom</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to fix domain name with frequent typo</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DOMAINS</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">curr_c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dom</span><span class="p">):</span>
+            <span class="c1"># two neighbor chars in reverse order</span>
+            <span class="k">if</span> <span class="n">dom</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="ow">in</span> <span class="n">DOMAINS</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">dom</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+
+            <span class="c1"># missing single char</span>
+            <span class="k">for</span> <span class="n">new_c</span> <span class="ow">in</span> <span class="s2">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dom</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_c</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="ow">in</span> <span class="n">DOMAINS</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">dom</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_c</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+
+            <span class="c1"># redundant single char</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dom</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dom</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">curr_c</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]</span> <span class="ow">in</span> <span class="n">DOMAINS</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">dom</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">curr_c</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]</span>
+
+            <span class="c1"># misspelled single char</span>
+            <span class="k">if</span> <span class="n">curr_c</span> <span class="ow">in</span> <span class="n">NEARBYKEYS</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">c_p</span> <span class="ow">in</span> <span class="n">NEARBYKEYS</span><span class="p">[</span><span class="n">curr_c</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">dom</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">c_p</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="ow">in</span> <span class="n">DOMAINS</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">dom</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">c_p</span> <span class="o">+</span> <span class="n">dom</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">dom</span>
+
+
+<span class="k">def</span> <span class="nf">_not_email</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">errtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">processtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return result when value unable to be parsed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">processtype</span> <span class="o">==</span> <span class="s2">&quot;coerce&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">errtype</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">errtype</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">processtype</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">errtype</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">errtype</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">processtype</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unable to parse value </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid error processing type&quot;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

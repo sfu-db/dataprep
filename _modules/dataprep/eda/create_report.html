@@ -18,6 +18,7 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta charset="utf-8">
@@ -151,12 +152,13 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This module implements the create_report(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">bokeh.resources</span> <span class="kn">import</span> <span class="n">INLINE</span>
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">PackageLoader</span>
+
+<span class="kn">from</span> <span class="nn">..configs</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">.formatter</span> <span class="kn">import</span> <span class="n">format_report</span>
 <span class="kn">from</span> <span class="nn">.report</span> <span class="kn">import</span> <span class="n">Report</span>
 
@@ -169,6 +171,9 @@
 
 <div class="viewcode-block" id="create_report"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.create_report.html#dataprep.eda.create_report.create_report">[docs]</a><span class="k">def</span> <span class="nf">create_report</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;DataPrep Report&quot;</span><span class="p">,</span>
     <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;basic&quot;</span><span class="p">,</span>
     <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -180,6 +185,13 @@
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
 <span class="sd">        The DataFrame for which data are calculated.</span>
+<span class="sd">    config</span>
+<span class="sd">        A dictionary for configuring the visualizations</span>
+<span class="sd">        E.g. config={&quot;hist.bins&quot;: 20}</span>
+<span class="sd">    display</span>
+<span class="sd">        The list that contains the names of plots user wants to display,</span>
+<span class="sd">        E.g. display =  [&quot;bar&quot;, &quot;hist&quot;]</span>
+<span class="sd">        Without user&#39;s specifications, the default is &quot;auto&quot;</span>
 <span class="sd">    title: Optional[str], default &quot;DataPrep Report&quot;</span>
 <span class="sd">        The title of the report, which will be shown on the navigation bar.</span>
 <span class="sd">    mode: Optional[str], default &quot;basic&quot;</span>
@@ -198,10 +210,11 @@
 <span class="sd">    &gt;&gt;&gt; report.save(&#39;My Fantastic Report&#39;) # save report to local disk</span>
 <span class="sd">    &gt;&gt;&gt; report.show_browser() # show report in the browser</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="n">INLINE</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span>
         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-        <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="n">format_report</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="p">),</span>
+        <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="n">format_report</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">progress</span><span class="p">),</span>
     <span class="p">}</span>
     <span class="n">template_base</span> <span class="o">=</span> <span class="n">ENV_LOADER</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;base.html&quot;</span><span class="p">)</span>
     <span class="n">report</span> <span class="o">=</span> <span class="n">template_base</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>

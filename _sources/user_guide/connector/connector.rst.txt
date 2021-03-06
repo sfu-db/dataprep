@@ -1,8 +1,7 @@
-.. _dataconnector:
+.. _`userguide/connector`:
 
-===========
 Connector
-===========
+=========
 
 .. toctree::
     :maxdepth: 1
@@ -11,11 +10,12 @@ Connector
     connector_concurrency
     connector_pagination
 
-To see detailed examples of how to use Connector, check out our Jupyter Notebooks repository `here  <https://github.com/sfu-db/dataprep/tree/develop/examples>`_.
+To see detailed examples of how to use Connector, check out our `Jupyter Notebooks repository <https://github.com/sfu-db/dataprep/tree/develop/examples>`_.
 
 Overview
-==========
-Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector's full documentation `here  <https://sfu-db.github.io/dataprep/>`_.
+--------
+
+Connector is a component in DataPrep that aims to simplify data collection from Web APIs by providing a standard set of operations. See Connector's `full documentation <https://sfu-db.github.io/dataprep/>`_.
 
 Connector wraps-up complex API calls into a set of easy-to-use Python functions. By using Connector, you can skip the complex API configuration process and rapidly query different Web APIs in few steps, enabling you to execute the analysis workflow you are familiar with in a direct way.
 
@@ -28,7 +28,7 @@ Connector offers essential features to facilitate the process of collecting data
 In the following sections, this guide will walk you through Connector's main features in a hands-on way, using as a case study the `Yelp API  <https://www.yelp.com/developers>`_.
 
 Fetching data in a nutshell
-==============================
+---------------------------
 
 With Connector, you can collect data from one of the top recommendations' sites online: **Yelp**. Let's see how:
 
@@ -56,8 +56,8 @@ The ``info`` function gives information and guidelines on using Connector over a
 
 .. image:: ../../_static/images/connector/info.png
 	:align: center
-   	:width: 1249
-   	:height: 319
+   	:width: 720
+   	:height: 320
 
 
 As you can see in the image above, in this example, there is only one endpoint available for Yelp: ``businesses``. However, if you want to connect to a different Yelp endpoint, you can build a new configuration file. See: `Configuration Files
@@ -96,7 +96,7 @@ You can store these results in a `Pandas Dataframe <https://pandas.pydata.org/pa
 
 
 Authorization
-===============
+-------------
 Connector supports the most used authorization methods in Web APIs:
 
 - API Key
@@ -108,7 +108,7 @@ Specifically, you have to define the value of the ``_auth`` parameter by using t
     yelp_connector = connect("yelp", _auth={"access_token":"<Your Yelp access token>"})
 
 Pagination
-==========
+----------
 Connector implements pagination more smartly! This feature allows you to get more results from the same query on a Web API endpoint. In that sense, with Connector's auto-pagination feature, you don't need to code how to handle result pages because Connector does that for you!
 
 Continuing with the Yelp example, this Web API, by default, only returns 20 records per request (see results image above). However, with Connector, you can specify the desired number of records you want to obtain. To achieve this, you must use the ``_count`` argument.
@@ -133,7 +133,7 @@ Nevertheless, the side effect of incrementing the ``_count`` argument is that Da
 To alleviate this problem, Connector implements **concurrency**! Let's see the details below.
 
 Concurrency
-==============
+-----------
 Another great feature of Connector is concurrency. Through this feature, you can retrieve data, in parallel, in less time!
 
 Next, you can see a code example where the ``_concurrency`` parameter is used on the ``connect`` function. This parameter allows you to define the number of requests per second to be sent out to the Web API. In that sense, when the ``_concurrency`` parameter is used jointly with the pagination feature (``_count`` parameter), Connector accelerates the data request process, and, therefore, the total request time is improved::
@@ -145,7 +145,7 @@ Next, you can see a code example where the ``_concurrency`` parameter is used on
 
 
 Configuration Files
-=====================
+-------------------
 A configuration file defines the information needed to fetch data from a website, e.g., the request URL, the API authorization type, the required parameters from the user (API key, search keyword, etc.), and the returned data's schema.
 
 All the information is reusable.

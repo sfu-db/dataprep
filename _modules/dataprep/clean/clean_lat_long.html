@@ -1,0 +1,718 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>dataprep.clean.clean_lat_long &#8212; DataPrep 0.2.15 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/_modules/dataprep/clean/clean_lat_long.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <h1>Source code for dataprep.clean.clean_lat_long</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Clean and validate a DataFrame column containing geographic coordinates.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">..eda.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NULL_VALUES</span><span class="p">,</span> <span class="n">create_report_new</span><span class="p">,</span> <span class="n">to_dask</span>
+
+<span class="n">LAT_LONG_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    [^/]*?[(]?</span>
+<span class="sd">      (?P&lt;dir_front&gt;[NS])?[ ]*</span>
+<span class="sd">        (?P&lt;deg&gt;-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*</span>
+<span class="sd">        (?:(?P&lt;min&gt;%(FLOAT)s)[%(PRIME)s&#39;m]?[ ]*)?</span>
+<span class="sd">        (?:(?P&lt;sec&gt;%(FLOAT)s)[%(DOUBLE_PRIME)s&quot;s][ ]*)?</span>
+<span class="sd">      )?(?P&lt;dir_back&gt;[NS])?</span>
+<span class="sd">      \s*[,;/\s]\s*</span>
+<span class="sd">      (?P&lt;dir_front2&gt;[EW])?[ ]*</span>
+<span class="sd">        (?P&lt;deg2&gt;-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*</span>
+<span class="sd">        (?:(?P&lt;min2&gt;%(FLOAT)s)[%(PRIME)s&#39;m]?[ ]*)?</span>
+<span class="sd">        (?:(?P&lt;sec2&gt;%(FLOAT)s)[%(DOUBLE_PRIME)s&quot;s][ ]*)?</span>
+<span class="sd">      )?(?P&lt;dir_back2&gt;[EW])?</span>
+<span class="sd">    [)]?\s*$</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="o">%</span> <span class="p">{</span>
+        <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\d+(?:\.\d+)?&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DEGREE&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">),</span>
+        <span class="s2">&quot;PRIME&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">),</span>
+        <span class="s2">&quot;DOUBLE_PRIME&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">8243</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">LAT_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .*?</span>
+<span class="sd">      (?P&lt;dir_front&gt;[NS])?[ ]*</span>
+<span class="sd">        (?P&lt;deg&gt;-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*</span>
+<span class="sd">        (?:(?P&lt;min&gt;%(FLOAT)s)[%(PRIME)s&#39;m]?[ ]*)?</span>
+<span class="sd">        (?:(?P&lt;sec&gt;%(FLOAT)s)[%(DOUBLE_PRIME)s&quot;s][ ]*)?</span>
+<span class="sd">      )?(?P&lt;dir_back&gt;[NS])?</span>
+<span class="sd">    \s*$</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="o">%</span> <span class="p">{</span>
+        <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\d+(?:\.\d+)?&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DEGREE&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">),</span>
+        <span class="s2">&quot;PRIME&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">),</span>
+        <span class="s2">&quot;DOUBLE_PRIME&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">8243</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">LONG_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .*?</span>
+<span class="sd">      (?P&lt;dir_front&gt;[EW])?[ ]*</span>
+<span class="sd">        (?P&lt;deg&gt;-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*</span>
+<span class="sd">        (?:(?P&lt;min&gt;%(FLOAT)s)[%(PRIME)s&#39;m]?[ ]*)?</span>
+<span class="sd">        (?:(?P&lt;sec&gt;%(FLOAT)s)[%(DOUBLE_PRIME)s&quot;s][ ]*)?</span>
+<span class="sd">      )?(?P&lt;dir_back&gt;[EW])?</span>
+<span class="sd">    \s*$</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="o">%</span> <span class="p">{</span>
+        <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\d+(?:\.\d+)?&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DEGREE&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">),</span>
+        <span class="s2">&quot;PRIME&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">),</span>
+        <span class="s2">&quot;DOUBLE_PRIME&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">8243</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="clean_lat_long"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_lat_long.clean_lat_long">[docs]</a><span class="k">def</span> <span class="nf">clean_lat_long</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">lat_long</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">lat_col</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">long_col</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dd&quot;</span><span class="p">,</span>
+    <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;coerce&quot;</span><span class="p">,</span>
+    <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean and standardize latitude and longitude coordinates.</span>
+
+<span class="sd">    Read more in the :ref:`User Guide &lt;clean_lat_long_user_guide&gt;`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        A pandas or Dask DataFrame containing the data to be cleaned.</span>
+<span class="sd">    lat_long</span>
+<span class="sd">        The name of the column containing latitude and longitude coordinates.</span>
+<span class="sd">    lat_col</span>
+<span class="sd">        The name of the column containing latitude coordinates.</span>
+
+<span class="sd">        If specified, the parameter lat_long must be None.</span>
+<span class="sd">    long_col</span>
+<span class="sd">        The name of the column containing longitude coordinates.</span>
+
+<span class="sd">        If specified, the parameter lat_long must be None.</span>
+<span class="sd">    output_format</span>
+<span class="sd">        The desired format of the coordinates.</span>
+<span class="sd">            - &#39;dd&#39;: decimal degrees (51.4934, 0.0098)</span>
+<span class="sd">            - &#39;ddh&#39;: decimal degrees with hemisphere (&#39;51.4934° N, 0.0098° E&#39;)</span>
+<span class="sd">            - &#39;dm&#39;: degrees minutes (&#39;51° 29.604′ N, 0° 0.588′ E&#39;)</span>
+<span class="sd">            - &#39;dms&#39;: degrees minutes seconds (&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;)</span>
+
+<span class="sd">        (default: &#39;dd&#39;)</span>
+<span class="sd">    split</span>
+<span class="sd">        If True, split the latitude and longitude coordinates into one column</span>
+<span class="sd">        for latitude and a separate column for longitude. Otherwise, merge</span>
+<span class="sd">        the latitude and longitude coordinates into one column.</span>
+
+<span class="sd">        (default: False)</span>
+<span class="sd">    inplace</span>
+<span class="sd">        If True, delete the column(s) containing the data that was cleaned. Otherwise,</span>
+<span class="sd">        keep the original column(s).</span>
+
+<span class="sd">        (default: False)</span>
+<span class="sd">    errors</span>
+<span class="sd">        How to handle parsing errors.</span>
+<span class="sd">            - ‘coerce’: invalid parsing will be set to NaN.</span>
+<span class="sd">            - ‘ignore’: invalid parsing will return the input.</span>
+<span class="sd">            - ‘raise’: invalid parsing will raise an exception.</span>
+
+<span class="sd">        (default: &#39;coerce&#39;)</span>
+<span class="sd">    report</span>
+<span class="sd">        If True, output the summary report. Otherwise, no report is outputted.</span>
+
+<span class="sd">        (default: True)</span>
+<span class="sd">    progress</span>
+<span class="sd">        If True, display a progress bar.</span>
+
+<span class="sd">        (default: True)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Split a column containing latitude and longitude strings into separate</span>
+<span class="sd">    columns in decimal degrees format.</span>
+
+<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;coord&#39;: [&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;, &#39;51.4934° N, 0.0098° E&#39;]})</span>
+<span class="sd">    &gt;&gt;&gt; clean_lat_long(df, &#39;coord&#39;, split=True)</span>
+<span class="sd">    Latitude and Longitude Cleaning Report:</span>
+<span class="sd">        2 values cleaned (100.0%)</span>
+<span class="sd">    Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="sd">                            coord  latitude  longitude</span>
+<span class="sd">    0  51° 29′ 36.24″ N, 0° 0′ 35.28″ E   51.4934     0.0098</span>
+<span class="sd">    1             51.4934° N, 0.0098° E   51.4934     0.0098</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-branches</span>
+
+    <span class="k">if</span> <span class="n">lat_long</span> <span class="ow">and</span> <span class="p">(</span><span class="n">lat_col</span> <span class="ow">or</span> <span class="n">long_col</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lat_long must be None if either lat_col or long_col is not None&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;dd&quot;</span><span class="p">,</span> <span class="s2">&quot;ddh&quot;</span><span class="p">,</span> <span class="s2">&quot;dm&quot;</span><span class="p">,</span> <span class="s2">&quot;dms&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;output_format </span><span class="si">{</span><span class="n">output_format</span><span class="si">}</span><span class="s1"> is invalid, it must be &quot;dd&quot;, &quot;ddh&quot;, &quot;dm&quot;, or &quot;dms&quot;&#39;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># convert to dask</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="c1"># To clean, create a new column &quot;clean_code_tup&quot; which contains</span>
+    <span class="c1"># the cleaned values and code indicating how the initial value was</span>
+    <span class="c1"># changed in a tuple. Then split the column of tuples and count the</span>
+    <span class="c1"># amount of different codes to produce the report</span>
+    <span class="k">if</span> <span class="n">lat_long</span><span class="p">:</span>
+        <span class="c1"># clean a latitude and longitude column</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">lat_long</span><span class="p">]</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">srs</span><span class="p">:</span> <span class="p">[</span><span class="n">_format_lat_long</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span><span class="p">],</span>
+            <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+                <span class="n">latitude</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+                <span class="n">longitude</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">_code_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+                <span class="n">_temp_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+                <span class="n">_code_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;_temp_&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat_long</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">lat_long</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># clean a latitude column</span>
+        <span class="k">if</span> <span class="n">lat_col</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">lat_col</span><span class="p">]</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">srs</span><span class="p">:</span> <span class="p">[</span><span class="n">_format_lat_or_long</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span><span class="p">],</span>
+                <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+                <span class="n">_temp_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+                <span class="n">_code_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;_temp_&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">lat_col</span><span class="p">)</span>
+        <span class="c1"># clean a longitude column</span>
+        <span class="k">if</span> <span class="n">long_col</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">long_col</span><span class="p">]</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">srs</span><span class="p">:</span> <span class="p">[</span><span class="n">_format_lat_or_long</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="s2">&quot;long&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span><span class="p">],</span>
+                <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+                <span class="n">_temp_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+                <span class="n">_code_</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;_temp_&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">long_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">long_col</span><span class="p">)</span>
+        <span class="c1"># merge the cleaned latitude and longitude</span>
+        <span class="k">if</span> <span class="n">lat_col</span> <span class="ow">and</span> <span class="n">long_col</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">split</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dd&quot;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;latitude_longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">long_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="nb">tuple</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="nb">object</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;latitude_longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">long_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">]</span>
+
+            <span class="c1"># if seperate lat and long columns are merged, then all values are &quot;cleaned&quot;</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;_code_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">long_col</span><span class="si">}</span><span class="s2">_clean&quot;</span><span class="p">])</span>
+
+    <span class="c1"># counts of codes indicating how values were changed</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;_code_&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">,</span> <span class="s2">&quot;_code_&quot;</span><span class="p">])</span>
+
+    <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+
+    <span class="c1"># output a report describing the result of clean_lat_long</span>
+    <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+        <span class="n">create_report_new</span><span class="p">(</span><span class="s2">&quot;Latitude and Longitude&quot;</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="validate_lat_long"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_lat_long.validate_lat_long">[docs]</a><span class="k">def</span> <span class="nf">validate_lat_long</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">lat_long</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate latitude and longitude coordinates.</span>
+
+<span class="sd">    Read more in the :ref:`User Guide &lt;clean_lat_long_user_guide&gt;`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x</span>
+<span class="sd">        A pandas Series, string, float, or tuple of floats, containing the latitude</span>
+<span class="sd">        and/or longitude coordinates to be validated.</span>
+<span class="sd">    lat_long</span>
+<span class="sd">        If True, valid values contain latitude and longitude coordinates. Parameters</span>
+<span class="sd">        lat and lon must be False if lat_long is True.</span>
+
+<span class="sd">        (default: True)</span>
+<span class="sd">    lat</span>
+<span class="sd">        If True, valid values contain only latitude coordinates. Parameters</span>
+<span class="sd">        lat_long and lon must be False if lat is True.</span>
+
+<span class="sd">       (default: False)</span>
+<span class="sd">    lon</span>
+<span class="sd">        If True, valid values contain only longitude coordinates. Parameters</span>
+<span class="sd">        lat_long and lat must be False if lon is True.</span>
+
+<span class="sd">        (default: False)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Validate a coordinate string or series of coordinates.</span>
+
+<span class="sd">    &gt;&gt;&gt; validate_lat_long(&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;coordinates&#39;, [&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;, &#39;NaN&#39;]})</span>
+<span class="sd">    &gt;&gt;&gt; validate_lat_long(df[&#39;coordinates&#39;])</span>
+<span class="sd">    0     True</span>
+<span class="sd">    1    False</span>
+<span class="sd">    Name: coordinates, dtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">lat</span> <span class="ow">or</span> <span class="n">lon</span><span class="p">:</span>
+        <span class="n">hor_dir</span> <span class="o">=</span> <span class="s2">&quot;lat&quot;</span> <span class="k">if</span> <span class="n">lat</span> <span class="k">else</span> <span class="s2">&quot;long&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_check_lat_or_long</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">hor_dir</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">_check_lat_or_long</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hor_dir</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">lat_long</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_check_lat_long</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="kc">False</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="n">_check_lat_long</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<span class="k">def</span> <span class="nf">_format_lat_long</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to transform a coordinate instance into the desired format</span>
+
+<span class="sd">    The last component of the returned tuple contains a code indicating how the</span>
+<span class="sd">    input value was changed:</span>
+<span class="sd">        0 := the value is null</span>
+<span class="sd">        1 := the value could not be parsed</span>
+<span class="sd">        2 := the value is cleaned and the cleaned value is DIFFERENT than the input value</span>
+<span class="sd">        3 := the value is cleaned and is THE SAME as the input value (no transformation)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-locals</span>
+    <span class="c1"># _check_lat_long parses the value val, and will return the components</span>
+    <span class="c1"># if the parse is succesful. The returned value &quot;status&quot; can be either 0 ie</span>
+    <span class="c1"># &quot;null&quot; (which means val is a null value), 1 ie (&quot;unkwonw&quot;) (in which case</span>
+    <span class="c1"># val could not be parsed) or 2 ie &quot;success&quot; (a succesful parse of val).</span>
+    <span class="c1"># dds, mins, secs, hem are the latitude components and # dds2, mins2, secs2, hem2</span>
+    <span class="c1"># are the longitude components</span>
+    <span class="n">dds</span><span class="p">,</span> <span class="n">mins</span><span class="p">,</span> <span class="n">secs</span><span class="p">,</span> <span class="n">hem</span><span class="p">,</span> <span class="n">dds2</span><span class="p">,</span> <span class="n">mins2</span><span class="p">,</span> <span class="n">secs2</span><span class="p">,</span> <span class="n">hem2</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_check_lat_long</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># val is a null value</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">split</span> <span class="k">else</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># val contains an unknown value</span>
+        <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unable to parse value </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">val</span> <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">split</span> <span class="k">else</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># derive the hemisphere if not given in the initial coordinate</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">hem</span><span class="p">:</span>
+        <span class="n">hem</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span> <span class="k">if</span> <span class="n">dds</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;S&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">hem2</span><span class="p">:</span>
+        <span class="n">hem2</span> <span class="o">=</span> <span class="s2">&quot;E&quot;</span> <span class="k">if</span> <span class="n">dds2</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;W&quot;</span>
+    <span class="n">dds</span><span class="p">,</span> <span class="n">dds2</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dds</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dds2</span><span class="p">)</span>
+
+    <span class="c1"># the following code if/elif blocks converts the</span>
+    <span class="c1"># coordinate components to the desired output</span>
+    <span class="c1"># https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#Change_of_units_and_format</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dd&quot;</span><span class="p">:</span>
+        <span class="n">fctr</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">hem</span> <span class="o">==</span> <span class="s2">&quot;S&quot;</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">fctr2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">hem2</span> <span class="o">==</span> <span class="s2">&quot;W&quot;</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">fctr</span> <span class="o">*</span> <span class="n">dds</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">fctr2</span> <span class="o">*</span> <span class="n">dds2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;ddh&quot;</span><span class="p">:</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dds2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem2</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dm&quot;</span><span class="p">:</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mins</span><span class="p">)</span> <span class="k">if</span> <span class="n">mins</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">mins</span>
+        <span class="n">mins2</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds2</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds2</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">mins2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mins2</span><span class="p">)</span> <span class="k">if</span> <span class="n">mins2</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">mins2</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mins</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dds2</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mins2</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem2</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dms&quot;</span><span class="p">:</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)))</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">3600</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span> <span class="o">-</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">mins</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="k">if</span> <span class="n">secs</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">secs</span>
+        <span class="n">mins2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds2</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds2</span><span class="p">)))</span>
+        <span class="n">secs2</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">3600</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds2</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds2</span><span class="p">))</span> <span class="o">-</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">mins2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">secs2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">secs2</span><span class="p">)</span> <span class="k">if</span> <span class="n">secs2</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">secs2</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mins</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">secs</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8243</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dds2</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mins2</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">secs2</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8243</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem2</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dd&quot;</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">lon</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">result</span> <span class="k">else</span> <span class="mi">3</span>
+
+
+<span class="k">def</span> <span class="nf">_check_lat_long</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to check if a coordinate instance is valid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-boolean-expressions</span>
+    <span class="c1"># if the value is null, return empty strings for the components</span>
+    <span class="c1"># and the code 0 to indicate a null status</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="n">mch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">LAT_LONG_PATTERN</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&#39;&#39;&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+    <span class="c1"># check if the value was able to be parsed</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mch</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg2&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="c1"># coordinates for latitude</span>
+    <span class="n">mins</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">secs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sec&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sec&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">dds</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="n">mins</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">secs</span> <span class="o">/</span> <span class="mi">3600</span>
+    <span class="n">hem</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_back&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_front&quot;</span><span class="p">)</span>
+
+    <span class="c1"># coordinates for longitude</span>
+    <span class="n">mins2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;min2&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;min2&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">secs2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sec2&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sec2&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">dds2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg2&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="n">mins2</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">secs2</span> <span class="o">/</span> <span class="mi">3600</span>
+    <span class="n">hem2</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_back2&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_front2&quot;</span><span class="p">)</span>
+
+    <span class="c1"># minutes and seconds need to be in the interval [0, 60)</span>
+    <span class="c1"># for degrees:</span>
+    <span class="c1">#  if hemisphere is given, then 0&lt;=lat&lt;=90 and 0&lt;=long&lt;=180</span>
+    <span class="c1">#  if hemisphere is not given, then -90&lt;=lat&lt;=90 and -180&lt;=long&lt;=180</span>
+    <span class="c1"># decimal degrees must be -90&lt;=lat&lt;=90 and -180&lt;=long&lt;=180</span>
+    <span class="c1"># the first given hemisphere and last hemisphere cannot both be set</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">mins</span> <span class="o">&lt;</span> <span class="mi">60</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">mins2</span> <span class="o">&lt;</span> <span class="mi">60</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">secs</span> <span class="o">&lt;</span> <span class="mi">60</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">secs2</span> <span class="o">&lt;</span> <span class="mi">60</span>
+        <span class="ow">or</span> <span class="n">hem</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">90</span>
+        <span class="ow">or</span> <span class="n">hem2</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg2&quot;</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">180</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="n">hem</span>
+        <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">90</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="n">hem2</span>
+        <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg2&quot;</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">180</span>
+        <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">90</span>
+        <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dds2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">180</span>
+        <span class="ow">or</span> <span class="nb">sum</span><span class="p">([</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_back&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_front&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="ow">or</span> <span class="nb">sum</span><span class="p">([</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_back2&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_front2&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">dds</span><span class="p">,</span> <span class="n">mins</span><span class="p">,</span> <span class="n">secs</span><span class="p">,</span> <span class="n">hem</span><span class="p">,</span> <span class="n">dds2</span><span class="p">,</span> <span class="n">mins2</span><span class="p">,</span> <span class="n">secs2</span><span class="p">,</span> <span class="n">hem2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_format_lat_or_long</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">hor_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to transform a coordinate instance into the desired format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dds</span><span class="p">,</span> <span class="n">mins</span><span class="p">,</span> <span class="n">secs</span><span class="p">,</span> <span class="n">hem</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_check_lat_or_long</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">hor_dir</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># val contains a null value</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># val contains an unknown value</span>
+        <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unable to parse value </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span> <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">hem</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">hor_dir</span> <span class="o">==</span> <span class="s2">&quot;lat&quot;</span><span class="p">:</span>
+            <span class="n">hem</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span> <span class="k">if</span> <span class="n">dds</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;S&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hem</span> <span class="o">=</span> <span class="s2">&quot;E&quot;</span> <span class="k">if</span> <span class="n">dds</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;W&quot;</span>
+    <span class="n">dds</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dd&quot;</span><span class="p">:</span>
+        <span class="n">fctr</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">hem</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">}</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">fctr</span> <span class="o">*</span> <span class="n">dds</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;ddh&quot;</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dm&quot;</span><span class="p">:</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mins</span><span class="p">)</span> <span class="k">if</span> <span class="n">mins</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">mins</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mins</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;dms&quot;</span><span class="p">:</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)))</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">3600</span> <span class="o">*</span> <span class="p">(</span><span class="n">dds</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span> <span class="o">-</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">mins</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="k">if</span> <span class="n">secs</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">else</span> <span class="n">secs</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">176</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mins</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8242</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">secs</span><span class="si">}{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">8243</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hem</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">res</span> <span class="k">else</span> <span class="mi">3</span>
+
+
+<span class="k">def</span> <span class="nf">_check_lat_or_long</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">hor_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to check if a coordinate instance is valid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-boolean-expressions</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="n">pat</span> <span class="o">=</span> <span class="n">LAT_PATTERN</span> <span class="k">if</span> <span class="n">hor_dir</span> <span class="o">==</span> <span class="s2">&quot;lat&quot;</span> <span class="k">else</span> <span class="n">LONG_PATTERN</span>
+
+    <span class="n">mch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pat</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&#39;&#39;&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mch</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="c1"># coordinates</span>
+    <span class="n">mins</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">secs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sec&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sec&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">dds</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="n">mins</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">secs</span> <span class="o">/</span> <span class="mi">3600</span>
+    <span class="n">hem</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_back&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_front&quot;</span><span class="p">)</span>
+
+    <span class="c1"># range is [-90, 90] for latitude and [-180, 180] for longitude</span>
+    <span class="n">bound</span> <span class="o">=</span> <span class="mi">90</span> <span class="k">if</span> <span class="n">hor_dir</span> <span class="o">==</span> <span class="s2">&quot;lat&quot;</span> <span class="k">else</span> <span class="mi">180</span>
+
+    <span class="c1"># minutes and seconds need to be in the interval [0, 60)</span>
+    <span class="c1"># for degrees:</span>
+    <span class="c1">#  if hemisphere is give, then 0&lt;=deg&lt;=bound</span>
+    <span class="c1">#  if hemisphere is not given, then -bound&lt;=deg&lt;=bound</span>
+    <span class="c1"># decimal degrees must be -bound&lt;=lat&lt;=bound</span>
+    <span class="c1"># the first given hemisphere and last hemisphere cannot both be set</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">mins</span> <span class="o">&lt;</span> <span class="mi">60</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">secs</span> <span class="o">&lt;</span> <span class="mi">60</span>
+        <span class="ow">or</span> <span class="n">hem</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">bound</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="n">hem</span>
+        <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;deg&quot;</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">bound</span>
+        <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">bound</span>
+        <span class="ow">or</span> <span class="nb">sum</span><span class="p">([</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_back&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dir_front&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">dds</span><span class="p">,</span> <span class="n">mins</span><span class="p">,</span> <span class="n">secs</span><span class="p">,</span> <span class="n">hem</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
+</pre></div>
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

@@ -18,6 +18,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Clean" href="../clean/introduction.html" />
@@ -127,6 +128,12 @@
         
       
         
+          
+            
+              <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
           
             
               <li class="">
@@ -259,7 +266,7 @@
 <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">dblp_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SIGMOD&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this case, the DBLP endpoint specification defines that the name of the offset parameter is <code class="docutils literal notranslate"><span class="pre">f</span></code> and the name of the limit parameter is <code class="docutils literal notranslate"><span class="pre">h</span></code>. For that reason, parameters with names <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">h</span></code> are used in the <code class="docutils literal notranslate"><span class="pre">query</span></code> function. These parameter names are also defined in the DBLP’s <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/blob/develop/dblp/publication.json">configuration file</a> for the publication endpoint.:</p>
+<p>In this case, the DBLP endpoint specification defines that the name of the offset parameter is <code class="docutils literal notranslate"><span class="pre">f</span></code> and the name of the limit parameter is <code class="docutils literal notranslate"><span class="pre">h</span></code>. For that reason, parameters with names <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">h</span></code> are used in the <code class="docutils literal notranslate"><span class="pre">query</span></code> function. These parameter names are also defined in the <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/blob/develop/dblp/publication.json">DBLP’s configuration file</a> for the publication endpoint.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
     <span class="s2">&quot;offsetKey&quot;</span><span class="p">:</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span>
@@ -281,7 +288,7 @@ In the following example, you can see how this pagination method works using as 
 <span class="n">df</span> <span class="o">=</span> <span class="k">await</span> <span class="n">mapquest_connector</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;place&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;Vancouver, BC&quot;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;relevance&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">pageSize</span><span class="o">=</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this case, the specification of the MapQuest - “place” endpoint defines that the name of the “Page” parameter is <code class="docutils literal notranslate"><span class="pre">page</span></code> and the name of the “Perpage” parameter is <code class="docutils literal notranslate"><span class="pre">pageSize</span></code>. For that reason, parameters with names <code class="docutils literal notranslate"><span class="pre">page</span></code> and <code class="docutils literal notranslate"><span class="pre">pageSize</span></code> are used into the <code class="docutils literal notranslate"><span class="pre">query</span></code> function. These parameter names are also defined into the MapQuest’s <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/blob/develop/mapquest/place.json">configuration file</a> for the place endpoint.:</p>
+<p>In this case, the specification of the MapQuest - “place” endpoint defines that the name of the “Page” parameter is <code class="docutils literal notranslate"><span class="pre">page</span></code> and the name of the “Perpage” parameter is <code class="docutils literal notranslate"><span class="pre">pageSize</span></code>. For that reason, parameters with names <code class="docutils literal notranslate"><span class="pre">page</span></code> and <code class="docutils literal notranslate"><span class="pre">pageSize</span></code> are used into the <code class="docutils literal notranslate"><span class="pre">query</span></code> function. These parameter names are also defined into the <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/blob/develop/mapquest/place.json">MapQuest’s configuration file</a> for the place endpoint.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;page&quot;</span><span class="p">,</span>
     <span class="s2">&quot;pageKey&quot;</span><span class="p">:</span> <span class="s2">&quot;page&quot;</span><span class="p">,</span>

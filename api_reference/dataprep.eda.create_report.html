@@ -18,6 +18,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dataprep.eda auxiliary modules" href="dataprep.eda.html" />
@@ -166,6 +167,12 @@
               </li>
             
           
+            
+              <li class="">
+                  <a href="dataprep.clean.html">DataPrep.Clean</a>
+              </li>
+            
+          
         
       
         
@@ -202,12 +209,17 @@
 <p>This module implements the create_report(df) function.</p>
 <dl class="py function">
 <dt id="dataprep.eda.create_report.create_report">
-<code class="sig-prename descclassname">dataprep.eda.create_report.</code><code class="sig-name descname">create_report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">'DataPrep Report'</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'basic'</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report.html#create_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.create_report" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.create_report.</code><code class="sig-name descname">create_report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">'DataPrep Report'</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'basic'</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report.html#create_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.create_report" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is to generate and render element in a report object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p></li>
+<li><p><strong>config</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – A dictionary for configuring the visualizations
+E.g. config={“hist.bins”: 20}</p></li>
+<li><p><strong>display</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – The list that contains the names of plots user wants to display,
+E.g. display =  [“bar”, “hist”]
+Without user’s specifications, the default is “auto”</p></li>
 <li><p><strong>title</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default &quot;DataPrep Report&quot;</em>) – The title of the report, which will be shown on the navigation bar.</p></li>
 <li><p><strong>mode</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default &quot;basic&quot;</em>) – This controls what type of report to be generated.
 Currently only the ‘basic’ is fully implemented.</p></li>
@@ -239,25 +251,33 @@ Currently only the ‘basic’ is fully implemented.</p></li>
 for create_report(df) function.</p>
 <dl class="py function">
 <dt id="dataprep.eda.create_report.formatter.basic_computations">
-<code class="sig-prename descclassname">dataprep.eda.create_report.formatter.</code><code class="sig-name descname">basic_computations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report/formatter.html#basic_computations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.formatter.basic_computations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.create_report.formatter.</code><code class="sig-name descname">basic_computations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">cfg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report/formatter.html#basic_computations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.formatter.basic_computations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computations for the basic version.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="dataprep.eda.html#dataprep.eda.configs.Config" title="dataprep.eda.configs.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a>) – The config dict user passed in. E.g. config =  {“hist.bins”: 20}
+Without user’s specifications, the default is “auto”</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]], <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="dataprep.eda.create_report.formatter.format_basic">
-<code class="sig-prename descclassname">dataprep.eda.create_report.formatter.</code><code class="sig-name descname">format_basic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report/formatter.html#format_basic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.formatter.format_basic" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.create_report.formatter.</code><code class="sig-name descname">format_basic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">cfg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report/formatter.html#format_basic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.formatter.format_basic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format basic version.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame for which data are calculated.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="dataprep.eda.html#dataprep.eda.configs.Config" title="dataprep.eda.configs.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a>) – The config dict user passed in. E.g. config =  {“hist.bins”: 20}
+Without user’s specifications, the default is “auto”</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A dictionary in which formatted data is stored.
@@ -271,12 +291,13 @@ This variable acts like an API in passing data to the template engine.</p>
 
 <dl class="py function">
 <dt id="dataprep.eda.create_report.formatter.format_report">
-<code class="sig-prename descclassname">dataprep.eda.create_report.formatter.</code><code class="sig-name descname">format_report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">mode</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report/formatter.html#format_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.formatter.format_report" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.eda.create_report.formatter.</code><code class="sig-name descname">format_report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">cfg</span></em>, <em class="sig-param"><span class="n">mode</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/create_report/formatter.html#format_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.create_report.formatter.format_report" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format the data and figures needed by report</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – The DataFrame for which data are calculated.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="dataprep.eda.html#dataprep.eda.configs.Config" title="dataprep.eda.configs.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a>) – The config instance</p></li>
 <li><p><strong>mode</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – This controls what type of report to be generated.
 Currently only the ‘basic’ is fully implemented.</p></li>
 <li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to show the progress bar.</p></li>

@@ -1,0 +1,1273 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>DataPrep.Clean &#8212; DataPrep 0.2.15 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contribute" href="../contribute.html" />
+    <link rel="prev" title="dataprep.data_connector" href="dataprep.connector.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/api_reference/dataprep.clean.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.distribution.html">dataprep.eda.distribution</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.correlation.html">dataprep.eda.correlation</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.missing.html">dataprep.eda.missing</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.create_report.html">dataprep.eda.create_report</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.eda.html">dataprep.eda auxiliary modules</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="dataprep.connector.html">dataprep.data_connector</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="">DataPrep.Clean</a>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_headers" class="nav-link">Column Headers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_country" class="nav-link">Country Names</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_date" class="nav-link">Dates and Times</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_email" class="nav-link">Email Addresses</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_lat_long" class="nav-link">Geographic Coordinates</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_ip" class="nav-link">IP Addresses</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_phone" class="nav-link">Phone Numbers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_url" class="nav-link">URLs</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_address" class="nav-link">US Street Addresses</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="dataprep-clean">
+<h1>DataPrep.Clean<a class="headerlink" href="#dataprep-clean" title="Permalink to this headline">¶</a></h1>
+<p>API reference for the DataPrep.Clean subpackage.</p>
+<div class="section" id="module-dataprep.clean.clean_headers">
+<span id="column-headers"></span><h2>Column Headers<a class="headerlink" href="#module-dataprep.clean.clean_headers" title="Permalink to this headline">¶</a></h2>
+<p>Clean and standardize column headers for a DataFrame.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_headers.clean_headers">
+<code class="sig-prename descclassname">dataprep.clean.clean_headers.</code><code class="sig-name descname">clean_headers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">case</span><span class="o">=</span><span class="default_value">'snake'</span></em>, <em class="sig-param"><span class="n">replace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">remove_accents</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_headers.html#clean_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_headers.clean_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to clean column headers (column names).</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_headers.html#clean-headers-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Dataframe from which column names are to be cleaned.</p></li>
+<li><p><strong>case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The desired case style of the column name.</dt><dd><ul>
+<li><p>’snake’: ‘column_name’</p></li>
+<li><p>’kebab’: ‘column-name’</p></li>
+<li><p>’camel’: ‘columnName’</p></li>
+<li><p>’pascal’: ‘ColumnName’</p></li>
+<li><p>’const’: ‘COLUMN_NAME’</p></li>
+<li><p>’sentence’: ‘Column name’</p></li>
+<li><p>’title’: ‘Column Name’</p></li>
+<li><p>’lower’: ‘column name’</p></li>
+<li><p>’upper’: ‘COLUMN NAME’</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘snake’)</p>
+</p></li>
+<li><p><strong>replace</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – <dl class="simple">
+<dt>Values to replace in the column names.</dt><dd><ul>
+<li><p>{‘old_value’: ‘new_value’}</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: None)</p>
+</p></li>
+<li><p><strong>remove_accents</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, strip accents from the column names.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean column names by converting the names to camel case style, removing accents,
+and correcting a mispelling.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;FirstNom&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Philip&#39;</span><span class="p">,</span> <span class="s1">&#39;Turanga&#39;</span><span class="p">],</span> <span class="s1">&#39;lastName&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Fry&#39;</span><span class="p">,</span> <span class="s1">&#39;Leela&#39;</span><span class="p">],</span> <span class="s1">&#39;Téléphone&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;555-234-5678&#39;</span><span class="p">,</span> <span class="s1">&#39;(604) 111-2335&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_headers</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="s1">&#39;camel&#39;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Nom&#39;</span><span class="p">:</span> <span class="s1">&#39;Name&#39;</span><span class="p">})</span>
+<span class="go">Column Headers Cleaning Report:</span>
+<span class="go">    2 values cleaned (66.67%)</span>
+<span class="go">  firstName lastName       telephone</span>
+<span class="go">0    Philip      Fry    555-234-5678</span>
+<span class="go">1   Turanga    Leela  (604) 111-2335</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_country">
+<span id="country-names"></span><h2>Country Names<a class="headerlink" href="#module-dataprep.clean.clean_country" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing country names.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_country.clean_country">
+<code class="sig-prename descclassname">dataprep.clean.clean_country.</code><code class="sig-name descname">clean_country</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'name'</span></em>, <em class="sig-param"><span class="n">fuzzy_dist</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">strict</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_country.html#clean_country"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_country.clean_country" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize country names.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_country.html#country-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing country names.</p></li>
+<li><p><strong>input_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The ISO 3166 input format of the country.</dt><dd><ul>
+<li><p>’auto’: infer the input format</p></li>
+<li><p>’name’: country name (‘United States’)</p></li>
+<li><p>’official’: official state name (‘United States of America’)</p></li>
+<li><p>’alpha-2’: alpha-2 code (‘US’)</p></li>
+<li><p>’alpha-3’: alpha-3 code (‘USA’)</p></li>
+<li><p>’numeric’: numeric code (840)</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘auto’)</p>
+</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The desired ISO 3166 format of the country:</dt><dd><ul>
+<li><p>’name’: country name (‘United States’)</p></li>
+<li><p>’official’: official state name (‘United States of America’)</p></li>
+<li><p>’alpha-2’: alpha-2 code (‘US’)</p></li>
+<li><p>’alpha-3’: alpha-3 code (‘USA’)</p></li>
+<li><p>’numeric’: numeric code (840)</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘name’)</p>
+</p></li>
+<li><p><strong>fuzzy_dist</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – <p>The maximum edit distance (number of single character insertions, deletions
+or substitutions required to change one word into the other) between a country value
+and input that will count as a match. Only applies to ‘auto’, ‘name’ and ‘official’
+input formats.</p>
+<p>(default: 0)</p>
+</p></li>
+<li><p><strong>strict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, matching for input formats ‘name’ and ‘official’ are done by looking
+for a direct match. If False, matching is done by searching the input for a
+regex match.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;country&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39; Canada &#39;</span><span class="p">,</span> <span class="s1">&#39;US&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_country</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;country&#39;</span><span class="p">)</span>
+<span class="go">Country Cleaning Report:</span>
+<span class="go">    2 values cleaned (100.0%)</span>
+<span class="go">Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="go">    country  country_clean</span>
+<span class="go">0   Canada          Canada</span>
+<span class="go">1        US  United States</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_country.validate_country">
+<code class="sig-prename descclassname">dataprep.clean.clean_country.</code><code class="sig-name descname">validate_country</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">strict</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_country.html#validate_country"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_country.validate_country" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate country names.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_country.html#country-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of countries or str/int country value.</p></li>
+<li><p><strong>input_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The ISO 3166 input format of the country.</dt><dd><ul>
+<li><p>’auto’: infer the input format</p></li>
+<li><p>’name’: country name (‘United States’)</p></li>
+<li><p>’official’: official state name (‘United States of America’)</p></li>
+<li><p>’alpha-2’: alpha-2 code (‘US’)</p></li>
+<li><p>’alpha-3’: alpha-3 code (‘USA’)</p></li>
+<li><p>’numeric’: numeric code (840)</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘auto’)</p>
+</p></li>
+<li><p><strong>strict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, matching for input formats ‘name’ and ‘official’ are done by
+looking for a direct match, if False, matching is done by searching
+the input for a regex match.</p>
+<p>(default: False)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_country</span><span class="p">(</span><span class="s1">&#39;United States&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;country&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Canada&#39;</span><span class="p">,</span> <span class="s1">&#39;NaN&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_country</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">])</span>
+<span class="go">0     True</span>
+<span class="go">1    False</span>
+<span class="go">Name: country, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_date">
+<span id="dates-and-times"></span><h2>Dates and Times<a class="headerlink" href="#module-dataprep.clean.clean_date" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing dates and times.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_date.clean_date">
+<code class="sig-prename descclassname">dataprep.clean.clean_date.</code><code class="sig-name descname">clean_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'YYYY-MM-DD hh:mm:ss'</span></em>, <em class="sig-param"><span class="n">input_timezone</span><span class="o">=</span><span class="default_value">'UTC'</span></em>, <em class="sig-param"><span class="n">output_timezone</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">fix_missing</span><span class="o">=</span><span class="default_value">'minimum'</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_date.html#clean_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_date.clean_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize dates and times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing dates.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The desired format of the date.</p>
+<p>(default: ‘YYYY-MM-DD hh:mm:ss’)</p>
+</p></li>
+<li><p><strong>input_timezone</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>Time zone of the input date.</p>
+<p>(default: ‘UTC’)</p>
+</p></li>
+<li><p><strong>output_timezone</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The desired time zone of the date.</p>
+<p>(default: ‘’)</p>
+</p></li>
+<li><p><strong>fix_missing</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>Specify how to fill missing components of a date value.</dt><dd><ul>
+<li><p>’minimum’: fill hours, minutes, seconds with zeros, and month, day, year with             January 1st, 2000.</p></li>
+<li><p>’current’: fill with the current date and time.</p></li>
+<li><p>’empty’: don’t fill missing components.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘minimum’)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Thu Sep 25 2003&#39;</span><span class="p">,</span> <span class="s1">&#39;Thu 10:36:28&#39;</span><span class="p">,</span> <span class="s1">&#39;2003 09 25&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_date</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span>
+<span class="go">Dates Cleaning Report:</span>
+<span class="go">    3 values cleaned (100.0%)</span>
+<span class="go">Result contains 3 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="go">            date           date_clean</span>
+<span class="go">0  Thu Sep 25 2003  2003-09-25 00:00:00</span>
+<span class="go">1     Thu 10:36:28  2000-01-01 10:36:28</span>
+<span class="go">2       2003 09 25  2003-09-25 00:00:00</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_date.validate_date">
+<code class="sig-prename descclassname">dataprep.clean.clean_date.</code><code class="sig-name descname">validate_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_date.html#validate_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_date.validate_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate dates and times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of dates or a date string</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_date</span><span class="p">(</span><span class="s1">&#39;3rd of May 2001&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2003/09/25&#39;</span><span class="p">,</span> <span class="s1">&#39;This is Sep.&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_date</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
+<span class="go">0     True</span>
+<span class="go">1    False</span>
+<span class="go">Name: date, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_email">
+<span id="email-addresses"></span><h2>Email Addresses<a class="headerlink" href="#module-dataprep.clean.clean_email" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing email addresses.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_email.clean_email">
+<code class="sig-prename descclassname">dataprep.clean.clean_email.</code><code class="sig-name descname">clean_email</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">remove_whitespace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fix_domain</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_email.html#clean_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_email.clean_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize email address.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_email.html#email-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing email addresses.</p></li>
+<li><p><strong>remove_whitespace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, remove all whitespace from the input value before
+verifying and cleaning it.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>fix_domain</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <dl class="simple">
+<dt>If True, for invalid email domains, try to fix it using 4 strategies:</dt><dd><ul>
+<li><p>Swap neighboring characters.</p></li>
+<li><p>Add a single character.</p></li>
+<li><p>Remove a single character.</p></li>
+<li><p>Swap each character with its nearby keys on the qwerty keyboard.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The first valid domain found will be returned.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, split a column containing email addresses into one column
+for the usernames and another column for the domains.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Else, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Abc.example.com&#39;</span><span class="p">,</span> <span class="s1">&#39;Abc@example.com&#39;</span><span class="p">,</span> <span class="s1">&#39;H ELLO@hotmal.COM&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_email</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">)</span>
+<span class="go">Email Cleaning Report:</span>
+<span class="go">    2 values with bad format (66.67%)</span>
+<span class="go">Result contains 1 (33.33%) values in the correct format and 2 null values (66.67%)</span>
+<span class="go">            email      email_clean</span>
+<span class="go">0    Abc.example.com              NaN</span>
+<span class="go">1    Abc@example.com  abc@example.com</span>
+<span class="go">2  H ELLO@hotmal.COM              NaN</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_email.validate_email">
+<code class="sig-prename descclassname">dataprep.clean.clean_email.</code><code class="sig-name descname">validate_email</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_email.html#validate_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_email.validate_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate email addresses.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_email.html#email-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of emails or a string containing an email.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_email</span><span class="p">(</span><span class="s1">&#39;Abc.example@com&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;abc.example.com&#39;</span><span class="p">,</span> <span class="s1">&#39;HELLO@HOTMAIL.COM&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_email</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">])</span>
+<span class="go">0    False</span>
+<span class="go">1     True</span>
+<span class="go">Name: email, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_lat_long">
+<span id="geographic-coordinates"></span><h2>Geographic Coordinates<a class="headerlink" href="#module-dataprep.clean.clean_lat_long" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing geographic coordinates.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_lat_long.clean_lat_long">
+<code class="sig-prename descclassname">dataprep.clean.clean_lat_long.</code><code class="sig-name descname">clean_lat_long</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">lat_long</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lat_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">long_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'dd'</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_lat_long.html#clean_lat_long"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_lat_long.clean_lat_long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize latitude and longitude coordinates.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_lat_long.html#clean-lat-long-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>lat_long</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the column containing latitude and longitude coordinates.</p></li>
+<li><p><strong>lat_col</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – <p>The name of the column containing latitude coordinates.</p>
+<p>If specified, the parameter lat_long must be None.</p>
+</p></li>
+<li><p><strong>long_col</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – <p>The name of the column containing longitude coordinates.</p>
+<p>If specified, the parameter lat_long must be None.</p>
+</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The desired format of the coordinates.</dt><dd><ul>
+<li><p>’dd’: decimal degrees (51.4934, 0.0098)</p></li>
+<li><p>’ddh’: decimal degrees with hemisphere (‘51.4934° N, 0.0098° E’)</p></li>
+<li><p>’dm’: degrees minutes (‘51° 29.604′ N, 0° 0.588′ E’)</p></li>
+<li><p>’dms’: degrees minutes seconds (‘51° 29′ 36.24″ N, 0° 0′ 35.28″ E’)</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘dd’)</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, split the latitude and longitude coordinates into one column
+for latitude and a separate column for longitude. Otherwise, merge
+the latitude and longitude coordinates into one column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column(s) containing the data that was cleaned. Otherwise,
+keep the original column(s).</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Split a column containing latitude and longitude strings into separate
+columns in decimal degrees format.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;coord&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;</span><span class="p">,</span> <span class="s1">&#39;51.4934° N, 0.0098° E&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_lat_long</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;coord&#39;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">Latitude and Longitude Cleaning Report:</span>
+<span class="go">    2 values cleaned (100.0%)</span>
+<span class="go">Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="go">                        coord  latitude  longitude</span>
+<span class="go">0  51° 29′ 36.24″ N, 0° 0′ 35.28″ E   51.4934     0.0098</span>
+<span class="go">1             51.4934° N, 0.0098° E   51.4934     0.0098</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_lat_long.validate_lat_long">
+<code class="sig-prename descclassname">dataprep.clean.clean_lat_long.</code><code class="sig-name descname">validate_lat_long</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lat_long</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lat</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">lon</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_lat_long.html#validate_lat_long"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_lat_long.validate_lat_long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate latitude and longitude coordinates.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_lat_long.html#clean-lat-long-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – A pandas Series, string, float, or tuple of floats, containing the latitude
+and/or longitude coordinates to be validated.</p></li>
+<li><p><strong>lat_long</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, valid values contain latitude and longitude coordinates. Parameters
+lat and lon must be False if lat_long is True.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>lat</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <dl class="simple">
+<dt>If True, valid values contain only latitude coordinates. Parameters</dt><dd><p>lat_long and lon must be False if lat is True.</p>
+</dd>
+</dl>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>lon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, valid values contain only longitude coordinates. Parameters
+lat_long and lat must be False if lon is True.</p>
+<p>(default: False)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Validate a coordinate string or series of coordinates.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_lat_long</span><span class="p">(</span><span class="s1">&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;coordinates&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;51° 29′ 36.24″ N, 0° 0′ 35.28″ E&#39;</span><span class="p">,</span> <span class="s1">&#39;NaN&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_lat_long</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">])</span>
+<span class="go">0     True</span>
+<span class="go">1    False</span>
+<span class="go">Name: coordinates, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_ip">
+<span id="ip-addresses"></span><h2>IP Addresses<a class="headerlink" href="#module-dataprep.clean.clean_ip" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing IP addresses.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_ip.clean_ip">
+<code class="sig-prename descclassname">dataprep.clean.clean_ip.</code><code class="sig-name descname">clean_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'compressed'</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ip.html#clean_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_ip.clean_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize IP addresses.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_ip.html#ip-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing IP addresses.</p></li>
+<li><p><strong>input_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The input format of the IP addresses.</dt><dd><ul>
+<li><p>’auto’: parse both ipv4 and ipv6 addresses.</p></li>
+<li><p>’ipv4’: only parse ipv4 addresses.</p></li>
+<li><p>’ipv6’: only parse ipv6 addresses.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘auto’)</p>
+</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The desired output format of the IP addresses.</dt><dd><ul>
+<li><p>’compressed’: compressed representation (‘12.3.4.5’)</p></li>
+<li><p>’full’: full representation (‘0012.0003.0004.0005’)</p></li>
+<li><p>’binary’: binary representation (‘00001100000000110000010000000101’)</p></li>
+<li><p>’hexa’: hexadecimal representation (‘0xc030405’)</p></li>
+<li><p>’integer’: integer representation (201524229)</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘compressed’)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2001:0db8:85a3:0000:0000:8a2e:0370:7334&#39;</span><span class="p">,</span> <span class="s1">&#39;233.5.6.000&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_ip</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;ip&#39;</span><span class="p">)</span>
+<span class="go">IP Cleaning Report:</span>
+<span class="go">    2 values cleaned (100.0%)</span>
+<span class="go">Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="go">                                        ip                      ip_clean</span>
+<span class="go">0  2001:0db8:85a3:0000:0000:8a2e:0370:7334  2001:db8:85a3::8a2e:370:7334</span>
+<span class="go">1                              233.5.6.000                     233.5.6.0</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_ip.validate_ip">
+<code class="sig-prename descclassname">dataprep.clean.clean_ip.</code><code class="sig-name descname">validate_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ip.html#validate_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_ip.validate_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate IP addresses.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_ip.html#ip-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of IP addresses or a str ip address value</p></li>
+<li><p><strong>input_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The IP address format to validate.</dt><dd><ul>
+<li><p>’auto’: validate both ipv4 and ipv6 addresses.</p></li>
+<li><p>’ipv4’: only validate ipv4 addresses.</p></li>
+<li><p>’ipv6’: only validate ipv6 addresses.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘auto’)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_ip</span><span class="p">(</span><span class="s1">&#39;fdf8:f53b:82e4::53&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;fdf8:f53b:82e4::53&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_ip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ip&#39;</span><span class="p">])</span>
+<span class="go">0     True</span>
+<span class="go">1    False</span>
+<span class="go">Name: ip, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_phone">
+<span id="phone-numbers"></span><h2>Phone Numbers<a class="headerlink" href="#module-dataprep.clean.clean_phone" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing phone numbers.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_phone.clean_phone">
+<code class="sig-prename descclassname">dataprep.clean.clean_phone.</code><code class="sig-name descname">clean_phone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'nanp'</span></em>, <em class="sig-param"><span class="n">fix_missing</span><span class="o">=</span><span class="default_value">'empty'</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_phone.html#clean_phone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_phone.clean_phone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize phone numbers.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_phone.html#phone-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing phone numbers.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The desired format of the phone numbers.</dt><dd><ul>
+<li><p>’nanp’: ‘NPA-NXX-XXXX’</p></li>
+<li><p>’e164’: ‘+1NPANXXXXXX’</p></li>
+<li><p>’national’: ‘(NPA) NXX-XXXX’</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘nanp’)</p>
+</p></li>
+<li><p><strong>fix_missing</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>Fix the missing country code of a parsed phone number.</dt><dd><ul>
+<li><p>’empty’: leave the missing component as is.</p></li>
+<li><p>’auto’: set the country code to a default value (1).</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘empty’)</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, split a column containing a phone number into different
+columns containing individual components.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Else, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, enable the progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;phone&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;555-234-5678&#39;</span><span class="p">,</span> <span class="s1">&#39;(555) 234-5678&#39;</span><span class="p">,</span> <span class="s1">&#39;555.234.5678&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_phone</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">)</span>
+<span class="go">Phone Number Cleaning Report:</span>
+<span class="go">    2 values cleaned (66.67%)</span>
+<span class="go">Result contains 3 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="go">            phone   phone_clean</span>
+<span class="go">0    555-234-5678  555-234-5678</span>
+<span class="go">1  (555) 234-5678  555-234-5678</span>
+<span class="go">2    555.234.5678  555-234-5678</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_phone.validate_phone">
+<code class="sig-prename descclassname">dataprep.clean.clean_phone.</code><code class="sig-name descname">validate_phone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_phone.html#validate_phone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_phone.validate_phone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate phone numbers.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_phone.html#phone-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of phone numbers or a string/int containing a phone number.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_phone</span><span class="p">(</span><span class="s1">&#39;1 800 234 6789&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;phone&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1234567</span><span class="p">,</span> <span class="s1">&#39;1234&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_phone</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;phone&#39;</span><span class="p">])</span>
+<span class="go">0     True</span>
+<span class="go">1    False</span>
+<span class="go">Name: phone, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_url">
+<span id="urls"></span><h2>URLs<a class="headerlink" href="#module-dataprep.clean.clean_url" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing URLs.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_url.clean_url">
+<code class="sig-prename descclassname">dataprep.clean.clean_url.</code><code class="sig-name descname">clean_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">remove_auth</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_url.html#clean_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_url.clean_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize URLs.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_url.html#url-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing URL addresses.</p></li>
+<li><p><strong>remove_auth</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – <p>Can be a boolean value or list of strings representing the names of
+Auth queries to be removed. If True, remove default Auth values. If
+False, do not remove Auth values.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, split the URL into the scheme, hostname, queries, cleaned_url columns.
+If False, return a column of dictionaries with the relavant
+information (e.g., scheme, hostname, etc.) as key-value pairs.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Split a URL into its components.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;https://github.com/sfu-db/dataprep&#39;</span><span class="p">,</span><span class="s1">&#39;https://www.google.com/&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_url</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">)</span>
+<span class="go">URL Cleaning Report:</span>
+<span class="go">    2 values parsed (100.0%)</span>
+<span class="go">Result contains 2 (100.0%) parsed key-value pairs and 0 null values (0.0%)</span>
+<span class="go">                                url                                        url_details</span>
+<span class="go">0  https://github.com/sfu-db/dataprep  {&#39;scheme&#39;: &#39;https&#39;, &#39;host&#39;: &#39;github.com&#39;, &#39;url...</span>
+<span class="go">1             https://www.google.com/  {&#39;scheme&#39;: &#39;https&#39;, &#39;host&#39;: &#39;www.google.com&#39;, ...</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_url.validate_url">
+<code class="sig-prename descclassname">dataprep.clean.clean_url.</code><code class="sig-name descname">validate_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_url.html#validate_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_url.validate_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate URLs.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_url.html#url-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of URLs or string URL.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_url</span><span class="p">(</span><span class="s1">&#39;https://github.com/sfu-db/dataprep&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;https://www.google.com/&#39;</span><span class="p">,</span> <span class="s1">&#39;NaN&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_url</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+<span class="go">0     True</span>
+<span class="go">1    False</span>
+<span class="go">Name: url, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_address">
+<span id="us-street-addresses"></span><h2>US Street Addresses<a class="headerlink" href="#module-dataprep.clean.clean_address" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing US street addresses.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_address.clean_address">
+<code class="sig-prename descclassname">dataprep.clean.clean_address.</code><code class="sig-name descname">clean_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'(building) house_number street_prefix_abbr street_name street_suffix_abbr apartment, city, state_abbr zipcode'</span></em>, <em class="sig-param"><span class="n">must_contain</span><span class="o">=</span><span class="default_value">('house_number', 'street_name')</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#clean_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_address.clean_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and standardize US street addresses.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_address.html#address-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing addresses.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The output format can be specified using the following keywords.</dt><dd><ul>
+<li><p>’house_number’: ‘1234’</p></li>
+<li><p>’street_prefix_abbr’: ‘N’, ‘S’, ‘E’, or ‘W’</p></li>
+<li><p>’street_prefix_full’: ‘North’, ‘South’, ‘East’, or ‘West’</p></li>
+<li><p>’street_name’: ‘Main’</p></li>
+<li><p>’street_suffix_abbr’: ‘St’, ‘Ave’</p></li>
+<li><p>’street_suffix_full’: ‘Street’, ‘Avenue’</p></li>
+<li><p>’apartment’: ‘Apt 1’</p></li>
+<li><p>’building’: ‘Staples Center’</p></li>
+<li><p>’city’: ‘Los Angeles’</p></li>
+<li><p>’state_abbr’: ‘CA’</p></li>
+<li><p>’state_full’: ‘California’</p></li>
+<li><p>’zipcode’: ‘57903’</p></li>
+</ul>
+</dd>
+</dl>
+<p>The output_format can contain ‘\t’ characters to specify how to split the output into
+columns.</p>
+<p>(default: ‘(building) house_number street_prefix_abbr street_name street_suffix_abbr
+apartment, city, state_abbr zipcode’)</p>
+</p></li>
+<li><p><strong>must_contain</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]) – <p>A tuple containing parts of the address that must be included for the address to be
+successfully cleaned.</p>
+<blockquote>
+<div><ul>
+<li><p>’house_number’: ‘1234’</p></li>
+<li><p>’street_prefix’: ‘N’, ‘North’</p></li>
+<li><p>’street_name’: ‘Main’</p></li>
+<li><p>’street_suffix’: ‘St’, ‘Avenue’</p></li>
+<li><p>’apartment’: ‘Apt 1’</p></li>
+<li><p>’building’: ‘Staples Center’</p></li>
+<li><p>’city’: ‘Los Angeles’</p></li>
+<li><p>’state’: ‘CA’, ‘California’</p></li>
+<li><p>’zipcode’: ‘57903’</p></li>
+</ul>
+</div></blockquote>
+<p>(default: (‘house_number’, ‘street_name’))</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, each component of the address specified by the output_format parameter will be put
+into it’s own column.</p>
+<p>For example if output_format = “house_number street_name” and split = True, then there
+will be one column for house_number and another for street_name.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
+keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>How to handle parsing errors.</dt><dd><ul>
+<li><p>‘coerce’: invalid parsing will be set to NaN.</p></li>
+<li><p>‘ignore’: invalid parsing will return the input.</p></li>
+<li><p>‘raise’: invalid parsing will raise an exception.</p></li>
+</ul>
+</dd>
+</dl>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, output the summary report. Otherwise, no report is outputted.</p>
+<p>(default: True)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean addresses and add the house number and street name to separate columns.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;123 pine avenue&#39;</span><span class="p">,</span> <span class="s1">&#39;1234 w main st 57033&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_address</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;house_number </span><span class="se">\t</span><span class="s1"> street_name&#39;</span><span class="p">)</span>
+<span class="go">Address Cleaning Report:</span>
+<span class="go">        2 values cleaned (100.0%)</span>
+<span class="go">Result contains 2 (100.0%) values in the correct format and 0 null values (0.0%)</span>
+<span class="go">    address                house_number      street_name</span>
+<span class="go">0    123 pine avenue           123             Pine</span>
+<span class="go">1   1234 w main st 57033       1234            Main</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_address.validate_address">
+<code class="sig-prename descclassname">dataprep.clean.clean_address.</code><code class="sig-name descname">validate_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">must_contain</span><span class="o">=</span><span class="default_value">('house_number', 'street_name')</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#validate_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_address.validate_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate US street addresses.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_address.html#address-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of addresses or a string containing an address.</p></li>
+<li><p><strong>must_contain</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]) – <p>A tuple containing parts of the address that must be included for the
+address to be successfully cleaned.</p>
+<blockquote>
+<div><ul>
+<li><p>’house_number’: ‘1234’</p></li>
+<li><p>’street_prefix’: ‘N’, ‘North’</p></li>
+<li><p>’street_name’: ‘Main’</p></li>
+<li><p>’street_suffix’: ‘St’, ‘Avenue’</p></li>
+<li><p>’apartment’: ‘Apt 1’</p></li>
+<li><p>’building’: ‘Staples Center’</p></li>
+<li><p>’city’: ‘Los Angeles’</p></li>
+<li><p>’state’: ‘CA’, ‘California’</p></li>
+<li><p>’zipcode’: ‘57903’</p></li>
+</ul>
+</div></blockquote>
+<p>(default: (‘house_number’, ‘street_name’))</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;123 pine avenue&#39;</span><span class="p">,</span> <span class="s1">&#39;NULL&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_address</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">])</span>
+<span class="go">0    True</span>
+<span class="go">1    False</span>
+<span class="go">Name: address, dtype: bool</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

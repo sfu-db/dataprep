@@ -18,6 +18,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dataprep.data_connector" href="dataprep.connector.html" />
@@ -166,6 +167,12 @@
               </li>
             
           
+            
+              <li class="">
+                  <a href="dataprep.clean.html">DataPrep.Clean</a>
+              </li>
+            
+          
         
       
         
@@ -194,11 +201,15 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#report" class="nav-link">Report</a>
+          <a href="#module-dataprep.eda.container" class="nav-link">Container</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.eda.utils" class="nav-link">Utils</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.eda.configs" class="nav-link">Config</a>
         </li>
       
     </ul>
@@ -463,8 +474,64 @@ This is immutable.</p>
 <span id="palette"></span><h2>Palette<a class="headerlink" href="#module-dataprep.eda.palette" title="Permalink to this headline">¶</a></h2>
 <p>This file defines palettes used for EDA.</p>
 </div>
-<div class="section" id="report">
-<h2>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-dataprep.eda.container">
+<span id="container"></span><h2>Container<a class="headerlink" href="#module-dataprep.eda.container" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the Container class.</p>
+<dl class="py class">
+<dt id="dataprep.eda.container.Container">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.container.</code><code class="sig-name descname">Container</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_render</span></em>, <em class="sig-param"><span class="n">visual_type</span></em>, <em class="sig-param"><span class="n">cfg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/container.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.container.Container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class creates a customized Container object for the plot* function.</p>
+<dl class="py method">
+<dt id="dataprep.eda.container.Container.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/container.html#Container.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.container.Container.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.container.Container.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/container.html#Container.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.container.Container.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the report. This is useful when calling plot in a for loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.container.Container.show_browser">
+<code class="sig-name descname">show_browser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/container.html#Container.show_browser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.container.Container.show_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the plot in the browser. This is useful when plotting
+from terminmal or when the fig is very large in notebook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.container.Context">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.container.</code><code class="sig-name descname">Context</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">param</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/container.html#Context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.container.Context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define the context class that stores all the parameters needed by template engine.
+The instance is read-only.</p>
+<p>Since we use same template to render different components without strict evaluation,
+when the engine tries to read an attribute from Context object, it will get None if
+the attribute doesn’t exist, making the rendering keep going instead of being
+interrupted.</p>
+<p>Here we override __getitem__() and __getattr__() to do the trick, it also makes
+the object have a key-value pair which works as same as accessing its attribute.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dataprep.eda.utils">
 <span id="utils"></span><h2>Utils<a class="headerlink" href="#module-dataprep.eda.utils" title="Permalink to this headline">¶</a></h2>
@@ -524,6 +591,1757 @@ not from the distribution of <cite>arr</cite>’s elems.</p>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
 </dd>
 </dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.eda.configs">
+<span id="config"></span><h2>Config<a class="headerlink" href="#module-dataprep.eda.configs" title="Permalink to this headline">¶</a></h2>
+<p>Parameter configurations</p>
+<p>This file contains configurations for stats, auto-insights and plots. There are mainly two settings,
+“display” and “config”. Display is a list of Tab names which control the Tabs to show.
+Config is a dictionary that contains the customizable parameters and corresponding values.
+There are two types of parameters, global and local. Local parameters are plot-specified and
+the names are separated  by “.”. The portion before the first “.” is plot name and the portion
+after the first “.” is parameter name. e.g. “hist.bins”. The “.” is also used when the parameter
+name contains more than one word. e.g. “insight.duplicates.threshold”. However, in the codebase,
+the “.” is replaced with “__” for parameters with long names.e.g. “insight.duplicates__threshold”.
+Global parameter is single-word. It applies to all the plots which has that parameter.
+e.g. “bins:50” applies to “hist.bins”, “line.bins”, “kde.bins”, “wordlen.bins” and “box.bins”.
+In addition,when global parameter and local parameter are both entered by a user in config,
+the global parameter will be overwrote by local parameters for specific plots.</p>
+<dl class="py class">
+<dt id="dataprep.eda.configs.Bar">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Bar</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Bar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>bars: int, default 10</dt><dd><p>Maximum number of bars to display</p>
+</dd>
+<dt>sort_descending: bool, default True</dt><dd><p>Whether to sort the bars in descending order</p>
+</dd>
+<dt>yscale: str, default “linear”</dt><dd><p>Y-axis scale (“linear” or “log”)</p>
+</dd>
+<dt>color: str, default “#1f77b4”</dt><dd><p>Color of the bar chart</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.bars">
+<code class="sig-name descname">bars</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Bar.bars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.color">
+<code class="sig-name descname">color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Bar.color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Bar.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Bar.grid_how_to_guide">
+<code class="sig-name descname">grid_how_to_guide</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Bar.grid_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Bar.grid_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Bar.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Bar.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Bar.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Bar.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Bar.missing_how_to_guide">
+<code class="sig-name descname">missing_how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Bar.missing_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Bar.missing_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot_missing(df, x, [y])</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.sort_descending">
+<code class="sig-name descname">sort_descending</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Bar.sort_descending" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Bar.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Bar.yscale">
+<code class="sig-name descname">yscale</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Bar.yscale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Box">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Box</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>ngroups: int, default 15</dt><dd><p>Maximum number of groups to display</p>
+</dd>
+<dt>bins: int, default 50</dt><dd><p>Number of bins</p>
+</dd>
+<dt>unit: str, default “auto”</dt><dd><p>Defines the time unit to group values over for a datetime column.
+It can be “year”, “quarter”, “month”, “week”, “day”, “hour”,
+“minute”, “second”. With default value “auto”, it will use the
+time unit such that the resulting number of groups is closest to 15</p>
+</dd>
+<dt>sort_descending: bool, default True</dt><dd><p>Whether to sort the boxes in descending order of frequency</p>
+</dd>
+<dt>color: str, default “#d62728</dt><dd><p>Color of the box_plot</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.bins">
+<code class="sig-name descname">bins</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Box.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.color">
+<code class="sig-name descname">color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Box.color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Box.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Box.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.ngroups">
+<code class="sig-name descname">ngroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Box.ngroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Box.nom_cont_how_to_guide">
+<code class="sig-name descname">nom_cont_how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Box.nom_cont_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Box.nom_cont_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, nominal, continuous)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.sort_descending">
+<code class="sig-name descname">sort_descending</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Box.sort_descending" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Box.two_cont_how_to_guide">
+<code class="sig-name descname">two_cont_how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Box.two_cont_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Box.two_cont_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, continuous, continuous)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.unit">
+<code class="sig-name descname">unit</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Box.unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Box.univar_how_to_guide">
+<code class="sig-name descname">univar_how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Box.univar_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Box.univar_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Box.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Box.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.CDF">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">CDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#CDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.CDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>sample_size:</dt><dd><p>Number of evenly spaced samples between the minimum and maximum values to compute the cdf at</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.CDF.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.CDF.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.CDF.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.CDF.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.CDF.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#CDF.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.CDF.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.CDF.sample_size">
+<code class="sig-name descname">sample_size</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.CDF.sample_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.CDF.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.CDF.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Config">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Config</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<p>Configuration class</p>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.bar">
+<code class="sig-name descname">bar</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Bar" title="dataprep.eda.configs.Bar">dataprep.eda.configs.Bar</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.bar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.box">
+<code class="sig-name descname">box</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Box" title="dataprep.eda.configs.Box">dataprep.eda.configs.Box</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.cdf">
+<code class="sig-name descname">cdf</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.CDF" title="dataprep.eda.configs.CDF">dataprep.eda.configs.CDF</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.correlations">
+<code class="sig-name descname">correlations</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Correlations" title="dataprep.eda.configs.Correlations">dataprep.eda.configs.Correlations</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.correlations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.dendro">
+<code class="sig-name descname">dendro</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Dendrogram" title="dataprep.eda.configs.Dendrogram">dataprep.eda.configs.Dendrogram</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.dendro" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Config.from_dict">
+<em class="property">classmethod </em><code class="sig-name descname">from_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">display</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Config.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Config.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an dictionary instance into a config class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataprep.eda.configs.Config" title="dataprep.eda.configs.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.heatmap">
+<code class="sig-name descname">heatmap</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Heatmap" title="dataprep.eda.configs.Heatmap">dataprep.eda.configs.Heatmap</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.heatmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.hexbin">
+<code class="sig-name descname">hexbin</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Hexbin" title="dataprep.eda.configs.Hexbin">dataprep.eda.configs.Hexbin</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.hexbin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.hist">
+<code class="sig-name descname">hist</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Hist" title="dataprep.eda.configs.Hist">dataprep.eda.configs.Hist</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.insight">
+<code class="sig-name descname">insight</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Insight" title="dataprep.eda.configs.Insight">dataprep.eda.configs.Insight</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.insight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.interactions">
+<code class="sig-name descname">interactions</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Interactions" title="dataprep.eda.configs.Interactions">dataprep.eda.configs.Interactions</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.interactions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.kde">
+<code class="sig-name descname">kde</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.KDE" title="dataprep.eda.configs.KDE">dataprep.eda.configs.KDE</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.kde" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.kendall">
+<code class="sig-name descname">kendall</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.KendallTau" title="dataprep.eda.configs.KendallTau">dataprep.eda.configs.KendallTau</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.kendall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.line">
+<code class="sig-name descname">line</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Line" title="dataprep.eda.configs.Line">dataprep.eda.configs.Line</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.missingvalues">
+<code class="sig-name descname">missingvalues</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.MissingValues" title="dataprep.eda.configs.MissingValues">dataprep.eda.configs.MissingValues</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.missingvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.nested">
+<code class="sig-name descname">nested</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Nested" title="dataprep.eda.configs.Nested">dataprep.eda.configs.Nested</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.nested" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.overview">
+<code class="sig-name descname">overview</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Overview" title="dataprep.eda.configs.Overview">dataprep.eda.configs.Overview</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.overview" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.pdf">
+<code class="sig-name descname">pdf</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.PDF" title="dataprep.eda.configs.PDF">dataprep.eda.configs.PDF</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.pdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.pearson">
+<code class="sig-name descname">pearson</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Pearson" title="dataprep.eda.configs.Pearson">dataprep.eda.configs.Pearson</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.pearson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.pie">
+<code class="sig-name descname">pie</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Pie" title="dataprep.eda.configs.Pie">dataprep.eda.configs.Pie</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.pie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.plot">
+<code class="sig-name descname">plot</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Plot" title="dataprep.eda.configs.Plot">dataprep.eda.configs.Plot</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.qqnorm">
+<code class="sig-name descname">qqnorm</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.QQNorm" title="dataprep.eda.configs.QQNorm">dataprep.eda.configs.QQNorm</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.qqnorm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.scatter">
+<code class="sig-name descname">scatter</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Scatter" title="dataprep.eda.configs.Scatter">dataprep.eda.configs.Scatter</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.spearman">
+<code class="sig-name descname">spearman</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Spearman" title="dataprep.eda.configs.Spearman">dataprep.eda.configs.Spearman</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.spearman" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.spectrum">
+<code class="sig-name descname">spectrum</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Spectrum" title="dataprep.eda.configs.Spectrum">dataprep.eda.configs.Spectrum</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.spectrum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.stacked">
+<code class="sig-name descname">stacked</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Stacked" title="dataprep.eda.configs.Stacked">dataprep.eda.configs.Stacked</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.stacked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.stats">
+<code class="sig-name descname">stats</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Stats" title="dataprep.eda.configs.Stats">dataprep.eda.configs.Stats</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.variables">
+<code class="sig-name descname">variables</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.Variables" title="dataprep.eda.configs.Variables">dataprep.eda.configs.Variables</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.wordcloud">
+<code class="sig-name descname">wordcloud</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.WordCloud" title="dataprep.eda.configs.WordCloud">dataprep.eda.configs.WordCloud</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.wordcloud" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.wordfreq">
+<code class="sig-name descname">wordfreq</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.WordFrequency" title="dataprep.eda.configs.WordFrequency">dataprep.eda.configs.WordFrequency</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.wordfreq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Config.wordlen">
+<code class="sig-name descname">wordlen</code><em class="property">: <a class="reference internal" href="#dataprep.eda.configs.WordLength" title="dataprep.eda.configs.WordLength">dataprep.eda.configs.WordLength</a></em><a class="headerlink" href="#dataprep.eda.configs.Config.wordlen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Correlations">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Correlations</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Correlations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Correlations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Correlations.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Correlations.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Dendrogram">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Dendrogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Dendrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Dendrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Dendrogram.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Dendrogram.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Dendrogram.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Dendrogram.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Dendrogram.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Dendrogram.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Dendrogram.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Dendrogram.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Dendrogram.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Heatmap">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Heatmap</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Heatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Heatmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>ngroups: int, default 10</dt><dd><p>Maximum number of most frequent values from the first column to display</p>
+</dd>
+<dt>nsubgroups: int, default 5</dt><dd><p>Maximum number of most frequent values from the second column to display (computed
+on the filtered data consisting of the most frequent values from the first column)</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Heatmap.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Heatmap.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Heatmap.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Heatmap.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Heatmap.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Heatmap.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Heatmap.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, nominal, nominal)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Heatmap.missing_how_to_guide">
+<code class="sig-name descname">missing_how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Heatmap.missing_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Heatmap.missing_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot_missing(df)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Heatmap.ngroups">
+<code class="sig-name descname">ngroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Heatmap.ngroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Heatmap.nsubgroups">
+<code class="sig-name descname">nsubgroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Heatmap.nsubgroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Heatmap.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Heatmap.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Hexbin">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Hexbin</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Hexbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Hexbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>tile_size: float, default “auto”</dt><dd><p>The size of the tile in the hexbin plot. Measured from the middle
+of a hexagon to its left or right corner.</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hexbin.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Hexbin.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hexbin.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Hexbin.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Hexbin.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tile_size</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Hexbin.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Hexbin.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hexbin.tile_size">
+<code class="sig-name descname">tile_size</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Hexbin.tile_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hexbin.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Hexbin.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Hist">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Hist</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Hist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>bins: int, default 50</dt><dd><p>Number of bins in the histogram</p>
+</dd>
+<dt>yscale: str, default “linear”</dt><dd><p>Y-axis scale (“linear” or “log”)</p>
+</dd>
+<dt>color: str, default “#aec7e8”</dt><dd><p>Color of the histogram</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hist.bins">
+<code class="sig-name descname">bins</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Hist.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hist.color">
+<code class="sig-name descname">color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Hist.color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hist.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Hist.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Hist.grid_how_to_guide">
+<code class="sig-name descname">grid_how_to_guide</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Hist.grid_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Hist.grid_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hist.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Hist.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Hist.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Hist.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Hist.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hist.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Hist.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Hist.yscale">
+<code class="sig-name descname">yscale</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Hist.yscale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Insight">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Insight</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Insight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Insight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>duplicates__threshold: int, default 1</dt><dd><p>Warn if the percent of duplicated values is above this threshold</p>
+</dd>
+<dt>similar_distribution__threshold:float, default 0.05</dt><dd><p>The significance level for Kolmogorov–Smirnov test</p>
+</dd>
+<dt>uniform__threshold: float, default 0.999</dt><dd><p>The p-value threshold for chi-square test</p>
+</dd>
+<dt>missing__threshold: int, default 1</dt><dd><p>Warn if the percent of missing values is above this threshold</p>
+</dd>
+<dt>skewed__threshold: float, default 1e-5</dt><dd><p>The p-value for the scipy.skewtest which test whether the skew is
+different from the normal distributionin</p>
+</dd>
+<dt>infinity__threshold: int, default 1</dt><dd><p>Warn if the percent of infinites is above this threshold</p>
+</dd>
+<dt>zeros__threshold: int, default 5</dt><dd><p>Warn if the percent of zeros is above this threshold</p>
+</dd>
+<dt>negatives__threshold: int, default 1</dt><dd><p>Warn if the percent of negatives is above this threshold</p>
+</dd>
+<dt>normal__threshold: float, default 0.99</dt><dd><p>The p-value threshold for normal test, it is based on D’Agostino and Pearson’s test that
+combines skew and kurtosis to produce an omnibus test of normality</p>
+</dd>
+<dt>high_cardinality__threshold: int, default 50</dt><dd><p>The threshold for unique values count, count larger than threshold yields high cardinality</p>
+</dd>
+<dt>constant__threshold: int, default 1</dt><dd><p>The threshold for unique values count, count equals to threshold yields constant value</p>
+</dd>
+<dt>outstanding_no1__threshold: float, default 1.5</dt><dd><p>The threshold for outstanding no1 insight, measures the ratio of the largest category count
+to the second-largest category count</p>
+</dd>
+<dt>attribution__threshold: float, default 0.5</dt><dd><p>The threshold for the attribution insight, measures the percentage of the top 2 categories</p>
+</dd>
+<dt>high_word_cardinality__threshold: int, default 1000</dt><dd><p>The threshold for the high word cardinality insight, which measures the number of words of
+that cateogory</p>
+</dd>
+<dt>outstanding_no1_word__threshold: int, default 0</dt><dd><p>The threshold for the outstanding no1 word threshold, which measures the ratio of the most
+frequent word count to the second most frequent word count</p>
+</dd>
+<dt>outlier__threshold: int, default 0</dt><dd><p>The threshold for the outlier count in the box plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.attribution__threshold">
+<code class="sig-name descname">attribution__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.attribution__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.constant__threshold">
+<code class="sig-name descname">constant__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.constant__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.duplicates__threshold">
+<code class="sig-name descname">duplicates__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.duplicates__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Insight.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.high_cardinality__threshold">
+<code class="sig-name descname">high_cardinality__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.high_cardinality__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.high_word_cardinality__threshold">
+<code class="sig-name descname">high_word_cardinality__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.high_word_cardinality__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.infinity__threshold">
+<code class="sig-name descname">infinity__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.infinity__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.missing__threshold">
+<code class="sig-name descname">missing__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.missing__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.negatives__threshold">
+<code class="sig-name descname">negatives__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.negatives__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.normal__threshold">
+<code class="sig-name descname">normal__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.normal__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.outlier__threshold">
+<code class="sig-name descname">outlier__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.outlier__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.outstanding_no1__threshold">
+<code class="sig-name descname">outstanding_no1__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.outstanding_no1__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.outstanding_no1_word__threshold">
+<code class="sig-name descname">outstanding_no1_word__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.outstanding_no1_word__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.similar_distribution__threshold">
+<code class="sig-name descname">similar_distribution__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.similar_distribution__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.skewed__threshold">
+<code class="sig-name descname">skewed__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.skewed__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.uniform__threshold">
+<code class="sig-name descname">uniform__threshold</code><em class="property">: float</em><a class="headerlink" href="#dataprep.eda.configs.Insight.uniform__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Insight.zeros__threshold">
+<code class="sig-name descname">zeros__threshold</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Insight.zeros__threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Interactions">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Interactions</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Interactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Interactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Interactions.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Interactions.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.KDE">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">KDE</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#KDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.KDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>bins: int, default 50</dt><dd><p>Number of bins in the histogram</p>
+</dd>
+<dt>yscale: str, default “linear”</dt><dd><p>Y-axis scale (“linear” or “log”)</p>
+</dd>
+<dt>hist_color: str, default “#aec7e8”</dt><dd><p>Color of the density histogram</p>
+</dd>
+<dt>line_color: str, default “#d62728</dt><dd><p>Color of the density line</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.bins">
+<code class="sig-name descname">bins</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.KDE.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.KDE.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.KDE.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.hist_color">
+<code class="sig-name descname">hist_color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.KDE.hist_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.KDE.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#KDE.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.KDE.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.line_color">
+<code class="sig-name descname">line_color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.KDE.line_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.KDE.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KDE.yscale">
+<code class="sig-name descname">yscale</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.KDE.yscale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.KendallTau">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">KendallTau</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#KendallTau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.KendallTau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KendallTau.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.KendallTau.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KendallTau.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.KendallTau.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.KendallTau.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#KendallTau.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.KendallTau.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.KendallTau.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.KendallTau.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Line">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Line</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>bins: int, default 50</dt><dd><p>Number of bins</p>
+</dd>
+<dt>ngroups: int, default 10</dt><dd><p>Maximum number of groups to display</p>
+</dd>
+<dt>sort_descending: bool, default True</dt><dd><p>Whether to sort the groups in descending order of frequency</p>
+</dd>
+<dt>yscale: str, default “linear”</dt><dd><p>The scale to show on the y axis. Can be “linear” or “log”.</p>
+</dd>
+<dt>unit: str, default “auto”</dt><dd><p>Defines the time unit to group values over for a datetime column.
+It can be “year”, “quarter”, “month”, “week”, “day”, “hour”,
+“minute”, “second”. With default value “auto”, it will use the
+time unit such that the resulting number of groups is closest to 15</p>
+</dd>
+<dt>agg: str, default “mean”</dt><dd><p>Specify the aggregate to use when aggregating over a numeric column</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.agg">
+<code class="sig-name descname">agg</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Line.agg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.bins">
+<code class="sig-name descname">bins</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Line.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Line.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Line.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.ngroups">
+<code class="sig-name descname">ngroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Line.ngroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Line.nom_cont_how_to_guide">
+<code class="sig-name descname">nom_cont_how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Line.nom_cont_how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Line.nom_cont_how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, nominal, continuous)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.sort_descending">
+<code class="sig-name descname">sort_descending</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Line.sort_descending" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.unit">
+<code class="sig-name descname">unit</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Line.unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Line.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Line.yscale">
+<code class="sig-name descname">yscale</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Line.yscale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.MissingValues">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">MissingValues</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#MissingValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.MissingValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.MissingValues.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.MissingValues.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Nested">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Nested</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Nested"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Nested" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>ngroups: int, default 10</dt><dd><p>Maximum number of most frequent values from the first column to display</p>
+</dd>
+<dt>nsubgroups: int, default 5</dt><dd><p>Maximum number of most frequent values from the second column to display (computed
+on the filtered data consisting of the most frequent values from the first column)</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Nested.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Nested.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Nested.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Nested.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Nested.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Nested.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Nested.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Nested.ngroups">
+<code class="sig-name descname">ngroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Nested.ngroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Nested.nsubgroups">
+<code class="sig-name descname">nsubgroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Nested.nsubgroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Nested.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Nested.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Overview">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Overview</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Overview"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Overview" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Overview.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Overview.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.PDF">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">PDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#PDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.PDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>sample_size: int, default 100</dt><dd><p>Number of evenly spaced samples between the minimum and maximum values to compute the pdf at</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.PDF.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.PDF.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.PDF.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.PDF.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.PDF.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#PDF.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.PDF.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.PDF.sample_size">
+<code class="sig-name descname">sample_size</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.PDF.sample_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.PDF.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.PDF.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Pearson">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Pearson</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Pearson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Pearson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pearson.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Pearson.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pearson.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Pearson.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Pearson.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Pearson.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Pearson.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pearson.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Pearson.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Pie">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Pie</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Pie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Pie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>slices: int, default 10</dt><dd><p>Maximum number of pie slices to display</p>
+</dd>
+<dt>sort_descending: bool, default True</dt><dd><p>Whether to sort the slices in descending order of frequency</p>
+</dd>
+<dt>colors: Optional[List[str]], default None</dt><dd><p>List of colors</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pie.colors">
+<code class="sig-name descname">colors</code><em class="property">: Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Pie.colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pie.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Pie.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pie.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Pie.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Pie.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">color_list</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Pie.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Pie.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pie.slices">
+<code class="sig-name descname">slices</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Pie.slices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pie.sort_descending">
+<code class="sig-name descname">sort_descending</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Pie.sort_descending" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Pie.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Pie.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Plot">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<p>Class containing global parameters for the plots</p>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Plot.bins">
+<code class="sig-name descname">bins</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Plot.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Plot.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Plot.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Plot.ngroups">
+<code class="sig-name descname">ngroups</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Plot.ngroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Plot.report">
+<code class="sig-name descname">report</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Plot.report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Plot.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Plot.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.QQNorm">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">QQNorm</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#QQNorm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.QQNorm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>point_color: str, default “#1f77b4”</dt><dd><p>Color of the density histogram</p>
+</dd>
+<dt>line_color: str, default “#d62728</dt><dd><p>Color of the density line</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.QQNorm.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.QQNorm.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.QQNorm.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.QQNorm.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.QQNorm.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#QQNorm.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.QQNorm.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.QQNorm.line_color">
+<code class="sig-name descname">line_color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.QQNorm.line_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.QQNorm.point_color">
+<code class="sig-name descname">point_color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.QQNorm.point_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.QQNorm.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.QQNorm.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Scatter">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Scatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>sample_size: int, default 1000</dt><dd><p>Number of points to randomly sample per partition</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Scatter.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Scatter.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Scatter.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Scatter.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Scatter.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Scatter.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Scatter.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Scatter.sample_size">
+<code class="sig-name descname">sample_size</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Scatter.sample_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Scatter.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Scatter.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Spearman">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Spearman</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Spearman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Spearman" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spearman.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Spearman.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spearman.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Spearman.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Spearman.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Spearman.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Spearman.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spearman.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Spearman.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Spectrum">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Spectrum</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>bins: int, default 20</dt><dd><p>Number of bins</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spectrum.bins">
+<code class="sig-name descname">bins</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Spectrum.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spectrum.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Spectrum.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spectrum.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Spectrum.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Spectrum.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Spectrum.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Spectrum.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Spectrum.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Spectrum.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Stacked">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Stacked</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Stacked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Stacked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>ngroups: int, default 10</dt><dd><p>Maximum number of most frequent values from the first column to display</p>
+</dd>
+<dt>nsubgroups: int, default 5</dt><dd><p>Maximum number of most frequent values from the second column to display (computed
+on the filtered data consisting of the most frequent values from the first column)</p>
+</dd>
+<dt>unit: str, default “auto”</dt><dd><p>Defines the time unit to group values over for a datetime column.
+It can be “year”, “quarter”, “month”, “week”, “day”, “hour”,
+“minute”, “second”. With default value “auto”, it will use the
+time unit such that the resulting number of groups is closest to 15</p>
+</dd>
+<dt>sort_descending: bool, default True</dt><dd><p>Whether to sort the groups in descending order of frequency</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Stacked.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Stacked.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Stacked.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Stacked.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Stacked.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.ngroups">
+<code class="sig-name descname">ngroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Stacked.ngroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.nsubgroups">
+<code class="sig-name descname">nsubgroups</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.Stacked.nsubgroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.sort_descending">
+<code class="sig-name descname">sort_descending</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Stacked.sort_descending" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.unit">
+<code class="sig-name descname">unit</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.Stacked.unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stacked.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.Stacked.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Stats">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to display the stats section</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Stats.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Stats.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.Variables">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">Variables</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.Variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Variables.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.Variables.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.WordCloud">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">WordCloud</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#WordCloud"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.WordCloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>top_words: int, default 30</dt><dd><p>Maximum number of most frequent words to display</p>
+</dd>
+<dt>stopword: bool, default True</dt><dd><p>Whether to remove stopwords</p>
+</dd>
+<dt>lemmatize: bool, default False</dt><dd><p>Whether to lemmatize the words</p>
+</dd>
+<dt>stem: bool, default False</dt><dd><p>Whether to apply Potter Stem on the words</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.WordCloud.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#WordCloud.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.WordCloud.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.lemmatize">
+<code class="sig-name descname">lemmatize</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.lemmatize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.stem">
+<code class="sig-name descname">stem</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.stem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.stopword">
+<code class="sig-name descname">stopword</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.stopword" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.top_words">
+<code class="sig-name descname">top_words</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.top_words" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordCloud.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.WordCloud.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.WordFrequency">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">WordFrequency</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#WordFrequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.WordFrequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>top_words: int, default 30</dt><dd><p>Maximum number of most frequent words to display</p>
+</dd>
+<dt>stopword: bool, default True</dt><dd><p>Whether to remove stopwords</p>
+</dd>
+<dt>lemmatize: bool, default False</dt><dd><p>Whether to lemmatize the words</p>
+</dd>
+<dt>stem: bool, default False</dt><dd><p>Whether to apply Potter Stem on the words</p>
+</dd>
+<dt>color: str, default “#1f77b4”</dt><dd><p>Color of the bar chart</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.color">
+<code class="sig-name descname">color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.WordFrequency.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#WordFrequency.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.lemmatize">
+<code class="sig-name descname">lemmatize</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.lemmatize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.stem">
+<code class="sig-name descname">stem</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.stem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.stopword">
+<code class="sig-name descname">stopword</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.stopword" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.top_words">
+<code class="sig-name descname">top_words</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.top_words" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordFrequency.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.WordFrequency.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dataprep.eda.configs.WordLength">
+<em class="property">class </em><code class="sig-prename descclassname">dataprep.eda.configs.</code><code class="sig-name descname">WordLength</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#WordLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.WordLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<dl class="simple">
+<dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
+</dd>
+<dt>bins: int, default 50</dt><dd><p>Number of bins in the histogram</p>
+</dd>
+<dt>yscale: str, default “linear”</dt><dd><p>Y-axis scale (“linear” or “log”)</p>
+</dd>
+<dt>color: str, default “#aec7e8”</dt><dd><p>Color of the histogram</p>
+</dd>
+<dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
+</dd>
+<dt>width: int, default “auto”</dt><dd><p>Width of the plot</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordLength.bins">
+<code class="sig-name descname">bins</code><em class="property">: int</em><a class="headerlink" href="#dataprep.eda.configs.WordLength.bins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordLength.color">
+<code class="sig-name descname">color</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.WordLength.color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordLength.enable">
+<code class="sig-name descname">enable</code><em class="property">: bool</em><a class="headerlink" href="#dataprep.eda.configs.WordLength.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordLength.height">
+<code class="sig-name descname">height</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.WordLength.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.WordLength.how_to_guide">
+<code class="sig-name descname">how_to_guide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">width</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#WordLength.how_to_guide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.configs.WordLength.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordLength.width">
+<code class="sig-name descname">width</code><em class="property">: Optional<span class="p">[</span>int<span class="p">]</span></em><a class="headerlink" href="#dataprep.eda.configs.WordLength.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.WordLength.yscale">
+<code class="sig-name descname">yscale</code><em class="property">: str</em><a class="headerlink" href="#dataprep.eda.configs.WordLength.yscale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
