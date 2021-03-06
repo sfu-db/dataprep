@@ -92,6 +92,8 @@ jobs:
           name: Disable jekyll builds
           command: touch docs/build/html/.nojekyll
       - run:
+          command: echo 'docs.dataprep.ai' > docs/build/html/CNAME
+      - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/build/html
 workflows:
