@@ -56,8 +56,8 @@ The ``info`` function gives information and guidelines on using Connector over a
 
 .. image:: ../../_static/images/connector/info.png
 	:align: center
-   	:width: 1249
-   	:height: 319
+   	:width: 720
+   	:height: 320
 
 
 As you can see in the image above, in this example, there is only one endpoint available for Yelp: ``businesses``. However, if you want to connect to a different Yelp endpoint, you can build a new configuration file. See: `Configuration Files

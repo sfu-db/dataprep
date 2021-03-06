@@ -112,8 +112,8 @@ html_theme_path = ["."]
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-nbsphinx_execute = "always"
-nbsphinx_allow_errors = True
+nbsphinx_execute = "auto"
+nbsphinx_allow_errors = False  # exception cells should be run apriori
 
 nbsphinx_execute_arguments = []
 
