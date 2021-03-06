@@ -68,3 +68,8 @@ def test_sanity_compute_7(simpledf: dd.DataFrame) -> None:
 def test_specify_column_type(simpledf: dd.DataFrame) -> None:
     plot(simpledf, dtype={"a": Nominal()})
     plot(simpledf, dtype=Nominal())
+
+
+def test_specify_color(simpledf: dd.DataFrame) -> None:
+    plot(simpledf, config={"bar.color": "#123456", "hist.color": "orange"})
+    plot(simpledf, "a", config={"kde.hist_color": (1, 2, 3)})
