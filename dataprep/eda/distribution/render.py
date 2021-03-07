@@ -1506,7 +1506,8 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
 def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Create visualizations for plot(df, Nominal)
-    """  # pylint: disable=too-many-locals
+    """
+    # pylint: disable=too-many-locals,too-many-branches
 
     if cfg.plot.report:
         plot_width = 450
@@ -1577,18 +1578,83 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(Panel(child=row(length_dist), title="Word Length"))
         htgs["Word Length"] = cfg.wordlen.how_to_guide(plot_height, plot_width)
 
+    if cfg.value_table.enable:
+        htgs["Value Table"] = cfg.value_table.how_to_guide()
+        value_table = _value_table(
+            data["value_table"], stats["nrows"], stats["npres"], stats["nuniq"]
+        )
+    else:
+        value_table = []
+
     # panel.child.children[0] is a figure
     for panel in tabs[0:]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
     tabs[0].child.children[0].frame_width = int(plot_width_bar * 0.9)
     return {
         "tabledata": format_cat_stats(stats, len_stats, letter_stats) if cfg.stats.enable else [],
+        "value_table": value_table,
         "insights": nom_insights(data, col, cfg) if cfg.insight.enable else [],
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [tab.title for tab in tabs],
         "container_width": plot_width + 110,
         "how_to_guide": htgs,
     }
+
+
+def _value_table(srs: pd.Series, nrows: int, npres: int, nuniq: int) -> List[Dict[str, Any]]:
+    """
+    Render the rows for the frequency table.
+    """
+
+    df = srs.to_frame()
+    (col,) = df.columns
+
+    val_sum = df[col].sum()  # sum of all value counts that appear in the table
+    nothers = npres - val_sum  # count of values that do not appear in the table
+    nmissing = nrows - npres  # number of missing values
+    df["pct"] = (df[col] / nrows * 100).round(1)
+
+    max_freq = max(df[col].max(), nothers, nmissing)
+
+    rows: List[Dict[str, Any]] = []
+    for index, record in df.iterrows():
+        rows.append(
+            {
+                "label": index,
+                "width": record[col] / max_freq,
+                "width_perc": f"{record[col] / max_freq * 100}%",
+                "count": int(record[col]),
+                "percentage": f"{record['pct']}%",
+                "n": nrows,
+                "extra_class": "",
+            }
+        )
+    if nothers > 0:
+        rows.append(
+            {
+                "label": f"Other values ({nuniq - len(df)})",
+                "width": nothers / max_freq,
+                "width_perc": f"{nothers / max_freq * 100}%",
+                "count": int(nothers),
+                "percentage": f"{round(nothers / nrows * 100, 1)}%",
+                "n": nrows,
+                "extra_class": "other",
+            }
+        )
+    if nmissing > 0:
+        rows.append(
+            {
+                "label": "(Missing)",
+                "width": nmissing / max_freq,
+                "width_perc": f"{nmissing / max_freq * 100}%",
+                "count": int(nmissing),
+                "percentage": f"{round(nmissing / nrows * 100, 1)}%",
+                "n": nrows,
+                "extra_class": "missing",
+            }
+        )
+
+    return rows
 
 
 def nom_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List[str]]:
@@ -1717,6 +1783,12 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(box_viz(df, col, plot_width, plot_height, cfg.box))
         htgs["Box Plot"] = cfg.box.univar_how_to_guide(plot_height, plot_width)
 
+    if cfg.value_table.enable:
+        htgs["Value Table"] = cfg.value_table.how_to_guide()
+        value_table = _value_table(data["value_table"], data["nrows"], data["npres"], data["nuniq"])
+    else:
+        value_table = []
+
     # panel.child.children[0] is a figure
     for panel in tabs[0:]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
@@ -1725,6 +1797,7 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 
     return {
         "tabledata": format_num_stats(data) if cfg.stats.enable else [],
+        "value_table": value_table,
         "insights": cont_insights(data, col, cfg) if cfg.insight.enable else [],
         "layout": [panel.child for panel in tabs],
         "meta": [tab.title for tab in tabs],
