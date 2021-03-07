@@ -56,6 +56,8 @@ class Container:
             setattr(self.context, "highlight", cfg.insight.enable)
             if to_render.get("tabledata"):
                 self.context.meta.insert(0, "Stats")  # type: ignore
+            if to_render.get("value_table"):
+                self.context.meta.append("Value Table")  # type: ignore
             if visual_type == "correlation_impact":
                 self.template_base = ENV_LOADER.get_template("tab_base_corr.html")
             else:

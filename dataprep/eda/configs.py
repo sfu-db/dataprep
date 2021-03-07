@@ -49,6 +49,7 @@ DISPLAY_MAP = {
     "Dendrogram": "dendro",
     "PDF": "pdf",
     "CDF": "cdf",
+    "Value Table": "value_table",
 }
 
 # This dictionary map is used for session control in create_report
@@ -1005,6 +1006,27 @@ class CDF(BaseModel):
         return [(f"'{name}': {val}", desc) for name, val, desc in zip(names, vals, descs)]
 
 
+class ValueTable(BaseModel):
+    """
+    enable: bool, default True
+        Whether to create this element
+    ngroups: int, default 10
+        Number of values to show in the table
+    """
+
+    enable: bool = True
+    ngroups: int = 10
+
+    def how_to_guide(self) -> List[Tuple[str, str]]:
+        """
+        how-to guide for plot(df, x)
+        """
+        vals = [self.ngroups]
+        names = ["value_table.ngroups"]
+        descs = ["The number of distinct values to show"]
+        return [(f"'{name}': {_form(val)}", desc) for name, val, desc in zip(names, vals, descs)]
+
+
 def _form(val: Any) -> Any:
     """
     Format a value for the how-to guide
@@ -1088,6 +1110,7 @@ class Config(BaseModel):
     dendro: Dendrogram = Field(default_factory=Dendrogram)
     pdf: PDF = Field(default_factory=PDF)
     cdf: CDF = Field(default_factory=CDF)
+    value_table: ValueTable = Field(default_factory=ValueTable)
     plot: Plot = Field(default_factory=Plot)
     overview: Overview = Field(default_factory=Overview)
     variables: Variables = Field(default_factory=Variables)
