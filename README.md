@@ -67,12 +67,9 @@ Do you want to leverage the growing number of websites that are opening their da
 
 Let's check out the several benefits that Connector offers:
 
-- <ins>**A unified API:**</ins> You can fetch data using one or two lines of code to get data from [tens of popular websites](https://github.com/sfu-db/DataConnectorConfigs).
-
-- <ins>**Auto Pagination:**</ins> Do you want to invoke a Web API that could return a large result set and need to handle it through pagination? Connector automatically does the pagination for you! Just specify the desired number of returned results (argument `_count`) without getting into unnecessary detail about a specific pagination scheme.
-
-- <ins>**Smart API request strategy:**</ins> Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy.
-
+- **A unified API:** You can fetch data using one or two lines of code to get data from [tens of popular websites](https://github.com/sfu-db/DataConnectorConfigs).
+- **Auto Pagination:** Do you want to invoke a Web API that could return a large result set and need to handle it through pagination? Connector automatically does the pagination for you! Just specify the desired number of returned results (argument `_count`) without getting into unnecessary detail about a specific pagination scheme.
+- **Smart API request strategy:** Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy.
 #### How to fetch all publications of Andrew Y. Ng?
 
 ```python
@@ -83,7 +80,7 @@ df = await conn_dblp.query("publication", author = "Andrew Y. Ng", _count = 2000
 
 Here, you can find detailed [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
-If you want to connect with a different web API, Connector is designed to be easy to extend. You just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs/blob/develop/CONTRIBUTING.md#add-configuration-files) to support the new web API. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.
+Connector is designed to be easy to extend. If you want to connect with your own web API, you just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs/blob/develop/CONTRIBUTING.md#add-configuration-files) to support it. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.
 
 ## EDA
 
