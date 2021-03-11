@@ -23,7 +23,7 @@ def _gen_random_int_series(
 ) -> pd.Series:
     """Return a randonly generated int Series, where the value is in [low, high]"""
     rand = _resolve_random_state(random_state)
-    arr = rand.random_integers(low=low, high=high, size=size)
+    arr = rand.randint(low=low, high=high, size=size)
     return pd.Series(arr)
 
 
