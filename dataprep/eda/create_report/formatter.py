@@ -8,7 +8,6 @@ import dask
 import dask.dataframe as dd
 import pandas as pd
 from bokeh.embed import components
-from bokeh.models import Title
 from bokeh.plotting import Figure
 
 from ..configs import Config
@@ -117,8 +116,6 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
 
     # results dictionary
     res: Dict[str, Any] = {}
-    # figure list
-    figs: List[Figure] = []
     # overview
     if cfg.overview.enable:
         data["ov"].pop("ks_tests")
@@ -150,16 +147,17 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 )
                 stats = stats_viz_dt(data[col]["stats"])
             rndrd = render(itmdt, cfg)["layout"]
+            figs_var: List[Figure] = []
             for tab in rndrd:
                 try:
                     fig = tab.children[0]
                 except AttributeError:
                     fig = tab
                 # fig.title = Title(text=tab.title, align="center")
-                figs.append(fig)
+                figs_var.append(fig)
             res["variables"][col] = {
                 "tabledata": stats,
-                "plots": components(figs),
+                "plots": components(figs_var),
                 "col_type": itmdt.visual_type.replace("_column", ""),
             }
     else:
@@ -193,13 +191,16 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 visual_type="correlation_heatmaps",
             )
             rndrd = render_correlation(itmdt, cfg)
-            figs.clear()
+            res["correlation_names"] = []
+            figs_corr: List[Figure] = []
             for tab in rndrd.tabs:
                 fig = tab.child
                 fig.sizing_mode = "stretch_width"
-                fig.title = Title(text=tab.title, align="center", text_font_size="20px")
-                figs.append(fig)
-            res["correlations"] = components(figs)
+                # fig.title = Title(text=tab.title, align="center", text_font_size="20px")
+                figs_corr.append(fig)
+                res["correlation_names"].append(tab.title)
+            res["correlations"] = components(figs_corr)
+
     else:
         res["has_interaction"], res["has_correlation"] = False, False
 
@@ -209,16 +210,17 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         itmdt = completions["miss"](data["miss"])
 
         rndrd = render_missing(itmdt, cfg)
-        figs.clear()
+        figs_missing: List[Figure] = []
         for fig in rndrd["layout"]:
             fig.sizing_mode = "stretch_width"
-            fig.title = Title(
-                text=rndrd["meta"][rndrd["layout"].index(fig)],
-                align="center",
-                text_font_size="20px",
-            )
-            figs.append(fig)
-        res["missing"] = components(figs)
+            # fig.title = Title(
+            #     text=rndrd["meta"][rndrd["layout"].index(fig)],
+            #     align="center",
+            #     text_font_size="20px",
+            # )
+            figs_missing.append(fig)
+        res["missing"] = components(figs_missing)
+        res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map", "Dendogram"]
 
     return res
 
