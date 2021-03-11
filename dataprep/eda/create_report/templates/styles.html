@@ -349,9 +349,6 @@
 
     .missing-container {
         margin: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
     }
 
     .miss-plot {
@@ -376,6 +373,43 @@
         font-family: monospace !important;
         margin: unset !important;
     }
+    .report-tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+    }
+
+    .report-tab button {
+      background-color: inherit;
+      float: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      border-bottom: 2px solid #9edae5;
+      border-bottom-style: inset;
+    }
+
+    .report-tab button:hover {
+      background-color: #ddd;
+    }
+
+    .report-tab button.active {
+      background-color: #ccc;
+    }
+
+    .corr-tabcontent {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+    .missing-tabcontent {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+
 
     @media screen and (max-width: 1320px) {
         h1.tb-title {
@@ -504,4 +538,5 @@
             font-size: 18px;
         }
     }
+
 </style>
