@@ -1,4 +1,4 @@
-DataPrep.Clean
+dataprep.clean
 ==============
 
 API reference for the DataPrep.Clean subpackage.

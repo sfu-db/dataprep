@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>DataPrep.Clean &#8212; DataPrep 0.2.15 documentation</title>
+  <title>dataprep.clean &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -169,7 +169,7 @@
           
             
               <li class="active">
-                  <a href="">DataPrep.Clean</a>
+                  <a href="">dataprep.clean</a>
               </li>
             
           
@@ -231,7 +231,7 @@
           <div>
             
   <div class="section" id="dataprep-clean">
-<h1>DataPrep.Clean<a class="headerlink" href="#dataprep-clean" title="Permalink to this headline">¶</a></h1>
+<h1>dataprep.clean<a class="headerlink" href="#dataprep-clean" title="Permalink to this headline">¶</a></h1>
 <p>API reference for the DataPrep.Clean subpackage.</p>
 <div class="section" id="module-dataprep.clean.clean_headers">
 <span id="column-headers"></span><h2>Column Headers<a class="headerlink" href="#module-dataprep.clean.clean_headers" title="Permalink to this headline">¶</a></h2>
@@ -1083,7 +1083,7 @@ keep the original column.</p>
 <p>Clean and validate a DataFrame column containing US street addresses.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_address.clean_address">
-<code class="sig-prename descclassname">dataprep.clean.clean_address.</code><code class="sig-name descname">clean_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'(building) house_number street_prefix_abbr street_name street_suffix_abbr apartment, city, state_abbr zipcode'</span></em>, <em class="sig-param"><span class="n">must_contain</span><span class="o">=</span><span class="default_value">('house_number', 'street_name')</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#clean_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_address.clean_address" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dataprep.clean.clean_address.</code><code class="sig-name descname">clean_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'(building) house_number street_prefix_abbr street_name street_suffix_abbr, apartment, city, state_abbr zipcode'</span></em>, <em class="sig-param"><span class="n">must_contain</span><span class="o">=</span><span class="default_value">('house_number', 'street_name')</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#clean_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_address.clean_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize US street addresses.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_address.html#address-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -1110,7 +1110,7 @@ keep the original column.</p>
 </dl>
 <p>The output_format can contain ‘\t’ characters to specify how to split the output into
 columns.</p>
-<p>(default: ‘(building) house_number street_prefix_abbr street_name street_suffix_abbr
+<p>(default: ‘(building) house_number street_prefix_abbr street_name street_suffix_abbr,
 apartment, city, state_abbr zipcode’)</p>
 </p></li>
 <li><p><strong>must_contain</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]) – <p>A tuple containing parts of the address that must be included for the address to be

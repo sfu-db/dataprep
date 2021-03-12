@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_address &#8212; DataPrep 0.2.15 documentation</title>
+  <title>dataprep.clean.clean_address &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -180,7 +180,7 @@
     <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(building) house_number street_prefix_abbr &quot;</span>
-    <span class="s2">&quot;street_name street_suffix_abbr apartment, city, state_abbr zipcode&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;street_name street_suffix_abbr, apartment, city, state_abbr zipcode&quot;</span><span class="p">,</span>
     <span class="n">must_contain</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;house_number&quot;</span><span class="p">,</span> <span class="s2">&quot;street_name&quot;</span><span class="p">),</span>
     <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -217,7 +217,7 @@
 <span class="sd">        The output_format can contain &#39;\\\\t&#39; characters to specify how to split the output into</span>
 <span class="sd">        columns.</span>
 
-<span class="sd">        (default: &#39;(building) house_number street_prefix_abbr street_name street_suffix_abbr</span>
+<span class="sd">        (default: &#39;(building) house_number street_prefix_abbr street_name street_suffix_abbr,</span>
 <span class="sd">        apartment, city, state_abbr zipcode&#39;)</span>
 <span class="sd">    must_contain</span>
 <span class="sd">        A tuple containing parts of the address that must be included for the address to be</span>
@@ -364,7 +364,7 @@
 
 
 <span class="k">def</span> <span class="nf">_format_address</span><span class="p">(</span>
-    <span class="n">address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">must_contain</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">address</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">must_contain</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">split</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to transform an address instance into the desired format</span>
@@ -396,14 +396,14 @@
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="k">else</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">code</span><span class="p">,)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_address</span><span class="p">(</span><span class="n">address_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">must_contain</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_check_address</span><span class="p">(</span><span class="n">address</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">must_contain</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds the index of the given country in the DATA dataframe.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    address_str</span>
-<span class="sd">        string containing the address value being cleaned</span>
+<span class="sd">        address value to be cleaned</span>
 <span class="sd">    must_contain</span>
 <span class="sd">        A tuple containing parts of the address that must be included for the</span>
 <span class="sd">         address to be successfully cleaned</span>
@@ -411,13 +411,13 @@
 <span class="sd">        If True, a tuple (index, status) is returned.</span>
 <span class="sd">        If False, the function returns True/False to be used by the validate address function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">address_str</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
 
-    <span class="n">address_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[().]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">address_str</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[().]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">address</span><span class="p">))</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">address</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">usaddress</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="n">address_str</span><span class="p">,</span> <span class="n">TAG_MAPPING</span><span class="p">)</span>
+        <span class="n">address</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">usaddress</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">TAG_MAPPING</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="n">usaddress</span><span class="o">.</span><span class="n">RepeatedLabelError</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
@@ -450,12 +450,17 @@
     <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
         <span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_format</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
+    <span class="c1"># add a comma after the street name if there is no street suffix</span>
+    <span class="c1"># in address_items</span>
+    <span class="k">if</span> <span class="s2">&quot;street_suffix_abbr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">address_items</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">split</span><span class="p">:</span>
+        <span class="n">output_format</span> <span class="o">=</span> <span class="n">output_format</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;street_name&quot;</span><span class="p">,</span> <span class="s2">&quot;street_name,&quot;</span><span class="p">)</span>
+
     <span class="c1"># first split output_format into each column of the final output</span>
     <span class="c1"># for each column split it into attributes and add the corresponding</span>
     <span class="c1"># cleaned part of the address to the output for each attribute</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">columns</span> <span class="o">=</span> <span class="n">output_format</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">current_part</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_part</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">output_attr</span> <span class="ow">in</span> <span class="n">column</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
@@ -466,12 +471,11 @@
                     <span class="c1"># if (building) is in output_str. Only if split is False</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">address_attr</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
-                        <span class="n">current_part</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">address_val</span><span class="p">)</span>
+                        <span class="n">current_part</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">address_val</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">current_part</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_attr</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">address_val</span> <span class="o">+</span> <span class="n">output_attr</span><span class="p">[</span><span class="n">end</span><span class="p">:])</span>
-
-        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_part</span><span class="p">))</span>
-        <span class="n">current_part</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">current_part</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">output_attr</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span><span class="si">}{</span><span class="n">address_val</span><span class="si">}{</span><span class="n">output_attr</span><span class="p">[</span><span class="n">end</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_part</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; ,&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; # &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+        <span class="n">current_part</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">output</span>
 
@@ -526,7 +530,7 @@
 <span class="sd">    Adds a cleaned full prefix and cleaned abbreviated prefix to result_dict,</span>
 <span class="sd">    based on the value of street prefix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">prefix_abbr</span> <span class="o">=</span> <span class="n">PREFIXES</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">PREFIXES</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">prefix_abbr</span> <span class="o">=</span> <span class="n">PREFIXES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">prefix</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">prefix_abbr</span><span class="p">:</span>
         <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_prefix_abbr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefix_abbr</span>
         <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_prefix_full&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FULL_PREFIX</span><span class="p">[</span><span class="n">prefix_abbr</span><span class="p">]</span>
@@ -537,7 +541,7 @@
 <span class="sd">    Adds a cleaned full suffix and cleaned abbreviated suffix to result_dict,</span>
 <span class="sd">    based on the value of the street suffix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">suffix_tuple</span> <span class="o">=</span> <span class="n">SUFFIXES</span><span class="p">[</span><span class="n">suffix</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="k">if</span> <span class="n">suffix</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">SUFFIXES</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">suffix_tuple</span> <span class="o">=</span> <span class="n">SUFFIXES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">suffix</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">suffix_tuple</span><span class="p">:</span>
         <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_suffix_abbr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">suffix_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
         <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_suffix_full&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">suffix_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
@@ -586,9 +590,13 @@
 
 <span class="k">def</span> <span class="nf">_clean_street</span><span class="p">(</span><span class="n">result_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">street</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    capitalize each word of the street name and add it to result_dict</span>
+<span class="sd">    capitalize each word of the street name and add it to result_dict,</span>
+<span class="sd">    except keep the number suffixes &#39;st&#39;, &#39;nd&#39;, &#39;rd&#39;, &#39;th&#39; lower case</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">street</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+[st|nd|rd|th]&quot;</span><span class="p">,</span> <span class="n">street</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">street</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;street_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">street</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_clean_apartment</span><span class="p">(</span><span class="n">result_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">apartment</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

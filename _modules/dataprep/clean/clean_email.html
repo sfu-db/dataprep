@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_email &#8212; DataPrep 0.2.15 documentation</title>
+  <title>dataprep.clean.clean_email &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -566,6 +566,7 @@
     <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;null&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
 
+    <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;@&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;bad_format&quot;</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
 
