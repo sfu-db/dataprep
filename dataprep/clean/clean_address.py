@@ -213,7 +213,7 @@ def validate_address(
 
 
 def _format_address(
-    address: str, output_format: str, must_contain: Tuple[str, ...], split: bool, errors: str
+    address: Any, output_format: str, must_contain: Tuple[str, ...], split: bool, errors: str
 ) -> Any:
     """
     Function to transform an address instance into the desired format
@@ -245,14 +245,14 @@ def _format_address(
     return tuple(np.nan if not value else value for value in outputs) + (code,)
 
 
-def _check_address(address_str: str, must_contain: Tuple[str, ...], clean: bool) -> Any:
+def _check_address(address: Any, must_contain: Tuple[str, ...], clean: bool) -> Any:
     """
     Finds the index of the given country in the DATA dataframe.
 
     Parameters
     ----------
     address_str
-        string containing the address value being cleaned
+        address value to be cleaned
     must_contain
         A tuple containing parts of the address that must be included for the
          address to be successfully cleaned
@@ -260,13 +260,13 @@ def _check_address(address_str: str, must_contain: Tuple[str, ...], clean: bool)
         If True, a tuple (index, status) is returned.
         If False, the function returns True/False to be used by the validate address function.
     """
-    if address_str in NULL_VALUES:
+    if address in NULL_VALUES:
         return (None, "null") if clean else False
 
-    address_str = re.sub(r"[().]", "", address_str)
+    address = re.sub(r"[().]", "", str(address))
 
     try:
-        address, _ = usaddress.tag(address_str, TAG_MAPPING)
+        address, _ = usaddress.tag(address, TAG_MAPPING)
 
     except usaddress.RepeatedLabelError:
         return (None, "unknown") if clean else False
@@ -304,7 +304,7 @@ def _address_dict_to_string(address: Dict[str, str], output_format: str, split: 
     # cleaned part of the address to the output for each attribute
     output = []
     columns = output_format.split("\t")
-    current_part = []
+    current_part = ""
 
     for column in columns:
         for output_attr in column.split():
@@ -315,12 +315,11 @@ def _address_dict_to_string(address: Dict[str, str], output_format: str, split: 
                     # if (building) is in output_str. Only if split is False
                     end = idx + len(address_attr)
                     if split:
-                        current_part.append(address_val)
+                        current_part += f" {address_val}"
                     else:
-                        current_part.append(output_attr[:idx] + address_val + output_attr[end:])
-
-        output.append(" ".join(current_part))
-        current_part = []
+                        current_part += f" {output_attr[:idx]}{address_val}{output_attr[end:]}"
+        output.append(current_part.strip(" ,").replace(" # ", " "))
+        current_part = ""
 
     return output
 
@@ -375,7 +374,7 @@ def _clean_prefix(result_dict: Dict[str, str], prefix: str) -> None:
     Adds a cleaned full prefix and cleaned abbreviated prefix to result_dict,
     based on the value of street prefix
     """
-    prefix_abbr = PREFIXES[prefix.lower()] if prefix.lower() in PREFIXES else None
+    prefix_abbr = PREFIXES.get(prefix.lower())
     if prefix_abbr:
         result_dict["street_prefix_abbr"] = prefix_abbr
         result_dict["street_prefix_full"] = FULL_PREFIX[prefix_abbr]
@@ -386,7 +385,7 @@ def _clean_suffix(result_dict: Dict[str, str], suffix: str) -> None:
     Adds a cleaned full suffix and cleaned abbreviated suffix to result_dict,
     based on the value of the street suffix
     """
-    suffix_tuple = SUFFIXES[suffix.upper()] if suffix.upper() in SUFFIXES else None
+    suffix_tuple = SUFFIXES.get(suffix.upper())
     if suffix_tuple:
         result_dict["street_suffix_abbr"] = suffix_tuple[0].capitalize() + "."
         result_dict["street_suffix_full"] = suffix_tuple[1].capitalize()
@@ -435,9 +434,13 @@ def _clean_zip(result_dict: Dict[str, str], zipcode: str) -> None:
 
 def _clean_street(result_dict: Dict[str, str], street: str) -> None:
     """
-    capitalize each word of the street name and add it to result_dict
+    capitalize each word of the street name and add it to result_dict,
+    except keep the number suffixes 'st', 'nd', 'rd', 'th' lower case
     """
-    result_dict["street_name"] = street.title()
+    if re.match(r"\d+[st|nd|rd|th]", street, flags=re.IGNORECASE):
+        result_dict["street_name"] = street.lower()
+    else:
+        result_dict["street_name"] = street.title()
 
 
 def _clean_apartment(result_dict: Dict[str, str], apartment: str) -> None:
