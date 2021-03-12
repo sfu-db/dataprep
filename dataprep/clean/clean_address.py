@@ -29,7 +29,7 @@ def clean_address(
     df: Union[pd.DataFrame, dd.DataFrame],
     column: str,
     output_format: str = "(building) house_number street_prefix_abbr "
-    "street_name street_suffix_abbr apartment, city, state_abbr zipcode",
+    "street_name street_suffix_abbr, apartment, city, state_abbr zipcode",
     must_contain: Tuple[str, ...] = ("house_number", "street_name"),
     split: bool = False,
     inplace: bool = False,
@@ -66,7 +66,7 @@ def clean_address(
         The output_format can contain '\\\\t' characters to specify how to split the output into
         columns.
 
-        (default: '(building) house_number street_prefix_abbr street_name street_suffix_abbr
+        (default: '(building) house_number street_prefix_abbr street_name street_suffix_abbr,
         apartment, city, state_abbr zipcode')
     must_contain
         A tuple containing parts of the address that must be included for the address to be
@@ -298,6 +298,11 @@ def _address_dict_to_string(address: Dict[str, str], output_format: str, split: 
     # add tabs between each attribute if split is True
     if split:
         output_format = "\t".join(output_format.split())
+
+    # add a comma after the street name if there is no street suffix
+    # in address_items
+    if "street_suffix_abbr" not in address_items and not split:
+        output_format = output_format.replace("street_name", "street_name,")
 
     # first split output_format into each column of the final output
     # for each column split it into attributes and add the corresponding
