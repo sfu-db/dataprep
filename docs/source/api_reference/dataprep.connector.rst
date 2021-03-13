@@ -18,6 +18,23 @@ Connector
    :undoc-members:
    :show-inheritance:
 
+Info
+-----------------------------------------
+
+.. automodule:: dataprep.connector.info
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Info UI
+-----------------------------------------
+
+.. automodule:: dataprep.connector.info_ui
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+
 Schema
 --------------------------------------
 
@@ -41,4 +58,3 @@ Errors
    :members:
    :undoc-members:
    :show-inheritance:
-
