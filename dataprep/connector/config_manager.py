@@ -11,8 +11,8 @@ from typing import cast, Tuple
 from .utils import Request
 
 # note: apply change after rename the config repo
-META_URL = "https://raw.githubusercontent.com/sfu-db/APIConnectors/api-connectors/{}/{}/_meta.json"
-TABLE_URL = "https://raw.githubusercontent.com/sfu-db/APIConnectors/api-connectors/{}/{}/{}.json"
+META_URL = "https://raw.githubusercontent.com/sfu-db/APIConnectors/{}/api-connectors/{}/_meta.json"
+TABLE_URL = "https://raw.githubusercontent.com/sfu-db/APIConnectors/{}/api-connectors/{}/{}.json"
 GIT_REF_URL = "https://api.github.com/repos/sfu-db/APIConnectors/git/refs/heads"
 
 
