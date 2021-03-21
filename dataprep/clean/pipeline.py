@@ -116,14 +116,14 @@ class Pipeline:
                     break
         if not self.is_num_type:
             for i in range(len(self.cat_pipe_with_ops)):
-                temp_training_df, temp_test_df = self.cat_pipe_with_ops[
-                    i
-                ].fit_transform(temp_training_df, temp_test_df)
+                temp_training_df, temp_test_df = self.cat_pipe_with_ops[i].fit_transform(
+                    temp_training_df, temp_test_df
+                )
         else:
             for i in range(len(self.num_pipe_with_ops)):
-                temp_training_df, temp_test_df = self.num_pipe_with_ops[
-                    i
-                ].fit_transform(temp_training_df, temp_test_df)
+                temp_training_df, temp_test_df = self.num_pipe_with_ops[i].fit_transform(
+                    temp_training_df, temp_test_df
+                )
         return temp_training_df, temp_test_df
 
     def generate_cat_pipe(self, cat_pipe_info: dict) -> Any:

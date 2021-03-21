@@ -73,6 +73,4 @@ class VarianceThresholder:
             Test data column.
         """
         self.thresholder.fit(training_df)
-        return self.thresholder.transform(training_df), self.thresholder.transform(
-            test_df
-        )
+        return self.thresholder.transform(training_df), self.thresholder.transform(test_df)

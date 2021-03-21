@@ -138,9 +138,7 @@ def clean_ml(
                 include_operators,
                 exclude_operators,
             )
-        elif (
-            not customized_cat_pipeline is None and not customized_num_pipeline is None
-        ):
+        elif not customized_cat_pipeline is None and not customized_num_pipeline is None:
             temp_training_df, temp_test_df = format_data_with_customized_cat_and_num(
                 training_df[col_name].compute(),
                 test_df[col_name].compute(),

@@ -44,9 +44,7 @@ class CatImputer:
             else:
                 self.impute_type = impute_type
                 self.fill_value = fill_value
-            self.imputer: Any = operator_dic[self.impute_type](
-                self.null_values, self.fill_value
-            )
+            self.imputer: Any = operator_dic[self.impute_type](self.null_values, self.fill_value)
         # elif isinstance(cat_pipe_info['cat_imputation'], object):
         else:
             self.imputer = cat_pipe_info["cat_imputation"]()
