@@ -90,6 +90,7 @@ class DropImputer:
             Current value needs to be checked.
         """
 
-        if val in self.null_values:
-            return True
+        if not self.null_values is None:
+            if val in self.null_values:
+                return True
         return False

@@ -78,6 +78,7 @@ class MostFrequentImputer:
             Each value in dask's Series
         """
 
-        if val in self.null_values:
-            return self.fill_value
+        if not self.null_values is None:
+            if val in self.null_values:
+                return self.fill_value
         return val

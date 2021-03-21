@@ -2,7 +2,7 @@
 Implement numerical variance thresholder.
 """
 
-from typing import Any
+from typing import Any, Union
 from dask import dataframe as dd
 from dask.dataframe import from_pandas
 import pandas as pd
@@ -17,7 +17,7 @@ class VarThreholder:
             Variance of provided data column.
     """
 
-    def __init__(self, variance) -> None:
+    def __init__(self, variance: Union[int, float]) -> None:
         """
         This function initiate variance thresholder.
 

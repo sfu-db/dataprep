@@ -76,7 +76,8 @@ class OneHotEncoder:
         val
             Value should be transferred to one-hot encoding.
         """
-        result = np.zeros(len(self.unique_list))
+        temp_result = np.zeros(len(self.unique_list))
         idx = self.unique_list.tolist().index(val)
-        result[idx] = 1
-        return result.tolist()
+        temp_result[idx] = 1
+        result: List[float] = temp_result.tolist()
+        return result
