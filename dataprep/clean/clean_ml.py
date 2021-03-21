@@ -15,18 +15,18 @@ def clean_ml(
     test_df: Union[pd.DataFrame, dd.DataFrame],
     target: str = "target",
     cat_imputation: str = "constant",
-    cat_null_value: Optional[List] = None,
+    cat_null_value: Optional[List[Any]] = None,
     fill_val: str = "missing_value",
     num_imputation: str = "mean",
-    num_null_value: Optional[List] = None,
+    num_null_value: Optional[List[Any]] = None,
     cat_encoding: str = "one_hot",
     variance_threshold: bool = False,
     variance: float = 0.0,
     num_scaling: str = "standardize",
     include_operators: Optional[List[str]] = None,
     exclude_operators: Optional[List[str]] = None,
-    customized_cat_pipeline: Optional[List[Dict]] = None,
-    customized_num_pipeline: Optional[List[Dict]] = None,
+    customized_cat_pipeline: Optional[List[Dict[str, Any]]] = None,
+    customized_num_pipeline: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     This function transforms an arbitrary tabular dataset
@@ -160,13 +160,13 @@ def format_data_with_customized_cat(
     training_row: dd.Series,
     test_row: dd.Series,
     num_imputation: str = "mean",
-    num_null_value: Optional[List] = None,
+    num_null_value: Optional[List[Any]] = None,
     variance_threshold: bool = False,
     variance: float = 0.0,
     num_scaling: str = "standardize",
-    include_operators: List[str] = None,
-    exclude_operators: List[str] = None,
-    customized_cat_pipeline: List[Dict] = None,
+    include_operators: Optional[List[str]] = None,
+    exclude_operators: Optional[List[str]] = None,
+    customized_cat_pipeline: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[dd.Series, dd.Series]:
     """
     This function transforms an arbitrary tabular dataset
@@ -274,12 +274,12 @@ def format_data_with_customized_num(
     training_row: dd.Series,
     test_row: dd.Series,
     cat_imputation: str = "constant",
-    cat_null_value: Optional[List] = None,
+    cat_null_value: Optional[List[Any]] = None,
     fill_val: str = "missing_value",
     cat_encoding: str = "one_hot",
-    include_operators: List[str] = None,
-    exclude_operators: List[str] = None,
-    customized_num_pipeline: List[Dict] = None,
+    include_operators: Optional[List[str]] = None,
+    exclude_operators: Optional[List[str]] = None,
+    customized_num_pipeline: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[dd.Series, dd.Series]:
     """
     This function transforms an arbitrary tabular dataset
@@ -373,16 +373,16 @@ def format_data_with_default(
     training_row: dd.Series,
     test_row: dd.Series,
     cat_imputation: str = "constant",
-    cat_null_value: Optional[List] = None,
+    cat_null_value: Optional[List[Any]] = None,
     fill_val: str = "missing_value",
     num_imputation: str = "mean",
-    num_null_value: Optional[List] = None,
+    num_null_value: Optional[List[Any]] = None,
     cat_encoding: str = "one_hot",
     variance_threshold: bool = True,
     variance: float = 0.0,
     num_scaling: str = "standardize",
-    include_operators: List[str] = None,
-    exclude_operators: List[str] = None,
+    include_operators: Optional[List[str]] = None,
+    exclude_operators: Optional[List[str]] = None,
 ) -> Tuple[dd.Series, dd.Series]:
     """
     This function transforms an arbitrary tabular dataset
@@ -502,10 +502,10 @@ def format_data_with_default(
 def format_data_with_customized_cat_and_num(
     training_row: dd.Series,
     test_row: dd.Series,
-    include_operators: List[str] = None,
-    exclude_operators: List[str] = None,
-    customized_cat_pipeline: List[Dict] = None,
-    customized_num_pipeline: List[Dict] = None,
+    include_operators: Optional[List[str]] = None,
+    exclude_operators: Optional[List[str]] = None,
+    customized_cat_pipeline: Optional[List[Dict[str, Any]]] = None,
+    customized_num_pipeline: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[dd.Series, dd.Series]:
     """
     This function transforms an arbitrary tabular dataset

@@ -2,7 +2,7 @@
 Implement categorical drop imputer.
 """
 
-from typing import Any
+from typing import Any, List, Optional
 import dask.dataframe as dd
 from dask.dataframe import from_pandas
 import pandas as pd
@@ -17,7 +17,7 @@ class DropImputer:
             Value used for imputing missing values.
     """
 
-    def __init__(self, null_values: dict, fill_value: str = "") -> None:
+    def __init__(self, null_values: Optional[List[Any]], fill_value: str = "") -> None:
         """
         This function initiate drop imputer.
 

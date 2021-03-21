@@ -2,7 +2,7 @@
 Implement numerical imputer component.
 """
 
-from typing import Any, Tuple
+from typing import Any, Tuple, Dict
 import dask.dataframe as dd
 
 from .num_imputation import operator_dic
@@ -19,7 +19,7 @@ class NumImputer:
             Specified null values which should be recognized
     """
 
-    def __init__(self, num_pipe_info: dict) -> None:
+    def __init__(self, num_pipe_info: Dict[str, Any]) -> None:
 
         """
         This function initiate numerical imputer.

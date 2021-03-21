@@ -17,7 +17,7 @@ class NumScaler:
             Scaler
     """
 
-    def __init__(self, num_pipe_info: Dict) -> None:
+    def __init__(self, num_pipe_info: Dict[str, Any]) -> None:
         """
         This function initiate numerical scaler.
 

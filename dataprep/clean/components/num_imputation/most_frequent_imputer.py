@@ -2,7 +2,7 @@
 Implement numerical most frequent imputer.
 """
 
-from typing import Any, Union
+from typing import Any, Union, List, Optional
 import dask.dataframe as dd
 
 
@@ -15,7 +15,7 @@ class MostFrequentImputer:
             Value used to fill missing value
     """
 
-    def __init__(self, null_values: dict) -> None:
+    def __init__(self, null_values: Optional[List[Any]]) -> None:
         """
         This function initiate most frequent imputer.
 

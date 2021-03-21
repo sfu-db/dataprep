@@ -2,7 +2,7 @@
 Implement numerical mean imputer.
 """
 
-from typing import Any, Union
+from typing import Any, Union, List, Optional
 import math
 import dask.dataframe as dd
 
@@ -16,7 +16,7 @@ class MeanImputer:
             Mean value
     """
 
-    def __init__(self, null_values: dict) -> None:
+    def __init__(self, null_values: Optional[List[Any]]) -> None:
         """
         This function initiate mean imputer.
 

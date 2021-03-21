@@ -2,7 +2,7 @@
 Implement variance thresholder component.
 """
 
-from typing import Any, Tuple
+from typing import Any, Tuple, Dict
 import dask.dataframe as dd
 
 from .variance_threshold import operator_dic
@@ -17,7 +17,7 @@ class VarianceThresholder:
             Thresholder
     """
 
-    def __init__(self, num_pipe_info: dict) -> None:
+    def __init__(self, num_pipe_info: Dict[str, Any]) -> None:
         """
         This function initiate variance thresholder.
 

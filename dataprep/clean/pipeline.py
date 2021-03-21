@@ -28,7 +28,7 @@ class Pipeline:
             Generated pipeline with specific operators. Using the components in num_pipeline.
     """
 
-    def __init__(self, cat_pipe_info: Dict, num_pipe_info: Dict) -> None:
+    def __init__(self, cat_pipe_info: Dict[str, Any], num_pipe_info: Dict[str, Any]) -> None:
         """
         This function initiate categorical pipeline and numerical pipeline.
 
@@ -126,7 +126,7 @@ class Pipeline:
                 )
         return temp_training_df, temp_test_df
 
-    def generate_cat_pipe(self, cat_pipe_info: dict) -> Any:
+    def generate_cat_pipe(self, cat_pipe_info: Dict[str, Any]) -> Any:
         """
         This function is used to generate categorical pipeline with specific operators.
 
@@ -144,7 +144,7 @@ class Pipeline:
             result.append(component_dic[component](cat_pipe_info))
         return result
 
-    def generate_num_pipe(self, num_pipe_info: dict) -> Any:
+    def generate_num_pipe(self, num_pipe_info: Dict[str, Any]) -> Any:
         """
         This function is used to generate numerical pipeline with specific operators.
 

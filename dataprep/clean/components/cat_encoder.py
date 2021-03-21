@@ -2,7 +2,7 @@
 Implement categorical encoder component.
 """
 
-from typing import Any, Tuple
+from typing import Any, Tuple, Dict
 import dask.dataframe as dd
 
 from .cat_encoding import operator_dic
@@ -18,7 +18,7 @@ class CatEncoder:
             Encoder object
     """
 
-    def __init__(self, cat_pipe_info: dict) -> None:
+    def __init__(self, cat_pipe_info: Dict[str, Any]) -> None:
         """
         This function initiate categorical encoder.
 

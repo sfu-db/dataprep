@@ -2,7 +2,7 @@
 Implement numerical drop imputer.
 """
 
-from typing import Any, Union
+from typing import Any, Union, List, Optional
 import dask.dataframe as dd
 from dask.dataframe import from_pandas
 import pandas as pd
@@ -17,7 +17,7 @@ class DropImputer:
             Whether data column should be dropped.
     """
 
-    def __init__(self, null_values: dict) -> None:
+    def __init__(self, null_values: Optional[List[Any]]) -> None:
         """
         This function initiate drop imputer.
 

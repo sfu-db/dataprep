@@ -2,7 +2,7 @@
 Implement categorical constant imputer.
 """
 
-from typing import Any, Dict
+from typing import Any, List, Optional
 import dask.dataframe as dd
 
 
@@ -15,7 +15,7 @@ class ConstantImputer:
             Value used for imputing missing values, the default value is "Missing"
     """
 
-    def __init__(self, null_values: Dict, fill_value: str = "") -> None:
+    def __init__(self, null_values: Optional[List[Any]], fill_value: str = "") -> None:
         """
         This function initiate constant imputer.
 
