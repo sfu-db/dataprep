@@ -10,9 +10,10 @@ from typing import cast, Tuple
 
 from .utils import Request
 
-META_URL = "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/{}/{}/_meta.json"
-TABLE_URL = "https://raw.githubusercontent.com/sfu-db/DataConnectorConfigs/{}/{}/{}.json"
-GIT_REF_URL = "https://api.github.com/repos/sfu-db/DataConnectorConfigs/git/refs/heads"
+# note: apply change after rename the config repo
+META_URL = "https://raw.githubusercontent.com/sfu-db/APIConnectors/{}/api-connectors/{}/_meta.json"
+TABLE_URL = "https://raw.githubusercontent.com/sfu-db/APIConnectors/{}/api-connectors/{}/{}.json"
+GIT_REF_URL = "https://api.github.com/repos/sfu-db/APIConnectors/git/refs/heads"
 
 
 def separate_branch(config_path: str) -> Tuple[str, str]:
