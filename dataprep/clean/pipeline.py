@@ -6,8 +6,8 @@ from typing import Any, Tuple, Dict
 
 import dask.dataframe as dd
 
-from components import component_dic
-from utils import NULL_VALUES
+from .components import component_dic
+from .utils import NULL_VALUES
 
 
 class Pipeline:
