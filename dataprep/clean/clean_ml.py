@@ -2,7 +2,7 @@
 Implement clean_ml function
 """
 
-# pylint: disable=too-many-arguments, trailing-whitespace, global-statement, line-too-long
+# pylint: disable=too-many-arguments, too-many-locals, too-many-branches
 from typing import Union, Dict, List, Tuple, Optional, Any
 
 import dask.dataframe as dd
