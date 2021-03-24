@@ -35,19 +35,29 @@
             </div>
             <div class="var-plot">
                 <div class="vp-switch">
-                    <label class="switch" onclick="showStats(this)" style="background-color: #b5d6ea;">
+                    {% if value.col_type == 'numerical' %}
+                        <label class="switch-{{key}}" onclick="openTab(event, 'Stats-num-{{key}}')" style="background-color: #b5d6ea;">
                         <input type="radio" />
                         Stats
                     </label>
-                    <label class="switch" onclick="showPlots(this)">
+                    {% endif %}
+                    {% if value.col_type == 'categorical' %}
+                    <label class="switch-{{key}}" onclick="openTab(event, 'Stats-cat-{{key}}')" style="background-color: #b5d6ea;">
                         <input type="radio" />
-                        Plots
+                        Stats
                     </label>
+                    {% endif %}
+                    {% for tab in value.tab_name[1:]%}
+                    <label class="switch-{{key}}" onclick="openTab(event, '{{tab}}-{{key}}')">
+                        <input type="radio" />
+                        {{tab}}
+                    </label>
+                    {% endfor %}
                 </div>
                 {% if value.col_type == 'numerical' %}
-                <div class="vp-table">
+                <div class="vp-table-{{key}}" id = "Stats-num-{{key}}">
                     <div>
-                        <h4 class="tb-title">Quantile Statistics</h3>
+                        <h4 class="tb-title">Quantile Statistics</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Quantile Statistics'].items() %}
                                 <tr>
@@ -58,7 +68,7 @@
                             </table>
                     </div>
                     <div>
-                        <h4 class="tb-title">Descriptive Statistics</h3>
+                        <h4 class="tb-title">Descriptive Statistics</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Descriptive Statistics'].items() %}
                                 <tr>
@@ -71,9 +81,9 @@
                 </div>
                 {% endif %}
                 {% if value.col_type == 'categorical' %}
-                <div class="vp-table">
+                <div class="vp-table-{{key}}" id = "Stats-cat-{{key}}">
                     <div>
-                        <h4 class="tb-title">Length</h3>
+                        <h4 class="tb-title">Length</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Length'].items() %}
                                 <tr>
@@ -84,7 +94,7 @@
                             </table>
                     </div>
                     <div>
-                        <h4 class="tb-title">Sample</h3>
+                        <h4 class="tb-title">Sample</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Sample'].items() %}
                                 <tr>
@@ -95,7 +105,7 @@
                             </table>
                     </div>
                     <div>
-                        <h4 class="tb-title">Letter</h3>
+                        <h4 class="tb-title">Letter</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Letter'].items() %}
                                 <tr>
@@ -107,11 +117,27 @@
                     </div>
                 </div>
                 {% endif %}
-                <div class="vp-plot-{{ value.col_type }}">
-                    {% for div in value.plots[1][1:] %}
+                {% for div,tab,insight_key in value.plots_tab %}
+                <div class="vp-plot-{{ value.col_type }} vp-table-{{key}}" id="{{tab}}-{{key}}">
+                    {% if value.insights_tab[insight_key] %}
+                    <div class="insight-container-column">
+                        <input type='checkbox'  style='display: none' id="ib-{{ insight_key }}-{{ key }}" class="insight-check-column">
+                        <label class="insight-btn-column-{{key}}" for="ib-{{ insight_key }}-{{ key }}"></label>
+                            <div class="insight-panel-column">
+                                <ul>
+                                {% for insight in value.insights_tab[insight_key] %}
+                                    <li class="entry-column">
+                                    {{ insight }}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                    {% endif %}
                     {{ div }}
-                    {% endfor %}
                 </div>
+                {% endfor %}
+
             </div>
 
         </div>
