@@ -9,7 +9,6 @@ import dask.dataframe as dd
 import pandas as pd
 from bokeh.embed import components
 from bokeh.plotting import Figure
-
 from ..configs import Config
 from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
@@ -19,6 +18,14 @@ from ..distribution.compute.common import _calc_line_dt
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import calc_stats_dt, cont_comps, nom_comps
 from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats, stats_viz_dt
+from ..distribution.compute.overview import (
+    _nom_calcs,
+    _cont_calcs,
+    _format_nom_ins,
+    _format_cont_ins,
+    _format_ov_ins,
+    _insight_pagination,
+)
 from ..dtypes import (
     CATEGORICAL_DTYPES,
     Continuous,
@@ -100,7 +107,6 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         data, completions = basic_computations(df, cfg)
     else:
         data = basic_computations(df, cfg)
-
     with catch_warnings():
         filterwarnings(
             "ignore",
@@ -113,12 +119,21 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
             category=RuntimeWarning,
         )
         (data,) = dask.compute(data)
-
     # results dictionary
     res: Dict[str, Any] = {}
     # overview
     if cfg.overview.enable:
-        data["ov"].pop("ks_tests")
+        # insight
+        all_ins = _format_ov_ins(data["ov"], cfg)
+        for col, dtp, dat in data["insights"]:
+            if is_dtype(dtp, Continuous()):
+                ins = _format_cont_ins(col, dat, data["ov"]["nrows"], cfg)[1]
+            elif is_dtype(dtp, Nominal()):
+                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
+            else:
+                continue
+            all_ins += ins
+        res["overview_insights"] = _insight_pagination(all_ins)
         res["overview"] = format_ov_stats(data["ov"])
         res["has_overview"] = True
     else:
@@ -146,20 +161,28 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                     visual_type="datetime_column",
                 )
                 stats = stats_viz_dt(data[col]["stats"])
-            rndrd = render(itmdt, cfg)["layout"]
+            rndrd = render(itmdt, cfg)
+            layout = rndrd["layout"]
             figs_var: List[Figure] = []
-            for tab in rndrd:
+            for tab in layout:
                 try:
                     fig = tab.children[0]
                 except AttributeError:
                     fig = tab
                 # fig.title = Title(text=tab.title, align="center")
                 figs_var.append(fig)
+            comp = components(figs_var)
+            insight_keys = list(rndrd["insights"].keys())[2:] if rndrd["insights"] else []
             res["variables"][col] = {
                 "tabledata": stats,
-                "plots": components(figs_var),
+                "plots": comp,
                 "col_type": itmdt.visual_type.replace("_column", ""),
+                "tab_name": rndrd["meta"],
+                "plots_tab": zip(comp[1][1:], rndrd["meta"][1:], insight_keys),
+                "insights_tab": rndrd["insights"],
             }
+            # for div, tab, key in res["variables"][col]['plots_tab']:
+            #     print(div)
     else:
         res["has_variables"] = False
 
@@ -237,7 +260,7 @@ def basic_computations(
     cfg
         The config dict user passed in. E.g. config =  {"hist.bins": 20}
         Without user's specifications, the default is "auto"
-    """
+    """  # pylint: disable=too-many-branches
     data: Dict[str, Any] = {}
     df = DataArray(df)
 
@@ -260,7 +283,27 @@ def basic_computations(
                 data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
     # overview
     if cfg.overview.enable:
-        data["ov"] = calc_stats(df.frame.astype(str), cfg, None)
+        data["ov"] = calc_stats(df.frame, cfg, None)
+        head: pd.DataFrame = df.head
+        data["insights"] = []
+        for col in df.columns:
+            col_dtype = detect_dtype(df.frame[col])
+            if is_dtype(col_dtype, Continuous()):
+                data["insights"].append(
+                    (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
+                )
+            elif is_dtype(col_dtype, Nominal()):
+                # Since it will throw error if column is object while some cells are
+                # numerical, we transform column to string first.
+                df.frame[col] = df.frame[col].astype(str)
+                data["insights"].append(
+                    (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
+                )
+            elif is_dtype(col_dtype, DateTime()):
+                data["insights"].append(
+                    (col, DateTime(), dask.delayed(_calc_line_dt)(df.frame[[col]], cfg.line.unit))
+                )
+
     # interactions
     if cfg.interactions.enable:
         data["scat"] = df_num.frame.map_partitions(

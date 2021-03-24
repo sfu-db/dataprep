@@ -245,7 +245,7 @@ def wordcloud_viz(
     Visualize the word cloud
     """  # pylint: disable=unsubscriptable-object
     ellipse_mask = np.load(f"{Path(__file__).parent.parent.parent}/assets/ellipse.npz").get("image")
-    wordcloud = WordCloud(background_color="white", mask=ellipse_mask)
+    wordcloud = WordCloud(background_color="white", mask=ellipse_mask, repeat=False)
     wordcloud.generate_from_frequencies(word_cnts)
     wcarr = wordcloud.to_array().astype(np.uint8)
 
@@ -1506,15 +1506,18 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
 def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Create visualizations for plot(df, Nominal)
-    """
+    """  # pylint: disable=too-many-locals
 
     if cfg.plot.report:
-        plot_width = 280
-        plot_height = 250
+        plot_width = 450
+        plot_height = 400
+        plot_width_bar = 280
+        plot_height_bar = 248
     else:
         plot_width = cfg.plot.width if cfg.plot.width is not None else 450
         plot_height = cfg.plot.height if cfg.plot.height is not None else 400
-
+        plot_width_bar = plot_width
+        plot_height_bar = plot_height
     tabs: List[Panel] = []
     htgs: Dict[str, List[Tuple[str, str]]] = {}
     col, data = itmdt["col"], itmdt["data"]
@@ -1531,8 +1534,8 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
             data["nuniq"],
             data["nrows"],
             col,
-            plot_width,
-            plot_height,
+            plot_width_bar,
+            plot_height_bar,
             True,
             cfg.bar,
         )
@@ -1575,9 +1578,9 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         htgs["Word Length"] = cfg.wordlen.how_to_guide(plot_height, plot_width)
 
     # panel.child.children[0] is a figure
-    for panel in tabs:
+    for panel in tabs[0:]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
-
+    tabs[0].child.children[0].frame_width = int(plot_width_bar * 0.9)
     return {
         "tabledata": format_cat_stats(stats, len_stats, letter_stats) if cfg.stats.enable else [],
         "insights": nom_insights(data, col, cfg) if cfg.insight.enable else [],
@@ -1599,7 +1602,7 @@ def nom_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List[
         "Bar Chart": [],
         "Pie Chart": [],
         "Word Cloud": [],
-        "Word Frequencies": [],
+        "Word Frequency": [],
         "Word Length": [],
     }
 
@@ -1648,12 +1651,12 @@ def nom_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List[
                 data["word_cnts_freq"].index[0],
                 data["word_cnts_freq"].index[1],
             )
-            ins["Word Frequencies"].append(
+            ins["Word Frequency"].append(
                 f"""The largest value ({val1}) is over {factor} times larger than the second
                 largest value ({val2})"""
             )
         if data["len_stats"]["Minimum"] == data["len_stats"]["Maximum"]:
-            ins["Word Frequencies"].append(f"{col} has words of constant length")
+            ins["Word Frequency"].append(f"{col} has words of constant length")
 
     return ins
 
@@ -1664,12 +1667,15 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals
     if cfg.plot.report:
-        plot_width = 280
-        plot_height = 250
+        plot_width = 450
+        plot_height = 400
+        plot_width_hist = 280
+        plot_height_hist = 248
     else:
         plot_width = cfg.plot.width if cfg.plot.width is not None else 450
         plot_height = cfg.plot.height if cfg.plot.height is not None else 400
-
+        plot_width_hist = plot_width
+        plot_height_hist = plot_height
     col, data = itmdt["col"], itmdt["data"]
     tabs: List[Panel] = []
     htgs: Dict[str, List[Tuple[str, str]]] = {}
@@ -1681,8 +1687,8 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
             col,
             cfg.hist.yscale,
             cfg.hist.color,
-            plot_width,
-            plot_height,
+            plot_width_hist,
+            plot_height_hist,
             True,
         )
         tabs.append(Panel(child=row(fig), title="Histogram"))
@@ -1712,8 +1718,9 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         htgs["Box Plot"] = cfg.box.univar_how_to_guide(plot_height, plot_width)
 
     # panel.child.children[0] is a figure
-    for panel in tabs:
+    for panel in tabs[0:]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
+    tabs[0].child.children[0].frame_width = int(plot_width_hist * 0.9)
 
     return {
         "tabledata": format_num_stats(data) if cfg.stats.enable else [],
@@ -1785,8 +1792,12 @@ def render_dt(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Create visualizations for plot(df, DateTime)
     """
-    plot_width = cfg.plot.width if cfg.plot.width is not None else 450
-    plot_height = cfg.plot.height if cfg.plot.height is not None else 400
+    if cfg.plot.report:
+        plot_width = 280
+        plot_height = 248
+    else:
+        plot_width = cfg.plot.width if cfg.plot.width is not None else 450
+        plot_height = cfg.plot.height if cfg.plot.height is not None else 400
 
     tabs: List[Panel] = []
     if cfg.line.enable:
