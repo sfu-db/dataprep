@@ -2,6 +2,7 @@
 import http.server
 import json
 import random
+import re
 import socket
 import socketserver
 import string
@@ -356,8 +357,14 @@ class SearchDef(BaseDef):
     key: str
 
 
-class RequestDef(BaseDef):
+class UrlDef(BaseDef):
     url: str
+    parse: bool = True
+    skip: Set[str] = Field(default_factory=set)
+
+
+class RequestDef(BaseDef):
+    url: Union[str, UrlDef]
     method: Method
 
     headers: Optional[Dict[str, FieldDefUnion]]
@@ -368,6 +375,38 @@ class RequestDef(BaseDef):
     authorization: Optional[AuthorizationDef]
     pagination: Optional[PaginationDef]
     search: Optional[SearchDef]
+
+    def url_path_params(self) -> Set[str]:
+        if isinstance(self.url, str):
+            url = self.url
+            skip: Set[str] = set()
+        else:
+            if not self.url.parse:
+                return set()
+            url = self.url.url
+            skip = self.url.skip
+
+        ret: Set[str] = set()
+
+        for match in re.finditer(r"\{(?P<param>.*?)\}", url):
+            param = match.group("param")
+            if param:
+                ret.add(param)
+
+        return ret - skip
+
+    def populate_url(self, params: Dict[str, str]) -> str:
+        if isinstance(self.url, str):
+            url = self.url
+        else:
+            url = self.url.url
+            if not self.url.parse:
+                return url
+
+        for key, value in params.items():
+            url = url.replace("{" + key + "}", value)
+
+        return url
 
 
 class SchemaFieldDef(BaseDef):
