@@ -12,8 +12,13 @@ import pandas as pd
 from jsonpath_ng import parse as jparse
 from dataprep.connector.schema.defs import ConfigDef
 
-from .schema import ConfigDef
-
+from .schema import (
+    ConfigDef,
+    FieldDefUnion
+)
+######
+import re
+########
 _TYPE_MAPPING = {
     "int": int,
     "string": str,
@@ -35,18 +40,18 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
         self.name = name
         self.config = ConfigDef(**config)
 
-    def from_response(self, payload: str) -> pd.DataFrame:
+    def from_response(self, payload: str,fields: Dict[str, FieldDefUnion]) -> pd.DataFrame:
         """Create a dataframe from a http body payload."""
 
         ctype = self.config.response.ctype  # pylint: disable=no-member
         if ctype == "application/json":
-            rows = self.from_json(payload)
+            rows = self.from_json(payload,fields)
         else:
             raise NotImplementedError(f"{ctype} not supported")
 
         return pd.DataFrame(rows)
 
-    def from_json(self, data: str) -> Dict[str, List[Any]]:
+    def from_json(self, data: str, fields: Dict[str, FieldDefUnion]) -> Dict[str, List[Any]]:
         """Create rows from json string."""
 
         data = jloads(data)
@@ -56,14 +61,24 @@ class ImplicitTable:  # pylint: disable=too-many-instance-attributes
 
         if respdef.orient == "records":  # pylint: disable=no-member
             data_rows = [match.value for match in table_expr.find(data)]
-
+            ###############################
+            
+            ###############################
             for (
                 column_name,
                 column_def,
             ) in respdef.schema_.items():
+                
                 column_target = column_def.target
+                #################################################
+                matches = (re.findall(r"(?={).+?(?<=})",column_target))
+                for key, def_ in fields.items():
+                    key = "{" + key + "}"
+                    for x in matches:
+                        if(key == x):
+                            column_target = re.sub(x, def_, column_target)
+                ##################################################
                 column_type = column_def.type
-
                 target_matcher = jparse(column_target)
 
                 col: List[Any] = []

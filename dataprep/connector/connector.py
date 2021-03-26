@@ -397,8 +397,8 @@ class Connector:  # pylint: disable=too-many-instance-attributes
             if resp.status != 200:
                 raise RequestError(status_code=resp.status, message=await resp.text())
             content = await resp.text()
-            df = table.from_response(content)
-
+            df = table.from_response(content,req_data["params"])
+        
             if len(df) == 0 and _allowed_page is not None and _page is not None:
                 _allowed_page.set(_page)
                 df = None

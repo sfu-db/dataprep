@@ -1,0 +1,72 @@
+{
+    "version": 1,
+    "request": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "method": "GET",
+        "authorization": {
+            "type": "QueryParam",
+            "keyParam": "key"
+        },
+        "params": {
+            "q": true,
+            "part": true,
+            "type": false,
+            "maxResults": false,
+            "pageToken": false
+        },
+        "search": {
+            "key": "q"
+        },
+        "pagination": {
+            "type": "token",
+            "tokenKey": "pageToken",
+            "tokenLocation": "body",
+            "tokenAccessor": "$.nextPageToken",
+            "limitKey": "maxResults",
+            "maxCount": 50
+        }
+    },
+    "examples": {
+        "q": "'animation'",
+        "part": "'snippet'"
+    },
+    "response": {
+        "ctype": "application/json",
+        "tablePath": "$.items[*]",
+        "schema": {
+            "etag": {
+                "target": "$.etag",
+                "type": "string"
+            },
+            "videoId": {
+                "target": "$.id.{type}Id",
+                "type": "string"
+            },
+            "publishedAt": {
+                "target": "$.snippet.publishedAt",
+                "type": "string"
+            },
+            "channelId": {
+                "target": "$.snippet.channelId",
+                "type": "string"
+            },
+            "title": {
+                "target": "$.snippet.title",
+                "type": "string"
+            },
+            "description": {
+                "target": "$.snippet.description",
+                "type": "string"
+            },
+            "channelTitle": {
+                "target": "$.snippet.channelTitle",
+                "type": "string"
+            },
+            "publishTime": {
+                "target": "$.publishTime",
+                "type": "string"
+            }
+        },
+        "orient": "records"
+    }
+}
