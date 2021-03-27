@@ -21,6 +21,7 @@ from .clean_address import clean_address, validate_address
 
 from .clean_date import clean_date, validate_date
 
+from .clean_duplication import clean_duplication
 
 __all__ = [
     "clean_lat_long",
@@ -40,4 +41,5 @@ __all__ = [
     "validate_address",
     "clean_date",
     "validate_date",
+    "clean_duplication",
 ]
