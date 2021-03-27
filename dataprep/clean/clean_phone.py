@@ -20,14 +20,44 @@ CA_US_PATTERN = re.compile(
     [-. (]*
     (?P<area>\d{3})?
     [-. )\/]*
-    (?P<office>\d{3})
+    (?:(?P<office>\d{3})
     [-. \/]*
-    (?P<station>\d{4})
+    (?P<station>\d{4})|
+    (?P<letters>[0-9A-Z-. \/]{7,13}?))
     (?:[ \t]*(?:\#|x[.:]?|[Ee]xt[.:]?|[Ee]xtension)[ \t]*(?P<ext>\d+))?
     \s*$
     """,
     re.VERBOSE,
 )
+
+ALPHA_NUM_MAP = {
+    "A": "2",
+    "B": "2",
+    "C": "2",
+    "D": "3",
+    "E": "3",
+    "F": "3",
+    "G": "4",
+    "H": "4",
+    "I": "4",
+    "J": "5",
+    "K": "5",
+    "L": "5",
+    "M": "6",
+    "N": "6",
+    "O": "6",
+    "P": "7",
+    "Q": "7",
+    "R": "7",
+    "S": "7",
+    "T": "8",
+    "U": "8",
+    "V": "8",
+    "W": "9",
+    "X": "9",
+    "Y": "9",
+    "Z": "9",
+}
 
 
 def clean_phone(
@@ -265,12 +295,20 @@ def _check_phone(phone: Any, clean: bool) -> Any:
         return (None,) * 5 + ("unknown",) if clean else False
     if mch.group("country") and not mch.group("area"):
         return (None,) * 5 + ("unknown",) if clean else False
+    if mch.group("letters"):
+        # Check that there are 7 alphanumeric characters present
+        letters = re.sub(r"\W+", "", mch.group("letters"))
+        if len(letters) != 7:
+            return (None,) * 5 + ("unknown",) if clean else False
+        # Convert letters to numbers
+        numlist = [ALPHA_NUM_MAP[char] if char.isalpha() else char for char in letters]
+        numbers = "".join(numlist)
 
     # Components for phone number
     country_code = mch.group("country")
     area_code = mch.group("area")
-    office_code = mch.group("office")
-    station_code = mch.group("station")
+    office_code = numbers[:3] if mch.group("letters") else mch.group("office")
+    station_code = numbers[3:] if mch.group("letters") else mch.group("station")
     ext_num = mch.group("ext")
 
     return (
