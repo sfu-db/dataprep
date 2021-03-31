@@ -1,26 +1,61 @@
 <div class="ov-container">
-    <div class="tb-container">
-        <h3 class="tb-title">Dataset Statistics</h3>
-        <table class="rp-table">
-            {% for h, d in context.components.overview[0].items() %}
-            <tr>
-                <th>{{ h }}</th>
-                <td>{{ d }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <div class="ov-stats-container">
+        <div class="tb-container">
+            <h3 class="tb-title">Dataset Statistics</h3>
+            <table class="rp-table">
+                {% for h, d in context.components.overview[0].items() %}
+                <tr>
+                    <th>{{ h }}</th>
+                    <td>{{ d }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="tb-container">
+            <h3 class="tb-title">Variable Types</h3>
+            <table class="rp-table">
+                {% for h, d in context.components.overview[1].items() %}
+                {% if d > 0 %}
+                <tr>
+                    <th>{{ h }}</th>
+                    <td>{{ d }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </table>
+        </div>
     </div>
-    <div class="tb-container">
-        <h3 class="tb-title">Variable Types</h3>
-        <table class="rp-table">
-            {% for h, d in context.components.overview[1].items() %}
-            {% if d > 0 %}
-            <tr>
-                <th>{{ h }}</th>
-                <td>{{ d }}</td>
-            </tr>
+    {% if context.components.overview_insights %}
+        <div class="insights">
+            {% for page, content in context.components.overview_insights.items() %}
+            <div class="page-box" id="page-{{ loop.index }}">
+                <h3>Dataset Insights</h3>
+                <table>
+                    {% for entry in content %}
+                    {% for ins_type, insight in entry.items() %}
+                    <tr>
+                        <th id="des">
+                            {{ insight.replace('/*', '<span class="col-name' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                        </th>
+                        <td><span class="ins-type">{{ ins_type }}</span></td>
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    </div>
+    {% if context.components.overview_insights %}
+    <div class="page-switch-box">
+        <ul class="page-switch">
+            {% for _ in context.components.overview_insights %}
+            {% if loop.length > 1 %}
+            <li id="switch-{{ loop.index }}" onclick="switchPage(this)">{{ loop.index }}</li>
             {% endif %}
             {% endfor %}
-        </table>
+        </ul>
     </div>
+    {% endif %}
 </div>
