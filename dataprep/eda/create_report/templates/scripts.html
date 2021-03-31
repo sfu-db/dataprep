@@ -101,13 +101,29 @@
 
       tablinks = document.getElementsByClassName(evt.currentTarget.className);
       for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].style.background = "transparent";
         tablinks[i].className = tablinks[i].className.replace(" active", "");
       }
-
-      document.getElementById(tabName).style.display = "block";
+      document.getElementById(tabName).style.display = "flex";
+      for (i = 0; i < tablinks.length; i++){
+      }
       evt.currentTarget.className += " active";
+
+      evt.currentTarget.style.background = "#b5d6ea";
     }
 
-
+    function switchPage(e) {
+        const pageTo = e.id.replace('switch', 'page');
+        const pageBox = document.getElementById(pageTo);
+        const pageBoxAll = document.getElementsByClassName('page-box');
+        for (let i of pageBoxAll) {
+            i.style.display = 'none';
+        }
+        for (let i of document.querySelectorAll('.page-switch li')) {
+            i.style.backgroundColor = 'white';
+        }
+        pageBox.style.display = 'block';
+        e.style.backgroundColor = '#5DADE2';
+    }
 
 </script>

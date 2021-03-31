@@ -87,7 +87,6 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
             if col_ins:
                 col_insights[col] = col_ins
             all_ins += ins
-
     return Intermediate(
         data=plot_data,
         stats=ov_stats,
