@@ -27,6 +27,14 @@ Dates and Times
    :undoc-members:
    :show-inheritance:
 
+Duplicate Values
+----------------
+
+.. automodule:: dataprep.clean.clean_duplication
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Email Addresses
 ---------------
 
