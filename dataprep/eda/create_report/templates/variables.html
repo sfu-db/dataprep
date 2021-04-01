@@ -30,6 +30,36 @@
                     </div>
                 </div>
                 <div class="var-ovplot">
+                    {% if value.insights_tab["Bar Chart"] %}
+                    <div class="insight-container-column-single">
+                        <input type='checkbox'  style='display: none' id="ib-bar-{{ key }}" class="insight-check-column">
+                        <label class="insight-btn-column-single" for="ib-bar-{{ key }}"></label>
+                            <div class="insight-panel-column">
+                                <ul>
+                                {% for insight in value.insights_tab["Bar Chart"] %}
+                                    <li class="entry-column">
+                                    {{ insight }}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                    {% endif %}
+                    {% if value.insights_tab["Histogram"] %}
+                    <div class="insight-container-column-single">
+                        <input type='checkbox'  style='display: none' id="ib-histogram-{{ key }}" class="insight-check-column">
+                        <label class="insight-btn-column-single" for="ib-histogram-{{ key }}"></label>
+                            <div class="insight-panel-column">
+                                <ul>
+                                {% for insight in value.insights_tab["Histogram"] %}
+                                    <li class="entry-column">
+                                    {{ insight }}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                    {% endif %}
                     {{ value.plots[1][0] }}
                 </div>
             </div>
@@ -56,7 +86,7 @@
                 </div>
                 {% if value.col_type == 'numerical' %}
                 <div class="vp-table-{{key}}" id = "Stats-num-{{key}}">
-                    <div>
+                    <div class="stats-table">
                         <h4 class="tb-title">Quantile Statistics</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Quantile Statistics'].items() %}
@@ -67,7 +97,7 @@
                                 {% endfor %}
                             </table>
                     </div>
-                    <div>
+                    <div class="stats-table">
                         <h4 class="tb-title">Descriptive Statistics</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Descriptive Statistics'].items() %}
@@ -82,7 +112,7 @@
                 {% endif %}
                 {% if value.col_type == 'categorical' %}
                 <div class="vp-table-{{key}}" id = "Stats-cat-{{key}}">
-                    <div>
+                    <div class="stats-table">
                         <h4 class="tb-title">Length</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Length'].items() %}
@@ -93,7 +123,7 @@
                                 {% endfor %}
                             </table>
                     </div>
-                    <div>
+                    <div class="stats-table">
                         <h4 class="tb-title">Sample</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Sample'].items() %}
@@ -104,7 +134,7 @@
                                 {% endfor %}
                             </table>
                     </div>
-                    <div>
+                    <div class="stats-table">
                         <h4 class="tb-title">Letter</h4>
                             <table class="rp-table">
                                 {% for h, d in value.tabledata['Letter'].items() %}

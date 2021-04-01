@@ -245,7 +245,7 @@ def wordcloud_viz(
     Visualize the word cloud
     """  # pylint: disable=unsubscriptable-object
     ellipse_mask = np.load(f"{Path(__file__).parent.parent.parent}/assets/ellipse.npz").get("image")
-    wordcloud = WordCloud(background_color="white", mask=ellipse_mask, repeat=False)
+    wordcloud = WordCloud(background_color="white", mask=ellipse_mask)
     wordcloud.generate_from_frequencies(word_cnts)
     wcarr = wordcloud.to_array().astype(np.uint8)
 
@@ -1720,7 +1720,8 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     # panel.child.children[0] is a figure
     for panel in tabs[0:]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
-    tabs[0].child.children[0].frame_width = int(plot_width_hist * 0.9)
+    if cfg.hist.enable:
+        tabs[0].child.children[0].frame_width = int(plot_width_hist * 0.9)
 
     return {
         "tabledata": format_num_stats(data) if cfg.stats.enable else [],
