@@ -15,9 +15,9 @@
 <p align="center">
   <a href="https://sfu-db.github.io/dataprep/">Documentation</a>
   |
-  <a href="https://discord.gg/xwbkFNk">Forum</a>
+  <a href="https://discord.gg/xwbkFNk">Discord</a>
   | 
-  <a href="https://groups.google.com/forum/#!forum/dataprep">Mail List</a>
+  <a href="https://github.com/sfu-db/dataprep/discussions">Forum</a>
 </p>
 
 DataPrep lets you prepare your data using a single library with a few lines of code.
@@ -176,7 +176,7 @@ There are many ways to contribute to DataPrep.
 - Submit bugs and help us verify fixes as they are checked in.
 - Review the source code changes.
 - Engage with other DataPrep users and developers on StackOverflow.
-- Help each other in the [DataPrep Community Discord](https://discord.gg/xwbkFNk) and [Mail list & Forum].
+- Help each other in the [DataPrep Community Discord](https://discord.gg/xwbkFNk) and [Forum].
 - [![Twitter]](https://twitter.com/sfu_db)
 - Contribute bug fixes.
 - Providing use cases and writing down your user experience.
@@ -184,7 +184,7 @@ There are many ways to contribute to DataPrep.
 Please take a look at our [wiki] for development documentations!
 
 [build status]: https://img.shields.io/circleci/build/github/sfu-db/dataprep/master?style=flat-square&token=f68e38757f5c98771f46d1c7e700f285a0b9784d
-[mail list & forum]: https://groups.google.com/forum/#!forum/dataprep
+[Forum]: https://github.com/sfu-db/dataprep/discussions
 [wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
 [twitter]: https://img.shields.io/twitter/follow/sfu_db?style=social

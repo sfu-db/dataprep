@@ -29,9 +29,9 @@ DataPrep lets you prepare your data using a single library with a few lines of c
     <p align="center">
     <a href="https://sfu-db.github.io/dataprep/">Documentation</a>
     |
-    <a href="https://discord.gg/xwbkFNk">Forum</a>
+    <a href="https://discord.gg/xwbkFNk">Discord</a>
     | 
-    <a href="https://groups.google.com/forum/#!forum/dataprep">Mail List</a>
+    <a href="https://github.com/sfu-db/dataprep/discussions">Forum</a>
     </p>
 
 
