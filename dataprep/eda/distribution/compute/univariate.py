@@ -103,6 +103,7 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
         data["bar"] = (
             grps.nlargest(cfg.bar.bars) if cfg.bar.sort_descending else grps.nsmallest(cfg.bar.bars)
         )
+
         if cfg.bar.bars == cfg.pie.slices and cfg.bar.sort_descending == cfg.pie.sort_descending:
             data["pie"] = data["bar"]
         else:
@@ -111,6 +112,14 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
                 if cfg.pie.sort_descending
                 else grps.nsmallest(cfg.pie.slices)
             )
+
+        if cfg.bar.bars == cfg.value_table.ngroups and cfg.bar.sort_descending:
+            data["value_table"] = data["bar"]
+        elif cfg.pie.slices == cfg.value_table.ngroups and cfg.pie.sort_descending:
+            data["value_table"] = data["pie"]
+        else:
+            data["value_table"] = grps.nlargest(cfg.value_table.ngroups)
+
         if cfg.insight.enable:
             data["chisq"] = chisquare(grps.values)
 
@@ -228,6 +237,9 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
 
     if cfg.box.enable:
         data.update(_calc_box(srs, data["qntls"], cfg))
+
+    if cfg.value_table.enable:
+        data["value_table"] = srs.value_counts(sort=False).nlargest(cfg.value_table.ngroups)
 
     return data
 

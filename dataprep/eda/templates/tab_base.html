@@ -68,6 +68,52 @@
                 {{ fig }}
             </div>
             {% endfor %}
+            {% if context.value_table %}
+            <div class="plots-{{ context.rnd }}">
+                <div class="insight-container-{{ context.rnd }}">
+                    <input type='checkbox' style='display: none' id="htgbt-{{ context.rnd }}" class="insight-check-{{ context.rnd }}">
+                    <label class="htg-btn-{{ context.rnd }}" for="htgbt-{{ context.rnd }}"></label>
+                    <div class="insight-panel-{{ context.rnd }}" style="padding:20px;">
+                        {% for desc in context.how_to_guide["Value Table"] %}
+                        <div class="htg-entry-{{ context.rnd }}">
+                            <div class="htg-entry-conf-{{ context.rnd }}">{{ desc[0] }}</div>
+                            <div class="htg-entry-desc-{{ context.rnd }}">{{ desc[1] }}</div>
+                        </div>
+                        {% endfor %}
+                        <button class="htg-copy-btn-{{ context.rnd }}" onclick="copyParam(this)">Copy All Parameters</button>
+                    </div>
+                </div>
+                <table class="freq table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <td>Value</td>
+                            <td>Count</td>
+                            <td>Frequency (%)</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in context.value_table %}
+                        <tr class="{{ row['extra_class'] }}">
+                            <td title="{{ row['label'] }}">{{ row['label'] }}</td>
+                            <td>{{ row['count'] }}</td>
+                            <td>
+                                <div class="bar" style="width:{{ row['width_perc'] }}">
+                                    {% if row['width'] > 0.20 %}
+                                        {{ row['percentage'] }}
+                                    {% else %}
+                                        &nbsp;
+                                    {% endif %}
+                                </div>
+                                {% if row['width'] <= 0.20 %}
+                                    {{ row['percentage'] }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
         </div>
     </div>
 </body>
