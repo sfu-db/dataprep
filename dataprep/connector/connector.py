@@ -14,10 +14,10 @@ from aiohttp.client_reqrep import ClientResponse
 from jinja2 import Environment, StrictUndefined, UndefinedError
 from jsonpath_ng import parse as jparse
 
+from .config_manager import initialize_path
 from .errors import InvalidParameterError, RequestError, UniversalParameterOverridden
 from .implicit_database import ImplicitDatabase, ImplicitTable
 from .info import info
-from .config_manager import initialize_path
 from .ref import Ref
 from .schema import (
     FieldDef,
@@ -126,6 +126,8 @@ class Connector:  # pylint: disable=too-many-instance-attributes
                     allowed_params.add(key)
             else:
                 allowed_params.add(key)
+
+        allowed_params.update(self._impdb.tables[table].config.request.url_path_params())
 
         for key in where:
             if key not in allowed_params:
@@ -299,7 +301,7 @@ class Connector:  # pylint: disable=too-many-instance-attributes
 
         reqdef = table.config.request
         method = reqdef.method
-        url = reqdef.url
+
         req_data: Dict[str, Dict[str, Any]] = {
             "headers": {},
             "params": {},
@@ -364,6 +366,7 @@ class Connector:  # pylint: disable=too-many-instance-attributes
                     self._jenv,
                     merged_vars,
                 )
+
                 for ikey in instantiated_fields:
                     if ikey in req_data[key]:
                         warn(
@@ -377,6 +380,8 @@ class Connector:  # pylint: disable=too-many-instance-attributes
             field_def = getattr(reqdef, key, None)
             if field_def is not None:
                 validate_fields(field_def, req_data[key])
+
+        url = reqdef.populate_url(merged_vars)
 
         await _throttler.acquire(_page)
 
