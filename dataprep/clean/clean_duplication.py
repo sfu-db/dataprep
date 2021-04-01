@@ -40,11 +40,11 @@ def clean_duplication(
     Examples
     --------
 
-    >>> df = pd.DataFrame({'city': ['New York', 'new york']})
-    >>> clean_duplication(df, 'city')
-
+    After running clean_duplication(df, 'city') below in a notebook, a GUI will appear.
     Select the merge checkbox, press merge and re-cluster, then press finish.
 
+    >>> df = pd.DataFrame({'city': ['New York', 'new york']})
+    >>> clean_duplication(df, 'city')
           city
     0    New York
     1    New York
