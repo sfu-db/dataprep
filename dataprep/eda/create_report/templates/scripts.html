@@ -17,6 +17,17 @@
 {% endif %}
 
 <script>
+    setTimeout(init, 100);
+    function init() {
+        const tableRows_num = document.querySelectorAll('.tb-numerical tr');
+        highlightTableValue(tableRows_num, '#f00');
+        scientificNotationStrip(tableRows_num);
+
+        const tableRows_cat = document.querySelectorAll('.tb-categorical tr');
+        highlightTableValue(tableRows_cat, '#f00');
+        scientificNotationStrip(tableRows_cat);
+    }
+
     window.onload = () => {
         let tableRows = document.getElementsByTagName('tr');
         hightlightTableValue(tableRows, '#f00');
