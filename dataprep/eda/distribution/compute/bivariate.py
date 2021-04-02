@@ -10,7 +10,7 @@ from ....errors import UnreachableError
 from ...configs import Config
 from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, is_dtype
 from ...intermediate import Intermediate
-from .common import (
+from ...utils import (
     DTMAP,
     _calc_box_otlrs,
     _calc_box_stats,

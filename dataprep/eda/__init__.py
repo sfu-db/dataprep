@@ -20,6 +20,7 @@ from .dtypes import (
     Text,
 )
 from .missing import compute_missing, plot_missing, render_missing
+from .diff import plot_diff, compute_diff, render_diff
 
 __all__ = [
     "plot_correlation",
@@ -41,6 +42,9 @@ __all__ = [
     "DateTime",
     "Text",
     "create_report",
+    "plot_diff",
+    "compute_diff",
+    "render_diff",
 ]
 
 

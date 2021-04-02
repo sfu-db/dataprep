@@ -7,17 +7,52 @@
 </head>
 
 <body>
-    {% if context.tabledata or context.overview_insights%}
+    {% if context.tabledata or context.overview_insights or context.comparison_stats %}
     <div class="top-info-{{ context.rnd }}">
         <input type='checkbox' style='display: none' id="tb-{{ context.rnd }}">
         <label class="toggle-label-{{ context.rnd }}" for="tb-{{ context.rnd }}">
             {{ context.toggle_content }}
         </label>
         <div class="stats-{{ context.rnd }}">
-            {% if context.tabledata%}
+            {% if context.comparison_stats %}
+            <div class="comparison-stats-{{ context.rnd }}">
+                <div>
+                    <div class="tabledata-title-{{ context.rnd }}">Difference Overview</div>
+                    <table>
+                        <tr id="comp-label-{{ context.rnd }}">
+                            <th></th>
+                            {% for df_label in context.df_labels %}
+                            <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ df_label }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% for th, td in context.comparison_stats[0].items() %}
+                        <tr>
+                            <th>{{ th }}</th>
+                            {% for df_stat in td %}
+                            <td>{{ df_stat }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <tr id="vtr-{{ context.rnd }}">
+                            <th style="vertical-align: top;">Variable Types</th>
+                            {% for vb_types in context.comparison_stats[1] %}
+                            <td>
+                                {% for tp, num in vb_types.items() %}
+                                <ul>
+                                    <li>{{ tp }}: {{ num }}</li>
+                                </ul>
+                                {% endfor %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+            {% if context.tabledata %}
             <div class="tabledata-{{ context.rnd }}">
                 <div>
-                    <h3>Dataset Statistics</h3>
+                    <div class="tabledata-title-{{ context.rnd }}">Dataset Statistics</div>
                     <table>
                         {% for th, td in context.tabledata[0].items() %}
                         <tr>
@@ -43,12 +78,12 @@
             <div class="insights-{{ context.rnd }}">
                 {% for page, content in context.overview_insights.items() %}
                 <div class="page-box-{{ context.rnd }}" id="page-{{ context.rnd }}-{{ loop.index }}">
-                    <h3>Dataset Insights</h3>
+                    <div class="tabledata-title-{{ context.rnd }}">Dataset Insights</div>
                     <table>
                         {% for entry in content %}
                         {% for ins_type, insight in entry.items() %}
                         <tr>
-                            <th id="des-{{ context.rnd }}">
+                            <th class="des-{{ context.rnd }}">
                                 {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
                             </th>
                             <td><span class="ins-type-{{ context.rnd }}">{{ ins_type }}</span></td>
@@ -79,7 +114,11 @@
         {% for legend in context.legend_labels %}
             <div class="legend-bar-{{ context.rnd }}">
                 <div class="legend-color-{{ context.rnd }}" style="background-color: {{ legend.color }};"></div>
+                {% if loop.index0 == context.baseline %}
+                <div class="legend-label-{{ context.rnd }}"><strong>{{ legend.label }}</strong></div>
+                {% else %}
                 <div class="legend-label-{{ context.rnd }}">{{ legend.label }}</div>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
@@ -89,12 +128,14 @@
         <div class="fig-{{ context.rnd }}">
             {% if context.meta %}
             <div class="menu-{{ context.rnd }}">
-                <div class="plot-title-{{ context.rnd }}">{{ context.meta[loop.index0] }}</div>
+                <div class="plot-title-{{ context.rnd }}">
+                    <div>{{ context.meta[loop.index0] }}</div>
+                </div>
                 {% if context.how_to_guide[context.meta[loop.index0]] %}
-                <div class="insight-container-{{ context.rnd }}">
+                <div class="info-container-{{ context.rnd }}">
                     <input type='checkbox' style='display: none' id="htgbt-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
                     <label class="htg-btn-{{ context.rnd }}" for="htgbt-{{ context.rnd }}-{{ loop.index0 }}"></label>
-                    <div class="insight-panel-{{ context.rnd }}" style="padding:20px;">
+                    <div class="insight-panel-{{ context.rnd }}">
                         {% for desc in context.how_to_guide[context.meta[loop.index0]] %}
                         <div class="htg-entry-{{ context.rnd }}">
                             <div class="htg-entry-conf-{{ context.rnd }}">{{ desc[0] }}</div>
@@ -106,17 +147,19 @@
                 </div>
                 {% endif %}
                 {% if context.column_insights[context.meta[loop.index0]] %}
-                <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
-                <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
-                <div class="insight-panel-{{ context.rnd }}">
-                    <h4>Column Insights</h3>
-                        <ol>
-                            {% for insight in context.column_insights[context.meta[loop.index0]] %}
-                            <li class="entry-{{ context.rnd }}">
-                                {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
-                            </li>
-                            {% endfor %}
-                        </ol>
+                <div class="info-container-{{ context.rnd }}">
+                    <input type='checkbox' style='display: none' id="ib-{{ context.rnd }}-{{ loop.index0 }}" class="insight-check-{{ context.rnd }}">
+                    <label class="insight-btn-{{ context.rnd }}" for="ib-{{ context.rnd }}-{{ loop.index0 }}"></label>
+                    <div class="insight-panel-{{ context.rnd }}">
+                        <div class="insight-panel-title-{{ context.rnd }}">Column Insights</div>
+                            <ol>
+                                {% for insight in context.column_insights[context.meta[loop.index0]] %}
+                                <li class="entry-{{ context.rnd }}">
+                                    {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                                </li>
+                                {% endfor %}
+                            </ol>
+                    </div>
                 </div>
                 {% endif %}
             </div>
