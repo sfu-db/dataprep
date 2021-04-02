@@ -4,11 +4,11 @@
         -webkit-font-smoothing: antialiased;
         display: flex;
         flex-wrap: wrap;
-        width: {{ context.container_width }}px;
+        max-width: {{ context.container_width }}px;
     }
 
     .fig-{{ context.rnd }} {
-        flex: 0 1 30%;
+        flex: 1 1 30%;
         margin-top: 10px;
         background: white;
     }
@@ -29,20 +29,10 @@
         cursor: none;
     }
 
-    .expandable-{{ context.rnd }}:hover .insight-pre-{{ context.rnd }} {
-        max-width: 0;
-        width: auto;
-    }
-
-    .expandable-{{ context.rnd }}:hover .plot-title-{{ context.rnd }} {
-        max-width: 100% !important;
-        width: auto;
-    }
-
     .insight-pre-{{ context.rnd }}>span{
         margin: 0 5px;
     }
-    
+
     .col-cat-des-{{ context.rnd }} {
         flex: 0 1 auto;
         text-overflow: clip;
@@ -51,14 +41,27 @@
     }
 
     .plot-title-{{ context.rnd }} {
+        display: inline-block;
+        width: 245px;
+        vertical-align: middle;
+        height: 25px;
+    }
+
+    .plot-title-{{ context.rnd }} > div {
         font-weight: 800;
         color: #828282;
-        display: inline-block;
-        width: 269px;
         text-overflow: ellipsis;
         overflow: hidden;
-        white-space: nowrap;
-        vertical-align: middle;
+        margin: 0;
+    }
+
+    .plot-title-{{ context.rnd }}:hover > div{
+        overflow-wrap: break-word;
+        max-width: 240px;
+        z-index: 1;
+        position: absolute;
+        max-height: 300px;
+        background-color: white;
     }
 
     .insight-btn-{{ context.rnd }} {
@@ -73,7 +76,7 @@
         cursor: pointer;
         position: relative;
         left: 250px;
-        bottom: 2px;
+        bottom: 15px;
         margin: 0;
         z-index: 1;
     }
@@ -93,7 +96,7 @@
         background-color: #212121;
         transition: all .2s ease;
         position: relative;
-        top: 27px;
+        top: 10px;
         margin-top: -20px;
         border-radius: 5px;
         width: 98%;
@@ -123,12 +126,14 @@
         hyphens: auto;
     }
 
-    .insight-panel-{{ context.rnd }} h4 {
+    .insight-panel-title-{{ context.rnd }} {
         -webkit-font-smoothing: antialiased;
         text-align: center;
         color: #fff;
         margin-top: 1em !important;
         margin-bottom: 0 !important;
+        font-size: 16px;
+        font-weight: 600;
     }
 
     #tb-{{ context.rnd }}:checked+label+div {
@@ -161,6 +166,7 @@
         text-align: center;
         text-decoration: none;
         font-size: 15px;
+        width: 100%;
     }
 
     .toggle-label-{{ context.rnd }}:hover {
@@ -170,17 +176,15 @@
     .stats-{{ context.rnd }} {
         display: none;
         justify-content: space-between;
-        width: {{context.container_width}};
-        height: 350px;
     }
 
     .stats-{{ context.rnd }} table {
         font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
         -webkit-font-smoothing: antialiased;
-        border-collapse: collapse;
+        border-collapse: collapse !important;
         font-size: 12px;
-        table-layout: auto;
-        width: 100%;
+        table-layout: auto !important;
+        width: 100% !important;
     }
 
     .stats-{{ context.rnd }} table th {
@@ -193,21 +197,17 @@
 
     .tabledata-{{ context.rnd }} {
         flex: 1 1 50%;
-<!--        max-width: 477px;-->
     }
 
-    .tabledata-{{ context.rnd }} h3 {
+    .tabledata-title-{{ context.rnd }} {
         text-align: center;
+        font-size: 16px;
+        font-weight: 600;
     }
 
-    .tabledata-{{ context.rnd }} th {
+    .tabledata-{{ context.rnd }} th, .tabledata-{{ context.rnd }} td {
         text-align: left;
     }
-
-    .tabledata-{{ context.rnd }} td {
-        text-align: left;
-    }
-
     .insights-{{ context.rnd }} {
         flex: 1 1 50%;
         text-align: center;
@@ -243,6 +243,14 @@
         min-width: 82px;
     }
 
+    .des-{{ context.rnd }} span {
+        max-width: 85px;
+    }
+
+    .des-{{ context.rnd }} span:hover {
+        position: absolute;
+    }
+
     .ins-type-{{ context.rnd }} {
         font-weight: 700;
         font-size: 85%;
@@ -264,11 +272,14 @@
         max-width: 200px;
         text-overflow: ellipsis;
         overflow: hidden;
-        white-space: nowrap;
         vertical-align: middle;
         color: #000000;
     }
-    
+
+    .col-name-{{ context.rnd }}:hover {
+        overflow-wrap: break-word;
+    }
+
     .col-cat-{{ context.rnd }} {
         border-radius: 2px;
         flex: 0 1 auto;
@@ -278,7 +289,7 @@
 
     .page-switch-box-{{ context.rnd }} {
         display: none;
-        margin-left: 477px;
+        margin-left: clamp(200px, 40vw, 460px);
         width: 477px;
     }
 
@@ -323,9 +334,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: {{ context.container_width }}px;
+        max-width: {{ context.container_width }}px;
         background-color: white;
         cursor: default;
+    }
+
+    .plot-legend-{{ context.rnd }}:hover .legend-color-{{ context.rnd }} {
+        filter: unset;
     }
 
     .legend-bar-{{ context.rnd }} {
@@ -339,7 +354,7 @@
     .legend-color-{{ context.rnd }} {
         width: 15px;
         height: 15px;
-        filter: opacity(0.5);
+        filter: opacity(0.6);
         border: 1px solid #444444;
     }
 
@@ -349,7 +364,7 @@
         color: #444444
     }
 
-    .insight-container-{{ context.rnd }} {
+    .info-container-{{ context.rnd }} {
         width: 300px;
         height: 0;
         position: relative;
@@ -369,7 +384,7 @@
         cursor: pointer;
         position: absolute;
         left: 275px;
-        bottom: -8px;
+        bottom: -5px;
         margin: 0;
         z-index: 1;
     }
@@ -384,12 +399,13 @@
         background: rgba(0, 0, 0, 0.1);
         color: #ffffffe0;
         padding: 10px;
-        margin: 5px 0px;
+        margin: 10px auto;
+        width: 240px;
     }
 
     .htg-entry-conf-{{ context.rnd }} {
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-        font-size: 85%;
+        font-size: 12px;
         background: rgb(187, 71, 103);
         width: fit-content;
         border: 1px solid white;
@@ -399,20 +415,48 @@
 
     .htg-entry-desc-{{ context.rnd }} {
         font-family: sans-serif;
-        font-size: 110%;
+        font-size: 12px;
         color: #909599;
         cursor: default;
+        padding: 2px 5px;
     }
 
     .htg-copy-btn-{{ context.rnd }} {
         border: 1px solid white;
-        border-radius: 5px;
-        margin: auto 25%;
+        border-radius: 3px;
+        margin: 10px 25%;
         width: 50%;
         margin-top: 10px;
+        font-size: 12px;
     }
 
     .htg-copy-btn-{{ context.rnd }}:hover {
         background: #5DADE2;
+    }
+
+    .top-info-{{ context.rnd }} {
+        max-width: 972px;
+    }
+
+    .comparison-stats-{{ context.rnd }} {
+        flex: 0 1 100%;
+    }
+
+    .comparison-stats-{{ context.rnd }} h3 {
+        text-align: center;
+    }
+
+    .comparison-stats-{{ context.rnd }} table, .comparison-stats-{{ context.rnd }} tr {
+        text-align: left;
+    }
+
+    .comparison-stats-{{ context.rnd }} th {
+        text-align: right;
+        max-width: 90px;
+    }
+
+    #comp-label-{{ context.rnd }} td {
+        font-weight: 800;
+        font-size: 15px;
     }
 </style>
