@@ -43,8 +43,6 @@ class ConstantImputer:
             Provided data column.
         """
 
-        if col_df:
-            return self
         return self
 
     def transform(self, col_df: dd.Series) -> dd.Series:
