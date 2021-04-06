@@ -2,6 +2,7 @@
 Implement categorical constant imputer.
 """
 
+# pylint: disable=unused-argument
 from typing import Any, List, Optional
 import dask.dataframe as dd
 
