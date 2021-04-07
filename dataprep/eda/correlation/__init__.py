@@ -72,6 +72,7 @@ def plot_correlation(
     This function only supports numerical or categorical data,
     and it is better to drop None, Nan and Null value before using it
     """
+
     cfg = Config.from_dict(display, config)
 
     with ProgressBar(minimum=1, disable=not progress):
