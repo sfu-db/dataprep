@@ -220,7 +220,7 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     if cfg.stats.enable:
         data["min"] = srs.min()
         data["max"] = srs.max()
-        data["nuniq"] = srs.nunique()
+        data["nuniq"] = srs.nunique_approx()
         data["nreals"] = srs.shape[0]
         data["nzero"] = (srs == 0).sum()
         data["nneg"] = (srs < 0).sum()
@@ -353,10 +353,14 @@ def calc_stats_dt(srs: dd.Series) -> Dict[str, str]:
     """
     size = srs.shape[0]  # include nan
     count = srs.count()  # exclude nan
-    uniq_count = srs.nunique()
+    # nunique_approx() has error when type is datetime
+    try:
+        uniq_count = srs.nunique_approx()
+    except:  # pylint: disable=W0702
+        uniq_count = srs.nunique()
     overview_dict = {
         "Distinct Count": uniq_count,
-        "Unique (%)": uniq_count / count,
+        "Approximate Unique (%)": uniq_count / count,
         "Missing": size - count,
         "Missing (%)": 1 - (count / size),
         "Memory Size": srs.memory_usage(deep=True),
