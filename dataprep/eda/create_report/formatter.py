@@ -33,13 +33,12 @@ from ..dtypes import (
     Nominal,
     detect_dtype,
     is_dtype,
-    string_dtype_to_object,
 )
 from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ..progress_bar import ProgressBar
-from ..utils import to_dask
+from ..utils import preprocess_dataframe
 
 
 def format_report(
@@ -70,8 +69,7 @@ def format_report(
         This variable acts like an API in passing data to the template engine.
     """
     with ProgressBar(minimum=1, disable=not progress):
-        df = to_dask(df)
-        df = string_dtype_to_object(df)
+        df = preprocess_dataframe(df)
         if mode == "basic":
             comps = format_basic(df, cfg)
         # elif mode == "full":

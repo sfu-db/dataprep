@@ -3,11 +3,14 @@
 import logging
 from math import ceil
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from collections import Counter
+
 
 import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_object_dtype
 from bokeh.models import Legend, FuncTickFormatter
 from bokeh.plotting import Figure
 from scipy.stats import gaussian_kde as gaussian_kde_
@@ -32,6 +35,58 @@ def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
     df_size = df.memory_usage(deep=True).sum()
     npartitions = ceil(df_size / 128 / 1024 / 1024)  # 128 MB partition size
     return dd.from_pandas(df, npartitions=npartitions)
+
+
+def preprocess_dataframe(
+    org_df: Union[pd.DataFrame, dd.DataFrame],
+    used_columns: Optional[Union[List[str], List[object]]] = None,
+) -> dd.DataFrame:
+    """
+    Make a dask dataframe with only used_columns.
+    This function will do the following:
+        1. keep only used_columns.
+        2. transform column name to string (avoid object column name) and rename
+        duplicate column names in form of {col}_{id}.
+        3. reset index
+        4. transform object column to string column (note that obj column can contain
+        cells from different type).
+        5. transform to dask dataframe if input is pandas dataframe.
+    """
+    if used_columns is None:
+        df = org_df.copy()
+    else:
+        # Process the case when used_columns are string column name,
+        # but org_df column name is object.
+        used_columns_set = set(used_columns)
+        used_cols_obj = set()
+        for col in org_df.columns:
+            if str(col) in used_columns_set or col in used_columns_set:
+                used_cols_obj.add(col)
+        df = org_df[used_cols_obj]
+
+    columns = list(df.columns)
+
+    # Resolve duplicate names in columns.
+    # Duplicate names will be renamed as col_{id}.
+    column_count = Counter(columns)
+    current_id: Dict[Any, int] = dict()
+    for i, col in enumerate(columns):
+        if column_count[col] > 1:
+            current_id[col] = current_id.get(col, 0) + 1
+            new_col_name = f"{col}_{current_id[col]}"
+        else:
+            new_col_name = f"{col}"
+        columns[i] = new_col_name
+
+    df.columns = columns
+    df = df.reset_index(drop=True)
+
+    # Since an object column could contains multiple types
+    # in different cells. transform object column to string.
+    for col in df.columns:
+        if is_object_dtype(df[col].dtype):
+            df[col] = df[col].astype(str)
+    return to_dask(df)
 
 
 def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103

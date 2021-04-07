@@ -83,6 +83,7 @@ def gen_random_series(
     size: int,
     dtype: str = "object",
     na_ratio: float = 0.0,
+    str_max_len: int = 100,
     random_state: Union[int, np.random.RandomState] = 0,
 ) -> pd.Series:
     """
@@ -97,6 +98,8 @@ def gen_random_series(
         Chosen from 'int', 'float', 'boolean', 'datetime', 'string' and 'object'.
     na_ratio: float
         The ratio of NA values in the series. Should be in [0.0, 1.0]
+    str_max_len: int
+        The max len of random string
     seed: int
         generator seed
     """
@@ -118,7 +121,10 @@ def gen_random_series(
     population_list = []
     for curr_type in gen_func:
         if dtype in [curr_type, "object"]:
-            rand_series = gen_func[curr_type](size, random_state=rand)
+            if curr_type != "string":
+                rand_series = gen_func[curr_type](size, random_state=rand)
+            else:
+                rand_series = gen_func[curr_type](size, max_len=str_max_len, random_state=rand)
             population_list.append(rand_series)
     object_population = pd.concat(population_list, ignore_index=True)
     object_series = pd.Series(rand.choice(object_population, size=size))
@@ -134,6 +140,7 @@ def gen_random_dataframe(
     nrows: int = 30,
     ncols: int = 30,
     na_ratio: float = 0.0,
+    str_col_name_max_len: int = 100,
     random_state: Union[int, np.random.RandomState] = 0,
 ) -> pd.DataFrame:
     """
@@ -148,6 +155,8 @@ def gen_random_dataframe(
         Number of rows of the generated dataframe.
     na_ratio:
         Ratio of NA values.
+    str_col_name_max_len:
+        max length of string column name
     ncols: int
         Number of columns of the generated dataframe.
     seed: int
@@ -166,7 +175,15 @@ def gen_random_dataframe(
     df = pd.DataFrame(series_list)
 
     # Generate random column names and index.
-    col_names = gen_random_series(size=ncols, dtype="object", na_ratio=0.1, random_state=rand)
+    col_names = gen_random_series(
+        size=ncols,
+        dtype="object",
+        na_ratio=0.1,
+        str_max_len=str_col_name_max_len,
+        random_state=rand,
+    )
     df.columns = col_names
-    df.index = gen_random_series(df.index.shape[0], na_ratio=0.1, random_state=rand)
+    df.index = gen_random_series(
+        df.index.shape[0], na_ratio=0.1, str_max_len=str_col_name_max_len, random_state=rand
+    )
     return df
