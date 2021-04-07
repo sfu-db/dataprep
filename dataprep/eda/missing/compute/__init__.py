@@ -6,7 +6,8 @@ from warnings import catch_warnings, filterwarnings
 
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
-from ...dtypes import DTypeDef, string_dtype_to_object
+from ...dtypes import DTypeDef
+from ...utils import preprocess_dataframe
 from ...intermediate import Intermediate
 from .bivariate import compute_missing_bivariate
 from .nullivariate import compute_missing_nullivariate
@@ -61,7 +62,7 @@ def compute_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
-    df = string_dtype_to_object(df)
+    df = preprocess_dataframe(df)
     df = DataArray(df)
 
     # pylint: disable=no-else-raise

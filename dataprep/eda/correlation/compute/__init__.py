@@ -7,6 +7,7 @@ from warnings import catch_warnings, filterwarnings
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
 from ...intermediate import Intermediate
+from ...utils import preprocess_dataframe
 from .bivariate import _calc_bivariate
 from .overview import _calc_overview
 from .univariate import _calc_univariate
@@ -55,6 +56,7 @@ def compute_correlation(
     elif not cfg:
         cfg = Config()
 
+    df = preprocess_dataframe(df)
     if x is None and y is None:  # pylint: disable=no-else-return
         with catch_warnings():
             filterwarnings(
