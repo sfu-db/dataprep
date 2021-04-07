@@ -11,7 +11,7 @@ import pandas as pd
 from ...configs import Config
 from ...dtypes import DTypeDef, string_dtype_to_object
 from ...intermediate import Intermediate
-from ...utils import to_dask
+from ...utils import preprocess_dataframe
 from .bivariate import compute_bivariate
 from .overview import compute_overview
 from .trivariate import compute_trivariate
@@ -59,9 +59,7 @@ def compute(
     """
     # pylint: disable=too-many-arguments
 
-    df = to_dask(df)
-    df.columns = df.columns.astype(str)
-    df = string_dtype_to_object(df)
+    df = preprocess_dataframe(df)
 
     if isinstance(cfg, dict):
         cfg = Config.from_dict(display, cfg)
