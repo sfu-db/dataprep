@@ -15,6 +15,15 @@ from IPython.display import Javascript, display
 from metaphone import doublemetaphone
 from Levenshtein import distance
 
+DECODE_FUNC = """
+    function b64DecodeUnicode(str) {
+        // Going backwards: from bytestream, to percent-encoding, to original string.
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+"""
+
 
 class Clusterer:
     """
@@ -31,7 +40,7 @@ class Clusterer:
 
     def __init__(self, df: pd.DataFrame, col_name: str, df_name: str):
         self.clusters = pd.Series()
-        self._df = df
+        self._df = df.copy(deep=True)
         self._df_name = df_name
         self._col = col_name
         self._ngram = 2
@@ -192,6 +201,7 @@ class Clusterer:
     def _create_replace_calls(
         self, cluster_page: pd.Series, do_merge: List[bool], new_values: List[str]
     ) -> str:
+
         """
         Creates a string containing the required replace function calls.
 
@@ -224,13 +234,15 @@ class Clusterer:
         """
         code = self._create_replace_calls(cluster_page, do_merge, new_values)
         encoded_code = (b64encode(str.encode(code))).decode()
+
         code = """
+            {0}
             var ind = IPython.notebook.get_selected_index();
             var cell = IPython.notebook.get_cell(ind);
             var text = cell.get_text();
-            cell.set_text(text.concat(atob("{0}")));
+            cell.set_text(text.concat(b64DecodeUnicode("{1}")));
         """.format(
-            encoded_code
+            DECODE_FUNC, encoded_code
         )
         display(Javascript(code))
 
@@ -256,13 +268,17 @@ class Clusterer:
         """
         code = "# dataframe with cleaned string values\ndf_clean"
         encoded_code = (b64encode(str.encode(code))).decode()
+        json = self._df.to_json(force_ascii=False)
+        execute_code = f"import pandas as pd\ndf_clean = pd.read_json('{json}')"
+        encoded_execute = (b64encode(str.encode(execute_code))).decode()
         code = """
-                     IPython.notebook.kernel.execute("df_clean = {0}.copy()");
-                     var code = IPython.notebook.insert_cell_below('code');
-                     code.set_text(atob("{1}"));
-                     code.execute();
-                 """.format(
-            self._df_name, encoded_code
+                 {0}
+                 IPython.notebook.kernel.execute(b64DecodeUnicode('{1}'));
+                 var code = IPython.notebook.insert_cell_below('code');
+                 code.set_text(b64DecodeUnicode("{2}"));
+                 code.execute();
+             """.format(
+            DECODE_FUNC, encoded_execute, encoded_code
         )
         display(Javascript(code))
 

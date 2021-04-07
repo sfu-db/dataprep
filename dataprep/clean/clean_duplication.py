@@ -20,6 +20,8 @@ def clean_duplication(
     """
     Cleans and standardized duplicate values in a DataFrame.
 
+    Read more in the :ref:`User Guide <duplication_userguide>`.
+
     Parameters
     ----------
     df
@@ -45,6 +47,7 @@ def clean_duplication(
 
     >>> df = pd.DataFrame({'city': ['New York', 'new york']})
     >>> clean_duplication(df, 'city')
+
           city
     0    New York
     1    New York
@@ -185,7 +188,7 @@ class UserInterface:
         # VBox containing a VBox with all the clusters in the first row and an optional
         # second row containing next and previous page buttons
         self._cluster_and_next_prev = VBox()
-        self._cluster_vbox = VBox(layout=Layout(height="600px", flex_flow="row wrap"))
+        self._cluster_vbox = VBox(layout=Layout(height="450px", flex_flow="row wrap"))
 
         footer = HBox([self._sel_all, merge_and_recluster, finish])
 
