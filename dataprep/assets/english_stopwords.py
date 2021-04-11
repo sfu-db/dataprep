@@ -1,4 +1,4 @@
-english_stopwords = [
+english_stopwords = {
     "i",
     "me",
     "my",
@@ -178,4 +178,4 @@ english_stopwords = [
     "won't",
     "wouldn",
     "wouldn't",
-]
+}
