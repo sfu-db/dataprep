@@ -67,6 +67,14 @@ Phone Numbers
    :undoc-members:
    :show-inheritance:
 
+Text
+----
+
+.. automodule:: dataprep.clean.clean_text
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 URLs
 ----
 
