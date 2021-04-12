@@ -1506,31 +1506,33 @@ def _value_table(srs: pd.Series, nrows: int, npres: int, nuniq: int) -> List[Dic
                 "width": record[col] / max_freq,
                 "width_perc": f"{record[col] / max_freq * 100}%",
                 "count": int(record[col]),
-                "percentage": f"{record['pct']}%",
+                "percentage": f"{record['pct']}%" if record["pct"] >= 0.1 else "< 0.1%",
                 "n": nrows,
                 "extra_class": "",
             }
         )
     if nothers > 0:
+        pct = round(nothers / nrows * 100, 1)
         rows.append(
             {
                 "label": f"Other values ({nuniq - len(df)})",
                 "width": nothers / max_freq,
                 "width_perc": f"{nothers / max_freq * 100}%",
                 "count": int(nothers),
-                "percentage": f"{round(nothers / nrows * 100, 1)}%",
+                "percentage": f"{pct}%" if pct >= 0.1 else "< 0.1%",
                 "n": nrows,
                 "extra_class": "other",
             }
         )
     if nmissing > 0:
+        pct = round(nmissing / nrows * 100, 1)
         rows.append(
             {
                 "label": "(Missing)",
                 "width": nmissing / max_freq,
                 "width_perc": f"{nmissing / max_freq * 100}%",
                 "count": int(nmissing),
-                "percentage": f"{round(nmissing / nrows * 100, 1)}%",
+                "percentage": f"{pct}%" if pct >= 0.1 else "< 0.1%",
                 "n": nrows,
                 "extra_class": "missing",
             }
