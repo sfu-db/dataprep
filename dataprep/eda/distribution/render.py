@@ -1248,8 +1248,8 @@ def format_num_stats(data: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     Format numerical statistics
     """
     overview = {
-        "Distinct Count": data["nuniq"],
-        "Unique (%)": data["nuniq"] / data["npres"],
+        "Approximate Distinct Count": data["nuniq"],
+        "Approximate Unique (%)": data["nuniq"] / data["npres"],
         "Missing": data["nrows"] - data["npres"],
         "Missing (%)": 1 - (data["npres"] / data["nrows"]),
         "Infinite": (data["npres"] - data["nreals"]),
@@ -1301,8 +1301,8 @@ def format_cat_stats(
     Format categorical statistics
     """
     ov_stats = {
-        "Distinct Count": stats["nuniq"],
-        "Unique (%)": stats["nuniq"] / stats["npres"],
+        "Approximate Distinct Count": stats["nuniq"],
+        "Approximate Unique (%)": stats["nuniq"] / stats["npres"],
         "Missing": stats["nrows"] - stats["npres"],
         "Missing (%)": 1 - stats["npres"] / stats["nrows"],
         "Memory Size": stats["mem_use"],

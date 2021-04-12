@@ -117,7 +117,7 @@ def _cont_calcs(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data["norm"] = normaltest(data["hist"][0])
         data["skew"] = skewtest(data["hist"][0])
         data["nneg"] = (srs < 0).sum()  # number of negative values
-        data["nuniq"] = srs.nunique()  # number of unique values
+        data["nuniq"] = srs.nunique_approx()  # number of unique values
         data["nzero"] = (srs == 0).sum()  # number of zeros
 
     return data
