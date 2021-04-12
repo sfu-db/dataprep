@@ -6,6 +6,7 @@ from typing import Tuple, List, Dict, Any, Union
 
 from ipywidgets.widgets import Label, Dropdown, Checkbox, Button, HBox, VBox, Box, Layout, Text
 import pandas as pd
+import dask.dataframe as dd
 
 from .clean_duplication_utils import Clusterer
 
@@ -15,7 +16,7 @@ DEFAULT_BLOCK_SIZE = "6"
 
 
 def clean_duplication(
-    df: pd.DataFrame, column: str, df_var_name: str = "df", page_size: int = 5
+    df: Union[pd.DataFrame, dd.DataFrame], column: str, df_var_name: str = "df", page_size: int = 5
 ) -> Box:
     """
     Cleans and standardized duplicate values in a DataFrame.
@@ -25,7 +26,7 @@ def clean_duplication(
     Parameters
     ----------
     df
-        A pandas DataFrame containing the data to be cleaned.
+        A pandas or Dask DataFrame containing the data to be cleaned.
     column
         The name of the column containing duplicate values.
     df_var_name
@@ -207,9 +208,7 @@ class UserInterface:
         line = HBox(children=[Label("-" * 186, layout=Layout(margin="0 0 0 18px"))])
         self._sel_all.value = False
 
-        cluster_page = self._clusterer.clusters.iloc[
-            self._page_pos : self._page_pos + self._page_size
-        ]
+        cluster_page = self._clusterer.get_page(self._page_pos, self._page_pos + self._page_size)
 
         label_layout = Layout(height="22px", width="360px")
         box_children = [line]
@@ -240,7 +239,7 @@ class UserInterface:
             box_children.append(line)
 
         # no clusters to display
-        if len(box_children) == 1:
+        if len(cluster_page) == 0:
             box_children = [
                 Label(
                     "No clusters, try a different clustering method",
@@ -404,9 +403,7 @@ class UserInterface:
 
         do_merge = [check.value for check in self._checks]
         new_values = [text.value for text in self._reprs]
-        cluster_page = self._clusterer.clusters.iloc[
-            self._page_pos : self._page_pos + self._page_size
-        ]
+        cluster_page = self._clusterer.get_page(self._page_pos, self._page_pos + self._page_size)
 
         if self._export_code.value:
             self._clusterer.live_export_code(cluster_page, do_merge, new_values)
