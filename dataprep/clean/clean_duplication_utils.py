@@ -7,13 +7,17 @@ from unicodedata import combining, category, normalize
 from base64 import b64encode
 from collections import defaultdict
 from operator import itemgetter
-from typing import List, Set, DefaultDict
+from typing import List, Set, Union, DefaultDict
 from itertools import permutations
 
 import pandas as pd
+import dask.dataframe as dd
+import dask
 from IPython.display import Javascript, display
 from metaphone import doublemetaphone
 from Levenshtein import distance
+
+from .utils import to_dask
 
 DECODE_FUNC = """
     function b64DecodeUnicode(str) {
@@ -30,19 +34,23 @@ class Clusterer:
     Performs clustering methods on data.
     """
 
+    # pylint: disable=too-many-instance-attributes
+
     clusters: pd.Series
-    _df: pd.DataFrame
+    _df: dd.DataFrame
+    _counts: pd.Series
     _df_name: str
     _col: str
     _ngram: int
     _radius: int
     _block_size: int
 
-    def __init__(self, df: pd.DataFrame, col_name: str, df_name: str):
-        self.clusters = pd.Series()
-        self._df = df.copy(deep=True)
+    def __init__(self, df: Union[pd.DataFrame, dd.DataFrame], col: str, df_name: str):
+        self.clusters = pd.Series(dtype=object)
+        self._df = to_dask(df)
+        self._counts = pd.Series(dtype=object)
         self._df_name = df_name
-        self._col = col_name
+        self._col = col
         self._ngram = 2
         self._radius = 2
         self._block_size = 6
@@ -52,6 +60,7 @@ class Clusterer:
         """
         Create clusters using the given clustering method.
         """
+
         if cluster_method == "levenshtein":
             self._nearest_neighbours_cluster()
         else:
@@ -60,8 +69,7 @@ class Clusterer:
     def _key_collision_cluster(self, cluster_method: str) -> None:
         """
         Create clusters using a key collision method.
-        Clusters are a Pandas Series of lists (each list represents a cluster),
-        each list contains tuples with the form (item, count).
+        Clusters are a Pandas Series of lists (each list represents a cluster).
         """
         key_funcs = {
             "fingerprint": self._finger_print_key,
@@ -69,21 +77,19 @@ class Clusterer:
             "phonetic-fingerprint": self._phonetic_fingerprint_key,
         }
         key_func = key_funcs[cluster_method]
-        col = self._col
-        # get the count of each item in the dataframe and remove duplicates
-        counts = self._df[col].value_counts(sort=False)
-        no_dups = self._df.drop_duplicates(subset=[col]).reset_index()
-        # create a column "vals" containing tuples of the form (item, count)
-        no_dups.loc[:, "vals"] = no_dups[col].map(lambda val: (val, counts.loc[val]))
+        counts = self._df[self._col].value_counts(sort=False)
+        # create dataframe containing unique values
+        df = counts.index.to_frame(name=self._col)
         # create a column "key" containing keys created by the given key collision method
-        no_dups.loc[:, "key"] = no_dups[col].map(key_func)
+        df["key"] = df[self._col].map(key_func)
         # put items with the same key into the same list
-        clusters = no_dups.groupby("key")["vals"].agg(list)
+        clusters = df.groupby("key")[self._col].apply(list, meta=(self._col, "object"))
         clusters = clusters.loc[clusters.map(len) > 1]
+        clusters, self._counts = dask.compute(clusters, counts)
         # sort by the size of each cluster, so that larger clusters appear first
-        clusters = clusters.sort_values(key=lambda x: x.map(len), ascending=False)
-        # values with greater counts appear first in the cluster
-        self.clusters = clusters.map(lambda x: sorted(x, key=itemgetter(1), reverse=True))
+        self.clusters = clusters.sort_values(key=lambda x: x.map(len), ascending=False).reset_index(
+            drop=True
+        )
 
     def _nearest_neighbours_cluster(self) -> None:
         """
@@ -95,15 +101,18 @@ class Clusterer:
         Method from OpenRefine: https://github.com/OpenRefine/OpenRefine/wiki/Clustering-In-Depth
         and simile-vicino: https://code.google.com/archive/p/simile-vicino/
         """
-        col = self._col
         blocks: DefaultDict[str, Set[str]] = defaultdict(set)
-        counts = self._df[col].value_counts(sort=False)
-        no_dups = self._df.drop_duplicates(subset=[col]).reset_index()
-
+        counts = self._df[self._col].value_counts(sort=False)
+        # create dataframe containing unique values
+        df = counts.index.to_frame(name=self._col)
         # put strings in blocks
-        no_dups[col].apply(self._populate_blocks, args=(blocks, self._block_size))
+        populate_blocks = df[self._col].apply(
+            self._populate_blocks, args=(blocks, self._block_size), meta=(self._col, "object")
+        )
+        _, self._counts = dask.compute(populate_blocks, counts)
+
         # compare strings in the same block and create clusters
-        self.clusters = self._get_nearest_neighbour_clusters(blocks, counts, self._radius)
+        self.clusters = self._get_nearest_neighbour_clusters(blocks, self._radius)
 
     @staticmethod
     def _populate_blocks(val: str, blocks: DefaultDict[str, Set[str]], block_size: int) -> None:
@@ -117,7 +126,7 @@ class Clusterer:
 
     @staticmethod
     def _get_nearest_neighbour_clusters(
-        blocks: DefaultDict[str, Set[str]], counts: pd.Series, radius: int
+        blocks: DefaultDict[str, Set[str]], radius: int
     ) -> pd.Series:
         """
         Compare every pair of strings in each block and add to cluster if
@@ -134,17 +143,13 @@ class Clusterer:
                 if dist <= radius or radius < 0:
                     cluster_map[center].add(val)
 
-        # remove duplicate clusters and sort so that values with greater counts
-        # appear first in the cluster.
+        # remove duplicate clusters and clusters of length 1
         unique_clusters = set(
-            tuple(sorted(cluster, key=lambda x: counts.loc[x], reverse=True))
-            for cluster in cluster_map.values()
+            frozenset(cluster) for cluster in cluster_map.values() if len(cluster) > 1
         )
-
-        clusters = [
-            [(x, counts.loc[x]) for x in cluster] for cluster in unique_clusters if len(cluster) > 1
-        ]
-
+        # convert to list of lists
+        clusters = [list(cluster) for cluster in unique_clusters]
+        # sort by the size of each cluster, so that larger clusters appear first
         return pd.Series(sorted(clusters, key=len, reverse=True))
 
     @staticmethod
@@ -258,7 +263,7 @@ class Clusterer:
         for idx, cluster in enumerate(cluster_page):
             cluster_repr = new_values[idx]
             if do_merge[idx]:
-                self._df.loc[:, self._col] = self._df[self._col].replace(
+                self._df[self._col] = self._df[self._col].replace(
                     [cluster_val for cluster_val, _ in cluster], cluster_repr
                 )
 
@@ -268,7 +273,8 @@ class Clusterer:
         """
         code = "# dataframe with cleaned string values\ndf_clean"
         encoded_code = (b64encode(str.encode(code))).decode()
-        json = self._df.to_json(force_ascii=False)
+        final_df = self._df.compute()
+        json = final_df.to_json(force_ascii=False)
         execute_code = f"import pandas as pd\ndf_clean = pd.read_json('{json}')"
         encoded_execute = (b64encode(str.encode(execute_code))).decode()
         code = """
@@ -281,6 +287,17 @@ class Clusterer:
             DECODE_FUNC, encoded_execute, encoded_code
         )
         display(Javascript(code))
+
+    def get_page(self, start: int, end: int) -> pd.Series:
+        """
+        Returns a page of clusters from start to end. Adds the counts to
+        each cluster entry and sorts each cluster by the counts, so that values
+        with a greater count appear first in the cluster.
+        """
+        page = self.clusters.iloc[start:end]
+        page = page.map(lambda cluster: [(val, self._counts.loc[val]) for val in cluster])
+        page = page.map(lambda x: sorted(x, key=itemgetter(1), reverse=True))
+        return page
 
     def set_cluster_params(self, ngram: int, radius: int, block_size: int) -> None:
         """
@@ -302,10 +319,7 @@ def _ngram_tokens(val: str, n: int) -> List[str]:
     # remove control characters
     val = "".join(ch for ch in val if category(ch)[0] != "C")
     val = normalize_non_ascii(val)
-    n_grams = []
-    for i in range(len(val) - n + 1):
-        n_grams.append(val[i : i + n])
-    return n_grams
+    return [val[i : i + n] for i in range(len(val) - n + 1)]
 
 
 def normalize_non_ascii(val: str) -> str:
