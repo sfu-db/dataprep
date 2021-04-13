@@ -220,7 +220,6 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     if cfg.stats.enable:
         data["min"] = srs.min()
         data["max"] = srs.max()
-        data["nuniq"] = srs.nunique_approx()
         data["nreals"] = srs.shape[0]
         data["nzero"] = (srs == 0).sum()
         data["nneg"] = (srs < 0).sum()
@@ -239,7 +238,12 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data.update(_calc_box(srs, data["qntls"], cfg))
 
     if cfg.value_table.enable:
-        data["value_table"] = srs.value_counts(sort=False).nlargest(cfg.value_table.ngroups)
+        value_counts = srs.value_counts(sort=False)
+        if cfg.stats.enable:
+            data["nuniq"] = value_counts.shape[0]
+        data["value_table"] = value_counts.nlargest(cfg.value_table.ngroups)
+    elif cfg.stats.enable:
+        data["nuniq"] = srs.nunique_approx()
 
     return data
 
