@@ -25,8 +25,8 @@ Loading dataset
 ===============
 Here we load the `titanic` dataset into a pandas dataframe and use it to demonstrate our functionality::
 
-    import pandas as pd
-    df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+    from dataprep.datasets import load_dataset
+    df = load_dataset("titanic")
 
 Generate report via `create_report(df)`
 =======================================
