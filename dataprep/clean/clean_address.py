@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import usaddress
 
-from ..eda.progress_bar import ProgressBar
+from ..progress_bar import ProgressBar
 from .address_utils import (
     ABBR_STATES,
     FULL_PREFIX,

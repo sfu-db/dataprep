@@ -40,6 +40,7 @@ def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
 def preprocess_dataframe(
     org_df: Union[pd.DataFrame, dd.DataFrame],
     used_columns: Optional[Union[List[str], List[object]]] = None,
+    excluded_columns: Optional[Union[List[str], List[object]]] = None,
 ) -> dd.DataFrame:
     """
     Make a dask dataframe with only used_columns.
@@ -84,7 +85,9 @@ def preprocess_dataframe(
     # Since an object column could contains multiple types
     # in different cells. transform object column to string.
     for col in df.columns:
-        if is_object_dtype(df[col].dtype):
+        if is_object_dtype(df[col].dtype) and (
+            excluded_columns is not None and col not in excluded_columns
+        ):
             df[col] = df[col].astype(str)
     return to_dask(df)
 

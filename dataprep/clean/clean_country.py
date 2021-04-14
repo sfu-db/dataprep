@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import regex as re
 
-from ..eda.progress_bar import ProgressBar
+from ..progress_bar import ProgressBar
 from .utils import NULL_VALUES, create_report_new, to_dask
 
 COUNTRY_DATA_FILE = path.join(path.split(path.abspath(__file__))[0], "country_data.tsv")

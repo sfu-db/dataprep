@@ -12,6 +12,7 @@ from scipy.stats import kendalltau as kendalltau_
 class CorrelationMethod(Enum):
     """Supported correlation methods"""
 
+    # pylint: disable=invalid-name
     Pearson = auto()
     Spearman = auto()
     KendallTau = auto()

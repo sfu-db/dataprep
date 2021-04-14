@@ -10,7 +10,7 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
-from ..eda.progress_bar import ProgressBar
+from ..progress_bar import ProgressBar
 from .utils import NEARBYKEYS, NULL_VALUES, create_report_new, to_dask
 
 USER_REGEX = re.compile(

@@ -5,7 +5,7 @@ import dask.array as da
 import dask.dataframe as dd
 
 from ...configs import Config
-from ...dtypes import Continuous, DTypeDef, Nominal, detect_dtype, is_dtype
+from ...dtypes import Continuous, DTypeDef, Nominal, detect_dtype, is_dtype, GeoGraphy
 
 LABELS = ["Orignal data", "After drop missing values"]
 
@@ -24,7 +24,9 @@ def uni_histogram(
 
         return counts, centers, edges
 
-    elif is_dtype(detect_dtype(srs, dtype), Nominal()):
+    elif is_dtype(detect_dtype(srs, dtype), Nominal()) or is_dtype(
+        detect_dtype(srs, dtype), GeoGraphy()
+    ):
         # Dask array's unique is way slower than the values_counts on Series
         # See https://github.com/dask/dask/issues/2851
         # centers, counts = da.unique(arr, return_counts=True)
@@ -65,7 +67,9 @@ def histogram(
         if not return_edges:
             return counts, centers
         return counts, centers, edges
-    elif is_dtype(detect_dtype(arr, dtype), Nominal()):
+    elif is_dtype(detect_dtype(arr, dtype), Nominal()) or is_dtype(
+        detect_dtype(arr, dtype), GeoGraphy()
+    ):
         # Dask array's unique is way slower than the values_counts on Series
         # See https://github.com/dask/dask/issues/2851
         # centers, counts = da.unique(arr, return_counts=True)

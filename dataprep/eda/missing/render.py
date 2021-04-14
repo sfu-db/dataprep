@@ -26,7 +26,7 @@ from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
 from ..configs import Config
-from ..dtypes import Continuous, Nominal, drop_null, is_dtype
+from ..dtypes import Continuous, Nominal, GeoGraphy, drop_null, is_dtype
 from ..intermediate import ColumnMetadata, Intermediate
 from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
@@ -135,7 +135,7 @@ def render_hist(  # pylint: disable=too-many-arguments
     """
     Render a histogram
     """
-    if is_dtype(meta["dtype"], Nominal()):
+    if is_dtype(meta["dtype"], Nominal()) or is_dtype(meta["dtype"], GeoGraphy()):
         tooltips = [
             (x, "@x"),
             ("Count", "@count"),
@@ -153,7 +153,7 @@ def render_hist(  # pylint: disable=too-many-arguments
 
     cmapper = CategoricalColorMapper(palette=CATEGORY10, factors=LABELS)
 
-    if is_dtype(meta["dtype"], Nominal()):
+    if is_dtype(meta["dtype"], Nominal()) or is_dtype(meta["dtype"], GeoGraphy()):
         radius = 0.99
 
         # Inputs of FactorRange() have to be sequence of strings,
@@ -640,7 +640,7 @@ def render_missing_impact_1vn(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
         fig.frame_height = plot_height
         panels.append(Panel(child=fig, title=col))
 
-        if is_dtype(meta[col]["dtype"], Nominal()):
+        if is_dtype(meta[col]["dtype"], Nominal()) or is_dtype(meta[col]["dtype"], GeoGraphy()):
             htgs[title] = cfg.bar.grid_how_to_guide()
         else:
             htgs[title] = cfg.hist.grid_how_to_guide()
