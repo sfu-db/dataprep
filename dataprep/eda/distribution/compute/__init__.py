@@ -3,13 +3,13 @@ Computations for plot(df, ...)
 """
 
 
-from typing import Optional, Union, List, Dict, Any
+from typing import Optional, Union, List, Dict, Any, Tuple
 
 import dask.dataframe as dd
 import pandas as pd
 
 from ...configs import Config
-from ...dtypes import DTypeDef, string_dtype_to_object
+from ...dtypes import DTypeDef, string_dtype_to_object, is_dtype, GeoPoint
 from ...intermediate import Intermediate
 from ...utils import preprocess_dataframe
 from .bivariate import compute_bivariate
@@ -59,7 +59,8 @@ def compute(
     """
     # pylint: disable=too-many-arguments
 
-    df = preprocess_dataframe(df)
+    params, exlude, ddf = process_latlong(df, x, y, z)
+    ddf = preprocess_dataframe(ddf, excluded_columns=exlude)
 
     if isinstance(cfg, dict):
         cfg = Config.from_dict(display, cfg)
@@ -67,18 +68,53 @@ def compute(
     elif not cfg:
         cfg = Config()
 
-    if not any((x, y, z)):
-        return compute_overview(df, cfg, dtype)
+    if not any(params):
+        return compute_overview(ddf, cfg, dtype)
 
-    if sum(v is None for v in (x, y, z)) == 2:
-        x = x or y or z
-        return compute_univariate(df, x, cfg, dtype)
+    if sum(v is None for v in params) == 2:
+        x = params[0] or params[1] or params[2]
+        return compute_univariate(ddf, x, cfg, dtype)
 
-    if sum(v is None for v in (x, y, z)) == 1:
-        x, y = (v for v in (x, y, z) if v is not None)
-        return compute_bivariate(df, x, y, cfg, dtype)
+    if sum(v is None for v in params) == 1:
+        x, y = (v for v in params if v is not None)
+        return compute_bivariate(ddf, x, y, cfg, dtype)
 
     if x is not None and y is not None and z is not None:
-        return compute_trivariate(df, x, y, z, cfg, dtype)
+        return compute_trivariate(ddf, x, y, z, cfg, dtype)
 
     raise ValueError("not possible")
+
+
+def concat_latlong(df: Union[pd.DataFrame, dd.DataFrame], x: Any) -> Tuple[str, Any]:
+    """
+    Merge Latlong into one new column.
+    """
+
+    name = x.lat + "_&_" + x.long
+    lat_long = tuple(zip(df[x.lat], df[x.long]))
+
+    return name, lat_long
+
+
+def process_latlong(
+    df: pd.DataFrame,
+    x: Optional[str] = None,
+    y: Optional[str] = None,
+    z: Optional[str] = None,
+) -> Tuple[List[Optional[str]], List[str], pd.DataFrame]:
+    """
+    Process Latlong data tpye.
+    """
+
+    params = []
+    exclude: List[str] = []
+    add_df = df.copy()
+    for temp in (x, y, z):
+        name = temp
+        if isinstance(temp, GeoPoint):
+            name, lat_long = concat_latlong(df, temp)
+            add_df[name] = lat_long
+            exclude.append(name)
+        params.append(name)
+
+    return params, exclude, add_df

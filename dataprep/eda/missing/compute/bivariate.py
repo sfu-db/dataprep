@@ -10,7 +10,7 @@ from scipy.stats import rv_histogram
 
 from ...configs import Config
 from ...data_array import DataArray
-from ...dtypes import Continuous, DTypeDef, Nominal, detect_dtype, is_dtype
+from ...dtypes import Continuous, DTypeDef, Nominal, GeoGraphy, detect_dtype, is_dtype
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, histogram
@@ -32,7 +32,14 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-stat
     col1 = df.values[~(df.nulls[:, xloc] | df.nulls[:, yloc]), yloc].astype(df.dtypes[y])
 
     minimum, maximum = col0.min(), col0.max()
-    bins = cfg.bar.bars if is_dtype(detect_dtype(df.frame[y], dtype), Nominal()) else cfg.hist.bins
+    bins = (
+        cfg.bar.bars
+        if (
+            is_dtype(detect_dtype(df.frame[y], dtype), Nominal())
+            or is_dtype(detect_dtype(df.frame[y], dtype), GeoGraphy())
+        )
+        else cfg.hist.bins
+    )
 
     hists = [histogram(col, bins, return_edges=True, dtype=dtype) for col in [col0, col1]]
 

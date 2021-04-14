@@ -6,7 +6,16 @@ import dask
 import dask.dataframe as dd
 
 from ...configs import Config
-from ...dtypes import Continuous, DateTime, DTypeDef, Nominal, detect_dtype, drop_null, is_dtype
+from ...dtypes import (
+    Continuous,
+    DateTime,
+    DTypeDef,
+    Nominal,
+    GeoGraphy,
+    detect_dtype,
+    drop_null,
+    is_dtype,
+)
 from ...intermediate import Intermediate
 from ...utils import _calc_line_dt
 
@@ -45,27 +54,41 @@ def compute_trivariate(
     ytype = detect_dtype(df[y], dtype)
     ztype = detect_dtype(df[z], dtype)
 
-    if is_dtype(xtype, DateTime()) and is_dtype(ytype, Nominal()) and is_dtype(ztype, Continuous()):
+    if (
+        is_dtype(xtype, DateTime())
+        and (is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()))
+        and is_dtype(ztype, Continuous())
+    ):
         y, z = z, y
     elif (
-        is_dtype(xtype, Continuous()) and is_dtype(ytype, DateTime()) and is_dtype(ztype, Nominal())
+        is_dtype(xtype, Continuous())
+        and is_dtype(ytype, DateTime())
+        and (is_dtype(ztype, Nominal()) or is_dtype(ztype, GeoGraphy()))
     ):
         x, y = y, x
     elif (
-        is_dtype(xtype, Continuous()) and is_dtype(ytype, Nominal()) and is_dtype(ztype, DateTime())
+        is_dtype(xtype, Continuous())
+        and (is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()))
+        and is_dtype(ztype, DateTime())
     ):
         x, y, z = z, x, y
     elif (
-        is_dtype(xtype, Nominal()) and is_dtype(ytype, DateTime()) and is_dtype(ztype, Continuous())
+        (is_dtype(xtype, Nominal()) or is_dtype(xtype, GeoGraphy()))
+        and is_dtype(ytype, DateTime())
+        and is_dtype(ztype, Continuous())
     ):
         x, y, z = y, z, x
     elif (
-        is_dtype(xtype, Nominal()) and is_dtype(ytype, Continuous()) and is_dtype(ztype, DateTime())
+        (is_dtype(xtype, Nominal()) or is_dtype(xtype, GeoGraphy()))
+        and is_dtype(ytype, Continuous())
+        and is_dtype(ztype, DateTime())
     ):
         x, z = z, x
 
     if not (
-        is_dtype(xtype, DateTime()) and is_dtype(ytype, Continuous()) and is_dtype(ztype, Nominal())
+        is_dtype(xtype, DateTime())
+        and is_dtype(ytype, Continuous())
+        and (is_dtype(ztype, Nominal()) or is_dtype(ztype, GeoGraphy()))
     ):
         raise ValueError(
             "x, y, and z must be one each of type datetime, numerical, and categorical"

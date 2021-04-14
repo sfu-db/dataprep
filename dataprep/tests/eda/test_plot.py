@@ -7,6 +7,7 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import pytest
+from ...datasets import load_dataset
 
 from ...eda import plot
 from ...eda.dtypes import Nominal
@@ -44,6 +45,15 @@ def simpledf() -> dd.DataFrame:
     return ddf
 
 
+@pytest.fixture(scope="module")  # type: ignore
+def geodf() -> dd.DataFrame:
+    df = df = load_dataset("countries")
+
+    ddf = to_dask(df)
+
+    return ddf
+
+
 def test_sanity_compute_univariate(simpledf: dd.DataFrame) -> None:
     plot(simpledf, "a")
     plot(simpledf, "e")
@@ -73,3 +83,8 @@ def test_specify_column_type(simpledf: dd.DataFrame) -> None:
 def test_specify_color(simpledf: dd.DataFrame) -> None:
     plot(simpledf, config={"bar.color": "#123456", "hist.color": "orange"})
     plot(simpledf, "a", config={"kde.hist_color": (1, 2, 3)})
+
+
+def test_geo(geodf: dd.DataFrame) -> None:
+    plot(geodf, "Country")
+    plot(geodf, "Country", "Population")
