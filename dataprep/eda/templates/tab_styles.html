@@ -50,7 +50,7 @@
         background: white;
     }
     {% endif %}
-    
+
     .contents-{{ context.rnd }}>div {
         animation: fadeIn .3s;
     }
@@ -64,7 +64,7 @@
         display: flex;
         flex-flow: column wrap;
         justify-content: flex-start;
-        max-height: 560px;
+        max-height: 550px;
         flex-grow: 1;
     }
 
@@ -239,8 +239,9 @@
         background: #5DADE2;
     }
 
-    /* Freq table */
+    {# Freq table #}
     table.freq {
+        margin-top: 30px;
         margin-bottom: 2em;
         border: 0;
         width:100%;
@@ -259,7 +260,7 @@
         font-size: 14px;
     }
 
-    /* Message classes */
+    {# Message classes #}
     .missing {
         color: #d62728;
     }
@@ -268,7 +269,7 @@
         opacity: 0.4;
     }
 
-    /* Bars in tables */
+    {# Bars in tables #}
     .freq.table{
         table-layout: fixed;
     }
@@ -277,7 +278,6 @@
         width: auto;
         max-width: none;
         text-align: left;
-
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -287,9 +287,6 @@
         width: auto;
         text-align: right;
     }
-    /* .freq:not(.mini) tr td:nth-child(4), .freq:not(.mini) tr th:nth-child(4){
-        width: 50px;
-    } */
 
     .freq .bar {
         float: left;
