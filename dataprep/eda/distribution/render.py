@@ -637,7 +637,7 @@ def latlong_viz(
     )
     fig.add_tools(HoverTool(renderers=[my_dots], tooltips=tooltip_2))
 
-    return Panel(child=row(fig), title="Geo_point Plot")
+    return Panel(child=row(fig), title="Geo Map")
 
 
 def geo_viz(
