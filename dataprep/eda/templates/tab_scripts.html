@@ -2,7 +2,7 @@
 {{ context.components[0] }}
 
 <script>
-    setTimeout(init, 100);
+    setTimeout(init, 50);
 
     function init() {
         const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
@@ -13,7 +13,7 @@
     }
 
     function switchTab{{ context.rnd }}(e) {
-        const selectedAreaSuffix = e.parentElement.parentElement.className.split('-')[1];
+        const selectedAreaSuffix = {{ context.rnd }};
         const selectedTabId = e.id.split('-')[2];
         const selectedTabContent = document.querySelector(`.contents-${selectedAreaSuffix}>div:nth-of-type(${selectedTabId})`);
         const contentArray = document.getElementsByClassName('plots-{{ context.rnd }}')
