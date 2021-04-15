@@ -159,7 +159,7 @@ series
 Name: country, dtype: bool
 ```
 
-**Currently supports functions for:** Column Headers | Country Names | Dates and Times | Email Addresses | Geographic Coordinates | IP Addresses | Phone Numbers | URLs | US Street Addresses
+**Currently supports functions for:** Column Headers | Country Names | Dates and Times | Duplicate Strings | Email Addresses | Geographic Coordinates | IP Addresses | Phone Numbers | URLs | US Street Addresses
 
 ## Documentation
 
