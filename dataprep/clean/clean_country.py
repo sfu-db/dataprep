@@ -4,6 +4,7 @@ Clean and validate a DataFrame column containing country names.
 from functools import lru_cache
 from operator import itemgetter
 from os import path
+from re import error
 from typing import Any, Union
 
 import dask
@@ -20,8 +21,6 @@ COUNTRY_DATA_FILE = path.join(path.split(path.abspath(__file__))[0], "country_da
 DATA = pd.read_csv(COUNTRY_DATA_FILE, sep="\t", encoding="utf-8", dtype=str)
 
 REGEXES = [re.compile(entry, re.IGNORECASE) for entry in DATA.regex]
-# alternative regex search strategy given on line 243
-# REGEXES = re.compile("|".join(f"(?P<a{i}>{x})" for i, x in enumerate(DATA.regex)), re.IGNORECASE)
 
 
 def clean_country(
@@ -290,19 +289,20 @@ def _check_country(country: str, input_format: str, strict: bool, clean: bool) -
 
     if strict and input_format == "regex":
         for form in ("name", "official"):
-            ind = DATA[DATA[form].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)].index
-            if np.size(ind) > 0:
-                return (ind[0], "success") if clean else True
+            try:
+                ind = DATA[
+                    DATA[form].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)
+                ].index
+                if np.size(ind) > 0:
+                    return (ind[0], "success") if clean else True
+            except error:
+                return (None, "unknown") if clean else False
 
     elif not strict and input_format in ("regex", "name", "official"):
         for index, country_regex in enumerate(REGEXES):
             if country_regex.search(country):
                 return (index, "success") if clean else True
 
-        # alternative regex search strategy
-        # match = REGEXES.search(country)
-        # if match:
-        #     return (int(match.lastgroup[1:]), "success") if clean else True
     else:
         ind = DATA[
             DATA[input_format].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)
