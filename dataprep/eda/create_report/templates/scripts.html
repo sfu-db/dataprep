@@ -30,11 +30,11 @@
 
     window.onload = () => {
         let tableRows = document.getElementsByTagName('tr');
-        hightlightTableValue(tableRows, '#f00');
+        highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
     }
 
-    function hightlightTableValue(element, color) {
+    function highlightTableValue(element, color) {
         for (let i of element) {
             let thValue = i.firstElementChild.innerText;
             let tbValue = i.lastElementChild.innerText;
