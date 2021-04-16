@@ -2,7 +2,7 @@
     <div class="ov-stats-container">
         <div class="tb-container">
             <h3 class="tb-title">Dataset Statistics</h3>
-            <table class="rp-table-overview">
+            <table class="rp-table">
                 {% for h, d in context.components.overview[0].items() %}
                 <tr>
                     <th>{{ h }}</th>
@@ -12,7 +12,7 @@
                 <tr>
                     <th style="vertical-align: top;">Variable Types</th>
                     <td>
-                        <ul>
+                        <ul style="list-style: none;padding-left: 0;">
                             {% for tp, num in context.components.overview[1].items() %}
                             <li>{{ tp }}: {{ num }}</li>
                             {% endfor %}
@@ -24,15 +24,15 @@
     </div>
     {% if context.components.overview_insights %}
         <div class="insights">
+            <h3>Dataset Insights</h3>
             {% for page, content in context.components.overview_insights.items() %}
             <div class="page-box" id="page-{{ loop.index }}">
-                <h3>Dataset Insights</h3>
                 <table>
                     {% for entry in content %}
                     {% for ins_type, insight in entry.items() %}
                     <tr>
                         <th id="des">
-                            {{ insight.replace('/*', '<span class="col-name' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                            {{ insight|escape|replace('/*start*/', '<span class="col-name">')|replace('/*end*/', '</span>') }}
                         </th>
                         <td><span class="ins-type">{{ ins_type }}</span></td>
                     </tr>
@@ -41,18 +41,17 @@
                 </table>
             </div>
             {% endfor %}
+            <div class="page-switch-box">
+                <ul class="page-switch">
+                    {% for _ in context.components.overview_insights %}
+                    {% if loop.length > 1 %}
+                    <li id="switch-{{ loop.index }}" onclick="switchPage(this)">{{ loop.index }}</li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     {% endif %}
     </div>
-    {% if context.components.overview_insights %}
-    <div class="page-switch-box">
-        <ul class="page-switch">
-            {% for _ in context.components.overview_insights %}
-            {% if loop.length > 1 %}
-            <li id="switch-{{ loop.index }}" onclick="switchPage(this)">{{ loop.index }}</li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+
 </div>
