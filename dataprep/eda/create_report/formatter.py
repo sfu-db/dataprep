@@ -217,7 +217,6 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
             for tab in rndrd.tabs:
                 fig = tab.child
                 fig.sizing_mode = "stretch_width"
-                # fig.title = Title(text=tab.title, align="center", text_font_size="20px")
                 figs_corr.append(fig)
                 res["correlation_names"].append(tab.title)
             res["correlations"] = components(figs_corr)

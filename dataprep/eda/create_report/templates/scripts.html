@@ -17,19 +17,10 @@
 {% endif %}
 
 <script>
-    setTimeout(init, 100);
+    setTimeout(init, 50);
+
     function init() {
-        const tableRows_num = document.querySelectorAll('.tb-numerical tr');
-        highlightTableValue(tableRows_num, '#f00');
-        scientificNotationStrip(tableRows_num);
-
-        const tableRows_cat = document.querySelectorAll('.tb-categorical tr');
-        highlightTableValue(tableRows_cat, '#f00');
-        scientificNotationStrip(tableRows_cat);
-    }
-
-    window.onload = () => {
-        let tableRows = document.getElementsByTagName('tr');
+        const tableRows = document.querySelectorAll('.rp-table tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
     }
@@ -102,25 +93,13 @@
         }
     }
 
-    function openTab(evt, tabName) {
-      var i, tabcontent, tablinks;
-
-      tabcontent = document.getElementsByClassName(evt.currentTarget.parentElement.nextElementSibling.className);
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-      }
-
-      tablinks = document.getElementsByClassName(evt.currentTarget.className);
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].style.background = "transparent";
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-      }
-      document.getElementById(tabName).style.display = "flex";
-      for (i = 0; i < tablinks.length; i++){
-      }
-      evt.currentTarget.className += " active";
-
-      evt.currentTarget.style.background = "#b5d6ea";
+    function openTab(e) {
+        const btnIndex = [...e.parentElement.children].indexOf(e);
+        const allContentEle = e.parentElement.parentElement.children;
+        for (let i of [...allContentEle].slice(1)) {
+            i.style.display = 'none';
+        }
+        allContentEle[Math.round(btnIndex/2)].style.display = (btnIndex == 1) ? 'flex' : 'block';
     }
 
     function switchPage(e) {

@@ -1,24 +1,28 @@
 <div class="missing-container">
   <div class="miss-plot">
-    <div class="report-tab">
-      <button class="missing-tablinks active" onclick="openTab(event, '{{context.components.missing_tabs[0]}}')" >{{context.components.missing_tabs[0]}}</button>
-      <button class="missing-tablinks" onclick="openTab(event, '{{context.components.missing_tabs[1]}}')">{{context.components.missing_tabs[1]}}</button>
-      <button class="missing-tablinks" onclick="openTab(event, '{{context.components.missing_tabs[2]}}')">{{context.components.missing_tabs[2]}}</button>
-      <button class="missing-tablinks" onclick="openTab(event, '{{context.components.missing_tabs[3]}}')">{{context.components.missing_tabs[3]}}</button>
+    <div class="vp-switch">
+      {% for miss_name in context.components.missing_tabs %}
+      {% if loop.index == 1 %}
+      <input type="radio" name="miss-names" id="miss-name-{{ miss_name }}" checked />
+      <label for="miss-name-{{ miss_name }}" onclick="openTab(this)" >{{ miss_name }}</label>
+      {% else %}
+      <input type="radio" name="miss-names" id="miss-name-{{ miss_name }}" />
+      <label for="miss-name-{{ miss_name }}" onclick="openTab(this)" >{{ miss_name }}</label>
+      {% endif %}
+      {% endfor %}
     </div>
 
-    <div id="{{context.components.missing_tabs[0]}}" class="missing-tabcontent">
-      {{ context.components.missing[1][0]}}
+    {% for plot in context.components.missing[1] %}
+    {% if loop.index == 1 %}
+    <div class="missing-tabcontent" style="display: block;">
+      {{ plot }}
     </div>
-    <div id="{{context.components.missing_tabs[1]}}" style="display:none" class="missing-tabcontent">
-      {{ context.components.missing[1][1]}}
+    {% else %}
+    <div class="missing-tabcontent">
+      {{ plot }}
     </div>
-    <div id="{{context.components.missing_tabs[2]}}" style="display:none" class="missing-tabcontent">
-      {{ context.components.missing[1][2]}}
-    </div>
-    <div id="{{context.components.missing_tabs[3]}}" style="display:none" class="missing-tabcontent">
-      {{ context.components.missing[1][3]}}
-    </div>
+    {% endif %}
+    {% endfor %}
 
   </div>
 </div>

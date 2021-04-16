@@ -84,7 +84,7 @@
                         {% for ins_type, insight in entry.items() %}
                         <tr>
                             <th class="des-{{ context.rnd }}">
-                                {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                                {{ insight|escape|replace('/*start*/', '<span class="col-name-' + context.rnd|string + '">')|replace('/*end*/', '</span>') }}
                             </th>
                             <td><span class="ins-type-{{ context.rnd }}">{{ ins_type }}</span></td>
                         </tr>
@@ -129,7 +129,7 @@
             {% if context.meta %}
             <div class="menu-{{ context.rnd }}">
                 <div class="plot-title-{{ context.rnd }}">
-                    <div>{{ context.meta[loop.index0] }}</div>
+                    <div>{{ context.meta[loop.index0]|escape }}</div>
                 </div>
                 {% if context.how_to_guide[context.meta[loop.index0]] %}
                 <div class="info-container-{{ context.rnd }}">
@@ -155,7 +155,7 @@
                             <ol>
                                 {% for insight in context.column_insights[context.meta[loop.index0]] %}
                                 <li class="entry-{{ context.rnd }}">
-                                    {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                                    {{ insight|escape|replace('/*start*/', '<span class="col-name-' + context.rnd|string + '">')|replace('/*end*/', '</span>') }}
                                 </li>
                                 {% endfor %}
                             </ol>
