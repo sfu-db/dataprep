@@ -35,6 +35,7 @@ def simpledf() -> dd.DataFrame:
     df["e"] = pd.to_datetime(df["e"])
     # test when column is object but some cells are numerical
     df["g"] = pd.Series([0, "x"] * 500)
+    df["h"] = pd.Series(np.ones(1000))
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
@@ -62,6 +63,7 @@ def test_sanity_compute_univariate(simpledf: dd.DataFrame) -> None:
 
 def test_sanity_compute_overview(simpledf: dd.DataFrame) -> None:
     plot(simpledf)
+    plot(simpledf, config={"hist.yscale": "log"})
 
 
 def test_sanity_compute_bivariate(simpledf: dd.DataFrame) -> None:
