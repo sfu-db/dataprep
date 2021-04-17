@@ -339,14 +339,31 @@ def hist_viz(
     )
 
     tooltips = [("Bin", "@intvl"), ("Frequency", "@freq"), ("Percent", "@pct{0.2f}%")]
-    fig = Figure(
-        plot_height=plot_height,
-        plot_width=plot_width,
-        title=col,
-        toolbar_location=None,
-        y_axis_type=yscale,
-    )
-    bottom = 0 if yscale == "linear" or df.empty else df["freq"].min() / 2
+    if yscale == "linear" or df.empty:
+        bottom = 0.0
+    elif yscale == "log" and df["freq"].min() == 0:  # freq >= 1 so we set 0.1 as lower bound
+        bottom = 0.1
+    else:
+        bottom = df["freq"].min() / 2
+
+    if yscale == "linear":
+        fig = Figure(
+            plot_height=plot_height,
+            plot_width=plot_width,
+            title=col,
+            toolbar_location=None,
+            y_axis_type=yscale,
+        )
+    else:
+        fig = Figure(
+            plot_height=plot_height,
+            plot_width=plot_width,
+            title=col,
+            toolbar_location=None,
+            y_axis_type=yscale,
+            y_range=(bottom, df["freq"].max()),
+        )
+
     fig.quad(
         source=df,
         left="left",
