@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 import json
 import os
+import math
 
 import numpy as np
 import pandas as pd
@@ -1875,11 +1876,13 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(Panel(child=row(fig), title="Histogram"))
         htgs["Histogram"] = cfg.hist.how_to_guide(plot_height, plot_width)
     if cfg.kde.enable:
-        if data["kde"] is not None:
+        # when the column is constant, we wont display kde plot
+        if data["kde"] is not None and (not math.isclose(data["min"], data["max"])):
             dens, kde = data["dens"], data["kde"]
             tabs.append(kde_viz(dens, kde, col, plot_width, plot_height, cfg.kde))
             htgs["KDE Plot"] = cfg.kde.how_to_guide(plot_height, plot_width)
-    if cfg.qqnorm.enable:
+    if cfg.qqnorm.enable and (not math.isclose(data["min"], data["max"])):
+        # when the column is constant, we wont display qq plot
         if data["qntls"].any():
             qntls, mean, std = data["qntls"], data["mean"], data["std"]
             tabs.append(qqnorm_viz(qntls, mean, std, col, plot_width, plot_height, cfg.qqnorm))

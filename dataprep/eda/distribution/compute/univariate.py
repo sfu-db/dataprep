@@ -4,6 +4,7 @@ Computations for plot(df, x)
 
 from typing import Any, Dict, List, Optional
 
+import math
 import dask
 import dask.array as da
 import dask.dataframe as dd
@@ -207,22 +208,16 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
 
     if cfg.stats.enable or cfg.hist.enable:
         data["nrows"] = srs.shape[0]  # total rows
-
     srs = srs.dropna()
-
     if cfg.stats.enable:
         data["npres"] = srs.shape[0]  # number of present (not null) values
-
     srs = srs[~srs.isin({np.inf, -np.inf})]  # remove infinite values
-
     if cfg.hist.enable or cfg.qqnorm.enable and cfg.insight.enable:
         data["hist"] = da.histogram(srs, cfg.hist.bins, (srs.min(), srs.max()))
         if cfg.insight.enable:
             data["norm"] = normaltest(data["hist"][0])
-
     if cfg.hist.enable and cfg.insight.enable:
         data["chisq"] = chisquare(data["hist"][0])
-
     # compute only the required amount of quantiles
     if cfg.qqnorm.enable:
         data["qntls"] = srs.quantile(np.linspace(0.01, 0.99, 99))
@@ -230,14 +225,11 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data["qntls"] = srs.quantile([0.05, 0.25, 0.5, 0.75, 0.95])
     elif cfg.box.enable:
         data["qntls"] = srs.quantile([0.25, 0.5, 0.75])
-
     if cfg.stats.enable or cfg.hist.enable and cfg.insight.enable:
         data["skew"] = skew(srs)
-
     if cfg.stats.enable or cfg.qqnorm.enable:
         data["mean"] = srs.mean()
         data["std"] = srs.std()
-
     if cfg.stats.enable:
         data["min"] = srs.min()
         data["max"] = srs.max()
@@ -246,18 +238,19 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data["nneg"] = (srs < 0).sum()
         data["kurt"] = kurtosis(srs)
         data["mem_use"] = srs.memory_usage(deep=True)
-
     # compute the density histogram
     if cfg.kde.enable:
-        data["dens"] = da.histogram(srs, cfg.kde.bins, (srs.min(), srs.max()), density=True)
-        # gaussian kernel density estimate
-        data["kde"] = gaussian_kde(
-            srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
-        )
-
+        # To avoid the singular matrix problem, gaussian_kde needs a non-zero std.
+        if not math.isclose(dask.compute(data["min"])[0], dask.compute(data["max"])[0]):
+            data["dens"] = da.histogram(srs, cfg.kde.bins, (srs.min(), srs.max()), density=True)
+            # gaussian kernel density estimate
+            data["kde"] = gaussian_kde(
+                srs.map_partitions(lambda x: x.sample(min(1000, x.shape[0])), meta=srs)
+            )
+        else:
+            data["kde"] = None
     if cfg.box.enable:
         data.update(_calc_box(srs, data["qntls"], cfg))
-
     if cfg.value_table.enable:
         value_counts = srs.value_counts(sort=False)
         if cfg.stats.enable:

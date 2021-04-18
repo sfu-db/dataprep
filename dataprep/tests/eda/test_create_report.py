@@ -37,6 +37,13 @@ def simpledf() -> pd.DataFrame:
     return df
 
 
+@pytest.fixture(scope="module")  # type: ignore
+def constantdf() -> pd.DataFrame:
+    df = pd.DataFrame({"a": [0] * 10, "b": [1] * 10, "c": [np.nan] * 10})
+
+    return df
+
+
 def test_report(simpledf: pd.DataFrame) -> None:
     from sys import platform
 
@@ -56,3 +63,13 @@ def test_report_show(simpledf: pd.DataFrame) -> None:
         matplotlib.use("PS")
     report = create_report(simpledf, mode="basic")
     report.show()
+
+
+def test_report_constant(constantdf: pd.DataFrame) -> None:
+    from sys import platform
+
+    if platform == "darwin":
+        import matplotlib
+
+        matplotlib.use("PS")
+    create_report(constantdf, mode="basic")
