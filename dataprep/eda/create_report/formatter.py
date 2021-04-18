@@ -178,8 +178,6 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 "plots_tab": zip(comp[1][1:], rndrd["meta"][1:], insight_keys),
                 "insights_tab": rndrd["insights"],
             }
-            # for div, tab, key in res["variables"][col]['plots_tab']:
-            #     print(div)
     else:
         res["has_variables"] = False
 
@@ -267,13 +265,19 @@ def basic_computations(
     # variables
     if cfg.variables.enable:
         for col in df.columns:
-            if is_dtype(detect_dtype(df.frame[col]), Continuous()):
-                data[col] = cont_comps(df.frame[col], cfg)
+            npres = dask.compute(df.frame[col].dropna().shape[0])
+            # Since it will throw error if a numerical column is all-nan,
+            # we transform it to categorical column
+            if npres[0] == 0:
+                df.frame[col] = df.frame[col].astype(str)
+                data[col] = nom_comps(df.frame[col], df.frame[col].head(), cfg)
             elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
                 # Since it will throw error if column is object while some cells are
                 # numerical, we transform column to string first.
                 df.frame[col] = df.frame[col].astype(str)
                 data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), Continuous()):
+                data[col] = cont_comps(df.frame[col], cfg)
             elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
                 data[col] = {}
                 data[col]["stats"] = calc_stats_dt(df.frame[col])
@@ -323,3 +327,26 @@ def basic_computations(
 
     else:
         return data
+
+
+# def cont_comps_brief(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
+#
+#     """
+#     Computations required for constant column and all-nan column
+#     """
+#     # pylint: disable=too-many-branches
+#     data: Dict[str, Any] = {}
+#
+#     data["nrows"] = srs.shape[0]  # total rows
+#     srs = srs.dropna()
+#     data["npres"] = srs.shape[0]  # number of present (not null) values
+#     data["mean"] = srs.mean()
+#     data["min"] = srs.min()
+#     data["max"] = srs.max()
+#     data["nreals"] = srs.shape[0]
+#     data["nzero"] = (srs == 0).sum()
+#     data["nneg"] = (srs < 0).sum()
+#     data["mem_use"] = srs.memory_usage(deep=True)
+#     data["nuniq"] = srs.nunique_approx()
+#
+#     return data
