@@ -199,7 +199,12 @@ def detect_without_known(col: dd.Series) -> DType:
             return Nominal()
 
     elif is_continuous(col.dtype):
-        return Continuous()
+        # detect as categorical if distinct value is small
+        nuniques = col.nunique_approx().compute()
+        if nuniques < 10:
+            return Nominal()
+        else:
+            return Continuous()
 
     elif is_datetime(col.dtype):
         return DateTime()
