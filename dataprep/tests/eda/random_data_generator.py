@@ -2,6 +2,7 @@ import string
 from typing import Any, Dict, List, Optional, Tuple, Mapping, Callable, Union
 import pandas as pd
 import numpy as np
+import pytest
 
 
 def _resolve_random_state(random_state: Union[int, np.random.RandomState]) -> np.random.RandomState:
@@ -187,3 +188,8 @@ def gen_random_dataframe(
         df.index.shape[0], na_ratio=0.1, str_max_len=str_col_name_max_len, random_state=rand
     )
     return df
+
+
+@pytest.fixture(scope="module")  # type: ignore
+def random_df() -> pd.DataFrame:
+    return gen_random_dataframe()
