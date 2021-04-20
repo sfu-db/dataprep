@@ -221,7 +221,7 @@ class Clusterer:
         for idx, cluster in enumerate(cluster_page):
             cluster_repr = f"'{new_values[idx]}'"
             if do_merge[idx]:
-                cluster_vals = [f"'{cluster_val}'" for cluster_val, _ in cluster]
+                cluster_vals = [f"'{val}'" for val, _ in cluster if f"'{val}'" != cluster_repr]
                 code = (
                     f"{df_name}[{col}] = {df_name}[{col}].replace"
                     f"([{', '.join(cluster_vals)}], {cluster_repr})"
