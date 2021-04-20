@@ -23,6 +23,9 @@ from .clean_date import clean_date, validate_date
 
 from .clean_duplication import clean_duplication
 
+from .clean_currency import clean_currency, validate_currency
+
+
 __all__ = [
     "clean_lat_long",
     "validate_lat_long",
@@ -42,4 +45,6 @@ __all__ = [
     "clean_date",
     "validate_date",
     "clean_duplication",
+    "clean_currency",
+    "validate_currency",
 ]
