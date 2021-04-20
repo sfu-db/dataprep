@@ -248,7 +248,7 @@
     }
 
     .des-{{ context.rnd }} span:hover {
-        position: absolute;
+        max-width: 90px;
     }
 
     .ins-type-{{ context.rnd }} {
@@ -274,10 +274,13 @@
         overflow: hidden;
         vertical-align: middle;
         color: #000000;
+        white-space: nowrap;
+        transition: all 0.5s ease-out;
     }
 
     .col-name-{{ context.rnd }}:hover {
         overflow-wrap: break-word;
+        white-space: normal;
     }
 
     .col-cat-{{ context.rnd }} {
