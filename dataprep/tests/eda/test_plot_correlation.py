@@ -26,6 +26,7 @@ from ...eda.correlation.compute.overview import (
 from ...eda.utils import to_dask
 from ...eda.data_array import DataArray
 from ...eda.configs import Config
+from .random_data_generator import random_df
 
 
 @pytest.fixture(scope="module")  # type: ignore
@@ -36,6 +37,10 @@ def simpledf() -> dd.DataFrame:
     df = to_dask(df)
 
     return df
+
+
+def test_random_df(random_df: pd.DataFrame) -> None:
+    plot_correlation(random_df)
 
 
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
