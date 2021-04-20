@@ -1,20 +1,27 @@
 <div class="correlation-container">
   <div class="corr-plot">
-    <div class="report-tab">
-      <button class="corr-tablinks active" onclick="openTab(event, '{{context.components.correlation_names[0]}}')" >{{context.components.correlation_names[0]}}</button>
-      <button class="corr-tablinks" onclick="openTab(event, '{{context.components.correlation_names[1]}}')">{{context.components.correlation_names[1]}}</button>
-      <button class="corr-tablinks" onclick="openTab(event, '{{context.components.correlation_names[2]}}')">{{context.components.correlation_names[2]}}</button>
+    <div class="vp-switch">
+      {% for corr_name in context.components.correlation_names %}
+      {% if loop.index == 1 %}
+      <input type="radio" name="correlation-names" id="corr-name-{{ corr_name }}" checked />
+      <label for="corr-name-{{ corr_name }}" onclick="openTab(this)" >{{ corr_name }}</label>
+      {% else %}
+      <input type="radio" name="correlation-names" id="corr-name-{{ corr_name }}" />
+      <label for="corr-name-{{ corr_name }}" onclick="openTab(this)" >{{ corr_name }}</label>
+      {% endif %}
+      {% endfor %}
     </div>
 
-    <div id={{context.components.correlation_names[0]}} class="corr-tabcontent">
-      {{ context.components.correlations[1][0]}}
+    {% for plot in context.components.correlations[1] %}
+    {% if loop.index == 1 %}
+    <div class="corr-tabcontent" style="display: block;">
+      {{ plot }}
     </div>
-    <div id={{context.components.correlation_names[1]}} style="display:none" class="corr-tabcontent">
-      {{ context.components.correlations[1][1]}}
+    {% else %}
+    <div class="corr-tabcontent">
+      {{ plot }}
     </div>
-    <div id={{context.components.correlation_names[2]}} style="display:none" class="corr-tabcontent">
-      {{ context.components.correlations[1][2]}}
-    </div>
-
+    {% endif %}
+    {% endfor %}
   </div>
 </div>

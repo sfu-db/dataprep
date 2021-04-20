@@ -12,6 +12,7 @@ from ...datasets import load_dataset
 from ...eda import plot
 from ...eda.dtypes import Nominal
 from ...eda.utils import to_dask
+from .random_data_generator import random_df
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ def simpledf() -> dd.DataFrame:
     # test when column is object but some cells are numerical
     df["g"] = pd.Series([0, "x"] * 500)
     df["h"] = pd.Series(np.ones(1000))
+    df["i"] = pd.Series(np.random.normal(0, 0.1, 1000))
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
@@ -90,3 +92,7 @@ def test_specify_color(simpledf: dd.DataFrame) -> None:
 def test_geo(geodf: dd.DataFrame) -> None:
     plot(geodf, "Country")
     plot(geodf, "Country", "Population")
+
+
+def test_random_df(random_df: pd.DataFrame) -> None:
+    plot(random_df)

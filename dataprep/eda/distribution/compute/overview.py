@@ -192,6 +192,7 @@ def _format_ov_ins(data: Dict[str, Any], cfg: Config) -> List[Dict[str, str]]:
     """
     Determine and format the overview insights for plot(df)
     """
+    # pylint: disable=line-too-long
     # list of insights
     ins: List[Dict[str, str]] = []
 
@@ -202,7 +203,7 @@ def _format_ov_ins(data: Dict[str, Any], cfg: Config) -> List[Dict[str, str]]:
 
     for (*cols, test_result) in data.get("ks_tests", []):
         if test_result > cfg.insight.similar_distribution__threshold:
-            msg = f"/*{cols[0]}*/ and /*{cols[1]}*/ have similar distributions"
+            msg = f"/*start*/{cols[0]}/*end*/ and /*start*/{cols[1]}/*end*/ have similar distributions"
             ins.append({"Similar Distribution": msg})
 
     data.pop("ks_tests", None)
@@ -218,33 +219,33 @@ def _format_cont_ins(col: str, data: Dict[str, Any], nrows: int, cfg: Config) ->
     ins: List[Dict[str, str]] = []
 
     if data["chisq"][1] > cfg.insight.uniform__threshold:
-        ins.append({"Uniform": f"/*{col}*/ is uniformly distributed"})
+        ins.append({"Uniform": f"/*start*/{col}/*end*/ is uniformly distributed"})
 
     pmiss = round((1 - (data["npres"] / nrows)) * 100, 2)
     if pmiss > cfg.insight.missing__threshold:
         nmiss = nrows - data["npres"]
-        ins.append({"Missing": f"/*{col}*/ has {nmiss} ({pmiss}%) missing values"})
+        ins.append({"Missing": f"/*start*/{col}/*end*/ has {nmiss} ({pmiss}%) missing values"})
 
     if data["skew"][1] < cfg.insight.skewed__threshold:
-        ins.append({"Skewed": f"/*{col}*/ is skewed"})
+        ins.append({"Skewed": f"/*start*/{col}/*end*/ is skewed"})
 
     pinf = round((nrows - data["npres"]) / nrows * 100, 2)
     if pinf >= cfg.insight.infinity__threshold:
         ninf = nrows - data["npres"]
-        ins.append({"Infinity": f"/*{col}*/ has {ninf} ({pinf}%) infinite values"})
+        ins.append({"Infinity": f"/*start*/{col}/*end*/ has {ninf} ({pinf}%) infinite values"})
 
     pzero = round(data["nzero"] / nrows * 100, 2)
     if pzero > cfg.insight.zeros__threshold:
         nzero = data["nzero"]
-        ins.append({"Zeros": f"/*{col}*/ has {nzero} ({pzero}%) zeros"})
+        ins.append({"Zeros": f"/*start*/{col}/*end*/ has {nzero} ({pzero}%) zeros"})
 
     pneg = round(data["nneg"] / nrows * 100, 2)
     if pneg > cfg.insight.negatives__threshold:
         nneg = data["nneg"]
-        ins.append({"Negatives": f"/*{col}*/ has {nneg} ({pneg}%) negatives"})
+        ins.append({"Negatives": f"/*start*/{col}/*end*/ has {nneg} ({pneg}%) negatives"})
 
     if data["norm"][1] > cfg.insight.normal__threshold:
-        ins.append({"Normal": f"/*{col}*/ is normally distributed"})
+        ins.append({"Normal": f"/*start*/{col}/*end*/ is normally distributed"})
 
     # list of insight messages
     ins_msg_list = [list(insight.values())[0] for insight in ins]
@@ -260,28 +261,28 @@ def _format_nom_ins(col: str, data: Dict[str, Any], nrows: int, cfg: Config) -> 
     ins: List[Dict[str, str]] = []
 
     if data["chisq"][1] > cfg.insight.uniform__threshold:
-        ins.append({"Uniform": f"/*{col}*/ is uniformly distributed"})
+        ins.append({"Uniform": f"/*start*/{col}/*end*/ is uniformly distributed"})
 
     pmiss = round((1 - (data["npres"] / nrows)) * 100, 2)
     if pmiss > cfg.insight.missing__threshold:
         nmiss = nrows - data["npres"]
-        ins.append({"Missing": f"/*{col}*/ has {nmiss} ({pmiss}%) missing values"})
+        ins.append({"Missing": f"/*start*/{col}/*end*/ has {nmiss} ({pmiss}%) missing values"})
 
     if data["nuniq"] > cfg.insight.high_cardinality__threshold:
         uniq = data["nuniq"]
-        msg = f"/*{col}*/ has a high cardinality: {uniq} distinct values"
+        msg = f"/*start*/{col}/*end*/ has a high cardinality: {uniq} distinct values"
         ins.append({"High Cardinality": msg})
 
     if data["nuniq"] == cfg.insight.constant__threshold:
         val = data["bar"].index[0]
-        ins.append({"Constant": f'/*{col}*/ has constant value "{val}"'})
+        ins.append({"Constant": f'/*start*/{col}/*end*/ has constant value "{val}"'})
 
     if data["min_len"] == data["max_len"]:
         length = data["min_len"]
-        ins.append({"Constant Length": f"/*{col}*/ has constant length {length}"})
+        ins.append({"Constant Length": f"/*start*/{col}/*end*/ has constant length {length}"})
 
     if data["nuniq"] == data["npres"]:
-        ins.append({"Unique": f"/*{col}*/ has all distinct values"})
+        ins.append({"Unique": f"/*start*/{col}/*end*/ has all distinct values"})
 
     # list of insight messages
     ins_msg_list = [list(ins.values())[0] for ins in ins]

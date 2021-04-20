@@ -4,7 +4,6 @@ Clean and validate a DataFrame column containing country names.
 from functools import lru_cache
 from operator import itemgetter
 from os import path
-from re import error
 from typing import Any, Union
 
 import dask
@@ -289,14 +288,11 @@ def _check_country(country: str, input_format: str, strict: bool, clean: bool) -
 
     if strict and input_format == "regex":
         for form in ("name", "official"):
-            try:
-                ind = DATA[
-                    DATA[form].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)
-                ].index
-                if np.size(ind) > 0:
-                    return (ind[0], "success") if clean else True
-            except error:
-                return (None, "unknown") if clean else False
+            ind = DATA[
+                DATA[form].str.contains(f"^{re.escape(country)}$", flags=re.IGNORECASE, na=False)
+            ].index
+            if np.size(ind) > 0:
+                return (ind[0], "success") if clean else True
 
     elif not strict and input_format in ("regex", "name", "official"):
         for index, country_regex in enumerate(REGEXES):
@@ -305,7 +301,9 @@ def _check_country(country: str, input_format: str, strict: bool, clean: bool) -
 
     else:
         ind = DATA[
-            DATA[input_format].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)
+            DATA[input_format].str.contains(
+                f"^{re.escape(country)}$", flags=re.IGNORECASE, na=False
+            )
         ].index
         if np.size(ind) > 0:
             return (ind[0], "success") if clean else True
