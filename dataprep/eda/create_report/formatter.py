@@ -27,7 +27,6 @@ from ..distribution.compute.overview import (
     _insight_pagination,
 )
 from ..dtypes import (
-    CATEGORICAL_DTYPES,
     Continuous,
     DateTime,
     Nominal,
@@ -263,7 +262,8 @@ def basic_computations(
 
     df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
-    first_rows = df.select_dtypes(CATEGORICAL_DTYPES).head
+    first_rows = df.head
+
     # variables
     if cfg.variables.enable:
         for col in df.columns:
