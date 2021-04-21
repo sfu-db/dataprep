@@ -3,8 +3,8 @@ Computations for plot(df, ...)
 """
 
 
+import warnings
 from typing import Optional, Union, List, Dict, Any, Tuple
-
 import dask.dataframe as dd
 import pandas as pd
 
@@ -59,6 +59,8 @@ def compute(
     """
     # pylint: disable=too-many-arguments
 
+    suppress_warnings()
+
     params, exlude, ddf = process_latlong(df, x, y, z)
     ddf = preprocess_dataframe(ddf, excluded_columns=exlude)
 
@@ -83,6 +85,17 @@ def compute(
         return compute_trivariate(ddf, x, y, z, cfg, dtype)
 
     raise ValueError("not possible")
+
+
+def suppress_warnings() -> None:
+    """
+    Suppress warnings.
+    """
+    warnings.filterwarnings(
+        "ignore",
+        "The default value of regex will change from True to False in a future version",
+        category=FutureWarning,
+    )
 
 
 def concat_latlong(df: Union[pd.DataFrame, dd.DataFrame], x: Any) -> Tuple[str, Any]:
