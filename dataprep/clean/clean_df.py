@@ -2,6 +2,9 @@
 Conduct a set of operations that would be useful for
 cleaning and standardizing a full Pandas DataFrame.
 """
+# pylint: disable-msg=relative-beyond-top-level
+# pylint: disable-msg=cyclic-import
+
 import operator
 from typing import Dict, Any, Union, Tuple
 
@@ -12,10 +15,14 @@ from pandas.api.types import infer_dtype
 
 # from ..eda.progress_bar import ProgressBar
 
-from dataprep.clean import validate_email, validate_country, validate_phone
-from dataprep.clean import validate_url, validate_lat_long, validate_ip
-from dataprep.clean import validate_address, clean_headers
-
+from .clean_email import validate_email
+from .clean_country import validate_country
+from .clean_phone import validate_phone
+from .clean_url import validate_url
+from .clean_lat_long import validate_lat_long
+from .clean_ip import validate_ip
+from .clean_address import validate_address
+from .clean_headers import clean_headers
 from .utils import NULL_VALUES
 
 
@@ -91,6 +98,7 @@ def clean_df(
     # pylint: disable=too-many-arguments
     # pylint: disable-msg=too-many-locals
     # pylint:disable=too-many-branches
+    # type: ignore
 
     if data_type_detection not in {"semantic", "atomic", "none"}:
         raise ValueError(
