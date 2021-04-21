@@ -27,6 +27,8 @@ from .clean_currency import clean_currency, validate_currency
 
 from .clean_df import clean_df
 
+from .clean_text import clean_text, default_text_pipeline
+
 
 __all__ = [
     "clean_lat_long",
@@ -50,4 +52,6 @@ __all__ = [
     "clean_currency",
     "validate_currency",
     "clean_df",
+    "clean_text",
+    "default_text_pipeline",
 ]
