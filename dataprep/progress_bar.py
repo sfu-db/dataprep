@@ -1,6 +1,5 @@
 """ProgressBar shows the how many dask tasks finished/remains using tqdm."""
-
-import sys
+import warnings
 from time import time
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -31,6 +30,8 @@ class ProgressBar(Callback):  # type: ignore
         Update resolution in seconds, default is 0.1 seconds.
     disable : bool, optional
         Disable the progress bar.
+    warn_cost: bool, optional
+        Whether print the warning of computational time of progress bar if it is high.
     """
 
     _minimum: float = 0
@@ -45,6 +46,7 @@ class ProgressBar(Callback):  # type: ignore
     _pbar_runtime: float = 0
     _last_updated: Optional[float] = None
     _disable: bool = False
+    _warn_cost: bool = False
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -53,6 +55,7 @@ class ProgressBar(Callback):  # type: ignore
         width: Optional[int] = None,
         interval: float = 0.1,
         disable: bool = False,
+        warn_cost: bool = False,
     ) -> None:
         super().__init__()
         self._minimum = minimum
@@ -60,6 +63,7 @@ class ProgressBar(Callback):  # type: ignore
         self._width = width
         self._interval = interval
         self._disable = disable
+        self._warn_cost = warn_cost
 
     def _start(self, _dsk: Any) -> None:
         """A hook to start this callback."""
@@ -145,11 +149,12 @@ class ProgressBar(Callback):  # type: ignore
 
         self._pbar_runtime += time() - then
 
-        if self._pbar_runtime > 0.1 * (time() - self._started) and self._pbar_runtime > 1:
-            print(
+        if self._warn_cost and (
+            self._pbar_runtime > 0.1 * (time() - self._started) and self._pbar_runtime > 1
+        ):
+            warnings.warn(
                 "[ProgressBar] ProgressBar takes additional 10%+ of the computation time,"
                 " consider disable it by passing 'progress=False' to the plot function.",
-                file=sys.stderr,
             )
 
         self._state = None
