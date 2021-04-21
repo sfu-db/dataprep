@@ -35,7 +35,7 @@ from wordcloud import WordCloud
 from ..configs import KDE, Bar, Box, Config, Pie, QQNorm, WordFrequency
 from ..dtypes import Continuous, DateTime, Nominal, is_dtype, GeoGraphy
 from ..intermediate import Intermediate
-from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS
+from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS, YlGnBu
 from ..utils import tweak_figure, _format_ticks, _format_axis, _format_bin_intervals
 
 COUNTRY_MAP_FILE = os.path.join(os.path.split(os.path.abspath(__file__))[0], "country.json")
@@ -688,8 +688,9 @@ def geo_viz(
         temp_list.append(value.get(MAPS["fip"][itr], "unknown"))
     MAPS["value"] = temp_list
 
-    # palette = RDBU[(len(RDBU) // 2 - 1) :]  # or VIRIDIS
-    mapper = LinearColorMapper(palette=VIRIDIS, low=minimum, high=maximum)
+    mapper = LinearColorMapper(
+        palette=YlGnBu[33:233], low=minimum, high=maximum, nan_color="#cccccc"
+    )
     tools = "pan,wheel_zoom,box_zoom,reset,hover"
 
     fig = Figure(
