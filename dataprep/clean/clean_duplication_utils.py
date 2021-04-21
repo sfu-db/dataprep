@@ -9,6 +9,8 @@ from collections import defaultdict
 from operator import itemgetter
 from typing import List, Set, Union, DefaultDict
 from itertools import permutations
+from os import path
+from tempfile import mkdtemp
 
 import pandas as pd
 import dask.dataframe as dd
@@ -240,15 +242,13 @@ class Clusterer:
         code = self._create_replace_calls(cluster_page, do_merge, new_values)
         encoded_code = (b64encode(str.encode(code))).decode()
 
-        code = """
-            {0}
+        code = f"""
+            {DECODE_FUNC}
             var ind = IPython.notebook.get_selected_index();
             var cell = IPython.notebook.get_cell(ind);
             var text = cell.get_text();
-            cell.set_text(text.concat(b64DecodeUnicode("{1}")));
-        """.format(
-            DECODE_FUNC, encoded_code
-        )
+            cell.set_text(text.concat(b64DecodeUnicode("{encoded_code}")));
+        """
         display(Javascript(code))
 
     def execute_merge_code(
@@ -270,22 +270,31 @@ class Clusterer:
     def final_df(self) -> None:
         """
         Displays a DataFrame with the final values in the next notebook cell.
+        Writes the final dataframe to a pickle file then reads the file from
+        inside the IPython kernel.
         """
         code = "# dataframe with cleaned string values\ndf_clean"
         encoded_code = (b64encode(str.encode(code))).decode()
         final_df = self._df.compute()
-        json = final_df.to_json(force_ascii=False)
-        execute_code = f"import pandas as pd\ndf_clean = pd.read_json('{json}')"
-        encoded_execute = (b64encode(str.encode(execute_code))).decode()
-        code = """
-                 {0}
-                 IPython.notebook.kernel.execute(b64DecodeUnicode('{1}'));
-                 var code = IPython.notebook.insert_cell_below('code');
-                 code.set_text(b64DecodeUnicode("{2}"));
-                 code.execute();
-             """.format(
-            DECODE_FUNC, encoded_execute, encoded_code
+        # create a temporary directory for the dataframe file
+        tmp_dir = mkdtemp()
+        df_file = path.join(tmp_dir, "clean_duplication_output.pkl")
+        final_df.to_pickle(df_file)
+        # code to read the file and delete the temporary directory afterwards
+        execute_code = (
+            "import pandas as pd\n"
+            "import shutil\n"
+            f"df_clean = pd.read_pickle('{df_file}')\n"
+            f"shutil.rmtree('{tmp_dir}')"
         )
+        encoded_execute = (b64encode(str.encode(execute_code))).decode()
+        code = f"""
+                 {DECODE_FUNC}
+                 IPython.notebook.kernel.execute(b64DecodeUnicode("{encoded_execute}"));
+                 var code = IPython.notebook.insert_cell_below('code');
+                 code.set_text(b64DecodeUnicode("{encoded_code}"));
+                 code.execute();
+             """
         display(Javascript(code))
 
     def get_page(self, start: int, end: int) -> pd.Series:
