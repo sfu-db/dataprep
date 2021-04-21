@@ -1,5 +1,7 @@
 """Common functions"""
-from typing import Dict, Union
+from typing import Dict, Union, Any
+import http.client
+import json
 
 import dask.dataframe as dd
 import numpy as np
@@ -129,3 +131,85 @@ def create_report_new(type_cleaned: str, stats: pd.Series, errors: str) -> None:
         f"Result contains {ncorrect} ({pcorrect}%) values in the correct format "
         f"and {nnull} null values ({pnull}%)"
     )
+
+
+def _get_data(currency_code: str, file_path: str) -> Any:
+    """
+    returns the fiat currency's symbol and full name
+    """
+    with open(file_path) as f:
+        currency_data = json.loads(f.read())
+    currency_dict = next((item for item in currency_data if item["cc"] == currency_code), None)
+    if currency_dict:
+        symbol = currency_dict.get("symbol")
+        currency_name = currency_dict.get("name")
+        return symbol, currency_name
+    return None, None
+
+
+def _get_rate(base_cur: str, dest_cur: str, url: str) -> Any:
+    """
+    returns the conversion rate between 2 fiat currencies
+    """
+    if base_cur == dest_cur:
+        return 1.0
+    conn = http.client.HTTPSConnection(url)
+    conn.request("GET", f"/api/latest?base={base_cur}&symbols={dest_cur}&rtype=fpy")
+    response = conn.getresponse()
+
+    if response.status == 200:
+        response_json = json.loads(response.read())
+        rate = np.round(response_json["rates"][dest_cur], 4)
+        if not rate:
+            raise RatesNotAvailableError(
+                "Currency Rate {0} => {1} not available latest".format(base_cur, dest_cur)
+            )
+        return rate
+    raise RatesNotAvailableError("Currency Rates Source Not Ready / Available")
+
+
+def _get_rate_crypto(base_cur: str, dest_cur: str, url: str) -> Any:
+    """
+    returns the price of the cryptocurrecy in the specified base currency
+    """
+    if base_cur == dest_cur:
+        return 1.0
+    conn = http.client.HTTPSConnection(url)
+    conn.request("GET", f"/api/v3/simple/price?ids={base_cur}&vs_currencies={dest_cur}")
+    response = conn.getresponse()
+
+    if response.status == 200:
+        response_json = json.loads(response.read())
+        rate = response_json[base_cur][dest_cur]
+        if not rate:
+            raise RatesNotAvailableError(
+                "Currency Rate {0} => {1} not available latest".format(base_cur, dest_cur)
+            )
+        return rate
+    raise RatesNotAvailableError("Currency Rates Source Not Ready / Available")
+
+
+def _get_crypto_symbol_and_id(crypto_name: str, file_path: str) -> Any:
+    """
+    gets the cryprocurrency ID and symbol from cryptocurries.json file
+    """
+    cryptocurrencies = {}
+    with open(file_path, "r") as file:
+        cryptocurrencies = json.load(file)
+    try:
+        crypto = cryptocurrencies[crypto_name]
+        crypto_id = crypto[0]
+        crypto_symbol = crypto[1]
+        return crypto_id, crypto_symbol
+    except Exception as key_error:
+        raise KeyError(
+            "The target curency name `{0}` doesn't sound correct, please recheck your value".format(
+                crypto_name
+            )
+        ) from key_error
+
+
+class RatesNotAvailableError(Exception):
+    """
+    Custome Exception when https://ratesapi.io is Down and not available for currency rates
+    """
