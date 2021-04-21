@@ -435,10 +435,14 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
     """
     Format the axis ticks
     """  # pylint: disable=too-many-locals
+
     # divisor for 5 ticks (5 results in ticks that are too close together)
     divisor = 4.5
     # interval
-    gap = (maxv - minv) / divisor
+    if np.isinf(minv) or np.isinf(maxv):
+        gap = 1.0
+    else:
+        gap = (maxv - minv) / divisor
     # get exponent from scientific notation
     _, after = f"{gap:.0e}".split("e")
     # round to this amount
@@ -450,8 +454,9 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
 
     # make the tick values
     ticks = [float(minv)]
-    while max(ticks) + gap < maxv:
-        ticks.append(max(ticks) + gap)
+    if not np.isinf(maxv):
+        while max(ticks) + gap < maxv:
+            ticks.append(max(ticks) + gap)
     ticks = np.round(ticks, round_to)
     ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
     formatted_ticks = _format_ticks(ticks)
