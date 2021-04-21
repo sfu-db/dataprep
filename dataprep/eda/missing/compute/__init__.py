@@ -2,7 +2,8 @@
 calculating intermediate part
 """
 from typing import Optional, cast, List, Any, Dict, Union
-from warnings import catch_warnings, filterwarnings
+import warnings
+from scipy.cluster.hierarchy import ClusterWarning
 
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
@@ -62,6 +63,7 @@ def compute_missing(
     >>> plot_missing(df, "HDI_for_year")
     >>> plot_missing(df, "HDI_for_year", "population")
     """
+    suppress_warnings()
     df = preprocess_dataframe(df)
     df = DataArray(df)
 
@@ -77,13 +79,26 @@ def compute_missing(
     elif x is not None and y is not None:
         ret = compute_missing_bivariate(df, x, y, cfg, dtype)
     else:
-        # supress divide by 0 error due to heatmap
-        with catch_warnings():
-            filterwarnings(
-                "ignore",
-                "invalid value encountered in true_divide",
-                category=RuntimeWarning,
-            )
-            ret = compute_missing_nullivariate(df, cfg)
+        ret = compute_missing_nullivariate(df, cfg)
 
     return cast(Intermediate, ret)
+
+
+def suppress_warnings() -> None:
+    """
+    suppress warnings for plot_missing
+    """
+    warnings.filterwarnings(
+        "ignore",
+        "scipy.cluster: The symmetric non-negative hollow observation matrix looks "
+        + "suspiciously like an uncondensed distance matrix",
+        category=ClusterWarning,
+    )
+    warnings.filterwarnings(
+        "ignore", "invalid value encountered in double_scalars", category=RuntimeWarning
+    )
+    warnings.filterwarnings(
+        "ignore",
+        "invalid value encountered in true_divide",
+        category=RuntimeWarning,
+    )
