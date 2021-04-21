@@ -251,7 +251,7 @@ def least_corr(corrs: np.ndarray) -> Tuple[float, List[Any]]:
     for i in range(corrs_copy.shape[0]):
         corrs_copy[i, i] = 2
     minimum = abs(corrs_copy).min()
-    col1, col2 = np.where(corrs_copy == minimum)
+    col1, col2 = np.where(abs(corrs_copy) == minimum)
 
     for i, _ in enumerate(col1):
         if col1[i] < col2[i]:
