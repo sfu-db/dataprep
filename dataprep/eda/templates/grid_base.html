@@ -93,20 +93,18 @@
                     </table>
                 </div>
                 {% endfor %}
+                <div class="page-switch-box-{{ context.rnd }}">
+                    <ul class="page-switch-{{ context.rnd }}">
+                        {% for _ in context.overview_insights %}
+                        {% if loop.length > 1 %}
+                        <li id="switch-{{ context.rnd }}-{{ loop.index }}" onclick="switchPage{{ context.rnd }}(this)">{{ loop.index }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
             {% endif %}
         </div>
-        {% if context.overview_insights %}
-        <div class="page-switch-box-{{ context.rnd }}">
-            <ul class="page-switch-{{ context.rnd }}">
-                {% for _ in context.overview_insights %}
-                {% if loop.length > 1 %}
-                <li id="switch-{{ context.rnd }}-{{ loop.index }}" onclick="switchPage{{ context.rnd }}(this)">{{ loop.index }}</li>
-                {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
     </div>
     {% endif %}
     {% if context.legend_labels %}
