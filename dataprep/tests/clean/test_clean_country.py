@@ -196,6 +196,34 @@ def test_clean_input_format(df_countries: pd.DataFrame) -> None:
     assert df_clean_numeric.equals(df_check_numeric)
 
 
+def test_clean_input_format_tuple(df_countries: pd.DataFrame) -> None:
+    df_clean = clean_country(df_countries, "messy_country", input_format=("name", "alpha-2"))
+    df_check = df_countries.copy()
+    df_check["messy_country_clean"] = [
+        "Canada",
+        "Canada",
+        np.nan,
+        np.nan,
+        "Ireland",
+        "DR Congo",
+        "Congo Republic",
+        np.nan,
+        np.nan,
+        np.nan,
+        "American Samoa",
+        "Turkey",
+        "Belize",
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+    ]
+
+    assert df_clean.equals(df_check)
+
+
 def test_clean_output_format(df_countries: pd.DataFrame) -> None:
     df_clean_official = clean_country(df_countries, "messy_country", output_format="official")
     df_clean_alpha2 = clean_country(df_countries, "messy_country", output_format="alpha-2")
@@ -682,6 +710,35 @@ def test_validate_series_input_format(df_countries: pd.DataFrame) -> None:
     )
     assert srs_check_name.equals(srs_valid_name)
     assert srs_check_alpha2.equals(srs_valid_alpha2)
+
+
+def test_validate_series_input_format_tuple(df_countries: pd.DataFrame) -> None:
+    srs_valid = validate_country(df_countries["messy_country"], input_format=("name", "alpha-2"))
+    srs_check = pd.Series(
+        [
+            True,
+            False,
+            False,
+            False,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
+        ],
+        name="messy_country",
+    )
+    assert srs_check.equals(srs_valid)
 
 
 def test_validate_series_strict(df_countries: pd.DataFrame) -> None:
