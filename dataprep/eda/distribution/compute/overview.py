@@ -127,7 +127,7 @@ def _cont_calcs(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data["nneg"] = (srs < 0).sum()  # number of negative values
         data["nuniq"] = srs.nunique_approx()  # number of unique values
         data["nzero"] = (srs == 0).sum()  # number of zeros
-
+        data["nreals"] = srs.shape[0]  # number of non-inf values
     return data
 
 
@@ -229,9 +229,9 @@ def _format_cont_ins(col: str, data: Dict[str, Any], nrows: int, cfg: Config) ->
     if data["skew"][1] < cfg.insight.skewed__threshold:
         ins.append({"Skewed": f"/*start*/{col}/*end*/ is skewed"})
 
-    pinf = round((nrows - data["npres"]) / nrows * 100, 2)
+    pinf = round((data["npres"] - data["nreals"]) / nrows * 100, 2)
     if pinf >= cfg.insight.infinity__threshold:
-        ninf = nrows - data["npres"]
+        ninf = data["npres"] - data["nreals"]
         ins.append({"Infinity": f"/*start*/{col}/*end*/ has {ninf} ({pinf}%) infinite values"})
 
     pzero = round(data["nzero"] / nrows * 100, 2)
