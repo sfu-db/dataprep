@@ -229,12 +229,7 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         rndrd = render_missing(itmdt, cfg)
         figs_missing: List[Figure] = []
         for fig in rndrd["layout"]:
-            fig.sizing_mode = "stretch_width"
-            # fig.title = Title(
-            #     text=rndrd["meta"][rndrd["layout"].index(fig)],
-            #     align="center",
-            #     text_font_size="20px",
-            # )
+            fig.sizing_mode = "stretch_both"
             figs_missing.append(fig)
         res["missing"] = components(figs_missing)
         res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map", "Dendogram"]

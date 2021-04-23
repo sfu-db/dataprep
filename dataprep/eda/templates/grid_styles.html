@@ -185,6 +185,7 @@
         font-size: 12px;
         table-layout: auto !important;
         width: 100% !important;
+        font-weight: 600;
     }
 
     .stats-{{ context.rnd }} table th {
@@ -291,15 +292,30 @@
     }
 
     .page-switch-box-{{ context.rnd }} {
-        display: none;
-        margin-left: clamp(200px, 40vw, 460px);
-        width: 477px;
+        max-width: 13em;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .page-switch-{{ context.rnd }}::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .page-switch-{{ context.rnd }}::-webkit-scrollbar-thumb {
+        background-color: #5DADE2;
+        border-radius: 5px;
+    }
+
+    .page-switch-{{ context.rnd }}::-webkit-scrollbar-track {
+        background: #b5d6ea;
     }
 
     .page-switch-{{ context.rnd }} {
         list-style: none;
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
+        overflow: auto;
+        padding: 0 !important;
     }
 
     .page-switch-{{ context.rnd }} li {
@@ -323,10 +339,19 @@
         background-color: #5DADE2;
     }
 
+    #vtr-{{ context.rnd }} {
+        height: 56px;
+    }
+
     #vtr-{{ context.rnd }} ul {
         list-style: none;
         margin: 0;
         padding: 0;
+    }
+
+    #vtr-{{ context.rnd }} td {
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     .patch-cls-{{ context.rnd }} {
