@@ -219,9 +219,13 @@ class Clusterer:
         df_name, col = self._df_name, f"'{self._col}'"
         replace_calls = []
         for idx, cluster in enumerate(cluster_page):
-            cluster_repr = f"'{new_values[idx]}'"
             if do_merge[idx]:
-                cluster_vals = [f"'{val}'" for val, _ in cluster if f"'{val}'" != cluster_repr]
+                # create the string that all the values in the cluster will be set to
+                cluster_repr = new_values[idx].replace("'", "\\'")
+                cluster_repr = f"'{cluster_repr}'"
+                # create the strings to be replaced
+                cluster_vals = [val.replace("'", "\\'") for val, _ in cluster]
+                cluster_vals = [f"'{val}'" for val in cluster_vals if f"'{val}'" != cluster_repr]
                 code = (
                     f"{df_name}[{col}] = {df_name}[{col}].replace"
                     f"([{', '.join(cluster_vals)}], {cluster_repr})"
