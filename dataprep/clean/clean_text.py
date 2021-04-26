@@ -37,6 +37,8 @@ def clean_text(
     """
     Clean text data in a DataFrame column.
 
+    Read more in the :ref:`User Guide <clean_text_user_guide>`.
+
     Parameters
     ----------
         df
@@ -45,7 +47,8 @@ def clean_text(
             The name of the column containing text data.
         pipeline
             A list of cleaning functions to be applied to the column. If None,
-            use the default pipeline.
+            use the default pipeline. See the :ref:`User Guide <clean_text_custom_pipeline>`
+            for more information on customizing the pipeline.
 
             (default: None)
         stopwords
@@ -80,6 +83,8 @@ def default_text_pipeline() -> List[Dict[str, Any]]:
     """
     Return a list of dictionaries representing the functions in the default pipeline.
     Use as a template for creating a custom pipeline.
+
+    Read more in the :ref:`User Guide <clean_text_user_guide>`.
 
     Examples
     --------
