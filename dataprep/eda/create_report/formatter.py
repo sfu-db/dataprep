@@ -267,9 +267,6 @@ def basic_computations(
                 df.frame[col] = df.frame[col].astype(str)
                 data[col] = nom_comps(df.frame[col], df.frame[col].head(), cfg)
             elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
-                # Since it will throw error if column is object while some cells are
-                # numerical, we transform column to string first.
-                df.frame[col] = df.frame[col].astype(str)
                 data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
             elif is_dtype(detect_dtype(df.frame[col]), Continuous()):
                 data[col] = cont_comps(df.frame[col], cfg)
@@ -289,9 +286,6 @@ def basic_computations(
                     (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
                 )
             elif is_dtype(col_dtype, Nominal()):
-                # Since it will throw error if column is object while some cells are
-                # numerical, we transform column to string first.
-                df.frame[col] = df.frame[col].astype(str)
                 data["insights"].append(
                     (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
                 )
