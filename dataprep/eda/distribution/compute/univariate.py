@@ -59,9 +59,6 @@ def compute_univariate(
         if is_dtype(col_dtype, GeoPoint()):
             df[x] = df[x].astype(str)
 
-        # Since it will throw error if column is object while some cells are
-        # numerical, we transform column to string first.
-        df[x] = df[x].astype(str)
         # all computations for plot(df, Nominal())
         (data,) = dask.compute(nom_comps(df[x], head, cfg))
 
@@ -92,10 +89,6 @@ def compute_univariate(
         )
     elif is_dtype(col_dtype, GeoGraphy()):
         head = df[x].head()  # dd.Series.head() triggers a (small) data read
-
-        # Since it will throw error if column is object while some cells are
-        # numerical, we transform column to string first.
-        df[x] = df[x].astype(str)
         # all computations for plot(df, Nominal())
         (data,) = dask.compute(nom_comps(df[x], head, cfg))
 

@@ -10,14 +10,20 @@ import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_object_dtype
+import pandas._libs.missing as libmissing
 from bokeh.models import Legend, FuncTickFormatter
 from bokeh.plotting import Figure
 from scipy.stats import gaussian_kde as gaussian_kde_
 from scipy.stats import ks_2samp as ks_2samp_
 from scipy.stats import normaltest as normaltest_
 from scipy.stats import skewtest as skewtest_
-from .dtypes import drop_null
+from .dtypes import (
+    drop_null,
+    Nominal,
+    detect_dtype,
+    is_dtype,
+)
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -81,15 +87,23 @@ def preprocess_dataframe(
 
     df.columns = columns
     df = df.reset_index(drop=True)
+    df = to_dask(df)
 
     # Since an object column could contains multiple types
-    # in different cells. transform object column to string.
+    # in different cells. transform non-na values in object column to string.
+
+    # Function `_notna2str` transforms an obj to str if it is not NA.
+    # The check for NA is similar to pd.isna, but will treat a list obj as
+    # a scalar and return a single boolean, rather than a list of booleans.
+    # Otherwise when a cell is tuple or list it will throw an error.
+    _notna2str = lambda obj: obj if libmissing.checknull(obj) else str(obj)
     for col in df.columns:
-        if is_object_dtype(df[col].dtype) and (
-            excluded_columns is not None and col not in excluded_columns
+        col_dtype = detect_dtype(df[col])
+        if (is_dtype(col_dtype, Nominal())) and (
+            (excluded_columns is None) or (col not in excluded_columns)
         ):
-            df[col] = df[col].astype(str)
-    return to_dask(df)
+            df[col] = df[col].apply(_notna2str, meta=("object"))
+    return df
 
 
 def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103
