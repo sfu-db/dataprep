@@ -54,16 +54,8 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
         if is_dtype(col_dtype, Continuous()) and (cfg.hist.enable or cfg.insight.enable):
             data.append((col, Continuous(), _cont_calcs(df[col].dropna(), cfg)))
         elif is_dtype(col_dtype, Nominal()) and (cfg.bar.enable or cfg.insight.enable):
-            # Since it will throw error if column is object while some cells are
-            # numerical, we transform column to string first.
-            df[col] = df[col].astype(str)
             data.append((col, Nominal(), _nom_calcs(df[col].dropna(), head[col], cfg)))
         elif is_dtype(col_dtype, GeoGraphy()) and (cfg.bar.enable or cfg.insight.enable):
-            # cast the column as string type if it contains a mutable type
-            try:
-                head[col].apply(hash)
-            except TypeError:
-                df[col] = df[col].astype(str)
             data.append((col, GeoGraphy(), _nom_calcs(df[col].dropna(), head[col], cfg)))
         elif is_dtype(col_dtype, DateTime()) and (cfg.line.enable or cfg.insight.enable):
             data.append((col, DateTime(), dask.delayed(_calc_line_dt)(df[[col]], cfg.line.unit)))

@@ -63,10 +63,6 @@ def compute_bivariate(
     ):
         x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
         df = df[[x, y]]
-        # Since it will throw error if column is object while some cells are
-        # numerical, we transform column to string first.
-        df[x] = df[x].astype(str)
-
         (comps,) = dask.compute(_nom_cont_comps(df.dropna(), cfg))
 
         return Intermediate(
@@ -112,7 +108,6 @@ def compute_bivariate(
     ):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
         df = df[[x, y]].dropna()
-        df[y] = df[y].apply(str, meta=(y, str))
         dtcat: List[Any] = []
         if cfg.line.enable:
             # line chart
@@ -153,20 +148,15 @@ def compute_bivariate(
             stackdata=stackdata,
             visual_type="dt_and_cat_cols",
         )
+
     elif (is_dtype(xtype, GeoGraphy()) and is_dtype(ytype, Continuous())) or (
         is_dtype(xtype, Continuous()) and is_dtype(ytype, GeoGraphy())
     ):
         x, y = (x, y) if is_dtype(xtype, GeoGraphy()) else (y, x)
         df = df[[x, y]]
-        first_rows = df.head()
-        try:
-            first_rows[x].apply(hash)
-        except TypeError:
-            df[x] = df[x].astype(str)
-
         (comps,) = dask.compute(geo_cont_comps(df.dropna(), cfg))
-
         return Intermediate(x=x, y=y, data=comps, visual_type="geo_and_num_cols")
+
     elif (is_dtype(xtype, GeoPoint()) and is_dtype(ytype, Continuous())) or (
         is_dtype(xtype, Continuous()) and is_dtype(ytype, GeoPoint())
     ):
@@ -187,10 +177,6 @@ def compute_bivariate(
         is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()) or is_dtype(ytype, GeoPoint())
     ):
         df = df[[x, y]]
-        # Since it will throw error if column is object while some cells are
-        # numerical, we transform column to string first.
-        df[x] = df[x].astype(str)
-        df[y] = df[y].astype(str)
 
         if is_dtype(xtype, GeoPoint()):
             df[x] = df[x].astype(str)
