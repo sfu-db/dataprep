@@ -73,3 +73,13 @@ def test_report_constant(constantdf: pd.DataFrame) -> None:
 
         matplotlib.use("PS")
     create_report(constantdf, mode="basic")
+
+
+def test_report_single_column(simpledf: pd.DataFrame) -> None:
+    from sys import platform
+
+    if platform == "darwin":
+        import matplotlib
+
+        matplotlib.use("PS")
+    create_report(simpledf[["a"]], mode="basic")
