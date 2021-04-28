@@ -69,7 +69,6 @@ def format_report(
         This variable acts like an API in passing data to the template engine.
     """
     with ProgressBar(minimum=1, disable=not progress):
-        df = preprocess_dataframe(df)
         if mode == "basic":
             comps = format_basic(df, cfg)
         # elif mode == "full":
@@ -100,11 +99,14 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals,too-many-statements,too-many-branches
     # aggregate all computations
+
+    df_num = DataArray(df).select_num_columns()
+    df = preprocess_dataframe(df)
     setattr(getattr(cfg, "plot"), "report", True)
     if cfg.missingvalues.enable:
-        data, completions = basic_computations(df, cfg)
+        data, completions = basic_computations(df, df_num, cfg)
     else:
-        data = basic_computations(df, cfg)
+        data = basic_computations(df, df_num, cfg)
     with catch_warnings():
         filterwarnings(
             "ignore",
@@ -249,7 +251,7 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
 
 
 def basic_computations(
-    df: dd.DataFrame, cfg: Config
+    df: dd.DataFrame, df_num: DataArray, cfg: Config
 ) -> Union[Tuple[Dict[str, Any], Dict[str, Any]], Any]:
     """Computations for the basic version.
 
@@ -257,14 +259,18 @@ def basic_computations(
     ----------
     df
         The DataFrame for which data are calculated.
+    df_num
+        The DataFrame of numerical column (used for correlation). It is seperated from df since
+        the small distinct value numerical column in df is regarded as categorical column, and
+        will transform to str then used for other plots. But they should be regarded as numerical
+        column in df_num and used in correlation. This is a temporary fix, in the future we should treat
+        those small distinct value numerical columns as ordinary in both correlation plots and other plots.
     cfg
         The config dict user passed in. E.g. config =  {"hist.bins": 20}
         Without user's specifications, the default is "auto"
     """  # pylint: disable=too-many-branches
     data: Dict[str, Any] = {}
     df = DataArray(df)
-
-    df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
     first_rows = df.head
 
