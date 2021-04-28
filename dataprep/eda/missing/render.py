@@ -322,7 +322,8 @@ def render_missing_impact(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(Panel(child=row(fig_heatmap), title="Heat Map"))
         htgs["Heat Map"] = cfg.heatmap.missing_how_to_guide(plot_height, plot_width)
 
-    if cfg.dendro.enable:
+    # itmdt["data_dendrogram"] is None when dataframe has only one column so that won't be displayed
+    if cfg.dendro.enable and itmdt["ncols"] > 1:
         fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
         tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
         htgs["Dendrogram"] = cfg.dendro.how_to_guide(plot_height, plot_width)
