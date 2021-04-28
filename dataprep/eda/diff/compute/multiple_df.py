@@ -174,7 +174,6 @@ def compare_multiple_df(
         if is_dtype(col_dtype, Continuous()) and cfg.hist.enable:
             data.append((col, Continuous(), _cont_calcs(srs.apply("dropna"), cfg), orig))
         elif is_dtype(col_dtype, Nominal()) and cfg.bar.enable:
-            srs = srs.apply("astype", "str")
             data.append((col, Nominal(), _nom_calcs(srs.apply("dropna"), cfg), orig))
         elif is_dtype(col_dtype, DateTime()) and cfg.line.enable:
             data.append(

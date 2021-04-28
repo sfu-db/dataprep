@@ -5,7 +5,7 @@ import dask.dataframe as dd
 import pandas as pd
 from ....errors import DataprepError
 from ...intermediate import Intermediate
-from ...utils import to_dask
+from ...utils import preprocess_dataframe
 from ...dtypes import DTypeDef, string_dtype_to_object
 from ...configs import Config
 from .multiple_df import compare_multiple_df  # type: ignore
@@ -65,10 +65,7 @@ def compute_diff(
         if cfg.diff.baseline > len(df) - 1:
             raise ValueError("Baseline is out of the boundary of the input.")
 
-        df_list = list(map(to_dask, df))
-        for i, _ in enumerate(df_list):
-            df_list[i].columns = df_list[i].columns.astype(str)
-        df_list = list(map(string_dtype_to_object, df_list))
+        df_list = list(map(preprocess_dataframe, df))
 
         if x:
             # return compare_multiple_on_column(df_list, x)
