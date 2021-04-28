@@ -56,7 +56,7 @@ def compute_correlation(
     elif not cfg:
         cfg = Config()
 
-    df = preprocess_dataframe(df)
+    df = preprocess_dataframe(df, detect_small_distinct=False)
     if x is None and y is None:  # pylint: disable=no-else-return
         with catch_warnings():
             filterwarnings(

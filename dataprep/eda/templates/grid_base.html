@@ -84,7 +84,7 @@
                         {% for ins_type, insight in entry.items() %}
                         <tr>
                             <th class="des-{{ context.rnd }}">
-                                {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                                {{ insight|escape|replace('/*start*/', '<span class="col-name-' + context.rnd|string + '">')|replace('/*end*/', '</span>') }}
                             </th>
                             <td><span class="ins-type-{{ context.rnd }}">{{ ins_type }}</span></td>
                         </tr>
@@ -93,20 +93,18 @@
                     </table>
                 </div>
                 {% endfor %}
+                <div class="page-switch-box-{{ context.rnd }}">
+                    <ul class="page-switch-{{ context.rnd }}">
+                        {% for _ in context.overview_insights %}
+                        {% if loop.length > 1 %}
+                        <li id="switch-{{ context.rnd }}-{{ loop.index }}" onclick="switchPage{{ context.rnd }}(this)">{{ loop.index }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
             {% endif %}
         </div>
-        {% if context.overview_insights %}
-        <div class="page-switch-box-{{ context.rnd }}">
-            <ul class="page-switch-{{ context.rnd }}">
-                {% for _ in context.overview_insights %}
-                {% if loop.length > 1 %}
-                <li id="switch-{{ context.rnd }}-{{ loop.index }}" onclick="switchPage{{ context.rnd }}(this)">{{ loop.index }}</li>
-                {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
     </div>
     {% endif %}
     {% if context.legend_labels %}
@@ -129,7 +127,7 @@
             {% if context.meta %}
             <div class="menu-{{ context.rnd }}">
                 <div class="plot-title-{{ context.rnd }}">
-                    <div>{{ context.meta[loop.index0] }}</div>
+                    <div>{{ context.meta[loop.index0]|escape }}</div>
                 </div>
                 {% if context.how_to_guide[context.meta[loop.index0]] %}
                 <div class="info-container-{{ context.rnd }}">
@@ -155,7 +153,7 @@
                             <ol>
                                 {% for insight in context.column_insights[context.meta[loop.index0]] %}
                                 <li class="entry-{{ context.rnd }}">
-                                    {{ insight.replace('/*', '<span class="col-name-' + context.rnd | string() + '">').replace('*/', '</span>') }}
+                                    {{ insight|escape|replace('/*start*/', '<span class="col-name-' + context.rnd|string + '">')|replace('/*end*/', '</span>') }}
                                 </li>
                                 {% endfor %}
                             </ol>

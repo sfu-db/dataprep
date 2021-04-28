@@ -1,6 +1,7 @@
 """
     This module implements the create_report(df) function.
 """
+import warnings
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -59,6 +60,7 @@ def create_report(
     >>> report.save('My Fantastic Report') # save report to local disk
     >>> report.show_browser() # show report in the browser
     """
+    suppress_warnings()
     cfg = Config.from_dict(display, config)
     context = {
         "resources": INLINE.render(),
@@ -68,3 +70,14 @@ def create_report(
     template_base = ENV_LOADER.get_template("base.html")
     report = template_base.render(context=context)
     return Report(report)
+
+
+def suppress_warnings() -> None:
+    """
+    suppress warnings in create_report
+    """
+    warnings.filterwarnings(
+        "ignore",
+        "The default value of regex will change from True to False in a future version",
+        category=FutureWarning,
+    )

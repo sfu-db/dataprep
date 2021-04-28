@@ -14,7 +14,6 @@ from bokeh.models import (
     ColumnDataSource,
     CustomJSHover,
     FactorRange,
-    FuncTickFormatter,
     HoverTool,
     LinearColorMapper,
     NumeralTickFormatter,
@@ -60,20 +59,6 @@ def tweak_figure(fig: Figure) -> Figure:
     fig.axis.major_label_text_font_size = "9pt"
     fig.axis.major_label_standoff = 0
     fig.xaxis.major_label_orientation = np.pi / 3
-    # truncate axis tick values
-    format_js = """
-        if (tick.toString().length > 15) {
-            if (typeof tick === 'string') {
-                return tick.toString().substring(0, 13) + '...';
-            } else {
-                return tick.toPrecision(1);
-            }
-        } else {
-            return tick;
-        }
-    """
-    fig.xaxis.formatter = FuncTickFormatter(code=format_js)
-    fig.yaxis.formatter = FuncTickFormatter(code=format_js)
 
     return fig
 
@@ -314,8 +299,8 @@ def render_missing_impact(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     Render correlation heatmaps in to tabs
     """
-    plot_width = cfg.plot.width if cfg.plot.width is not None else 400
-    plot_height = cfg.plot.height if cfg.plot.height is not None else 400
+    plot_width = cfg.plot.width if cfg.plot.width is not None else 500
+    plot_height = cfg.plot.height if cfg.plot.height is not None else 500
 
     tabs: List[Panel] = []
     htgs: Dict[str, List[Tuple[str, str]]] = {}
@@ -337,7 +322,8 @@ def render_missing_impact(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(Panel(child=row(fig_heatmap), title="Heat Map"))
         htgs["Heat Map"] = cfg.heatmap.missing_how_to_guide(plot_height, plot_width)
 
-    if cfg.dendro.enable:
+    # itmdt["data_dendrogram"] is None when dataframe has only one column so that won't be displayed
+    if cfg.dendro.enable and itmdt["ncols"] > 1:
         fig_dendrogram = render_dendrogram(itmdt["data_dendrogram"], plot_width, plot_height)
         tabs.append(Panel(child=row(fig_dendrogram), title="Dendrogram"))
         htgs["Dendrogram"] = cfg.dendro.how_to_guide(plot_height, plot_width)
@@ -350,7 +336,7 @@ def render_missing_impact(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         "tabledata": {"Missing Statistics": stat_dict} if cfg.stats.enable else {},
         "layout": [panel.child.children[0] for panel in tabs],
         "meta": [panel.title for panel in tabs],
-        "container_width": plot_width + 160,
+        "container_width": max([panel.child.children[0].plot_width for panel in tabs]),
         "how_to_guide": htgs,
     }
 
@@ -430,7 +416,6 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
     fig.grid.grid_line_color = None
     fig.axis.axis_line_color = None
     fig.add_layout(color_bar, "left")
-    fig.frame_width = plot_width
     return fig
 
 
@@ -444,6 +429,7 @@ def render_bar_chart(
     Render a bar chart for the missing and present values
     """
     pres_cnts, null_cnts, cols = data
+    cols = [f"{col[:13]}...{col[len(col)-3:]}" if len(col) > 18 else col for col in cols]
     df = pd.DataFrame({"Present": pres_cnts, "Missing": null_cnts}, index=cols)
 
     if len(df) > 20:
@@ -468,7 +454,6 @@ def render_bar_chart(
         source=df,
         legend_label=list(df.columns),
     )
-
     # hover tool with count and percent
     formatter = CustomJSHover(
         args=dict(source=ColumnDataSource(df)),
@@ -500,7 +485,6 @@ def render_bar_chart(
     fig.yaxis.axis_label = "Row Count"
     tweak_figure(fig)
     relocate_legend(fig, "left")
-    fig.frame_width = plot_width
 
     return fig
 
@@ -567,7 +551,6 @@ def render_missing_spectrum(
         line_color=None,
     )
     fig.add_layout(color_bar, "left")
-    fig.frame_width = plot_width
     return fig
 
 
@@ -617,7 +600,6 @@ def render_dendrogram(dend: Dict["str", Any], plot_width: int, plot_height: int)
     fig.xaxis.major_label_orientation = np.pi / 3
     fig.yaxis.axis_label = "Average Distance Between Clusters"
     fig.grid.visible = False
-    fig.frame_width = plot_width
     return fig
 
 
@@ -693,12 +675,11 @@ def render_missing_impact_1v1(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
         return {
             "layout": [panel.child for panel in panels],
             "meta": [panel.title for panel in panels],
-            "container_width": plot_width + 240,
+            "container_width": max([panel.child.plot_width for panel in panels]),
             "how_to_guide": htgs,
         }
     else:
         fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height, True)
-        fig.frame_width = plot_width
         shown, total = meta["shown"], meta["total"]
         if shown != total:
             _title = f"Missing impact of {x} by ({shown} out of {total}) {y}"
@@ -708,6 +689,6 @@ def render_missing_impact_1v1(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
         return {
             "layout": [fig],
             "meta": [_title],
-            "container_width": plot_width + 240,
+            "container_width": fig.plot_width,
             "how_to_guide": htgs,
         }

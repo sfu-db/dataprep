@@ -27,10 +27,10 @@ from ..distribution.compute.overview import (
     _insight_pagination,
 )
 from ..dtypes import (
-    CATEGORICAL_DTYPES,
     Continuous,
     DateTime,
     Nominal,
+    GeoGraphy,
     detect_dtype,
     is_dtype,
 )
@@ -69,7 +69,6 @@ def format_report(
         This variable acts like an API in passing data to the template engine.
     """
     with ProgressBar(minimum=1, disable=not progress):
-        df = preprocess_dataframe(df)
         if mode == "basic":
             comps = format_basic(df, cfg)
         # elif mode == "full":
@@ -100,11 +99,14 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals,too-many-statements,too-many-branches
     # aggregate all computations
+
+    df_num = DataArray(df).select_num_columns()
+    df = preprocess_dataframe(df)
     setattr(getattr(cfg, "plot"), "report", True)
     if cfg.missingvalues.enable:
-        data, completions = basic_computations(df, cfg)
+        data, completions = basic_computations(df, df_num, cfg)
     else:
-        data = basic_computations(df, cfg)
+        data = basic_computations(df, df_num, cfg)
     with catch_warnings():
         filterwarnings(
             "ignore",
@@ -128,6 +130,8 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 ins = _format_cont_ins(col, dat, data["ov"]["nrows"], cfg)[1]
             elif is_dtype(dtp, Nominal()):
                 ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
+            elif is_dtype(dtp, GeoGraphy()):
+                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
             else:
                 continue
             all_ins += ins
@@ -147,6 +151,11 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
                 stats = format_num_stats(data[col])
             elif is_dtype(detect_dtype(df[col]), Nominal()):
+                itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
+                stats = format_cat_stats(
+                    data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
+                )
+            elif is_dtype(detect_dtype(df[col]), GeoGraphy()):
                 itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
                 stats = format_cat_stats(
                     data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
@@ -179,8 +188,6 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 "plots_tab": zip(comp[1][1:], rndrd["meta"][1:], insight_keys),
                 "insights_tab": rndrd["insights"],
             }
-            # for div, tab, key in res["variables"][col]['plots_tab']:
-            #     print(div)
     else:
         res["has_variables"] = False
 
@@ -217,7 +224,6 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
             for tab in rndrd.tabs:
                 fig = tab.child
                 fig.sizing_mode = "stretch_width"
-                # fig.title = Title(text=tab.title, align="center", text_font_size="20px")
                 figs_corr.append(fig)
                 res["correlation_names"].append(tab.title)
             res["correlations"] = components(figs_corr)
@@ -233,21 +239,19 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         rndrd = render_missing(itmdt, cfg)
         figs_missing: List[Figure] = []
         for fig in rndrd["layout"]:
-            fig.sizing_mode = "stretch_width"
-            # fig.title = Title(
-            #     text=rndrd["meta"][rndrd["layout"].index(fig)],
-            #     align="center",
-            #     text_font_size="20px",
-            # )
+            fig.sizing_mode = "stretch_both"
             figs_missing.append(fig)
         res["missing"] = components(figs_missing)
-        res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map", "Dendogram"]
+        res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map"]
+        # only display dendrogram when df has more than one column
+        if dask.compute(df.shape[1])[0] > 1:
+            res["missing_tabs"].append("Dendogram")
 
     return res
 
 
 def basic_computations(
-    df: dd.DataFrame, cfg: Config
+    df: dd.DataFrame, df_num: DataArray, cfg: Config
 ) -> Union[Tuple[Dict[str, Any], Dict[str, Any]], Any]:
     """Computations for the basic version.
 
@@ -255,26 +259,36 @@ def basic_computations(
     ----------
     df
         The DataFrame for which data are calculated.
+    df_num
+        The DataFrame of numerical column (used for correlation). It is seperated from df since
+        the small distinct value numerical column in df is regarded as categorical column, and
+        will transform to str then used for other plots. But they should be regarded as numerical
+        column in df_num and used in correlation. This is a temporary fix, in the future we should treat
+        those small distinct value numerical columns as ordinary in both correlation plots and other plots.
     cfg
         The config dict user passed in. E.g. config =  {"hist.bins": 20}
         Without user's specifications, the default is "auto"
     """  # pylint: disable=too-many-branches
     data: Dict[str, Any] = {}
     df = DataArray(df)
-
-    df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
-    first_rows = df.select_dtypes(CATEGORICAL_DTYPES).head
+    first_rows = df.head
+
     # variables
     if cfg.variables.enable:
         for col in df.columns:
-            if is_dtype(detect_dtype(df.frame[col]), Continuous()):
-                data[col] = cont_comps(df.frame[col], cfg)
-            elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
-                # Since it will throw error if column is object while some cells are
-                # numerical, we transform column to string first.
+            npres = dask.compute(df.frame[col].dropna().shape[0])
+            # Since it will throw error if a numerical column is all-nan,
+            # we transform it to categorical column
+            if npres[0] == 0:
                 df.frame[col] = df.frame[col].astype(str)
+                data[col] = nom_comps(df.frame[col], df.frame[col].head(), cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
                 data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), GeoGraphy()):
+                data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), Continuous()):
+                data[col] = cont_comps(df.frame[col], cfg)
             elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
                 data[col] = {}
                 data[col]["stats"] = calc_stats_dt(df.frame[col])
@@ -291,9 +305,10 @@ def basic_computations(
                     (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
                 )
             elif is_dtype(col_dtype, Nominal()):
-                # Since it will throw error if column is object while some cells are
-                # numerical, we transform column to string first.
-                df.frame[col] = df.frame[col].astype(str)
+                data["insights"].append(
+                    (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
+                )
+            elif is_dtype(col_dtype, GeoGraphy()):
                 data["insights"].append(
                     (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
                 )
@@ -324,3 +339,26 @@ def basic_computations(
 
     else:
         return data
+
+
+# def cont_comps_brief(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
+#
+#     """
+#     Computations required for constant column and all-nan column
+#     """
+#     # pylint: disable=too-many-branches
+#     data: Dict[str, Any] = {}
+#
+#     data["nrows"] = srs.shape[0]  # total rows
+#     srs = srs.dropna()
+#     data["npres"] = srs.shape[0]  # number of present (not null) values
+#     data["mean"] = srs.mean()
+#     data["min"] = srs.min()
+#     data["max"] = srs.max()
+#     data["nreals"] = srs.shape[0]
+#     data["nzero"] = (srs == 0).sum()
+#     data["nneg"] = (srs < 0).sum()
+#     data["mem_use"] = srs.memory_usage(deep=True)
+#     data["nuniq"] = srs.nunique_approx()
+#
+#     return data

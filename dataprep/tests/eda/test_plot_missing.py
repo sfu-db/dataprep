@@ -10,6 +10,8 @@ from ...eda.dtypes import Numerical
 from ...eda.missing import compute_missing, render_missing, plot_missing
 from ...eda.utils import to_dask
 from ...eda.configs import Config
+from ...datasets import load_dataset
+from .random_data_generator import random_df
 
 
 @pytest.fixture(scope="module")  # type: ignore
@@ -26,6 +28,10 @@ def simpledf() -> dd.DataFrame:
     ddf = to_dask(df)
 
     return ddf
+
+
+def test_random_df(random_df: pd.DataFrame) -> None:
+    plot_missing(random_df)
 
 
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:
@@ -109,7 +115,6 @@ def test_no_missing() -> None:
         import matplotlib
 
         matplotlib.use("PS")
-    import seaborn as sns
 
-    df = sns.load_dataset("iris")
+    df = load_dataset("iris")
     plot_missing(df)

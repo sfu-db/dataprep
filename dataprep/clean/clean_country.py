@@ -4,8 +4,7 @@ Clean and validate a DataFrame column containing country names.
 from functools import lru_cache
 from operator import itemgetter
 from os import path
-from re import error
-from typing import Any, Union
+from typing import Any, Union, Tuple, Optional
 
 import dask
 import dask.dataframe as dd
@@ -26,7 +25,7 @@ REGEXES = [re.compile(entry, re.IGNORECASE) for entry in DATA.regex]
 def clean_country(
     df: Union[pd.DataFrame, dd.DataFrame],
     column: str,
-    input_format: str = "auto",
+    input_format: Union[str, Tuple[str, ...]] = "auto",
     output_format: str = "name",
     fuzzy_dist: int = 0,
     strict: bool = False,
@@ -54,6 +53,10 @@ def clean_country(
             - 'alpha-2': alpha-2 code ('US')
             - 'alpha-3': alpha-3 code ('USA')
             - 'numeric': numeric code (840)
+
+        Can also be a tuple containing any combination of input formats,
+        for example to clean a column containing alpha-2 and numeric
+        codes set input_format to ('alpha-2', 'numeric').
 
         (default: 'auto')
     output_format
@@ -112,14 +115,7 @@ def clean_country(
     1        US  United States
     """
     # pylint: disable=too-many-arguments
-
-    input_formats = {"auto", "name", "official", "alpha-2", "alpha-3", "numeric"}
     output_formats = {"name", "official", "alpha-2", "alpha-3", "numeric"}
-    if input_format not in input_formats:
-        raise ValueError(
-            f'input_format {input_format} is invalid, it needs to be one of "auto", '
-            '"name", "official", "alpha-2", "alpha-3" or "numeric'
-        )
     if output_format not in output_formats:
         raise ValueError(
             f'output_format {output_format} is invalid, it needs to be "name", '
@@ -130,6 +126,7 @@ def clean_country(
             "can't do fuzzy matching while strict mode is enabled, "
             "set strict=False for fuzzy matching or fuzzy_dist=0 for strict matching"
         )
+    input_formats = _input_format_to_tuple(input_format)
 
     # convert to dask
     df = to_dask(df)
@@ -140,7 +137,8 @@ def clean_country(
     # amount of different codes to produce the report
     df["clean_code_tup"] = df[column].map_partitions(
         lambda srs: [
-            _format_country(x, input_format, output_format, fuzzy_dist, strict, errors) for x in srs
+            _format_country(x, input_formats, output_format, fuzzy_dist, strict, errors)
+            for x in srs
         ],
         meta=object,
     )
@@ -168,7 +166,9 @@ def clean_country(
 
 
 def validate_country(
-    x: Union[str, int, pd.Series], input_format: str = "auto", strict: bool = True
+    x: Union[str, int, pd.Series],
+    input_format: Union[str, Tuple[str, ...]] = "auto",
+    strict: bool = True,
 ) -> Union[bool, pd.Series]:
     """
     Validate country names.
@@ -187,6 +187,10 @@ def validate_country(
             - 'alpha-2': alpha-2 code ('US')
             - 'alpha-3': alpha-3 code ('USA')
             - 'numeric': numeric code (840)
+
+        Can also be a tuple containing any combination of input formats,
+        for example to clean a column containing alpha-2 and numeric
+        codes set input_format to ('alpha-2', 'numeric').
 
         (default: 'auto')
     strict
@@ -207,18 +211,18 @@ def validate_country(
     1    False
     Name: country, dtype: bool
     """
-
+    input_formats = _input_format_to_tuple(input_format)
     if isinstance(x, pd.Series):
         x = x.astype(str).str.lower().str.strip()
-        return x.apply(_check_country, args=(input_format, strict, False))
+        return x.apply(_check_country, args=(input_formats, strict, False))
 
     x = str(x).lower().strip()
-    return _check_country(x, input_format, strict, False)
+    return _check_country(x, input_formats, strict, False)
 
 
 def _format_country(
     val: Any,
-    input_format: str,
+    input_formats: Tuple[str, ...],
     output_format: str,
     fuzzy_dist: int,
     strict: bool,
@@ -241,9 +245,13 @@ def _format_country(
     # could not be parsed) or "success" (a successful parse of the value).
 
     country = str(val).lower().strip()
-    result_index, status = _check_country(country, input_format, strict, True)
+    result_index, status = _check_country(country, input_formats, strict, True)
 
-    if fuzzy_dist > 0 and status == "unknown" and input_format in ("auto", "name", "official"):
+    if (
+        fuzzy_dist > 0
+        and status == "unknown"
+        and ("name" in input_formats or "official" in input_formats)
+    ):
         result_index, status = _check_fuzzy_dist(country, fuzzy_dist)
 
     if status == "null":
@@ -264,7 +272,7 @@ def _format_country(
 
 
 @lru_cache(maxsize=2 ** 20)
-def _check_country(country: str, input_format: str, strict: bool, clean: bool) -> Any:
+def _check_country(country: str, input_formats: Tuple[str, ...], strict: bool, clean: bool) -> Any:
     """
     Finds the index of the given country in the DATA dataframe.
 
@@ -272,8 +280,8 @@ def _check_country(country: str, input_format: str, strict: bool, clean: bool) -
     ----------
     country
         string containing the country value being cleaned
-    input_format
-        the ISO 3166 input format of the country
+    input_formats
+        Tuple containing potential ISO 3166 input formats of the country
     strict
         If True, for input types "name" and "offical" the function looks for a direct match
         in the DATA dataframe. If False, the country input is searched for a regex match.
@@ -284,19 +292,18 @@ def _check_country(country: str, input_format: str, strict: bool, clean: bool) -
     if country in NULL_VALUES:
         return (None, "null") if clean else False
 
-    if input_format == "auto":
-        input_format = _get_format_from_name(country)
+    country_format = _get_format_from_name(country)
+    input_format = _get_format_if_allowed(country_format, input_formats)
+    if not input_format:
+        return (None, "unknown") if clean else False
 
     if strict and input_format == "regex":
         for form in ("name", "official"):
-            try:
-                ind = DATA[
-                    DATA[form].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)
-                ].index
-                if np.size(ind) > 0:
-                    return (ind[0], "success") if clean else True
-            except error:
-                return (None, "unknown") if clean else False
+            ind = DATA[
+                DATA[form].str.contains(f"^{re.escape(country)}$", flags=re.IGNORECASE, na=False)
+            ].index
+            if np.size(ind) > 0:
+                return (ind[0], "success") if clean else True
 
     elif not strict and input_format in ("regex", "name", "official"):
         for index, country_regex in enumerate(REGEXES):
@@ -305,7 +312,9 @@ def _check_country(country: str, input_format: str, strict: bool, clean: bool) -
 
     else:
         ind = DATA[
-            DATA[input_format].str.contains(f"^{country}$", flags=re.IGNORECASE, na=False)
+            DATA[input_format].str.contains(
+                f"^{re.escape(country)}$", flags=re.IGNORECASE, na=False
+            )
         ].index
         if np.size(ind) > 0:
             return (ind[0], "success") if clean else True
@@ -346,3 +355,45 @@ def _get_format_from_name(name: str) -> str:
         return "numeric"
     except ValueError:
         return "alpha-2" if len(name) == 2 else "alpha-3" if len(name) == 3 else "regex"
+
+
+def _get_format_if_allowed(input_format: str, allowed_formats: Tuple[str, ...]) -> Optional[str]:
+    """
+    Returns the input format if it's an allowed format.
+    "regex" input_format is only returned if "name" and "official are
+    allowed. This is because when strict = True and input_format = "regex"
+    both the "name" and "official" columns in the DATA dataframe are checked.
+    """
+    if input_format == "regex":
+        if "name" in allowed_formats and "official" in allowed_formats:
+            return "regex"
+
+        return (
+            "name"
+            if "name" in allowed_formats
+            else "official"
+            if "official" in allowed_formats
+            else None
+        )
+
+    return input_format if input_format in allowed_formats else None
+
+
+def _input_format_to_tuple(input_format: Union[str, Tuple[str, ...]]) -> Tuple[str, ...]:
+    """
+    Converts a string input format to a tuple of allowed input formats and raises an error
+    if an input format is not valid.
+    """
+    input_formats = {"auto", "name", "official", "alpha-2", "alpha-3", "numeric"}
+    if isinstance(input_format, str):
+        if input_format == "auto":
+            return ("name", "official", "alpha-2", "alpha-3", "numeric")
+        input_format = (input_format,)
+
+    for fmt in input_format:
+        if fmt not in input_formats:
+            raise ValueError(
+                f'input_format {fmt} is invalid, it needs to be one of "auto", '
+                '"name", "official", "alpha-2", "alpha-3" or "numeric'
+            )
+    return input_format

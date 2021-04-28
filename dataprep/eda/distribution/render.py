@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 import json
 import os
+import math
 
 import numpy as np
 import pandas as pd
@@ -34,7 +35,7 @@ from wordcloud import WordCloud
 from ..configs import KDE, Bar, Box, Config, Pie, QQNorm, WordFrequency
 from ..dtypes import Continuous, DateTime, Nominal, is_dtype, GeoGraphy
 from ..intermediate import Intermediate
-from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS
+from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS, YlGnBu
 from ..utils import tweak_figure, _format_ticks, _format_axis, _format_bin_intervals
 
 COUNTRY_MAP_FILE = os.path.join(os.path.split(os.path.abspath(__file__))[0], "country.json")
@@ -687,8 +688,9 @@ def geo_viz(
         temp_list.append(value.get(MAPS["fip"][itr], "unknown"))
     MAPS["value"] = temp_list
 
-    # palette = RDBU[(len(RDBU) // 2 - 1) :]  # or VIRIDIS
-    mapper = LinearColorMapper(palette=VIRIDIS, low=minimum, high=maximum)
+    mapper = LinearColorMapper(
+        palette=YlGnBu[33:233], low=minimum, high=maximum, nan_color="#cccccc"
+    )
     tools = "pan,wheel_zoom,box_zoom,reset,hover"
 
     fig = Figure(
@@ -1803,7 +1805,7 @@ def nom_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List[
     if cfg.bar.enable:
         if data["chisq"][1] > cfg.insight.uniform__threshold:
             ins["Bar Chart"].append(f"{col} is relatively evenly distributed")
-        factor = round(data["bar"][0] / data["bar"][1], 2) if len(data["bar"]) > 1 else 0
+        factor = round(data["bar"].iloc[0] / data["bar"].iloc[1], 2) if len(data["bar"]) > 1 else 0
         if factor > cfg.insight.outstanding_no1__threshold:
             val1, val2 = data["bar"].index[0], data["bar"].index[1]
             ins["Bar Chart"].append(
@@ -1812,7 +1814,7 @@ def nom_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List[
             )
     if cfg.pie.enable:
         if (
-            data["pie"][:2].sum() / data["nrows"] > cfg.insight.attribution__threshold
+            data["pie"].iloc[:2].sum() / data["nrows"] > cfg.insight.attribution__threshold
             and len(data["pie"]) >= 2
         ):
             vals = ", ".join(str(data["pie"].index[i]) for i in range(2))
@@ -1823,7 +1825,7 @@ def nom_insights(data: Dict[str, Any], col: str, cfg: Config) -> Dict[str, List[
             ins["Word Cloud"].append(f"{col} contains many words: {nwords} words")
     if cfg.wordfreq.enable:
         factor = (
-            round(data["word_cnts_freq"][0] / data["word_cnts_freq"][1], 2)
+            round(data["word_cnts_freq"].iloc[0] / data["word_cnts_freq"].iloc[1], 2)
             if len(data["word_cnts_freq"]) > 1
             else 0
         )
@@ -1875,11 +1877,13 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(Panel(child=row(fig), title="Histogram"))
         htgs["Histogram"] = cfg.hist.how_to_guide(plot_height, plot_width)
     if cfg.kde.enable:
-        if data["kde"] is not None:
+        # when the column is constant, we wont display kde plot
+        if data["kde"] is not None and (not math.isclose(data["min"], data["max"])):
             dens, kde = data["dens"], data["kde"]
             tabs.append(kde_viz(dens, kde, col, plot_width, plot_height, cfg.kde))
             htgs["KDE Plot"] = cfg.kde.how_to_guide(plot_height, plot_width)
-    if cfg.qqnorm.enable:
+    if cfg.qqnorm.enable and (not math.isclose(data["min"], data["max"])):
+        # when the column is constant, we wont display qq plot
         if data["qntls"].any():
             qntls, mean, std = data["qntls"], data["mean"], data["std"]
             tabs.append(qqnorm_viz(qntls, mean, std, col, plot_width, plot_height, cfg.qqnorm))

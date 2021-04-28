@@ -137,6 +137,7 @@ DTypeDef = Union[Dict[str, Union[DType, Type[DType], str]], DType, Type[DType], 
 def detect_dtype(
     col: dd.Series,
     known_dtype: Optional[DTypeDef] = None,
+    detect_small_distinct: bool = True,
 ) -> DType:
     """
     Given a column, detect its type or transform its type according to users' specification
@@ -150,9 +151,11 @@ def detect_dtype(
         all columns. E.g.  known_dtype = {"a": Continuous, "b": "Nominal"} or
         known_dtype = {"a": Continuous(), "b": "nominal"} or
         known_dtype = Continuous() or known_dtype = "Continuous" or known_dtype = Continuous()
+    detect_small_distinct: bool, default True
+        Whether to detect numerical columns with small distinct values as categorical column.
     """
     if not known_dtype:
-        return detect_without_known(col)
+        return detect_without_known(col, detect_small_distinct=detect_small_distinct)
 
     if isinstance(known_dtype, dict):
         if col.name in known_dtype:
@@ -162,7 +165,7 @@ def detect_dtype(
     elif isinstance(normalize_dtype(known_dtype), DType):
         return map_dtype(normalize_dtype(known_dtype))
 
-    return detect_without_known(col)
+    return detect_without_known(col, detect_small_distinct=detect_small_distinct)
 
 
 def map_dtype(dtype: DType) -> DType:
@@ -186,7 +189,8 @@ def map_dtype(dtype: DType) -> DType:
         return dtype
 
 
-def detect_without_known(col: dd.Series) -> DType:
+def detect_without_known(col: dd.Series, detect_small_distinct: bool) -> DType:
+    # pylint: disable=too-many-return-statements
     """
     This function detects dtypes of column when users didn't specify.
     """
@@ -199,7 +203,15 @@ def detect_without_known(col: dd.Series) -> DType:
             return Nominal()
 
     elif is_continuous(col.dtype):
-        return Continuous()
+        if detect_small_distinct:
+            # detect as categorical if distinct value is small
+            nuniques = col.nunique_approx().compute()
+            if nuniques < 10:
+                return Nominal()
+            else:
+                return Continuous()
+        else:
+            return Continuous()
 
     elif is_datetime(col.dtype):
         return DateTime()
@@ -361,6 +373,8 @@ def get_dtype_cnts_and_num_cols(
             dtype_cnts["DateTime"] += 1
         elif is_dtype(col_dtype, GeoGraphy()):
             dtype_cnts["GeoGraphy"] += 1
+        elif is_dtype(col_dtype, GeoPoint()):
+            dtype_cnts["GeoPoint"] += 1
         else:
             raise NotImplementedError
     return dtype_cnts, num_cols

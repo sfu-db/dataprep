@@ -10,14 +10,20 @@ import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_object_dtype
+import pandas._libs.missing as libmissing
 from bokeh.models import Legend, FuncTickFormatter
 from bokeh.plotting import Figure
 from scipy.stats import gaussian_kde as gaussian_kde_
 from scipy.stats import ks_2samp as ks_2samp_
 from scipy.stats import normaltest as normaltest_
 from scipy.stats import skewtest as skewtest_
-from .dtypes import drop_null
+from .dtypes import (
+    drop_null,
+    Nominal,
+    detect_dtype,
+    is_dtype,
+)
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,6 +47,7 @@ def preprocess_dataframe(
     org_df: Union[pd.DataFrame, dd.DataFrame],
     used_columns: Optional[Union[List[str], List[object]]] = None,
     excluded_columns: Optional[Union[List[str], List[object]]] = None,
+    detect_small_distinct: bool = True,
 ) -> dd.DataFrame:
     """
     Make a dask dataframe with only used_columns.
@@ -52,6 +59,17 @@ def preprocess_dataframe(
         4. transform object column to string column (note that obj column can contain
         cells from different type).
         5. transform to dask dataframe if input is pandas dataframe.
+
+    Parameters
+    ----------------
+    org_df: dataframe
+        the original dataframe
+    used_columns: optional list[str], default None
+        used columns in org_df
+    excluded_columns: optional list[str], default None
+        excluded columns from used_columns, mainly used for geo point data processing.
+    detect_small_distinct: bool, default True
+        whether to detect numerical columns with small distinct values as categorical column.
     """
     if used_columns is None:
         df = org_df.copy()
@@ -81,15 +99,23 @@ def preprocess_dataframe(
 
     df.columns = columns
     df = df.reset_index(drop=True)
+    df = to_dask(df)
 
     # Since an object column could contains multiple types
-    # in different cells. transform object column to string.
+    # in different cells. transform non-na values in object column to string.
+
+    # Function `_notna2str` transforms an obj to str if it is not NA.
+    # The check for NA is similar to pd.isna, but will treat a list obj as
+    # a scalar and return a single boolean, rather than a list of booleans.
+    # Otherwise when a cell is tuple or list it will throw an error.
+    _notna2str = lambda obj: obj if libmissing.checknull(obj) else str(obj)
     for col in df.columns:
-        if is_object_dtype(df[col].dtype) and (
-            excluded_columns is not None and col not in excluded_columns
+        col_dtype = detect_dtype(df[col], detect_small_distinct=detect_small_distinct)
+        if (is_dtype(col_dtype, Nominal())) and (
+            (excluded_columns is None) or (col not in excluded_columns)
         ):
-            df[col] = df[col].astype(str)
-    return to_dask(df)
+            df[col] = df[col].apply(_notna2str, meta=("object"))
+    return df
 
 
 def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103
@@ -435,10 +461,14 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
     """
     Format the axis ticks
     """  # pylint: disable=too-many-locals
+
     # divisor for 5 ticks (5 results in ticks that are too close together)
     divisor = 4.5
     # interval
-    gap = (maxv - minv) / divisor
+    if np.isinf(minv) or np.isinf(maxv):
+        gap = 1.0
+    else:
+        gap = (maxv - minv) / divisor
     # get exponent from scientific notation
     _, after = f"{gap:.0e}".split("e")
     # round to this amount
@@ -450,8 +480,9 @@ def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
 
     # make the tick values
     ticks = [float(minv)]
-    while max(ticks) + gap < maxv:
-        ticks.append(max(ticks) + gap)
+    if not np.isinf(maxv):
+        while max(ticks) + gap < maxv:
+            ticks.append(max(ticks) + gap)
     ticks = np.round(ticks, round_to)
     ticks = [int(tick) if tick.is_integer() else tick for tick in ticks]
     formatted_ticks = _format_ticks(ticks)

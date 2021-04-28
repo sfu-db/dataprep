@@ -51,8 +51,9 @@ def histogram(
     """Calculate "histogram" for both numerical and categorical."""
     if len(arr.shape) != 1:
         raise ValueError("Histogram only supports 1-d array.")
-
-    if is_dtype(detect_dtype(arr, dtype), Continuous()):
+    srs = dd.from_dask_array(arr)
+    detected_type = detect_dtype(srs, dtype)
+    if is_dtype(detected_type, Continuous()):
         if range is not None:
             minimum, maximum = range
         else:
@@ -67,14 +68,11 @@ def histogram(
         if not return_edges:
             return counts, centers
         return counts, centers, edges
-    elif is_dtype(detect_dtype(arr, dtype), Nominal()) or is_dtype(
-        detect_dtype(arr, dtype), GeoGraphy()
-    ):
+    elif is_dtype(detected_type, Nominal()) or is_dtype(detected_type, GeoGraphy()):
         # Dask array's unique is way slower than the values_counts on Series
         # See https://github.com/dask/dask/issues/2851
         # centers, counts = da.unique(arr, return_counts=True)
 
-        srs = dd.from_dask_array(arr)
         value_counts = srs.value_counts()
 
         counts = value_counts.to_dask_array()

@@ -56,7 +56,10 @@ class Container:
         if visual_type in GRID_VISUAL_TYPES:
             self.template_base = ENV_LOADER.get_template("grid_base.html")
         elif visual_type in TAB_VISUAL_TYPES:
-            setattr(self.context, "highlight", cfg.insight.enable)
+            if visual_type == "missing_impact":
+                setattr(self.context, "highlight", False)
+            else:
+                setattr(self.context, "highlight", cfg.insight.enable)
             if to_render.get("tabledata"):
                 self.context.meta.insert(0, "Stats")  # type: ignore
             if to_render.get("value_table"):

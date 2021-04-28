@@ -2,6 +2,7 @@ import string
 from typing import Any, Dict, List, Optional, Tuple, Mapping, Callable, Union
 import pandas as pd
 import numpy as np
+import pytest
 
 
 def _resolve_random_state(random_state: Union[int, np.random.RandomState]) -> np.random.RandomState:
@@ -22,7 +23,7 @@ def _gen_random_int_series(
 ) -> pd.Series:
     """Return a randonly generated int Series, where the value is in [low, high]"""
     rand = _resolve_random_state(random_state)
-    arr = rand.random_integers(low=low, high=high, size=size)
+    arr = rand.randint(low=low, high=high, size=size)
     return pd.Series(arr)
 
 
@@ -187,3 +188,8 @@ def gen_random_dataframe(
         df.index.shape[0], na_ratio=0.1, str_max_len=str_col_name_max_len, random_state=rand
     )
     return df
+
+
+@pytest.fixture(scope="module")  # type: ignore
+def random_df() -> pd.DataFrame:
+    return gen_random_dataframe()
