@@ -47,6 +47,7 @@ def preprocess_dataframe(
     org_df: Union[pd.DataFrame, dd.DataFrame],
     used_columns: Optional[Union[List[str], List[object]]] = None,
     excluded_columns: Optional[Union[List[str], List[object]]] = None,
+    detect_small_distinct: bool = True,
 ) -> dd.DataFrame:
     """
     Make a dask dataframe with only used_columns.
@@ -58,6 +59,17 @@ def preprocess_dataframe(
         4. transform object column to string column (note that obj column can contain
         cells from different type).
         5. transform to dask dataframe if input is pandas dataframe.
+
+    Parameters
+    ----------------
+    org_df: dataframe
+        the original dataframe
+    used_columns: optional list[str], default None
+        used columns in org_df
+    excluded_columns: optional list[str], default None
+        excluded columns from used_columns, mainly used for geo point data processing.
+    detect_small_distinct: bool, default True
+        whether to detect numerical columns with small distinct values as categorical column.
     """
     if used_columns is None:
         df = org_df.copy()
@@ -98,7 +110,7 @@ def preprocess_dataframe(
     # Otherwise when a cell is tuple or list it will throw an error.
     _notna2str = lambda obj: obj if libmissing.checknull(obj) else str(obj)
     for col in df.columns:
-        col_dtype = detect_dtype(df[col])
+        col_dtype = detect_dtype(df[col], detect_small_distinct=detect_small_distinct)
         if (is_dtype(col_dtype, Nominal())) and (
             (excluded_columns is None) or (col not in excluded_columns)
         ):
