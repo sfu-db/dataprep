@@ -366,6 +366,8 @@ def get_dtype_cnts_and_num_cols(
             dtype_cnts["DateTime"] += 1
         elif is_dtype(col_dtype, GeoGraphy()):
             dtype_cnts["GeoGraphy"] += 1
+        elif is_dtype(col_dtype, GeoPoint()):
+            dtype_cnts["GeoPoint"] += 1
         else:
             raise NotImplementedError
     return dtype_cnts, num_cols
