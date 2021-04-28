@@ -31,6 +31,7 @@ from ..dtypes import (
     DateTime,
     Nominal,
     GeoGraphy,
+    GeoPoint,
     detect_dtype,
     is_dtype,
 )
@@ -132,6 +133,8 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                 ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
             elif is_dtype(dtp, GeoGraphy()):
                 ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
+            elif is_dtype(dtp, GeoPoint()):
+                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
             else:
                 continue
             all_ins += ins
@@ -156,6 +159,11 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                     data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
                 )
             elif is_dtype(detect_dtype(df[col]), GeoGraphy()):
+                itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
+                stats = format_cat_stats(
+                    data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
+                )
+            elif is_dtype(detect_dtype(df[col]), GeoPoint()):
                 itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
                 stats = format_cat_stats(
                     data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
@@ -287,6 +295,8 @@ def basic_computations(
                 data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
             elif is_dtype(detect_dtype(df.frame[col]), GeoGraphy()):
                 data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
+            elif is_dtype(detect_dtype(df.frame[col]), GeoPoint()):
+                data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
             elif is_dtype(detect_dtype(df.frame[col]), Continuous()):
                 data[col] = cont_comps(df.frame[col], cfg)
             elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
@@ -309,6 +319,10 @@ def basic_computations(
                     (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
                 )
             elif is_dtype(col_dtype, GeoGraphy()):
+                data["insights"].append(
+                    (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
+                )
+            elif is_dtype(col_dtype, GeoPoint()):
                 data["insights"].append(
                     (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
                 )
