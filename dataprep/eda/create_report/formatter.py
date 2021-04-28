@@ -240,7 +240,10 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
             fig.sizing_mode = "stretch_both"
             figs_missing.append(fig)
         res["missing"] = components(figs_missing)
-        res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map", "Dendogram"]
+        res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map"]
+        # only display dendrogram when df has more than one column
+        if dask.compute(df.shape[1])[0] > 1:
+            res["missing_tabs"].append("Dendogram")
 
     return res
 

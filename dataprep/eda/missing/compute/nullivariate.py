@@ -40,7 +40,8 @@ def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, 
         null_perc if cfg.spectrum.enable or cfg.heatmap.enable else None,
         missing_bars(null_cnts, df.columns.values, nrows) if cfg.bar.enable else None,
         missing_heatmap(df) if cfg.heatmap.enable else None,
-        missing_dendrogram(df) if cfg.dendro.enable else None,
+        # dendrogram cannot be computed for single column dataframe
+        missing_dendrogram(df) if cfg.dendro.enable and ncols > 1 else None,
         nullity.sum() if cfg.stats.enable else None,
         missing_col_cnt(df) if cfg.stats.enable else None,
         missing_row_cnt(df) if cfg.stats.enable else None,
@@ -68,10 +69,12 @@ def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, 
         avg_col,
     ) = yield tasks
     ### Eager Region Begin
-
     if cfg.heatmap.enable:
         sel = ~((null_perc == 0) | (null_perc == 1))
         if nrows != 1:
+            # heatmap is nan when dataframe has only one column so that generate error.
+            # To solve the problem, we create a 2d array here
+            heatmap = np.empty([ncols, ncols]) if not isinstance(heatmap, np.ndarray) else heatmap
             heatmap = pd.DataFrame(
                 data=heatmap[:, sel][sel, :], columns=df.columns[sel], index=df.columns[sel]
             )
@@ -137,6 +140,7 @@ def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, 
         visual_type="missing_impact",
         missing_stat=missing_stat if cfg.stats.enable else {},
         insights=insights if cfg.insight.enable else {},
+        ncols=ncols,
     )
 
 
