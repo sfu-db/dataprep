@@ -22,7 +22,7 @@ def plot_diff(
     config: Optional[Dict[str, Any]] = None,
     display: Optional[List[str]] = None,
     dtype: Optional[DTypeDef] = None,
-    progress: bool = True,
+    progress: bool = False,
 ) -> Container:
     """
     This function is to compute and visualize the differences between 2 or more(up to 5) datasets.
