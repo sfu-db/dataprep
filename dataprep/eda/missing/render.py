@@ -135,7 +135,8 @@ def render_hist(  # pylint: disable=too-many-arguments
             ("Frequency", "@count"),
             ("Label", "@label"),
         ]
-
+    cols = [f"{col[:12]}..." if isinstance(col, str) and len(col) > 18 else col for col in df["x"]]
+    df["x"] = cols
     cmapper = CategoricalColorMapper(palette=CATEGORY10, factors=LABELS)
 
     if is_dtype(meta["dtype"], Nominal()) or is_dtype(meta["dtype"], GeoGraphy()):
