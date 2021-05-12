@@ -12,7 +12,6 @@ from bokeh.plotting import Figure
 from ..configs import Config
 from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
-from ..data_array import DataArray
 from ..distribution import render
 from ..utils import _calc_line_dt
 from ..distribution.compute.overview import calc_stats
@@ -26,20 +25,19 @@ from ..distribution.compute.overview import (
     _format_ov_ins,
     _insight_pagination,
 )
-from ..dtypes import (
+from ..dtypes_v2 import (
     Continuous,
     DateTime,
     Nominal,
     GeoGraphy,
     GeoPoint,
-    detect_dtype,
-    is_dtype,
+    SmallCardNum,
 )
+from ..eda_frame import EDAFrame
 from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ...progress_bar import ProgressBar
-from ..utils import preprocess_dataframe
 
 
 def format_report(
@@ -71,7 +69,8 @@ def format_report(
     """
     with ProgressBar(minimum=1, disable=not progress):
         if mode == "basic":
-            comps = format_basic(df, cfg)
+            edaframe = EDAFrame(df)
+            comps = format_basic(edaframe, cfg)
         # elif mode == "full":
         #     comps = format_full(df)
         # elif mode == "minimal":
@@ -81,7 +80,7 @@ def format_report(
     return comps
 
 
-def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
+def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     """
     Format basic version.
 
@@ -101,13 +100,11 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
     # pylint: disable=too-many-locals,too-many-statements,too-many-branches
     # aggregate all computations
 
-    df_num = DataArray(df).select_num_columns()
-    df = preprocess_dataframe(df)
     setattr(getattr(cfg, "plot"), "report", True)
     if cfg.missingvalues.enable:
-        data, completions = basic_computations(df, df_num, cfg)
+        data, completions = basic_computations(df, cfg)
     else:
-        data = basic_computations(df, df_num, cfg)
+        data = basic_computations(df, cfg)
     with catch_warnings():
         filterwarnings(
             "ignore",
@@ -127,13 +124,9 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         # insight
         all_ins = _format_ov_ins(data["ov"], cfg)
         for col, dtp, dat in data["insights"]:
-            if is_dtype(dtp, Continuous()):
+            if isinstance(dtp, Continuous):
                 ins = _format_cont_ins(col, dat, data["ov"]["nrows"], cfg)[1]
-            elif is_dtype(dtp, Nominal()):
-                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
-            elif is_dtype(dtp, GeoGraphy()):
-                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
-            elif is_dtype(dtp, GeoPoint()):
+            elif type(dtp) in [Nominal, SmallCardNum, GeoGraphy, GeoPoint]:
                 ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
             else:
                 continue
@@ -150,25 +143,16 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         res["has_variables"] = True
         for col in df.columns:
             stats: Any = None  # needed for pylint
-            if is_dtype(detect_dtype(df[col]), Continuous()):
+            dtp = df.get_dtype(col)
+            if isinstance(dtp, Continuous):
                 itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
                 stats = format_num_stats(data[col])
-            elif is_dtype(detect_dtype(df[col]), Nominal()):
+            elif type(dtp) in [Nominal, SmallCardNum, GeoGraphy, GeoPoint]:
                 itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
                 stats = format_cat_stats(
                     data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
                 )
-            elif is_dtype(detect_dtype(df[col]), GeoGraphy()):
-                itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
-                stats = format_cat_stats(
-                    data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
-                )
-            elif is_dtype(detect_dtype(df[col]), GeoPoint()):
-                itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
-                stats = format_cat_stats(
-                    data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
-                )
-            elif is_dtype(detect_dtype(df[col]), DateTime()):
+            elif isinstance(dtp, DateTime):
                 itmdt = Intermediate(
                     col=col,
                     data=data[col]["stats"],
@@ -176,6 +160,9 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
                     visual_type="datetime_column",
                 )
                 stats = stats_viz_dt(data[col]["stats"])
+            else:
+                raise RuntimeError(f"the type of column {col} is unknown: {type(dtp)}")
+
             rndrd = render(itmdt, cfg)
             layout = rndrd["layout"]
             figs_var: List[Figure] = []
@@ -252,14 +239,14 @@ def format_basic(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
         res["missing"] = components(figs_missing)
         res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map"]
         # only display dendrogram when df has more than one column
-        if dask.compute(df.shape[1])[0] > 1:
+        if df.shape[1] > 1:
             res["missing_tabs"].append("Dendogram")
 
     return res
 
 
 def basic_computations(
-    df: dd.DataFrame, df_num: DataArray, cfg: Config
+    df: EDAFrame, cfg: Config
 ) -> Union[Tuple[Dict[str, Any], Dict[str, Any]], Any]:
     """Computations for the basic version.
 
@@ -278,58 +265,54 @@ def basic_computations(
         Without user's specifications, the default is "auto"
     """  # pylint: disable=too-many-branches
     data: Dict[str, Any] = {}
-    df = DataArray(df)
+    df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
-    first_rows = df.head
+    head: pd.DataFrame = df.head()
 
     # variables
     if cfg.variables.enable:
         for col in df.columns:
-            npres = dask.compute(df.frame[col].dropna().shape[0])
+            dtype = df.get_dtype(col)
             # Since it will throw error if a numerical column is all-nan,
-            # we transform it to categorical column
-            if npres[0] == 0:
-                df.frame[col] = df.frame[col].astype(str)
-                data[col] = nom_comps(df.frame[col], df.frame[col].head(), cfg)
-            elif is_dtype(detect_dtype(df.frame[col]), Nominal()):
-                data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
-            elif is_dtype(detect_dtype(df.frame[col]), GeoGraphy()):
-                data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
-            elif is_dtype(detect_dtype(df.frame[col]), GeoPoint()):
-                data[col] = nom_comps(df.frame[col], first_rows[col], cfg)
-            elif is_dtype(detect_dtype(df.frame[col]), Continuous()):
+            # we transform it to categorical column.
+            # We also transform to categorical for small cardinality numerical column.
+            if df.get_missing_cnt(col) == df.shape[0]:
+                srs = df.get_col_as_str(col, na_as_str=True)
+                data[col] = nom_comps(srs, srs.head(), cfg)
+            elif isinstance(dtype, Nominal):
+                data[col] = nom_comps(df.frame[col], head[col], cfg)
+            elif isinstance(dtype, SmallCardNum):
+                srs = df.get_col_as_str(col, na_as_str=False)
+                data[col] = nom_comps(srs, srs.head(), cfg)
+            elif isinstance(dtype, GeoGraphy):
+                data[col] = nom_comps(df.frame[col], head[col], cfg)
+            elif isinstance(dtype, GeoPoint):
+                data[col] = nom_comps(df.frame[col], head[col], cfg)
+            elif isinstance(dtype, Continuous):
                 data[col] = cont_comps(df.frame[col], cfg)
-            elif is_dtype(detect_dtype(df.frame[col]), DateTime()):
+            elif isinstance(dtype, DateTime):
                 data[col] = {}
                 data[col]["stats"] = calc_stats_dt(df.frame[col])
                 data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
     # overview
     if cfg.overview.enable:
         data["ov"] = calc_stats(df.frame, cfg, None)
-        head: pd.DataFrame = df.head
         data["insights"] = []
         for col in df.columns:
-            col_dtype = detect_dtype(df.frame[col])
-            if is_dtype(col_dtype, Continuous()):
+            col_dtype = df.get_dtype(col)
+            if isinstance(col_dtype, Continuous):
                 data["insights"].append(
                     (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
                 )
-            elif is_dtype(col_dtype, Nominal()):
-                data["insights"].append(
-                    (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
-                )
-            elif is_dtype(col_dtype, GeoGraphy()):
-                data["insights"].append(
-                    (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
-                )
-            elif is_dtype(col_dtype, GeoPoint()):
-                data["insights"].append(
-                    (col, Nominal(), _nom_calcs(df.frame[col].dropna(), head[col], cfg))
-                )
-            elif is_dtype(col_dtype, DateTime()):
+            elif type(col_dtype) in [Nominal, GeoGraphy, GeoPoint, SmallCardNum]:
+                srs = df.get_col_as_str(col, na_as_str=False).dropna()
+                data["insights"].append((col, Nominal(), _nom_calcs(srs, head[col], cfg)))
+            elif isinstance(col_dtype, DateTime):
                 data["insights"].append(
                     (col, DateTime(), dask.delayed(_calc_line_dt)(df.frame[[col]], cfg.line.unit))
                 )
+            else:
+                raise RuntimeError(f"unprocessed data type: col:{col}, dtype: {type(col_dtype)}")
 
     # interactions
     if cfg.interactions.enable:

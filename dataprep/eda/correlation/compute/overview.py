@@ -3,7 +3,7 @@
 Currently this boils down to pandas' implementation."""
 
 from functools import partial
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import dask
 import dask.array as da
@@ -12,6 +12,7 @@ import pandas as pd
 
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
+from ...eda_frame import EDAFrame
 from ...intermediate import Intermediate
 from ...utils import cut_long_name
 from .common import CorrelationMethod
@@ -151,7 +152,7 @@ def _calc_overview(
 
 
 def correlation_nxn(
-    df: DataArray, cfg: Config
+    df: Union[DataArray, EDAFrame], cfg: Config
 ) -> Tuple[np.ndarray, np.ndarray, Dict[CorrelationMethod, da.Array]]:
     """
     Calculation of a n x n correlation matrix for n columns
@@ -177,7 +178,7 @@ def correlation_nxn(
     return cordx, cordy, corrs
 
 
-def _pearson_nxn(df: DataArray) -> da.Array:
+def _pearson_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
     """Calculate column-wise pearson correlation."""
     return (
         df.frame.repartition(npartitions=1)
@@ -186,7 +187,7 @@ def _pearson_nxn(df: DataArray) -> da.Array:
     )
 
 
-def _spearman_nxn(df: DataArray) -> da.Array:
+def _spearman_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
     """Calculate column-wise spearman correlation."""
     return (
         df.frame.repartition(npartitions=1)
@@ -195,7 +196,7 @@ def _spearman_nxn(df: DataArray) -> da.Array:
     )
 
 
-def _kendall_tau_nxn(df: DataArray) -> da.Array:
+def _kendall_tau_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
     """Calculate column-wise kendalltau correlation."""
     return (
         df.frame.repartition(npartitions=1)

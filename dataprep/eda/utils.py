@@ -114,7 +114,7 @@ def preprocess_dataframe(
         if (is_dtype(col_dtype, Nominal())) and (
             (excluded_columns is None) or (col not in excluded_columns)
         ):
-            df[col] = df[col].apply(_notna2str, meta=("object"))
+            df[col] = df[col].apply(_notna2str, meta=(col, "object"))
     return df
 
 
