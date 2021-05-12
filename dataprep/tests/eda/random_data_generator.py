@@ -192,4 +192,12 @@ def gen_random_dataframe(
 
 @pytest.fixture(scope="module")  # type: ignore
 def random_df() -> pd.DataFrame:
-    return gen_random_dataframe()
+    df1 = gen_random_dataframe(nrows=30, ncols=10, random_state=0).reset_index(drop=True)
+    df2 = gen_random_dataframe(nrows=30, ncols=10, na_ratio=0.1, random_state=1).reset_index(
+        drop=True
+    )
+    df3 = gen_constant_series(30, np.nan).to_frame().reset_index(drop=True)
+    df4 = gen_constant_series(30, "s").to_frame().reset_index(drop=True)
+    df = pd.concat([df1, df2, df3, df4], axis=1)
+    df.index = gen_random_series(df.index.shape[0], na_ratio=0.1, str_max_len=100, random_state=2)
+    return df

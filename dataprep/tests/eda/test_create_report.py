@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 from ...eda import create_report
 from ...datasets import load_dataset
+from .random_data_generator import random_df
 
 LOGGER = logging.getLogger(__name__)
 
@@ -90,8 +91,12 @@ def test_dataset() -> None:
     dataset_names = ["titanic", "iris"]
     # dataset_names = get_dataset_names()
     for dataset in dataset_names:
-        print(f"testing dataset:{dataset}")
+        # print(f"testing dataset:{dataset}")
         df = load_dataset(dataset)
         # popu_size = df.shape[0]
         # df = df.sample(n=min(popu_size, 1000), random_state=0)
         create_report(df)
+
+
+def test_random_df(random_df: pd.DataFrame) -> None:
+    create_report(random_df)
