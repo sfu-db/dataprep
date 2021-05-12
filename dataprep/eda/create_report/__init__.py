@@ -60,7 +60,7 @@ def create_report(
     >>> report.save('My Fantastic Report') # save report to local disk
     >>> report.show_browser() # show report in the browser
     """
-    suppress_warnings()
+    _suppress_warnings()
     cfg = Config.from_dict(display, config)
     context = {
         "resources": INLINE.render(),
@@ -72,7 +72,7 @@ def create_report(
     return Report(report)
 
 
-def suppress_warnings() -> None:
+def _suppress_warnings() -> None:
     """
     suppress warnings in create_report
     """
