@@ -143,7 +143,7 @@ def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
         res["has_variables"] = True
         for col in df.columns:
             stats: Any = None  # needed for pylint
-            dtp = df.get_dtype(col)
+            dtp = df.get_eda_dtype(col)
             if isinstance(dtp, Continuous):
                 itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
                 stats = format_num_stats(data[col])
@@ -272,7 +272,7 @@ def basic_computations(
     # variables
     if cfg.variables.enable:
         for col in df.columns:
-            dtype = df.get_dtype(col)
+            dtype = df.get_eda_dtype(col)
             # Since it will throw error if a numerical column is all-nan,
             # we transform it to categorical column.
             # We also transform to categorical for small cardinality numerical column.
@@ -299,7 +299,7 @@ def basic_computations(
         data["ov"] = calc_stats(df.frame, cfg, None)
         data["insights"] = []
         for col in df.columns:
-            col_dtype = df.get_dtype(col)
+            col_dtype = df.get_eda_dtype(col)
             if isinstance(col_dtype, Continuous):
                 data["insights"].append(
                     (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))

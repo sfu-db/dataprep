@@ -40,11 +40,6 @@ class EDAFrame:
     ----------
     df
         The DataFrame
-    value_length
-        Whether to compute the lengths of the array.
-        This triggers a read on the data thus expensive if the passed in df
-        is a dask DataFrame.
-        If a pandas DataFrame passed in, lengths will always be compute.
     repartition
         Whether to repartition the DataFrame into 128M chunks.
     dtype: str or DType or dict of str or dict of DType, default None
@@ -54,27 +49,28 @@ class EDAFrame:
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
 
-    # pylint: disable=too-many-instance-attributes
-    _ddf: dd.DataFrame
-    _values: da.Array
-    _nulls: Union[da.Array, np.ndarray]
-    _columns: pd.Index
-    _eda_dtypes: Dict[str, DType] = {}
-    _str_col_cache: Dict[Tuple[str, bool], dd.Series] = {}
-    _nulls_cnt: Dict[str, int] = {}
-    _head: Optional[pd.DataFrame] = None
-    _shape: Optional[Tuple[int, int]] = None
-
     # pylint: disable = too-many-branches
+    # pylint: disable = too-many-statements
+    # pylint: disable = too-many-instance-attributes
     def __init__(
         self,
         df: Optional[DataFrame] = None,
-        value_length: bool = False,
         repartition: bool = True,
         dtype: Optional[DTypeDef] = None,
     ) -> None:
 
         _suppress_warnings()
+
+        # Init. instance attribute.
+        self._ddf: Optional[dd.DataFrame] = None
+        self._values: Optional[da.Array] = None
+        self._nulls: Optional[Union[da.Array, np.ndarray]] = None
+        self._columns: Optional[pd.Index] = None
+        self._head: Optional[pd.DataFrame] = None
+        self._shape: Optional[Tuple[int, int]] = None
+        self._eda_dtypes: Dict[str, DType] = {}
+        self._str_col_cache: Dict[Tuple[str, bool], dd.Series] = {}
+        self._nulls_cnt: Dict[str, int] = {}
 
         if df is None:
             return
@@ -82,8 +78,8 @@ class EDAFrame:
         if isinstance(df, EDAFrame):
             self._ddf = df._ddf
             self._values = df._values
-            self._columns = df._columns
             self._nulls = df._nulls
+            self._columns = df._columns
             self._nulls_cnt = df._nulls_cnt
             self._eda_dtypes = df._eda_dtypes
             self._str_col_cache = df._str_col_cache
@@ -101,10 +97,8 @@ class EDAFrame:
             df.index = df.index.astype(str)
 
         if isinstance(df, dd.DataFrame):
-            is_pandas = False
             ddf = df
         elif isinstance(df, pd.DataFrame):
-            is_pandas = True
             if repartition:
                 df_size = df.memory_usage(deep=True).sum()
                 npartitions = ceil(df_size / 128 / 1024 / 1024)
@@ -115,7 +109,6 @@ class EDAFrame:
             raise ValueError(f"{type(df)} not supported")
 
         ddf.columns = _process_column_name(ddf.columns)
-        ddf = ddf.persist()
         self._eda_dtypes = _detect_dtypes(ddf, dtype)
 
         # Transform categorical column to string for non-na values.
@@ -125,10 +118,7 @@ class EDAFrame:
 
         self._ddf = ddf.persist()
         self._columns = self._ddf.columns
-        if value_length or is_pandas:
-            self._values = self._ddf.to_dask_array(lengths=True)
-        else:
-            self._values = self._ddf.to_dask_array()
+        self._values = self._ddf.to_dask_array(lengths=True)
 
         # compute meta for null values
         dd_null = self._ddf.isnull()
@@ -148,7 +138,10 @@ class EDAFrame:
     @property
     def dtypes(self) -> pd.Series:
         """Returns the dtypes of the DataFrame."""
-        return self._ddf.dtypes
+        if self._ddf is None:
+            return pd.DataFrame().dtypes
+        else:
+            return self._ddf.dtypes
 
     @property
     def nulls(self) -> da.Array:
@@ -184,7 +177,10 @@ class EDAFrame:
         If na_as_str is True, then NA vlaues will also be transformed to str,
         otherwise it is kept as NA.
         """
-        if col not in self._columns:
+        if self._ddf is None:
+            raise RuntimeError("dataframe is empty!")
+
+        if (self._columns is None) or (col not in self._columns):
             raise RuntimeError(f"column is not exists: {col}")
 
         if (col, na_as_str) in self._str_col_cache:
@@ -211,7 +207,7 @@ class EDAFrame:
         """
         return self._nulls_cnt[col]
 
-    def get_dtype(self, col: str) -> DType:
+    def get_eda_dtype(self, col: str) -> DType:
         """
         Get the infered dtype for the given column.
         """
@@ -257,12 +253,18 @@ class EDAFrame:
             chunks_, nulls = dask.compute(tuple(c), self.nulls)
             chunks = tuple([tuple([int(chunk) for chunk in chunks]) for chunks in chunks_])
             self._nulls = nulls
-            self._values._chunks = chunks
+            if self._values is not None:
+                self._values._chunks = chunks
+            else:
+                raise ValueError("edaframe._values is not initialized.")
         else:
             raise ValueError(f"{type} not supported.")
 
     def select_dtypes(self, include: List[Any]) -> "EDAFrame":
         """Return a new DataArray with designated dtype columns."""
+        if self._ddf is None:
+            raise RuntimeError("dataframe is empty")
+
         subdf = self._ddf.select_dtypes(include)  # pylint: disable=W0212
         return self[subdf.columns]
 
@@ -273,6 +275,10 @@ class EDAFrame:
 
     def __getitem__(self, indexer: Union[Sequence[str], str]) -> "EDAFrame":
         """Return a new DataArray select by column names."""
+
+        if self._ddf is None:
+            raise RuntimeError("dataframe is empty")
+
         if isinstance(indexer, str):
             indexer = [indexer]
 
@@ -348,6 +354,7 @@ def _detect_dtypes(df: dd.DataFrame, known_dtype: Optional[DTypeDef] = None) -> 
     """
     Return a dict that maps column name to its dtype for each column in given df.
     """
+    df = df.persist()
     head = df.head(n=100)
     res = {}
     for col in df.columns:
