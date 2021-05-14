@@ -5,6 +5,7 @@ from os.path import dirname
 from typing import List
 
 import pandas as pd
+import dask.dataframe as dd
 
 
 def get_dataset_names() -> List[str]:
@@ -25,6 +26,26 @@ def get_dataset_names() -> List[str]:
     datasets = list(map(lambda f: os.path.splitext(f)[0], csv_files))
 
     return datasets
+
+
+def _get_dataset_path(name: str) -> str:
+    """
+    Given a dataset name, output the file path.
+    """
+    # Remove suffix 'csv' and transform to lower case
+    lower_name = name.lower()
+    if lower_name.endswith(".csv"):
+        lower_name = os.path.splitext(lower_name)[0]
+
+    if lower_name not in get_dataset_names():
+        raise ValueError(
+            f"Dataset {name} is not found. You may want to try get_dataset_names()"
+            + " to get all available dataset names"
+        )
+
+    module_path = dirname(__file__)
+    path = f"{module_path}/data/{lower_name}.csv"
+    return path
 
 
 def load_dataset(name: str) -> pd.DataFrame:
@@ -52,18 +73,15 @@ def load_dataset(name: str) -> pd.DataFrame:
     >>> get_dataset_names()
     ['iris', 'titanic', 'adult', 'house_prices_train', 'house_prices_test']
     """
-
-    # Remove suffix 'csv' and transform to lower case
-    lower_name = name.lower()
-    if lower_name.endswith(".csv"):
-        lower_name = os.path.splitext(lower_name)[0]
-
-    if lower_name not in get_dataset_names():
-        raise ValueError(
-            f"Dataset {name} is not found. You may want to try get_dataset_names()"
-            + " to get all available dataset names"
-        )
-
-    module_path = dirname(__file__)
-    df = pd.read_csv(f"{module_path}/data/{lower_name}.csv")
+    path = _get_dataset_path(name)
+    df = pd.read_csv(path)
     return df
+
+
+def _load_dataset_as_dask(name: str) -> dd.DataFrame:
+    """
+    Return a dask dataframe from dd.read_csv. Used for testing.
+    """
+    path = _get_dataset_path(name)
+    ddf = dd.read_csv(path)
+    return ddf

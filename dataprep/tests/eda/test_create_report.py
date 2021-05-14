@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import pytest
 from ...eda import create_report
-from ...datasets import load_dataset
+from ...datasets import load_dataset, _load_dataset_as_dask
+import dask.dataframe as dd
 from .random_data_generator import random_df
 
 LOGGER = logging.getLogger(__name__)
@@ -96,6 +97,8 @@ def test_dataset() -> None:
         # popu_size = df.shape[0]
         # df = df.sample(n=min(popu_size, 1000), random_state=0)
         create_report(df)
+        ddf = _load_dataset_as_dask(dataset)
+        create_report(ddf)
 
 
 def test_random_df(random_df: pd.DataFrame) -> None:
