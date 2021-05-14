@@ -6,7 +6,7 @@ import datetime
 from copy import deepcopy
 from datetime import timedelta
 from operator import itemgetter
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Tuple, Union, Optional
 
 import dask
 import dask.dataframe as dd
@@ -49,6 +49,7 @@ def clean_date(
     input_timezone: str = "UTC",
     output_timezone: str = "",
     fix_missing: str = "minimum",
+    infer_day_first: bool = True,
     inplace: bool = False,
     errors: str = "coerce",
     report: bool = True,
@@ -83,6 +84,12 @@ def clean_date(
             - 'empty': don't fill missing components.
 
         (default: 'minimum')
+    infer_day_first
+        If True, the program will infer the ambiguous format '09-10-03' and '25-09-03' according \
+        to '25-09-03' (day is the number of first position). The result should be '2003-10-09' and \
+        '2003-09-25'.
+        If False, do nothing of inferring. The result should be '2003-09-10' and '2003-09-25'.
+        (default: False)
     inplace
         If True, delete the column containing the data that was cleaned. Otherwise,
         keep the original column.
@@ -136,13 +143,21 @@ def clean_date(
     # convert to dask
     df = to_dask(df)
 
+    is_day_first = None
+    if infer_day_first:
+        is_day_first = _is_day_first(df[column])
+    else:
+        is_day_first = False
+
     # To clean, create a new column "clean_code_tup" which contains
     # the cleaned values and code indicating how the initial value was
     # changed in a tuple. Then split the column of tuples and count the
     # amount of different codes to produce the report
     df["clean_code_tup"] = df[column].map_partitions(
         lambda srs: [
-            _format_date(x, output_format, input_timezone, output_timezone, fix_missing, errors)
+            _format_date(
+                x, output_format, input_timezone, output_timezone, fix_missing, is_day_first, errors
+            )
             for x in srs
         ],
         meta=object,
@@ -195,12 +210,50 @@ def validate_date(date: Union[str, pd.Series]) -> Union[bool, pd.Series]:
     return check_date(date, False)
 
 
+def _is_day_first(date: Union[str, dd.Series]) -> Optional[bool]:
+    """
+    Inferring if the first number of ambiguous string is the day.
+
+    Parameters
+    ----------
+    date
+        pandas Series of dates or a date string
+    """
+    if isinstance(date, dd.Series):
+        judge_col = date.apply(_check_is_day_first, meta=object)
+        return True in judge_col.unique()
+    return _check_is_day_first(date)
+
+
+def _check_is_day_first(val: Any) -> Optional[bool]:
+    """
+    Inferring if the first number of ambiguous string is the day.
+
+    Parameters
+    ----------
+    val
+        date string
+    """
+    date = str(val)
+    is_day_first = None
+    status = check_date(date, True)
+    if status == "null":
+        return is_day_first
+    elif status == "unknown":
+        return is_day_first
+    else:
+        tokens = split(date, JUMP)
+        _, _, is_day_first = _ensure_ymd(tokens, None)
+    return is_day_first
+
+
 def _format_date(
     val: Any,
     output_format: str,
     input_timezone: str,
     output_timezone: str,
     fix_missing: str,
+    is_day_first: Optional[bool],
     errors: str,
 ) -> Tuple[Any, int]:
     """
@@ -221,7 +274,7 @@ def _format_date(
         return val if errors == "ignore" else np.nan, 1
     else:
         # Handle date data and timezone
-        parsed_date_data = _parse(date, fix_missing)
+        parsed_date_data = _parse(date, fix_missing, is_day_first)
         parsed_date_data.set_tzinfo(timezone=input_timezone)
         parsed_date_data = _set_parseddate_timezone_offset(input_timezone, parsed_date_data)
         # Handle target format and timezone
@@ -497,18 +550,22 @@ def _get_output_format_hms_tokens(
     return parsed_data, hms_tokens
 
 
-def _ensure_ymd(tokes: List[str]) -> Tuple[ParsedDate, List[str]]:
+def _ensure_ymd(
+    tokes: List[str], is_day_first: Optional[bool]
+) -> Tuple[ParsedDate, List[str], Optional[bool]]:
     """
     This function extract value of year, month, day
     Parameters
     ----------
     tokes
         generated tokens
+    is_day_first
+        signal of inferring result.
     """
     result = ParsedDate()
     result, remain_tokens = _ensure_year(result, tokes, deepcopy(tokes))
     if len(remain_tokens) == 0:
-        return result, remain_tokens
+        return result, remain_tokens, not is_day_first is None
     num_tokens = []
     for token in remain_tokens:
         if token.isnumeric():
@@ -516,10 +573,10 @@ def _ensure_ymd(tokes: List[str]) -> Tuple[ParsedDate, List[str]]:
     for token in num_tokens:
         remain_tokens.remove(token)
     if result.ymd["year"] != -1:
-        result = _ensure_month_day(result, num_tokens)
+        result, is_day_first = _ensure_month_day(result, num_tokens, is_day_first)
     else:
-        result = _ensure_year_month_day(result, num_tokens)
-    return result, remain_tokens
+        result, is_day_first = _ensure_year_month_day(result, num_tokens, is_day_first)
+    return result, remain_tokens, is_day_first
 
 
 def _ensure_year(
@@ -553,7 +610,9 @@ def _ensure_year(
     return parsed_data, remain_tokens
 
 
-def _ensure_month_day(parsed_data: ParsedDate, num_tokens: List[str]) -> ParsedDate:
+def _ensure_month_day(
+    parsed_data: ParsedDate, num_tokens: List[str], is_day_first: Optional[bool]
+) -> Tuple[ParsedDate, Optional[bool]]:
     """
     This function extract month and day when year is not None.
     Parameters
@@ -562,26 +621,44 @@ def _ensure_month_day(parsed_data: ParsedDate, num_tokens: List[str]) -> ParsedD
         parsed date
     num_tokens
         remained numerical tokens
+    is_day_first
+        signal of inferring result.
     """
     if len(num_tokens) == 1:
         if parsed_data.ymd["month"] != -1:
             parsed_data.set_day(int(num_tokens[0]))
         else:
             parsed_data.set_month(int(num_tokens[0]))
+        if is_day_first is None:
+            is_day_first = False
     else:
         if int(num_tokens[0]) > 12:
             parsed_data.set_month(int(num_tokens[1]))
             parsed_data.set_day(int(num_tokens[0]))
+            if is_day_first is None:
+                is_day_first = True
         elif int(num_tokens[1]) > 12:
             parsed_data.set_month(int(num_tokens[0]))
             parsed_data.set_day(int(num_tokens[1]))
+            if is_day_first is None:
+                is_day_first = False
         else:
-            parsed_data.set_month(int(num_tokens[0]))
-            parsed_data.set_day(int(num_tokens[1]))
-    return parsed_data
+            if is_day_first is None:
+                is_day_first = False
+                parsed_data.set_month(int(num_tokens[0]))
+                parsed_data.set_day(int(num_tokens[1]))
+            elif is_day_first:
+                parsed_data.set_month(int(num_tokens[1]))
+                parsed_data.set_day(int(num_tokens[0]))
+            elif not is_day_first:
+                parsed_data.set_month(int(num_tokens[0]))
+                parsed_data.set_day(int(num_tokens[1]))
+    return parsed_data, is_day_first
 
 
-def _ensure_year_month_day(parsed_data: ParsedDate, num_tokens: List[str]) -> ParsedDate:
+def _ensure_year_month_day(
+    parsed_data: ParsedDate, num_tokens: List[str], is_day_first: Optional[bool]
+) -> Tuple[ParsedDate, Optional[bool]]:
     """
     This function extract month and day when year is None.
     Parameters
@@ -590,27 +667,46 @@ def _ensure_year_month_day(parsed_data: ParsedDate, num_tokens: List[str]) -> Pa
         parsed date
     num_tokens
         remained numerical tokens
+    is_day_first
+        signal of inferring result.
     """
+    # pylint: disable=too-many-branches
     if len(num_tokens) == 1:
         parsed_data.set_year(int(num_tokens[-1]) + 2000)
+        if is_day_first is None:
+            is_day_first = False
     elif len(num_tokens) == 2:
         parsed_data.set_year(int(num_tokens[-1]) + 2000)
         if parsed_data.ymd["month"] == -1:
             parsed_data.set_month(int(num_tokens[0]))
         else:
             parsed_data.set_day(int(num_tokens[0]))
+        if is_day_first is None:
+            is_day_first = False
     elif len(num_tokens) == 3:
         parsed_data.set_year(int(num_tokens[-1]) + 2000)
         if int(num_tokens[0]) > 12:
             parsed_data.set_month(int(num_tokens[1]))
             parsed_data.set_day(int(num_tokens[0]))
+            if is_day_first is None:
+                is_day_first = True
         elif int(num_tokens[1]) > 12:
             parsed_data.set_month(int(num_tokens[0]))
             parsed_data.set_day(int(num_tokens[1]))
+            if is_day_first is None:
+                is_day_first = False
         else:
-            parsed_data.set_month(int(num_tokens[0]))
-            parsed_data.set_day(int(num_tokens[1]))
-    return parsed_data
+            if is_day_first is None:
+                is_day_first = False
+                parsed_data.set_month(int(num_tokens[0]))
+                parsed_data.set_day(int(num_tokens[1]))
+            elif is_day_first:
+                parsed_data.set_month(int(num_tokens[1]))
+                parsed_data.set_day(int(num_tokens[0]))
+            elif not is_day_first:
+                parsed_data.set_month(int(num_tokens[0]))
+                parsed_data.set_day(int(num_tokens[1]))
+    return parsed_data, is_day_first
 
 
 def _ensure_hms(inner_result: ParsedDate, remain_tokens: List[str]) -> ParsedDate:
@@ -692,7 +788,7 @@ def _fix_missing_element(parsed_res: ParsedDate, fix_missing: str) -> ParsedDate
     return parsed_res
 
 
-def _parse(date: str, fix_missing: str) -> ParsedDate:
+def _parse(date: str, fix_missing: str, is_day_first: Optional[bool]) -> ParsedDate:
     """
     This function parse string into tokens
     Parameters
@@ -701,9 +797,11 @@ def _parse(date: str, fix_missing: str) -> ParsedDate:
         date string
     fix_missing
         format of fixing empty
+    is_day_first
+        signal of inferring result.
     """
     tokens = split(date, JUMP)
-    parsed_date_res, remain_tokens = _ensure_ymd(tokens)
+    parsed_date_res, remain_tokens, _ = _ensure_ymd(tokens, is_day_first)
     if len(remain_tokens) > 0:
         parsed_time_res = _ensure_hms(parsed_date_res, remain_tokens)
     else:
