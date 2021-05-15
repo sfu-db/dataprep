@@ -7,7 +7,7 @@ from warnings import catch_warnings, filterwarnings
 from ...configs import Config
 from ...data_array import DataArray, DataFrame
 from ...intermediate import Intermediate
-from ...utils import preprocess_dataframe
+from ...eda_frame import EDAFrame
 from .bivariate import _calc_bivariate
 from .overview import _calc_overview
 from .univariate import _calc_univariate
@@ -56,7 +56,7 @@ def compute_correlation(
     elif not cfg:
         cfg = Config()
 
-    df = preprocess_dataframe(df, detect_small_distinct=False)
+    frame = EDAFrame(df)
     if x is None and y is None:  # pylint: disable=no-else-return
         with catch_warnings():
             filterwarnings(
@@ -64,7 +64,7 @@ def compute_correlation(
                 "overflow encountered in long_scalars",
                 category=RuntimeWarning,
             )
-            return _calc_overview(df, cfg, value_range=value_range, k=k)
+            return _calc_overview(frame, cfg, value_range=value_range, k=k)
     elif x is not None and y is None:
         with catch_warnings():
             filterwarnings(
@@ -72,10 +72,10 @@ def compute_correlation(
                 "overflow encountered in long_scalars",
                 category=RuntimeWarning,
             )
-            return _calc_univariate(df, x, cfg, value_range=value_range, k=k)
+            return _calc_univariate(frame, x, cfg, value_range=value_range, k=k)
     elif x is None and y is not None:
         raise ValueError("Please give the column name to x instead of y")
     elif x is not None and y is not None:
-        return _calc_bivariate(df, cfg, x, y, k=k)
+        return _calc_bivariate(frame, cfg, x, y, k=k)
 
     raise ValueError("Not Possible")
