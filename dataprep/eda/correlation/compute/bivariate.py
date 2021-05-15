@@ -9,15 +9,13 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 
-from ...utils import to_dask
-from ...data_array import DataFrame
-from ...dtypes import NUMERICAL_DTYPES
+from ...eda_frame import EDAFrame
 from ...configs import Config
 from ...intermediate import Intermediate
 
 
 def _calc_bivariate(
-    df: DataFrame,
+    df: EDAFrame,
     cfg: Config,
     x: str,
     y: str,
@@ -25,7 +23,7 @@ def _calc_bivariate(
     k: Optional[int] = None,
 ) -> Intermediate:
 
-    num_df = to_dask(df.select_dtypes(NUMERICAL_DTYPES))
+    num_df: dd.DataFrame = df.select_num_columns().frame
 
     if x not in num_df.columns:
         raise ValueError(f"{x} not in columns names")

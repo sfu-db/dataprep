@@ -10,13 +10,13 @@ import numpy as np
 import pandas as pd
 
 from ...configs import Config
-from ...data_array import DataArray, DataFrame
+from ...eda_frame import EDAFrame
 from ...intermediate import Intermediate
 from .common import CorrelationMethod, corrcoef, kendalltau, nanrankdata
 
 
 def _calc_univariate(
-    df: DataFrame,
+    df: EDAFrame,
     x: str,
     cfg: Config,
     *,
@@ -38,7 +38,7 @@ def _calc_univariate(
         Choose top-k element
     """
 
-    num_df = DataArray(df).select_num_columns()
+    num_df = df.select_num_columns()
 
     if len(num_df.columns) == 0:
         return Intermediate(visual_type=None)
