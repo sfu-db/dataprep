@@ -6,8 +6,8 @@ import warnings
 from scipy.cluster.hierarchy import ClusterWarning
 
 from ...configs import Config
-from ...data_array import DataArray, DataFrame
-from ...dtypes import DTypeDef
+from ...eda_frame import DataFrame, EDAFrame
+from ...dtypes_v2 import DTypeDef
 from ...utils import preprocess_dataframe
 from ...intermediate import Intermediate
 from .bivariate import compute_missing_bivariate
@@ -64,8 +64,7 @@ def compute_missing(
     >>> plot_missing(df, "HDI_for_year", "population")
     """
     suppress_warnings()
-    df = preprocess_dataframe(df)
-    df = DataArray(df)
+    eda_frame = EDAFrame(df, dtype=dtype)
 
     # pylint: disable=no-else-raise
     if isinstance(cfg, dict):
@@ -75,11 +74,11 @@ def compute_missing(
     if x is None and y is not None:
         raise ValueError("x cannot be None while y has value")
     elif x is not None and y is None:
-        ret = compute_missing_univariate(df, x, cfg, dtype)
+        ret = compute_missing_univariate(eda_frame, x, cfg, dtype)
     elif x is not None and y is not None:
-        ret = compute_missing_bivariate(df, x, y, cfg, dtype)
+        ret = compute_missing_bivariate(eda_frame, x, y, cfg, dtype)
     else:
-        ret = compute_missing_nullivariate(df, cfg)
+        ret = compute_missing_nullivariate(eda_frame, cfg)
 
     return cast(Intermediate, ret)
 

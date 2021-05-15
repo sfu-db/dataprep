@@ -9,15 +9,15 @@ import pandas as pd
 from scipy.stats import rv_histogram
 
 from ...configs import Config
-from ...data_array import DataArray
-from ...dtypes import Continuous, DTypeDef, Nominal, GeoGraphy, detect_dtype, is_dtype
+from ...eda_frame import EDAFrame
+from ...dtypes_v2 import Continuous, DTypeDef, Nominal, GeoGraphy
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, histogram
 
 
 def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-statements
-    df: DataArray,
+    df: EDAFrame,
     x: str,
     y: str,
     cfg: Config,
@@ -32,19 +32,13 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-stat
     col1 = df.values[~(df.nulls[:, xloc] | df.nulls[:, yloc]), yloc].astype(df.dtypes[y])
 
     minimum, maximum = col0.min(), col0.max()
-    bins = (
-        cfg.bar.bars
-        if (
-            is_dtype(detect_dtype(df.frame[y], dtype), Nominal())
-            or is_dtype(detect_dtype(df.frame[y], dtype), GeoGraphy())
-        )
-        else cfg.hist.bins
-    )
+    y_dtype = df.get_eda_dtype(y)
+    bins = cfg.bar.bars if isinstance(y_dtype, (Nominal, GeoGraphy)) else cfg.hist.bins
 
     hists = [histogram(col, bins, return_edges=True, dtype=dtype) for col in [col0, col1]]
 
     quantiles = None
-    if is_dtype(detect_dtype(df.frame[y], dtype), Continuous()) and cfg.box.enable:
+    if isinstance(y_dtype, Continuous) and cfg.box.enable:
         quantiles = [
             dd.from_dask_array(col).quantile([0, 0.25, 0.5, 0.75, 1]) for col in [col0, col1]
         ]
@@ -54,9 +48,9 @@ def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-stat
     ### Eager region Begin
 
     meta = ColumnsMetadata()
-    meta["y", "dtype"] = detect_dtype(df.frame[y], dtype)
+    meta["y", "dtype"] = y_dtype
 
-    if is_dtype(detect_dtype(df.frame[y], dtype), Continuous()):
+    if isinstance(y_dtype, Continuous):
 
         if cfg.pdf.enable or cfg.cdf.enable:
             dists = [rv_histogram((hist[0], hist[2])) for hist in hists]  # type: ignore

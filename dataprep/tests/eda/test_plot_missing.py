@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...eda.dtypes import Numerical
+from ...eda.dtypes_v2 import Numerical
 from ...eda.missing import compute_missing, render_missing, plot_missing
 from ...eda.utils import to_dask
 from ...eda.configs import Config

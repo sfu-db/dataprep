@@ -7,15 +7,15 @@ import numpy as np
 import pandas as pd
 
 from ...configs import Config
-from ...data_array import DataArray
-from ...dtypes import DTypeDef, Continuous, Nominal, GeoGraphy, detect_dtype, is_dtype
+from ...eda_frame import EDAFrame
+from ...dtypes_v2 import DTypeDef, Continuous, Nominal, GeoGraphy
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, uni_histogram
 
 
 def _compute_missing_univariate(  # pylint: disable=too-many-locals
-    df: DataArray,
+    df: EDAFrame,
     x: str,
     cfg: Config,
     dtype: Optional[DTypeDef] = None,
@@ -30,14 +30,12 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
     hists = {}
 
     for col in df.columns:
+        col_dtype = df.get_eda_dtype(col)
         if (
             col == x
-            or (
-                is_dtype(detect_dtype(df.frame[col]), Nominal())
-                or is_dtype(detect_dtype(df.frame[col]), GeoGraphy())
-            )
+            or isinstance(col_dtype, (Nominal, GeoGraphy))
             and not cfg.bar.enable
-            or is_dtype(detect_dtype(df.frame[col]), Continuous())
+            or isinstance(col_dtype, Continuous)
             and not cfg.hist.enable
         ):
             continue
@@ -81,10 +79,8 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
 
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
-        if len(counts[0]) > cfg.bar.bars and (
-            is_dtype(detect_dtype(df.frame[col_name], dtype), Nominal())
-            or is_dtype(detect_dtype(df.frame[col_name], dtype), GeoGraphy())
-        ):
+        col_dtype = df.get_eda_dtype(col_name)
+        if len(counts[0]) > cfg.bar.bars and (isinstance(col_dtype, (Nominal, GeoGraphy))):
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[: cfg.bar.bars]]
             ret_df = ret_df[ret_df["x"].isin(selected_xs)]
@@ -92,7 +88,7 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
         else:
             meta[col_name, "shown"] = len(counts[0])
         meta[col_name, "total"] = len(counts[0])
-        meta[col_name, "dtype"] = detect_dtype(df.frame[col_name], dtype)
+        meta[col_name, "dtype"] = col_dtype
         dfs[col_name] = ret_df
 
     return Intermediate(data=dfs, x=x, meta=meta, visual_type="missing_impact_1vn")

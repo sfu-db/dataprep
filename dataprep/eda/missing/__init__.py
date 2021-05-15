@@ -9,7 +9,7 @@ import pandas as pd
 
 from ..configs import Config
 from ..container import Container
-from ..dtypes import DTypeDef
+from ..dtypes_v2 import DTypeDef
 from ...progress_bar import ProgressBar
 from .compute import compute_missing
 from .render import render_missing
