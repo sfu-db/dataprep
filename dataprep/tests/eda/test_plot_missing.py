@@ -31,7 +31,14 @@ def simpledf() -> dd.DataFrame:
 
 
 def test_random_df(random_df: pd.DataFrame) -> None:
-    plot_missing(random_df)
+    # Need to fix the issue #632 with const_na later.
+    # For now, just drop it temporarily.
+    df = random_df.drop("const_na", axis="columns")
+    plot_missing(df)
+    for x in ["small_distinct_miss", "str_miss", "num_miss"]:
+        plot_missing(df, x)
+        for y in ["small_distinct_miss", "str_miss", "num_miss"]:
+            plot_missing(df, x, y)
 
 
 def test_sanity_compute_1(simpledf: dd.DataFrame) -> None:

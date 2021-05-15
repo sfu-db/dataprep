@@ -190,14 +190,34 @@ def gen_random_dataframe(
     return df
 
 
-@pytest.fixture(scope="module")  # type: ignore
-def random_df() -> pd.DataFrame:
-    df1 = gen_random_dataframe(nrows=30, ncols=10, random_state=0).reset_index(drop=True)
-    df2 = gen_random_dataframe(nrows=30, ncols=10, na_ratio=0.1, random_state=1).reset_index(
-        drop=True
+def gen_test_df() -> pd.DataFrame:
+    rand = np.random.RandomState(0)
+    nrows = 30
+    data = {}
+    data[0] = gen_random_dataframe(nrows=nrows, ncols=10, random_state=rand).reset_index(drop=True)
+    data[1] = gen_random_dataframe(
+        nrows=nrows, ncols=10, na_ratio=0.1, random_state=rand
+    ).reset_index(drop=True)
+    data[2] = pd.Series([np.nan] * nrows, name="const_na")
+    data[3] = pd.Series(["s"] * nrows, name="const_str")
+    data[4] = pd.Series([0] * nrows, name="const_zero")
+    data[5] = pd.Series([-1] * nrows, name="const_neg")
+    data[6] = pd.Series([1] * nrows, name="const_pos")
+    data[7] = pd.Series([0, 1, np.nan] * (nrows // 3), name="small_distinct_miss")
+    data[8] = gen_random_series(size=nrows, dtype="string", random_state=rand).rename("str_no_miss")
+    data[9] = gen_random_series(size=nrows, dtype="string", na_ratio=0.1, random_state=rand).rename(
+        "str_miss"
     )
-    df3 = gen_constant_series(30, np.nan).to_frame().reset_index(drop=True)
-    df4 = gen_constant_series(30, "s").to_frame().reset_index(drop=True)
-    df = pd.concat([df1, df2, df3, df4], axis=1)
+    data[10] = gen_random_series(size=nrows, dtype="float", random_state=rand).rename("num_no_miss")
+    data[11] = gen_random_series(size=nrows, dtype="float", na_ratio=0.1, random_state=rand).rename(
+        "num_miss"
+    )
+
+    df = pd.concat(data.values(), axis=1)
     df.index = gen_random_series(df.index.shape[0], na_ratio=0.1, str_max_len=100, random_state=2)
     return df
+
+
+@pytest.fixture(scope="module")  # type: ignore
+def random_df() -> pd.DataFrame:
+    return gen_test_df()

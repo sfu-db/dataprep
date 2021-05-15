@@ -1,7 +1,7 @@
 """This module implements the plot_missing(df) function's
 calculating intermediate part."""
 
-from typing import Any, Generator, List, Optional
+from typing import Any, Generator, List
 
 import dask.dataframe as dd
 import numpy as np
@@ -10,32 +10,45 @@ from scipy.stats import rv_histogram
 
 from ...configs import Config
 from ...eda_frame import EDAFrame
-from ...dtypes_v2 import Continuous, DTypeDef, Nominal, GeoGraphy
+from ...dtypes_v2 import Continuous, Nominal, GeoGraphy, SmallCardNum, DateTime
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, histogram
 
 
-def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-statements
+def _compute_missing_bivariate(  # pylint: disable=too-many-locals,too-many-statements, too-many-branches
     df: EDAFrame,
     x: str,
     y: str,
     cfg: Config,
-    dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on another column y when
     the missing values in x is dropped."""
 
-    xloc, yloc = df.columns.get_loc(x), df.columns.get_loc(y)
-
-    col0 = df.values[~df.nulls[:, yloc], yloc].astype(df.dtypes[y])
-    col1 = df.values[~(df.nulls[:, xloc] | df.nulls[:, yloc]), yloc].astype(df.dtypes[y])
+    y_dtype = df.get_eda_dtype(y)
+    # dataframe with all rows where column x is null removed
+    ddf = df.frame[~df.frame[x].isna()]
+    if isinstance(y_dtype, (SmallCardNum, DateTime)):
+        col0 = df.frame[y].dropna().astype(str).values  # series from original dataframe
+        col1 = ddf[y].dropna().astype(str).values  # series with null rows from col x removed
+    elif isinstance(y_dtype, (GeoGraphy, Nominal, Continuous)):
+        # Geograph, Nominal should be transformed to str when constructing edaframe.
+        # Here we do not need to transform them again.
+        col0 = df.frame[y].dropna().values
+        col1 = ddf[y].dropna().values
+    else:
+        raise ValueError(f"unprocessed type:{y_dtype}")
 
     minimum, maximum = col0.min(), col0.max()
-    y_dtype = df.get_eda_dtype(y)
-    bins = cfg.bar.bars if isinstance(y_dtype, (Nominal, GeoGraphy)) else cfg.hist.bins
+    bins = (
+        cfg.bar.bars
+        if isinstance(y_dtype, (Nominal, GeoGraphy, SmallCardNum, DateTime))
+        else cfg.hist.bins
+    )
 
-    hists = [histogram(col, bins, return_edges=True, dtype=dtype) for col in [col0, col1]]
+    hists = [
+        histogram(col, eda_dtype=y_dtype, bins=bins, return_edges=True) for col in [col0, col1]
+    ]
 
     quantiles = None
     if isinstance(y_dtype, Continuous) and cfg.box.enable:
