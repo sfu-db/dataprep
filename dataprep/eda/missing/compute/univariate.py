@@ -1,14 +1,14 @@
 """This module implements the plot_missing(df, x) function's
 calculating intermediate part
 """
-from typing import Any, Generator, List, Optional
+from typing import Any, Generator, List
 
 import numpy as np
 import pandas as pd
 
 from ...configs import Config
 from ...eda_frame import EDAFrame
-from ...dtypes_v2 import DTypeDef, Continuous, Nominal, GeoGraphy
+from ...dtypes_v2 import Continuous, Nominal, GeoGraphy, SmallCardNum, DateTime
 from ...intermediate import ColumnsMetadata, Intermediate
 from ...staged import staged
 from .common import LABELS, uni_histogram
@@ -18,7 +18,6 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
     df: EDAFrame,
     x: str,
     cfg: Config,
-    dtype: Optional[DTypeDef] = None,
 ) -> Generator[Any, Any, Intermediate]:
     """Calculate the distribution change on other columns when
     the missing values in x is dropped."""
@@ -33,17 +32,26 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
         col_dtype = df.get_eda_dtype(col)
         if (
             col == x
-            or isinstance(col_dtype, (Nominal, GeoGraphy))
-            and not cfg.bar.enable
-            or isinstance(col_dtype, Continuous)
-            and not cfg.hist.enable
+            or (
+                isinstance(col_dtype, (Nominal, GeoGraphy, SmallCardNum, DateTime))
+                and not cfg.bar.enable
+            )
+            or (isinstance(col_dtype, Continuous) and not cfg.hist.enable)
         ):
             continue
 
-        srs0 = df.frame[col].dropna()  # series from original dataframe
-        srs1 = ddf[col].dropna()  # series with null rows from col x removed
+        if isinstance(col_dtype, (SmallCardNum, DateTime)):
+            srs0 = df.frame[col].dropna().astype(str)  # series from original dataframe
+            srs1 = ddf[col].dropna().astype(str)  # series with null rows from col x removed
+        elif isinstance(col_dtype, (GeoGraphy, Nominal, Continuous)):
+            # Geograph, Nominal should be transformed to str when constructing edaframe.
+            # Here we do not need to transform them again.
+            srs0 = df.frame[col].dropna()
+            srs1 = ddf[col].dropna()
+        else:
+            raise ValueError(f"unprocessed type:{col_dtype}")
 
-        hists[col] = [uni_histogram(srs, cfg, dtype) for srs in [srs0, srs1]]
+        hists[col] = [uni_histogram(srs, col_dtype, cfg) for srs in [srs0, srs1]]
 
     ### Lazy Region End
     hists = yield hists
@@ -80,7 +88,9 @@ def _compute_missing_univariate(  # pylint: disable=too-many-locals
         # If the cardinality of a categorical column is too large,
         # we show the top `num_bins` values, sorted by their count before drop
         col_dtype = df.get_eda_dtype(col_name)
-        if len(counts[0]) > cfg.bar.bars and (isinstance(col_dtype, (Nominal, GeoGraphy))):
+        if len(counts[0]) > cfg.bar.bars and (
+            isinstance(col_dtype, (Nominal, GeoGraphy, SmallCardNum, DateTime))
+        ):
             sortidx = np.argsort(-counts[0])
             selected_xs = xs[0][sortidx[: cfg.bar.bars]]
             ret_df = ret_df[ret_df["x"].isin(selected_xs)]
