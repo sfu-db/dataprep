@@ -25,7 +25,7 @@ from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
 from ..configs import Config
-from ..dtypes_v2 import Continuous, Nominal, GeoGraphy, drop_null, is_dtype
+from ..dtypes_v2 import Continuous, Nominal, GeoGraphy, SmallCardNum, drop_null, DateTime
 from ..intermediate import ColumnMetadata, Intermediate
 from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend
@@ -109,7 +109,7 @@ def render_dist(
     return fig
 
 
-def render_hist(  # pylint: disable=too-many-arguments
+def render_hist(
     df: pd.DataFrame,
     x: str,
     meta: ColumnMetadata,
@@ -120,13 +120,16 @@ def render_hist(  # pylint: disable=too-many-arguments
     """
     Render a histogram
     """
-    if is_dtype(meta["dtype"], Nominal()) or is_dtype(meta["dtype"], GeoGraphy()):
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals
+
+    if isinstance(meta["dtype"], (Nominal, GeoGraphy, SmallCardNum, DateTime)):
         tooltips = [
             (x, "@x"),
             ("Count", "@count"),
             ("Label", "@label"),
         ]
-    else:
+    elif isinstance(meta["dtype"], Continuous):
         df = df.copy()
         df["repr"] = [f"[{row.lower_bound:.0f}~{row.upper_bound:.0f})" for row in df.itertuples()]
 
@@ -135,21 +138,28 @@ def render_hist(  # pylint: disable=too-many-arguments
             ("Frequency", "@count"),
             ("Label", "@label"),
         ]
+    else:
+        mtype = type(meta["dtype"])
+        raise ValueError(f"unprocessed data type:{mtype}, col:{x}")
+
     cols = [f"{col[:12]}..." if isinstance(col, str) and len(col) > 18 else col for col in df["x"]]
     df["x"] = cols
     cmapper = CategoricalColorMapper(palette=CATEGORY10, factors=LABELS)
 
-    if is_dtype(meta["dtype"], Nominal()) or is_dtype(meta["dtype"], GeoGraphy()):
+    if isinstance(meta["dtype"], (Nominal, GeoGraphy, SmallCardNum, DateTime)):
         radius = 0.99
 
         # Inputs of FactorRange() have to be sequence of strings,
         # object only contains numbers can cause errors.(Issue#98).
         df["x"] = df["x"].astype("str")
         x_range = FactorRange(*df["x"].unique())
-    else:
+    elif isinstance(meta["dtype"], Continuous):
 
         radius = df["x"][1] - df["x"][0]
         x_range = Range1d(df["x"].min() - radius, df["x"].max() + radius)
+    else:
+        mtype = type(meta["dtype"])
+        raise ValueError(f"unprocessed data type:{mtype}, col:{x}")
 
     y_range = Range1d(0, df["count"].max() * 1.05)
 
@@ -608,6 +618,7 @@ def render_missing_impact_1vn(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
     """
     Render the plot from `plot_missing(df, "x")`
     """
+    # pylint: disable = too-many-locals
     plot_width = cfg.plot.width if cfg.plot.width is not None else 300
     plot_height = cfg.plot.height if cfg.plot.height is not None else 300
 
@@ -623,10 +634,13 @@ def render_missing_impact_1vn(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
         fig.frame_height = plot_height
         panels.append(Panel(child=fig, title=col))
 
-        if is_dtype(meta[col]["dtype"], Nominal()) or is_dtype(meta[col]["dtype"], GeoGraphy()):
+        if isinstance(meta[col]["dtype"], (Nominal, GeoGraphy, SmallCardNum, DateTime)):
             htgs[title] = cfg.bar.grid_how_to_guide()
-        else:
+        elif isinstance(meta[col]["dtype"], Continuous):
             htgs[title] = cfg.hist.grid_how_to_guide()
+        else:
+            mtype = type(meta[col]["dtype"])
+            raise ValueError(f"unprocessed type:{mtype}")
         titles.append(title)
     legend_colors = [CATEGORY10[count] for count in range(len(LABELS))]
     return {
@@ -650,7 +664,7 @@ def render_missing_impact_1v1(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
     x, y, meta = itmdt["x"], itmdt["y"], itmdt["meta"]
     htgs: Dict[str, List[Tuple[str, str]]] = {}
 
-    if is_dtype(meta["dtype"], Continuous()):
+    if isinstance(meta["dtype"], Continuous):
         panels = []
 
         if cfg.hist.enable:
@@ -679,7 +693,7 @@ def render_missing_impact_1v1(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
             "container_width": max([panel.child.plot_width for panel in panels]),
             "how_to_guide": htgs,
         }
-    else:
+    elif isinstance(meta["dtype"], (Nominal, SmallCardNum, GeoGraphy, DateTime)):
         fig = render_hist(itmdt["hist"], y, meta, plot_width, plot_height, True)
         shown, total = meta["shown"], meta["total"]
         if shown != total:
@@ -693,3 +707,6 @@ def render_missing_impact_1v1(itmdt: Intermediate, cfg: Config) -> Dict[str, Any
             "container_width": fig.plot_width,
             "how_to_guide": htgs,
         }
+    else:
+        mtype = type(meta["dtype"])
+        raise ValueError(f"unsupported type:{mtype}")

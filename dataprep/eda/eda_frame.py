@@ -13,13 +13,7 @@ import numpy as np
 import pandas as pd
 import pandas._libs.missing as libmissing
 
-from .dtypes_v2 import (
-    NUMERICAL_DTYPES,
-    DType,
-    DTypeDef,
-    detect_dtype,
-    Nominal,
-)
+from .dtypes_v2 import NUMERICAL_DTYPES, DType, DTypeDef, detect_dtype, Nominal, GeoGraphy
 
 DataFrame = Union[pd.DataFrame, dd.DataFrame, "EDAFrame"]
 
@@ -113,7 +107,7 @@ class EDAFrame:
 
         # Transform categorical column to string for non-na values.
         for col in ddf.columns:
-            if isinstance(self._eda_dtypes[col], Nominal):
+            if isinstance(self._eda_dtypes[col], (Nominal, GeoGraphy)):
                 ddf[col] = ddf[col].apply(_to_str_if_not_na, meta=(col, "object"))
 
         self._ddf = ddf.persist()
