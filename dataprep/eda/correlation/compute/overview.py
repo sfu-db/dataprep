@@ -3,7 +3,7 @@
 Currently this boils down to pandas' implementation."""
 
 from functools import partial
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import dask
 import dask.array as da
@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 
 from ...configs import Config
-from ...data_array import DataArray, DataFrame
 from ...eda_frame import EDAFrame
 from ...intermediate import Intermediate
 from ...utils import cut_long_name
@@ -19,7 +18,7 @@ from .common import CorrelationMethod
 
 
 def _calc_overview(
-    df: DataFrame,
+    df: EDAFrame,
     cfg: Config,
     *,
     value_range: Optional[Tuple[float, float]] = None,
@@ -32,7 +31,7 @@ def _calc_overview(
     if value_range is not None and k is not None:
         raise ValueError("value_range and k cannot be present in both")
 
-    num_df = DataArray(df).select_num_columns()
+    num_df = df.select_num_columns()
 
     cordx, cordy, corrs = correlation_nxn(num_df, cfg)
 
@@ -152,7 +151,7 @@ def _calc_overview(
 
 
 def correlation_nxn(
-    df: Union[DataArray, EDAFrame], cfg: Config
+    df: EDAFrame, cfg: Config
 ) -> Tuple[np.ndarray, np.ndarray, Dict[CorrelationMethod, da.Array]]:
     """
     Calculation of a n x n correlation matrix for n columns
@@ -178,7 +177,7 @@ def correlation_nxn(
     return cordx, cordy, corrs
 
 
-def _pearson_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
+def _pearson_nxn(df: EDAFrame) -> da.Array:
     """Calculate column-wise pearson correlation."""
     return (
         df.frame.repartition(npartitions=1)
@@ -187,7 +186,7 @@ def _pearson_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
     )
 
 
-def _spearman_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
+def _spearman_nxn(df: EDAFrame) -> da.Array:
     """Calculate column-wise spearman correlation."""
     return (
         df.frame.repartition(npartitions=1)
@@ -196,7 +195,7 @@ def _spearman_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
     )
 
 
-def _kendall_tau_nxn(df: Union[DataArray, EDAFrame]) -> da.Array:
+def _kendall_tau_nxn(df: EDAFrame) -> da.Array:
     """Calculate column-wise kendalltau correlation."""
     return (
         df.frame.repartition(npartitions=1)
@@ -263,7 +262,7 @@ def least_corr(corrs: np.ndarray) -> Tuple[float, List[Any]]:
     return round(minimum, 3), list(col_set)
 
 
-def create_string(flag: str, source: List[Any], most_show: int, df: DataArray) -> str:
+def create_string(flag: str, source: List[Any], most_show: int, df: EDAFrame) -> str:
     """Create the output string"""
     suffix = "" if len(source) <= most_show else ", ..."
     if flag == "positive":
@@ -289,58 +288,3 @@ def create_string(flag: str, source: List[Any], most_show: int, df: DataArray) -
         out = temp
 
     return out
-
-
-## The code below is the correlation algorithms for array. Since we don't have
-## block-wise algorithms for spearman and kendalltal, it might be more suitable
-## to just use the pandas version of correlation.
-## The correlations from pandas use double for-loops but they write them in cython
-## and they are super fast already.
-#
-# def _pearson_nxn(data: da.Array) -> da.Array:
-#     """Calculate column-wise pearson correlation."""
-
-#     mean = data.mean(axis=0)[None, :]
-#     dem = data - mean
-
-#     num = dem.T @ dem
-
-#     std = data.std(axis=0, keepdims=True)
-#     dom = data.shape[0] * (std * std.T)
-
-#     correl = num / dom
-
-#     return correl
-
-
-# def _spearman_nxn(array: da.Array) -> da.Array:
-#     rank_array = (
-#         array.rechunk((-1, None))  #! TODO: avoid this
-#         .map_blocks(partial(rankdata, axis=0))
-#         .rechunk("auto")
-#     )
-#     return _pearson_nxn(rank_array)
-
-
-# def _kendall_tau_nxn(array: da.Array) -> da.Array:
-#     """Kendal Tau correlation outputs an n x n correlation matrix for n columns."""
-
-#     _, ncols = array.shape
-
-#     corrmat = []
-#     for _ in range(ncols):
-#         corrmat.append([float("nan")] * ncols)
-
-#     for i in range(ncols):
-#         corrmat[i][i] = 1.0
-
-#     for i in range(ncols):
-#         for j in range(i + 1, ncols):
-
-#             tmp = kendalltau(array[:, i], array[:, j])
-
-#             corrmat[j][i] = corrmat[i][j] = da.from_delayed(
-#                 tmp, shape=(), dtype=np.float
-#             )
-
-#     return da.stack(corrmat)
