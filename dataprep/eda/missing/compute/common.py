@@ -5,7 +5,7 @@ import dask.array as da
 import dask.dataframe as dd
 
 from ...configs import Config
-from ...dtypes import Continuous, DTypeDef, Nominal, detect_dtype, is_dtype, GeoGraphy
+from ...dtypes_v2 import Continuous, DTypeDef, Nominal, detect_dtype, GeoGraphy
 
 LABELS = ["Orignal data", "After drop missing values"]
 
@@ -17,16 +17,16 @@ def uni_histogram(
 ) -> Tuple[da.Array, ...]:
     """Calculate "histogram" for both numerical and categorical."""
 
-    if is_dtype(detect_dtype(srs, dtype), Continuous()):
+    srs_type = detect_dtype(srs, srs.head(), dtype)
+
+    if isinstance(srs_type, Continuous):
 
         counts, edges = da.histogram(srs, cfg.hist.bins, (srs.min(), srs.max()))
         centers = (edges[:-1] + edges[1:]) / 2
 
         return counts, centers, edges
 
-    elif is_dtype(detect_dtype(srs, dtype), Nominal()) or is_dtype(
-        detect_dtype(srs, dtype), GeoGraphy()
-    ):
+    elif isinstance(srs_type, (Nominal, GeoGraphy)):
         # Dask array's unique is way slower than the values_counts on Series
         # See https://github.com/dask/dask/issues/2851
         # centers, counts = da.unique(arr, return_counts=True)
@@ -52,8 +52,8 @@ def histogram(
     if len(arr.shape) != 1:
         raise ValueError("Histogram only supports 1-d array.")
     srs = dd.from_dask_array(arr)
-    detected_type = detect_dtype(srs, dtype)
-    if is_dtype(detected_type, Continuous()):
+    detected_type = detect_dtype(srs, srs.head(), dtype)
+    if isinstance(detected_type, Continuous):
         if range is not None:
             minimum, maximum = range
         else:
@@ -68,7 +68,7 @@ def histogram(
         if not return_edges:
             return counts, centers
         return counts, centers, edges
-    elif is_dtype(detected_type, Nominal()) or is_dtype(detected_type, GeoGraphy()):
+    elif isinstance(detected_type, (Nominal, GeoGraphy)):
         # Dask array's unique is way slower than the values_counts on Series
         # See https://github.com/dask/dask/issues/2851
         # centers, counts = da.unique(arr, return_counts=True)
