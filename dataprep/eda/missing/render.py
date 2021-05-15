@@ -25,7 +25,7 @@ from bokeh.plotting import Figure
 
 from ...errors import UnreachableError
 from ..configs import Config
-from ..dtypes import Continuous, Nominal, GeoGraphy, drop_null, is_dtype
+from ..dtypes_v2 import Continuous, Nominal, GeoGraphy, drop_null, is_dtype
 from ..intermediate import ColumnMetadata, Intermediate
 from ..palette import CATEGORY10, CATEGORY20, GREYS256, RDBU
 from ..utils import cut_long_name, fuse_missing_perc, relocate_legend

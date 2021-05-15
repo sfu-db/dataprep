@@ -11,13 +11,13 @@ from dask import delayed
 from scipy.cluster import hierarchy
 
 from ...configs import Config
-from ...data_array import DataArray
+from ...eda_frame import EDAFrame
 from ...intermediate import Intermediate
 from ...staged import staged
 from ...utils import cut_long_name
 
 
-def _compute_missing_nullivariate(df: DataArray, cfg: Config) -> Generator[Any, Any, Intermediate]:
+def _compute_missing_nullivariate(df: EDAFrame, cfg: Config) -> Generator[Any, Any, Intermediate]:
     """Calculate the data for visualizing the plot_missing(df).
     This contains the missing spectrum, missing bar chart and missing heatmap."""
     # pylint: disable=too-many-locals
@@ -169,7 +169,7 @@ def missing_perc_blockwise(bin_size: int) -> Callable[[np.ndarray], np.ndarray]:
 
 
 def missing_spectrum(
-    df: DataArray, bins: int
+    df: EDAFrame, bins: int
 ) -> Dict[str, da.Array]:  # pylint: disable=too-many-locals
     """Calculate a missing spectrum for each column."""
 
@@ -234,14 +234,14 @@ def missing_bars(
     return nrows - null_cnts, null_cnts, cols
 
 
-def missing_heatmap(df: DataArray) -> Optional[pd.DataFrame]:
+def missing_heatmap(df: EDAFrame) -> Optional[pd.DataFrame]:
     """Calculate a heatmap visualization of nullity correlation
     in the given DataFrame."""
 
     return da.corrcoef(df.nulls, rowvar=False)
 
 
-def missing_dendrogram(df: DataArray) -> Any:
+def missing_dendrogram(df: EDAFrame) -> Any:
     """Calculate a missing values dendrogram."""
     # Link the hierarchical output matrix, figure out orientation, construct base dendrogram.
     linkage_matrix = delayed(hierarchy.linkage)(df.nulls.T, "average")
@@ -257,7 +257,7 @@ def missing_dendrogram(df: DataArray) -> Any:
     return dendrogram
 
 
-def missing_col_cnt(df: DataArray) -> Any:
+def missing_col_cnt(df: EDAFrame) -> Any:
     """Calculate how many columns contain missing values."""
     nulls = df.nulls
     rst = nulls.sum(0)
@@ -266,7 +266,7 @@ def missing_col_cnt(df: DataArray) -> Any:
     return (rst > 0).sum()
 
 
-def missing_row_cnt(df: DataArray) -> Any:
+def missing_row_cnt(df: EDAFrame) -> Any:
     """Calculate how many rows contain missing values."""
     nulls = df.nulls
     rst = nulls.sum(1)
@@ -275,7 +275,7 @@ def missing_row_cnt(df: DataArray) -> Any:
     return (rst > 0).sum()
 
 
-def missing_most_col(df: DataArray) -> Tuple[int, float, List[Any]]:
+def missing_most_col(df: EDAFrame) -> Tuple[int, float, List[Any]]:
     """Find which column has the most number of missing values.
 
     Parameters
@@ -302,7 +302,7 @@ def missing_most_col(df: DataArray) -> Tuple[int, float, List[Any]]:
     return cnt, rate, rst
 
 
-def missing_most_row(df: DataArray) -> Tuple[int, float, List[Any]]:
+def missing_most_row(df: EDAFrame) -> Tuple[int, float, List[Any]]:
     """Find which row has the most number of missing values.
 
     Parameters
