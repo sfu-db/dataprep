@@ -10,7 +10,7 @@ import pytest
 from ...datasets import load_dataset
 
 from ...eda import plot
-from ...eda.dtypes import Nominal
+from ...eda.dtypes import Nominal, LatLong
 from ...eda.utils import to_dask
 from .random_data_generator import random_df
 
@@ -92,6 +92,8 @@ def test_specify_color(simpledf: dd.DataFrame) -> None:
 def test_geo(geodf: dd.DataFrame) -> None:
     plot(geodf, "Country")
     plot(geodf, "Country", "Population")
+    covid = load_dataset("covid19")
+    plot(covid, LatLong("Lat", "Long"), "2/16/2020")
 
 
 def test_random_df(random_df: pd.DataFrame) -> None:

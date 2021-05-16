@@ -9,7 +9,7 @@ import dask.dataframe as dd
 import pandas as pd
 
 from ...configs import Config
-from ...dtypes import DTypeDef, string_dtype_to_object, is_dtype, GeoPoint
+from ...dtypes import DTypeDef, string_dtype_to_object, is_dtype, GeoPoint, LatLong
 from ...intermediate import Intermediate
 from ...utils import preprocess_dataframe
 from .bivariate import compute_bivariate
@@ -22,8 +22,8 @@ __all__ = ["compute"]
 
 def compute(
     df: Union[pd.DataFrame, dd.DataFrame],
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    x: Optional[Union[str, LatLong]] = None,
+    y: Optional[Union[str, LatLong]] = None,
     z: Optional[str] = None,
     *,
     cfg: Union[Config, Dict[str, Any], None] = None,
@@ -111,10 +111,10 @@ def concat_latlong(df: Union[pd.DataFrame, dd.DataFrame], x: Any) -> Tuple[str, 
 
 def process_latlong(
     df: pd.DataFrame,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    x: Optional[Union[str, LatLong]] = None,
+    y: Optional[Union[str, LatLong]] = None,
     z: Optional[str] = None,
-) -> Tuple[List[Optional[str]], List[str], pd.DataFrame]:
+) -> Tuple[List[Optional[Union[str, LatLong]]], List[str], pd.DataFrame]:
     """
     Process Latlong data tpye.
     """

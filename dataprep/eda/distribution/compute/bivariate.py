@@ -17,6 +17,7 @@ from ...dtypes import (
     GeoPoint,
     detect_dtype,
     is_dtype,
+    LatLong,
 )
 from ...intermediate import Intermediate
 from ...utils import (
@@ -31,8 +32,8 @@ from ...utils import (
 
 def compute_bivariate(
     df: dd.DataFrame,
-    x: str,
-    y: str,
+    x: Union[str, LatLong],
+    y: Union[str, LatLong],
     cfg: Config,
     dtype: Optional[DTypeDef],
 ) -> Intermediate:
