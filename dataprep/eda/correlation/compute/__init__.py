@@ -5,9 +5,8 @@ from typing import Optional, Tuple, List, Dict, Union, Any
 from warnings import catch_warnings, filterwarnings
 
 from ...configs import Config
-from ...data_array import DataArray, DataFrame
 from ...intermediate import Intermediate
-from ...eda_frame import EDAFrame
+from ...eda_frame import EDAFrame, DataFrame
 from .bivariate import _calc_bivariate
 from .overview import _calc_overview
 from .univariate import _calc_univariate

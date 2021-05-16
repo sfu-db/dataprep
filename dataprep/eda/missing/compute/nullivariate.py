@@ -24,8 +24,6 @@ def _compute_missing_nullivariate(df: EDAFrame, cfg: Config) -> Generator[Any, A
 
     most_show = 5  # the most number of column/row to show in "insight"
 
-    df.compute()
-
     nullity = df.nulls
     null_cnts = nullity.sum(axis=0)
     nrows = df.shape[0]

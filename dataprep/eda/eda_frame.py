@@ -1,4 +1,4 @@
-"""Defines DataArray."""
+"""Defines EDAFrame."""
 
 from functools import reduce
 from math import ceil
@@ -6,7 +6,6 @@ from typing import Any, List, Optional, Sequence, Tuple, Union, cast, Dict
 from collections import Counter
 import warnings
 
-import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
@@ -19,8 +18,8 @@ DataFrame = Union[pd.DataFrame, dd.DataFrame, "EDAFrame"]
 
 
 class EDAFrame:
-    """EDAFrame provides an abstraction over dask DataFrame
-    and dask Array. The reason is that sometimes some algorithms
+    """EDAFrame provides an abstraction over dask DataFrame, Array and pandas DataFrame.
+    The reason is that sometimes some algorithms
     only works on the Array and not the DataFrame. However,
     the cost for getting the array from a dask DataFrame (with known length)
     is non trivial. Instead of computing the array from a dask
@@ -207,55 +206,8 @@ class EDAFrame:
         """
         return self._eda_dtypes[col]
 
-    def compute(self, type: str = "lengths") -> None:  # pylint: disable=redefined-builtin
-        """Compute the lengths or materialize the null values inplace.
-
-        Parameters
-        ----------
-        type
-            Can be lengths or nulls. lengths will compute the array chunk sizes and nulls
-            will compute and materialize the null values as well as the lengths of the chunks.
-
-        """
-
-        # pylint: disable = protected-access
-        if type == "lengths":
-            not_computed = np.isnan(self.shape[0])
-            if not_computed:
-                self._values = self.frame.to_dask_array(lengths=True)
-                self._nulls = self.frame.isnull().to_dask_array()
-                self._nulls._chunks = self.values.chunks
-        elif type == "nulls":
-            x = self.nulls
-            # Copied from compute_chunk_sizes
-            # pylint: disable=invalid-name
-            chunk_shapes = x.map_blocks(
-                _get_chunk_shape,
-                dtype=int,
-                chunks=tuple(len(c) * (1,) for c in x.chunks) + ((x.ndim,),),
-                new_axis=x.ndim,
-            )
-
-            c = []
-            for i in range(x.ndim):
-                s = x.ndim * [0] + [i]
-                s[i] = slice(None)
-                s = tuple(s)
-
-                c.append(tuple(chunk_shapes[s]))
-
-            chunks_, nulls = dask.compute(tuple(c), self.nulls)
-            chunks = tuple([tuple([int(chunk) for chunk in chunks]) for chunks in chunks_])
-            self._nulls = nulls
-            if self._values is not None:
-                self._values._chunks = chunks
-            else:
-                raise ValueError("edaframe._values is not initialized.")
-        else:
-            raise ValueError(f"{type} not supported.")
-
     def select_dtypes(self, include: List[Any]) -> "EDAFrame":
-        """Return a new DataArray with designated dtype columns."""
+        """Return a new EDAFrame with designated dtype columns."""
         if self._ddf is None:
             raise RuntimeError("dataframe is empty")
 
@@ -263,12 +215,12 @@ class EDAFrame:
         return self[subdf.columns]
 
     def select_num_columns(self) -> "EDAFrame":
-        """Return a new DataArray with numerical dtype columns."""
+        """Return a new EDAFrame with numerical dtype columns."""
         df = self.select_dtypes(NUMERICAL_DTYPES)
         return df
 
     def __getitem__(self, indexer: Union[Sequence[str], str]) -> "EDAFrame":
-        """Return a new DataArray select by column names."""
+        """Return a new EDAFrame select by column names."""
 
         if self._ddf is None:
             raise RuntimeError("dataframe is empty")
@@ -307,12 +259,6 @@ class EDAFrame:
                 df._values = df._values.astype(dtype)
 
         return df
-
-
-def _get_chunk_shape(arr: np.ndarray) -> np.ndarray:
-    """Given an (x,y,...) N-d array, returns (1,1,...,N) N+1-d array"""
-    shape = np.asarray(arr.shape, dtype=int)
-    return shape[len(shape) * (None,) + (slice(None),)]
 
 
 def _process_column_name(df_columns: pd.Index) -> List[str]:
