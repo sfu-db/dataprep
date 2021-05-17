@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 
 from ...eda import plot_diff
+from ...datasets import load_dataset
 from ...eda.dtypes import Nominal
 from ...eda.utils import to_dask
 
@@ -64,3 +65,10 @@ def test_specify_label(simpledf: dd.DataFrame) -> None:
 
 def test_specify_baseline(simpledf: dd.DataFrame) -> None:
     plot_diff([simpledf, simpledf], config={"diff.baseline": 1})
+
+
+def test_dataset() -> None:
+    df = load_dataset("titanic")
+    df1 = df[df["Survived"] == 0]
+    df2 = df[df["Survived"] == 1]
+    plot_diff([df1, df2])
