@@ -33,7 +33,7 @@ from scipy.stats import norm
 from wordcloud import WordCloud
 
 from ..configs import KDE, Bar, Box, Config, Pie, QQNorm, WordFrequency
-from ..dtypes import Continuous, DateTime, Nominal, is_dtype, GeoGraphy
+from ..dtypes_v2 import Continuous, DateTime, Nominal, GeoGraphy, SmallCardNum, GeoPoint
 from ..intermediate import Intermediate
 from ..palette import CATEGORY20, PASTEL1, RDBU, VIRIDIS, YlGnBu
 from ..utils import tweak_figure, _format_ticks, _format_axis, _format_bin_intervals
@@ -1484,7 +1484,7 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
     nrows = itmdt["stats"]["nrows"]
     titles: List[str] = []
     for col, dtp, data in itmdt["data"]:
-        if is_dtype(dtp, Nominal()) or is_dtype(dtp, GeoGraphy()):
+        if isinstance(dtp, (Nominal, GeoGraphy, SmallCardNum, GeoPoint)):
             df, ttl_grps = data
             fig = bar_viz(
                 df,
@@ -1497,16 +1497,18 @@ def render_distribution_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]
                 cfg.bar,
             )
             htgs[col] = cfg.bar.grid_how_to_guide()
-        elif is_dtype(dtp, Continuous()):
+        elif isinstance(dtp, Continuous):
             fig = hist_viz(
                 data, nrows, col, cfg.hist.yscale, cfg.hist.color, plot_width, plot_height, False
             )
             htgs[col] = cfg.hist.grid_how_to_guide()
-        elif is_dtype(dtp, DateTime()):
+        elif isinstance(dtp, DateTime):
             df, timeunit, miss_pct = data
             fig = dt_line_viz(
                 df, col, timeunit, cfg.line.yscale, plot_width, plot_height, False, miss_pct
             )
+        else:
+            raise ValueError(f"unprocessed col:{col}, type:{dtp}")
         fig.frame_height = plot_height
         titles.append(fig.title.text)
         fig.title.text = ""

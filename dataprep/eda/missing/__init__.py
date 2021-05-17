@@ -19,8 +19,8 @@ __all__ = ["render_missing", "compute_missing", "plot_missing"]
 
 def plot_missing(
     df: Union[pd.DataFrame, dd.DataFrame],
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    col1: Optional[str] = None,
+    col2: Optional[str] = None,
     *,
     config: Optional[Dict[str, Any]] = None,
     display: Optional[List[str]] = None,
@@ -36,9 +36,9 @@ def plot_missing(
     ----------
     df
         the pandas data_frame for which plots are calculated for each column.
-    x
+    col1
         a valid column name of the data frame.
-    y
+    col2
         a valid column name of the data frame.
     config
         A dictionary for configuring the visualizations.
@@ -65,7 +65,7 @@ def plot_missing(
     cfg = Config.from_dict(display, config)
 
     with ProgressBar(minimum=1, disable=not progress):
-        itmdt = compute_missing(df, x, y, cfg=cfg, dtype=dtype)
+        itmdt = compute_missing(df, col1, col2, cfg=cfg, dtype=dtype)
 
     to_render = render_missing(itmdt, cfg)
 

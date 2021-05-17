@@ -58,14 +58,14 @@ def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
     config = {"hist.bins": 20, "bar.bars": 15}
     cfg = Config.from_dict(config=config)
 
-    itmdt = compute_missing(simpledf, x="a", cfg=cfg)
+    itmdt = compute_missing(simpledf, col1="a", cfg=cfg)
     render_missing(itmdt, cfg)
 
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
     config = {"hist.bins": 20, "bar.bars": 15}
     cfg = Config.from_dict(config=config)
-    itmdt = compute_missing(simpledf, x="d", cfg=cfg)
+    itmdt = compute_missing(simpledf, col1="d", cfg=cfg)
     render_missing(itmdt, cfg)
 
 
@@ -78,7 +78,7 @@ def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
         "width": 500,
     }
     cfg = Config.from_dict(display=display, config=config)
-    itmdt = compute_missing(simpledf, x="a", y="b", cfg=cfg)
+    itmdt = compute_missing(simpledf, col1="a", col2="b", cfg=cfg)
     render_missing(itmdt, cfg)
 
 
@@ -91,20 +91,20 @@ def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
         "width": 500,
     }
     cfg = Config.from_dict(display=display, config=config)
-    itmdt = compute_missing(simpledf, x="a", y="d", cfg=cfg)
+    itmdt = compute_missing(simpledf, col1="a", col2="d", cfg=cfg)
     render_missing(itmdt, cfg)
 
 
 def test_specify_column_type(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    itmdt = compute_missing(simpledf, x="b", cfg=cfg, dtype={"a": Numerical()})
+    itmdt = compute_missing(simpledf, col1="b", cfg=cfg, dtype={"a": Numerical()})
     render_missing(itmdt, cfg)
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_missing(simpledf, y="b", cfg=cfg)
+    compute_missing(simpledf, col2="b", cfg=cfg)
 
 
 def test_sanity_compute_7() -> None:
