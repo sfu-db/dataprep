@@ -9,7 +9,7 @@ import dask.dataframe as dd
 import pandas as pd
 
 from ...configs import Config
-from ...dtypes import DTypeDef, string_dtype_to_object, is_dtype, GeoPoint, LatLong
+from ...dtypes import DTypeDef, is_dtype, GeoPoint, LatLong
 from ...intermediate import Intermediate
 from ...utils import preprocess_dataframe
 from .bivariate import compute_bivariate

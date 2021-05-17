@@ -10,6 +10,7 @@ import numpy as np
 import dask
 import dask.array as da
 import dask.dataframe as dd
+from pandas.api.types import is_integer_dtype
 from ...utils import DTMAP, _get_timeunit
 from ...intermediate import Intermediate
 from ...dtypes import (
@@ -174,8 +175,18 @@ def compare_multiple_df(
         if is_dtype(col_dtype, Continuous()) and cfg.hist.enable:
             data.append((col, Continuous(), _cont_calcs(srs.apply("dropna"), cfg), orig))
         elif is_dtype(col_dtype, Nominal()) and cfg.bar.enable:
-            srs = srs.apply("astype", "str")
-            data.append((col, Nominal(), _nom_calcs(srs.apply("dropna"), cfg), orig))
+            # When concating dfs, NA may be introduced (e.g., dfs with different rows),
+            # making the int column becomes float. Hence we check whether the col should be
+            # int after drop NA. If so, we will round column before transform it to str.
+            is_int = _is_all_int(df_list, col)
+            if is_int:
+                norm_srs = srs.apply("dropna").apply(
+                    "apply", lambda x: str(round(x)), meta=(col, "object")
+                )
+            else:
+                norm_srs = srs.apply("dropna").apply("astype", "str")
+
+            data.append((col, Nominal(), _nom_calcs(norm_srs, cfg), orig))
         elif is_dtype(col_dtype, DateTime()) and cfg.line.enable:
             data.append(
                 (col, DateTime(), dask.delayed(_calc_line_dt)(srs, col, cfg.line.unit), orig)
@@ -195,6 +206,24 @@ def compare_multiple_df(
         elif is_dtype(dtp, DateTime()):
             plot_data.append((col, dtp, dask.compute(*datum), orig))  # workaround
     return Intermediate(data=plot_data, stats=stats, visual_type="comparison_grid")
+
+
+def _is_all_int(df_list: List[Union[dd.DataFrame, pd.DataFrame]], col: str) -> bool:
+    """
+    Check whether the col in all dataframes are all integer type.
+    """
+    for df in df_list:
+        srs = df[col]
+        if isinstance(srs, (dd.DataFrame, pd.DataFrame)):
+            for dtype in srs.dtypes:
+                if not is_integer_dtype(dtype):
+                    return False
+        elif isinstance(srs, (dd.Series, pd.Series)):
+            if not is_integer_dtype(srs.dtype):
+                return False
+        else:
+            raise ValueError(f"unprocessed type of data:{type(srs)}")
+    return True
 
 
 def calc_stats(dfs: Dfs, cfg: Config, dtype: Optional[DTypeDef]) -> Dict[str, List[str]]:

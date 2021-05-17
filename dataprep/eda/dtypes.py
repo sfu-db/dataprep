@@ -318,17 +318,6 @@ def is_pandas_categorical(dtype: Any) -> bool:
     return any(isinstance(dtype, c) for c in CATEGORICAL_PANDAS_DTYPES)
 
 
-def string_dtype_to_object(df: dd.DataFrame) -> dd.DataFrame:
-    """
-    Convert string dtype to object dtype
-    """
-    for col in df.columns:
-        if any(isinstance(df[col].dtype, c) for c in STRING_DTYPES):
-            df[col] = df[col].astype(object)
-
-    return df
-
-
 def drop_null(
     var: Union[dd.Series, pd.DataFrame, dd.DataFrame]
 ) -> Union[pd.Series, dd.Series, pd.DataFrame, dd.DataFrame]:
