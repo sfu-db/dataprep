@@ -16,8 +16,8 @@ __all__ = ["compute_correlation"]
 
 def compute_correlation(
     df: DataFrame,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    col1: Optional[str] = None,
+    col2: Optional[str] = None,
     *,
     cfg: Union[Config, Dict[str, Any], None] = None,
     display: Optional[List[str]] = None,
@@ -32,9 +32,9 @@ def compute_correlation(
         The pandas dataframe for which plots are calculated for each column.
     cfg
         Config instance
-    x
+    col1
         A valid column name of the dataframe
-    y
+    col2
         A valid column name of the dataframe
     value_range
         If the correlation value is out of the range, don't show it.
@@ -55,6 +55,7 @@ def compute_correlation(
     elif not cfg:
         cfg = Config()
 
+    x, y = col1, col2
     frame = EDAFrame(df)
     if x is None and y is None:  # pylint: disable=no-else-return
         with catch_warnings():

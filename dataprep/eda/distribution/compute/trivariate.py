@@ -6,27 +6,26 @@ import dask
 import dask.dataframe as dd
 
 from ...configs import Config
-from ...dtypes import (
+from ...dtypes_v2 import (
     Continuous,
     DateTime,
     DTypeDef,
     Nominal,
     GeoGraphy,
+    SmallCardNum,
+    GeoPoint,
     Union,
-    detect_dtype,
-    drop_null,
-    is_dtype,
-    LatLong,
 )
 from ...intermediate import Intermediate
+from ...eda_frame import EDAFrame
 from ...utils import _calc_line_dt
 
 
 def compute_trivariate(
-    df: dd.DataFrame,
-    x: Union[str, LatLong],
-    y: Union[str, LatLong],
-    z: Union[str, LatLong],
+    df: Union[dd.DataFrame, dd.DataFrame],
+    col1: str,
+    col2: str,
+    col3: str,
     cfg: Config,
     dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
@@ -51,53 +50,59 @@ def compute_trivariate(
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals
 
-    xtype = detect_dtype(df[x], dtype)
-    ytype = detect_dtype(df[y], dtype)
-    ztype = detect_dtype(df[z], dtype)
+    x, y, z = col1, col2, col3
+    frame = EDAFrame(df[[x, y, z]], dtype)
 
+    xtype = frame.get_eda_dtype(x)
+    ytype = frame.get_eda_dtype(y)
+    ztype = frame.get_eda_dtype(z)
+
+    # Note that CategoricalTypes need to be defined case by case. Whether
+    # SmallCardNum and GeoPoint treated as Categorical is depends on the function.
+    # pylint: disable = invalid-name
+    CategoricalTypes = (Nominal, GeoGraphy, SmallCardNum, GeoPoint)
+
+    # Make x datetime, y: numerical, z: categorical
     if (
-        is_dtype(xtype, DateTime())
-        and (is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()))
-        and is_dtype(ztype, Continuous())
+        isinstance(xtype, DateTime)
+        and isinstance(ytype, CategoricalTypes)
+        and isinstance(ztype, Continuous)
     ):
         y, z = z, y
     elif (
-        is_dtype(xtype, Continuous())
-        and is_dtype(ytype, DateTime())
-        and (is_dtype(ztype, Nominal()) or is_dtype(ztype, GeoGraphy()))
+        isinstance(xtype, Continuous)
+        and isinstance(ytype, DateTime)
+        and isinstance(ztype, CategoricalTypes)
     ):
         x, y = y, x
     elif (
-        is_dtype(xtype, Continuous())
-        and (is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()))
-        and is_dtype(ztype, DateTime())
+        isinstance(xtype, Continuous)
+        and isinstance(ytype, CategoricalTypes)
+        and isinstance(ztype, DateTime)
     ):
         x, y, z = z, x, y
     elif (
-        (is_dtype(xtype, Nominal()) or is_dtype(xtype, GeoGraphy()))
-        and is_dtype(ytype, DateTime())
-        and is_dtype(ztype, Continuous())
+        isinstance(xtype, CategoricalTypes)
+        and isinstance(ytype, DateTime)
+        and isinstance(ztype, Continuous)
     ):
         x, y, z = y, z, x
     elif (
-        (is_dtype(xtype, Nominal()) or is_dtype(xtype, GeoGraphy()))
-        and is_dtype(ytype, Continuous())
-        and is_dtype(ztype, DateTime())
+        isinstance(xtype, CategoricalTypes)
+        and isinstance(ytype, Continuous)
+        and isinstance(ztype, DateTime)
     ):
         x, z = z, x
-
-    if not (
-        is_dtype(xtype, DateTime())
-        and is_dtype(ytype, Continuous())
-        and (is_dtype(ztype, Nominal()) or is_dtype(ztype, GeoGraphy()))
-    ):
+    else:
         raise ValueError(
-            "x, y, and z must be one each of type datetime, numerical, and categorical"
+            "Three column types must be one each of type datetime, numerical, and categorical."
+            + f" Current types:({x},{xtype}), ({y},{ytype}), ({z},{ztype})"
         )
 
-    df = drop_null(df[[x, y, z]])
-    df[z] = df[z].apply(str, meta=(z, str))
+    tmp_df = frame.frame[[x, y, z]].dropna()
+    tmp_df[z] = tmp_df[z].astype(str)
 
     # line chart
     data = dask.compute(

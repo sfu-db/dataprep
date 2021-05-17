@@ -8,14 +8,15 @@ import pandas as pd
 
 from ....errors import UnreachableError
 from ...configs import Config
-from ...dtypes import (
+from ...dtypes_v2 import (
     Continuous,
     DateTime,
+    DType,
     DTypeDef,
     Nominal,
     GeoGraphy,
     GeoPoint,
-    detect_dtype,
+    SmallCardNum,
     is_dtype,
     LatLong,
 )
@@ -28,12 +29,30 @@ from ...utils import (
     _calc_line_dt,
     _get_timeunit,
 )
+from .common import gen_new_df_with_used_cols
+from ...eda_frame import EDAFrame
+
+
+def _check_type_combination(
+    instance_tuple: Tuple[DType, DType],
+    type_tuple: Tuple[
+        Union[type, Tuple[Union[type, Tuple[Any, ...]], ...]],
+        Union[type, Tuple[Union[type, Tuple[Any, ...]], ...]],
+    ],
+) -> bool:
+    """Check whether two instance types is instance of types in type_tuples"""
+
+    xtype, ytype = instance_tuple[0], instance_tuple[1]
+    type1, type2 = type_tuple[0], type_tuple[1]
+    return (isinstance(xtype, type1) and isinstance(ytype, type2)) or (
+        isinstance(xtype, type2) and isinstance(ytype, type1)
+    )
 
 
 def compute_bivariate(
-    df: dd.DataFrame,
-    x: Union[str, LatLong],
-    y: Union[str, LatLong],
+    df: Union[pd.DataFrame, dd.DataFrame],
+    col1: Union[str, LatLong],
+    col2: Union[str, LatLong],
     cfg: Config,
     dtype: Optional[DTypeDef],
 ) -> Intermediate:
@@ -57,14 +76,29 @@ def compute_bivariate(
     """
     # pylint: disable=too-many-branches,too-many-statements,too-many-boolean-expressions
     # pylint: disable = too-many-return-statements
-    xtype, ytype = detect_dtype(df[x], dtype), detect_dtype(df[y], dtype)
+    # pylint: disable = too-many-locals
 
-    if (is_dtype(xtype, Nominal()) and is_dtype(ytype, Continuous())) or (
-        is_dtype(xtype, Continuous()) and is_dtype(ytype, Nominal())
-    ):
-        x, y = (x, y) if is_dtype(xtype, Nominal()) else (y, x)
-        df = df[[x, y]]
-        (comps,) = dask.compute(_nom_cont_comps(df.dropna(), cfg))
+    if col1 is None or col2 is None:
+        raise ValueError(f"Input column name should not be None. Input columns: {col1}, y={col2}.")
+
+    new_col_names, ndf = gen_new_df_with_used_cols(df, col1, col2, z=None)
+    x = new_col_names[col1]
+    y = new_col_names[col2]
+    if x is None or y is None:
+        raise ValueError
+
+    frame = EDAFrame(ndf, dtype)
+
+    xtype = frame.get_eda_dtype(x)
+    ytype = frame.get_eda_dtype(y)
+
+    if _check_type_combination((xtype, ytype), ((Nominal, SmallCardNum), Continuous)):
+        x, y = (x, y) if isinstance(xtype, (Nominal, SmallCardNum)) else (y, x)
+        tmp_df = frame.frame[[x, y]].dropna()
+        # Note that NA is droped, so transform to str will not introduce NA in viz.
+        if isinstance(xtype, SmallCardNum):
+            tmp_df[x] = tmp_df[x].astype(str)
+        (comps,) = dask.compute(_nom_cont_comps(tmp_df, cfg))
 
         return Intermediate(
             x=x,
@@ -72,18 +106,16 @@ def compute_bivariate(
             data=comps,
             visual_type="cat_and_num_cols",
         )
-    elif (is_dtype(xtype, DateTime()) and is_dtype(ytype, Continuous())) or (
-        is_dtype(xtype, Continuous()) and is_dtype(ytype, DateTime())
-    ):
-        x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
-        df = df[[x, y]].dropna()
+    elif _check_type_combination((xtype, ytype), (DateTime, Continuous)):
+        x, y = (x, y) if isinstance(xtype, DateTime) else (y, x)
+        tmp_df = frame.frame[[x, y]].dropna()
         dtnum: List[Any] = []
         # line chart
         if cfg.line.enable:
-            dtnum.append(dask.delayed(_calc_line_dt)(df, cfg.line.unit, cfg.line.agg))
+            dtnum.append(dask.delayed(_calc_line_dt)(tmp_df, cfg.line.unit, cfg.line.agg))
         # box plot
         if cfg.box.enable:
-            dtnum.append(dask.delayed(_calc_box_dt)(df, cfg.box.unit))
+            dtnum.append(dask.delayed(_calc_box_dt)(tmp_df, cfg.box.unit))
 
         dtnum = dask.compute(*dtnum)
 
@@ -104,17 +136,17 @@ def compute_bivariate(
             boxdata=boxdata,
             visual_type="dt_and_num_cols",
         )
-    elif (is_dtype(xtype, DateTime()) and is_dtype(ytype, Nominal())) or (
-        is_dtype(xtype, Nominal()) and is_dtype(ytype, DateTime())
-    ):
+    elif _check_type_combination((xtype, ytype), (DateTime, (Nominal, SmallCardNum))):
         x, y = (x, y) if is_dtype(xtype, DateTime()) else (y, x)
-        df = df[[x, y]].dropna()
+        tmp_df = frame.frame[[x, y]].dropna()
+        if isinstance(ytype, SmallCardNum):
+            tmp_df[y] = tmp_df[y].astype(str)
         dtcat: List[Any] = []
         if cfg.line.enable:
             # line chart
             dtcat.append(
                 dask.delayed(_calc_line_dt)(
-                    df,
+                    tmp_df,
                     cfg.line.unit,
                     ngroups=cfg.line.ngroups,
                     largest=cfg.line.sort_descending,
@@ -124,7 +156,7 @@ def compute_bivariate(
             # stacked bar chart
             dtcat.append(
                 dask.delayed(_calc_stacked_dt)(
-                    df,
+                    tmp_df,
                     cfg.stacked.unit,
                     cfg.stacked.ngroups,
                     cfg.stacked.sort_descending,
@@ -150,63 +182,50 @@ def compute_bivariate(
             visual_type="dt_and_cat_cols",
         )
 
-    elif (is_dtype(xtype, GeoGraphy()) and is_dtype(ytype, Continuous())) or (
-        is_dtype(xtype, Continuous()) and is_dtype(ytype, GeoGraphy())
-    ):
-        x, y = (x, y) if is_dtype(xtype, GeoGraphy()) else (y, x)
-        df = df[[x, y]]
-        (comps,) = dask.compute(geo_cont_comps(df.dropna(), cfg))
+    elif _check_type_combination((xtype, ytype), (GeoGraphy, Continuous)):
+        x, y = (x, y) if isinstance(xtype, GeoGraphy) else (y, x)
+        tmp_df = frame.frame[[x, y]]
+        (comps,) = dask.compute(geo_cont_comps(tmp_df.dropna(), cfg))
         return Intermediate(x=x, y=y, data=comps, visual_type="geo_and_num_cols")
 
-    elif (is_dtype(xtype, GeoPoint()) and is_dtype(ytype, Continuous())) or (
-        is_dtype(xtype, Continuous()) and is_dtype(ytype, GeoPoint())
-    ):
-        x, y = (x, y) if is_dtype(xtype, GeoPoint()) else (y, x)
-        df = df[[x, y]]
-        first_rows = df.head()
-        try:
-            first_rows[x].apply(hash)
-        except TypeError:
-            df[x] = df[x].astype(str)
-
-        (comps,) = dask.compute(geop_cont_comps(df.dropna()))
-
+    elif _check_type_combination((xtype, ytype), (GeoPoint, Continuous)):
+        x, y = (x, y) if isinstance(xtype, GeoPoint) else (y, x)
+        tmp_df = frame.frame[[x, y]].dropna()
+        (comps,) = dask.compute(geop_cont_comps(tmp_df))
         return Intermediate(x=x, y=y, data=comps, visual_type="latlong_and_num_cols")
-    elif (
-        is_dtype(xtype, Nominal()) or is_dtype(xtype, GeoGraphy()) or is_dtype(xtype, GeoPoint())
-    ) and (
-        is_dtype(ytype, Nominal()) or is_dtype(ytype, GeoGraphy()) or is_dtype(ytype, GeoPoint())
+
+    elif isinstance(xtype, (Nominal, SmallCardNum, GeoGraphy, GeoPoint)) and isinstance(
+        ytype, (Nominal, SmallCardNum, GeoGraphy, GeoPoint)
     ):
-        df = df[[x, y]]
+        tmp_df = frame.frame[[x, y]].dropna()
+        if isinstance(xtype, (SmallCardNum, GeoPoint)):
+            tmp_df[x] = tmp_df[x].astype(str)
+        if isinstance(ytype, (SmallCardNum, GeoPoint)):
+            tmp_df[y] = tmp_df[y].astype(str)
 
-        if is_dtype(xtype, GeoPoint()):
-            df[x] = df[x].astype(str)
-        if is_dtype(ytype, GeoPoint()):
-            df[y] = df[y].astype(str)
-
-        (comps,) = dask.compute(df.dropna().groupby([x, y]).size())
+        (comps,) = dask.compute(tmp_df.groupby([x, y]).size())
         return Intermediate(
             x=x,
             y=y,
             data=comps,
             visual_type="two_cat_cols",
         )
-    elif is_dtype(xtype, Continuous()) and is_dtype(ytype, Continuous()):
+    elif isinstance(xtype, Continuous) and isinstance(ytype, Continuous):
         # one partition required for apply(pd.cut) in _calc_box_cont
-        df = df[[x, y]].dropna().repartition(npartitions=1)
+        tmp_df = frame.frame[[x, y]].dropna().repartition(npartitions=1)
 
         data: Dict[str, Any] = {}
         if cfg.scatter.enable:
             # scatter plot data
-            data["scat"] = df.map_partitions(
-                lambda x: x.sample(min(cfg.scatter.sample_size, x.shape[0])), meta=df
+            data["scat"] = tmp_df.map_partitions(
+                lambda x: x.sample(min(cfg.scatter.sample_size, x.shape[0])), meta=tmp_df
             )
         if cfg.hexbin.enable:
             # hexbin plot data
-            data["hex"] = df
+            data["hex"] = tmp_df
         if cfg.box.enable:
             # box plot
-            data["box"] = _calc_box_cont(df, cfg)
+            data["box"] = _calc_box_cont(tmp_df, cfg)
 
         (data,) = dask.compute(data)
 
@@ -217,7 +236,9 @@ def compute_bivariate(
             visual_type="two_num_cols",
         )
     else:
-        raise UnreachableError
+        raise UnreachableError(
+            "Unprocessed type. x_name:{x}, x_type:{xtype}, y_name:{y}, y_type:{ytype}"
+        )
 
 
 def _nom_cont_comps(df: dd.DataFrame, cfg: Config) -> Dict[str, Any]:
