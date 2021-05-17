@@ -9,7 +9,7 @@ import pandas as pd
 
 from ..configs import Config
 from ..container import Container
-from ..dtypes import DTypeDef
+from ..dtypes import DTypeDef, LatLong
 from ...progress_bar import ProgressBar
 from .compute import compute
 from .render import render
@@ -19,8 +19,8 @@ __all__ = ["plot", "compute", "render"]
 
 def plot(
     df: Union[pd.DataFrame, dd.DataFrame],
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    x: Optional[Union[str, LatLong]] = None,
+    y: Optional[Union[str, LatLong]] = None,
     z: Optional[str] = None,
     *,
     config: Optional[Dict[str, Any]] = None,

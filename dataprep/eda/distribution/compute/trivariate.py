@@ -12,9 +12,11 @@ from ...dtypes import (
     DTypeDef,
     Nominal,
     GeoGraphy,
+    Union,
     detect_dtype,
     drop_null,
     is_dtype,
+    LatLong,
 )
 from ...intermediate import Intermediate
 from ...utils import _calc_line_dt
@@ -22,9 +24,9 @@ from ...utils import _calc_line_dt
 
 def compute_trivariate(
     df: dd.DataFrame,
-    x: str,
-    y: str,
-    z: str,
+    x: Union[str, LatLong],
+    y: Union[str, LatLong],
+    z: Union[str, LatLong],
     cfg: Config,
     dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:

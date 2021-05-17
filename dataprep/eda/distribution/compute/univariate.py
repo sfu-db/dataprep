@@ -2,7 +2,7 @@
 Computations for plot(df, x)
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import math
 import dask
@@ -25,6 +25,7 @@ from ...dtypes import (
     GeoPoint,
     detect_dtype,
     is_dtype,
+    LatLong,
 )
 from ...intermediate import Intermediate
 from ...utils import _calc_line_dt, gaussian_kde, normaltest
@@ -32,7 +33,7 @@ from ...utils import _calc_line_dt, gaussian_kde, normaltest
 
 def compute_univariate(
     df: dd.DataFrame,
-    x: Optional[str],
+    x: Optional[Union[str, LatLong]],
     cfg: Config,
     dtype: Optional[DTypeDef],
 ) -> Intermediate:
