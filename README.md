@@ -57,31 +57,6 @@ Currently, you can use DataPrep to:
 pip install -U dataprep
 ```
 
-## Connector
-
-Connector is an intuitive, open-source API wrapper that speeds up development by standardizing calls to multiple APIs as a simple workflow.
-
-Connector provides a simple wrapper to collect structured data from different Web APIs (e.g., Twitter, Spotify), making web data collection easy and efficient, without requiring advanced programming skills.
-
-Do you want to leverage the growing number of websites that are opening their data through public APIs? Connector is for you!
-
-Let's check out the several benefits that Connector offers:
-
-- **A unified API:** You can fetch data using one or two lines of code to get data from [tens of popular websites](https://github.com/sfu-db/DataConnectorConfigs).
-- **Auto Pagination:** Do you want to invoke a Web API that could return a large result set and need to handle it through pagination? Connector automatically does the pagination for you! Just specify the desired number of returned results (argument `_count`) without getting into unnecessary detail about a specific pagination scheme.
-- **Smart API request strategy:** Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy.
-#### How to fetch all publications of Andrew Y. Ng?
-
-```python
-from dataprep.connector import connect
-conn_dblp = connect("dblp", _concurrency = 5)
-df = await conn_dblp.query("publication", author = "Andrew Y. Ng", _count = 2000)
-```
-
-Here, you can find detailed [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
-
-Connector is designed to be easy to extend. If you want to connect with your own web API, you just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs/blob/develop/CONTRIBUTING.md#add-configuration-files) to support it. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.
-
 ## EDA
 
 DataPrep.EDA is the fastest and the easiest EDA (Exploratory Data Analysis) tool in Python. It allows you to understand a Pandas/Dask DataFrame with a few lines of code in seconds.
@@ -90,7 +65,7 @@ DataPrep.EDA is the fastest and the easiest EDA (Exploratory Data Analysis) tool
 
 You can create a beautiful profile report from a Pandas/Dask DataFrame with the `create_report` function. DataPrep.EDA has the following advantages compared to other tools:
 
-- **10-100X Faster**: DataPrep.EDA is 10-100X faster than Pandas-based profiling tools due to its highly optimized Dask-based computing module.
+- **[10X Faster](https://arxiv.org/abs/2104.00841)**: DataPrep.EDA can be 10X faster than Pandas-based profiling tools due to its highly optimized Dask-based computing module.
 - **Interactive Visualization**: DataPrep.EDA generates interactive visualizations in a report, which makes the report look more appealing to end users.
 - **Big Data Support**: DataPrep.EDA naturally supports big data stored in a Dask cluster by accepting a Dask dataframe as input.
 
@@ -109,13 +84,13 @@ Click [here](https://sfu-db.github.io/dataprep/_downloads/c9bf292ac949ebcf9b65bb
 
 DataPrep.EDA is the **_only_** task-centric EDA system in Python. It is carefully designed to improve usability.
 
-- **Task-Centric API Design**: You can declaratively specify a wide range of EDA tasks in different granularities with a single function call. All needed visualizations will be automatically and intelligently generated for you.
+- **Task-Centric API Design**: You can declaratively specify a wide range of EDA tasks in different granularity with a single function call. All needed visualizations will be automatically and intelligently generated for you.
 - **Auto-Insights**: DataPrep.EDA automatically detects and highlights the insights (e.g., a column has many outliers) to facilitate pattern discovery about the data.
-- **[How-to Guide](https://sfu-db.github.io/dataprep/user_guide/eda/how_to_guide.html)** : A how-to guide is provided to show the configuration of each plot function. With this feature, you can easily customize the generated visualizations.
+- **How-to Guide**: A how-to guide is provided to show the configuration of each plot function. With this feature, you can easily customize the generated visualizations.
 
-#### Understand the Titanic dataset with Task-Centric API:
+#### Learn DataPrep.EDA in 2 minutes:
 
-<a href="assets/eda_demo.gif"><img src="assets/eda_demo.gif"/></a>
+<a href="https://youtu.be/nSkQy3ew3EI"><img src="assets/eda_video_cover.png"/></a>
 
 Click [here](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html) to check all the supported tasks.
 
@@ -131,7 +106,7 @@ DataPrep.Clean contains simple functions designed for cleaning and validating da
 
 The following example shows how to clean and standardize a column of country names.
 
-``` python
+```python
 from dataprep.clean import clean_country
 import pandas as pd
 df = pd.DataFrame({'country': ['USA', 'country: Canada', '233', ' tr ', 'NA']})
@@ -147,7 +122,7 @@ df2
 
 Type validation is also supported:
 
-``` python
+```python
 from dataprep.clean import validate_country
 series = validate_country(df['country'])
 series
@@ -160,6 +135,32 @@ Name: country, dtype: bool
 ```
 
 **Currently supports functions for:** Column Headers | Country Names | Dates and Times | Duplicate Strings | Email Addresses | Geographic Coordinates | IP Addresses | Phone Numbers | URLs | US Street Addresses
+
+## Connector
+
+Connector is an intuitive, open-source API wrapper that speeds up development by standardizing calls to multiple APIs as a simple workflow.
+
+Connector provides a simple wrapper to collect structured data from different Web APIs (e.g., Twitter, Spotify), making web data collection easy and efficient, without requiring advanced programming skills.
+
+Do you want to leverage the growing number of websites that are opening their data through public APIs? Connector is for you!
+
+Let's check out the several benefits that Connector offers:
+
+- **A unified API:** You can fetch data using one or two lines of code to get data from [tens of popular websites](https://github.com/sfu-db/DataConnectorConfigs).
+- **Auto Pagination:** Do you want to invoke a Web API that could return a large result set and need to handle it through pagination? Connector automatically does the pagination for you! Just specify the desired number of returned results (argument `_count`) without getting into unnecessary detail about a specific pagination scheme.
+- **Smart API request strategy:** Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy.
+
+#### How to fetch all publications of Andrew Y. Ng?
+
+```python
+from dataprep.connector import connect
+conn_dblp = connect("dblp", _concurrency = 5)
+df = await conn_dblp.query("publication", author = "Andrew Y. Ng", _count = 2000)
+```
+
+Here, you can find detailed [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
+
+Connector is designed to be easy to extend. If you want to connect with your own web API, you just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs/blob/develop/CONTRIBUTING.md#add-configuration-files) to support it. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.
 
 ## Documentation
 
@@ -184,7 +185,7 @@ There are many ways to contribute to DataPrep.
 Please take a look at our [wiki] for development documentations!
 
 [build status]: https://img.shields.io/circleci/build/github/sfu-db/dataprep/master?style=flat-square&token=f68e38757f5c98771f46d1c7e700f285a0b9784d
-[Forum]: https://github.com/sfu-db/dataprep/discussions
+[forum]: https://github.com/sfu-db/dataprep/discussions
 [wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
 [twitter]: https://img.shields.io/twitter/follow/sfu_db?style=social
@@ -200,3 +201,21 @@ Some functionalities of DataPrep are inspired by the following packages.
 - [missingno](https://github.com/ResidentMario/missingno)
 
   Inspired the missing value analysis in `dataprep.eda`.
+
+## Citing DataPrep
+
+If you use DataPrep, please consider citing the following paper:
+
+Jinglin Peng, Weiyuan Wu, Brandon Lockhart, Song Bian, Jing Nathan Yan, Linghao Xu, Zhixuan Chi, Jeffrey M. Rzeszotarski, and Jiannan Wang. [DataPrep.EDA: Task-Centric Exploratory Data Analysis for Statistical
+Modeling in Python.](https://arxiv.org/abs/2104.00841) _SIGMOD 2021_.
+
+BibTeX entry:
+
+```bibtex
+@inproceedings{dataprepeda2021,
+  author    = {Jinglin Peng and Weiyuan Wu and Brandon Lockhart and Song Bian and Jing Nathan Yan and Linghao Xu and Zhixuan Chi and Jeffrey M. Rzeszotarski and Jiannan Wang},
+  title     = {DataPrep.EDA: Task-Centric Exploratory Data Analysis for Statistical Modeling in Python},
+  booktitle = {Proceedings of the 2021 International Conference on Management of Data (SIGMOD '21), June 20--25, 2021, Virtual Event, China},
+  year      = {2021}
+}
+```
