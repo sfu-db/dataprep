@@ -33,13 +33,13 @@ class EDAFrame:
     ----------
     df
         The DataFrame
-    repartition
-        Whether to repartition the DataFrame into 128M chunks.
     dtype: str or DType or dict of str or dict of DType, default None
         Specify Data Types for designated column or all columns.
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+    repartition
+        Whether to repartition the DataFrame into 128M chunks.
     """
 
     # pylint: disable = too-many-branches
@@ -48,8 +48,8 @@ class EDAFrame:
     def __init__(
         self,
         df: Optional[DataFrame] = None,
-        repartition: bool = True,
         dtype: Optional[DTypeDef] = None,
+        repartition: bool = True,
     ) -> None:
 
         _suppress_warnings()

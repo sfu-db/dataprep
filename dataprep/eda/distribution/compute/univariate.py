@@ -14,26 +14,26 @@ from dask.array.stats import chisquare, kurtosis, skew
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 from ....assets.english_stopwords import english_stopwords as ess
-from ....errors import UnreachableError
 from ...configs import Config
-from ...dtypes import (
+from ...dtypes_v2 import (
     Continuous,
     DateTime,
     DTypeDef,
     Nominal,
+    SmallCardNum,
     GeoGraphy,
     GeoPoint,
-    detect_dtype,
-    is_dtype,
     LatLong,
 )
 from ...intermediate import Intermediate
+from ...eda_frame import EDAFrame
+from .common import gen_new_df_with_used_cols
 from ...utils import _calc_line_dt, gaussian_kde, normaltest
 
 
 def compute_univariate(
-    df: dd.DataFrame,
-    x: Optional[Union[str, LatLong]],
+    df: Union[dd.DataFrame, pd.DataFrame],
+    col: Union[str, LatLong],
     cfg: Config,
     dtype: Optional[DTypeDef],
 ) -> Intermediate:
@@ -54,30 +54,32 @@ def compute_univariate(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
-    col_dtype = detect_dtype(df[x], dtype)
-    if is_dtype(col_dtype, Nominal()) or is_dtype(col_dtype, GeoPoint()):
-        head = df[x].head()  # dd.Series.head() triggers a (small) data read
-        if is_dtype(col_dtype, GeoPoint()):
-            df[x] = df[x].astype(str)
 
-        # all computations for plot(df, Nominal())
-        (data,) = dask.compute(nom_comps(df[x], head, cfg))
+    new_col_names, ndf = gen_new_df_with_used_cols(df, col, None, None)
+    x = new_col_names[col]
+    if x is None:
+        raise ValueError
 
+    frame = EDAFrame(ndf, dtype)
+    col_dtype = frame.get_eda_dtype(x)
+
+    if isinstance(col_dtype, (Nominal, GeoPoint, SmallCardNum)):
+        srs = frame.get_col_as_str(x)
+        head = frame.head()[x]
+        (data,) = dask.compute(nom_comps(srs, head, cfg))
         return Intermediate(col=x, data=data, visual_type="categorical_column")
 
-    elif is_dtype(col_dtype, Continuous()):
-        # all computations for plot(df, Continuous())
-        (data,) = dask.compute(cont_comps(df[x], cfg))
-
+    elif isinstance(col_dtype, Continuous):
+        (data,) = dask.compute(cont_comps(frame.frame[x], cfg))
         return Intermediate(col=x, data=data, visual_type="numerical_column")
 
-    elif is_dtype(col_dtype, DateTime()):
+    elif isinstance(col_dtype, DateTime):
         data_dt: List[Any] = []
         # stats
-        data_dt.append(dask.delayed(calc_stats_dt)(df[x]))
+        data_dt.append(dask.delayed(calc_stats_dt)(frame.frame[x]))
         # line chart
         if cfg.line.enable:
-            data_dt.append(dask.delayed(_calc_line_dt)(df[[x]], cfg.line.unit))
+            data_dt.append(dask.delayed(_calc_line_dt)(frame.frame[[x]], cfg.line.unit))
             data, line = dask.compute(*data_dt)
         else:
             data = dask.compute(*data_dt)[0]
@@ -88,14 +90,12 @@ def compute_univariate(
             line=line,
             visual_type="datetime_column",
         )
-    elif is_dtype(col_dtype, GeoGraphy()):
-        head = df[x].head()  # dd.Series.head() triggers a (small) data read
-        # all computations for plot(df, Nominal())
-        (data,) = dask.compute(nom_comps(df[x], head, cfg))
-
+    elif isinstance(col_dtype, GeoGraphy):
+        head = frame.head()[x]
+        (data,) = dask.compute(nom_comps(frame.frame[x], head, cfg))
         return Intermediate(col=x, data=data, visual_type="geography_column")
     else:
-        raise UnreachableError
+        raise ValueError(f"unprocessed type. col:{x}, type:{col_dtype}")
 
 
 def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:

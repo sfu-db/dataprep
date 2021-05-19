@@ -296,7 +296,7 @@ def basic_computations(
                 data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
     # overview
     if cfg.overview.enable:
-        data["ov"] = calc_stats(df.frame, cfg, None)
+        data["ov"] = calc_stats(df, cfg)
         data["insights"] = []
         for col in df.columns:
             col_dtype = df.get_eda_dtype(col)

@@ -10,7 +10,7 @@ import pytest
 from ...datasets import load_dataset
 
 from ...eda import plot
-from ...eda.dtypes import Nominal, LatLong
+from ...eda.dtypes_v2 import Nominal, LatLong
 from ...eda.utils import to_dask
 from .random_data_generator import random_df
 

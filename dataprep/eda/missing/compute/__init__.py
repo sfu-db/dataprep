@@ -19,8 +19,8 @@ __all__ = ["compute_missing"]
 
 def compute_missing(
     df: DataFrame,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    col1: Optional[str] = None,
+    col2: Optional[str] = None,
     *,
     cfg: Union[Config, Dict[str, Any], None] = None,
     display: Optional[List[str]] = None,
@@ -36,9 +36,9 @@ def compute_missing(
     ----------
     df
         the pandas data_frame for which plots are calculated for each column
-    x
+    col1
         a valid column name of the data frame
-    y
+    col2
         a valid column name of the data frame
     cfg: Union[Config, Dict[str, Any], None], default None
         When a user call plot_missing(), the created Config object will be passed to
@@ -64,6 +64,9 @@ def compute_missing(
     >>> plot_missing(df, "HDI_for_year", "population")
     """
     suppress_warnings()
+
+    x, y = col1, col2
+
     eda_frame = EDAFrame(df, dtype=dtype)
 
     # pylint: disable=no-else-raise

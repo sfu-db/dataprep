@@ -1,7 +1,8 @@
 """Computations for plot(df)"""
 
 from itertools import combinations
-from typing import Any, Dict, List, Optional, Tuple
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, Tuple, Union, DefaultDict
 
 import dask
 import dask.array as da
@@ -11,22 +12,24 @@ import pandas as pd
 from dask.array.stats import chisquare
 
 from ...configs import Config
-from ...dtypes import (
+from ...dtypes_v2 import (
     Continuous,
     DateTime,
+    SmallCardNum,
+    GeoPoint,
     DType,
     DTypeDef,
     Nominal,
     GeoGraphy,
-    detect_dtype,
-    get_dtype_cnts_and_num_cols,
-    is_dtype,
 )
+from ...eda_frame import EDAFrame
 from ...utils import _calc_line_dt, ks_2samp, normaltest, skewtest
 from ...intermediate import Intermediate
 
 
-def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -> Intermediate:
+def compute_overview(
+    df: Union[pd.DataFrame, dd.DataFrame], cfg: Config, dtype: Optional[DTypeDef]
+) -> Intermediate:
     """
     Compute functions for plot(df)
 
@@ -43,24 +46,29 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-branches
+    # pylint: disable=too-many-locals
 
-    if cfg.bar.enable or cfg.insight.enable:
-        # extract the first rows to check if a column contains a mutable type
-        head: pd.DataFrame = df.head()  # head triggers a (small) data read
+    frame = EDAFrame(df, dtype=dtype)
+    head: pd.DataFrame = frame.head()
 
     data: List[Tuple[str, DType, Any]] = []
-    for col in df.columns:
-        col_dtype = detect_dtype(df[col], dtype)
-        if is_dtype(col_dtype, Continuous()) and (cfg.hist.enable or cfg.insight.enable):
-            data.append((col, Continuous(), _cont_calcs(df[col].dropna(), cfg)))
-        elif is_dtype(col_dtype, Nominal()) and (cfg.bar.enable or cfg.insight.enable):
-            data.append((col, Nominal(), _nom_calcs(df[col].dropna(), head[col], cfg)))
-        elif is_dtype(col_dtype, GeoGraphy()) and (cfg.bar.enable or cfg.insight.enable):
-            data.append((col, GeoGraphy(), _nom_calcs(df[col].dropna(), head[col], cfg)))
-        elif is_dtype(col_dtype, DateTime()) and (cfg.line.enable or cfg.insight.enable):
-            data.append((col, DateTime(), dask.delayed(_calc_line_dt)(df[[col]], cfg.line.unit)))
+    for col in frame.columns:
+        col_dtype = frame.get_eda_dtype(col)
+        if isinstance(col_dtype, Continuous) and (cfg.hist.enable or cfg.insight.enable):
+            data.append((col, col_dtype, _cont_calcs(frame.frame[col].dropna(), cfg)))
+        elif isinstance(col_dtype, (Nominal, GeoGraphy, GeoPoint, SmallCardNum)) and (
+            cfg.bar.enable or cfg.insight.enable
+        ):
+            srs = frame.get_col_as_str(col).dropna()
+            data.append((col, col_dtype, _nom_calcs(srs, head[col], cfg)))
+        elif isinstance(col_dtype, DateTime) and (cfg.line.enable or cfg.insight.enable):
+            data.append(
+                (col, col_dtype, dask.delayed(_calc_line_dt)(frame.frame[[col]], cfg.line.unit))
+            )
+        else:
+            raise ValueError(f"unprocessed col:{col}, type:{col_dtype}")
 
-    ov_stats = calc_stats(df, cfg, dtype)  # overview statistics
+    ov_stats = calc_stats(frame, cfg)  # overview statistics
     data, ov_stats = dask.compute(data, ov_stats)
 
     # extract the plotting data, and detect and format the insights
@@ -69,17 +77,17 @@ def compute_overview(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -
     all_ins = _format_ov_ins(ov_stats, cfg) if cfg.insight.enable else []
 
     for col, dtp, dat in data:
-        if is_dtype(dtp, Continuous()):
+        if isinstance(dtp, Continuous):
             if cfg.insight.enable:
                 col_ins, ins = _format_cont_ins(col, dat, ov_stats["nrows"], cfg)
             if cfg.hist.enable:
                 plot_data.append((col, dtp, dat["hist"]))
-        elif is_dtype(dtp, Nominal()) or is_dtype(dtp, GeoGraphy()):
+        elif isinstance(dtp, (Nominal, GeoGraphy, SmallCardNum, GeoPoint)):
             if cfg.insight.enable:
                 col_ins, ins = _format_nom_ins(col, dat, ov_stats["nrows"], cfg)
             if cfg.bar.enable:
                 plot_data.append((col, dtp, (dat["bar"].to_frame(), dat["nuniq"])))
-        elif is_dtype(dtp, DateTime()):
+        elif isinstance(dtp, DateTime):
             plot_data.append((col, dtp, dat))
             continue
 
@@ -151,15 +159,43 @@ def _nom_calcs(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
     return data
 
 
-def calc_stats(df: dd.DataFrame, cfg: Config, dtype: Optional[DTypeDef]) -> Dict[str, Any]:
+def _get_dtype_cnts_and_num_cols(
+    frame: EDAFrame,
+) -> Tuple[Dict[str, int], List[str]]:
+    """
+    Get the count of each dtype in a dataframe
+    """
+
+    dtype_cnts: DefaultDict[str, int] = defaultdict(int)
+    num_cols: List[str] = []
+    for col in frame.columns:
+        col_dtype = frame.get_eda_dtype(col)
+        if isinstance(col_dtype, (Nominal, SmallCardNum)):
+            dtype_cnts["Categorical"] += 1
+        elif isinstance(col_dtype, Continuous):
+            dtype_cnts["Numerical"] += 1
+            num_cols.append(col)
+        elif isinstance(col_dtype, DateTime):
+            dtype_cnts["DateTime"] += 1
+        elif isinstance(col_dtype, GeoGraphy):
+            dtype_cnts["GeoGraphy"] += 1
+        elif isinstance(col_dtype, GeoPoint):
+            dtype_cnts["GeoPoint"] += 1
+        else:
+            raise NotImplementedError(f"col:{col}, type:{col_dtype}")
+    return dtype_cnts, num_cols
+
+
+def calc_stats(frame: EDAFrame, cfg: Config) -> Dict[str, Any]:
     """
     Calculate the statistics for plot(df)
     """
-    stats = {"nrows": df.shape[0]}
+    stats: Dict[str, Any] = {"nrows": frame.shape[0]}
 
     if cfg.stats.enable or cfg.insight.enable:
-        dtype_cnts, num_cols = get_dtype_cnts_and_num_cols(df, dtype)
+        dtype_cnts, num_cols = _get_dtype_cnts_and_num_cols(frame)
 
+    df: dd.DataFrame = frame.frame
     if cfg.stats.enable:
         stats["ncols"] = df.shape[1]
         stats["npresent_cells"] = df.count().sum()
