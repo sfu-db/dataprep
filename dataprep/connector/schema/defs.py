@@ -404,7 +404,7 @@ class RequestDef(BaseDef):
                 return url
 
         for key, value in params.items():
-            url = url.replace("{" + key + "}", value)
+            url = url.replace("{" + key + "}", str(value))
 
         return url
 
