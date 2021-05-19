@@ -18,8 +18,8 @@ __all__ = ["render_correlation", "compute_correlation", "plot_correlation"]
 
 def plot_correlation(
     df: Union[pd.DataFrame, dd.DataFrame],
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    col1: Optional[str] = None,
+    col2: Optional[str] = None,
     *,
     value_range: Optional[Tuple[float, float]] = None,
     k: Optional[int] = None,
@@ -37,9 +37,9 @@ def plot_correlation(
     ----------
     df
         The pandas data_frame for which plots are calculated for each column.
-    x
+    col1
         A valid column name of the data frame.
-    y
+    col2
         A valid column name of the data frame.
     value_range
         Range of value.
@@ -76,7 +76,7 @@ def plot_correlation(
     cfg = Config.from_dict(display, config)
 
     with ProgressBar(minimum=1, disable=not progress):
-        itmdt = compute_correlation(df, x, y, cfg=cfg, value_range=value_range, k=k)
+        itmdt = compute_correlation(df, col1, col2, cfg=cfg, value_range=value_range, k=k)
     to_render = render_correlation(itmdt, cfg)
 
     return Container(to_render, itmdt.visual_type, cfg)

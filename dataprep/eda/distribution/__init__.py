@@ -9,7 +9,7 @@ import pandas as pd
 
 from ..configs import Config
 from ..container import Container
-from ..dtypes import DTypeDef, LatLong
+from ..dtypes_v2 import DTypeDef, LatLong
 from ...progress_bar import ProgressBar
 from .compute import compute
 from .render import render
@@ -19,9 +19,9 @@ __all__ = ["plot", "compute", "render"]
 
 def plot(
     df: Union[pd.DataFrame, dd.DataFrame],
-    x: Optional[Union[str, LatLong]] = None,
-    y: Optional[Union[str, LatLong]] = None,
-    z: Optional[str] = None,
+    col1: Optional[Union[str, LatLong]] = None,
+    col2: Optional[Union[str, LatLong]] = None,
+    col3: Optional[str] = None,
     *,
     config: Optional[Dict[str, Any]] = None,
     display: Optional[List[str]] = None,
@@ -66,11 +66,11 @@ def plot(
     ----------
     df
         DataFrame from which visualizations are generated
-    x: Optional[str], default None
+    col1: Optional[str], default None
         A valid column name from the dataframe
-    y: Optional[str], default None
+    col2: Optional[str], default None
         A valid column name from the dataframe
-    z: Optional[str], default None
+    col3: Optional[str], default None
         A valid column name from the dataframe
     config
         A dictionary for configuring the visualizations
@@ -98,7 +98,7 @@ def plot(
     cfg = Config.from_dict(display, config)
 
     with ProgressBar(minimum=1, disable=not progress):
-        itmdt = compute(df, x, y, z, cfg=cfg, dtype=dtype)
+        itmdt = compute(df, col1, col2, col3, cfg=cfg, dtype=dtype)
 
     to_render = render(itmdt, cfg)
 

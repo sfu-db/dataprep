@@ -61,38 +61,38 @@ def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="a", cfg=cfg)
-    plot_correlation(simpledf, x="a")
+    compute_correlation(simpledf, col1="a", cfg=cfg)
+    plot_correlation(simpledf, col1="a")
 
 
 def test_sanity_compute_4(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="a", cfg=cfg, value_range=(0.5, 0.8))
-    plot_correlation(simpledf, x="a", value_range=(0.5, 0.8))
+    compute_correlation(simpledf, col1="a", cfg=cfg, value_range=(0.5, 0.8))
+    plot_correlation(simpledf, col1="a", value_range=(0.5, 0.8))
 
 
 def test_sanity_compute_5(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="a", cfg=cfg, k=1)
-    plot_correlation(simpledf, x="a", k=1)
+    compute_correlation(simpledf, col1="a", cfg=cfg, k=1)
+    plot_correlation(simpledf, col1="a", k=1)
 
 
 def test_sanity_compute_6(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="a", cfg=cfg, k=0)
-    plot_correlation(simpledf, x="a", k=0)
+    compute_correlation(simpledf, col1="a", cfg=cfg, k=0)
+    plot_correlation(simpledf, col1="a", k=0)
 
 
 def test_sanity_compute_7(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="b", cfg=cfg, y="a")
-    plot_correlation(simpledf, x="b", y="a")
+    compute_correlation(simpledf, col1="b", cfg=cfg, col2="a")
+    plot_correlation(simpledf, col1="b", col2="a")
 
 
 def test_sanity_compute_8(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="b", cfg=cfg, y="a", k=1)
-    plot_correlation(simpledf, x="b", y="a", k=1)
+    compute_correlation(simpledf, col1="b", cfg=cfg, col2="a", k=1)
+    plot_correlation(simpledf, col1="b", col2="a", k=1)
 
 
 def test_sanity_compute_9(simpledf: dd.DataFrame) -> None:
@@ -111,36 +111,36 @@ def test_sanity_compute_fail_2(simpledf: dd.DataFrame) -> None:
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_3(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="a", cfg=cfg, value_range=(0.5, 0.8), k=3)
-    plot_correlation(simpledf, x="a", value_range=(0.5, 0.8), k=3)
+    compute_correlation(simpledf, col1="a", cfg=cfg, value_range=(0.5, 0.8), k=3)
+    plot_correlation(simpledf, col1="a", value_range=(0.5, 0.8), k=3)
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_4(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, y="a", cfg=cfg)
-    plot_correlation(simpledf, y="a")
+    compute_correlation(simpledf, col2="a", cfg=cfg)
+    plot_correlation(simpledf, col2="a")
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_5(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="d", cfg=cfg)
-    plot_correlation(simpledf, x="d")
+    compute_correlation(simpledf, col1="d", cfg=cfg)
+    plot_correlation(simpledf, col1="d")
 
 
 @pytest.mark.xfail  # type: ignore
 def test_test_sanity_compute_fail_6(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="b", y="a", cfg=cfg, value_range=(0.5, 0.8))
-    plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8))
+    compute_correlation(simpledf, col1="b", col2="a", cfg=cfg, value_range=(0.5, 0.8))
+    plot_correlation(simpledf, col1="b", col2="a", value_range=(0.5, 0.8))
 
 
 @pytest.mark.xfail  # type: ignore
 def test_sanity_compute_fail_7(simpledf: dd.DataFrame) -> None:
     cfg = Config.from_dict()
-    compute_correlation(simpledf, x="b", y="a", cfg=cfg, value_range=(0.5, 0.8), k=3)
-    plot_correlation(simpledf, x="b", y="a", value_range=(0.5, 0.8), k=3)
+    compute_correlation(simpledf, col1="b", col2="a", cfg=cfg, value_range=(0.5, 0.8), k=3)
+    plot_correlation(simpledf, col1="b", col2="a", value_range=(0.5, 0.8), k=3)
 
 
 def test_compute_pearson(simpledf: dd.DataFrame) -> None:

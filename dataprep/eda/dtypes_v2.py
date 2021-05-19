@@ -1,8 +1,7 @@
 """
 In this module lives the type tree.
 """
-from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, Optional, Type, Union
 
 import dask.dataframe as dd
 import numpy as np
@@ -162,6 +161,7 @@ def detect_dtype(
     detect_small_distinct: bool, default True
         Whether to detect numerical columns with small distinct values as categorical column.
     """
+
     if not known_dtype:
         return detect_without_known(col, head)
 
@@ -360,30 +360,3 @@ def drop_null(
         return df
 
     raise ValueError("Input should be a Pandas/Dask Dataframe or Series")
-
-
-def get_dtype_cnts_and_num_cols(
-    df: dd.DataFrame,
-    dtype: Union[Dict[str, Union[DType, Type[DType], str]], DType, Type[DType], None],
-) -> Tuple[Dict[str, int], List[str]]:
-    """
-    Get the count of each dtype in a dataframe
-    """
-    dtype_cnts: DefaultDict[str, int] = defaultdict(int)
-    num_cols: List[str] = []
-    for col in df.columns:
-        col_dtype = detect_dtype(df[col], dtype)
-        if is_dtype(col_dtype, Nominal()):
-            dtype_cnts["Categorical"] += 1
-        elif is_dtype(col_dtype, Continuous()):
-            dtype_cnts["Numerical"] += 1
-            num_cols.append(col)
-        elif is_dtype(col_dtype, DateTime()):
-            dtype_cnts["DateTime"] += 1
-        elif is_dtype(col_dtype, GeoGraphy()):
-            dtype_cnts["GeoGraphy"] += 1
-        elif is_dtype(col_dtype, GeoPoint()):
-            dtype_cnts["GeoPoint"] += 1
-        else:
-            raise NotImplementedError
-    return dtype_cnts, num_cols
