@@ -78,7 +78,7 @@ df = load_dataset("titanic")
 create_report(df).show_browser()
 ```
 
-Click [here](https://sfu-db.github.io/dataprep/_downloads/c9bf292ac949ebcf9b65bb2a2bc5a149/titanic_dp.html) to see the generated report of the above code.
+Click [here](https://docs.dataprep.ai/_downloads/1a61c6aebb3ecbe9dc9742bd6ca78ddb/titanic_dp.html) to see the generated report of the above code.
 
 #### Innovative System Design
 
