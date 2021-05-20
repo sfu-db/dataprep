@@ -352,7 +352,7 @@ def render_missing_impact(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     }
 
 
-def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: int) -> Figure:
+def render_heatmaps(data: Optional[pd.DataFrame], plot_width: int, plot_height: int) -> Figure:
     """
     Render missing heatmaps in to tabs
     """
@@ -379,8 +379,10 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
         fig.rect(x=0, y=0, width=0, height=0)
         return fig
 
-    if df is not None:
-
+    if data is not None:
+        df = data.copy()
+        df.columns = list(map(cut_long_name, df.columns))
+        df.index = list(map(cut_long_name, df.index))
         df = df.where(np.triu(np.ones(df.shape)).astype(np.bool)).T  # pylint: disable=no-member
 
         if df.size != 0:
@@ -391,10 +393,6 @@ def render_heatmaps(df: Optional[pd.DataFrame], plot_width: int, plot_height: in
             df = df.rename(columns={"level_0": "x", "level_1": "y"})
             df = df[df["x"] != df["y"]]
             df = drop_null(df)
-
-            # in case of numerical column names
-            df["x"] = df["x"].apply(str)
-            df["y"] = df["y"].apply(str)
 
             fig = Figure(
                 x_range=x_range,
