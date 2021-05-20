@@ -146,15 +146,14 @@ def relocate_legend(fig: Figure, loc: str) -> Figure:
     return fig
 
 
-def cut_long_name(name: str, max_len: int = 12) -> str:
+def cut_long_name(name: str, max_len: int = 18) -> str:
     """If the name is longer than `max_len`,
     cut it to `max_len` length and append "..."""
 
     # Bug 136 Fixed
     name = str(name)
-    if len(name) <= max_len:
-        return name
-    return f"{name[:max_len]}..."
+    cut_name = f"{name[:13]}...{name[len(name)-3:]}" if len(name) > max_len else name
+    return cut_name
 
 
 def fuse_missing_perc(name: str, perc: float) -> str:
