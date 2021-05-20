@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>An example dirty dataset &#8212; DataPrep 0.3.0 documentation</title>
+  <title>Pandas DataFrame &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -197,7 +197,7 @@
                       </li>
                   
                       <li class="active">
-                          <a href="">An example dirty dataset</a>
+                          <a href="">Whole DataFrame</a>
                       </li>
                   
                   </ul>
@@ -220,6 +220,50 @@
 <div class="d-none d-xl-block col-xl-2 bd-toc">
   <nav id="bd-toc-nav">
     <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Introduction" class="nav-link">Introduction</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#An-example-dirty-dataset" class="nav-link">An example dirty dataset</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#1.-Default-clean_df()" class="nav-link">1. Default clean_df()</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#2.-data_type_detection-parameter" class="nav-link">2. data_type_detection parameter</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h4">
+          <a href="#semantic" class="nav-link">semantic</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h4">
+          <a href="#atomic" class="nav-link">atomic</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h4">
+          <a href="#none" class="nav-link">none</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#3.-standardize_missing_values:-“remove”" class="nav-link">3. standardize_missing_values: “remove”</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#4.-remove_duplicate_entries-parameter" class="nav-link">4. remove_duplicate_entries parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#5.-downcast_memory-parameter" class="nav-link">5. downcast_memory parameter</a>
+        </li>
+      
+          </ul>
+        </li>
       
     </ul>
   </nav>
@@ -460,13 +504,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-.. _clean_df_user_guide:
-
-Pandas DataFrame
-==============Introduction
-------------
-
-The function :func:`clean_df() <dataprep.clean.clean_df.clean_df>` performs a set of operations that would be useful for cleaning and standardizing a full Pandas DataFrame.<p>In general, <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code> is designed as a function to be called initially when users want to clean a DataFrame. It currently supports the following functionalities via parameters:</p>
+<div class="section" id="Pandas-DataFrame">
+<span id="clean-df-user-guide"></span><h1>Pandas DataFrame<a class="headerlink" href="#Pandas-DataFrame" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The function <code class="xref py py-func docutils literal notranslate"><span class="pre">clean_df()</span></code> performs a set of operations that would be useful for cleaning and standardizing a full Pandas DataFrame.</p>
+<p>In general, <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code> is designed as a function to be called initially when users want to clean a DataFrame. It currently supports the following functionalities via parameters:</p>
 <ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">clean_headers</span></code>: aims to clean column headers in a DataFrame and standardizes them in a desired format. It uses the default settings from the function “clean_headers()”, which set column names to “snake” case and strip accents.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">data_type_detection</span></code>: aims to do a column-wise semantic and/or atomic data type detection for the whole DataFrame.</p>
@@ -489,7 +532,7 @@ The function :func:`clean_df() <dataprep.clean.clean_df.clean_df>` performs a se
 <p>After cleaning, a <strong>report</strong> is printed that provides the following information: * The number and percentage of header values that were cleaned from <code class="docutils literal notranslate"><span class="pre">clean_headers</span></code>. * A list of supported semantic data types by DataPrep from <code class="docutils literal notranslate"><span class="pre">data_type_detection</span></code>: “semantic”. * How many data entries are removed from <code class="docutils literal notranslate"><span class="pre">standardize_missing_values</span></code>: “remove” and/or <code class="docutils literal notranslate"><span class="pre">remove_duplicate_entries</span></code>. * How much memory is saved only from <code class="docutils literal notranslate"><span class="pre">downcast_memory</span></code>.</p>
 <p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code>.</p>
 <div class="section" id="An-example-dirty-dataset">
-<h1>An example dirty dataset<a class="headerlink" href="#An-example-dirty-dataset" title="Permalink to this headline">¶</a></h1>
+<h3>An example dirty dataset<a class="headerlink" href="#An-example-dirty-dataset" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -617,7 +660,7 @@ The function :func:`clean_df() <dataprep.clean.clean_df.clean_df>` performs a se
 </div>
 </div>
 <div class="section" id="1.-Default-clean_df()">
-<h1>1. Default <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code><a class="headerlink" href="#1.-Default-clean_df()" title="Permalink to this headline">¶</a></h1>
+<h3>1. Default <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code><a class="headerlink" href="#1.-Default-clean_df()" title="Permalink to this headline">¶</a></h3>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code> will always return <strong>a tuple of two DataFrames</strong>, with one for data types and another one for the cleaned DataFrame. The default parameters are set to be: * <code class="docutils literal notranslate"><span class="pre">clean_headers</span></code>: True * <code class="docutils literal notranslate"><span class="pre">data_type_detection</span></code>: “semantic” * <code class="docutils literal notranslate"><span class="pre">standardize_missing_values</span></code>: “fill” * <code class="docutils literal notranslate"><span class="pre">remove_duplicate_entries</span></code>: False * <code class="docutils literal notranslate"><span class="pre">downcast_memory</span></code>: True</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -829,9 +872,9 @@ Downcast Memory Report:
 <p>Note that the floating columns (e.g., “weight”) may look to lose some information by downcasting memory. Actually nowhere is precision lost, it is due to how the numbers get displayed in Python (more explanations are available in section 5).</p>
 </div>
 <div class="section" id="2.-data_type_detection-parameter">
-<h1>2. <code class="docutils literal notranslate"><span class="pre">data_type_detection</span></code> parameter<a class="headerlink" href="#2.-data_type_detection-parameter" title="Permalink to this headline">¶</a></h1>
+<h3>2. <code class="docutils literal notranslate"><span class="pre">data_type_detection</span></code> parameter<a class="headerlink" href="#2.-data_type_detection-parameter" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="semantic">
-<h2>semantic<a class="headerlink" href="#semantic" title="Permalink to this headline">¶</a></h2>
+<h4>semantic<a class="headerlink" href="#semantic" title="Permalink to this headline">¶</a></h4>
 <p>Consider the efficiency on medium or large datasets (&gt;=10,000 data entries), the function will randomly query a subset of valid data entries to best infer the semantic data types. Currently, <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code> supports to detect the following semantic data types, which all have the corresponding <code class="docutils literal notranslate"><span class="pre">clean_$()</span></code> function for users to call. * Country Names (<code class="docutils literal notranslate"><span class="pre">country</span></code>) * Email Addresses (<code class="docutils literal notranslate"><span class="pre">email</span></code>) * Geographic Coordinates (<code class="docutils literal notranslate"><span class="pre">coordinate</span></code>) * IP Address (<code class="docutils literal notranslate"><span class="pre">ip</span></code>) * Phone Numbers (<code class="docutils literal notranslate"><span class="pre">phone</span></code>) * URLs
 (<code class="docutils literal notranslate"><span class="pre">url</span></code>) * US Street Addresses (<code class="docutils literal notranslate"><span class="pre">address</span></code>) * …more types will be supported with the development</p>
 <p>Note that “semantic” will also generate a report to show the semantic data types that are supported by DataPrep to further clean.</p>
@@ -927,7 +970,7 @@ Downcast Memory Report:
 </div>
 </div>
 <div class="section" id="atomic">
-<h2>atomic<a class="headerlink" href="#atomic" title="Permalink to this headline">¶</a></h2>
+<h4>atomic<a class="headerlink" href="#atomic" title="Permalink to this headline">¶</a></h4>
 <p>The “atomic” option can give users an overview of the data types. Note that “atomic” does not generate a report.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -1011,7 +1054,7 @@ Downcast Memory Report:
 </div>
 </div>
 <div class="section" id="none">
-<h2>none<a class="headerlink" href="#none" title="Permalink to this headline">¶</a></h2>
+<h4>none<a class="headerlink" href="#none" title="Permalink to this headline">¶</a></h4>
 <p>If “none”, then no data type detection will be performed and <code class="docutils literal notranslate"><span class="pre">clean_df()</span></code> will return a single cleaned DataFrame only.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -1134,7 +1177,7 @@ Downcast Memory Report:
 </div>
 </div>
 <div class="section" id="3.-standardize_missing_values:-“remove”">
-<h1>3. <code class="docutils literal notranslate"><span class="pre">standardize_missing_values</span></code>: “remove”<a class="headerlink" href="#3.-standardize_missing_values:-“remove”" title="Permalink to this headline">¶</a></h1>
+<h3>3. <code class="docutils literal notranslate"><span class="pre">standardize_missing_values</span></code>: “remove”<a class="headerlink" href="#3.-standardize_missing_values:-“remove”" title="Permalink to this headline">¶</a></h3>
 <p>This section demonstrates how the “remove” option works. It removes all rows with <strong>any</strong> missing values and returns a complete DataFrame.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -1230,7 +1273,7 @@ Downcast Memory Report:
 </div>
 </div>
 <div class="section" id="4.-remove_duplicate_entries-parameter">
-<h1>4. <code class="docutils literal notranslate"><span class="pre">remove_duplicate_entries</span></code> parameter<a class="headerlink" href="#4.-remove_duplicate_entries-parameter" title="Permalink to this headline">¶</a></h1>
+<h3>4. <code class="docutils literal notranslate"><span class="pre">remove_duplicate_entries</span></code> parameter<a class="headerlink" href="#4.-remove_duplicate_entries-parameter" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -1336,7 +1379,7 @@ Downcast Memory Report:
 <p>Note that if multiple rows are all standardized in step 3 to be completely missing rows, this <code class="docutils literal notranslate"><span class="pre">remove_duplicate_entries</span> <span class="pre">=</span> <span class="pre">True</span></code> will also treat them as duplicated entries and only keep one.</p>
 </div>
 <div class="section" id="5.-downcast_memory-parameter">
-<h1>5. <code class="docutils literal notranslate"><span class="pre">downcast_memory</span></code> parameter<a class="headerlink" href="#5.-downcast_memory-parameter" title="Permalink to this headline">¶</a></h1>
+<h3>5. <code class="docutils literal notranslate"><span class="pre">downcast_memory</span></code> parameter<a class="headerlink" href="#5.-downcast_memory-parameter" title="Permalink to this headline">¶</a></h3>
 <p>By default and depending on the environment, Pandas will read numerical data and commonly store them using “<code class="docutils literal notranslate"><span class="pre">int64</span></code>/<code class="docutils literal notranslate"><span class="pre">float64</span></code>” types. The storage memory can usually be saved by assigning subtypes (e.g., <code class="docutils literal notranslate"><span class="pre">int8</span></code>), if the range of all data in a numerical column is not extreme. Also, Pandas stores categorical columns as <code class="docutils literal notranslate"><span class="pre">object</span></code>. This can be optimized by using the <code class="docutils literal notranslate"><span class="pre">category</span></code> type for columns with low cardinality.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -1408,6 +1451,8 @@ Name: weight, dtype: float32
 <div class="highlight"><pre>
 47.1
 </pre></div></div>
+</div>
+</div>
 </div>
 </div>
 
