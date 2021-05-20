@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>dataprep.connector.info &#8212; DataPrep 0.3.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/_modules/dataprep/connector/info.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <h1>Source code for dataprep.connector.info</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module contains back end functions helping developers use data connector.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">get_styled_schema</span><span class="p">,</span> <span class="n">is_notebook</span>
+<span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span>
+<span class="kn">from</span> <span class="nn">.info_ui</span> <span class="kn">import</span> <span class="n">info_ui</span>
+<span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="n">ConfigDef</span>
+<span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">initialize_path</span>
+
+
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.info.info">[docs]</a><span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-many-locals</span>
+    <span class="sd">&quot;&quot;&quot;Show the basic information and provide guidance for users</span>
+<span class="sd">    to issue queries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config_path</span>
+<span class="sd">        The path to the config. It can be hosted, e.g. &quot;yelp&quot;, or from</span>
+<span class="sd">        local filesystem, e.g. &quot;./yelp&quot;</span>
+<span class="sd">    update</span>
+<span class="sd">        Force update the config file even if the local version exists.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">initialize_path</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+    <span class="n">impdb</span> <span class="o">=</span> <span class="n">ImplicitDatabase</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="c1"># get info</span>
+    <span class="n">tbs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">cur_table</span> <span class="ow">in</span> <span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+        <span class="n">table_config_content</span><span class="p">:</span> <span class="n">ConfigDef</span> <span class="o">=</span> <span class="n">impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+
+        <span class="n">joined_auth_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">required_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">optional_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">examples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">example_query_fields</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">required_param_count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">auth</span> <span class="o">=</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">authorization</span>
+        <span class="n">config_examples</span> <span class="o">=</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">examples</span>
+
+        <span class="k">if</span> <span class="n">auth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">auth</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;OAuth2&quot;</span><span class="p">:</span>
+            <span class="n">joined_auth_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;client_id&#39;:&#39;QNf0IeGSeMq3K*********NIU9mfHFMfX3cYe&#39;&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot; , &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;&#39;client_secret&#39;:&#39;eeNspLqiRoVfX*********3V2ntIiXKui9A6X&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">joined_auth_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;access_token&#39;:&#39;cCMHU4M4t7rdt*********vp3whGzFjgIKIm0&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="p">:</span>
+                <span class="n">required_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">config_examples</span><span class="p">:</span>
+                    <span class="n">examples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="n">config_examples</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">required_param_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+                <span class="n">optional_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span>
+
+        <span class="k">if</span> <span class="n">examples</span><span class="p">:</span>
+            <span class="n">example_query_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">examples</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">table_config_content</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">pagination</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">(</span><span class="n">table_config_content</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">schema_</span><span class="p">)</span>
+        <span class="n">styled_schema</span> <span class="o">=</span> <span class="n">get_styled_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;joined_auth_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">joined_auth_params</span>
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;required_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">required_params</span>
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;optional_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optional_params</span>
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;joined_query_fields&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">example_query_fields</span>
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="n">tbs</span><span class="p">[</span><span class="n">cur_table</span><span class="p">][</span><span class="s2">&quot;schemas&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">styled_schema</span>
+
+    <span class="c1"># show table info</span>
+    <span class="n">info_ui</span><span class="p">(</span><span class="n">impdb</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tbs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.info.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This method returns the schema of the table that will be returned,</span>
+<span class="sd">    so that the user knows what information to expect.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    schema</span>
+<span class="sd">        The schema for the table from the config file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        The returned data&#39;s schema.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The schema is defined in the configuration file.</span>
+<span class="sd">    The user can either use the default one or change it by editing the configuration file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_schema_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;column_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">new_schema_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">new_schema_dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="websites"><a class="viewcode-back" href="../../../api_reference/dataprep.connector.html#dataprep.connector.info.websites">[docs]</a><span class="k">def</span> <span class="nf">websites</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Displays names of websites supported by data connector.&quot;&quot;&quot;</span>
+    <span class="n">websites</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;business&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;yelp&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;finance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;finnhub&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;geocoding&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mapquest&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;lifestyle&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;spoonacular&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;music&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;musixmatch&quot;</span><span class="p">,</span> <span class="s2">&quot;spotify&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;news&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;guardian&quot;</span><span class="p">,</span> <span class="s2">&quot;times&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;science&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dblp&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;shopping&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;etsy&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;social&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;twitch&quot;</span><span class="p">,</span> <span class="s2">&quot;twitter&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;video&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;youtube&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;weather&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;openweathermap&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="n">supported_websites</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">websites</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+    <span class="n">supported_websites</span> <span class="o">=</span> <span class="n">supported_websites</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">supported_websites</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">supported_websites</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="c1"># replace &quot;None&quot; values with empty string</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">supported_websites</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">supported_websites</span><span class="o">.</span><span class="n">columns</span><span class="p">[(</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">supported_websites</span><span class="p">[</span><span class="n">cols</span><span class="p">]:</span>
+        <span class="n">supported_websites</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">is_notebook</span><span class="p">():</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">supported_websites</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">supported_websites</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

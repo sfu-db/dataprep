@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_date &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.clean.clean_date &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -157,7 +157,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
@@ -166,7 +166,7 @@
 <span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">from</span> <span class="nn">pytz</span> <span class="kn">import</span> <span class="n">all_timezones</span>
 
-<span class="kn">from</span> <span class="nn">..eda.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">.clean_date_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AM</span><span class="p">,</span>
     <span class="n">JUMP</span><span class="p">,</span>
@@ -200,6 +200,7 @@
     <span class="n">input_timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;UTC&quot;</span><span class="p">,</span>
     <span class="n">output_timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">fix_missing</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;minimum&quot;</span><span class="p">,</span>
+    <span class="n">infer_day_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;coerce&quot;</span><span class="p">,</span>
     <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -234,6 +235,12 @@
 <span class="sd">            - &#39;empty&#39;: don&#39;t fill missing components.</span>
 
 <span class="sd">        (default: &#39;minimum&#39;)</span>
+<span class="sd">    infer_day_first</span>
+<span class="sd">        If True, the program will infer the ambiguous format &#39;09-10-03&#39; and &#39;25-09-03&#39; according \</span>
+<span class="sd">        to &#39;25-09-03&#39; (day is the number of first position). The result should be &#39;2003-10-09&#39; and \</span>
+<span class="sd">        &#39;2003-09-25&#39;.</span>
+<span class="sd">        If False, do nothing of inferring. The result should be &#39;2003-09-10&#39; and &#39;2003-09-25&#39;.</span>
+<span class="sd">        (default: False)</span>
 <span class="sd">    inplace</span>
 <span class="sd">        If True, delete the column containing the data that was cleaned. Otherwise,</span>
 <span class="sd">        keep the original column.</span>
@@ -287,13 +294,21 @@
     <span class="c1"># convert to dask</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
+    <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">infer_day_first</span><span class="p">:</span>
+        <span class="n">is_day_first</span> <span class="o">=</span> <span class="n">_is_day_first</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
+
     <span class="c1"># To clean, create a new column &quot;clean_code_tup&quot; which contains</span>
     <span class="c1"># the cleaned values and code indicating how the initial value was</span>
     <span class="c1"># changed in a tuple. Then split the column of tuples and count the</span>
     <span class="c1"># amount of different codes to produce the report</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">srs</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">_format_date</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">input_timezone</span><span class="p">,</span> <span class="n">output_timezone</span><span class="p">,</span> <span class="n">fix_missing</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="n">_format_date</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">input_timezone</span><span class="p">,</span> <span class="n">output_timezone</span><span class="p">,</span> <span class="n">fix_missing</span><span class="p">,</span> <span class="n">is_day_first</span><span class="p">,</span> <span class="n">errors</span>
+            <span class="p">)</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span>
         <span class="p">],</span>
         <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
@@ -346,12 +361,50 @@
     <span class="k">return</span> <span class="n">check_date</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_is_day_first</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inferring if the first number of ambiguous string is the day.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    date</span>
+<span class="sd">        pandas Series of dates or a date string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">judge_col</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_check_is_day_first</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">judge_col</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_check_is_day_first</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_is_day_first</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inferring if the first number of ambiguous string is the day.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val</span>
+<span class="sd">        date string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">check_date</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">is_day_first</span>
+    <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;unknown&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">is_day_first</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">JUMP</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">is_day_first</span> <span class="o">=</span> <span class="n">_ensure_ymd</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">is_day_first</span>
+
+
 <span class="k">def</span> <span class="nf">_format_date</span><span class="p">(</span>
     <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">input_timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">output_timezone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">fix_missing</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">is_day_first</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
     <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -372,7 +425,7 @@
         <span class="k">return</span> <span class="n">val</span> <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Handle date data and timezone</span>
-        <span class="n">parsed_date_data</span> <span class="o">=</span> <span class="n">_parse</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">fix_missing</span><span class="p">)</span>
+        <span class="n">parsed_date_data</span> <span class="o">=</span> <span class="n">_parse</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">fix_missing</span><span class="p">,</span> <span class="n">is_day_first</span><span class="p">)</span>
         <span class="n">parsed_date_data</span><span class="o">.</span><span class="n">set_tzinfo</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">input_timezone</span><span class="p">)</span>
         <span class="n">parsed_date_data</span> <span class="o">=</span> <span class="n">_set_parseddate_timezone_offset</span><span class="p">(</span><span class="n">input_timezone</span><span class="p">,</span> <span class="n">parsed_date_data</span><span class="p">)</span>
         <span class="c1"># Handle target format and timezone</span>
@@ -648,18 +701,22 @@
     <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">hms_tokens</span>
 
 
-<span class="k">def</span> <span class="nf">_ensure_ymd</span><span class="p">(</span><span class="n">tokes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParsedDate</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">_ensure_ymd</span><span class="p">(</span>
+    <span class="n">tokes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">is_day_first</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParsedDate</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function extract value of year, month, day</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    tokes</span>
 <span class="sd">        generated tokens</span>
+<span class="sd">    is_day_first</span>
+<span class="sd">        signal of inferring result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">ParsedDate</span><span class="p">()</span>
     <span class="n">result</span><span class="p">,</span> <span class="n">remain_tokens</span> <span class="o">=</span> <span class="n">_ensure_year</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">tokes</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">tokes</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">remain_tokens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">remain_tokens</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">remain_tokens</span><span class="p">,</span> <span class="ow">not</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span>
     <span class="n">num_tokens</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">remain_tokens</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
@@ -667,10 +724,10 @@
     <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">num_tokens</span><span class="p">:</span>
         <span class="n">remain_tokens</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">ymd</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">_ensure_month_day</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">,</span> <span class="n">is_day_first</span> <span class="o">=</span> <span class="n">_ensure_month_day</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">,</span> <span class="n">is_day_first</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">_ensure_year_month_day</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">remain_tokens</span>
+        <span class="n">result</span><span class="p">,</span> <span class="n">is_day_first</span> <span class="o">=</span> <span class="n">_ensure_year_month_day</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">,</span> <span class="n">is_day_first</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">remain_tokens</span><span class="p">,</span> <span class="n">is_day_first</span>
 
 
 <span class="k">def</span> <span class="nf">_ensure_year</span><span class="p">(</span>
@@ -704,7 +761,9 @@
     <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">remain_tokens</span>
 
 
-<span class="k">def</span> <span class="nf">_ensure_month_day</span><span class="p">(</span><span class="n">parsed_data</span><span class="p">:</span> <span class="n">ParsedDate</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ParsedDate</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_ensure_month_day</span><span class="p">(</span>
+    <span class="n">parsed_data</span><span class="p">:</span> <span class="n">ParsedDate</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">is_day_first</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParsedDate</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function extract month and day when year is not None.</span>
 <span class="sd">    Parameters</span>
@@ -713,26 +772,44 @@
 <span class="sd">        parsed date</span>
 <span class="sd">    num_tokens</span>
 <span class="sd">        remained numerical tokens</span>
+<span class="sd">    is_day_first</span>
+<span class="sd">        signal of inferring result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">parsed_data</span><span class="o">.</span><span class="n">ymd</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="k">return</span> <span class="n">parsed_data</span>
+            <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">is_day_first</span><span class="p">:</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">is_day_first</span><span class="p">:</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">is_day_first</span>
 
 
-<span class="k">def</span> <span class="nf">_ensure_year_month_day</span><span class="p">(</span><span class="n">parsed_data</span><span class="p">:</span> <span class="n">ParsedDate</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ParsedDate</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_ensure_year_month_day</span><span class="p">(</span>
+    <span class="n">parsed_data</span><span class="p">:</span> <span class="n">ParsedDate</span><span class="p">,</span> <span class="n">num_tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">is_day_first</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParsedDate</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function extract month and day when year is None.</span>
 <span class="sd">    Parameters</span>
@@ -741,27 +818,46 @@
 <span class="sd">        parsed date</span>
 <span class="sd">    num_tokens</span>
 <span class="sd">        remained numerical tokens</span>
+<span class="sd">    is_day_first</span>
+<span class="sd">        signal of inferring result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-branches</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_year</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_year</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">parsed_data</span><span class="o">.</span><span class="n">ymd</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_year</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="k">return</span> <span class="n">parsed_data</span>
+            <span class="k">if</span> <span class="n">is_day_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_day_first</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">is_day_first</span><span class="p">:</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">is_day_first</span><span class="p">:</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_month</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">set_day</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">is_day_first</span>
 
 
 <span class="k">def</span> <span class="nf">_ensure_hms</span><span class="p">(</span><span class="n">inner_result</span><span class="p">:</span> <span class="n">ParsedDate</span><span class="p">,</span> <span class="n">remain_tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ParsedDate</span><span class="p">:</span>
@@ -843,7 +939,7 @@
     <span class="k">return</span> <span class="n">parsed_res</span>
 
 
-<span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fix_missing</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParsedDate</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fix_missing</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_day_first</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ParsedDate</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function parse string into tokens</span>
 <span class="sd">    Parameters</span>
@@ -852,9 +948,11 @@
 <span class="sd">        date string</span>
 <span class="sd">    fix_missing</span>
 <span class="sd">        format of fixing empty</span>
+<span class="sd">    is_day_first</span>
+<span class="sd">        signal of inferring result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tokens</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">JUMP</span><span class="p">)</span>
-    <span class="n">parsed_date_res</span><span class="p">,</span> <span class="n">remain_tokens</span> <span class="o">=</span> <span class="n">_ensure_ymd</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+    <span class="n">parsed_date_res</span><span class="p">,</span> <span class="n">remain_tokens</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_ensure_ymd</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">is_day_first</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">remain_tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">parsed_time_res</span> <span class="o">=</span> <span class="n">_ensure_hms</span><span class="p">(</span><span class="n">parsed_date_res</span><span class="p">,</span> <span class="n">remain_tokens</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>

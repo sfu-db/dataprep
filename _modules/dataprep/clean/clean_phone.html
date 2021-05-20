@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_phone &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.clean.clean_phone &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -161,7 +161,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">..eda.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NULL_VALUES</span><span class="p">,</span> <span class="n">create_report_new</span><span class="p">,</span> <span class="n">to_dask</span>
 
 <span class="n">CA_US_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
@@ -171,14 +171,44 @@
 <span class="sd">    [-. (]*</span>
 <span class="sd">    (?P&lt;area&gt;\d{3})?</span>
 <span class="sd">    [-. )\/]*</span>
-<span class="sd">    (?P&lt;office&gt;\d{3})</span>
+<span class="sd">    (?:(?P&lt;office&gt;\d{3})</span>
 <span class="sd">    [-. \/]*</span>
-<span class="sd">    (?P&lt;station&gt;\d{4})</span>
+<span class="sd">    (?P&lt;station&gt;\d{4})|</span>
+<span class="sd">    (?P&lt;letters&gt;[0-9A-Z-. \/]{7,13}?))</span>
 <span class="sd">    (?:[ \t]*(?:\#|x[.:]?|[Ee]xt[.:]?|[Ee]xtension)[ \t]*(?P&lt;ext&gt;\d+))?</span>
 <span class="sd">    \s*$</span>
 <span class="sd">    &quot;&quot;&quot;</span><span class="p">,</span>
     <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="n">ALPHA_NUM_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;J&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;O&quot;</span><span class="p">:</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="clean_phone"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_phone.clean_phone">[docs]</a><span class="k">def</span> <span class="nf">clean_phone</span><span class="p">(</span>
@@ -416,12 +446,20 @@
         <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;unknown&quot;</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;country&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;area&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;unknown&quot;</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;letters&quot;</span><span class="p">):</span>
+        <span class="c1"># Check that there are 7 alphanumeric characters present</span>
+        <span class="n">letters</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;letters&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;unknown&quot;</span><span class="p">,)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="c1"># Convert letters to numbers</span>
+        <span class="n">numlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">ALPHA_NUM_MAP</span><span class="p">[</span><span class="n">char</span><span class="p">]</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">else</span> <span class="n">char</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">letters</span><span class="p">]</span>
+        <span class="n">numbers</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">numlist</span><span class="p">)</span>
 
     <span class="c1"># Components for phone number</span>
     <span class="n">country_code</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;country&quot;</span><span class="p">)</span>
     <span class="n">area_code</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;area&quot;</span><span class="p">)</span>
-    <span class="n">office_code</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;office&quot;</span><span class="p">)</span>
-    <span class="n">station_code</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
+    <span class="n">office_code</span> <span class="o">=</span> <span class="n">numbers</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;letters&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;office&quot;</span><span class="p">)</span>
+    <span class="n">station_code</span> <span class="o">=</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="k">if</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;letters&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
     <span class="n">ext_num</span> <span class="o">=</span> <span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;ext&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span>

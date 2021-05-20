@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Configuration files: usage and composition &#8212; DataPrep 0.3.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="connect() function" href="connect.html" />
+    <link rel="prev" title="Process overview via DBLP" href="dblp.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/connector/config.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="introduction.html">Connector</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="dblp.html">Case study: dblp API</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">Configuration files: usage and composition</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="connect.html">connect(): establish the connection and load the configurationfiles</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="query.html">query(): fetch data into DataFrames via APIs</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="info.html">info(): get information of a website</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="authorization.html">Authorization schemes supported</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="pagination.html">Auto-pagination</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../clean/introduction.html">Clean</a>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Loading-configuration-files" class="nav-link">Loading configuration files</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#1.-Loading-existing-files-from-our-github-repo" class="nav-link">1. Loading existing files from our github repo</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#2.-Loading-from-a-local-directory" class="nav-link">2. Loading from a local directory</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Composing-the-configuration-files" class="nav-link">Composing the configuration files</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#What-is-in-a-configuration-folder?" class="nav-link">What is in a configuration folder?</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Configuration-file" class="nav-link">Configuration file</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="Configuration-files:-usage-and-composition">
+<h1>Configuration files: usage and composition<a class="headerlink" href="#Configuration-files:-usage-and-composition" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Loading-configuration-files">
+<h2>Loading configuration files<a class="headerlink" href="#Loading-configuration-files" title="Permalink to this headline">¶</a></h2>
+<p>When <code class="docutils literal notranslate"><span class="pre">DataPrep.Connector.connect()</span></code> is called, the system reads from a configuration folder, which contains information about how to build connection with specific APIs.</p>
+<p>You can load the configuration files in the following two ways.</p>
+<div class="section" id="1.-Loading-existing-files-from-our-github-repo">
+<h3>1. Loading existing files from our github repo<a class="headerlink" href="#1.-Loading-existing-files-from-our-github-repo" title="Permalink to this headline">¶</a></h3>
+<p>We maintain a github repo that contains configuration files for more than 20 websites <a class="reference external" href="https://github.com/sfu-db/APIConnectors/tree/develop/api-connectors">here</a>.</p>
+<p>As an example, with the following code, the system will download the configuration file folder of dblp from our repo, load it, and build the connection. The file is placed at the system temporary file folder.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dblp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">connect()</span></code> provides a parameter called <code class="docutils literal notranslate"><span class="pre">update</span></code>, which forces downloading of the fresh config files if set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</div>
+<div class="section" id="2.-Loading-from-a-local-directory">
+<h3>2. Loading from a local directory<a class="headerlink" href="#2.-Loading-from-a-local-directory" title="Permalink to this headline">¶</a></h3>
+<p>You can also load from a local directory that contains your own configuration files. For example, by writing the following code, <code class="docutils literal notranslate"><span class="pre">connect()</span></code> will load from the corresponding folder and build the connection. You should have a folder called <code class="docutils literal notranslate"><span class="pre">dblp</span></code> in parallel with your code file and that contains the configuration files.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;./dblp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When the website API that you want to access is not supported by us, you will want to write your own configuration files. Or when you want to do some modification for the configuration files, you need to first download the configuration files to your local computer, change the files accordingly, and then load it from the local directory.</p>
+<p>See below for how to create your own configuration folder and files.</p>
+</div>
+</div>
+<div class="section" id="Composing-the-configuration-files">
+<h2>Composing the configuration files<a class="headerlink" href="#Composing-the-configuration-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="What-is-in-a-configuration-folder?">
+<h3>What is in a configuration folder?<a class="headerlink" href="#What-is-in-a-configuration-folder?" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">connect()</span></code> access the configurations for an API through a folder.</p>
+<p>A configuration folder contains two parts: <code class="docutils literal notranslate"><span class="pre">_meta.json</span></code> file and the configuration files. The following is the content of the <code class="docutils literal notranslate"><span class="pre">_meta.json</span></code> file for the <code class="docutils literal notranslate"><span class="pre">dblp</span></code> folder. It describes what are the <code class="docutils literal notranslate"><span class="pre">tables</span></code> available for this website. In DataPrep.Connector, we model the data behind each endpoint as a table just like the tables in the DBMS.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;tables&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;publication&quot;</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">_meta.json</span></code> indicates what are the configuration files. In the <code class="docutils literal notranslate"><span class="pre">dblp</span></code> folder, it is expected that there is a configuration file called <code class="docutils literal notranslate"><span class="pre">publication.json</span></code>. The details of configuration files are described in next subsection.</p>
+<p>In our repo, the folder also contains the test files for the configuration files. It tests if the configuration files can be processed smoothly by <code class="docutils literal notranslate"><span class="pre">connect()</span></code>.</p>
+</div>
+<div class="section" id="Configuration-file">
+<h3>Configuration file<a class="headerlink" href="#Configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>A config file is the magic that makes the data available via the simple function calls. The configuration files are reusable.</p>
+<p>Configuration files describe the settings of an API, such as:</p>
+<ul class="simple">
+<li><p>What is the endpoint of the API?</p></li>
+<li><p>What authorization scheme an API uses? (see authorization scheme section)</p></li>
+<li><p>What pagination scheme of the API? (see auto-pagination section)</p></li>
+<li><p>What are the parameters the query support?</p></li>
+<li><p>What is the schema of the returned results?</p></li>
+</ul>
+<p>A tutorial of how to write a configuration file is <a class="reference external" href="https://github.com/sfu-db/APIConnectors/blob/develop/CONTRIBUTING.md">here</a></p>
+<p>Below shows the configuration file of the publication API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://dblp.org/search/publ/api?format=json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;h&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="s2">&quot;author:{{author | replace(</span><span class="se">\&quot;</span><span class="s2"> </span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">_</span><span class="se">\&quot;</span><span class="s2">)}}:&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+                <span class="s2">&quot;removeIfEmpty&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+                <span class="s2">&quot;fromKey&quot;</span><span class="p">:</span> <span class="s2">&quot;author&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;toKey&quot;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;name_parts&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="s2">&quot;author:{{first_name}}_{{last_name}}:&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+                <span class="s2">&quot;removeIfEmpty&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+                <span class="s2">&quot;fromKey&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;first_name&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;last_name&quot;</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;toKey&quot;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;offsetKey&quot;</span><span class="p">:</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;limitKey&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;maxCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;examples&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="s2">&quot;&#39;lee&#39;&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ctype&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tablePath&quot;</span><span class="p">:</span> <span class="s2">&quot;$.result.hits.hit[*].info&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.title&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;venue&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.venue&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.publisher&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.year&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.type&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.key&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;ee&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.ee&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.url&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.authors.author[*].text&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;pages&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.pages&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;$.doi&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;orient&quot;</span><span class="p">:</span> <span class="s2">&quot;records&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

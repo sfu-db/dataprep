@@ -1,0 +1,625 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>dataprep.clean.clean_duplication &#8212; DataPrep 0.3.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/_modules/dataprep/clean/clean_duplication.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../user_guide/user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <h1>Source code for dataprep.clean.clean_duplication</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Clean a DataFrame column containing duplicate values.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">ipywidgets.widgets</span> <span class="kn">import</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">Checkbox</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Text</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+
+<span class="kn">from</span> <span class="nn">.clean_duplication_utils</span> <span class="kn">import</span> <span class="n">Clusterer</span>
+
+<span class="n">DEFAULT_NGRAM</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+<span class="n">DEFAULT_RADIUS</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+<span class="n">DEFAULT_BLOCK_SIZE</span> <span class="o">=</span> <span class="s2">&quot;6&quot;</span>
+
+
+<div class="viewcode-block" id="clean_duplication"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_duplication.clean_duplication">[docs]</a><span class="k">def</span> <span class="nf">clean_duplication</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df_var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;df&quot;</span><span class="p">,</span> <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Box</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cleans and standardized duplicate values in a DataFrame.</span>
+
+<span class="sd">    Read more in the :ref:`User Guide &lt;duplication_userguide&gt;`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df</span>
+<span class="sd">        A pandas or Dask DataFrame containing the data to be cleaned.</span>
+<span class="sd">    column</span>
+<span class="sd">        The name of the column containing duplicate values.</span>
+<span class="sd">    df_var_name</span>
+<span class="sd">        The variable name of the DataFrame being cleaned.</span>
+<span class="sd">        This is only needed for creating exported code snippets with</span>
+<span class="sd">        the correct variable name.</span>
+
+<span class="sd">        (default: &#39;df&#39;)</span>
+<span class="sd">    page_size</span>
+<span class="sd">        The number of clusters to display on each page.</span>
+
+<span class="sd">        (default: 5)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    After running clean_duplication(df, &#39;city&#39;) below in a notebook, a GUI will appear.</span>
+<span class="sd">    Select the merge checkbox, press merge and re-cluster, then press finish.</span>
+
+<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;city&#39;: [&#39;New York&#39;, &#39;new york&#39;]})</span>
+<span class="sd">    &gt;&gt;&gt; clean_duplication(df, &#39;city&#39;)</span>
+
+<span class="sd">          city</span>
+<span class="sd">    0    New York</span>
+<span class="sd">    1    New York</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">UserInterface</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">df_var_name</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="UserInterface"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_duplication.UserInterface">[docs]</a><span class="k">class</span> <span class="nc">UserInterface</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A user interface used by the clean_duplication function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+
+    <span class="n">_clusterer</span><span class="p">:</span> <span class="n">Clusterer</span>
+    <span class="n">_page_size</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_clustering_method_label</span><span class="p">:</span> <span class="n">Label</span>
+    <span class="n">_clustering_method_drop</span><span class="p">:</span> <span class="n">Dropdown</span>
+    <span class="n">_export_code</span><span class="p">:</span> <span class="n">Checkbox</span>
+    <span class="n">_sel_all</span><span class="p">:</span> <span class="n">Checkbox</span>
+    <span class="n">_next_button</span><span class="p">:</span> <span class="n">Button</span>
+    <span class="n">_prev_button</span><span class="p">:</span> <span class="n">Button</span>
+    <span class="n">_page_pos</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_ngram_text</span><span class="p">:</span> <span class="n">Text</span>
+    <span class="n">_radius_text</span><span class="p">:</span> <span class="n">Text</span>
+    <span class="n">_block_chars_text</span><span class="p">:</span> <span class="n">Text</span>
+    <span class="n">_dropds</span><span class="p">:</span> <span class="n">HBox</span>
+    <span class="n">_reprs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span>
+    <span class="n">_checks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Checkbox</span><span class="p">]</span>
+    <span class="n">_cluster_vbox</span><span class="p">:</span> <span class="n">VBox</span>
+    <span class="n">_box</span><span class="p">:</span> <span class="n">Box</span>
+    <span class="n">_loading_label</span><span class="p">:</span> <span class="n">Label</span>
+    <span class="n">_invalid_param_label</span><span class="p">:</span> <span class="n">Label</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span> <span class="o">=</span> <span class="n">Clusterer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">df_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="s2">&quot;fingerprint&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span> <span class="o">=</span> <span class="n">page_size</span>
+
+        <span class="c1"># clustering dropdown and export code checkbox, used in the top row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
+            <span class="s2">&quot; Clustering Method: &quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;2px 0 0 20px&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;fingerprint&quot;</span><span class="p">,</span> <span class="s2">&quot;ngram-fingerprint&quot;</span><span class="p">,</span> <span class="s2">&quot;phonetic-fingerprint&quot;</span><span class="p">,</span> <span class="s2">&quot;levenshtein&quot;</span><span class="p">],</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;150px&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 10px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_method_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span> <span class="o">=</span> <span class="n">Checkbox</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;export code&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;165px&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 482px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dropds</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_label</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;35px&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;10px 0 0 0&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># text boxes for clustering parameters used in the top row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ngram_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">DEFAULT_NGRAM</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;n-gram&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;130px&quot;</span><span class="p">),</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_radius_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">DEFAULT_RADIUS</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Radius&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;130px&quot;</span><span class="p">),</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_block_chars_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">DEFAULT_BLOCK_SIZE</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Block Chars&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;130px&quot;</span><span class="p">),</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ngram_text</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_param_recluster</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_radius_text</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_param_recluster</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_block_chars_text</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_param_recluster</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="c1"># create header labels, second row</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Distinct values&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 10px&quot;</span><span class="p">)),</span>
+                <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Total values&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 35px&quot;</span><span class="p">)),</span>
+                <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Cluster values&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 95px&quot;</span><span class="p">)),</span>
+                <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Merge?&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 295px&quot;</span><span class="p">)),</span>
+                <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Representative value&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 50px&quot;</span><span class="p">)),</span>
+            <span class="p">],</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;10px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># create buttons for bottom row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sel_all</span> <span class="o">=</span> <span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Select all&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;165px&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sel_all</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_select_all</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="n">merge_and_recluster</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Merge and Re-Cluster&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 466px&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s2">&quot;150px&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">merge_and_recluster</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_merge</span><span class="p">)</span>
+
+        <span class="n">finish</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Finish&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 10px&quot;</span><span class="p">))</span>
+        <span class="n">finish</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">)</span>
+
+        <span class="c1"># next and previous page buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Next&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_page</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prev_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Previous&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 20px&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prev_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prev_page</span><span class="p">)</span>
+
+        <span class="c1"># an index in the clusters Series indicating the start of the current page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># loading label, displayed when re-clustering or next page load</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loading_label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Loading...&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;170px 0 0 440px&quot;</span><span class="p">))</span>
+        <span class="c1"># displayed when the user enters a non integer value into a clustering parameter text box</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_param_label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid clustering parameter, please enter an integer&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;170px 0 0 350px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reprs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Text</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;200px&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 10px 0 40px&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checks</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Checkbox</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 20px&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># VBox containing a VBox with all the clusters in the first row and an optional</span>
+        <span class="c1"># second row containing next and previous page buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_and_next_prev</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_vbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;450px&quot;</span><span class="p">,</span> <span class="n">flex_flow</span><span class="o">=</span><span class="s2">&quot;row wrap&quot;</span><span class="p">))</span>
+
+        <span class="n">footer</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_sel_all</span><span class="p">,</span> <span class="n">merge_and_recluster</span><span class="p">,</span> <span class="n">finish</span><span class="p">])</span>
+
+        <span class="n">box_children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_dropds</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_and_next_prev</span><span class="p">,</span> <span class="n">footer</span><span class="p">]</span>
+
+        <span class="n">box_layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span>
+            <span class="n">display</span><span class="o">=</span><span class="s2">&quot;flex&quot;</span><span class="p">,</span> <span class="n">flex_flow</span><span class="o">=</span><span class="s2">&quot;column&quot;</span><span class="p">,</span> <span class="n">align_items</span><span class="o">=</span><span class="s2">&quot;stretch&quot;</span><span class="p">,</span> <span class="n">border</span><span class="o">=</span><span class="s2">&quot;solid&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">box_children</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">box_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_clusters</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the clusters currently being displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">186</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 18px&quot;</span><span class="p">))])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sel_all</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">cluster_page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">get_page</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span><span class="p">)</span>
+
+        <span class="n">label_layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;22px&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s2">&quot;360px&quot;</span><span class="p">)</span>
+        <span class="n">box_children</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cluster_page</span><span class="p">):</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">cluster_val</span><span class="p">,</span> <span class="n">cnt</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cnt</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">cluster_val</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">cnt</span><span class="si">}</span><span class="s2"> rows)&quot;</span>
+                <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Label</span><span class="p">(</span><span class="n">cluster_val</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">label_layout</span><span class="p">))</span>
+
+            <span class="n">totals_vals</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cnt</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cnt</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">)</span>
+            <span class="n">distinct_vals</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reprs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">cluster</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">box_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">HBox</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">Label</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">distinct_vals</span><span class="p">),</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;60px&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 60px&quot;</span><span class="p">)),</span>
+                        <span class="n">Label</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">totals_vals</span><span class="p">),</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;60px&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 50px&quot;</span><span class="p">)),</span>
+                        <span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 0 80px&quot;</span><span class="p">)),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_checks</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_reprs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">box_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="c1"># no clusters to display</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cluster_page</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">box_children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Label</span><span class="p">(</span>
+                    <span class="s2">&quot;No clusters, try a different clustering method&quot;</span><span class="p">,</span>
+                    <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;170px 0 0 360px&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_vbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">box_children</span>
+        <span class="n">cluster_and_next_prev</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_vbox</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_next_prev_button_row</span><span class="p">(</span><span class="n">cluster_and_next_prev</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_and_next_prev</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">cluster_and_next_prev</span>
+
+    <span class="k">def</span> <span class="nf">_update_dropds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clustering_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the dropdowns row of the UI to display the required text boxes for passing</span>
+<span class="sd">        parameters needed for the given clustering method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">clustering_method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;fingerprint&quot;</span><span class="p">,</span> <span class="s2">&quot;phonetic-fingerprint&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="s2">&quot;0 0 0 482px&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dropds</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_label</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="p">,</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">clustering_method</span> <span class="o">==</span> <span class="s2">&quot;ngram-fingerprint&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="s2">&quot;0 0 0 348px&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dropds</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_label</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ngram_text</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="p">,</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">clustering_method</span> <span class="o">==</span> <span class="s2">&quot;levenshtein&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="s2">&quot;0 0 0 214px&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dropds</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_label</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_radius_text</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_block_chars_text</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="p">,</span>
+            <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_param_recluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Re-cluster the dataframe with the new clustering parameters.</span>
+<span class="sd">        Triggered when the value in a clustering parameter textbox is changed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loading_label</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">set_cluster_params</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_params</span><span class="p">())</span>
+            <span class="n">cluster_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="o">.</span><span class="n">value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">cluster_method</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_clusters</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_invalid_param_label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_cluster_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve clustering parameters from their respective text boxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ngram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ngram_text</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ngram_text</span><span class="o">.</span><span class="n">value</span> <span class="k">else</span> <span class="n">DEFAULT_NGRAM</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius_text</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius_text</span><span class="o">.</span><span class="n">value</span> <span class="k">else</span> <span class="n">DEFAULT_RADIUS</span>
+        <span class="n">block_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_block_chars_text</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_block_chars_text</span> <span class="k">else</span> <span class="n">DEFAULT_BLOCK_SIZE</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ngram</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_select_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Triggered when the select all checkbox is selected or unselected.</span>
+<span class="sd">        Changes the value of the cluster checkboxes to match the state of the select all checkbox.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checks</span><span class="p">:</span>
+            <span class="n">check</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_cluster_method_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Triggered when the cluster method dropdown state is changed.</span>
+<span class="sd">        Re-clusters the DataFrame with the new clustering method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_dropds</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loading_label</span><span class="p">)</span>
+        <span class="n">cluster_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">cluster_method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_clusters</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_add_next_prev_button_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box_children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">HBox</span><span class="p">,</span> <span class="n">VBox</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a next page or previous page button, if the operation is valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">next_prev</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">prev_is_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="n">next_is_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">prev_is_valid</span> <span class="ow">and</span> <span class="n">next_is_valid</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next_button</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="s2">&quot;0 0 0 628px&quot;</span>
+            <span class="n">next_prev</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prev_button</span><span class="p">)</span>
+            <span class="n">next_prev</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_button</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">prev_is_valid</span><span class="p">:</span>
+            <span class="n">next_prev</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prev_button</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">next_is_valid</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next_button</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="s2">&quot;0 0 0 795px&quot;</span>
+            <span class="n">next_prev</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_button</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">next_is_valid</span> <span class="ow">or</span> <span class="n">prev_is_valid</span><span class="p">:</span>
+            <span class="n">box_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">HBox</span><span class="p">(</span><span class="n">next_prev</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="s2">&quot;50px&quot;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">_next_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Display the next page of clusters by increasing the page position.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loading_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_clusters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sel_all_on_page</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_prev_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Display the previous page of clusters by decreasing the page position.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loading_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_clusters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sel_all_on_page</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_label</span><span class="p">:</span> <span class="n">Label</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Display a message to the user, used for the loading screen</span>
+<span class="sd">        and invalid clustering parameter screen</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_vbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">message_label</span><span class="p">]</span>
+        <span class="c1"># don&#39;t display next and prev buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_and_next_prev</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_and_next_prev</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">_sel_all_on_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select all checkboxes on the current page of clusters if the</span>
+<span class="sd">        select all checkbox is selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_all</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checks</span><span class="p">:</span>
+                <span class="n">check</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the UI and display the final dataframe in the next jupyter notebook cell.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">final_df</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_box</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_execute_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge the selected clusters and re-cluster the dataframe. If the export code checkbox is</span>
+<span class="sd">        selected the required replace function calls and add them to the jupyter notebook cell.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loading_label</span><span class="p">)</span>
+
+        <span class="n">do_merge</span> <span class="o">=</span> <span class="p">[</span><span class="n">check</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checks</span><span class="p">]</span>
+        <span class="n">new_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">text</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprs</span><span class="p">]</span>
+        <span class="n">cluster_page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">get_page</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_code</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">live_export_code</span><span class="p">(</span><span class="n">cluster_page</span><span class="p">,</span> <span class="n">do_merge</span><span class="p">,</span> <span class="n">new_values</span><span class="p">)</span>
+
+        <span class="n">cluster_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_method_drop</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">execute_merge_code</span><span class="p">(</span><span class="n">cluster_page</span><span class="p">,</span> <span class="n">do_merge</span><span class="p">,</span> <span class="n">new_values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">cluster_method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_page_if_empty</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_clusters</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_page_if_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrease the page if the last page is empty.</span>
+<span class="sd">        Needed for when all clusters on the last page are merged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_clusterer</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_page_pos</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_size</span>
+
+<div class="viewcode-block" id="UserInterface.display"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_duplication.UserInterface.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Box</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Display the UI.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box</span></div></div>
+</pre></div>
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

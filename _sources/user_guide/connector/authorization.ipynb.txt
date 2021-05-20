@@ -1,0 +1,379 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "# Authorization schemes supported by Connector\n",
+    "\n",
+    "## Overview\n",
+    "\n",
+    "Connector supports the most used authorization methods in Web APIs:\n",
+    "\n",
+    "* API Key\n",
+    "    * Bearer Token\n",
+    "    * Query parameter\n",
+    "    * Request header parameter\n",
+    "* OAuth 2.0 \"Client Credentials\" and \"Authorization Code\" grants.\n",
+    "    * Client Credentials grant\n",
+    "    * Authorization Code grant\n",
+    "\n",
+    "Let's review them in detail:\n",
+    "\n",
+    "## API Key\n",
+    "\n",
+    "Depending on the Web API specification, you must send your API Key as a bearer token, a parameter in the URL (query parameter), or a parameter in the request header. Let's review these cases in detail:\n",
+    "\n",
+    "### Bearer Token\n",
+    "\n",
+    "If the Web API supports the Bearer Token authorization type, follow the next steps:\n",
+    "\n",
+    "#### Adjusting your configuration file\n",
+    "\n",
+    "You have to specify in your configuration file that the desired authentication method to be used is “Bearer token”. The following property should be included below the “method” property in your configuration file:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"Bearer\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "For example, you can review our Yelp configuration file for the “businesses” endpoint, which implements the “Bearer token” authorization method.\n",
+    "\n",
+    "#### Invoking the Web API\n",
+    "Use the connect function with the \"yelp\" string and your Yelp access token, both specified as parameters. This action allows you to create a Connector to the Yelp Web API. Next, through the query function, you can retrieve data from this endpoint. The parameter \"businesses\" indicates you want to query the Yelp \"businesses\" endpoint with the search term \"sushi\" and location \"Vancouver\":\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "yelp_connector = connect(\"yelp\", _auth={\"access_token\":\"<Your Yelp access token>\"})\n",
+    "df = await yelp_connector.query(\"businesses\", term=\"sushi\", location=\"Vancouver\")\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Query parameter\n",
+    "\n",
+    "You have to specify in your configuration file that you will send your API Key as a parameter in the request URL (\"type\": \"QueryParam\"). The following property should be included below the method property in your configuration file:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"QueryParam\",\n",
+    "    \"keyParam\": \"<API Key parameter name>\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You must replace the <API Key parameter name> string with the parameter’s exact name to be used to send the API Key to the remote endpoint. This parameter name is defined by the Web API. Review the Web API documentation to identify the exact name.\n",
+    "    \n",
+    "For example, the Finnhub API - IPO Calendar endpoint, names this parameter as token:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"QueryParam\",\n",
+    "    \"keyParam\": \"token\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To query information from this Finnhub endpoint, you can use both connect and query functions:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "finnhub_connector = connect(\"finnhub\", _auth={\"access_token\":\"<Your Finnhub API Key>\"})\n",
+    "df = await finnhub_connector.query(\"ipo_calendar\",from_=\"2020-01-01\", to=\"2020-04-30\")\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Internally, Connector will take your API Key and send it as the token parameter’s value in the request URL.\n",
+    "\n",
+    "### Request header parameter\n",
+    "\n",
+    "You have to specify in your configuration file that you will send your API Key as a parameter in the request header (\"type\": \"Header\"). The following property should be included below the method property in your configuration file:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"Header\",\n",
+    "    \"keyName\": \"<API Key parameter name>\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You must replace the <API Key parameter name> string with the parameter’s exact name to be used to send the API Key to the remote endpoint. This parameter name is defined by the Web API. Review the Web API documentation to identify the exact name.\n",
+    "\n",
+    "For example, the Twitch.tv API - channels endpoint, names this parameter as Client-ID:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"Header\",\n",
+    "    \"keyName\": \"Client-ID\",\n",
+    "    ...\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To query information from this Twitch endpoint, you can use both connect and query functions:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    "from dataprep.connector import connect\n",
+    "twitch_connector = connect(\"twitch\", _auth={\"access_token\":\"<Your Twitch API Key>\"})\n",
+    "df = await twitch_connector.query(\"channels\",q=\"a_seagull\")\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Internally, Connector will take your API Key and send it as the Client-ID parameter’s value in the request header.\n",
+    "\n",
+    "## OAuth 2.0 “Client Credentials” and “Authorization Code” grants\n",
+    "\n",
+    "Connector supports the authorization scheme OAuth 2.0 - “Client Credentials” and “Authorization Code” grants. Let’s review the details:\n",
+    "\n",
+    "### Client Credentials grant\n",
+    "\n",
+    "In your configuration file, you have to specify that you’ll use the OAuth 2.0 authorization type - Client Credentials grant. The following property should be included below the method property in your configuration file:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"OAuth2\",\n",
+    "    \"grantType\": \"ClientCredentials\",\n",
+    "    \"tokenServerUrl\": \"<OAuth 2.0 token URL>\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You must replace the <OAuth 2.0 token URL\" string with the OAuth 2.0 token URL defined by the Web API. Review the Web API documentation to identify the exact URL.\n",
+    "\n",
+    "For example, see the Twitter API - Tweets endpoint, configuration below:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"OAuth2\",\n",
+    "    \"grantType\": \"ClientCredentials\",\n",
+    "    \"tokenServerUrl\": \"https://api.twitter.com/oauth2/token\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Before executing any query, you must get your Web API Client ID and Client Secret information. Once obtained, you can pass these values as parameters in the connect function and then execute the query method to retrieve the desired data:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "twitter_connector = connect(\"twitter\", _auth={\"client_id\":twitter_client_id, \"client_secret\":twitter_client_secret})\n",
+    "df = await twitter_connector.query(\"tweets\", q=\"data science\")\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Internally, Connector will take both Client ID and Client Secret values and execute the OAuth 2.0 - Client Credentials grant process on your behalf.\n",
+    "\n",
+    "### Authorization Code grant\n",
+    "In your configuration file, you have to specify that you’ll use the OAuth 2.0 authorization type - Authorization Code grant. The following property should be included below the method property in your configuration file:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"OAuth2\",\n",
+    "    \"grantType\": \"AuthorizationCode\",\n",
+    "    \"tokenServerUrl\": \"<OAuth 2.0 token URL>\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You must replace the <OAuth 2.0 token URL\" string with the OAuth 2.0 token URL defined by the Web API. Review the Web API documentation to identify the exact URL.\n",
+    "\n",
+    "For example, see the Twitter API - Tweets endpoint - configuration below:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "```\n",
+    "\"authorization\": {\n",
+    "    \"type\": \"OAuth2\",\n",
+    "    \"grantType\": \"AuthorizationCode\",\n",
+    "    \"tokenServerUrl\": \"https://api.twitter.com/oauth2/token\"\n",
+    "},\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Before executing any query, you must get your Web API Client ID and Client Secret information. Once obtained, you can pass these values as parameters in the connect function and then execute the query method to retrieve the desired data:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "twitter_connector = connect(\"twitter\", _auth={\"client_id\":twitter_client_id, \"client_secret\":twitter_client_secret})\n",
+    "df = await twitter_connector.query(\"tweets\", q=\"data science\")\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Internally, Connector will take both Client ID and Client Secret values and execute the OAuth 2.0 - Authorization Code grant process on your behalf."
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Raw Cell Format",
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

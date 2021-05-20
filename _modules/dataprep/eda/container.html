@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.container &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.container &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -177,9 +177,12 @@
     <span class="s2">&quot;missing_impact_1v1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;missing_impact&quot;</span><span class="p">,</span>
     <span class="s2">&quot;categorical_column&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geography_column&quot;</span><span class="p">,</span>
     <span class="s2">&quot;numerical_column&quot;</span><span class="p">,</span>
     <span class="s2">&quot;datetime_column&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cat_and_num_cols&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geo_and_num_cols&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;latlong_and_num_cols&quot;</span><span class="p">,</span>
     <span class="s2">&quot;two_num_cols&quot;</span><span class="p">,</span>
     <span class="s2">&quot;two_cat_cols&quot;</span><span class="p">,</span>
     <span class="s2">&quot;dt_and_num_cols&quot;</span><span class="p">,</span>
@@ -190,7 +193,7 @@
     <span class="s2">&quot;correlation_scatter&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">GRID_VISUAL_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;distribution_grid&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_impact_1vn&quot;</span><span class="p">}</span>
+<span class="n">GRID_VISUAL_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;distribution_grid&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_impact_1vn&quot;</span><span class="p">,</span> <span class="s2">&quot;comparison_grid&quot;</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="Container"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.container.Container">[docs]</a><span class="k">class</span> <span class="nc">Container</span><span class="p">:</span>
@@ -204,9 +207,14 @@
         <span class="k">if</span> <span class="n">visual_type</span> <span class="ow">in</span> <span class="n">GRID_VISUAL_TYPES</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template_base</span> <span class="o">=</span> <span class="n">ENV_LOADER</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;grid_base.html&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">visual_type</span> <span class="ow">in</span> <span class="n">TAB_VISUAL_TYPES</span><span class="p">:</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s2">&quot;highlight&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">insight</span><span class="o">.</span><span class="n">enable</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;missing_impact&quot;</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s2">&quot;highlight&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s2">&quot;highlight&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">insight</span><span class="o">.</span><span class="n">enable</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">to_render</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tabledata&quot;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Stats&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">to_render</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value_table&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Value Table&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="n">visual_type</span> <span class="o">==</span> <span class="s2">&quot;correlation_impact&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">template_base</span> <span class="o">=</span> <span class="n">ENV_LOADER</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;tab_base_corr.html&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>

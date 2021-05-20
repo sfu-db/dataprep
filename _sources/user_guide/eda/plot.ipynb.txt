@@ -21,20 +21,29 @@
     "The function `plot()` explores the distributions and statistics of the dataset. It generates a variety of visualizations and statistics which enables the user to achieve a comprehensive understanding of the column distributions and their relationships. The following describes the functionality of `plot()` for a given dataframe `df`.\n",
     "\n",
     "1. `plot(df)`: plots the distribution of each column and computes dataset statistics\n",
-    "2. `plot(df, x)`: plots the distribution of column `x` in various ways, and computes its statistics\n",
-    "3. `plot(df, x, y)`: generates plots depicting the relationship between columns `x` and `y`\n",
+    "2. `plot(df, col1)`: plots the distribution of column `col1` in various ways, and computes its statistics\n",
+    "3. `plot(df, col1, col2)`: generates plots depicting the relationship between columns `col1` and `col2`\n",
     "\n",
-    "The generated plots are different for numerical and categorical columns. The following table summarizes the output for the different column types.\n",
+    "The generated plots are different for numerical, categorical and geography columns. The following table summarizes the output for the different column types.\n",
     "\n",
-    "| `x` | `y` | Output |\n",
+    "| `col1` | `col2` | Output |\n",
     "| --- | --- | --- |\n",
     "| None | None | dataset statistics, [histogram](https://www.wikiwand.com/en/Histogram) or [bar chart](https://www.wikiwand.com/en/Bar_chart) for each column |\n",
     "| Numerical | None | column statistics, histogram, [kde plot](https://www.wikiwand.com/en/Kernel_density_estimation), [qq-normal plot](https://www.wikiwand.com/en/Q%E2%80%93Q_plot), [box plot](https://www.wikiwand.com/en/Box_plot) |\n",
     "| Categorical | None | column statistics, bar chart, [pie chart](https://www.wikiwand.com/en/Pie_chart), [word cloud](https://www.wikiwand.com/en/Tag_cloud), word frequencies |\n",
+    "| Geography | None | column statistics, bar chart, [pie chart](https://www.wikiwand.com/en/Pie_chart), [word cloud](https://www.wikiwand.com/en/Tag_cloud), word frequencies, world map |\n",
     "| Numerical | Numerical | [scatter plot](https://www.wikiwand.com/en/Scatter_plot), [hexbin plot](https://www.data-to-viz.com/graph/hexbinmap.html), binned box plot|\n",
     "| Numerical | Categorical | categorical box plot, multi-[line chart](https://www.wikiwand.com/en/Line_chart) |\n",
     "| Categorical | Numerical | categorical box plot, multi-line chart\n",
     "| Categorical | Categorical | [nested bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [stacked bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [heat map](https://www.wikiwand.com/en/Heat_map) |\n",
+    "| Categorical | Geography | [nested bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [stacked bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [heat map](https://www.wikiwand.com/en/Heat_map) |\n",
+    "| Geography | Categorical | [nested bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [stacked bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [heat map](https://www.wikiwand.com/en/Heat_map) |\n",
+    "| Geopoint | Categorical | [nested bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [stacked bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [heat map](https://www.wikiwand.com/en/Heat_map) |\n",
+    "| Categorical | Geopoint | [nested bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [stacked bar chart](https://www.wikiwand.com/en/Bar_chart#/Grouped_and_stacked), [heat map](https://www.wikiwand.com/en/Heat_map) |\n",
+    "| Numerical | Geography | categorical box plot, multi-[line chart](https://www.wikiwand.com/en/Line_chart), world map |\n",
+    "| Geography | Numerical | categorical box plot, multi-[line chart](https://www.wikiwand.com/en/Line_chart), world map |\n",
+    "| Numerical | Geopoint | geo map|\n",
+    "| Geopoint | Numerical | geo map|\n",
     "\n",
     "Next, we demonstrate the functionality of `plot()`. "
    ]
@@ -50,12 +59,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "ExecuteTime": {
-     "end_time": "2020-11-12T01:42:06.693768Z",
-     "start_time": "2020-11-12T01:41:33.786993Z"
-    }
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "from dataprep.datasets import load_dataset\n",
@@ -97,11 +101,11 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Understand a column with `plot(df, x)`\n",
+    "## Understand a column with `plot(df, col1)`\n",
     "\n",
-    "After getting an overview of the dataset, we can thoroughly investigate a column of interest `x` using `plot(df, x)`. The output is of `plot(df, x)` is different for numerical and categorical columns.\n",
+    "After getting an overview of the dataset, we can thoroughly investigate a column of interest `col1` using `plot(df, col1)`. The output is of `plot(df, col1)` is different for numerical and categorical columns.\n",
     "\n",
-    "When `x` is a numerical column, it  computes column statistics, and generates a histogram, kde plot, box plot and qq-normal plot:"
+    "When `col1` is a numerical column, it  computes column statistics, and generates a histogram, kde plot, box plot and qq-normal plot:"
    ]
   },
   {
@@ -140,14 +144,31 @@
    ]
   },
   {
+   "source": [
+    "When `x` is a Geography column, it computes column statistics, and plots a bar chart, pie chart, word cloud, word frequency, word length and world map:"
+   ],
+   "cell_type": "markdown",
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_geo = load_dataset('countries')\n",
+    "plot(df_geo, \"Country\")"
+   ]
+  },
+  {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Understand the relationship between two columns with `plot(df, x, y)`\n",
+    "## Understand the relationship between two columns with `plot(df, col1, col2)`\n",
     "\n",
-    "Next, we can explore the relationship between columns `x` and `y` using `plot(df, x, y)`. The output depends on the types of the columns. \n",
+    "Next, we can explore the relationship between columns `col1` and `col2` using `plot(df, col1, col2)`. The output depends on the types of the columns. \n",
     "\n",
-    "When `x` and `y` are both numerical columns, it generates a scatter plot, hexbin plot and box plot:"
+    "When `col1` and `col2` are both numerical columns, it generates a scatter plot, hexbin plot and box plot:"
    ]
   },
   {
@@ -168,7 +189,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "When `x` and `y` are both categorical columns, it plots a nested bar chart, stacked bar chart and heat map:"
+    "When `col1` and `col2` are both categorical columns, it plots a nested bar chart, stacked bar chart and heat map:"
    ]
   },
   {
@@ -189,7 +210,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "When `x` and `y` are one each of type numerical and categorical, it generates a box plot per category and a multi-line chart:"
+    "When `col1` and `col2` are one each of type numerical and categorical, it generates a box plot per category and a multi-line chart:"
    ]
   },
   {
@@ -205,6 +226,63 @@
    "source": [
     "plot(df, \"age\", \"education\")\n",
     "# or plot(df, \"education\", \"age\")"
+   ]
+  },
+  {
+   "source": [
+    "When `col1` and `col2` are one each of type geopoint and categorical, or, geography and categorical, it generates a box plot per category and a multi-line chart:"
+   ],
+   "cell_type": "markdown",
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from dataprep.eda.dtypes_v2 import LatLong\n",
+    "covid = load_dataset('covid19')\n",
+    "latlong = LatLong(\"Lat\", \"Long\") # create geopoint type using \"LatLong\" function by inputing two columns names\n",
+    "plot(covid, latlong, \"Country/Region\")\n",
+    "# or plot(covid, \"Country/Region\", latlong)\n",
+    "\n",
+    "plot(df_geo,\"Country\", \"Region\")\n",
+    "# or plot(df_geo, \"Region\", \"Country\")"
+   ]
+  },
+  {
+   "source": [
+    "When `col1` and `col2` are one each of type geography and numerical, it generates a box plot per category, a multi-line chart and a world map:"
+   ],
+   "cell_type": "markdown",
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(df_geo,\"Country\", \"Population\")\n",
+    "# or plot(df_geo, \"Population\", \"Country\")"
+   ]
+  },
+  {
+   "source": [
+    "When `col1` and `col2` are one each of type geopoint and numerical, it generates a geo map:"
+   ],
+   "cell_type": "markdown",
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(covid, latlong, \"2/16/2020\")\n",
+    "# or plot(covid, \"2/16/2020\", latlong)"
    ]
   }
  ],
@@ -225,7 +303,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.7.1"
+   "version": "3.9.1"
   },
   "toc": {
    "base_numbering": 1,
@@ -268,6 +346,11 @@
     "_Feature"
    ],
    "window_display": false
+  },
+  "metadata": {
+   "interpreter": {
+    "hash": "cbc395162ceef86bd30db76a3f31f271f845529665561e61c8ad64483b646fe3"
+   }
   }
  },
  "nbformat": 4,

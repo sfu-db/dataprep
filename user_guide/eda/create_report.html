@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>create_report: generate profile reports from a pandas DataFrame &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>create_report: generate profile reports from a pandas DataFrame &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Customize your output" href="how_to_guide.html" />
-    <link rel="prev" title="plot_missing(): analyze missing values" href="plot_missing.html" />
+    <link rel="prev" title="plot_diff(): analyze differences" href="plot_diff.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
   <meta name="author" content="SFU Database Systems Lab">
@@ -152,6 +152,10 @@
                           <a href="plot_missing.html">plot_missing(): analyze missing values</a>
                       </li>
                   
+                      <li class="">
+                          <a href="plot_diff.html">plot_diff(): analyze difference betweenDataFrames</a>
+                      </li>
+                  
                       <li class="active">
                           <a href="">create_report(): create a profile report</a>
                       </li>
@@ -162,6 +166,10 @@
                   
                       <li class="">
                           <a href="parameter_configurations.html">Parameter configurations: parameter summarysettings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="insights.html">Insight: automatically insight detection</a>
                       </li>
                   
                       <li class="">
@@ -178,7 +186,7 @@
           
             
               <li class="">
-                  <a href="../connector/connector.html">Connector</a>
+                  <a href="../connector/introduction.html">Connector</a>
               </li>
             
           
@@ -264,8 +272,8 @@
 <div class="section" id="loading-dataset">
 <h2>Loading dataset<a class="headerlink" href="#loading-dataset" title="Permalink to this headline">¶</a></h2>
 <p>Here we load the <cite>titanic</cite> dataset into a pandas dataframe and use it to demonstrate our functionality:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;titanic&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -288,7 +296,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">report</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;report_01&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;~/Desktop&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can see the full report <a class="reference download internal" download="" href="../../_downloads/c9bf292ac949ebcf9b65bb2a2bc5a149/titanic_dp.html"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
+<p>You can see the full report <a class="reference download internal" download="" href="../../_downloads/1a61c6aebb3ecbe9dc9742bd6ca78ddb/titanic_dp.html"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
 </div>
 <div class="section" id="overview-section">
 <h2><cite>Overview</cite> section<a class="headerlink" href="#overview-section" title="Permalink to this headline">¶</a></h2>

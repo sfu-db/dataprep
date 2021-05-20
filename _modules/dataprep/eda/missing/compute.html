@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing.compute &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.missing.compute &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -153,11 +153,13 @@
 <span class="sd">calculating intermediate part</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">catch_warnings</span><span class="p">,</span> <span class="n">filterwarnings</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">ClusterWarning</span>
 
 <span class="kn">from</span> <span class="nn">...configs</span> <span class="kn">import</span> <span class="n">Config</span>
-<span class="kn">from</span> <span class="nn">...data_array</span> <span class="kn">import</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">DataFrame</span>
-<span class="kn">from</span> <span class="nn">...dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span><span class="p">,</span> <span class="n">string_dtype_to_object</span>
+<span class="kn">from</span> <span class="nn">...eda_frame</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">EDAFrame</span>
+<span class="kn">from</span> <span class="nn">...dtypes_v2</span> <span class="kn">import</span> <span class="n">DTypeDef</span>
+<span class="kn">from</span> <span class="nn">...utils</span> <span class="kn">import</span> <span class="n">preprocess_dataframe</span>
 <span class="kn">from</span> <span class="nn">...intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
 <span class="kn">from</span> <span class="nn">.bivariate</span> <span class="kn">import</span> <span class="n">compute_missing_bivariate</span>
 <span class="kn">from</span> <span class="nn">.nullivariate</span> <span class="kn">import</span> <span class="n">compute_missing_nullivariate</span>
@@ -168,8 +170,8 @@
 
 <div class="viewcode-block" id="compute_missing"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.missing.html#dataprep.eda.missing.compute.compute_missing">[docs]</a><span class="k">def</span> <span class="nf">compute_missing</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">col1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">col2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Config</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">display</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -185,9 +187,9 @@
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
 <span class="sd">        the pandas data_frame for which plots are calculated for each column</span>
-<span class="sd">    x</span>
+<span class="sd">    col1</span>
 <span class="sd">        a valid column name of the data frame</span>
-<span class="sd">    y</span>
+<span class="sd">    col2</span>
 <span class="sd">        a valid column name of the data frame</span>
 <span class="sd">    cfg: Union[Config, Dict[str, Any], None], default None</span>
 <span class="sd">        When a user call plot_missing(), the created Config object will be passed to</span>
@@ -212,8 +214,11 @@
 <span class="sd">    &gt;&gt;&gt; plot_missing(df, &quot;HDI_for_year&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; plot_missing(df, &quot;HDI_for_year&quot;, &quot;population&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">string_dtype_to_object</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">suppress_warnings</span><span class="p">()</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span>
+
+    <span class="n">eda_frame</span> <span class="o">=</span> <span class="n">EDAFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># pylint: disable=no-else-raise</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -223,20 +228,33 @@
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;x cannot be None while y has value&quot;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">compute_missing_univariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">compute_missing_univariate</span><span class="p">(</span><span class="n">eda_frame</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">compute_missing_bivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">compute_missing_bivariate</span><span class="p">(</span><span class="n">eda_frame</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># supress divide by 0 error due to heatmap</span>
-        <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-            <span class="n">filterwarnings</span><span class="p">(</span>
-                <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;invalid value encountered in true_divide&quot;</span><span class="p">,</span>
-                <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">compute_missing_nullivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">compute_missing_nullivariate</span><span class="p">(</span><span class="n">eda_frame</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Intermediate</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">suppress_warnings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    suppress warnings for plot_missing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scipy.cluster: The symmetric non-negative hollow observation matrix looks &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;suspiciously like an uncondensed distance matrix&quot;</span><span class="p">,</span>
+        <span class="n">category</span><span class="o">=</span><span class="n">ClusterWarning</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid value encountered in double_scalars&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span>
+    <span class="p">)</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;invalid value encountered in true_divide&quot;</span><span class="p">,</span>
+        <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
           </div>

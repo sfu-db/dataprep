@@ -31,9 +31,11 @@
     " * [plot(): analyze distributions](plot.ipynb)\n",
     " * [plot_correlation(): analyze correlations](plot_correlation.ipynb)\n",
     " * [plot_missing(): analyze missing values](plot_missing.ipynb)\n",
+    " * [plot_diff(): analyze difference between DataFrames](plot_diff.ipynb)\n",
     " * [create_report(): create a profile report](create_report.rst)\n",
     " * [How-to guide: customize your output](how_to_guide.ipynb)\n",
     " * [Parameter configurations: parameter summary settings](parameter_configurations.ipynb)\n",
+    " * [Insight: automatically insight detection](insights.ipynb)\n",
     " * [Case study: Titanic](titanic.ipynb)\n",
     " * [Case study: House Prices](house_price.ipynb) "
    ]
@@ -52,7 +54,9 @@
     "\n",
     "* Analyze **missing values** with `plot_missing()`. The function `plot_missing()` enables thorough analysis of the missing values and their impact on the dataset. By default, it will generate various plots which display the amount of missing values for each column and any underlying patterns of the missing values in the dataset. To understand the impact of the missing values in one column on the other columns, the user can pass the column name as a parameter. Then, `plot_missing()` will generate the distribution of each column with and without the missing values from the given column, enabling a thorough understanding of their impact.\n",
     "\n",
-    "The following sections give a simple demonstration of `plot()`, `plot_correlation()`, and `plot_missing()`, using an example dataset."
+    "* Analyze column **differences** with `plot_diff()`. The function `plot_diff()` explores the differences of column distributions and statistics across multiple datasets. It will detect the column type, and then output various plots and statistics that are appropriate for the respective type. The user can optionally set the baseline which is used as the target dataset to compare with other datasets.\n",
+    "\n",
+    "The following sections give a simple demonstration of `plot()`, `plot_correlation()`, `plot_missing()`, and `plot_diff()` using an example dataset."
    ]
   },
   {
@@ -90,7 +94,7 @@
     "from dataprep.eda import plot\n",
     "from dataprep.datasets import load_dataset\n",
     "import numpy as np\n",
-    "df = load_dataset('house_prices_train')\n",
+    "df = load_dataset('adult')\n",
     "plot(df)"
    ]
   },
@@ -203,6 +207,35 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
+    "## Analyze difference with `plot_diff()`\n",
+    "\n",
+    "The function `plot_diff()` explores the difference of column distributions and statistics across multiple datasets. The following describes the functionality of `plot_diff()` for two given dataframes `df1` and `df2`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from dataprep.eda import plot_diff\n",
+    "from dataprep.datasets import load_dataset\n",
+    "df1 = load_dataset(\"house_prices_test\")\n",
+    "df2 = load_dataset(\"house_prices_train\")\n",
+    "plot_diff([df1, df2])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For more information about the function `plot_diff()` see [here](plot_diff.ipynb)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
     "## Create a profile report with `create_report()`\n",
     "\n",
     "The function `create_report()` generates a comprehensive profile report of the dataset. `create_report()` combines the individual components of the `dataprep.eda` package and outputs them into a nicely formatted HTML document. The document contains the following information:\n",
@@ -254,7 +287,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.6"
+   "version": "3.7.5"
   },
   "toc": {
    "base_numbering": 1,

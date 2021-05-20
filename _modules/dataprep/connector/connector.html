@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.connector.connector &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.connector.connector &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -165,10 +165,10 @@
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">StrictUndefined</span><span class="p">,</span> <span class="n">UndefinedError</span>
 <span class="kn">from</span> <span class="nn">jsonpath_ng</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">jparse</span>
 
+<span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">initialize_path</span>
 <span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">InvalidParameterError</span><span class="p">,</span> <span class="n">RequestError</span><span class="p">,</span> <span class="n">UniversalParameterOverridden</span>
 <span class="kn">from</span> <span class="nn">.implicit_database</span> <span class="kn">import</span> <span class="n">ImplicitDatabase</span><span class="p">,</span> <span class="n">ImplicitTable</span>
 <span class="kn">from</span> <span class="nn">.info</span> <span class="kn">import</span> <span class="n">info</span>
-<span class="kn">from</span> <span class="nn">.config_manager</span> <span class="kn">import</span> <span class="n">initialize_path</span>
 <span class="kn">from</span> <span class="nn">.ref</span> <span class="kn">import</span> <span class="n">Ref</span>
 <span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">FieldDef</span><span class="p">,</span>
@@ -277,6 +277,8 @@
                     <span class="n">allowed_params</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">allowed_params</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="n">allowed_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_impdb</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url_path_params</span><span class="p">())</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">where</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_params</span><span class="p">:</span>
@@ -450,7 +452,7 @@
 
         <span class="n">reqdef</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">request</span>
         <span class="n">method</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">method</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">url</span>
+
         <span class="n">req_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{},</span>
             <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{},</span>
@@ -515,6 +517,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_jenv</span><span class="p">,</span>
                     <span class="n">merged_vars</span><span class="p">,</span>
                 <span class="p">)</span>
+
                 <span class="k">for</span> <span class="n">ikey</span> <span class="ow">in</span> <span class="n">instantiated_fields</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">ikey</span> <span class="ow">in</span> <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
                         <span class="n">warn</span><span class="p">(</span>
@@ -528,6 +531,8 @@
             <span class="n">field_def</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">reqdef</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">field_def</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">validate_fields</span><span class="p">(</span><span class="n">field_def</span><span class="p">,</span> <span class="n">req_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="n">reqdef</span><span class="o">.</span><span class="n">populate_url</span><span class="p">(</span><span class="n">merged_vars</span><span class="p">)</span>
 
         <span class="k">await</span> <span class="n">_throttler</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">_page</span><span class="p">)</span>
 

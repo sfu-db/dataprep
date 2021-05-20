@@ -1,0 +1,4447 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Text &#8212; DataPrep 0.3.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="URLs" href="clean_url.html" />
+    <link rel="prev" title="Phone Numbers" href="clean_phone.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/clean/clean_text.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../connector/introduction.html">Connector</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="introduction.html">Clean</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="clean_headers.html">Column Headers</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_country.html">Country Names</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_date.html">Dates and Times</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_duplication.html">Duplicate Values</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_email.html">Email Addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_lat_long.html">Geographic Goordinates</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ip.html">IP Addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_phone.html">Phone Numbers</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">Text</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_url.html">URLs</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_address.html">US Street Addresses</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Introduction" class="nav-link">Introduction</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#An-example-dirty-dataset" class="nav-link">An example dirty dataset</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#1.-Default-clean_text()" class="nav-link">1. Default clean_text()</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#2.-Custom-pipeline" class="nav-link">2. Custom pipeline</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#3.-Built-in-functions" class="nav-link">3. Built-in functions</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#fillna" class="nav-link">fillna</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#lowercase" class="nav-link">lowercase</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#sentence_case" class="nav-link">sentence_case</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#title_case" class="nav-link">title_case</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#uppercase" class="nav-link">uppercase</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_accents" class="nav-link">remove_accents</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_bracketed" class="nav-link">remove_bracketed</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_digits" class="nav-link">remove_digits</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_html" class="nav-link">remove_html</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_prefixed" class="nav-link">remove_prefixed</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_puncutation" class="nav-link">remove_puncutation</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_stopwords" class="nav-link">remove_stopwords</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_urls" class="nav-link">remove_urls</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#remove_whitespace" class="nav-link">remove_whitespace</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_bracketed" class="nav-link">replace_bracketed</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_digits" class="nav-link">replace_digits</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_prefixed" class="nav-link">replace_prefixed</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_punctuation" class="nav-link">replace_punctuation</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_stopwords" class="nav-link">replace_stopwords</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_text" class="nav-link">replace_text</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#replace_urls" class="nav-link">replace_urls</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Text">
+<span id="clean-text-user-guide"></span><h1>Text<a class="headerlink" href="#Text" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The function <a class="reference internal" href="../../api_reference/dataprep.clean.html#dataprep.clean.clean_text.clean_text" title="dataprep.clean.clean_text.clean_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">clean_text()</span></code></a> cleans text data in a DataFrame column.</p>
+<p>Using a default or customized pipeline, the function performs a series of cleaning operations on the data.</p>
+<p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_text()</span></code>.</p>
+<div class="section" id="An-example-dirty-dataset">
+<h3>An example dirty dataset<a class="headerlink" href="#An-example-dirty-dataset" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_colwidth&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;&#39;ZZZZZ!&#39; If IMDb would allow one-word reviews, that&#39;s what mine would be.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;[SPOILERS]</span><span class="se">\n</span><span class="s2">I don&#39;t think I&#39;ve seen a film this bad before {acting, script, effects (!), etc...}&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&lt;a href=&#39;/festivals/cannes-1968-a-video-essay&#39;&gt;Cannes 1968:</span><span class="se">\t</span><span class="s2">A video essay&lt;/a&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;#GameOfThrones: Season 8 is #Rotten at 54</span><span class="si">% o</span><span class="s2">n the #Tomatometer.  But does it deserve to be?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Come join and share your thoughts on this week&#39;s episode: https://twitter.com/i/spaces/1fake2URL3&quot;</span><span class="p">,</span>
+            <span class="mi">123</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;NULL&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="1.-Default-clean_text()">
+<h2>1. Default <code class="docutils literal notranslate"><span class="pre">clean_text()</span></code><a class="headerlink" href="#1.-Default-clean_text()" title="Permalink to this headline">¶</a></h2>
+<p>The default pipeline for the <code class="docutils literal notranslate"><span class="pre">clean_text()</span></code> function is the following:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#fillna"><span class="std std-ref">fillna</span></a>: Replace all null values with <cite>NaN</cite>.</p></li>
+<li><p><a class="reference internal" href="#lowercase"><span class="std std-ref">lowercase</span></a>: Convert all characters to lowercase.</p></li>
+<li><p><a class="reference internal" href="#remove-digits"><span class="std std-ref">remove_digits</span></a>: Remove numbers.</p></li>
+<li><p><a class="reference internal" href="#remove-html"><span class="std std-ref">remove_html</span></a> Remove HTML tags.</p></li>
+<li><p><a class="reference internal" href="#remove-urls"><span class="std std-ref">remove_urls</span></a>: Remove URLs.</p></li>
+<li><p><a class="reference internal" href="#remove-punctuation"><span class="std std-ref">remove_punctuation</span></a>: Remove punctuation marks.</p></li>
+<li><p><a class="reference internal" href="#remove-accents"><span class="std std-ref">remove_accents</span></a>: Remove accent marks.</p></li>
+<li><p><a class="reference internal" href="#remove-stopwords"><span class="std std-ref">remove_stopwords</span></a>: Remove stopwords.</p></li>
+<li><p><a class="reference internal" href="#remove-whitespace"><span class="std std-ref">remove_whitespace</span></a>: Remove extra spaces, and tabs and newlines.</p></li>
+</ol>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">clean_text</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>zzzzz imdb would allow one word reviews mine would</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cast played shakespeare shakespeare lost</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>simon desert simon del desierto film directed luis bunuel</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>spoilers think seen film bad acting script effects etc</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>cannes video essay</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>recap thread rottentomatoes excellent panel hosted erikdavis filmfatale nyc ashcrossan</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>gameofthrones season rotten tomatometer deserve</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>come join share thoughts week episode</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>By default, the stopwords removed are the set of words in NLTK’s English stopwords. To remove a different set of words, pass the set into the <code class="docutils literal notranslate"><span class="pre">stopwords</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">clean_text</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">stopwords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;imdb&quot;</span><span class="p">,</span> <span class="s2">&quot;film&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>zzzzz if would allow one word reviews that s what mine would be</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>the cast played shakespeare shakespeare lost</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>simon of the desert simon del desierto is a directed by luis bunuel</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>spoilers i don t think i ve seen a this bad before acting script effects etc</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>cannes a video essay</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>recap thread for rottentomatoes excellent panel hosted by erikdavis with filmfatale nyc and ashcrossan</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>gameofthrones season is rotten at on the tomatometer but does it deserve to be</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>come join and share your thoughts on this week s episode</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="2.-Custom-pipeline">
+<span id="clean-text-custom-pipeline"></span><h2>2. Custom pipeline<a class="headerlink" href="#2.-Custom-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>Users can pass in a custom pipeline to <code class="docutils literal notranslate"><span class="pre">clean_text()</span></code> using the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;lowercase&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_digits&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_whitespace&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'zzzzz!' if imdb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>the cast played shakespeare.&lt;br /&gt;&lt;br /&gt;shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>simon of the desert (simón del desierto) is a film directed by luis buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[spoilers] i don't think i've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes--a-video-essay'&gt;cannes : a video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>recap thread for @rottentomatoes excellent panel, hosted by @erikdavis with @filmfatale_nyc and @ashcrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#gameofthrones: season is #rotten at % on the #tomatometer. but does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/fakeurl</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>null</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Users can also define and pass in their own functions using the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">replace_z</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+
+<span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;lowercase&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_digits&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="n">split</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="n">replace_z</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">}},</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_whitespace&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>["'*****!'", 'if', 'imdb', 'would', 'allow', 'one-word', 'reviews,', "that's", 'what', 'mine', 'would', 'be.']</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>['the', 'cast', 'played', 'shakespeare.&lt;br', '/&gt;&lt;br', '/&gt;shakespeare', 'lost.']</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>['simon', 'of', 'the', 'desert', '(simón', 'del', 'desierto)', 'is', 'a', 'film', 'directed', 'by', 'luis', 'buñuel.']</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>['[spoilers]', 'i', "don't", 'think', "i've", 'seen', 'a', 'film', 'this', 'bad', 'before', '{acting,', 'script,', 'effects', '(!),', 'etc...}']</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>['&lt;a', "href='/festivals/cannes--a-video-essay'&gt;cannes", ':', 'a', 'video', 'essay&lt;/a&gt;']</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>['recap', 'thread', 'for', '@rottentomatoes', 'excellent', 'panel,', 'hosted', 'by', '@erikdavis', 'with', '@filmfatale_nyc', 'and', '@ashcrossan.']</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>['#gameofthrones:', 'season', 'is', '#rotten', 'at', '%', 'on', 'the', '#tomatometer.', 'but', 'does', 'it', 'deserve', 'to', 'be?']</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>['come', 'join', 'and', 'share', 'your', 'thoughts', 'on', 'this', "week's", 'episode:', 'https://twitter.com/i/spaces/fakeurl']</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>[]</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>['nan']</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>['null']</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>In general, custom pipelines can be defined using the form:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;operator_name&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&lt;parameter_name&gt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;parameter_value&gt;&quot;</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>To get the default pipeline in the form of a list, call <a class="reference internal" href="../../api_reference/dataprep.clean.html#dataprep.clean.clean_text.default_text_pipeline" title="dataprep.clean.clean_text.default_text_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_text_pipeline()</span></code></a>.</p>
+<p>This can be used as a template to build a list of cleaning operations to be passed into the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">default_text_pipeline</span>
+<span class="n">default_text_pipeline</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;operator&#39;: &#39;fillna&#39;},
+ {&#39;operator&#39;: &#39;lowercase&#39;},
+ {&#39;operator&#39;: &#39;remove_digits&#39;},
+ {&#39;operator&#39;: &#39;remove_html&#39;},
+ {&#39;operator&#39;: &#39;remove_urls&#39;},
+ {&#39;operator&#39;: &#39;remove_punctuation&#39;},
+ {&#39;operator&#39;: &#39;remove_accents&#39;},
+ {&#39;operator&#39;: &#39;remove_stopwords&#39;, &#39;parameters&#39;: {&#39;stopwords&#39;: None}},
+ {&#39;operator&#39;: &#39;remove_whitespace&#39;}]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="3.-Built-in-functions">
+<h2>3. Built-in functions<a class="headerlink" href="#3.-Built-in-functions" title="Permalink to this headline">¶</a></h2>
+<p>This section demonstrates the built-in cleaning operations which can be called using the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> parameter.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clean_text()</span></code> assumes the DataFrame column contains text data. As such, any <code class="docutils literal notranslate"><span class="pre">int</span></code> values will be cast to <code class="docutils literal notranslate"><span class="pre">str</span></code> after applying a cleaning function.</p>
+<span class="target" id="fillna"></span><div class="section" id="fillna">
+<h3>fillna<a class="headerlink" href="#fillna" title="Permalink to this headline">¶</a></h3>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">fillna</span></code> replaces all null values with <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;fillna&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To specify a specific value to replace null values, use the <code class="docutils literal notranslate"><span class="pre">value</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;fillna&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;NAN&gt;&quot;</span><span class="p">}}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>&lt;NAN&gt;</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>&lt;NAN&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="lowercase"></span></div>
+<div class="section" id="lowercase">
+<h3>lowercase<a class="headerlink" href="#lowercase" title="Permalink to this headline">¶</a></h3>
+<p>Convert all characters to lowercase.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;lowercase&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'zzzzz!' if imdb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>the cast played shakespeare.&lt;br /&gt;&lt;br /&gt;shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>simon of the desert (simón del desierto) is a 1965 film directed by luis buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[spoilers]\ni don't think i've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;cannes 1968:\ta video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>recap thread for @rottentomatoes excellent panel, hosted by @erikdavis with @filmfatale_nyc and @ashcrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#gameofthrones: season 8 is #rotten at 54% on the #tomatometer.  but does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2url3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>null</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="sentence_case">
+<h3>sentence_case<a class="headerlink" href="#sentence_case" title="Permalink to this headline">¶</a></h3>
+<p>Convert the first character of the string to uppercase and all remaining characters to lowercase.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence_case&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'zzzzz!' if imdb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played shakespeare.&lt;br /&gt;&lt;br /&gt;shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the desert (simón del desierto) is a 1965 film directed by luis buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[spoilers]\ni don't think i've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;cannes 1968:\ta video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @rottentomatoes excellent panel, hosted by @erikdavis with @filmfatale_nyc and @ashcrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#gameofthrones: season 8 is #rotten at 54% on the #tomatometer.  but does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2url3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Null</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="title_case">
+<h3>title_case<a class="headerlink" href="#title_case" title="Permalink to this headline">¶</a></h3>
+<p>Convert the first character of each word to uppercase and the remaining words to lowercase.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;title_case&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'Zzzzz!' If Imdb Would Allow One-Word Reviews, That'S What Mine Would Be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The Cast Played Shakespeare.&lt;Br /&gt;&lt;Br /&gt;Shakespeare Lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon Of The Desert (Simón Del Desierto) Is A 1965 Film Directed By Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[Spoilers]\nI Don'T Think I'Ve Seen A Film This Bad Before {Acting, Script, Effects (!), Etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;A Href='/Festivals/Cannes-1968-A-Video-Essay'&gt;Cannes 1968:\tA Video Essay&lt;/A&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap Thread For @Rottentomatoes Excellent Panel, Hosted By @Erikdavis With @Filmfatale_Nyc And @Ashcrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#Gameofthrones: Season 8 Is #Rotten At 54% On The #Tomatometer.  But Does It Deserve To Be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come Join And Share Your Thoughts On This Week'S Episode: Https://Twitter.Com/I/Spaces/1Fake2Url3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Null</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="uppercase">
+<h3>uppercase<a class="headerlink" href="#uppercase" title="Permalink to this headline">¶</a></h3>
+<p>Convert all characters to uppercase.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;uppercase&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' IF IMDB WOULD ALLOW ONE-WORD REVIEWS, THAT'S WHAT MINE WOULD BE.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>THE CAST PLAYED SHAKESPEARE.&lt;BR /&gt;&lt;BR /&gt;SHAKESPEARE LOST.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SIMON OF THE DESERT (SIMÓN DEL DESIERTO) IS A 1965 FILM DIRECTED BY LUIS BUÑUEL.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI DON'T THINK I'VE SEEN A FILM THIS BAD BEFORE {ACTING, SCRIPT, EFFECTS (!), ETC...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;A HREF='/FESTIVALS/CANNES-1968-A-VIDEO-ESSAY'&gt;CANNES 1968:\tA VIDEO ESSAY&lt;/A&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>RECAP THREAD FOR @ROTTENTOMATOES EXCELLENT PANEL, HOSTED BY @ERIKDAVIS WITH @FILMFATALE_NYC AND @ASHCROSSAN.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GAMEOFTHRONES: SEASON 8 IS #ROTTEN AT 54% ON THE #TOMATOMETER.  BUT DOES IT DESERVE TO BE?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>COME JOIN AND SHARE YOUR THOUGHTS ON THIS WEEK'S EPISODE: HTTPS://TWITTER.COM/I/SPACES/1FAKE2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-accents"></span></div>
+<div class="section" id="remove_accents">
+<h3>remove_accents<a class="headerlink" href="#remove_accents" title="Permalink to this headline">¶</a></h3>
+<p>Remove accents (diacritic marks) from the text.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_accents&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simon del desierto) is a 1965 film directed by Luis Bunuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="remove_bracketed">
+<h3>remove_bracketed<a class="headerlink" href="#remove_bracketed" title="Permalink to this headline">¶</a></h3>
+<p>Remove text between brackets.</p>
+<p>The style of the brackets can be specified using the <code class="docutils literal notranslate"><span class="pre">brackets</span></code> parameter:</p>
+<ul class="simple">
+<li><p>“angle”: <code class="docutils literal notranslate"><span class="pre">&lt;&gt;</span></code></p></li>
+<li><p>“curly”: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p></li>
+<li><p>“round”: <code class="docutils literal notranslate"><span class="pre">()</span></code></p></li>
+<li><p>“square”: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p></li>
+</ul>
+<p>By default, the <code class="docutils literal notranslate"><span class="pre">inclusive</span></code> parameter is set to True and the brackets are removed along with the text in between.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_bracketed&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="s2">&quot;round&quot;</span><span class="p">}}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert  is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects , etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To remove the text but keep the brackets, set <code class="docutils literal notranslate"><span class="pre">inclusive</span></code> to False.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;inclusive&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert () is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">brackets</span></code> parameter can also take in a set, which allows multiple bracket styles to be specified at a time.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="s2">&quot;curly&quot;</span><span class="p">,</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;square&quot;</span><span class="p">}},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert  is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>\nI don't think I've seen a film this bad before</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Cannes 1968:\tA video essay</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-digits"></span></div>
+<div class="section" id="remove_digits">
+<h3>remove_digits<a class="headerlink" href="#remove_digits" title="Permalink to this headline">¶</a></h3>
+<p>Remove all digits.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_digits&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a  film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes--a-video-essay'&gt;Cannes :\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season  is #Rotten at % on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/fakeURL</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-html"></span></div>
+<div class="section" id="remove_html">
+<h3>remove_html<a class="headerlink" href="#remove_html" title="Permalink to this headline">¶</a></h3>
+<p>Remove HTML tags, including the non-breaking space <code class="docutils literal notranslate"><span class="pre">&amp;nbsp;</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_html&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Cannes 1968:\tA video essay</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="remove_prefixed">
+<h3>remove_prefixed<a class="headerlink" href="#remove_prefixed" title="Permalink to this headline">¶</a></h3>
+<p>Remove substrings that start with the prefix(es) specified in the <code class="docutils literal notranslate"><span class="pre">prefix</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_prefixed&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;#&quot;</span><span class="p">}}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Season 8 is  at 54% on the   But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To specify multiple prefixes, pass in a set of the prefixes to the <code class="docutils literal notranslate"><span class="pre">prefix</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_prefixed&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">}}}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for  excellent panel, hosted by  with  and</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Season 8 is  at 54% on the   But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-punctuation"></span></div>
+<div class="section" id="remove_puncutation">
+<h3>remove_puncutation<a class="headerlink" href="#remove_puncutation" title="Permalink to this headline">¶</a></h3>
+<p>Remove all punctuation marks defined in Python’s <code class="docutils literal notranslate"><span class="pre">string.punctuation</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_punctuation&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ZZZZZ   If IMDb would allow one word reviews  that s what mine would be</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare  br    br   Shakespeare lost</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert  Simón del desierto  is a 1965 film directed by Luis Buñuel</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SPOILERS \nI don t think I ve seen a film this bad before  acting  script  effects      etc</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>a href   festivals cannes 1968 a video essay  Cannes 1968 \tA video essay  a</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for  RottenTomatoes excellent panel  hosted by  ErikDavis with  FilmFatale NYC and  AshCrossan</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>GameOfThrones  Season 8 is  Rotten at 54  on the  Tomatometer   But does it deserve to be</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week s episode  https   twitter com i spaces 1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-stopwords"></span></div>
+<div class="section" id="remove_stopwords">
+<h3>remove_stopwords<a class="headerlink" href="#remove_stopwords" title="Permalink to this headline">¶</a></h3>
+<p>Remove common words. By default, the set of stopwords to remove is NLTK’s English stopwords.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_stopwords&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' IMDb would allow one-word reviews, that's mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon Desert (Simón del desierto) 1965 film directed Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] think I've seen film bad {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread @RottenTomatoes excellent panel, hosted @ErikDavis @FilmFatale_NYC @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 #Rotten 54% #Tomatometer. deserve be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join share thoughts week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To use a custom set of words, pass the set into the <code class="docutils literal notranslate"><span class="pre">stopwords</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_stopwords&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;stopwords&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;imdb&quot;</span><span class="p">,</span> <span class="s2">&quot;film&quot;</span><span class="p">}}}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] I don't think I've seen a this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: A video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer. But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Alternatively, expand upon the default set of stopwords by importing <code class="docutils literal notranslate"><span class="pre">dataprep.assets.english_stopwords</span></code> and adding custom words.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.assets.english_stopwords</span> <span class="kn">import</span> <span class="n">english_stopwords</span>
+<span class="n">custom_stopwords</span> <span class="o">=</span> <span class="n">english_stopwords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">custom_stopwords</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;imdb&quot;</span><span class="p">)</span>
+<span class="n">custom_stopwords</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;film&quot;</span><span class="p">)</span>
+
+<span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_stopwords&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;stopwords&quot;</span><span class="p">:</span> <span class="n">custom_stopwords</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' would allow one-word reviews, that's mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon Desert (Simón del desierto) 1965 directed Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] think I've seen bad {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread @RottenTomatoes excellent panel, hosted @ErikDavis @FilmFatale_NYC @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 #Rotten 54% #Tomatometer. deserve be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join share thoughts week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-urls"></span></div>
+<div class="section" id="remove_urls">
+<h3>remove_urls<a class="headerlink" href="#remove_urls" title="Permalink to this headline">¶</a></h3>
+<p>Remove URLs. Substrings that start with “http” or “www” are considered URLs.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_urls&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode:</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<span class="target" id="remove-whitespace"></span></div>
+<div class="section" id="remove_whitespace">
+<h3>remove_whitespace<a class="headerlink" href="#remove_whitespace" title="Permalink to this headline">¶</a></h3>
+<p>Remove extra spaces (two or more) along with tabs and newlines. Leading and trailing spaces are also removed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;remove_whitespace&quot;</span><span class="p">}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] I don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: A video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer. But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_bracketed">
+<h3>replace_bracketed<a class="headerlink" href="#replace_bracketed" title="Permalink to this headline">¶</a></h3>
+<p>Replace text between brackets with the <code class="docutils literal notranslate"><span class="pre">value</span></code>.</p>
+<p>The style of the brackets can be specified using the <code class="docutils literal notranslate"><span class="pre">brackets</span></code> parameter:</p>
+<ul class="simple">
+<li><p>“angle”: <code class="docutils literal notranslate"><span class="pre">&lt;&gt;</span></code></p></li>
+<li><p>“curly”: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p></li>
+<li><p>“round”: <code class="docutils literal notranslate"><span class="pre">()</span></code></p></li>
+<li><p>“square”: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p></li>
+</ul>
+<p>By default, the <code class="docutils literal notranslate"><span class="pre">inclusive</span></code> parameter is set to True and the brackets are also replaced by the <code class="docutils literal notranslate"><span class="pre">value</span></code> along with the text in between.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="s2">&quot;square&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;**SPOILERS**&quot;</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>**SPOILERS**\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To replace the text, but keep the brackets, set <code class="docutils literal notranslate"><span class="pre">inclusive</span></code> to False.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="s2">&quot;square&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;**SPOILERS**&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;inclusive&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[**SPOILERS**]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">brackets</span></code> parameter can also take in a set, which allows multiple bracket styles to be specified at a time.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="s2">&quot;curly&quot;</span><span class="p">,</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;square&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;REDACTED&gt;&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;REDACTED&gt;&lt;REDACTED&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert &lt;REDACTED&gt; is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>&lt;REDACTED&gt;\nI don't think I've seen a film this bad before &lt;REDACTED&gt;</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;REDACTED&gt;Cannes 1968:\tA video essay&lt;REDACTED&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To assign different replacement values to different bracket styles, chain together <code class="docutils literal notranslate"><span class="pre">replace_bracketed</span></code> operations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="s2">&quot;square&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;**SPOILERS**&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_bracketed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;brackets&quot;</span><span class="p">:</span> <span class="s2">&quot;curly&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;in every aspect.&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>**SPOILERS**\nI don't think I've seen a film this bad before in every aspect.</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_digits">
+<h3>replace_digits<a class="headerlink" href="#replace_digits" title="Permalink to this headline">¶</a></h3>
+<p>Replace all digits with the <code class="docutils literal notranslate"><span class="pre">value</span></code>. By default, the <code class="docutils literal notranslate"><span class="pre">block</span></code> parameter is set to True and only blocks of digits, i.e. tokens composed solely of numbers, are removed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_digits&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">}}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a X film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-X-a-video-essay'&gt;Cannes X:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season X is #Rotten at X% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>X</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To replace all digits appearing in the text, set <code class="docutils literal notranslate"><span class="pre">block</span></code> to False.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_digits&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;block&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a X film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-X-a-video-essay'&gt;Cannes X:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season X is #Rotten at X% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/XfakeXURLX</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>X</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_prefixed">
+<h3>replace_prefixed<a class="headerlink" href="#replace_prefixed" title="Permalink to this headline">¶</a></h3>
+<p>Replace all substrings that start with the prefix(es) specified in the <code class="docutils literal notranslate"><span class="pre">prefix</span></code> parameter with the <code class="docutils literal notranslate"><span class="pre">value</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_prefixed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;HASHTAG&gt;&quot;</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>&lt;HASHTAG&gt; Season 8 is &lt;HASHTAG&gt; at 54% on the &lt;HASHTAG&gt;  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To replace substrings of different prefixes with the same <code class="docutils literal notranslate"><span class="pre">value</span></code>, pass in a set of the prefixes to the <code class="docutils literal notranslate"><span class="pre">prefix</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_prefixed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">},</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;TAG&gt;&quot;</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for &lt;TAG&gt; excellent panel, hosted by &lt;TAG&gt; with &lt;TAG&gt; and &lt;TAG&gt;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>&lt;TAG&gt; Season 8 is &lt;TAG&gt; at 54% on the &lt;TAG&gt;  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To replace different prefixed substrings with different values, chain together <code class="docutils literal notranslate"><span class="pre">replace_prefixed</span></code> operations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_prefixed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;HASHTAG&gt;&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_prefixed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;MENTION&gt;&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for &lt;MENTION&gt; excellent panel, hosted by &lt;MENTION&gt; with &lt;MENTION&gt; and &lt;MENTION&gt;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>&lt;HASHTAG&gt; Season 8 is &lt;HASHTAG&gt; at 54% on the &lt;HASHTAG&gt;  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_punctuation">
+<h3>replace_punctuation<a class="headerlink" href="#replace_punctuation" title="Permalink to this headline">¶</a></h3>
+<p>Replace all punctuation marks defined in <code class="docutils literal notranslate"><span class="pre">string.punctuation</span></code> with the <code class="docutils literal notranslate"><span class="pre">value</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_punctuation&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;PUNC&gt;&quot;</span><span class="p">}}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>&lt;PUNC&gt;ZZZZZ&lt;PUNC&gt;&lt;PUNC&gt; If IMDb would allow one&lt;PUNC&gt;word reviews&lt;PUNC&gt; that&lt;PUNC&gt;s what mine would be&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare&lt;PUNC&gt;&lt;PUNC&gt;br &lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt;br &lt;PUNC&gt;&lt;PUNC&gt;Shakespeare lost&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert &lt;PUNC&gt;Simón del desierto&lt;PUNC&gt; is a 1965 film directed by Luis Buñuel&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>&lt;PUNC&gt;SPOILERS&lt;PUNC&gt;\nI don&lt;PUNC&gt;t think I&lt;PUNC&gt;ve seen a film this bad before &lt;PUNC&gt;acting&lt;PUNC&gt; script&lt;PUNC&gt; effects &lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt; etc&lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;PUNC&gt;a href&lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt;festivals&lt;PUNC&gt;cannes&lt;PUNC&gt;1968&lt;PUNC&gt;a&lt;PUNC&gt;video&lt;PUNC&gt;essay&lt;PUNC&gt;&lt;PUNC&gt;Cannes 1968&lt;PUNC&gt;\tA video essay&lt;PUNC&gt;&lt;PUNC&gt;a&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for &lt;PUNC&gt;RottenTomatoes excellent panel&lt;PUNC&gt; hosted by &lt;PUNC&gt;ErikDavis with &lt;PUNC&gt;FilmFatale&lt;PUNC&gt;NYC and &lt;PUNC&gt;AshCrossan&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>&lt;PUNC&gt;GameOfThrones&lt;PUNC&gt; Season 8 is &lt;PUNC&gt;Rotten at 54&lt;PUNC&gt; on the &lt;PUNC&gt;Tomatometer&lt;PUNC&gt;  But does it deserve to be&lt;PUNC&gt;</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week&lt;PUNC&gt;s episode&lt;PUNC&gt; https&lt;PUNC&gt;&lt;PUNC&gt;&lt;PUNC&gt;twitter&lt;PUNC&gt;com&lt;PUNC&gt;i&lt;PUNC&gt;spaces&lt;PUNC&gt;1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_stopwords">
+<h3>replace_stopwords<a class="headerlink" href="#replace_stopwords" title="Permalink to this headline">¶</a></h3>
+<p>Replace common words with the <code class="docutils literal notranslate"><span class="pre">value</span></code>. By default, the set of stopwords to replace is NLTK’s English stopwords.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_stopwords&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;S&gt;&quot;</span><span class="p">}}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' &lt;S&gt; IMDb would allow one-word reviews, that's &lt;S&gt; mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>&lt;S&gt; cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon &lt;S&gt; &lt;S&gt; Desert (Simón del desierto) &lt;S&gt; &lt;S&gt; 1965 film directed &lt;S&gt; Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] &lt;S&gt; &lt;S&gt; think I've seen &lt;S&gt; film &lt;S&gt; bad &lt;S&gt; {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: &lt;S&gt; video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread &lt;S&gt; @RottenTomatoes excellent panel, hosted &lt;S&gt; @ErikDavis &lt;S&gt; @FilmFatale_NYC &lt;S&gt; @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 &lt;S&gt; #Rotten &lt;S&gt; 54% &lt;S&gt; &lt;S&gt; #Tomatometer. &lt;S&gt; &lt;S&gt; &lt;S&gt; deserve &lt;S&gt; be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join &lt;S&gt; share &lt;S&gt; thoughts &lt;S&gt; &lt;S&gt; week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To use a custom set of words, pass the set into the <code class="docutils literal notranslate"><span class="pre">stopwords</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_stopwords&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;stopwords&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;imdb&quot;</span><span class="p">,</span> <span class="s2">&quot;film&quot;</span><span class="p">},</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;S&gt;&quot;</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If &lt;S&gt; would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 &lt;S&gt; directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] I don't think I've seen a &lt;S&gt; this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: A video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer. But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Alternatively, expand upon the default set of stopwords by importing <code class="docutils literal notranslate"><span class="pre">dataprep.assets.english_stopwords</span></code> and adding custom words.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.assets.english_stopwords</span> <span class="kn">import</span> <span class="n">english_stopwords</span>
+<span class="n">custom_stopwords</span> <span class="o">=</span> <span class="n">english_stopwords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">custom_stopwords</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;imdb&quot;</span><span class="p">)</span>
+<span class="n">custom_stopwords</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;film&quot;</span><span class="p">)</span>
+
+<span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_stopwords&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;stopwords&quot;</span><span class="p">:</span> <span class="n">custom_stopwords</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;S&gt;&quot;</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' &lt;S&gt; &lt;S&gt; would allow one-word reviews, that's &lt;S&gt; mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>&lt;S&gt; cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon &lt;S&gt; &lt;S&gt; Desert (Simón del desierto) &lt;S&gt; &lt;S&gt; 1965 &lt;S&gt; directed &lt;S&gt; Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS] &lt;S&gt; &lt;S&gt; think I've seen &lt;S&gt; &lt;S&gt; &lt;S&gt; bad &lt;S&gt; {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968: &lt;S&gt; video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread &lt;S&gt; @RottenTomatoes excellent panel, hosted &lt;S&gt; @ErikDavis &lt;S&gt; @FilmFatale_NYC &lt;S&gt; @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 &lt;S&gt; #Rotten &lt;S&gt; 54% &lt;S&gt; &lt;S&gt; #Tomatometer. &lt;S&gt; &lt;S&gt; &lt;S&gt; deserve &lt;S&gt; be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join &lt;S&gt; share &lt;S&gt; thoughts &lt;S&gt; &lt;S&gt; week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_text">
+<h3>replace_text<a class="headerlink" href="#replace_text" title="Permalink to this headline">¶</a></h3>
+<p>Replace a sequence of characters with another according to the mapping specified in the <code class="docutils literal notranslate"><span class="pre">value</span></code> parameter. By default, <code class="docutils literal notranslate"><span class="pre">block</span></code> is set to True and only blocks of text, i.e. tokens composed solely of the specified sequence of characters, are replaced.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_text&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;imdb&quot;</span><span class="p">:</span> <span class="s2">&quot;Netflix&quot;</span><span class="p">,</span> <span class="s2">&quot;film&quot;</span><span class="p">:</span> <span class="s2">&quot;movie&quot;</span><span class="p">}},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If Netflix would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 movie directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a movie this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To replace the sequence of characters wherever they appear in the text, set <code class="docutils literal notranslate"><span class="pre">block</span></code> to False.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_text&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;imdb&quot;</span><span class="p">:</span> <span class="s2">&quot;Netflix&quot;</span><span class="p">,</span> <span class="s2">&quot;film&quot;</span><span class="p">:</span> <span class="s2">&quot;movie&quot;</span><span class="p">},</span> <span class="s2">&quot;block&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If Netflix would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 movie directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a movie this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @movieFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: https://twitter.com/i/spaces/1fake2URL3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="replace_urls">
+<h3>replace_urls<a class="headerlink" href="#replace_urls" title="Permalink to this headline">¶</a></h3>
+<p>Replace URLs with the <code class="docutils literal notranslate"><span class="pre">value</span></code>. Substrings that start with “http” or “www” are considered URLs.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">custom_pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;replace_urls&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;URL&gt;&quot;</span><span class="p">}}]</span>
+<span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="n">custom_pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'ZZZZZ!' If IMDb would allow one-word reviews, that's what mine would be.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>The cast played Shakespeare.&lt;br /&gt;&lt;br /&gt;Shakespeare lost.</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Simon of the Desert (Simón del desierto) is a 1965 film directed by Luis Buñuel.</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[SPOILERS]\nI don't think I've seen a film this bad before {acting, script, effects (!), etc...}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>&lt;a href='/festivals/cannes-1968-a-video-essay'&gt;Cannes 1968:\tA video essay&lt;/a&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Recap thread for @RottenTomatoes excellent panel, hosted by @ErikDavis with @FilmFatale_NYC and @AshCrossan.</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>#GameOfThrones: Season 8 is #Rotten at 54% on the #Tomatometer.  But does it deserve to be?</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Come join and share your thoughts on this week's episode: &lt;URL&gt;</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>NULL</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.correlation.compute &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.correlation.compute &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -156,8 +156,8 @@
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">catch_warnings</span><span class="p">,</span> <span class="n">filterwarnings</span>
 
 <span class="kn">from</span> <span class="nn">...configs</span> <span class="kn">import</span> <span class="n">Config</span>
-<span class="kn">from</span> <span class="nn">...data_array</span> <span class="kn">import</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">DataFrame</span>
 <span class="kn">from</span> <span class="nn">...intermediate</span> <span class="kn">import</span> <span class="n">Intermediate</span>
+<span class="kn">from</span> <span class="nn">...eda_frame</span> <span class="kn">import</span> <span class="n">EDAFrame</span><span class="p">,</span> <span class="n">DataFrame</span>
 <span class="kn">from</span> <span class="nn">.bivariate</span> <span class="kn">import</span> <span class="n">_calc_bivariate</span>
 <span class="kn">from</span> <span class="nn">.overview</span> <span class="kn">import</span> <span class="n">_calc_overview</span>
 <span class="kn">from</span> <span class="nn">.univariate</span> <span class="kn">import</span> <span class="n">_calc_univariate</span>
@@ -167,8 +167,8 @@
 
 <div class="viewcode-block" id="compute_correlation"><a class="viewcode-back" href="../../../../api_reference/dataprep.eda.correlation.html#dataprep.eda.correlation.compute.compute_correlation">[docs]</a><span class="k">def</span> <span class="nf">compute_correlation</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">col1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">col2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Config</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">display</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -183,9 +183,9 @@
 <span class="sd">        The pandas dataframe for which plots are calculated for each column.</span>
 <span class="sd">    cfg</span>
 <span class="sd">        Config instance</span>
-<span class="sd">    x</span>
+<span class="sd">    col1</span>
 <span class="sd">        A valid column name of the dataframe</span>
-<span class="sd">    y</span>
+<span class="sd">    col2</span>
 <span class="sd">        A valid column name of the dataframe</span>
 <span class="sd">    value_range</span>
 <span class="sd">        If the correlation value is out of the range, don&#39;t show it.</span>
@@ -206,6 +206,8 @@
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">cfg</span><span class="p">:</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
 
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">EDAFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-else-return</span>
         <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">filterwarnings</span><span class="p">(</span>
@@ -213,7 +215,7 @@
                 <span class="s2">&quot;overflow encountered in long_scalars&quot;</span><span class="p">,</span>
                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">return</span> <span class="n">_calc_overview</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_calc_overview</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">filterwarnings</span><span class="p">(</span>
@@ -221,11 +223,11 @@
                 <span class="s2">&quot;overflow encountered in long_scalars&quot;</span><span class="p">,</span>
                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">return</span> <span class="n">_calc_univariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_calc_univariate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please give the column name to x instead of y&quot;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_calc_bivariate</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_calc_bivariate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
 
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not Possible&quot;</span><span class="p">)</span></div>
 </pre></div>

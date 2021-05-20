@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.correlation &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.correlation &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -160,7 +160,7 @@
 
 <span class="kn">from</span> <span class="nn">..configs</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">..container</span> <span class="kn">import</span> <span class="n">Container</span>
-<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">...progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">.compute</span> <span class="kn">import</span> <span class="n">compute_correlation</span>
 <span class="kn">from</span> <span class="nn">.render</span> <span class="kn">import</span> <span class="n">render_correlation</span>
 
@@ -169,8 +169,8 @@
 
 <div class="viewcode-block" id="plot_correlation"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.correlation.html#dataprep.eda.correlation.plot_correlation">[docs]</a><span class="k">def</span> <span class="nf">plot_correlation</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">col1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">col2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">value_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -188,9 +188,9 @@
 <span class="sd">    ----------</span>
 <span class="sd">    df</span>
 <span class="sd">        The pandas data_frame for which plots are calculated for each column.</span>
-<span class="sd">    x</span>
+<span class="sd">    col1</span>
 <span class="sd">        A valid column name of the data frame.</span>
-<span class="sd">    y</span>
+<span class="sd">    col2</span>
 <span class="sd">        A valid column name of the data frame.</span>
 <span class="sd">    value_range</span>
 <span class="sd">        Range of value.</span>
@@ -223,10 +223,11 @@
 <span class="sd">    This function only supports numerical or categorical data,</span>
 <span class="sd">    and it is better to drop None, Nan and Null value before using it</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">itmdt</span> <span class="o">=</span> <span class="n">compute_correlation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="n">value_range</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
     <span class="n">to_render</span> <span class="o">=</span> <span class="n">render_correlation</span><span class="p">(</span><span class="n">itmdt</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">to_render</span><span class="p">,</span> <span class="n">itmdt</span><span class="o">.</span><span class="n">visual_type</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span></div>

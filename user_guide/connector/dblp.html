@@ -1,0 +1,982 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Process overview via DBLP &#8212; DataPrep 0.3.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Configuration files: usage and composition" href="config.html" />
+    <link rel="prev" title="Connector" href="introduction.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/connector/dblp.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="introduction.html">Connector</a>
+                  <ul>
+                  
+                      <li class="active">
+                          <a href="">Case study: dblp API</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="config.html">Configuration files: usage and composition</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="connect.html">connect(): establish the connection and load the configurationfiles</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="query.html">query(): fetch data into DataFrames via APIs</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="info.html">info(): get information of a website</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="authorization.html">Authorization schemes supported</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="pagination.html">Auto-pagination</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../clean/introduction.html">Clean</a>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#What-is-DataPrep.Connector?" class="nav-link">What is DataPrep.Connector?</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Collecting-data-from-DBLP" class="nav-link">Collecting data from DBLP</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#DBLP-Website" class="nav-link">DBLP Website</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Step-1:-Installation" class="nav-link">Step 1: Installation</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Step-2:-Connecting-to-the-API" class="nav-link">Step 2: Connecting to the API</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Step-3:-Understand-how-to-use-the-API" class="nav-link">Step 3: Understand how to use the API</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Step-4:-Customize-the-query-to-collect-data" class="nav-link">Step 4: Customize the query to collect data</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Process-overview-via-DBLP">
+<h1>Process overview via DBLP<a class="headerlink" href="#Process-overview-via-DBLP" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="What-is-DataPrep.Connector?">
+<h2>What is DataPrep.Connector?<a class="headerlink" href="#What-is-DataPrep.Connector?" title="Permalink to this headline">¶</a></h2>
+<p>Connector is an intuitive, open-source API wrapper that speeds up development by standardizing calls to multiple APIs as a simple workflow.</p>
+<p>Connector provides a simple wrapper to collect structured data from different Web APIs (e.g., Twitter, Spotify), making web data collection easy and efficient, without requiring advanced programming skills.</p>
+<p>With Connector, you can collect data in two steps: <strong>connect</strong> to a website and <strong>query</strong> the data.</p>
+<p>We currently support tens of websites: <a class="reference external" href="https://github.com/sfu-db/APIConnectors/tree/develop/api-connectors">https://github.com/sfu-db/APIConnectors/tree/develop/api-connectors</a></p>
+<p>You can also author your own configuration files to support new websites. We look forward to seeing your contribution to facilitate other users as well.</p>
+</div>
+<div class="section" id="Collecting-data-from-DBLP">
+<h2>Collecting data from DBLP<a class="headerlink" href="#Collecting-data-from-DBLP" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="DBLP-Website">
+<h3>DBLP Website<a class="headerlink" href="#DBLP-Website" title="Permalink to this headline">¶</a></h3>
+<p>DBLP (<a class="reference external" href="https://dblp.org/">https://dblp.org/</a>) is a computer science bibliography website. We will use it as an example to illustrate how to collect data easily using DataPrep.Connector.</p>
+<p>API: <a class="reference external" href="https://dblp.org/faq/13501473.html">https://dblp.org/faq/13501473.html</a></p>
+<p>And more examples are available here: <a class="reference external" href="https://github.com/sfu-db/dataprep/tree/develop/examples">https://github.com/sfu-db/dataprep/tree/develop/examples</a>.</p>
+</div>
+<div class="section" id="Step-1:-Installation">
+<h3>Step 1: Installation<a class="headerlink" href="#Step-1:-Installation" title="Permalink to this headline">¶</a></h3>
+<p>You can install the DataPrep through the single command below if you have not.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!pip install dataprep
+</pre></div>
+</div>
+</div>
+<div class="section" id="Step-2:-Connecting-to-the-API">
+<h3>Step 2: Connecting to the API<a class="headerlink" href="#Step-2:-Connecting-to-the-API" title="Permalink to this headline">¶</a></h3>
+<p>Once the library is installed, you can connect to a website that are supported by us or loading from local configuration files for connection. The detailed usage and paramsters for connect() can be found in next section. Here, we are connecting to DBLP API through the exsiting configuration file available here: <a class="reference external" href="https://github.com/sfu-db/DataConnectorConfigs/tree/develop/api-connectors/dblp">https://github.com/sfu-db/DataConnectorConfigs/tree/develop/api-connectors/dblp</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dblp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Step-3:-Understand-how-to-use-the-API">
+<h3>Step 3: Understand how to use the API<a class="headerlink" href="#Step-3:-Understand-how-to-use-the-API" title="Permalink to this headline">¶</a></h3>
+<p>info() function helps you understand what is available from the website. Here, the output shows there is one table called “publication” available. And to fetch the data, we have to specify the value of the “q” (query keyword) parameter. The schema block shows the schema of the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Generating new fontManager, this may take some time...
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<html>
+    <head>
+        <title> DataPrep.Connector Info </title>
+        <script>
+            function switchTab637(e) {
+                const selectedAreaSuffix = e.parentElement.parentElement.className.split('-')[1];
+                const selectedTabId = e.id.split('-')[2];
+                const selectedTabContent = document.querySelector(`.contents-${selectedAreaSuffix}>div:nth-of-type(${selectedTabId})`);
+                const contentArray = document.getElementsByClassName('info-637')
+                for (let i of contentArray) {
+                    i.style.display = 'none';
+                }
+                selectedTabContent.style.display = 'block';
+            }
+        </script>
+        <style>
+            .container-637 {
+            }
+            .container-637 input[type=radio] {
+            display: none;
+            }
+            .tabs-637 {
+            font-family: -apple-system, 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            display: grid;
+            flex-wrap: wrap;
+            gap: 5px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            justify-content: wrap;
+            }
+            .tabs-637 label {
+            word-wrap: break-word;
+            text-align: center;
+            font-size: 12px;
+            border-bottom: 2px solid #9edae5;
+            transition: border 0.3s ease;
+            }
+            .tabs-637 label:hover {
+            background: rgba(0, 0, 0, 0.1);
+            }
+            .tabs-637 input:checked+label {
+            border-bottom: 2px solid #1f77b4;
+            }
+            .contents-637>div:nth-of-type(n+2) {
+            display: none;
+            }
+            h4 {
+            font-size: 14px;
+            font-family: Arial;
+            }
+            p {
+            font-size: 13px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-637">
+            <div class="tabs-637">
+                <input type="radio" name="select" id='tab-637-1' checked onclick="switchTab637(this)">
+                <label for="tab-637-1">publication</label>
+
+
+
+
+            </div>
+            <div class="contents-637">
+
+                <div class="info-637">
+                    <div>
+                        <h4><u>Parameters</u></h4>
+
+
+                        <p style="display:wrap"><code>q (required)</code></p>
+
+
+
+
+                        <p style="display:wrap"><code>h</code></p>
+
+                        <p style="display:wrap"><code>f</code></p>
+
+
+
+                    </div>
+                    <div>
+                        <h4><u>Example</u></h4>
+
+
+
+
+
+
+
+
+
+
+
+
+                        <p><code>dc = connect('dblp')<br>df = await dc.query('publication', q='lee', _count=20)</code></p>
+                    </div>
+                    <div>
+                            <h4><u>Schema</u></h4>
+                            <style  type="text/css" >
+    #T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003 th {
+          background: white;
+          font-weight: bold;
+          text-align: right;
+          font-family: arial;
+          font-size: 13;
+    }    #T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003 td {
+          font-family: arial;
+    }    #T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003 tr:nth-of-type(odd) {
+          background: #f5f5f5;
+          font-size: 13;
+          text-align: right;
+    }    #T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003 tr:nth-of-type(even) {
+          background: #white;
+          font-size: 13;
+          text-align: right;
+    }    #T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003 tr:hover {
+          background-color: e0f1ff;
+    }</style><table id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003" ><thead>    <tr>        <th class="blank level0" ></th>        <th class="col_heading level0 col0" >column_name</th>        <th class="col_heading level0 col1" >data_type</th>    </tr></thead><tbody>
+                <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row0" class="row_heading level0 row0" >0</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row0_col0" class="data row0 col0" >title</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row0_col1" class="data row0 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row1" class="row_heading level0 row1" >1</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row1_col0" class="data row1 col0" >venue</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row1_col1" class="data row1 col1" >object</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row2" class="row_heading level0 row2" >2</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row2_col0" class="data row2 col0" >publisher</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row2_col1" class="data row2 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row3" class="row_heading level0 row3" >3</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row3_col0" class="data row3 col0" >year</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row3_col1" class="data row3 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row4" class="row_heading level0 row4" >4</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row4_col0" class="data row4 col0" >type</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row4_col1" class="data row4 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row5" class="row_heading level0 row5" >5</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row5_col0" class="data row5 col0" >key</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row5_col1" class="data row5 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row6" class="row_heading level0 row6" >6</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row6_col0" class="data row6 col0" >ee</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row6_col1" class="data row6 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row7" class="row_heading level0 row7" >7</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row7_col0" class="data row7 col0" >url</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row7_col1" class="data row7 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row8" class="row_heading level0 row8" >8</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row8_col0" class="data row8 col0" >authors</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row8_col1" class="data row8 col1" >object</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row9" class="row_heading level0 row9" >9</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row9_col0" class="data row9 col0" >pages</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row9_col1" class="data row9 col1" >string</td>
+            </tr>
+            <tr>
+                        <th id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003level0_row10" class="row_heading level0 row10" >10</th>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row10_col0" class="data row10 col0" >doi</td>
+                        <td id="T_e7f9eb5e_b91e_11eb_9a8a_0242ac1f0003row10_col1" class="data row10 col1" >string</td>
+            </tr>
+    </tbody></table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </body></div>
+</div>
+</div>
+<div class="section" id="Step-4:-Customize-the-query-to-collect-data">
+<h3>Step 4: Customize the query to collect data<a class="headerlink" href="#Step-4:-Customize-the-query-to-collect-data" title="Permalink to this headline">¶</a></h3>
+<p>Once you know how to use the API and the connection is built, you can issue the query through the query function. The first parameter specifies which API endpoint you want to query. The detailed parameter explanation can be found in later sections. In this example, we are collecting 2000 CVPR2020 papers.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;publication&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s2">&quot;CVPR 2020&quot;</span><span class="p">,</span> <span class="n">_count</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>title</th>
+      <th>venue</th>
+      <th>publisher</th>
+      <th>year</th>
+      <th>type</th>
+      <th>key</th>
+      <th>ee</th>
+      <th>url</th>
+      <th>authors</th>
+      <th>pages</th>
+      <th>doi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2020 IEEE/CVF Conference on Computer Vision an...</td>
+      <td>[CVPR]</td>
+      <td>IEEE</td>
+      <td>2020</td>
+      <td>Editorship</td>
+      <td>conf/cvpr/2020</td>
+      <td>https://ieeexplore.ieee.org/xpl/conhome/914230...</td>
+      <td>https://dblp.org/rec/conf/cvpr/2020</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2020 IEEE/CVF Conference on Computer Vision an...</td>
+      <td>[CVPR Workshops]</td>
+      <td>IEEE</td>
+      <td>2020</td>
+      <td>Editorship</td>
+      <td>conf/cvpr/2020w</td>
+      <td>https://ieeexplore.ieee.org/xpl/conhome/914228...</td>
+      <td>https://dblp.org/rec/conf/cvpr/2020w</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NTIRE 2020 Challenge on Real Image Denoising -...</td>
+      <td>[CVPR Workshops]</td>
+      <td>None</td>
+      <td>2020</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/AbdelhamedATBCZ20</td>
+      <td>https://doi.org/10.1109/CVPRW50498.2020.00256</td>
+      <td>https://dblp.org/rec/conf/cvpr/AbdelhamedATBCZ20</td>
+      <td>[Abdelrahman Abdelhamed, Mahmoud Afifi, Radu T...</td>
+      <td>2077-2088</td>
+      <td>10.1109/CVPRW50498.2020.00256</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>NTIRE 2020 Challenge on NonHomogeneous Dehazing.</td>
+      <td>[CVPR Workshops]</td>
+      <td>None</td>
+      <td>2020</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/AncutiAVTLWXQMH20</td>
+      <td>https://doi.org/10.1109/CVPRW50498.2020.00253</td>
+      <td>https://dblp.org/rec/conf/cvpr/AncutiAVTLWXQMH20</td>
+      <td>[Codruta O. Ancuti, Cosmin Ancuti, Florin-Alex...</td>
+      <td>2029-2044</td>
+      <td>10.1109/CVPRW50498.2020.00253</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>NTIRE 2020 Challenge on Spectral Reconstructio...</td>
+      <td>[CVPR Workshops]</td>
+      <td>None</td>
+      <td>2020</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/AradTBLFGLW0LLL20</td>
+      <td>https://doi.org/10.1109/CVPRW50498.2020.00231</td>
+      <td>https://dblp.org/rec/conf/cvpr/AradTBLFGLW0LLL20</td>
+      <td>[Boaz Arad, Radu Timofte, Ohad Ben-Shahar, Yi-...</td>
+      <td>1806-1822</td>
+      <td>10.1109/CVPRW50498.2020.00231</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1991</th>
+      <td>CVPR 2019 WAD Challenge on Trajectory Predicti...</td>
+      <td>[CoRR]</td>
+      <td>None</td>
+      <td>2020</td>
+      <td>Informal Publications</td>
+      <td>journals/corr/abs-2004-05966</td>
+      <td>https://arxiv.org/abs/2004.05966</td>
+      <td>https://dblp.org/rec/journals/corr/abs-2004-05966</td>
+      <td>[Sibo Zhang, Yuexin Ma, Ruigang Yang, Xin Li, ...</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1992</th>
+      <td>Priming Neural Networks.</td>
+      <td>[CVPR Workshops]</td>
+      <td>None</td>
+      <td>2018</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/RosenfeldBT18</td>
+      <td>http://openaccess.thecvf.com/content_cvpr_2018...</td>
+      <td>https://dblp.org/rec/conf/cvpr/RosenfeldBT18</td>
+      <td>[Amir Rosenfeld, Mahdi Biparva, John K. Tsotsos]</td>
+      <td>2011-2020</td>
+      <td>10.1109/CVPRW.2018.00270</td>
+    </tr>
+    <tr>
+      <th>1993</th>
+      <td>Superpixel meshes for fast edge-preserving sur...</td>
+      <td>[CVPR]</td>
+      <td>None</td>
+      <td>2015</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/Bodis-SzomoruRG15</td>
+      <td>https://doi.org/10.1109/CVPR.2015.7298812</td>
+      <td>https://dblp.org/rec/conf/cvpr/Bodis-SzomoruRG15</td>
+      <td>[András Bódis-Szomorú, Hayko Riemenschneider, ...</td>
+      <td>2011-2020</td>
+      <td>10.1109/CVPR.2015.7298812</td>
+    </tr>
+    <tr>
+      <th>1994</th>
+      <td>Multiphase geometric couplings for the segment...</td>
+      <td>[CVPR]</td>
+      <td>None</td>
+      <td>2009</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/ReinaMP09</td>
+      <td>https://doi.org/10.1109/CVPR.2009.5206524</td>
+      <td>https://dblp.org/rec/conf/cvpr/ReinaMP09</td>
+      <td>[Amelio Vázquez Reina, Eric L. Miller 0001, Ha...</td>
+      <td>2020-2027</td>
+      <td>10.1109/CVPR.2009.5206524</td>
+    </tr>
+    <tr>
+      <th>1995</th>
+      <td>Integrating Shape from Shading and Range Data ...</td>
+      <td>[CVPR]</td>
+      <td>None</td>
+      <td>1999</td>
+      <td>Conference and Workshop Papers</td>
+      <td>conf/cvpr/MostafaYF99</td>
+      <td>https://doi.org/10.1109/CVPR.1999.784602</td>
+      <td>https://dblp.org/rec/conf/cvpr/MostafaYF99</td>
+      <td>[Mostafa Gadal-Haqq M. Mostafa, Sameh M. Yaman...</td>
+      <td>2015-2020</td>
+      <td>10.1109/CVPR.1999.784602</td>
+    </tr>
+  </tbody>
+</table>
+<p>1996 rows × 11 columns</p>
+</div></div>
+</div>
+<p>And you have the data ready. It is so simple :)</p>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"19cc2b937c544809af626583e3d6da9d": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": "1px solid black", "bottom": null, "display": "flex", "flex": null, "flex_flow": "row", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": "scroll hidden", "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}}, "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

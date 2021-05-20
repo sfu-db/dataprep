@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.dtypes &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.dtypes &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -158,7 +158,7 @@
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
+<span class="kn">from</span> <span class="nn">..clean</span> <span class="kn">import</span> <span class="n">validate_country</span><span class="p">,</span> <span class="n">validate_lat_long</span>
 <span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 
 <span class="n">CATEGORICAL_NUMPY_DTYPES</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">object</span><span class="p">]</span>
@@ -256,6 +256,28 @@
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
+<div class="viewcode-block" id="GeoGraphy"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.GeoGraphy">[docs]</a><span class="k">class</span> <span class="nc">GeoGraphy</span><span class="p">(</span><span class="n">Categorical</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Type GeoGraphy, Subtype of Categorical</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GeoPoint"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.GeoPoint">[docs]</a><span class="k">class</span> <span class="nc">GeoPoint</span><span class="p">(</span><span class="n">DType</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Type GeoPoint</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="LatLong"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.LatLong">[docs]</a><span class="k">class</span> <span class="nc">LatLong</span><span class="p">(</span><span class="n">GeoPoint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Type LatLong, Tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">long_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lat</span> <span class="o">=</span> <span class="n">lat_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">long</span> <span class="o">=</span> <span class="n">long_col</span></div>
+
+
 <span class="c1">############## End of the Type Tree ##############</span>
 
 <span class="n">DTypeOrStr</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">DType</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DType</span><span class="p">],</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
@@ -266,6 +288,7 @@
 <div class="viewcode-block" id="detect_dtype"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.detect_dtype">[docs]</a><span class="k">def</span> <span class="nf">detect_dtype</span><span class="p">(</span>
     <span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">known_dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">detect_small_distinct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a column, detect its type or transform its type according to users&#39; specification</span>
@@ -279,9 +302,11 @@
 <span class="sd">        all columns. E.g.  known_dtype = {&quot;a&quot;: Continuous, &quot;b&quot;: &quot;Nominal&quot;} or</span>
 <span class="sd">        known_dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;} or</span>
 <span class="sd">        known_dtype = Continuous() or known_dtype = &quot;Continuous&quot; or known_dtype = Continuous()</span>
+<span class="sd">    detect_small_distinct: bool, default True</span>
+<span class="sd">        Whether to detect numerical columns with small distinct values as categorical column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">known_dtype</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">detect_without_known</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">detect_without_known</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">detect_small_distinct</span><span class="o">=</span><span class="n">detect_small_distinct</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">known_dtype</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">known_dtype</span><span class="p">:</span>
@@ -291,7 +316,7 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalize_dtype</span><span class="p">(</span><span class="n">known_dtype</span><span class="p">),</span> <span class="n">DType</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">map_dtype</span><span class="p">(</span><span class="n">normalize_dtype</span><span class="p">(</span><span class="n">known_dtype</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">detect_without_known</span><span class="p">(</span><span class="n">col</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">detect_without_known</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">detect_small_distinct</span><span class="o">=</span><span class="n">detect_small_distinct</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="map_dtype"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.map_dtype">[docs]</a><span class="k">def</span> <span class="nf">map_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
@@ -315,15 +340,29 @@
         <span class="k">return</span> <span class="n">dtype</span></div>
 
 
-<div class="viewcode-block" id="detect_without_known"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.detect_without_known">[docs]</a><span class="k">def</span> <span class="nf">detect_without_known</span><span class="p">(</span><span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
+<div class="viewcode-block" id="detect_without_known"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.detect_without_known">[docs]</a><span class="k">def</span> <span class="nf">detect_without_known</span><span class="p">(</span><span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">detect_small_distinct</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=too-many-return-statements</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function detects dtypes of column when users didn&#39;t specify.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_nominal</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Nominal</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">is_geography</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">GeoGraphy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">is_geopoint</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">GeoPoint</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Nominal</span><span class="p">()</span>
 
     <span class="k">elif</span> <span class="n">is_continuous</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Continuous</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">detect_small_distinct</span><span class="p">:</span>
+            <span class="c1"># detect as categorical if distinct value is small</span>
+            <span class="n">nuniques</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">nunique_approx</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">nuniques</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Nominal</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Continuous</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Continuous</span><span class="p">()</span>
 
     <span class="k">elif</span> <span class="n">is_datetime</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DateTime</span><span class="p">()</span>
@@ -331,7 +370,7 @@
         <span class="k">raise</span> <span class="n">UnreachableError</span></div>
 
 
-<div class="viewcode-block" id="is_dtype"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.is_dtype">[docs]</a><span class="k">def</span> <span class="nf">is_dtype</span><span class="p">(</span><span class="n">dtype1</span><span class="p">:</span> <span class="n">DType</span><span class="p">,</span> <span class="n">dtype2</span><span class="p">:</span> <span class="n">DType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="is_dtype"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.is_dtype">[docs]</a><span class="k">def</span> <span class="nf">is_dtype</span><span class="p">(</span><span class="n">dtype1</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype2</span><span class="p">:</span> <span class="n">DType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function detects if dtype2 is dtype1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -386,6 +425,24 @@
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">CATEGORICAL_PANDAS_DTYPES</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="is_geography"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.is_geography">[docs]</a><span class="k">def</span> <span class="nf">is_geography</span><span class="p">(</span><span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a column, return if its type is a geography type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">geo</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">100</span><span class="p">]</span>
+    <span class="n">geo_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">validate_country</span><span class="p">(</span><span class="n">geo</span><span class="p">))</span> <span class="o">/</span> <span class="n">geo</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">geo_ratio</span> <span class="o">&gt;</span> <span class="mf">0.8</span></div>
+
+
+<div class="viewcode-block" id="is_geopoint"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.is_geopoint">[docs]</a><span class="k">def</span> <span class="nf">is_geopoint</span><span class="p">(</span><span class="n">col</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a column, return if its type is a geopoint type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lat_long</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">100</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+    <span class="n">lat_long_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">validate_lat_long</span><span class="p">(</span><span class="n">lat_long</span><span class="p">))</span> <span class="o">/</span> <span class="n">lat_long</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lat_long_ratio</span> <span class="o">&gt;</span> <span class="mf">0.8</span></div>
+
+
 <div class="viewcode-block" id="is_continuous"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.is_continuous">[docs]</a><span class="k">def</span> <span class="nf">is_continuous</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a type, return if that type is a continuous type</span>
@@ -410,17 +467,6 @@
 <span class="sd">    Detect if a dtype is categorical and from pandas.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">CATEGORICAL_PANDAS_DTYPES</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="string_dtype_to_object"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.string_dtype_to_object">[docs]</a><span class="k">def</span> <span class="nf">string_dtype_to_object</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert string dtype to object dtype</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">STRING_DTYPES</span><span class="p">):</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <div class="viewcode-block" id="drop_null"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.dtypes.drop_null">[docs]</a><span class="k">def</span> <span class="nf">drop_null</span><span class="p">(</span>
@@ -465,6 +511,10 @@
             <span class="n">num_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">()):</span>
             <span class="n">dtype_cnts</span><span class="p">[</span><span class="s2">&quot;DateTime&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">GeoGraphy</span><span class="p">()):</span>
+            <span class="n">dtype_cnts</span><span class="p">[</span><span class="s2">&quot;GeoGraphy&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">col_dtype</span><span class="p">,</span> <span class="n">GeoPoint</span><span class="p">()):</span>
+            <span class="n">dtype_cnts</span><span class="p">[</span><span class="s2">&quot;GeoPoint&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
     <span class="k">return</span> <span class="n">dtype_cnts</span><span class="p">,</span> <span class="n">num_cols</span></div>

@@ -1,0 +1,193 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    "# Auto-pagination\n",
+    "\n",
+    "## Overview\n",
+    "\n",
+    "The pagination feature in Connector allows you to retrieve more results from Web APIs that support pagination.\n",
+    "\n",
+    "Connector supports two mainstream pagination schemes:\n",
+    "\n",
+    "* Offset-based\n",
+    "    * Offset & Limit\n",
+    "    * Page & Perpage\n",
+    "* Cursor-based\n",
+    "\n",
+    "Additionally, Connector’s auto-pagination feature enables you to implement pagination without getting into unnecessary detail about a specific pagination scheme.\n",
+    "\n",
+    "Let’s review how Connector supports pagination in the sections below.\n",
+    "\n",
+    "## Auto-pagination feature \n",
+    "\n",
+    "Connector automatically handles pagination for you and follows the Web API’s concurrency policy. You can directly specify the number of records to be collected without detailing a specific pagination scheme. Let’s review an example:\n",
+    "\n",
+    "DBLP is a Computer Science bibliography website that exposes several Web APIs, including the publication search Web API. DBLP restricts to 30 the maximum number of search results to return for each request. Therefore, in order to retrieve more information from this Web API using Connector’s auto-pagination feature, you can execute the query function with the parameter _count as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "dblp_connector = connect(\"dblp\")\n",
+    "df = await dblp_connector.query(\"publication\", q=\"SIGMOD\", _count=500)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "len(df)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Employing the _count parameter, you define the maximum number of results to retrieve, in this case: 500. Thus, your query is not limited to obtain a maximum of 30 results per invocation. The remaining parameters of the query function define the name of the endpoint (publication) and the search criteria (q=\"SIGMOD\").\n",
+    "\n",
+    "In contrast, when auto-pagination is not used, only 30 records are retrieved (DBLP’s search results limit):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "dblp_connector = connect(\"dblp\")\n",
+    "df = await dblp_connector.query(\"publication\", q=\"SIGMOD\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "len(df)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Offset-based pagination\n",
+    "Offset-based pagination scheme has two variants: Offset & Limit and Page & Perpage, as follows:\n",
+    "\n",
+    "#### Offset & Limit\n",
+    "Offset and limit parameters allow you to specify the number of rows to skip before selecting the actual rows. For example when parameters offset = 0 and limit = 20 are used, the first 20 items are fetched. Then, by sending offset = 20 and limit = 20, the next 20 items are fetched, and so on.\n",
+    "\n",
+    "Continuing with the DBLP example, below you can find how to use offset-based pagination in Connector:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "dblp_connector = connect(\"dblp\")\n",
+    "df = await dblp_connector.query(\"publication\", q=\"SIGMOD\", f=\"0\", h=\"10\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this case, the DBLP endpoint specification defines that the name of the offset parameter is f and the name of the limit parameter is h. For that reason, parameters with names f and h are used in the query function. These parameter names are also defined in the DBLP’s configuration file for the publication endpoint.:\n",
+    "\n",
+    "```\n",
+    "\"pagination\": {\n",
+    "    \"type\": \"offset\",\n",
+    "    \"offsetKey\": \"f\",\n",
+    "    \"limitKey\": \"h\",\n",
+    "    \"maxCount\": 1000\n",
+    "},\n",
+    "```\n",
+    "\n",
+    "After the execution of the query, 10 results are retrieved."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Page & Perpage\n",
+    "Instead of specifying offset and limit values, a page number (“Page”) and the amount of each page (“Perpage”) are used as parameters within the request. In the following example, you can see how this pagination method works using as an example the MapQuest Web API - “place” endpoint:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    "import asyncio\n",
+    "from dataprep.connector import connect\n",
+    "mapquest_connector = connect(\"mapquest\", _auth={\"access_token\":\"<Your MapQuest access token>\"})\n",
+    "df = await mapquest_connector.query(\"place\", q=\"Vancouver, BC\", sort=\"relevance\", page=\"1\", pageSize=\"10\")\n",
+    "```\n",
+    "\n",
+    "In this case, the specification of the MapQuest - “place” endpoint defines that the name of the “Page” parameter is page and the name of the “Perpage” parameter is pageSize. For that reason, parameters with names page and pageSize are used into the query function. These parameter names are also defined into the MapQuest’s configuration file for the place endpoint.:\n",
+    "\n",
+    "```\n",
+    "\"pagination\": {\n",
+    "    \"type\": \"page\",\n",
+    "    \"pageKey\": \"page\",\n",
+    "    \"limitKey\": \"pageSize\",\n",
+    "    \"maxCount\": 50\n",
+    "}\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Cursor-based pagination\n",
+    "Cursor-based pagination uses a “cursor” within each response to fetch the next block of data. Connector supports this type of pagination through the auto-pagination feature (see details above). That is, if a Web API implements cursor-based pagination, you can use the auto-pagination feature to retrieve data without requiring to write code for handling cursor-based pagination explicitly.\n",
+    "\n",
+    "Connector supports the two main variations of cursor-based pagination, as follows: Header Cursor and Item Cursor. Under the “Header Cursor” option, a token for the next “page” will be included in each response’s metadata. On the other hand, for the “Item Cursor” option, there will be multiple items within each response, where each item represents a valid data record. At the end of the item set of each response, a cursor of the next page will be included, which can be passed as a parameter for the subsequent request.\n",
+    "\n",
+    "However, remember that you just need to use Connector’s auto-pagination feature to fetch data from a Web API that implements cursor-based pagination."
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Raw Cell Format",
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

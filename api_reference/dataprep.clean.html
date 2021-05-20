@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.clean &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -151,6 +151,12 @@
           
             
               <li class="">
+                  <a href="dataprep.eda.diff.html">dataprep.eda.diff</a>
+              </li>
+            
+          
+            
+              <li class="">
                   <a href="dataprep.eda.create_report.html">dataprep.eda.create_report</a>
               </li>
             
@@ -201,6 +207,10 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_duplication" class="nav-link">Duplicate Values</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.clean.clean_email" class="nav-link">Email Addresses</a>
         </li>
       
@@ -214,6 +224,10 @@
       
         <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.clean.clean_phone" class="nav-link">Phone Numbers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_text" class="nav-link">Text</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -238,7 +252,7 @@
 <p>Clean and standardize column headers for a DataFrame.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_headers.clean_headers">
-<code class="sig-prename descclassname">dataprep.clean.clean_headers.</code><code class="sig-name descname">clean_headers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">case</span><span class="o">=</span><span class="default_value">'snake'</span></em>, <em class="sig-param"><span class="n">replace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">remove_accents</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_headers.html#clean_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_headers.clean_headers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_headers.</span></code><code class="sig-name descname"><span class="pre">clean_headers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'snake'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_accents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_headers.html#clean_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_headers.clean_headers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to clean column headers (column names).</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_headers.html#clean-headers-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -303,7 +317,7 @@ and correcting a mispelling.</p>
 <p>Clean and validate a DataFrame column containing country names.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_country.clean_country">
-<code class="sig-prename descclassname">dataprep.clean.clean_country.</code><code class="sig-name descname">clean_country</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'name'</span></em>, <em class="sig-param"><span class="n">fuzzy_dist</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">strict</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_country.html#clean_country"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_country.clean_country" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_country.</span></code><code class="sig-name descname"><span class="pre">clean_country</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'name'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuzzy_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_country.html#clean_country"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_country.clean_country" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize country names.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_country.html#country-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -311,7 +325,7 @@ and correcting a mispelling.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
 <li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing country names.</p></li>
-<li><p><strong>input_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<li><p><strong>input_format</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]]) – <dl class="simple">
 <dt>The ISO 3166 input format of the country.</dt><dd><ul>
 <li><p>’auto’: infer the input format</p></li>
 <li><p>’name’: country name (‘United States’)</p></li>
@@ -322,6 +336,9 @@ and correcting a mispelling.</p>
 </ul>
 </dd>
 </dl>
+<p>Can also be a tuple containing any combination of input formats,
+for example to clean a column containing alpha-2 and numeric
+codes set input_format to (‘alpha-2’, ‘numeric’).</p>
 <p>(default: ‘auto’)</p>
 </p></li>
 <li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
@@ -390,14 +407,14 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_country.validate_country">
-<code class="sig-prename descclassname">dataprep.clean.clean_country.</code><code class="sig-name descname">validate_country</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">strict</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_country.html#validate_country"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_country.validate_country" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_country.</span></code><code class="sig-name descname"><span class="pre">validate_country</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_country.html#validate_country"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_country.validate_country" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate country names.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_country.html#country-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]) – pandas Series of countries or str/int country value.</p></li>
-<li><p><strong>input_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<li><p><strong>input_format</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]]) – <dl class="simple">
 <dt>The ISO 3166 input format of the country.</dt><dd><ul>
 <li><p>’auto’: infer the input format</p></li>
 <li><p>’name’: country name (‘United States’)</p></li>
@@ -408,6 +425,9 @@ keep the original column.</p>
 </ul>
 </dd>
 </dl>
+<p>Can also be a tuple containing any combination of input formats,
+for example to clean a column containing alpha-2 and numeric
+codes set input_format to (‘alpha-2’, ‘numeric’).</p>
 <p>(default: ‘auto’)</p>
 </p></li>
 <li><p><strong>strict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, matching for input formats ‘name’ and ‘official’ are done by
@@ -441,7 +461,7 @@ the input for a regex match.</p>
 <p>Clean and validate a DataFrame column containing dates and times.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_date.clean_date">
-<code class="sig-prename descclassname">dataprep.clean.clean_date.</code><code class="sig-name descname">clean_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'YYYY-MM-DD hh:mm:ss'</span></em>, <em class="sig-param"><span class="n">input_timezone</span><span class="o">=</span><span class="default_value">'UTC'</span></em>, <em class="sig-param"><span class="n">output_timezone</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">fix_missing</span><span class="o">=</span><span class="default_value">'minimum'</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_date.html#clean_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_date.clean_date" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_date.</span></code><code class="sig-name descname"><span class="pre">clean_date</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'YYYY-MM-DD</span> <span class="pre">hh:mm:ss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'minimum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infer_day_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_date.html#clean_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_date.clean_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize dates and times.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -467,6 +487,9 @@ the input for a regex match.</p>
 </dl>
 <p>(default: ‘minimum’)</p>
 </p></li>
+<li><p><strong>infer_day_first</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, the program will infer the ambiguous format ‘09-10-03’ and ‘25-09-03’ according         to ‘25-09-03’ (day is the number of first position). The result should be ‘2003-10-09’ and         ‘2003-09-25’.
+If False, do nothing of inferring. The result should be ‘2003-09-10’ and ‘2003-09-25’.
+(default: False)</p></li>
 <li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned. Otherwise,
 keep the original column.</p>
 <p>(default: False)</p>
@@ -511,7 +534,7 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_date.validate_date">
-<code class="sig-prename descclassname">dataprep.clean.clean_date.</code><code class="sig-name descname">validate_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_date.html#validate_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_date.validate_date" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_date.</span></code><code class="sig-name descname"><span class="pre">validate_date</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_date.html#validate_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_date.validate_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate dates and times.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -536,12 +559,74 @@ keep the original column.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-dataprep.clean.clean_duplication">
+<span id="duplicate-values"></span><h2>Duplicate Values<a class="headerlink" href="#module-dataprep.clean.clean_duplication" title="Permalink to this headline">¶</a></h2>
+<p>Clean a DataFrame column containing duplicate values.</p>
+<dl class="py class">
+<dt id="dataprep.clean.clean_duplication.UserInterface">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_duplication.</span></code><code class="sig-name descname"><span class="pre">UserInterface</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_duplication.html#UserInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_duplication.UserInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A user interface used by the clean_duplication function.</p>
+<dl class="py method">
+<dt id="dataprep.clean.clean_duplication.UserInterface.display">
+<code class="sig-name descname"><span class="pre">display</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_duplication.html#UserInterface.display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_duplication.UserInterface.display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Box</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_duplication.clean_duplication">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_duplication.</span></code><code class="sig-name descname"><span class="pre">clean_duplication</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_var_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_duplication.html#clean_duplication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_duplication.clean_duplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans and standardized duplicate values in a DataFrame.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_duplication.html#duplication-userguide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing duplicate values.</p></li>
+<li><p><strong>df_var_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The variable name of the DataFrame being cleaned.
+This is only needed for creating exported code snippets with
+the correct variable name.</p>
+<p>(default: ‘df’)</p>
+</p></li>
+<li><p><strong>page_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – <p>The number of clusters to display on each page.</p>
+<p>(default: 5)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>After running clean_duplication(df, ‘city’) below in a notebook, a GUI will appear.
+Select the merge checkbox, press merge and re-cluster, then press finish.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;city&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;New York&#39;</span><span class="p">,</span> <span class="s1">&#39;new york&#39;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_duplication</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;city&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>city</p>
+</div></blockquote>
+<p>0    New York
+1    New York</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Box</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-dataprep.clean.clean_email">
 <span id="email-addresses"></span><h2>Email Addresses<a class="headerlink" href="#module-dataprep.clean.clean_email" title="Permalink to this headline">¶</a></h2>
 <p>Clean and validate a DataFrame column containing email addresses.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_email.clean_email">
-<code class="sig-prename descclassname">dataprep.clean.clean_email.</code><code class="sig-name descname">clean_email</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">remove_whitespace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fix_domain</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_email.html#clean_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_email.clean_email" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_email.</span></code><code class="sig-name descname"><span class="pre">clean_email</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_whitespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_email.html#clean_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_email.clean_email" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize email address.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_email.html#email-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -613,7 +698,7 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_email.validate_email">
-<code class="sig-prename descclassname">dataprep.clean.clean_email.</code><code class="sig-name descname">validate_email</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_email.html#validate_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_email.validate_email" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_email.</span></code><code class="sig-name descname"><span class="pre">validate_email</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_email.html#validate_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_email.validate_email" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate email addresses.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_email.html#email-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -644,7 +729,7 @@ keep the original column.</p>
 <p>Clean and validate a DataFrame column containing geographic coordinates.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_lat_long.clean_lat_long">
-<code class="sig-prename descclassname">dataprep.clean.clean_lat_long.</code><code class="sig-name descname">clean_lat_long</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">lat_long</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lat_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">long_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'dd'</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_lat_long.html#clean_lat_long"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_lat_long.clean_lat_long" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_lat_long.</span></code><code class="sig-name descname"><span class="pre">clean_lat_long</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_long</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_lat_long.html#clean_lat_long"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_lat_long.clean_lat_long" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize latitude and longitude coordinates.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_lat_long.html#clean-lat-long-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -719,7 +804,7 @@ columns in decimal degrees format.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_lat_long.validate_lat_long">
-<code class="sig-prename descclassname">dataprep.clean.clean_lat_long.</code><code class="sig-name descname">validate_lat_long</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lat_long</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lat</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">lon</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_lat_long.html#validate_lat_long"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_lat_long.validate_lat_long" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_lat_long.</span></code><code class="sig-name descname"><span class="pre">validate_lat_long</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_long</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_lat_long.html#validate_lat_long"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_lat_long.validate_lat_long" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate latitude and longitude coordinates.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_lat_long.html#clean-lat-long-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -768,7 +853,7 @@ lat_long and lat must be False if lon is True.</p>
 <p>Clean and validate a DataFrame column containing IP addresses.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_ip.clean_ip">
-<code class="sig-prename descclassname">dataprep.clean.clean_ip.</code><code class="sig-name descname">clean_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'compressed'</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ip.html#clean_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_ip.clean_ip" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ip.</span></code><code class="sig-name descname"><span class="pre">clean_ip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'compressed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ip.html#clean_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ip.clean_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize IP addresses.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_ip.html#ip-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -841,7 +926,7 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_ip.validate_ip">
-<code class="sig-prename descclassname">dataprep.clean.clean_ip.</code><code class="sig-name descname">validate_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">input_format</span><span class="o">=</span><span class="default_value">'auto'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ip.html#validate_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_ip.validate_ip" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ip.</span></code><code class="sig-name descname"><span class="pre">validate_ip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ip.html#validate_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ip.validate_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate IP addresses.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_ip.html#ip-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -884,7 +969,7 @@ keep the original column.</p>
 <p>Clean and validate a DataFrame column containing phone numbers.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_phone.clean_phone">
-<code class="sig-prename descclassname">dataprep.clean.clean_phone.</code><code class="sig-name descname">clean_phone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'nanp'</span></em>, <em class="sig-param"><span class="n">fix_missing</span><span class="o">=</span><span class="default_value">'empty'</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_phone.html#clean_phone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_phone.clean_phone" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_phone.</span></code><code class="sig-name descname"><span class="pre">clean_phone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nanp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'empty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_phone.html#clean_phone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_phone.clean_phone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize phone numbers.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_phone.html#phone-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -959,7 +1044,7 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_phone.validate_phone">
-<code class="sig-prename descclassname">dataprep.clean.clean_phone.</code><code class="sig-name descname">validate_phone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_phone.html#validate_phone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_phone.validate_phone" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_phone.</span></code><code class="sig-name descname"><span class="pre">validate_phone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_phone.html#validate_phone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_phone.validate_phone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate phone numbers.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_phone.html#phone-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -985,12 +1070,74 @@ keep the original column.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-dataprep.clean.clean_text">
+<span id="text"></span><h2>Text<a class="headerlink" href="#module-dataprep.clean.clean_text" title="Permalink to this headline">¶</a></h2>
+<p>Clean a DataFrame column containing text data.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_text.clean_text">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_text.</span></code><code class="sig-name descname"><span class="pre">clean_text</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopwords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_text.html#clean_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_text.clean_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean text data in a DataFrame column.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_text.html#clean-text-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing text data.</p></li>
+<li><p><strong>pipeline</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]) – <p>A list of cleaning functions to be applied to the column. If None,
+use the default pipeline. See the <a class="reference internal" href="../user_guide/clean/clean_text.html#clean-text-custom-pipeline"><span class="std std-ref">User Guide</span></a>
+for more information on customizing the pipeline.</p>
+<p>(default: None)</p>
+</p></li>
+<li><p><strong>stopwords</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – <p>A set of words to be removed from the column. If None, use NLTK’s
+stopwords.</p>
+<p>(default: None)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean a column of text data using the default pipeline.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;This show was an amazing, fresh &amp; innovative idea in the 70&#39;s when it first aired.&quot;</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">                                             text</span>
+<span class="go">0  show amazing fresh innovative idea first aired</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_text.default_text_pipeline">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_text.</span></code><code class="sig-name descname"><span class="pre">default_text_pipeline</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_text.html#default_text_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_text.default_text_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of dictionaries representing the functions in the default pipeline.
+Use as a template for creating a custom pipeline.</p>
+<p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_text.html#clean-text-user-guide"><span class="std std-ref">User Guide</span></a>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">default_text_pipeline</span><span class="p">()</span>
+<span class="go">[{&#39;operator&#39;: &#39;fillna&#39;}, {&#39;operator&#39;: &#39;lowercase&#39;}, {&#39;operator&#39;: &#39;remove_digits&#39;},</span>
+<span class="go">{&#39;operator&#39;: &#39;remove_html&#39;}, {&#39;operator&#39;: &#39;remove_urls&#39;}, {&#39;operator&#39;: &#39;remove_punctuation&#39;},</span>
+<span class="go">{&#39;operator&#39;: &#39;remove_accents&#39;}, {&#39;operator&#39;: &#39;remove_stopwords&#39;, &#39;parameters&#39;:</span>
+<span class="go">{&#39;stopwords&#39;: None}}, {&#39;operator&#39;: &#39;remove_whitespace&#39;}]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-dataprep.clean.clean_url">
 <span id="urls"></span><h2>URLs<a class="headerlink" href="#module-dataprep.clean.clean_url" title="Permalink to this headline">¶</a></h2>
 <p>Clean and validate a DataFrame column containing URLs.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_url.clean_url">
-<code class="sig-prename descclassname">dataprep.clean.clean_url.</code><code class="sig-name descname">clean_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">remove_auth</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_url.html#clean_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_url.clean_url" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_url.</span></code><code class="sig-name descname"><span class="pre">clean_url</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_auth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_url.html#clean_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_url.clean_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize URLs.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_url.html#url-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -1052,7 +1199,7 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_url.validate_url">
-<code class="sig-prename descclassname">dataprep.clean.clean_url.</code><code class="sig-name descname">validate_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_url.html#validate_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_url.validate_url" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_url.</span></code><code class="sig-name descname"><span class="pre">validate_url</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_url.html#validate_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_url.validate_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate URLs.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_url.html#url-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -1083,7 +1230,7 @@ keep the original column.</p>
 <p>Clean and validate a DataFrame column containing US street addresses.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_address.clean_address">
-<code class="sig-prename descclassname">dataprep.clean.clean_address.</code><code class="sig-name descname">clean_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'(building) house_number street_prefix_abbr street_name street_suffix_abbr, apartment, city, state_abbr zipcode'</span></em>, <em class="sig-param"><span class="n">must_contain</span><span class="o">=</span><span class="default_value">('house_number', 'street_name')</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">'coerce'</span></em>, <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#clean_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_address.clean_address" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_address.</span></code><code class="sig-name descname"><span class="pre">clean_address</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'(building)</span> <span class="pre">house_number</span> <span class="pre">street_prefix_abbr</span> <span class="pre">street_name</span> <span class="pre">street_suffix_abbr,</span> <span class="pre">apartment,</span> <span class="pre">city,</span> <span class="pre">state_abbr</span> <span class="pre">zipcode'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_contain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('house_number',</span> <span class="pre">'street_name')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#clean_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_address.clean_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean and standardize US street addresses.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_address.html#address-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">
@@ -1180,7 +1327,7 @@ keep the original column.</p>
 
 <dl class="py function">
 <dt id="dataprep.clean.clean_address.validate_address">
-<code class="sig-prename descclassname">dataprep.clean.clean_address.</code><code class="sig-name descname">validate_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">must_contain</span><span class="o">=</span><span class="default_value">('house_number', 'street_name')</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#validate_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.clean.clean_address.validate_address" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_address.</span></code><code class="sig-name descname"><span class="pre">validate_address</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_contain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('house_number',</span> <span class="pre">'street_name')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_address.html#validate_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_address.validate_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate US street addresses.</p>
 <p>Read more in the <a class="reference internal" href="../user_guide/clean/clean_address.html#address-userguide"><span class="std std-ref">User Guide</span></a>.</p>
 <dl class="field-list simple">

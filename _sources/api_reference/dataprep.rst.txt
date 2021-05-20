@@ -6,7 +6,7 @@
 API Reference
 =============
 
-This section contains the public API reference for DataPrep. It is 
+This section contains the public API reference for DataPrep. It is
 auto-generated from the docstrings in the project source code.
 
 
@@ -17,6 +17,7 @@ auto-generated from the docstrings in the project source code.
    dataprep.eda.distribution
    dataprep.eda.correlation
    dataprep.eda.missing
+   dataprep.eda.diff
    dataprep.eda.create_report
    dataprep.eda
    dataprep.connector
@@ -34,6 +35,7 @@ EDA Documentation
    dataprep.eda.correlation
    dataprep.eda.missing
    dataprep.eda.create_report
+   dataprep.eda.diff
    dataprep.eda
 
 Connector Documentation

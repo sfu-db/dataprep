@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.create_report &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.create_report &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -152,6 +152,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This module implements the create_report(df) function.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -210,6 +211,7 @@
 <span class="sd">    &gt;&gt;&gt; report.save(&#39;My Fantastic Report&#39;) # save report to local disk</span>
 <span class="sd">    &gt;&gt;&gt; report.show_browser() # show report in the browser</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_suppress_warnings</span><span class="p">()</span>
     <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="n">INLINE</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span>
@@ -219,6 +221,17 @@
     <span class="n">template_base</span> <span class="o">=</span> <span class="n">ENV_LOADER</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;base.html&quot;</span><span class="p">)</span>
     <span class="n">report</span> <span class="o">=</span> <span class="n">template_base</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Report</span><span class="p">(</span><span class="n">report</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_suppress_warnings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    suppress warnings in create_report</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;The default value of regex will change from True to False in a future version&quot;</span><span class="p">,</span>
+        <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
           </div>

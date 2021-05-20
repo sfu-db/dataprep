@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.distribution &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.distribution &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -151,6 +151,12 @@
           
             
               <li class="">
+                  <a href="dataprep.eda.diff.html">dataprep.eda.diff</a>
+              </li>
+            
+          
+            
+              <li class="">
                   <a href="dataprep.eda.create_report.html">dataprep.eda.create_report</a>
               </li>
             
@@ -212,7 +218,7 @@
 <span id="plot-doc"></span><h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="dataprep.eda.distribution.plot">
-<code class="sig-prename descclassname">dataprep.eda.distribution.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.eda.distribution.</span></code><code class="sig-name descname"><span class="pre">plot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution.html#plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.distribution.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates plots for exploratory data analysis.</p>
 <p>If no columns are specified, the distribution of
 each coloumn is plotted. A histogram is plotted if the
@@ -245,9 +251,9 @@ plotted.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – DataFrame from which visualizations are generated</p></li>
-<li><p><strong>x</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
-<li><p><strong>y</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
-<li><p><strong>z</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
+<li><p><strong>col1</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
+<li><p><strong>col2</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
+<li><p><strong>col3</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
 <li><p><strong>config</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – A dictionary for configuring the visualizations
 E.g. config={“hist.bins”: 20}</p></li>
 <li><p><strong>display</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list containing the names of the visualizations to display
@@ -282,7 +288,7 @@ or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous().</p>
 <p>Computations for plot(df, …)</p>
 <dl class="py function">
 <dt id="dataprep.eda.distribution.compute.compute">
-<code class="sig-prename descclassname">dataprep.eda.distribution.compute.</code><code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">cfg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/compute.html#compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.compute.compute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.eda.distribution.compute.</span></code><code class="sig-name descname"><span class="pre">compute</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/compute.html#compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.distribution.compute.compute" title="Permalink to this definition">¶</a></dt>
 <dd><p>All in one compute function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -294,9 +300,9 @@ cfg is a dictionary for configuring. If not, cfg is None and
 default values will be used for parameters.</p></li>
 <li><p><strong>display</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em><em>, </em><em>default None</em>) – A list containing the names of the visualizations to display. Only exist when
 a user call compute() directly and want to customize the output</p></li>
-<li><p><strong>x</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
-<li><p><strong>y</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
-<li><p><strong>z</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
+<li><p><strong>col1</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
+<li><p><strong>col2</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
+<li><p><strong>col3</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default None</em>) – A valid column name from the dataframe</p></li>
 <li><p><strong>dtype</strong> (<em>str</em><em> or </em><a class="reference internal" href="dataprep.eda.html#dataprep.eda.dtypes.DType" title="dataprep.eda.dtypes.DType"><em>DType</em></a><em> or </em><em>dict of str</em><em> or </em><em>dict of DType</em><em>, </em><em>default None</em>) – Specify Data Types for designated column or all columns.
 E.g.  dtype = {“a”: Continuous, “b”: “Nominal”} or
 dtype = {“a”: Continuous(), “b”: “nominal”}
@@ -315,7 +321,7 @@ or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p><
 <p>This module implements the visualization for the plot(df) function.</p>
 <dl class="py function">
 <dt id="dataprep.eda.distribution.render.render">
-<code class="sig-prename descclassname">dataprep.eda.distribution.render.</code><code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">itmdt</span></em>, <em class="sig-param"><span class="n">cfg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/render.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.distribution.render.render" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.eda.distribution.render.</span></code><code class="sig-name descname"><span class="pre">render</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">itmdt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/distribution/render.html#render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.distribution.render.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a basic plot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

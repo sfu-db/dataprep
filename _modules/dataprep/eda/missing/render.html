@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing.render &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.missing.render &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -165,7 +165,6 @@
     <span class="n">ColumnDataSource</span><span class="p">,</span>
     <span class="n">CustomJSHover</span><span class="p">,</span>
     <span class="n">FactorRange</span><span class="p">,</span>
-    <span class="n">FuncTickFormatter</span><span class="p">,</span>
     <span class="n">HoverTool</span><span class="p">,</span>
     <span class="n">LinearColorMapper</span><span class="p">,</span>
     <span class="n">NumeralTickFormatter</span><span class="p">,</span>
@@ -177,7 +176,7 @@
 
 <span class="kn">from</span> <span class="nn">...errors</span> <span class="kn">import</span> <span class="n">UnreachableError</span>
 <span class="kn">from</span> <span class="nn">..configs</span> <span class="kn">import</span> <span class="n">Config</span>
-<span class="kn">from</span> <span class="nn">..dtypes</span> <span class="kn">import</span> <span class="n">Continuous</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">,</span> <span class="n">drop_null</span><span class="p">,</span> <span class="n">is_dtype</span>
+<span class="kn">from</span> <span class="nn">..dtypes_v2</span> <span class="kn">import</span> <span class="n">Continuous</span><span class="p">,</span> <span class="n">Nominal</span><span class="p">,</span> <span class="n">GeoGraphy</span><span class="p">,</span> <span class="n">SmallCardNum</span><span class="p">,</span> <span class="n">drop_null</span><span class="p">,</span> <span class="n">DateTime</span>
 <span class="kn">from</span> <span class="nn">..intermediate</span> <span class="kn">import</span> <span class="n">ColumnMetadata</span><span class="p">,</span> <span class="n">Intermediate</span>
 <span class="kn">from</span> <span class="nn">..palette</span> <span class="kn">import</span> <span class="n">CATEGORY10</span><span class="p">,</span> <span class="n">CATEGORY20</span><span class="p">,</span> <span class="n">GREYS256</span><span class="p">,</span> <span class="n">RDBU</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">cut_long_name</span><span class="p">,</span> <span class="n">fuse_missing_perc</span><span class="p">,</span> <span class="n">relocate_legend</span>
@@ -211,20 +210,6 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9pt&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span>
-    <span class="c1"># truncate axis tick values</span>
-    <span class="n">format_js</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        if (tick.toString().length &gt; 15) {</span>
-<span class="s2">            if (typeof tick === &#39;string&#39;) {</span>
-<span class="s2">                return tick.toString().substring(0, 13) + &#39;...&#39;;</span>
-<span class="s2">            } else {</span>
-<span class="s2">                return tick.toPrecision(1);</span>
-<span class="s2">            }</span>
-<span class="s2">        } else {</span>
-<span class="s2">            return tick;</span>
-<span class="s2">        }</span>
-<span class="s2">    &quot;&quot;&quot;</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">FuncTickFormatter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">format_js</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">FuncTickFormatter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">format_js</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span>
 
@@ -275,7 +260,7 @@
     <span class="k">return</span> <span class="n">fig</span>
 
 
-<span class="k">def</span> <span class="nf">render_hist</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+<span class="k">def</span> <span class="nf">render_hist</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">meta</span><span class="p">:</span> <span class="n">ColumnMetadata</span><span class="p">,</span>
@@ -286,13 +271,16 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render a histogram</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Nominal</span><span class="p">()):</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="c1"># pylint: disable=too-many-locals</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="p">(</span><span class="n">Nominal</span><span class="p">,</span> <span class="n">GeoGraphy</span><span class="p">,</span> <span class="n">SmallCardNum</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">)):</span>
         <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;@x&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">,</span> <span class="s2">&quot;@count&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
         <span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Continuous</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">df</span><span class="p">[</span><span class="s2">&quot;repr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">lower_bound</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">~</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">upper_bound</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">()]</span>
 
@@ -301,20 +289,28 @@
             <span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;@count&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Label&quot;</span><span class="p">,</span> <span class="s2">&quot;@label&quot;</span><span class="p">),</span>
         <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unprocessed data type:</span><span class="si">{</span><span class="n">mtype</span><span class="si">}</span><span class="s2">, col:</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">18</span> <span class="k">else</span> <span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cols</span>
     <span class="n">cmapper</span> <span class="o">=</span> <span class="n">CategoricalColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="n">CATEGORY10</span><span class="p">,</span> <span class="n">factors</span><span class="o">=</span><span class="n">LABELS</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Nominal</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="p">(</span><span class="n">Nominal</span><span class="p">,</span> <span class="n">GeoGraphy</span><span class="p">,</span> <span class="n">SmallCardNum</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">)):</span>
         <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.99</span>
 
         <span class="c1"># Inputs of FactorRange() have to be sequence of strings,</span>
         <span class="c1"># object only contains numbers can cause errors.(Issue#98).</span>
         <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
         <span class="n">x_range</span> <span class="o">=</span> <span class="n">FactorRange</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Continuous</span><span class="p">):</span>
 
         <span class="n">radius</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">x_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">radius</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unprocessed data type:</span><span class="si">{</span><span class="n">mtype</span><span class="si">}</span><span class="s2">, col:</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span><span class="p">)</span>
 
@@ -465,8 +461,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render correlation heatmaps in to tabs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">plot_width</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">400</span>
-    <span class="n">plot_height</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">400</span>
+    <span class="n">plot_width</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">500</span>
+    <span class="n">plot_height</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">500</span>
 
     <span class="n">tabs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Panel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">htgs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -488,7 +484,8 @@
         <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">fig_heatmap</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Heat Map&quot;</span><span class="p">))</span>
         <span class="n">htgs</span><span class="p">[</span><span class="s2">&quot;Heat Map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">heatmap</span><span class="o">.</span><span class="n">missing_how_to_guide</span><span class="p">(</span><span class="n">plot_height</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dendro</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
+    <span class="c1"># itmdt[&quot;data_dendrogram&quot;] is None when dataframe has only one column so that won&#39;t be displayed</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dendro</span><span class="o">.</span><span class="n">enable</span> <span class="ow">and</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;ncols&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">fig_dendrogram</span> <span class="o">=</span> <span class="n">render_dendrogram</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;data_dendrogram&quot;</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">)</span>
         <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">row</span><span class="p">(</span><span class="n">fig_dendrogram</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dendrogram&quot;</span><span class="p">))</span>
         <span class="n">htgs</span><span class="p">[</span><span class="s2">&quot;Dendrogram&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dendro</span><span class="o">.</span><span class="n">how_to_guide</span><span class="p">(</span><span class="n">plot_height</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">)</span>
@@ -501,12 +498,12 @@
         <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Missing Statistics&quot;</span><span class="p">:</span> <span class="n">stat_dict</span><span class="p">}</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">enable</span> <span class="k">else</span> <span class="p">{},</span>
         <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
         <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">],</span>
-        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">160</span><span class="p">,</span>
+        <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">([</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_width</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">]),</span>
         <span class="s2">&quot;how_to_guide&quot;</span><span class="p">:</span> <span class="n">htgs</span><span class="p">,</span>
     <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">render_heatmaps</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">render_heatmaps</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render missing heatmaps in to tabs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -533,8 +530,10 @@
         <span class="n">fig</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span>
 
-    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">cut_long_name</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">cut_long_name</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># pylint: disable=no-member</span>
 
         <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -545,10 +544,6 @@
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;level_0&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;level_1&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">})</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]]</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">drop_null</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
-            <span class="c1"># in case of numerical column names</span>
-            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
             <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span>
                 <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>
@@ -581,7 +576,6 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">axis_line_color</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">plot_width</span>
     <span class="k">return</span> <span class="n">fig</span>
 
 
@@ -595,6 +589,7 @@
 <span class="sd">    Render a bar chart for the missing and present values</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pres_cnts</span><span class="p">,</span> <span class="n">null_cnts</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="p">[:</span><span class="mi">13</span><span class="p">]</span><span class="si">}</span><span class="s2">...</span><span class="si">{</span><span class="n">col</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">18</span> <span class="k">else</span> <span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Present&quot;</span><span class="p">:</span> <span class="n">pres_cnts</span><span class="p">,</span> <span class="s2">&quot;Missing&quot;</span><span class="p">:</span> <span class="n">null_cnts</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
@@ -619,7 +614,6 @@
         <span class="n">source</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
         <span class="n">legend_label</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
     <span class="p">)</span>
-
     <span class="c1"># hover tool with count and percent</span>
     <span class="n">formatter</span> <span class="o">=</span> <span class="n">CustomJSHover</span><span class="p">(</span>
         <span class="n">args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">df</span><span class="p">)),</span>
@@ -651,7 +645,6 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Row Count&quot;</span>
     <span class="n">tweak_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">relocate_legend</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">plot_width</span>
 
     <span class="k">return</span> <span class="n">fig</span>
 
@@ -718,7 +711,6 @@
         <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">plot_width</span>
     <span class="k">return</span> <span class="n">fig</span>
 
 
@@ -768,7 +760,6 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Average Distance Between Clusters&quot;</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">plot_width</span>
     <span class="k">return</span> <span class="n">fig</span>
 
 
@@ -776,6 +767,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render the plot from `plot_missing(df, &quot;x&quot;)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable = too-many-locals</span>
     <span class="n">plot_width</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">300</span>
     <span class="n">plot_height</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">300</span>
 
@@ -791,10 +783,13 @@
         <span class="n">fig</span><span class="o">.</span><span class="n">frame_height</span> <span class="o">=</span> <span class="n">plot_height</span>
         <span class="n">panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Panel</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">col</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Nominal</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="p">(</span><span class="n">Nominal</span><span class="p">,</span> <span class="n">GeoGraphy</span><span class="p">,</span> <span class="n">SmallCardNum</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">)):</span>
             <span class="n">htgs</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">grid_how_to_guide</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Continuous</span><span class="p">):</span>
             <span class="n">htgs</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">grid_how_to_guide</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s2">&quot;dtype&quot;</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unprocessed type:</span><span class="si">{</span><span class="n">mtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
     <span class="n">legend_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">CATEGORY10</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">LABELS</span><span class="p">))]</span>
     <span class="k">return</span> <span class="p">{</span>
@@ -818,7 +813,7 @@
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span>
     <span class="n">htgs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">if</span> <span class="n">is_dtype</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Continuous</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="n">Continuous</span><span class="p">):</span>
         <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
@@ -844,12 +839,11 @@
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">panels</span><span class="p">],</span>
             <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">panel</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">panels</span><span class="p">],</span>
-            <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">240</span><span class="p">,</span>
+            <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">([</span><span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">plot_width</span> <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">panels</span><span class="p">]),</span>
             <span class="s2">&quot;how_to_guide&quot;</span><span class="p">:</span> <span class="n">htgs</span><span class="p">,</span>
         <span class="p">}</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">],</span> <span class="p">(</span><span class="n">Nominal</span><span class="p">,</span> <span class="n">SmallCardNum</span><span class="p">,</span> <span class="n">GeoGraphy</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">)):</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">render_hist</span><span class="p">(</span><span class="n">itmdt</span><span class="p">[</span><span class="s2">&quot;hist&quot;</span><span class="p">],</span> <span class="n">y</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">plot_width</span>
         <span class="n">shown</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;shown&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">shown</span> <span class="o">!=</span> <span class="n">total</span><span class="p">:</span>
             <span class="n">_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Missing impact of </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> by (</span><span class="si">{</span><span class="n">shown</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -859,9 +853,12 @@
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">fig</span><span class="p">],</span>
             <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_title</span><span class="p">],</span>
-            <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">plot_width</span> <span class="o">+</span> <span class="mi">240</span><span class="p">,</span>
+            <span class="s2">&quot;container_width&quot;</span><span class="p">:</span> <span class="n">fig</span><span class="o">.</span><span class="n">plot_width</span><span class="p">,</span>
             <span class="s2">&quot;how_to_guide&quot;</span><span class="p">:</span> <span class="n">htgs</span><span class="p">,</span>
         <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unsupported type:</span><span class="si">{</span><span class="n">mtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
           </div>

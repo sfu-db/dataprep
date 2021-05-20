@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.configs &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.configs &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -200,6 +200,7 @@
     <span class="s2">&quot;Dendrogram&quot;</span><span class="p">:</span> <span class="s2">&quot;dendro&quot;</span><span class="p">,</span>
     <span class="s2">&quot;PDF&quot;</span><span class="p">:</span> <span class="s2">&quot;pdf&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CDF&quot;</span><span class="p">:</span> <span class="s2">&quot;cdf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Value Table&quot;</span><span class="p">:</span> <span class="s2">&quot;value_table&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1"># This dictionary map is used for session control in create_report</span>
@@ -222,6 +223,15 @@
     <span class="n">bins</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ngroups</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Diff"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.configs.Diff">[docs]</a><span class="k">class</span> <span class="nc">Diff</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define the parameters in the plot_diff</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">label</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">baseline</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="Stats"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.configs.Stats">[docs]</a><span class="k">class</span> <span class="nc">Stats</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
@@ -1156,6 +1166,27 @@
         <span class="k">return</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">descs</span><span class="p">)]</span></div></div>
 
 
+<div class="viewcode-block" id="ValueTable"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.configs.ValueTable">[docs]</a><span class="k">class</span> <span class="nc">ValueTable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    enable: bool, default True</span>
+<span class="sd">        Whether to create this element</span>
+<span class="sd">    ngroups: int, default 10</span>
+<span class="sd">        Number of values to show in the table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">ngroups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+
+<div class="viewcode-block" id="ValueTable.how_to_guide"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.configs.ValueTable.how_to_guide">[docs]</a>    <span class="k">def</span> <span class="nf">how_to_guide</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        how-to guide for plot(df, x)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups</span><span class="p">]</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;value_table.ngroups&quot;</span><span class="p">]</span>
+        <span class="n">descs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;The number of distinct values to show&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">_form</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">descs</span><span class="p">)]</span></div></div>
+
+
 <span class="k">def</span> <span class="nf">_form</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Format a value for the how-to guide</span>
@@ -1239,12 +1270,14 @@
     <span class="n">dendro</span><span class="p">:</span> <span class="n">Dendrogram</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Dendrogram</span><span class="p">)</span>
     <span class="n">pdf</span><span class="p">:</span> <span class="n">PDF</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PDF</span><span class="p">)</span>
     <span class="n">cdf</span><span class="p">:</span> <span class="n">CDF</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">CDF</span><span class="p">)</span>
+    <span class="n">value_table</span><span class="p">:</span> <span class="n">ValueTable</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ValueTable</span><span class="p">)</span>
     <span class="n">plot</span><span class="p">:</span> <span class="n">Plot</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Plot</span><span class="p">)</span>
     <span class="n">overview</span><span class="p">:</span> <span class="n">Overview</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Overview</span><span class="p">)</span>
     <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Variables</span><span class="p">)</span>
     <span class="n">interactions</span><span class="p">:</span> <span class="n">Interactions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Interactions</span><span class="p">)</span>
     <span class="n">correlations</span><span class="p">:</span> <span class="n">Correlations</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Correlations</span><span class="p">)</span>
     <span class="n">missingvalues</span><span class="p">:</span> <span class="n">MissingValues</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MissingValues</span><span class="p">)</span>
+    <span class="n">diff</span><span class="p">:</span> <span class="n">Diff</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Diff</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Config.from_dict"><a class="viewcode-back" href="../../../api_reference/dataprep.eda.html#dataprep.eda.configs.Config.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
@@ -1257,8 +1290,8 @@
         <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">display</span> <span class="o">=</span> <span class="p">[</span><span class="n">DISPLAY_MAP</span><span class="p">[</span><span class="n">disp</span><span class="p">]</span> <span class="k">for</span> <span class="n">disp</span> <span class="ow">in</span> <span class="n">display</span><span class="p">]</span>
-                <span class="c1"># set all plots not in display list to enable=False except for Plot class</span>
-                <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">display</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;plot&quot;</span><span class="p">}:</span>
+                <span class="c1"># set all plots not in display list to enable=False except for Plot and Diff class</span>
+                <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">display</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;plot&quot;</span><span class="p">}</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;diff&quot;</span><span class="p">}:</span>
                     <span class="nb">setattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">plot</span><span class="p">),</span> <span class="s2">&quot;enable&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="n">display</span> <span class="o">=</span> <span class="p">[</span><span class="n">DISPLAY_REPORT_MAP</span><span class="p">[</span><span class="n">disp</span><span class="p">]</span> <span class="k">for</span> <span class="n">disp</span> <span class="ow">in</span> <span class="n">display</span><span class="p">]</span>

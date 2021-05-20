@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_country &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.clean.clean_country &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -155,7 +155,7 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
@@ -163,7 +163,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">regex</span> <span class="k">as</span> <span class="nn">re</span>
 
-<span class="kn">from</span> <span class="nn">..eda.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NULL_VALUES</span><span class="p">,</span> <span class="n">create_report_new</span><span class="p">,</span> <span class="n">to_dask</span>
 
 <span class="n">COUNTRY_DATA_FILE</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;country_data.tsv&quot;</span><span class="p">)</span>
@@ -171,14 +171,12 @@
 <span class="n">DATA</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">COUNTRY_DATA_FILE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
 <span class="n">REGEXES</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">DATA</span><span class="o">.</span><span class="n">regex</span><span class="p">]</span>
-<span class="c1"># alternative regex search strategy given on line 243</span>
-<span class="c1"># REGEXES = re.compile(&quot;|&quot;.join(f&quot;(?P&lt;a{i}&gt;{x})&quot; for i, x in enumerate(DATA.regex)), re.IGNORECASE)</span>
 
 
 <div class="viewcode-block" id="clean_country"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_country.clean_country">[docs]</a><span class="k">def</span> <span class="nf">clean_country</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">input_format</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
     <span class="n">fuzzy_dist</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -206,6 +204,10 @@
 <span class="sd">            - &#39;alpha-2&#39;: alpha-2 code (&#39;US&#39;)</span>
 <span class="sd">            - &#39;alpha-3&#39;: alpha-3 code (&#39;USA&#39;)</span>
 <span class="sd">            - &#39;numeric&#39;: numeric code (840)</span>
+
+<span class="sd">        Can also be a tuple containing any combination of input formats,</span>
+<span class="sd">        for example to clean a column containing alpha-2 and numeric</span>
+<span class="sd">        codes set input_format to (&#39;alpha-2&#39;, &#39;numeric&#39;).</span>
 
 <span class="sd">        (default: &#39;auto&#39;)</span>
 <span class="sd">    output_format</span>
@@ -264,14 +266,7 @@
 <span class="sd">    1        US  United States</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
-
-    <span class="n">input_formats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;official&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-2&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-3&quot;</span><span class="p">,</span> <span class="s2">&quot;numeric&quot;</span><span class="p">}</span>
     <span class="n">output_formats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;official&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-2&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-3&quot;</span><span class="p">,</span> <span class="s2">&quot;numeric&quot;</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">input_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_formats</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;input_format </span><span class="si">{</span><span class="n">input_format</span><span class="si">}</span><span class="s1"> is invalid, it needs to be one of &quot;auto&quot;, &#39;</span>
-            <span class="s1">&#39;&quot;name&quot;, &quot;official&quot;, &quot;alpha-2&quot;, &quot;alpha-3&quot; or &quot;numeric&#39;</span>
-        <span class="p">)</span>
     <span class="k">if</span> <span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">output_formats</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;output_format </span><span class="si">{</span><span class="n">output_format</span><span class="si">}</span><span class="s1"> is invalid, it needs to be &quot;name&quot;, &#39;</span>
@@ -282,6 +277,7 @@
             <span class="s2">&quot;can&#39;t do fuzzy matching while strict mode is enabled, &quot;</span>
             <span class="s2">&quot;set strict=False for fuzzy matching or fuzzy_dist=0 for strict matching&quot;</span>
         <span class="p">)</span>
+    <span class="n">input_formats</span> <span class="o">=</span> <span class="n">_input_format_to_tuple</span><span class="p">(</span><span class="n">input_format</span><span class="p">)</span>
 
     <span class="c1"># convert to dask</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">to_dask</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -292,7 +288,8 @@
     <span class="c1"># amount of different codes to produce the report</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;clean_code_tup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">srs</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">_format_country</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_format</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">fuzzy_dist</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span>
+            <span class="n">_format_country</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_formats</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">fuzzy_dist</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">srs</span>
         <span class="p">],</span>
         <span class="n">meta</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
     <span class="p">)</span>
@@ -320,7 +317,9 @@
 
 
 <div class="viewcode-block" id="validate_country"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_country.validate_country">[docs]</a><span class="k">def</span> <span class="nf">validate_country</span><span class="p">(</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span> <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+    <span class="n">input_format</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validate country names.</span>
@@ -339,6 +338,10 @@
 <span class="sd">            - &#39;alpha-2&#39;: alpha-2 code (&#39;US&#39;)</span>
 <span class="sd">            - &#39;alpha-3&#39;: alpha-3 code (&#39;USA&#39;)</span>
 <span class="sd">            - &#39;numeric&#39;: numeric code (840)</span>
+
+<span class="sd">        Can also be a tuple containing any combination of input formats,</span>
+<span class="sd">        for example to clean a column containing alpha-2 and numeric</span>
+<span class="sd">        codes set input_format to (&#39;alpha-2&#39;, &#39;numeric&#39;).</span>
 
 <span class="sd">        (default: &#39;auto&#39;)</span>
 <span class="sd">    strict</span>
@@ -359,18 +362,18 @@
 <span class="sd">    1    False</span>
 <span class="sd">    Name: country, dtype: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="n">input_formats</span> <span class="o">=</span> <span class="n">_input_format_to_tuple</span><span class="p">(</span><span class="n">input_format</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_check_country</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">input_format</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_check_country</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">input_formats</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
 
     <span class="n">x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">_check_country</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_format</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_check_country</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_formats</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_format_country</span><span class="p">(</span>
     <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">input_formats</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">fuzzy_dist</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -393,9 +396,13 @@
     <span class="c1"># could not be parsed) or &quot;success&quot; (a successful parse of the value).</span>
 
     <span class="n">country</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="n">result_index</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_check_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">input_format</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">result_index</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_check_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">input_formats</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">fuzzy_dist</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;unknown&quot;</span> <span class="ow">and</span> <span class="n">input_format</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;official&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">fuzzy_dist</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;unknown&quot;</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">input_formats</span> <span class="ow">or</span> <span class="s2">&quot;official&quot;</span> <span class="ow">in</span> <span class="n">input_formats</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="n">result_index</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_check_fuzzy_dist</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">fuzzy_dist</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
@@ -416,7 +423,7 @@
 
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">20</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_check_country</span><span class="p">(</span><span class="n">country</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_check_country</span><span class="p">(</span><span class="n">country</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_formats</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">clean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds the index of the given country in the DATA dataframe.</span>
 
@@ -424,8 +431,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    country</span>
 <span class="sd">        string containing the country value being cleaned</span>
-<span class="sd">    input_format</span>
-<span class="sd">        the ISO 3166 input format of the country</span>
+<span class="sd">    input_formats</span>
+<span class="sd">        Tuple containing potential ISO 3166 input formats of the country</span>
 <span class="sd">    strict</span>
 <span class="sd">        If True, for input types &quot;name&quot; and &quot;offical&quot; the function looks for a direct match</span>
 <span class="sd">        in the DATA dataframe. If False, the country input is searched for a regex match.</span>
@@ -436,12 +443,16 @@
     <span class="k">if</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">NULL_VALUES</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
 
-    <span class="k">if</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-        <span class="n">input_format</span> <span class="o">=</span> <span class="n">_get_format_from_name</span><span class="p">(</span><span class="n">country</span><span class="p">)</span>
+    <span class="n">country_format</span> <span class="o">=</span> <span class="n">_get_format_from_name</span><span class="p">(</span><span class="n">country</span><span class="p">)</span>
+    <span class="n">input_format</span> <span class="o">=</span> <span class="n">_get_format_if_allowed</span><span class="p">(</span><span class="n">country_format</span><span class="p">,</span> <span class="n">input_formats</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">input_format</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">False</span>
 
     <span class="k">if</span> <span class="n">strict</span> <span class="ow">and</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;regex&quot;</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;official&quot;</span><span class="p">):</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="n">DATA</span><span class="p">[</span><span class="n">DATA</span><span class="p">[</span><span class="n">form</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;^</span><span class="si">{</span><span class="n">country</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">DATA</span><span class="p">[</span>
+                <span class="n">DATA</span><span class="p">[</span><span class="n">form</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;^</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">country</span><span class="p">)</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">index</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;success&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
 
@@ -450,13 +461,11 @@
             <span class="k">if</span> <span class="n">country_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
 
-        <span class="c1"># alternative regex search strategy</span>
-        <span class="c1"># match = REGEXES.search(country)</span>
-        <span class="c1"># if match:</span>
-        <span class="c1">#     return (int(match.lastgroup[1:]), &quot;success&quot;) if clean else True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="n">DATA</span><span class="p">[</span>
-            <span class="n">DATA</span><span class="p">[</span><span class="n">input_format</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;^</span><span class="si">{</span><span class="n">country</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">DATA</span><span class="p">[</span><span class="n">input_format</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;^</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">country</span><span class="p">)</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
         <span class="p">]</span><span class="o">.</span><span class="n">index</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;success&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">clean</span> <span class="k">else</span> <span class="kc">True</span>
@@ -497,6 +506,48 @@
         <span class="k">return</span> <span class="s2">&quot;numeric&quot;</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;alpha-2&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="s2">&quot;alpha-3&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="s2">&quot;regex&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_get_format_if_allowed</span><span class="p">(</span><span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">allowed_formats</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the input format if it&#39;s an allowed format.</span>
+<span class="sd">    &quot;regex&quot; input_format is only returned if &quot;name&quot; and &quot;official are</span>
+<span class="sd">    allowed. This is because when strict = True and input_format = &quot;regex&quot;</span>
+<span class="sd">    both the &quot;name&quot; and &quot;official&quot; columns in the DATA dataframe are checked.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;regex&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">allowed_formats</span> <span class="ow">and</span> <span class="s2">&quot;official&quot;</span> <span class="ow">in</span> <span class="n">allowed_formats</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;regex&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;name&quot;</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">allowed_formats</span>
+            <span class="k">else</span> <span class="s2">&quot;official&quot;</span>
+            <span class="k">if</span> <span class="s2">&quot;official&quot;</span> <span class="ow">in</span> <span class="n">allowed_formats</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">input_format</span> <span class="k">if</span> <span class="n">input_format</span> <span class="ow">in</span> <span class="n">allowed_formats</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_input_format_to_tuple</span><span class="p">(</span><span class="n">input_format</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a string input format to a tuple of allowed input formats and raises an error</span>
+<span class="sd">    if an input format is not valid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">input_formats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;official&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-2&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-3&quot;</span><span class="p">,</span> <span class="s2">&quot;numeric&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_format</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;official&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-2&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha-3&quot;</span><span class="p">,</span> <span class="s2">&quot;numeric&quot;</span><span class="p">)</span>
+        <span class="n">input_format</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_format</span><span class="p">,)</span>
+
+    <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="n">input_format</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fmt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_formats</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;input_format </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s1"> is invalid, it needs to be one of &quot;auto&quot;, &#39;</span>
+                <span class="s1">&#39;&quot;name&quot;, &quot;official&quot;, &quot;alpha-2&quot;, &quot;alpha-3&quot; or &quot;numeric&#39;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_format</span>
 </pre></div>
 
           </div>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.missing &#8212; DataPrep 0.3.0-alpha.0 documentation</title>
+  <title>dataprep.eda.missing &#8212; DataPrep 0.3.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -21,7 +21,7 @@
     <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="dataprep.eda.create_report" href="dataprep.eda.create_report.html" />
+    <link rel="next" title="dataprep.eda.diff" href="dataprep.eda.diff.html" />
     <link rel="prev" title="dataprep.eda.correlation" href="dataprep.eda.correlation.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
@@ -151,6 +151,12 @@
           
             
               <li class="">
+                  <a href="dataprep.eda.diff.html">dataprep.eda.diff</a>
+              </li>
+            
+          
+            
+              <li class="">
                   <a href="dataprep.eda.create_report.html">dataprep.eda.create_report</a>
               </li>
             
@@ -212,13 +218,13 @@
 <h2>plot_missing<a class="headerlink" href="#plot-missing" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="dataprep.eda.missing.plot_missing">
-<code class="sig-prename descclassname">dataprep.eda.missing.</code><code class="sig-name descname">plot_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.plot_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.eda.missing.</span></code><code class="sig-name descname"><span class="pre">plot_missing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/missing.html#plot_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.missing.plot_missing" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – the pandas data_frame for which plots are calculated for each column.</p></li>
-<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame.</p></li>
-<li><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame.</p></li>
+<li><p><strong>col1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame.</p></li>
+<li><p><strong>col2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame.</p></li>
 <li><p><strong>config</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – A dictionary for configuring the visualizations.
 E.g. config={“spectrum.bins”: 20}</p></li>
 <li><p><strong>display</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list containing the names of the visualizations to display
@@ -253,16 +259,16 @@ or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous().</p>
 calculating intermediate part</p>
 <dl class="py function">
 <dt id="dataprep.eda.missing.compute.compute_missing">
-<code class="sig-prename descclassname">dataprep.eda.missing.compute.</code><code class="sig-name descname">compute_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">cfg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.compute.compute_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.eda.missing.compute.</span></code><code class="sig-name descname"><span class="pre">compute_missing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/missing/compute.html#compute_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.missing.compute.compute_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to deal with missing values
 There are three functions: plot_missing(df), plot_missing(df, x)
 plot_missing(df, x, y)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]) – the pandas data_frame for which plots are calculated for each column</p></li>
-<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
-<li><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EDAFrame</span></code>]) – the pandas data_frame for which plots are calculated for each column</p></li>
+<li><p><strong>col1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
+<li><p><strong>col2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a valid column name of the data frame</p></li>
 <li><p><strong>cfg</strong> (<em>Union</em><em>[</em><a class="reference internal" href="dataprep.eda.html#dataprep.eda.configs.Config" title="dataprep.eda.configs.Config"><em>Config</em></a><em>, </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>None</em><em>]</em><em>, </em><em>default None</em>) – When a user call plot_missing(), the created Config object will be passed to
 compute_missing().
 When a user call compute_missing() directly, if he/she wants to customize the output,
@@ -299,7 +305,7 @@ or dtype = Continuous() or dtype = “Continuous” or dtype = Continuous()</p><
 visualization part.</p>
 <dl class="py function">
 <dt id="dataprep.eda.missing.render.render_missing">
-<code class="sig-prename descclassname">dataprep.eda.missing.render.</code><code class="sig-name descname">render_missing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">itmdt</span></em>, <em class="sig-param"><span class="n">cfg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/missing/render.html#render_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataprep.eda.missing.render.render_missing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">dataprep.eda.missing.render.</span></code><code class="sig-name descname"><span class="pre">render_missing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">itmdt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/missing/render.html#render_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.missing.render.render_missing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the visualizations from plot_missing</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
