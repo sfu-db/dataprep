@@ -134,7 +134,7 @@ series
 Name: country, dtype: bool
 ```
 
-**Currently supports functions for:** Column Headers | Country Names | Dates and Times | Duplicate Strings | Email Addresses | Geographic Coordinates | IP Addresses | Phone Numbers | URLs | US Street Addresses
+Check [clean_headers](https://docs.dataprep.ai/user_guide/clean/clean_headers.html), [clean_country](https://docs.dataprep.ai/user_guide/clean/clean_country.html), [clean_date](https://docs.dataprep.ai/user_guide/clean/clean_date.html), [clean_duplication](https://docs.dataprep.ai/user_guide/clean/clean_duplication.html), [clean_email](https://docs.dataprep.ai/user_guide/clean/clean_email.html), [clean_lat_long](https://docs.dataprep.ai/user_guide/clean/clean_lat_long.html), [clean_ip](https://docs.dataprep.ai/user_guide/clean/clean_ip.html), [clean_phone](https://docs.dataprep.ai/user_guide/clean/clean_phone.html), [clean_text](https://docs.dataprep.ai/user_guide/clean/clean_text.html), [clean_url](https://docs.dataprep.ai/user_guide/clean/clean_url.html), [clean_address](https://docs.dataprep.ai/user_guide/clean/clean_address.html) and [clean_df](https://docs.dataprep.ai/user_guide/clean/clean_df.html) to see how each function works.
 
 ## Connector
 
@@ -148,7 +148,7 @@ Let's check out the several benefits that Connector offers:
 
 - **A unified API:** You can fetch data using one or two lines of code to get data from [tens of popular websites](https://github.com/sfu-db/DataConnectorConfigs).
 - **Auto Pagination:** Do you want to invoke a Web API that could return a large result set and need to handle it through pagination? Connector automatically does the pagination for you! Just specify the desired number of returned results (argument `_count`) without getting into unnecessary detail about a specific pagination scheme.
-- **Smart API request strategy:** Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy.
+- **Speed:** Do you want to fetch results more quickly by making concurrent requests to Web APIs? Through the `_concurrency` argument, Connector simplifies concurrency, issuing API requests in parallel while respecting the API's rate limit policy.
 
 #### How to fetch all publications of Andrew Y. Ng?
 
