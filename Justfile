@@ -66,8 +66,8 @@ release version:
     exit 1;
   fi
   
-  from_version=$(echo "${vstring}" | sed -nr "s/^Bumping version from ([0-9]+\.[0-9]+\.[0-9]+) to ([0-9]+\.[0-9]+\.[0-9]+)$/\1/p")
-  to_version=$(echo "${vstring}" | sed -nr "s/^Bumping version from ([0-9]+\.[0-9]+\.[0-9]+) to ([0-9]+\.[0-9]+\.[0-9]+)$/\2/p")
+  from_version=$(echo "${vstring}" | sed -nr "s/^Bumping version from ([0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta).[0-9]+)?) to ([0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta).[0-9]+)?)$/\1/p")
+  to_version=$(echo "${vstring}" | sed -nr "s/^Bumping version from ([0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta).[0-9]+)?) to ([0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta).[0-9]+)?)$/\4/p")
 
   git checkout pyproject.toml # clean up
 
@@ -101,6 +101,7 @@ release version:
   
   echo "Creating release commit"
   git add pyproject.toml
+
   poetry run semantic-release version --{{version}}
   
   # echo "Merge release/v${to_version} to master & develop"
@@ -121,7 +122,8 @@ release version:
 
   echo "Creating release draft"
 
-  poetry run python scripts/release-note.py $(git rev-parse release/v${to_version}^) | sed "1iv${to_version}\n" | hub release create -d -a "dist/dataprep-${to_version}-py3-none-any.whl" -a "dist/dataprep-${to_version}.tar.gz" -F - "v${to_version}"
+  poetry run python scripts/release-note.py $(git rev-parse release/v${to_version}^) | sed "1iv${to_version}\n" | gh release create "v${to_version}" -d -F -
+  gh release upload "v${to_version}" "dist/dataprep-${to_version}-py3-none-any.whl" "dist/dataprep-${to_version}.tar.gz" 
 
 
 @ensure-git-clean:
