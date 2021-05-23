@@ -165,7 +165,7 @@ def clean_lat_long(
 
     if output_format not in {"dd", "ddh", "dm", "dms"}:
         raise ValueError(
-            f'output_format {output_format} is invalid, it must be "dd", "ddh", "dm", or "dms"'
+            f'output_format {output_format} is not valid, it must be "dd", "ddh", "dm", or "dms"'
         )
 
     # convert to dask
