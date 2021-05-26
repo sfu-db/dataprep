@@ -127,13 +127,13 @@ def test_clean_output_packed(df_ips: pd.DataFrame) -> None:
     df_clean = clean_ip(df_ips, column="messy_ip", output_format="packed")
     df_check = df_ips.copy()
     df_check["messy_ip_clean"] = [
-        b' \x01\r\xb8\x85\xa3\x00\x00\x00\x00\x8a.\x03ps4',
-        b'\x0c\x03\x04\x05',
-        b'\xe9\x05\x06\x00',
+        b" \x01\r\xb8\x85\xa3\x00\x00\x00\x00\x8a.\x03ps4",
+        b"\x0c\x03\x04\x05",
+        b"\xe9\x05\x06\x00",
         np.nan,
         np.nan,
-        b'\xb1\xc3\x94t',
-        b'\xfd\xf8\xf5;\x82\xe4\x00\x00\x00\x00\x00\x00\x00\x00\x00S',
+        b"\xb1\xc3\x94t",
+        b"\xfd\xf8\xf5;\x82\xe4\x00\x00\x00\x00\x00\x00\x00\x00\x00S",
     ]
     assert df_check.equals(df_clean)
 
