@@ -178,7 +178,7 @@ There are many ways to contribute to DataPrep.
 - Review the source code changes.
 - Engage with other DataPrep users and developers on StackOverflow.
 - Help each other in the [DataPrep Community Discord](https://discord.gg/xwbkFNk) and [Forum].
-- [![Twitter]](https://twitter.com/sfu_db)
+- [![Twitter]](https://twitter.com/dataprepai)
 - Contribute bug fixes.
 - Providing use cases and writing down your user experience.
 
@@ -188,7 +188,7 @@ Please take a look at our [wiki] for development documentations!
 [forum]: https://github.com/sfu-db/dataprep/discussions
 [wiki]: https://github.com/sfu-db/dataprep/wiki
 [examples]: https://github.com/sfu-db/dataprep/tree/master/examples
-[twitter]: https://img.shields.io/twitter/follow/sfu_db?style=social
+[twitter]: https://img.shields.io/twitter/follow/dataprepai?style=social
 
 ## Acknowledgement
 
