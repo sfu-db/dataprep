@@ -290,7 +290,6 @@ def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
 def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     """Computation of Variables section."""
     data: Dict[str, Any] = {}
-    head: pd.DataFrame = df.head()
     # variables
     if cfg.variables.enable:
         for col in df.columns:
@@ -301,16 +300,12 @@ def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
                 # We also transform to categorical for small cardinality numerical column.
                 if df.get_missing_cnt(col) == df.shape[0]:
                     srs = df.get_col_as_str(col, na_as_str=True)
-                    data[col] = nom_comps(srs, srs.head(), cfg)
-                elif isinstance(dtype, Nominal):
-                    data[col] = nom_comps(df.frame[col], head[col], cfg)
+                    data[col] = nom_comps(srs, cfg)
+                elif isinstance(dtype, (Nominal, GeoGraphy, GeoPoint)):
+                    data[col] = nom_comps(df.frame[col], cfg)
                 elif isinstance(dtype, SmallCardNum):
                     srs = df.get_col_as_str(col, na_as_str=False)
-                    data[col] = nom_comps(srs, srs.head(), cfg)
-                elif isinstance(dtype, GeoGraphy):
-                    data[col] = nom_comps(df.frame[col], head[col], cfg)
-                elif isinstance(dtype, GeoPoint):
-                    data[col] = nom_comps(df.frame[col], head[col], cfg)
+                    data[col] = nom_comps(srs, cfg)
                 elif isinstance(dtype, Continuous):
                     data[col] = cont_comps(df.frame[col], cfg)
                 elif isinstance(dtype, DateTime):
@@ -328,20 +323,25 @@ def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
 def _compute_overview(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     """Computation of Overview section."""
     data: Dict[str, Any] = {}
-    head = df.head()
     # overview
     if cfg.overview.enable:
         data["ov"] = calc_stats(df, cfg)
         data["insights"] = []
         for col in df.columns:
             col_dtype = df.get_eda_dtype(col)
-            if isinstance(col_dtype, Continuous):
+
+            # when srs is full NA, the column type will be float
+            # and need to be transformed into str.
+            if df.get_missing_cnt(col) == df.shape[0]:
+                srs = df.get_col_as_str(col, na_as_str=False).dropna().astype(str)
+                data["insights"].append((col, Nominal(), _nom_calcs(srs, cfg)))
+            elif isinstance(col_dtype, Continuous):
                 data["insights"].append(
                     (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
                 )
             elif isinstance(col_dtype, (Nominal, GeoGraphy, GeoPoint, SmallCardNum)):
                 srs = df.get_col_as_str(col, na_as_str=False).dropna()
-                data["insights"].append((col, Nominal(), _nom_calcs(srs, head[col], cfg)))
+                data["insights"].append((col, Nominal(), _nom_calcs(srs, cfg)))
             elif isinstance(col_dtype, DateTime):
                 data["insights"].append(
                     (col, DateTime(), dask.delayed(_calc_line_dt)(df.frame[[col]], cfg.line.unit))
