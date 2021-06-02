@@ -49,6 +49,7 @@ def clean_ip(
             - 'binary': binary representation ('00001100000000110000010000000101')
             - 'hexa': hexadecimal representation ('0xc030405')
             - 'integer': integer representation (201524229)
+            - 'packed': packed binary representation (big-endian, a bytes object)
 
         (default: 'compressed')
     inplace
@@ -98,10 +99,10 @@ def clean_ip(
             f'input_format {input_format} is invalid, it needs to be "ipv4", "ipv6" or "auto"'
         )
 
-    if output_format not in {"compressed", "full", "binary", "hexa", "integer"}:
+    if output_format not in {"compressed", "full", "binary", "hexa", "integer", "packed"}:
         raise ValueError(
             f'output_format {output_format} is invalid, it needs to be "compressed", "full", '
-            '"binary", "hexa" or "integer"'
+            '"binary", "hexa", "integer" or "packed"'
         )
 
     if not isinstance(inplace, bool):
@@ -192,6 +193,7 @@ def _format_ip(val: Any, input_format: str, output_format: str, errors: str) -> 
         2 := the value is cleaned and the cleaned value is DIFFERENT than the input value
         3 := the value is cleaned and is THE SAME as the input value (no transformation)
     """
+    # pylint: disable=too-many-branches
     address, status = _check_ip(val, input_format, True)
 
     if status == "null":
@@ -220,6 +222,10 @@ def _format_ip(val: Any, input_format: str, output_format: str, errors: str) -> 
     # converts to integer format
     elif output_format == "integer":
         result = int(address)
+
+    # converts to packed binary format (big-endian)
+    elif output_format == "packed":
+        result = address.packed
 
     # convert to full representation
     else:
