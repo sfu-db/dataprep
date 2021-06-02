@@ -1,6 +1,7 @@
 """This module implements the formatting
 for create_report(df) function."""  # pylint: disable=line-too-long,
 
+import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 from warnings import catch_warnings, filterwarnings
 
@@ -80,68 +81,17 @@ def format_report(
     return comps
 
 
-def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
-    """
-    Format basic version.
-
-    Parameters
-    ----------
-    df
-        The DataFrame for which data are calculated.
-    cfg
-        The config dict user passed in. E.g. config =  {"hist.bins": 20}
-        Without user's specifications, the default is "auto"
-    Returns
-    -------
-    Dict[str, Any]
-        A dictionary in which formatted data is stored.
-        This variable acts like an API in passing data to the template engine.
-    """
-    # pylint: disable=too-many-locals,too-many-statements,too-many-branches
-    # aggregate all computations
-
-    setattr(getattr(cfg, "plot"), "report", True)
-    if cfg.missingvalues.enable:
-        data, completions = basic_computations(df, cfg)
-    else:
-        data = basic_computations(df, cfg)
-    with catch_warnings():
-        filterwarnings(
-            "ignore",
-            "invalid value encountered in true_divide",
-            category=RuntimeWarning,
-        )
-        filterwarnings(
-            "ignore",
-            "overflow encountered in long_scalars",
-            category=RuntimeWarning,
-        )
-        (data,) = dask.compute(data)
-    # results dictionary
+def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[str, Any]:
     res: Dict[str, Any] = {}
-    # overview
-    if cfg.overview.enable:
-        # insight
-        all_ins = _format_ov_ins(data["ov"], cfg)
-        for col, dtp, dat in data["insights"]:
-            if isinstance(dtp, Continuous):
-                ins = _format_cont_ins(col, dat, data["ov"]["nrows"], cfg)[1]
-            elif type(dtp) in [Nominal, SmallCardNum, GeoGraphy, GeoPoint]:
-                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
-            else:
-                continue
-            all_ins += ins
-        res["overview_insights"] = _insight_pagination(all_ins)
-        res["overview"] = format_ov_stats(data["ov"])
-        res["has_overview"] = True
-    else:
-        res["has_overview"] = False
-
     # variables
-    if cfg.variables.enable:
-        res["variables"] = {}
-        res["has_variables"] = True
-        for col in df.columns:
+    if not cfg.variables.enable:
+        res["has_variables"] = False
+        return res
+
+    res["variables"] = {}
+    res["has_variables"] = True
+    for col in df.columns:
+        try:
             stats: Any = None  # needed for pylint
             dtp = df.get_eda_dtype(col)
             if isinstance(dtp, Continuous):
@@ -183,9 +133,17 @@ def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
                 "plots_tab": zip(comp[1][1:], rndrd["meta"][1:], insight_keys),
                 "insights_tab": rndrd["insights"],
             }
-    else:
-        res["has_variables"] = False
 
+        except:
+            print(f"error happended in column:{col}", file=sys.stderr)
+            raise
+
+    return res
+
+
+def _format_interaction(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
+    """Format of Interaction section"""
+    res: Dict[str, Any] = {}
     if len(data["num_cols"]) > 0:
         # interactions
         if cfg.interactions.enable:
@@ -194,7 +152,15 @@ def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
             rndrd = render_correlation(itmdt, cfg)
             rndrd.sizing_mode = "stretch_width"
             res["interactions"] = components(rndrd)
+        else:
+            res["has_interaction"] = False
+    return res
 
+
+def _format_correlation(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
+    """Format of Correlation section"""
+    res: Dict[str, Any] = {}
+    if len(data["num_cols"]) > 0:
         # correlations
         if cfg.correlations.enable:
             res["has_correlation"] = True
@@ -224,10 +190,18 @@ def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
             res["correlations"] = components(figs_corr)
 
     else:
-        res["has_interaction"], res["has_correlation"] = False, False
+        res["has_correlation"] = False
 
+    return res
+
+
+def _format_missing(
+    data: Dict[str, Any], cfg: Config, completions: Optional[Dict[str, Any]], ncols: int
+) -> Dict[str, Any]:
+    """Format of Missing section"""
+    res: Dict[str, Any] = {}
     # missing
-    if cfg.missingvalues.enable:
+    if cfg.missingvalues.enable and completions is not None:
         res["has_missing"] = True
         itmdt = completions["miss"](data["miss"])
 
@@ -239,15 +213,147 @@ def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
         res["missing"] = components(figs_missing)
         res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map"]
         # only display dendrogram when df has more than one column
-        if df.shape[1] > 1:
+        if ncols > 1:
             res["missing_tabs"].append("Dendogram")
+    return res
+
+
+def _format_overview(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
+    """Format of Overview section"""
+    # results dictionary
+    res: Dict[str, Any] = {}
+    # overview
+    if cfg.overview.enable:
+        # insight
+        all_ins = _format_ov_ins(data["ov"], cfg)
+        for col, dtp, dat in data["insights"]:
+            if isinstance(dtp, Continuous):
+                ins = _format_cont_ins(col, dat, data["ov"]["nrows"], cfg)[1]
+            elif type(dtp) in [Nominal, SmallCardNum, GeoGraphy, GeoPoint]:
+                ins = _format_nom_ins(col, dat, data["ov"]["nrows"], cfg)[1]
+            else:
+                continue
+            all_ins += ins
+        res["overview_insights"] = _insight_pagination(all_ins)
+        res["overview"] = format_ov_stats(data["ov"])
+        res["has_overview"] = True
+    else:
+        res["has_overview"] = False
+    return res
+
+
+def format_basic(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
+    """
+    Format basic version.
+
+    Parameters
+    ----------
+    df
+        The DataFrame for which data are calculated.
+    cfg
+        The config dict user passed in. E.g. config =  {"hist.bins": 20}
+        Without user's specifications, the default is "auto"
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary in which formatted data is stored.
+        This variable acts like an API in passing data to the template engine.
+    """
+    # pylint: disable=too-many-locals,too-many-statements,too-many-branches
+    # aggregate all computations
+
+    setattr(getattr(cfg, "plot"), "report", True)
+    data, completions = basic_computations(df, cfg)
+    with catch_warnings():
+        filterwarnings(
+            "ignore",
+            "invalid value encountered in true_divide",
+            category=RuntimeWarning,
+        )
+        filterwarnings(
+            "ignore",
+            "overflow encountered in long_scalars",
+            category=RuntimeWarning,
+        )
+        (data,) = dask.compute(data)
+
+    res_overview = _format_overview(data, cfg)
+    res_variables = _format_variables(df, cfg, data)
+    res_interaction = _format_interaction(data, cfg)
+    res_correlations = _format_correlation(data, cfg)
+    res_missing = _format_missing(data, cfg, completions, df.shape[1])
+    res = {**res_overview, **res_variables, **res_interaction, **res_correlations, **res_missing}
 
     return res
 
 
+def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
+    """Computation of Variables section."""
+    data: Dict[str, Any] = {}
+    head: pd.DataFrame = df.head()
+    # variables
+    if cfg.variables.enable:
+        for col in df.columns:
+            try:
+                dtype = df.get_eda_dtype(col)
+                # Since it will throw error if a numerical column is all-nan,
+                # we transform it to categorical column.
+                # We also transform to categorical for small cardinality numerical column.
+                if df.get_missing_cnt(col) == df.shape[0]:
+                    srs = df.get_col_as_str(col, na_as_str=True)
+                    data[col] = nom_comps(srs, srs.head(), cfg)
+                elif isinstance(dtype, Nominal):
+                    data[col] = nom_comps(df.frame[col], head[col], cfg)
+                elif isinstance(dtype, SmallCardNum):
+                    srs = df.get_col_as_str(col, na_as_str=False)
+                    data[col] = nom_comps(srs, srs.head(), cfg)
+                elif isinstance(dtype, GeoGraphy):
+                    data[col] = nom_comps(df.frame[col], head[col], cfg)
+                elif isinstance(dtype, GeoPoint):
+                    data[col] = nom_comps(df.frame[col], head[col], cfg)
+                elif isinstance(dtype, Continuous):
+                    data[col] = cont_comps(df.frame[col], cfg)
+                elif isinstance(dtype, DateTime):
+                    data[col] = {}
+                    data[col]["stats"] = calc_stats_dt(df.frame[col])
+                    data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
+                else:
+                    raise ValueError(f"unprocessed type in column{col}:{dtype}")
+            except:
+                print(f"error happended in column:{col}", file=sys.stderr)
+                raise
+    return data
+
+
+def _compute_overview(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
+    """Computation of Overview section."""
+    data: Dict[str, Any] = {}
+    head = df.head()
+    # overview
+    if cfg.overview.enable:
+        data["ov"] = calc_stats(df, cfg)
+        data["insights"] = []
+        for col in df.columns:
+            col_dtype = df.get_eda_dtype(col)
+            if isinstance(col_dtype, Continuous):
+                data["insights"].append(
+                    (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
+                )
+            elif isinstance(col_dtype, (Nominal, GeoGraphy, GeoPoint, SmallCardNum)):
+                srs = df.get_col_as_str(col, na_as_str=False).dropna()
+                data["insights"].append((col, Nominal(), _nom_calcs(srs, head[col], cfg)))
+            elif isinstance(col_dtype, DateTime):
+                data["insights"].append(
+                    (col, DateTime(), dask.delayed(_calc_line_dt)(df.frame[[col]], cfg.line.unit))
+                )
+            else:
+                raise RuntimeError(f"unprocessed data type: col:{col}, dtype: {type(col_dtype)}")
+    return data
+
+
 def basic_computations(
     df: EDAFrame, cfg: Config
-) -> Union[Tuple[Dict[str, Any], Dict[str, Any]], Any]:
+) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
     """Computations for the basic version.
 
     Parameters
@@ -264,56 +370,13 @@ def basic_computations(
         The config dict user passed in. E.g. config =  {"hist.bins": 20}
         Without user's specifications, the default is "auto"
     """  # pylint: disable=too-many-branches
-    data: Dict[str, Any] = {}
+
+    variables_data = _compute_variables(df, cfg)
+    overview_data = _compute_overview(df, cfg)
+    data: Dict[str, Any] = {**variables_data, **overview_data}
+
     df_num = df.select_num_columns()
     data["num_cols"] = df_num.columns
-    head: pd.DataFrame = df.head()
-
-    # variables
-    if cfg.variables.enable:
-        for col in df.columns:
-            dtype = df.get_eda_dtype(col)
-            # Since it will throw error if a numerical column is all-nan,
-            # we transform it to categorical column.
-            # We also transform to categorical for small cardinality numerical column.
-            if df.get_missing_cnt(col) == df.shape[0]:
-                srs = df.get_col_as_str(col, na_as_str=True)
-                data[col] = nom_comps(srs, srs.head(), cfg)
-            elif isinstance(dtype, Nominal):
-                data[col] = nom_comps(df.frame[col], head[col], cfg)
-            elif isinstance(dtype, SmallCardNum):
-                srs = df.get_col_as_str(col, na_as_str=False)
-                data[col] = nom_comps(srs, srs.head(), cfg)
-            elif isinstance(dtype, GeoGraphy):
-                data[col] = nom_comps(df.frame[col], head[col], cfg)
-            elif isinstance(dtype, GeoPoint):
-                data[col] = nom_comps(df.frame[col], head[col], cfg)
-            elif isinstance(dtype, Continuous):
-                data[col] = cont_comps(df.frame[col], cfg)
-            elif isinstance(dtype, DateTime):
-                data[col] = {}
-                data[col]["stats"] = calc_stats_dt(df.frame[col])
-                data[col]["line"] = dask.delayed(_calc_line_dt)(df.frame[[col]], "auto")
-    # overview
-    if cfg.overview.enable:
-        data["ov"] = calc_stats(df, cfg)
-        data["insights"] = []
-        for col in df.columns:
-            col_dtype = df.get_eda_dtype(col)
-            if isinstance(col_dtype, Continuous):
-                data["insights"].append(
-                    (col, Continuous(), _cont_calcs(df.frame[col].dropna(), cfg))
-                )
-            elif type(col_dtype) in [Nominal, GeoGraphy, GeoPoint, SmallCardNum]:
-                srs = df.get_col_as_str(col, na_as_str=False).dropna()
-                data["insights"].append((col, Nominal(), _nom_calcs(srs, head[col], cfg)))
-            elif isinstance(col_dtype, DateTime):
-                data["insights"].append(
-                    (col, DateTime(), dask.delayed(_calc_line_dt)(df.frame[[col]], cfg.line.unit))
-                )
-            else:
-                raise RuntimeError(f"unprocessed data type: col:{col}, dtype: {type(col_dtype)}")
-
     # interactions
     if cfg.interactions.enable:
         data["scat"] = df_num.frame.map_partitions(
@@ -322,7 +385,9 @@ def basic_computations(
     # correlations
     if cfg.correlations.enable:
         data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))
+
     # missing values
+    completions = None
     if cfg.missingvalues.enable:
         (
             delayed,
@@ -332,30 +397,5 @@ def basic_computations(
         )
         data["miss"] = delayed
         completions = {"miss": completion}
-        return data, completions
 
-    else:
-        return data
-
-
-# def cont_comps_brief(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
-#
-#     """
-#     Computations required for constant column and all-nan column
-#     """
-#     # pylint: disable=too-many-branches
-#     data: Dict[str, Any] = {}
-#
-#     data["nrows"] = srs.shape[0]  # total rows
-#     srs = srs.dropna()
-#     data["npres"] = srs.shape[0]  # number of present (not null) values
-#     data["mean"] = srs.mean()
-#     data["min"] = srs.min()
-#     data["max"] = srs.max()
-#     data["nreals"] = srs.shape[0]
-#     data["nzero"] = (srs == 0).sum()
-#     data["nneg"] = (srs < 0).sum()
-#     data["mem_use"] = srs.memory_usage(deep=True)
-#     data["nuniq"] = srs.nunique_approx()
-#
-#     return data
+    return data, completions
