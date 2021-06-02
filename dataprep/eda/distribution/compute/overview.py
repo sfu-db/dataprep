@@ -49,7 +49,6 @@ def compute_overview(
     # pylint: disable=too-many-locals
 
     frame = EDAFrame(df, dtype=dtype)
-    head: pd.DataFrame = frame.head()
 
     data: List[Tuple[str, DType, Any]] = []
     for col in frame.columns:
@@ -60,7 +59,11 @@ def compute_overview(
             cfg.bar.enable or cfg.insight.enable
         ):
             srs = frame.get_col_as_str(col).dropna()
-            data.append((col, col_dtype, _nom_calcs(srs, head[col], cfg)))
+            # when srs is full NA, the column type will be float
+            # and need to be transformed into str.
+            if frame.get_missing_cnt(col) == frame.shape[0]:
+                srs = srs.astype(str)
+            data.append((col, col_dtype, _nom_calcs(srs, cfg)))
         elif isinstance(col_dtype, DateTime) and (cfg.line.enable or cfg.insight.enable):
             data.append(
                 (col, col_dtype, dask.delayed(_calc_line_dt)(frame.frame[[col]], cfg.line.unit))
@@ -131,9 +134,9 @@ def _cont_calcs(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     return data
 
 
-def _nom_calcs(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
+def _nom_calcs(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     """
-    Computations for a nominal column in plot(df)
+    Computations for a nominal column in plot(df). Assume srs is string column.
     """
     # dictionary of data for the bar chart and related insights
     data: Dict[str, Any] = {}
@@ -152,9 +155,8 @@ def _nom_calcs(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
         data["chisq"] = chisquare(grps.values)  # chi-squared test for uniformity
         data["nuniq"] = grps.shape[0]  # number of unique values
         data["npres"] = grps.sum()  # number of present (not null) values
-        if not head.apply(lambda x: isinstance(x, str)).all():
-            srs = srs.astype(str)  # srs must be a string to compute the value lengths
-        data["min_len"], data["max_len"] = srs.str.len().min(), srs.str.len().max()
+        data["min_len"] = srs.str.len().min()
+        data["max_len"] = srs.str.len().max()
 
     return data
 

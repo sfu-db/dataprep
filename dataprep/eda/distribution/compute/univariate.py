@@ -65,8 +65,7 @@ def compute_univariate(
 
     if isinstance(col_dtype, (Nominal, GeoPoint, SmallCardNum)):
         srs = frame.get_col_as_str(x)
-        head = frame.head()[x]
-        (data,) = dask.compute(nom_comps(srs, head, cfg))
+        (data,) = dask.compute(nom_comps(srs, cfg))
         return Intermediate(col=x, data=data, visual_type="categorical_column")
 
     elif isinstance(col_dtype, Continuous):
@@ -91,16 +90,15 @@ def compute_univariate(
             visual_type="datetime_column",
         )
     elif isinstance(col_dtype, GeoGraphy):
-        head = frame.head()[x]
-        (data,) = dask.compute(nom_comps(frame.frame[x], head, cfg))
+        (data,) = dask.compute(nom_comps(frame.frame[x], cfg))
         return Intermediate(col=x, data=data, visual_type="geography_column")
     else:
         raise ValueError(f"unprocessed type. col:{x}, type:{col_dtype}")
 
 
-def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
+def nom_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     """
-    All computations required for plot(df, Nominal)
+    All computations required for plot(df, Nominal). Assume srs is string column.
     """
     # pylint: disable=too-many-branches
     data: Dict[str, Any] = dict()
@@ -140,14 +138,6 @@ def nom_comps(srs: dd.Series, head: pd.Series, cfg: Config) -> Dict[str, Any]:
             data["chisq"] = chisquare(grps.values)
 
     df = grps.reset_index()  # dataframe with group names and counts
-
-    if cfg.stats.enable or cfg.wordlen.enable:
-        if not head.apply(lambda x: isinstance(x, str)).all():
-            srs = srs.astype(str)  # srs must be a string to compute the value lengths
-    if cfg.stats.enable or cfg.wordcloud.enable or cfg.wordfreq.enable:
-        if not head.apply(lambda x: isinstance(x, str)).all():
-            df[df.columns[0]] = df[df.columns[0]].astype(str)
-
     if cfg.stats.enable:
         data.update(_calc_nom_stats(srs, df, data["nrows"], data["nuniq"]))
     elif cfg.wordfreq.enable and cfg.insight.enable:
