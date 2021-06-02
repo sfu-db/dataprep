@@ -180,7 +180,7 @@ class EDAFrame:
             return self._str_col_cache[(col, na_as_str)]
 
         # The case for directly return
-        if (isinstance(self._eda_dtypes[col], Nominal)) and (
+        if (isinstance(self._eda_dtypes[col], (Nominal, GeoGraphy))) and (
             (na_as_str and self.get_missing_cnt(col) == 0) or (not na_as_str)
         ):
             return self._ddf[col]

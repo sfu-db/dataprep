@@ -100,3 +100,9 @@ def suppress_warnings() -> None:
         "The default value of regex will change from True to False in a future version",
         category=FutureWarning,
     )
+
+    warnings.filterwarnings(
+        "ignore",
+        "invalid value encountered in true_divide",
+        category=RuntimeWarning,
+    )

@@ -212,7 +212,8 @@ def gen_test_df() -> pd.DataFrame:
     data[11] = gen_random_series(size=nrows, dtype="float", na_ratio=0.1, random_state=rand).rename(
         "num_miss"
     )
-
+    data[12] = pd.Series(["a", "b"] * (nrows // 2), name="category_no_miss", dtype="category")
+    data[13] = pd.Series(["a", np.nan] * (nrows // 2), name="category_miss", dtype="category")
     df = pd.concat(data.values(), axis=1)
     df.index = gen_random_series(df.index.shape[0], na_ratio=0.1, str_max_len=100, random_state=2)
     return df
