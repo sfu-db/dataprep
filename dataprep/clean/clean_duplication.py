@@ -7,6 +7,7 @@ from typing import Tuple, List, Dict, Any, Union
 from ipywidgets.widgets import Label, Dropdown, Checkbox, Button, HBox, VBox, Box, Layout, Text
 import pandas as pd
 import dask.dataframe as dd
+from varname import argname
 
 from .clean_duplication_utils import Clusterer
 
@@ -16,10 +17,13 @@ DEFAULT_BLOCK_SIZE = "6"
 
 
 def clean_duplication(
-    df: Union[pd.DataFrame, dd.DataFrame], column: str, df_var_name: str = "df", page_size: int = 5
+    df: Union[pd.DataFrame, dd.DataFrame],
+    column: str,
+    df_var_name: str = "default",
+    page_size: int = 5,
 ) -> Box:
     """
-    Cleans and standardized duplicate values in a DataFrame.
+    Cleans and standardizes duplicate values in a DataFrame.
 
     Read more in the :ref:`User Guide <duplication_userguide>`.
 
@@ -30,11 +34,11 @@ def clean_duplication(
     column
         The name of the column containing duplicate values.
     df_var_name
-        The variable name of the DataFrame being cleaned.
-        This is only needed for creating exported code snippets with
-        the correct variable name.
+        Optional parameter containing the variable name of the DataFrame being cleaned.
+        This is only needed for legacy compatibility with the original veraion of this
+        function, which needed it to produce correct exported code.
 
-        (default: 'df')
+        (default: 'default')
     page_size
         The number of clusters to display on each page.
 
@@ -53,6 +57,8 @@ def clean_duplication(
     0    New York
     1    New York
     """
+    if df_var_name == "default":
+        df_var_name = argname(df)
 
     return UserInterface(df, column, df_var_name, page_size).display()
 
