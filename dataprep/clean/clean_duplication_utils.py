@@ -277,18 +277,18 @@ class Clusterer:
         Writes the final dataframe to a pickle file then reads the file from
         inside the IPython kernel.
         """
-        code = "# dataframe with cleaned string values\ndf_clean"
+        code = f"# dataframe with cleaned string values\n{self._df_name}_clean"
         encoded_code = (b64encode(str.encode(code))).decode()
         final_df = self._df.compute()
         # create a temporary directory for the dataframe file
-        tmp_dir = mkdtemp()
-        df_file = path.join(tmp_dir, "clean_duplication_output.pkl")
+        tmp_dir = mkdtemp().replace("\\", "/")
+        df_file = path.join(tmp_dir, "clean_duplication_output.pkl").replace("\\", "/")
         final_df.to_pickle(df_file)
         # code to read the file and delete the temporary directory afterwards
         execute_code = (
             "import pandas as pd\n"
             "import shutil\n"
-            f"df_clean = pd.read_pickle('{df_file}')\n"
+            f"{self._df_name}_clean = pd.read_pickle('{df_file}')\n"
             f"shutil.rmtree('{tmp_dir}')"
         )
         encoded_execute = (b64encode(str.encode(execute_code))).decode()
