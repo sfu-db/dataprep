@@ -1578,9 +1578,14 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         tabs.append(fig)
         htgs["Pie Chart"] = cfg.pie.how_to_guide(color_list, plot_height, plot_width)
     if cfg.wordcloud.enable:
-        if data["nuniq_words_cloud"] > 0:
-            tabs.append(wordcloud_viz(data["word_cnts_cloud"], plot_width, plot_height))
-            htgs["Word Cloud"] = cfg.wordcloud.how_to_guide(plot_height, plot_width)
+        # wordcloud requires matplotlib, in some platform it may raise an error: NotImplementedError: Implement
+        # enable_gui in a subclass
+        try:
+            if data["nuniq_words_cloud"] > 0:
+                tabs.append(wordcloud_viz(data["word_cnts_cloud"], plot_width, plot_height))
+                htgs["Word Cloud"] = cfg.wordcloud.how_to_guide(plot_height, plot_width)
+        except Exception:
+            pass
     if cfg.wordfreq.enable:
         if data["nwords_freq"] > 0:
             tabs.append(
