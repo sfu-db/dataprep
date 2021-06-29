@@ -29,6 +29,8 @@ from .clean_df import clean_df
 
 from .clean_text import clean_text, default_text_pipeline
 
+from .clean_language import clean_language, validate_language
+
 
 __all__ = [
     "clean_lat_long",
@@ -54,4 +56,6 @@ __all__ = [
     "clean_df",
     "clean_text",
     "default_text_pipeline",
+    "clean_language",
+    "validate_language",
 ]
