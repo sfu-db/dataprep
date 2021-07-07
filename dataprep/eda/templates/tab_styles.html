@@ -42,7 +42,7 @@
         background: white;
     }
 
-    {% if not context.tabledata %}
+    {% if not context.comparison_stats %}
     .contents-{{ context.rnd }}>div:nth-of-type(1) {
         display: flex;
         flex-flow: column nowrap;
@@ -64,7 +64,7 @@
         display: flex;
         flex-flow: column wrap;
         justify-content: flex-start;
-        max-height: 550px;
+        max-height: 700px;
         flex-grow: 1;
     }
 
@@ -306,5 +306,42 @@
 
     .missing .bar {
         background-color: #d62728;
+    }
+    #comp-label-{{ context.rnd }} td {
+        font-weight: 800;
+        font-size: 15px;
+    }
+    .plot-legend-{{ context.rnd }} {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: {{ context.container_width }}px;
+        background-color: white;
+        cursor: default;
+    }
+
+    .plot-legend-{{ context.rnd }}:hover .legend-color-{{ context.rnd }} {
+        filter: unset;
+    }
+
+    .legend-bar-{{ context.rnd }} {
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 0 1 150px;
+    }
+
+    .legend-color-{{ context.rnd }} {
+        width: 15px;
+        height: 15px;
+        filter: opacity(0.6);
+        border: 1px solid #444444;
+    }
+
+    .legend-label-{{ context.rnd }} {
+        text-align: center;
+        margin: 0 10px;
+        color: #444444
     }
 </style>
