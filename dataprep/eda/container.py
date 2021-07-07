@@ -40,6 +40,7 @@ TAB_VISUAL_TYPES = {
     "correlation_impact",
     "correlation_single_heatmaps",
     "correlation_scatter",
+    "comparison_continuous",
 }
 
 GRID_VISUAL_TYPES = {"distribution_grid", "missing_impact_1vn", "comparison_grid"}

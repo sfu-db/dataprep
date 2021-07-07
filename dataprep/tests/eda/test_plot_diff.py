@@ -49,22 +49,29 @@ def test_sanity_compute_mulitple_df(simpledf: dd.DataFrame) -> None:
     plot_diff([simpledf, simpledf])
 
 
+def test_sanity_compute_mulitple_column(simpledf: dd.DataFrame) -> None:
+    plot_diff([simpledf, simpledf], "a")
+
+
 def test_specify_column_type(simpledf: dd.DataFrame) -> None:
     plot_diff([simpledf, simpledf], dtype={"a": Nominal()})
     plot_diff([simpledf, simpledf], dtype=Nominal())
-
-
-def test_specify_color(simpledf: dd.DataFrame) -> None:
-    plot_diff([simpledf, simpledf], config={"bar.color": "#123456", "hist.color": "orange"})
-    plot_diff([simpledf, simpledf], config={"kde.hist_color": (1, 2, 3)})
 
 
 def test_specify_label(simpledf: dd.DataFrame) -> None:
     plot_diff([simpledf, simpledf], config={"diff.label": ["label_1", "label_2"]})
 
 
+def test_specify_label_col(simpledf: dd.DataFrame) -> None:
+    plot_diff([simpledf, simpledf], "a", config={"diff.label": ["label_1", "label_2"]})
+
+
 def test_specify_baseline(simpledf: dd.DataFrame) -> None:
     plot_diff([simpledf, simpledf], config={"diff.baseline": 1})
+
+
+def test_specify_baseline_col(simpledf: dd.DataFrame) -> None:
+    plot_diff([simpledf, simpledf], "a", config={"diff.baseline": 1})
 
 
 def test_dataset() -> None:

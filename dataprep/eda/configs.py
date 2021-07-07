@@ -1075,9 +1075,27 @@ class Correlations(BaseModel):
     """
     enable: bool, default True
         Whether to create this element
+    value_range
+        If the correlation value is out of the range, don't show it.
+    k
+        Choose top-k element
     """
 
     enable: bool = True
+    value_range: Optional[Tuple[float, float]] = None
+    k: Optional[int] = None
+
+    def how_to_guide(self) -> List[Tuple[str, str]]:
+        """
+        how-to guide for plot_correlation(df, x)
+        """
+        vals = [self.value_range, self.k]
+        names = ["correlations.value_range", "correlations.k"]
+        descs = [
+            "If the correlation value is out of the range, don't show it",
+            "Choose top-k element",
+        ]
+        return [(f"'{name}': {_form(val)}", desc) for name, val, desc in zip(names, vals, descs)]
 
 
 class MissingValues(BaseModel):
