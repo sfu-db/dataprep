@@ -90,3 +90,13 @@ US Street Addresses
    :members:
    :undoc-members:
    :show-inheritance:
+
+Language Names
+--------------
+
+.. automodule:: dataprep.clean.clean_language
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+  
