@@ -80,6 +80,8 @@ create_report(df).show_browser()
 
 Click [here](https://docs.dataprep.ai/_downloads/1a61c6aebb3ecbe9dc9742bd6ca78ddb/titanic_dp.html) to see the generated report of the above code.
 
+Click [here](https://docs.dataprep.ai/dev/bench/index.html) to see the benchmark result.
+
 #### Innovative System Design
 
 DataPrep.EDA is the **_only_** task-centric EDA system in Python. It is carefully designed to improve usability.
