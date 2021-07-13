@@ -182,6 +182,7 @@ def _format_correlation(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
             rndrd = render_correlation(itmdt, cfg)
             res["correlation_names"] = []
             figs_corr: List[Figure] = []
+            # pylint: disable = not-an-iterable
             for tab in rndrd.tabs:
                 fig = tab.child
                 fig.sizing_mode = "stretch_width"
