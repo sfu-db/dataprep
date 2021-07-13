@@ -1,0 +1,64 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  benchmark:
+    name: ${{ matrix.os }} x ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.7"]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry config virtualenvs.in-project true
+          poetry install
+          poetry run pip install pytest-benchmark
+
+      - name: Run benchmark
+        run: poetry run pytest dataprep/tests/benchmarks/eda.py --benchmark-json benchmark.json
+
+      - name: Show benchmark result for pull request
+        if: ${{ github.event_name == 'pull_request'}}
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          name: DataPrep.EDA Benchmarks
+          tool: "pytest"
+          output-file-path: benchmark.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: false
+          save-data-file: false
+          fail-threshold: "200%"
+          comment-always: true
+          fail-on-alert: true
+
+      - name: Store benchmark result for push operator
+        if: ${{ github.event_name == 'push'}}
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          name: DataPrep.EDA Benchmarks
+          tool: "pytest"
+          output-file-path: benchmark.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          fail-threshold: "200%"
+          comment-always: true
+          fail-on-alert: true

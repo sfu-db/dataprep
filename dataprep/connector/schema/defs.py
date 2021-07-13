@@ -201,7 +201,7 @@ class OAuth2AuthorizationCodeAuthorizationDef(BaseDef):
         req_data["headers"]["Authorization"] = f"Bearer {storage['access_token']}"
 
     def _auth(self, client_id: str, port: int = 9999) -> str:
-        # pylint: disable=protected-access
+        # pylint: disable=protected-access, no-member
 
         state = get_random_string(23)
         scope = ",".join(self.scopes)
