@@ -3,9 +3,9 @@ This module implements the visualization for the plot_diff function.
 """  # pylint: disable=too-many-lines
 from typing import Any, Dict, List, Tuple, Optional
 
+import math
 import numpy as np
 import pandas as pd
-import math
 from bokeh.models import (
     HoverTool,
     Panel,
@@ -246,7 +246,7 @@ def kde_viz(
         toolbar_location=None,
         y_axis_type=cfg.kde.yscale,
     )
-    for i, (data, kde) in enumerate(zip(hist, kde)):
+    for i, (data, kde2) in enumerate(zip(hist, kde)):
         dens, bins = data
         intvls = _format_bin_intervals(bins)
         df = pd.DataFrame(
@@ -274,7 +274,7 @@ def kde_viz(
             mode="vline",
         )
         pts_rng = np.linspace(df.loc[0, "left"], df.loc[len(df) - 1, "right"], 1000)
-        pdf = kde(pts_rng)
+        pdf = kde2(pts_rng)
         line = fig.line(x=pts_rng, y=pdf, line_color=CATEGORY10[i], line_width=2, alpha=0.5)
     hover_dist = HoverTool(renderers=[line], tooltips=[("x", "@x"), ("y", "@y")])
     fig.add_tools(hover_hist)
@@ -344,6 +344,7 @@ def dt_line_viz(
     return fig
 
 
+# pylint:disable = unused-argument
 def box_viz(
     df_list: List[pd.DataFrame],
     x: str,
@@ -432,6 +433,7 @@ def box_viz(
     fig.xaxis.axis_label = None
     fig.yaxis.axis_label = x
 
+    # pylint:disable = undefined-loop-variable
     minw = min(otlrs) if otlrs else np.nan
     maxw = max(otlrs) if otlrs else np.nan
     _format_axis(fig, min(df["lw"].min(), minw), max(df["uw"].max(), maxw), "y")
@@ -439,20 +441,22 @@ def box_viz(
     return Panel(child=row(fig), title="Box Plot")
 
 
+# pylint:disable = unused-argument
 def render_correlation_single_heatmaps(
     df_list: List[Dict[str, pd.DataFrame]], col: str, plot_width: int, plot_height: int, cfg: Config
 ) -> List[Panel]:
     """
     Render correlation heatmaps, but with single column
     """
+    # pylint:disable = too-many-locals
     corr: Dict[str, List[Any]] = {}
     group_all_x = [col + "_" + str(i + 1) for i in range(len(df_list))]
     group_all_y = df_list[0]["Pearson"]["y"].unique()
     for meth in ["Pearson", "Spearman", "KendallTau"]:
         corr[meth] = []
-        for i in range(len(df_list)):
-            df_list[i][meth]["x"] = df_list[i][meth]["x"] + "_" + str(i + 1)
-            corr[meth].append(df_list[i][meth])
+        for i, df in enumerate(df_list):
+            df[meth]["x"] = df[meth]["x"] + "_" + str(i + 1)
+            corr[meth].append(df[meth])
     tabs: List[Panel] = []
     tooltips = [("y", "@y"), ("correlation", "@correlation{1.11}")]
     for method, dfs in corr.items():
@@ -655,10 +659,14 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 
 
 def render_comparison_continous(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
+    """
+    Render for continuous variable comparison
+    """
+    # pylint:disable = too-many-locals
     plot_width = cfg.plot.width if cfg.plot.width is not None else 450
     plot_height = cfg.plot.height if cfg.plot.height is not None else 400
     df_labels: List[str] = cfg.diff.label  # type: ignore
-    baseline: int = cfg.diff.baseline
+    # baseline: int = cfg.diff.baseline
     tabs: List[Panel] = []
     htgs: Dict[str, List[Tuple[str, str]]] = {}
     col, data = itmdt["col"], itmdt["data"][0]
@@ -700,6 +708,11 @@ def render_comparison_continous(itmdt: Intermediate, cfg: Config) -> Dict[str, A
             render_correlation_single_heatmaps(data["corr"], col, plot_width, plot_height, cfg)
         )
 
+    # pylint:disable=line-too-long
+    legend_lables = [
+        {"label": label, "color": color}
+        for label, color in zip(cfg.diff.label, CATEGORY10[: len(cfg.diff.label)])  # type: ignore
+    ]
     return {
         "comparison_stats": format_num_stats(itmdt["stats"]) if cfg.stats.enable else [],
         "value_table": [],
@@ -709,10 +722,7 @@ def render_comparison_continous(itmdt: Intermediate, cfg: Config) -> Dict[str, A
         "container_width": plot_width + 110,
         "how_to_guide": htgs,
         "df_labels": cfg.diff.label,
-        "legend_labels": [
-            {"label": label, "color": color}
-            for label, color in zip(cfg.diff.label, CATEGORY10[: len(cfg.diff.label)])  # type: ignore
-        ],
+        "legend_labels": legend_lables,
     }
 
 
