@@ -4,13 +4,13 @@
 from collections import UserList
 from typing import Any, Callable, Dict, List, Union, Optional
 
+import sys
+import math
 import pandas as pd
 import numpy as np
 import dask
-import math
 import dask.array as da
 import dask.dataframe as dd
-import sys
 
 from dask.array.stats import kurtosis, skew
 from ...utils import gaussian_kde
@@ -157,6 +157,8 @@ def _cont_calcs(srs: Srs, cfg: Config, df_list: List[dd.DataFrame], x: str) -> D
     """
     Computations for a continuous column in plot_diff([df...],x)
     """
+
+    # pylint:disable = too-many-branches, too-many-locals
 
     data: Dict[str, List[Any]] = {}
 

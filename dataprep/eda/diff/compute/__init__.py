@@ -45,6 +45,7 @@ def compute_diff(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
+    # pylint:disable = too-many-branches
     if isinstance(cfg, dict):
         cfg = Config.from_dict(display, cfg)
     elif not cfg:
@@ -73,7 +74,7 @@ def compute_diff(
             if [col for dfs in df for col in dfs.columns].count(x) < 2:
                 raise DataprepError("x must exist in at least two DataFrames")
             # return compare_multiple_on_column(df_list, x)
-            return compare_multiple_col(df_list, x, cfg)
+            return compare_multiple_col(df_list, x, cfg)  # type: ignore
         else:
             return compare_multiple_df(df_list, cfg, dtype)  # type: ignore
 
