@@ -9,6 +9,7 @@ from ...utils import to_dask
 from ...dtypes import DTypeDef
 from ...configs import Config
 from .multiple_df import compare_multiple_df  # type: ignore
+from .multiple_column import compare_multiple_col  # type: ignore
 
 __all__ = ["compute_diff"]
 
@@ -44,6 +45,7 @@ def compute_diff(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
+    # pylint:disable = too-many-branches
     if isinstance(cfg, dict):
         cfg = Config.from_dict(display, cfg)
     elif not cfg:
@@ -55,7 +57,6 @@ def compute_diff(
             raise DataprepError("plot_diff needs at least 2 DataFrames.")
         if len(df) > 5:
             raise DataprepError("Too many DataFrames, max: 5.")
-
         label = cfg.diff.label
         if not label:
             cfg.diff.label = [f"df{i+1}" for i in range(len(df))]
@@ -70,8 +71,10 @@ def compute_diff(
             df_list[i].columns = df_list[i].columns.astype(str)
 
         if x:
+            if [col for dfs in df for col in dfs.columns].count(x) < 2:
+                raise DataprepError("x must exist in at least two DataFrames")
             # return compare_multiple_on_column(df_list, x)
-            return Intermediate()
+            return compare_multiple_col(df_list, x, cfg)  # type: ignore
         else:
             return compare_multiple_df(df_list, cfg, dtype)  # type: ignore
 

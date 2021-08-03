@@ -14,10 +14,25 @@
             <label for="tab-{{ context.rnd }}-{{ loop.index }}">{{ title }}</label>
             {% endfor %}
         </div>
+        {% if context.legend_labels %}
+        <div class="plot-legend-{{ context.rnd }}">
+            {% for legend in context.legend_labels %}
+                <div class="legend-bar-{{ context.rnd }}">
+                    <div class="legend-color-{{ context.rnd }}" style="background-color: {{ legend.color }};"></div>
+                    {% if loop.index0 == context.baseline %}
+                    <div class="legend-label-{{ context.rnd }}"><strong>{{ legend.label }}</strong></div>
+                    {% else %}
+                    <div class="legend-label-{{ context.rnd }}">{{ legend.label }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <div class="contents-{{ context.rnd }}">
-            {% if context.tabledata %}
+            {% if context.tabledata or context.comparison_stats%}
             <div class="plots-{{ context.rnd }}">
                 <div class="stats-{{ context.rnd }}">
+                    {% if context.tabledata%}
                     {% for title, table in context.tabledata.items() %}
                     <div class="tabledata-{{ context.rnd }}">
                         <h3>{{ title }}</h3>
@@ -30,6 +45,31 @@
                         </table>
                     </div>
                     {% endfor %}
+                    {% endif %}
+
+                    {% if context.comparison_stats %}
+                    {% for title, table in context.comparison_stats.items() %}
+                    <div class="tabledata-{{ context.rnd }}">
+                        <h3>{{ title }}</h3>
+                        <table>
+                            <tr id="comp-label-{{ context.rnd }}">
+                            <th></th>
+                            {% for df_label in context.df_labels %}
+                            <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ df_label }}</td>
+                            {% endfor %}
+                            </tr>
+                            {% for th, td in table.items() %}
+                            <tr>
+                                <th>{{ th }}</th>
+                                {% for df_stat in td %}
+                                <td>{{ df_stat }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
