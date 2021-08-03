@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1626827705859,
+  "lastUpdate": 1628034979994,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -93,6 +93,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.10882099934591108",
             "extra": "mean: 5.549458479999998 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "72658db8cc238512466e02e7b2a45153ed379f12",
+          "message": "Merge pull request #667 from sfu-db/bug-fix\n\nfeat(eda.diff): Add plot_diff([df1..dfn], continuous)",
+          "timestamp": "2021-08-03T16:53:09-07:00",
+          "tree_id": "fd66052e2b9cc1420a0ab9c9a2963f702fb5bdbc",
+          "url": "https://github.com/sfu-db/dataprep/commit/72658db8cc238512466e02e7b2a45153ed379f12"
+        },
+        "date": 1628034978722,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.198074810508584,
+            "unit": "iter/sec",
+            "range": "stddev: 0.013045849110810106",
+            "extra": "mean: 5.048597534600003 sec\nrounds: 5"
           }
         ]
       }
