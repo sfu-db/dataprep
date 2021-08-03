@@ -1915,7 +1915,7 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
     if cfg.hist.enable:
         tabs[0].child.children[0].frame_width = int(plot_width_hist * 0.9)
-
+    print(data)
     return {
         "tabledata": format_num_stats(data) if cfg.stats.enable else [],
         "value_table": value_table,
