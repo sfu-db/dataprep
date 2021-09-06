@@ -60,10 +60,10 @@ def clean_nz_bankaccount(
     --------
     Clean a column of bankaccount data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "bankaccount": [
-            "51824753556",
-            "99999999999",]
+            "0102420100194000",
+            "01-0242-0100195-00",]
             })
     >>> clean_nz_bankaccount(df, 'bankaccount')
             bankaccount              bankaccount_clean

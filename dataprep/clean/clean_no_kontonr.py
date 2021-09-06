@@ -59,7 +59,7 @@ def clean_no_kontonr(
     --------
     Clean a column of kontonr data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "kontonr": [
             "8601 11 17947",
             "8601 11 17949",]

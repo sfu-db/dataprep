@@ -1,5 +1,6 @@
 """
-Clean and validate a DataFrame column containing Wertpapierkennnummer (WKNs).
+Clean and validate a DataFrame column containing
+German Securities Identification Codes (WKNs).
 """
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union

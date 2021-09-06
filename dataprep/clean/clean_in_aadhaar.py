@@ -36,7 +36,7 @@ def clean_in_aadhaar(
             The output format of standardized number string.
             If output_format = 'compact', return string without any separators or whitespace.
             If output_format = 'standard', return string with proper separators and whitespace.
-            If output_format = 'mask', Masks the first 8 digits as per MeitY guidelines for
+            If output_format = 'mask', mask the first 8 digits as per MeitY guidelines for
                 securing identity information and Sensitive personal data.
 
             (default: "standard")

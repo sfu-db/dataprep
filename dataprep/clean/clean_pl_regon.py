@@ -59,7 +59,7 @@ def clean_pl_regon(
     --------
     Clean a column of REGON data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "regon": [
             '192598184',
             '192598183',]

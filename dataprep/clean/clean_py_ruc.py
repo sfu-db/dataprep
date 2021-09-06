@@ -58,7 +58,7 @@ def clean_py_ruc(
     --------
     Clean a column of RUC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ruc": [
             "800000358",
             "80123456789",]
