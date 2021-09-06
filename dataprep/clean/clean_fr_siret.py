@@ -24,7 +24,7 @@ def clean_fr_siret(
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    Clean French company establishment identification numbers (SIRETs) data in a DataFrame column.
+    Clean French Company Establishment Identification Numbers (SIRETs) in a DataFrame column.
 
     Parameters
     ----------

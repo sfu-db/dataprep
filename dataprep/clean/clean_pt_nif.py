@@ -59,14 +59,14 @@ def clean_pt_nif(
     --------
     Clean a column of NIF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nif": [
             'PT 501 964 843',
             'PT 501 964 842',]
             })
     >>> clean_pt_nif(df, 'nif')
             nif                 nif_clean
-    0       PT 501 964 843      PT 501 964 843
+    0       PT 501 964 843      501964843
     1       PT 501 964 842      NaN
     """
 

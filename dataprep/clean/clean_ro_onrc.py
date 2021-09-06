@@ -59,7 +59,7 @@ def clean_ro_onrc(
     --------
     Clean a column of ONRC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "onrc": [
             "J52/750/2012",
             "X52/750/2012",]

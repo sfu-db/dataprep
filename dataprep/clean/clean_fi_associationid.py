@@ -58,7 +58,7 @@ def clean_fi_associationid(
     --------
     Clean a column of Finnish association registry id data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "associationid": [
             "1234",
             "12df",]
