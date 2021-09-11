@@ -58,7 +58,7 @@ def clean_duplication(
     1    New York
     """
     if df_var_name == "default":
-        df_var_name = argname('df', func=clean_duplication)
+        df_var_name = argname("df", func=clean_duplication)
 
     return UserInterface(df, column, df_var_name, page_size).display()
 
