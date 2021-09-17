@@ -380,9 +380,15 @@ def basic_computations(
     data["num_cols"] = df_num.columns
     # interactions
     if cfg.interactions.enable:
+        if cfg.scatter.sample_size is not None:
+            sample_func = lambda x: x.sample(n=min(cfg.scatter.sample_size, x.shape[0]))
+        else:
+            sample_func = lambda x: x.sample(frac=cfg.scatter.sample_rate)
         data["scat"] = df_num.frame.map_partitions(
-            lambda x: x.sample(min(1000, x.shape[0])), meta=df_num.frame
+            sample_func,
+            meta=df_num.frame,
         )
+
     # correlations
     if cfg.correlations.enable:
         data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))

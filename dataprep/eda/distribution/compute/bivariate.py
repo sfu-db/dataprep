@@ -217,9 +217,11 @@ def compute_bivariate(
         data: Dict[str, Any] = {}
         if cfg.scatter.enable:
             # scatter plot data
-            data["scat"] = tmp_df.map_partitions(
-                lambda x: x.sample(min(cfg.scatter.sample_size, x.shape[0])), meta=tmp_df
-            )
+            if cfg.scatter.sample_size is not None:
+                sample_func = lambda x: x.sample(n=min(cfg.scatter.sample_size, x.shape[0]))
+            else:
+                sample_func = lambda x: x.sample(frac=cfg.scatter.sample_rate)
+            data["scat"] = tmp_df.map_partitions(sample_func, meta=tmp_df)
         if cfg.hexbin.enable:
             # hexbin plot data
             data["hex"] = tmp_df

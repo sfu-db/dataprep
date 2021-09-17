@@ -7,7 +7,7 @@ import numpy as np
 import random
 import pytest
 
-from ...eda import plot, plot_correlation, plot_missing
+from ...eda import plot, plot_correlation, plot_missing, create_report
 from ...eda.utils import to_dask
 
 
@@ -45,6 +45,10 @@ def test_sanity_compute_2(simpledf: dd.DataFrame) -> None:
 
 
 def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
-    for _ in range(5):
-        sample_size = random.randint(200, 1000)
-        plot_correlation(simpledf, "a", "b", config={"scatter.sample_size": sample_size})
+    plot_correlation(simpledf, "a", "b", config={"scatter.sample_rate": 0.1})
+    plot_correlation(simpledf, "a", "b", config={"scatter.sample_size": 10000})
+    plot_correlation(simpledf, "a", "b", config={"scatter.sample_size": 100})
+
+
+def test_report(simpledf: dd.DataFrame) -> None:
+    create_report(simpledf, display=["Overview", "Interactions"])

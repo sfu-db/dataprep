@@ -62,8 +62,13 @@ def scatter_with_regression(
     (coeffa, coeffb), _, _, _ = da.linalg.lstsq(arr[:, [0, 2]], arr[:, 1])
 
     df = df.drop(columns=["ones"])
+    if cfg.scatter.sample_size is not None:
+        sample_func = lambda x: x.sample(n=min(cfg.scatter.sample_size, x.shape[0]))
+    else:
+        sample_func = lambda x: x.sample(frac=cfg.scatter.sample_rate)
     df_smp = df.map_partitions(
-        lambda x: x.sample(min(cfg.scatter.sample_size, x.shape[0])), meta=df
+        sample_func,
+        meta=df,
     )
     # TODO influences should not be computed on a sample
     influences = (
