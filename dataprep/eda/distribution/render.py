@@ -914,7 +914,7 @@ def scatter_viz(
     df: pd.DataFrame,
     x: str,
     y: str,
-    spl_sz: int,
+    sample_sr_and_name: Tuple[Union[int, float], str],
     plot_width: int,
     plot_height: int,
 ) -> Any:
@@ -922,7 +922,17 @@ def scatter_viz(
     Render a scatter plot
     """
     # pylint: disable=too-many-arguments
-    title = f"{y} by {x}" if len(df) < spl_sz else f"{y} by {x} (sample size {spl_sz})"
+    if sample_sr_and_name[1] == "sample size":
+        title = (
+            f"{y} by {x}"
+            if len(df) < sample_sr_and_name[0]
+            else f"{y} by {x} (sample size {sample_sr_and_name[0]})"
+        )
+    elif sample_sr_and_name[1] == "sample rate":
+        title = f"{y} by {x} (sample rate {sample_sr_and_name[0]})"
+    else:
+        raise RuntimeError("parameter name should be either 'sample size' or 'sample rate'")
+
     tooltips = [("(x, y)", f"(@{{{x}}}, @{{{y}}})")]
     fig = figure(
         tools="hover",
@@ -2143,12 +2153,21 @@ def render_two_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 
     if cfg.scatter.enable:
         # scatter plot
+        if cfg.scatter.sample_size is not None:
+            sample_sr_and_name: Tuple[Union[int, float], str] = (
+                cfg.scatter.sample_size,
+                "sample size",
+            )
+        elif cfg.scatter.sample_rate is not None:
+            sample_sr_and_name = (cfg.scatter.sample_rate, "sample rate")
+        else:
+            raise RuntimeError("In scatter plot, sample size and sample rate are both not None")
         tabs.append(
             scatter_viz(
                 data["scat"],
                 x,
                 y,
-                cfg.scatter.sample_size,
+                sample_sr_and_name,
                 plot_width,
                 plot_height,
             )

@@ -16,7 +16,7 @@ the global parameter will be overwrote by local parameters for specific plots.
 """
 
 # pylint: disable=too-many-lines,no-self-use,blacklisted-name,no-else-raise,too-many-branches,no-name-in-module
-
+# pylint: disable = protected-access
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -642,8 +642,12 @@ class Scatter(BaseModel):
     """
     enable: bool, default True
         Whether to create this element
-    sample_size: int, default 1000
-        Number of points to randomly sample per partition
+    sample_size: int, optional, default=1000
+        Number of points to randomly sample per partition.
+        Cannot be used with sample_rate.
+    sample_rate: float, optional, default None
+        sample rate per partition. Cannot be used with
+        sample_size. Set it to 1.0 for no sampling.
     height: int, default "auto"
         Height of the plot
     width: int, default "auto"
@@ -651,22 +655,60 @@ class Scatter(BaseModel):
     """
 
     enable: bool = True
-    sample_size: int = 1000
+    sample_size: Optional[int] = 1000
+    sample_rate: Optional[float] = None
     height: Union[int, None] = None
     width: Union[int, None] = None
+    # used internally for param checking. Seems
+    # internal param will be treat as class attr. in pydantic,
+    # hence we need to init. it in __init__.
+    _user_input_params: Dict[str, Any]
+
+    def __init__(self) -> None:
+        super().__init__()
+        object.__setattr__(self, "_user_input_params", {})
 
     def how_to_guide(self, height: int, width: int) -> List[Tuple[str, str]]:
         """
         how-to guide
         """
-        vals = [self.sample_size, height, width]
-        names = ["scatter.sample_size", "height", "width"]
+        if self.sample_size is not None:
+            para_val: Union[int, float, None] = self.sample_size
+            para_name = "scatter.sample_size"
+            para_desc = "Number of points to randomly sample per partition"
+        else:
+            para_val = self.sample_rate
+            para_name = "scatter.sample_rate"
+            para_desc = "Sample rate to randomly sample per partition"
+
+        vals = [para_val, height, width]
+        names = [para_name, "height", "width"]
         descs = [
-            "Number of points to randomly sample per partition",
+            para_desc,
             "Height of the plot",
             "Width of the plot",
         ]
         return [(f"'{name}': {val}", desc) for name, val, desc in zip(names, vals, descs)]
+
+    def _check_and_correct_param(self) -> None:
+        """Check whether the parameters are valid, and correct param when necessary"""
+        user_set_sample_size = (
+            self._user_input_params["sample_size"]
+            if "sample_size" in self._user_input_params
+            else None
+        )
+        user_set_sample_rate = (
+            self._user_input_params["sample_rate"]
+            if "sample_rate" in self._user_input_params
+            else None
+        )
+        if (user_set_sample_size is not None) and (user_set_sample_rate is not None):
+            raise AttributeError(
+                f"Scatter plot set sample size {user_set_sample_size} and "
+                + f"sample rate {user_set_sample_rate}, please only set one of them."
+            )
+        if user_set_sample_rate is not None:
+            self.sample_size = None
 
 
 class Hexbin(BaseModel):
@@ -1146,6 +1188,71 @@ class Config(BaseModel):
     missingvalues: MissingValues = Field(default_factory=MissingValues)
     diff: Diff = Field(default_factory=Diff)
 
+    def _set_enable_for_plots(self, display: List[str]) -> None:
+        """set the enable for all plots from display, used for 'from_dict' constructor """
+        all_plot_names = vars(self).keys()
+        try:
+            # set all plots not in display list to enable=False except for Plot and Diff class
+            valid_display = [DISPLAY_MAP[disp] for disp in display]
+            for plot_name in set(all_plot_names) - set(valid_display) - {"plot"} - {"diff"}:
+                setattr(getattr(self, plot_name), "enable", False)
+        except KeyError:
+            # handle report config
+            valid_display = [DISPLAY_REPORT_MAP[disp] for disp in display]
+            for plot_name in set(DISPLAY_REPORT_MAP.values()) - set(valid_display):
+                setattr(getattr(self, plot_name), "enable", False)
+
+    def _set_param_for_plot(
+        self, plot_name: str, param: str, val: Any, raise_error_if_not_exists: bool
+    ) -> None:
+        """set the parameter for a given plot, used when
+        set global and local parameters for each plot"""
+        if plot_name not in vars(self).keys():
+            raise AttributeError(f"plot {plot_name} does not exist")
+        plot = getattr(self, plot_name)
+        if hasattr(plot, param):
+            setattr(plot, param, val)
+            if hasattr(plot, "_user_input_params"):
+                plot._user_input_params[param] = val
+        else:
+            if raise_error_if_not_exists:
+                raise AttributeError(f"{plot_name} plot does not have parameter {param}")
+
+    def _set_global_param_for_plots(self, global_params: Dict[str, Any]) -> None:
+        """set the global parameters for all plots, used for 'from_dict' constructor """
+        all_plot_names = vars(self).keys()
+        valid_global_params = vars(self.plot).keys()
+        for param, val in global_params.items():
+            # set the parameter to the specified value for each plot that
+            # has this parameter
+            if param not in valid_global_params:
+                raise AttributeError(f"{param} is not a global parameter")
+            else:
+                # ngroups applies to "bars" and "slices" for the bar and pie charts
+                if param == "ngroups":
+                    setattr(getattr(self, "bar"), "bars", val)
+                    setattr(getattr(self, "pie"), "slices", val)
+                for plot_name in all_plot_names:
+                    self._set_param_for_plot(plot_name, param, val, raise_error_if_not_exists=False)
+
+    def _set_local_param_for_plots(self, local_params: Dict[str, Any]) -> None:
+        """set the local parameters for all plots, used for 'from_dict' constructor """
+        for key, value in local_params.items():
+            plot_name, rest = key.split(".", 1)
+            param = rest.replace(".", "__")
+            self._set_param_for_plot(plot_name, param, value, raise_error_if_not_exists=True)
+
+    def _check_and_correct_params_for_plots(self) -> None:
+        """Call the '_check_and_correct_param' for some plots, used for 'from_dict' constructor.
+        The '_check_and_correct_param' is used to check and correct parameter and handle the case
+        when multiple parameters are not allowed set at the same time. E.g., the sample size and
+        sample rate in scatter plot."""
+        all_plot_names = vars(self).keys()
+        for plot_name in all_plot_names:
+            plot = getattr(self, plot_name)
+            if hasattr(plot, "_check_and_correct_param"):
+                plot._check_and_correct_param()
+
     @classmethod
     def from_dict(
         cls, display: Optional[List[str]] = None, config: Optional[Dict[str, Any]] = None
@@ -1154,45 +1261,15 @@ class Config(BaseModel):
         Converts an dictionary instance into a config class
         """
         cfg = cls()
-        if display:
-            try:
-                display = [DISPLAY_MAP[disp] for disp in display]
-                # set all plots not in display list to enable=False except for Plot and Diff class
-                for plot in set(vars(cfg).keys()) - set(display) - {"plot"} - {"diff"}:
-                    setattr(getattr(cfg, plot), "enable", False)
-            except KeyError:
-                display = [DISPLAY_REPORT_MAP[disp] for disp in display]
-                for plot in set(DISPLAY_REPORT_MAP.values()) - set(display):
-                    setattr(getattr(cfg, plot), "enable", False)
+        if display is not None:
+            cfg._set_enable_for_plots(display)
 
-        if config:
-            # get the global parameters from config
+        if config is not None:
+            # get the global and local parameters from config
             global_params = {key: config[key] for key in config if "." not in key}
-            for param, val in global_params.items():
-                # set the parameter to the specified value for each plot that
-                # has this parameter
-                if param not in vars(cfg.plot).keys():
-                    raise Exception(param + " does not exist")
-                else:
-                    for plot in vars(cfg).keys():
-                        if hasattr(getattr(cfg, plot), param):
-                            setattr(getattr(cfg, plot), param, val)
-
-                    # ngroups applies to "bars" and "slices" for the bar and pie charts
-                    if param == "ngroups":
-                        setattr(getattr(cfg, "bar"), "bars", val)
-                        setattr(getattr(cfg, "pie"), "slices", val)
-
-            # get the local parameters from config
             local_params = {key: config[key] for key in config if key not in global_params}
-            for key, value in local_params.items():
-                plot, rest = key.split(".", 1)
-                param = rest.replace(".", "__")
-                if plot not in vars(cfg).keys():
-                    raise Exception(plot + " does not exist")
-                elif not hasattr(getattr(cfg, plot), param):
-                    raise Exception(key.replace(f"{plot}.", "") + " does not exist")
-                else:
-                    setattr(getattr(cfg, plot), param, value)
 
+            cfg._set_global_param_for_plots(global_params)
+            cfg._set_local_param_for_plots(local_params)
+            cfg._check_and_correct_params_for_plots()
         return cfg
