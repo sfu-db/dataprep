@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1631328005469,
+  "lastUpdate": 1631949054845,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -155,6 +155,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.11301872409362092",
             "extra": "mean: 6.164750727599977 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bf58e30df86d176f73b5aa9a29a626b14695892f",
+          "message": "Merge pull request #688 from sfu-db/scattersample\n\nfix(eda):fix scatter sample size and rate",
+          "timestamp": "2021-09-18T00:06:59-07:00",
+          "tree_id": "232aa18818ed19974b4270b4a566e5119825e8d6",
+          "url": "https://github.com/sfu-db/dataprep/commit/bf58e30df86d176f73b5aa9a29a626b14695892f"
+        },
+        "date": 1631949053337,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1572721461202357,
+            "unit": "iter/sec",
+            "range": "stddev: 0.1333391852454711",
+            "extra": "mean: 6.358404998399988 sec\nrounds: 5"
           }
         ]
       }
