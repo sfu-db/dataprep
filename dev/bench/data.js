@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1631949054845,
+  "lastUpdate": 1632019316237,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -186,6 +186,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.1333391852454711",
             "extra": "mean: 6.358404998399988 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "13032fe3d7fb5a4dbf29f8f554122e4a5711f1ab",
+          "message": "Merge pull request #691 from sahmad11/patch-1\n\ndocs(eda): scattter.sample_rate added to documentation",
+          "timestamp": "2021-09-18T19:38:06-07:00",
+          "tree_id": "6925a2e21290fb29d55f29a930355c23c1ceb71b",
+          "url": "https://github.com/sfu-db/dataprep/commit/13032fe3d7fb5a4dbf29f8f554122e4a5711f1ab"
+        },
+        "date": 1632019314824,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.15184162391310188,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0861931330025079",
+            "extra": "mean: 6.585809439000036 sec\nrounds: 5"
           }
         ]
       }
