@@ -16,8 +16,8 @@ import pandas as pd
 import dask.dataframe as dd
 import dask
 from IPython.display import Javascript, display
-from metaphone import doublemetaphone
 from Levenshtein import distance
+from metaphone import doublemetaphone
 
 from .utils import to_dask
 
