@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1632113212247,
+  "lastUpdate": 1632114485825,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -279,6 +279,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.027268157690841826",
             "extra": "mean: 6.463485474399977 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "12f3c9ef9b2f70ca4562c574a8ca3d54945cd419",
+          "message": "Merge pull request #622 from sfu-db/docs/clean_ml\n\ndocs(clean): add documentation for clean_ml function",
+          "timestamp": "2021-09-19T22:04:24-07:00",
+          "tree_id": "4809b548673a6f01ffffe0a6f55dbd355926d28b",
+          "url": "https://github.com/sfu-db/dataprep/commit/12f3c9ef9b2f70ca4562c574a8ca3d54945cd419"
+        },
+        "date": 1632114484351,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.17354952468802165,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0912781158708153",
+            "extra": "mean: 5.7620440148 sec\nrounds: 5"
           }
         ]
       }
