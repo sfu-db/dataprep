@@ -91,4 +91,14 @@ US Street Addresses
    :undoc-members:
    :show-inheritance:
 
+<<<<<<< HEAD
   
+=======
+ISBN Strings
+-------------------
+
+.. automodule:: dataprep.clean.clean_isbn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+>>>>>>> e9afded... feat/17_clean_functions
