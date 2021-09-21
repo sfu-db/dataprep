@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1632180506870,
+  "lastUpdate": 1632197770319,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -341,6 +341,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.048213157541849544",
             "extra": "mean: 5.854143027200007 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a8823a3122cc3c126c1cf4257220ecc9ede6c26c",
+          "message": "Merge pull request #693 from devinllu/fix/save_report\n\nfix(eda): changed report save method to accept one path parameter as …",
+          "timestamp": "2021-09-20T21:13:13-07:00",
+          "tree_id": "abcf9111e0808eb7c36fa07362d00675594e08ce",
+          "url": "https://github.com/sfu-db/dataprep/commit/a8823a3122cc3c126c1cf4257220ecc9ede6c26c"
+        },
+        "date": 1632197769214,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.21957163069782262,
+            "unit": "iter/sec",
+            "range": "stddev: 0.23070970790611833",
+            "extra": "mean: 4.554322417800018 sec\nrounds: 5"
           }
         ]
       }
