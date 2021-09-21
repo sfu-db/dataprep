@@ -6,6 +6,7 @@ import webbrowser
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Optional
+import os
 
 from ...utils import is_notebook
 
@@ -39,11 +40,7 @@ class Report:
         """
         return ""
 
-    def save(
-        self,
-        filename: Optional[str] = "report",
-        to: Optional[str] = None,
-    ) -> None:
+    def save(self, path: Optional[str] = None) -> None:
         """
         Save report to current working directory.
 
@@ -54,18 +51,37 @@ class Report:
         to: Optional[str], default Path.cwd()
             The path to where the report will be saved.
         """
-        # pylint: disable=invalid-name
-        if to:
-            path = Path(to).expanduser()
+
+        saved_file_path = None
+
+        if path:
+            extension = os.path.splitext(path)[1]
+            posix_path = Path(path).expanduser()
+
+            if posix_path.is_dir():
+                if path.endswith("/"):
+                    path += "report.html"
+                else:
+                    path += "/report.html"
+
+            elif extension:
+                if extension != ".html":
+                    raise ValueError(
+                        "Format '{extension}' is not supported (supported formats: html)"
+                    )
+
+            else:
+                path += ".html"
+
+            saved_file_path = Path(path).expanduser()
+
         else:
-            path = Path.cwd()
+            path = str(Path.cwd()) + "/report.html"
+            saved_file_path = Path(path).expanduser()
 
-        if not path.is_dir():
-            raise ValueError("The second parameter is not a valid path.")
-
-        with open(path / f"{filename}.html", "w", encoding="utf-8") as file:
+        with open(saved_file_path, "w", encoding="utf-8") as file:
             file.write(self.report)
-        print(f"Report has been saved to {path}/{filename}.html!")
+        print(f"Report has been saved to {saved_file_path}!")
 
     def show_browser(self) -> None:
         """
