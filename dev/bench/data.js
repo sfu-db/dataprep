@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1632197770319,
+  "lastUpdate": 1632204947694,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -372,6 +372,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.23070970790611833",
             "extra": "mean: 4.554322417800018 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9f6f5b2c033f0c9346080f8211d32ea249adb1b5",
+          "message": "Merge pull request #672 from sfu-db/feat/10_clean_functions_1\n\nfeat(clean): add another 10 clean functions for number types",
+          "timestamp": "2021-09-20T23:11:31-07:00",
+          "tree_id": "ac0f914b256514cdae24c058cc598868020b7bdc",
+          "url": "https://github.com/sfu-db/dataprep/commit/9f6f5b2c033f0c9346080f8211d32ea249adb1b5"
+        },
+        "date": 1632204946215,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1524718246126018,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08905113269114114",
+            "extra": "mean: 6.558588792 sec\nrounds: 5"
           }
         ]
       }
