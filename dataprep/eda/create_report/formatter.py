@@ -40,6 +40,8 @@ from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ...progress_bar import ProgressBar
 
+# pylint: disable=E1133
+
 
 def format_report(
     df: Union[pd.DataFrame, dd.DataFrame],
