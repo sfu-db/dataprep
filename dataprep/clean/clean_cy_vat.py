@@ -61,7 +61,7 @@ def clean_cy_vat(
 
     >>> df = pd.DataFrame({{
             "vat": [
-            '12302 6635',
+            'CY-10259033P',
             'CY-10259033Z',]
             })
     >>> clean_cy_vat(df, 'vat')

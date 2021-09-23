@@ -23,7 +23,7 @@ def clean_no_fodselsnummer(
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    Clean Estonian Personcal ID number type data in a DataFrame column.
+    Clean Norwegian birth number data in a DataFrame column.
 
     Parameters
     ----------

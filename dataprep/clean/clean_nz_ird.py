@@ -58,7 +58,7 @@ def clean_nz_ird(
     --------
     Clean a column of IRD data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ird": [
             "49091850",
             "136410133",]

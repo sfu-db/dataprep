@@ -1,5 +1,5 @@
 """
-Clean and validate a DataFrame column containing Romanian CF (CF) numbers (CFs).
+Clean and validate a DataFrame column containing Romanian CF (VAT) numbers (CFs).
 """
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
@@ -23,7 +23,7 @@ def clean_ro_cf(
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    Clean Romanian CF (CF) numbers (CFs) type data in a DataFrame column.
+    Clean Romanian CF (VAT) numbers (CFs) type data in a DataFrame column.
 
     Parameters
     ----------
