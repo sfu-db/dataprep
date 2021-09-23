@@ -1,5 +1,5 @@
 """
-Clean and validate a DataFrame column containing German VAT numberss (VATs).
+Clean and validate a DataFrame column containing German VAT numbers (VATs).
 """
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union

@@ -58,7 +58,7 @@ def clean_no_orgnr(
     --------
     Clean a column of Orgnr data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "orgnr": [
             "988077917",
             "988 077 918",]

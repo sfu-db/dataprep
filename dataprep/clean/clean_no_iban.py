@@ -59,7 +59,7 @@ def clean_no_iban(
     --------
     Clean a column of IBAN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "iban": [
             'NO9386011117947',
             'NO92 8601 1117 947',]

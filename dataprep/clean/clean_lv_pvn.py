@@ -1,5 +1,5 @@
 """
-Clean and validate a DataFrame column containing Latvian PVN (VAT) numbers (PVTs).
+Clean and validate a DataFrame column containing Latvian PVN (VAT) numbers (PVNs).
 """
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
@@ -23,21 +23,21 @@ def clean_lv_pvn(
     progress: bool = True,
 ) -> pd.DataFrame:
     """
-    Clean Latvian PVN (VAT) numbers (PVTs) type data in a DataFrame column.
+    Clean Latvian PVN (VAT) numbers (PVNs) type data in a DataFrame column.
 
     Parameters
     ----------
         df
             A pandas or Dask DataFrame containing the data to be cleaned.
         col
-            The name of the column containing data of PVT type.
+            The name of the column containing data of PVN type.
         output_format
             The output format of standardized number string.
             If output_format = 'compact', return string without any separators or whitespace.
             If output_format = 'standard', return string with proper separators and whitespace.
             If output_format = 'birthdate', return the birthdate of the person. Note only when
                 PVN refers to a person (but not a legal entity) this format will be available.
-            Note: in the case of PVT, the compact format is the same as the standard one.
+            Note: in the case of PVN, the compact format is the same as the standard one.
 
             (default: "standard")
         inplace
@@ -59,7 +59,7 @@ def clean_lv_pvn(
 
     Examples
     --------
-    Clean a column of PVT data.
+    Clean a column of PVN data.
 
     >>> df = pd.DataFrame({{
             "pvn": [
@@ -114,7 +114,7 @@ def validate_lv_pvn(
     column: str = "",
 ) -> Union[bool, pd.Series, pd.DataFrame]:
     """
-    Validate if a data cell is PVT in a DataFrame column. For each cell, return True or False.
+    Validate if a data cell is PVN in a DataFrame column. For each cell, return True or False.
 
     Parameters
     ----------
@@ -146,7 +146,7 @@ def _format(val: Any, output_format: str = "standard", errors: str = "coarse") -
            If output_format = 'standard', return string with proper separators and whitespace.
            If output_format = 'birthdate', return the birthdate of the person. Note only when
                 PVN refers to a person (but not a legal entity) this format will be available.
-           Note: in the case of PVT, the compact format is the same as the standard one.
+           Note: in the case of PVN, the compact format is the same as the standard one.
     """
     # pylint: disable=bare-except
 
