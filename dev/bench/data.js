@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1632204947694,
+  "lastUpdate": 1632415892766,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -403,6 +403,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.08905113269114114",
             "extra": "mean: 6.558588792 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4744134886017ce7381fa7ae7c201772e9bafc12",
+          "message": "Merge pull request #684 from NoirTree/docs/clean_num\n\ndocs(clean): add documentation for multiple clean functions for number types",
+          "timestamp": "2021-09-23T09:48:00-07:00",
+          "tree_id": "f05a64a3a08b94787d48ed230584daa37452d849",
+          "url": "https://github.com/sfu-db/dataprep/commit/4744134886017ce7381fa7ae7c201772e9bafc12"
+        },
+        "date": 1632415891359,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1718041216453461,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06689905573945601",
+            "extra": "mean: 5.820582128199999 sec\nrounds: 5"
           }
         ]
       }
