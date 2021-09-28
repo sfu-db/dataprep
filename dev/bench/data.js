@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1632415892766,
+  "lastUpdate": 1632868356224,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -434,6 +434,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06689905573945601",
             "extra": "mean: 5.820582128199999 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "53b29b1867106c5f462d4a4c859a207d73e3c32a",
+          "message": "Merge pull request #694 from sfu-db/fix/imdt_output\n\nfix(eda):remove imdt output from plot",
+          "timestamp": "2021-09-28T15:29:25-07:00",
+          "tree_id": "4984b420245cd55f9337630567201055fd51f880",
+          "url": "https://github.com/sfu-db/dataprep/commit/53b29b1867106c5f462d4a4c859a207d73e3c32a"
+        },
+        "date": 1632868354927,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.18634426466269907,
+            "unit": "iter/sec",
+            "range": "stddev: 0.10949621123563397",
+            "extra": "mean: 5.366411473999994 sec\nrounds: 5"
           }
         ]
       }
