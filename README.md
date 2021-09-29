@@ -78,11 +78,11 @@ df = load_dataset("titanic")
 create_report(df).show_browser()
 ```
 
-#### [Try DataPrep.EDA online (in Colab)](https://colab.research.google.com/drive/1U_-pAMcne3hK1HbMB3kuEt-093Np_7Uk?usp=sharing)
-
 Click [here](https://docs.dataprep.ai/_downloads/1a61c6aebb3ecbe9dc9742bd6ca78ddb/titanic_dp.html) to see the generated report of the above code.
 
 Click [here](https://docs.dataprep.ai/dev/bench/index.html) to see the benchmark result.
+
+#### Try DataPrep.EDA Online: [DataPrep.EDA Demo in Colab](https://colab.research.google.com/drive/1U_-pAMcne3hK1HbMB3kuEt-093Np_7Uk?usp=sharing)
 
 #### Innovative System Design
 
