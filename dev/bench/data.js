@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1632957872228,
+  "lastUpdate": 1632958788240,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -496,6 +496,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06664054546746451",
             "extra": "mean: 6.486514570200001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ce25b17d401646c4f8d2ae25c3df05f254e5b99e",
+          "message": "docs(eda): change eda colab position",
+          "timestamp": "2021-09-29T16:36:01-07:00",
+          "tree_id": "237aa6e77f7fe716e7e5356835fab4cadd287610",
+          "url": "https://github.com/sfu-db/dataprep/commit/ce25b17d401646c4f8d2ae25c3df05f254e5b99e"
+        },
+        "date": 1632958786830,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.16245631136579736,
+            "unit": "iter/sec",
+            "range": "stddev: 0.16965107827422618",
+            "extra": "mean: 6.155501079600003 sec\nrounds: 5"
           }
         ]
       }
