@@ -5,6 +5,7 @@
 from collections import UserList, OrderedDict
 from typing import Any, Callable, Dict, List, Tuple, Union, Optional
 
+import math
 import pandas as pd
 import numpy as np
 import dask
@@ -23,6 +24,7 @@ from ...dtypes import (
     drop_null,
     DTypeDef,
 )
+from ...utils import gaussian_kde
 from ...configs import Config
 
 
@@ -124,10 +126,23 @@ class Srs(UserList):
 
         return output
 
-    def self_map(self, func: Callable[[dd.Series], Any], **kwargs: Any) -> List[Any]:
+    def self_map(
+        self,
+        func: Callable[[dd.Series], Any],
+        condition: Optional[List[bool]] = None,
+        **kwargs: Any,
+    ) -> List[Any]:
         """
         Map the data to the given function.
         """
+        if condition:
+            rslt = []
+            for cond, data in zip(condition, self.data):
+                if not cond:
+                    rslt.append(func(data, **kwargs))
+                else:
+                    rslt.append(None)
+            return rslt
         return [func(srs, **kwargs) for srs in self.data]
 
 
@@ -198,7 +213,9 @@ def compare_multiple_df(
 
     for col, dtp, datum, orig in data:
         if is_dtype(dtp, Continuous()):
-            if cfg.hist.enable:
+            if cfg.diff.density:
+                plot_data.append((col, dtp, (datum["kde"], datum["dens"]), orig))
+            elif cfg.hist.enable:
                 plot_data.append((col, dtp, datum["hist"], orig))
         elif is_dtype(dtp, Nominal()):
             if cfg.bar.enable:
@@ -266,12 +283,37 @@ def _cont_calcs(srs: Srs, cfg: Config) -> Dict[str, List[Any]]:
     min_max = srs.apply(
         "map_partitions", lambda x: pd.Series([x.max(), x.min()]), meta=pd.Series([], dtype=float)
     ).data
+    min_max_comp = []
+    if cfg.diff.density:
+        for min_max_value in dask.compute(min_max)[0]:
+            min_max_comp.append(math.isclose(min_max_value.min(), min_max_value.max()))
     min_max = dd.concat(min_max).repartition(npartitions=1)
 
     # histogram
     data["hist"] = srs.self_map(
         da.histogram, bins=cfg.hist.bins, range=(min_max.min(), min_max.max())
     )
+
+    # compute the density histogram
+    if cfg.diff.density:
+        data["dens"] = srs.self_map(
+            da.histogram,
+            condition=min_max_comp,
+            bins=cfg.kde.bins,
+            range=(min_max.min(), min_max.max()),
+            density=True,
+        )
+        # gaussian kernel density estimate
+        data["kde"] = []
+        sample_data = dask.compute(
+            srs.apply(
+                "map_partitions",
+                lambda x: x.sample(min(1000, x.shape[0])),
+                meta=pd.Series([], dtype=float),
+            ).data
+        )
+        for ind in range(len(sample_data[0])):
+            data["kde"].append(gaussian_kde(sample_data[0][ind]))
 
     return data
 

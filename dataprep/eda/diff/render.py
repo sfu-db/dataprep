@@ -227,14 +227,14 @@ def hist_viz(
     return fig
 
 
-def kde_viz(
+def kde_viz_figure(
     hist: List[Tuple[np.ndarray, np.ndarray]],
     kde: np.ndarray,
     col: str,
     plot_width: int,
     plot_height: int,
     cfg: Config,
-) -> Panel:
+) -> Figure:
     """
     Render histogram with overlayed kde
     """
@@ -285,6 +285,22 @@ def kde_viz(
     _format_axis(fig, df.iloc[0]["left"], df.iloc[-1]["right"], "x")
     if cfg.kde.yscale == "linear":
         _format_axis(fig, 0, max(df["dens"].max(), pdf.max()), "y")
+    return fig
+
+
+def kde_viz_panel(
+    hist: List[Tuple[np.ndarray, np.ndarray]],
+    kde: np.ndarray,
+    col: str,
+    plot_width: int,
+    plot_height: int,
+    cfg: Config,
+) -> Panel:
+    """
+    Render histogram with overlayed kde
+    """
+    # pylint: disable=too-many-arguments, too-many-locals
+    fig = kde_viz_figure(hist, kde, col, plot_width, plot_height, cfg)
     return Panel(child=row(fig), title="KDE Plot")
 
 
@@ -593,7 +609,9 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     figs: List[Figure] = []
     nrows = itmdt["stats"]["nrows"]
     titles: List[str] = []
+
     for col, dtp, data, orig in itmdt["data"]:
+        fig = None
         if is_dtype(dtp, Nominal()):
             df, ttl_grps = data
             fig = bar_viz(
@@ -610,17 +628,22 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
                 baseline if len(df) > 1 else 0,
             )
         elif is_dtype(dtp, Continuous()):
-            fig = hist_viz(
-                data,
-                nrows,
-                col,
-                cfg.hist.yscale,
-                plot_width,
-                plot_height,
-                False,
-                df_labels,
-                orig,
-            )
+            if cfg.diff.density:
+                kde, dens = data
+                if kde is not None and not isinstance(dens, np.integer):
+                    fig = kde_viz_figure(dens, kde, col, plot_width, plot_height, cfg)
+            else:
+                fig = hist_viz(
+                    data,
+                    nrows,
+                    col,
+                    cfg.hist.yscale,
+                    plot_width,
+                    plot_height,
+                    False,
+                    df_labels,
+                    orig,
+                )
         elif is_dtype(dtp, DateTime()):
             df, timeunit = data
             fig = dt_line_viz(
@@ -634,10 +657,11 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
                 orig,
                 df_labels,
             )
-        fig.frame_height = plot_height
-        titles.append(fig.title.text)
-        fig.title.text = ""
-        figs.append(fig)
+        if fig is not None:
+            fig.frame_height = plot_height
+            titles.append(fig.title.text)
+            fig.title.text = ""
+            figs.append(fig)
 
     if cfg.stats.enable:
         toggle_content = "Stats"
@@ -682,7 +706,7 @@ def render_comparison_continous(itmdt: Intermediate, cfg: Config) -> Dict[str, A
             not math.isclose(itmdt["stats"]["min"][0], itmdt["stats"]["max"][0])
         ):
             dens, kde = data["dens"], data["kde"]
-            tabs.append(kde_viz(dens, kde, col, plot_width, plot_height, cfg))
+            tabs.append(kde_viz_panel(dens, kde, col, plot_width, plot_height, cfg))
             # htgs["KDE Plot"] = cfg.kde.how_to_guide(plot_height, plot_width)
     if cfg.box.enable:
         df_list = []

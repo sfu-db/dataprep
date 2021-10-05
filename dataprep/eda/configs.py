@@ -81,6 +81,7 @@ class Diff(BaseModel):
 
     label: Union[List[str], None] = None
     baseline: int = 0
+    density: bool = False
 
 
 class Stats(BaseModel):
