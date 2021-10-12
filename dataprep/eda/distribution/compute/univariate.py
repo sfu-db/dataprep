@@ -107,12 +107,10 @@ def nom_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     srs = srs.dropna()  # drop null values
     grps = srs.value_counts(sort=False)  # counts of unique values in the series
     data["geo"] = grps
-
-    if cfg.stats.enable or cfg.bar.enable or cfg.pie.enable:
-        data["nuniq"] = grps.shape[0]  # total number of groups
+    data["nuniq"] = grps.shape[0]  # total number of groups
 
     # compute bar and pie together unless the parameters are different
-    if cfg.bar.enable or cfg.pie.enable:
+    if cfg.bar.enable or cfg.pie.enable or cfg.value_table.enable:
         # select the largest or smallest groups
         data["bar"] = (
             grps.nlargest(cfg.bar.bars) if cfg.bar.sort_descending else grps.nsmallest(cfg.bar.bars)
@@ -138,7 +136,7 @@ def nom_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
             data["chisq"] = chisquare(grps.values)
 
     df = grps.reset_index()  # dataframe with group names and counts
-    if cfg.stats.enable:
+    if cfg.stats.enable or cfg.value_table.enable:
         data.update(_calc_nom_stats(srs, df, data["nrows"], data["nuniq"]))
     elif cfg.wordfreq.enable and cfg.insight.enable:
         data["len_stats"] = {"Minimum": srs.str.len().min(), "Maximum": srs.str.len().max()}
@@ -190,11 +188,9 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
     # pylint: disable=too-many-branches
     data: Dict[str, Any] = {}
 
-    if cfg.stats.enable or cfg.hist.enable:
-        data["nrows"] = srs.shape[0]  # total rows
+    data["nrows"] = srs.shape[0]  # total rows
     srs = srs.dropna()
-    if cfg.stats.enable:
-        data["npres"] = srs.shape[0]  # number of present (not null) values
+    data["npres"] = srs.shape[0]  # number of present (not null) values
     srs = srs[~srs.isin({np.inf, -np.inf})]  # remove infinite values
     if cfg.hist.enable or cfg.qqnorm.enable and cfg.insight.enable:
         data["hist"] = da.histogram(srs, cfg.hist.bins, (srs.min(), srs.max()))
@@ -237,8 +233,7 @@ def cont_comps(srs: dd.Series, cfg: Config) -> Dict[str, Any]:
         data.update(_calc_box(srs, data["qntls"], cfg))
     if cfg.value_table.enable:
         value_counts = srs.value_counts(sort=False)
-        if cfg.stats.enable:
-            data["nuniq"] = value_counts.shape[0]
+        data["nuniq"] = value_counts.shape[0]
         data["value_table"] = value_counts.nlargest(cfg.value_table.ngroups)
     elif cfg.stats.enable:
         data["nuniq"] = srs.nunique_approx()

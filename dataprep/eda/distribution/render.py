@@ -1619,6 +1619,7 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 
     if cfg.value_table.enable:
         htgs["Value Table"] = cfg.value_table.how_to_guide()
+        stats = data["stats"]
         value_table = _value_table(
             data["value_table"], stats["nrows"], stats["npres"], stats["nuniq"]
         )
@@ -1628,7 +1629,10 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     # panel.child.children[0] is a figure
     for panel in tabs[0:]:
         panel.child.children[0].frame_width = int(plot_width * 0.9)
-    tabs[0].child.children[0].frame_width = int(plot_width_bar * 0.9)
+
+    if len(tabs) > 0:
+        tabs[0].child.children[0].frame_width = int(plot_width_bar * 0.9)
+
     return {
         "tabledata": format_cat_stats(stats, len_stats, letter_stats) if cfg.stats.enable else [],
         "value_table": value_table,

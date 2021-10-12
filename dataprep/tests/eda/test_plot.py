@@ -12,6 +12,7 @@ from ...datasets import load_dataset
 from ...eda import plot
 from ...eda.dtypes_v2 import Nominal, LatLong
 from ...eda.utils import to_dask
+from ...datasets import load_dataset
 from .random_data_generator import random_df
 
 LOGGER = logging.getLogger(__name__)
@@ -98,3 +99,9 @@ def test_geo(geodf: dd.DataFrame) -> None:
 
 def test_random_df(random_df: pd.DataFrame) -> None:
     plot(random_df)
+
+
+def test_plot_titanic() -> None:
+    df = load_dataset("titanic")
+    plot(df, "Sex", display=["Value Table"])
+    plot(df, "Age", display=["Value Table"])
