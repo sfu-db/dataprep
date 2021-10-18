@@ -1,3 +1,7 @@
+"""
+This module contains the method of read_sql.
+It is a wrapper on connectorx.read_sql function.
+"""
 from typing import Optional, Tuple, Union, List, Any
 
 try:
@@ -49,7 +53,8 @@ def read_sql(
     return_type
       the return type of this function. It can be "arrow", "pandas", "modin", "dask" or "polars".
     protocol
-      the protocol used to fetch data from source. Valid protocols are database dependent (https://github.com/sfu-db/connector-x/blob/main/Types.md).
+      the protocol used to fetch data from source. Valid protocols are database dependent
+      (https://github.com/sfu-db/connector-x/blob/main/Types.md).
     partition_on
       the column to partition the result.
     partition_range
@@ -63,13 +68,15 @@ def read_sql(
     >>> postgres_url = "postgresql://username:password@server:port/database"
     >>> query = "SELECT * FROM lineitem"
     >>> read_sql(postgres_url, query)
-    Read a DataFrame parallelly using 10 threads by automatically partitioning the provided SQL on the partition column:
+    Read a DataFrame parallelly using 10 threads by automatically partitioning the provided SQL
+    on the partition column:
     >>> postgres_url = "postgresql://username:password@server:port/database"
     >>> query = "SELECT * FROM lineitem"
     >>> read_sql(postgres_url, query, partition_on="partition_col", partition_num=10)
     Read a DataFrame parallelly using 2 threads by manually providing two partition SQLs:
     >>> postgres_url = "postgresql://username:password@server:port/database"
-    >>> queries = ["SELECT * FROM lineitem WHERE partition_col <= 10", "SELECT * FROM lineitem WHERE partition_col > 10"]
+    >>> queries = ["SELECT * FROM lineitem WHERE partition_col <= 10",
+    "SELECT * FROM lineitem WHERE partition_col > 10"]
     >>> read_sql(postgres_url, queries)
     """
     if _WITH_CX:
@@ -77,6 +84,7 @@ def read_sql(
             conn=conn,
             query=query,
             return_type=return_type,
+            protocol=protocol,
             partition_on=partition_on,
             partition_range=partition_range,
             partition_num=partition_num,
