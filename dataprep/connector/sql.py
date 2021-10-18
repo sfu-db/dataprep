@@ -26,26 +26,8 @@ def read_sql(
     Run the SQL query, download the data from database into a dataframe.
     Please check out https://github.com/sfu-db/connector-x for more details.
 
-    Supported databases
-    ==========
-    - Postgres
-    - Mysql
-    - Sqlite
-    - SQL Server
-    - Oracle
-    - Redshift (through postgres protocol)
-    - Clickhouse (through mysql protocol)
-
-    Supported dataframes
-    ==========
-    - Pandas
-    - Arrow
-    - Dask
-    - Modin
-    - Polars
-
     Parameters
-    ==========
+    ----------
     conn
       the connection string.
     query
@@ -62,22 +44,11 @@ def read_sql(
     partition_num
       how many partition to generate.
 
-    Examples
-    ========
-    Read a DataFrame from a SQL using a single thread:
-    >>> postgres_url = "postgresql://username:password@server:port/database"
+    Example
+    --------
+    >>> db_url = "postgresql://username:password@server:port/database"
     >>> query = "SELECT * FROM lineitem"
-    >>> read_sql(postgres_url, query)
-    Read a DataFrame parallelly using 10 threads by automatically partitioning the provided SQL
-    on the partition column:
-    >>> postgres_url = "postgresql://username:password@server:port/database"
-    >>> query = "SELECT * FROM lineitem"
-    >>> read_sql(postgres_url, query, partition_on="partition_col", partition_num=10)
-    Read a DataFrame parallelly using 2 threads by manually providing two partition SQLs:
-    >>> postgres_url = "postgresql://username:password@server:port/database"
-    >>> queries = ["SELECT * FROM lineitem WHERE partition_col <= 10",
-    "SELECT * FROM lineitem WHERE partition_col > 10"]
-    >>> read_sql(postgres_url, queries)
+    >>> read_sql(db_url, query, partition_on="partition_col", partition_num=10)
     """
     if _WITH_CX:
         df = cx.read_sql(
