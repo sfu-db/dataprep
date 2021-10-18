@@ -142,6 +142,10 @@ Check [clean_headers](https://docs.dataprep.ai/user_guide/clean/clean_headers.ht
 
 ## Connector
 
+Connector now supports loading data from both web API and databases.
+
+### Web API
+
 Connector is an intuitive, open-source API wrapper that speeds up development by standardizing calls to multiple APIs as a simple workflow.
 
 Connector provides a simple wrapper to collect structured data from different Web APIs (e.g., Twitter, Spotify), making web data collection easy and efficient, without requiring advanced programming skills.
@@ -165,6 +169,19 @@ df = await conn_dblp.query("publication", author = "Andrew Y. Ng", _count = 2000
 Here, you can find detailed [Examples.](https://github.com/sfu-db/dataprep/tree/develop/examples)
 
 Connector is designed to be easy to extend. If you want to connect with your own web API, you just have to write a simple [configuration file](https://github.com/sfu-db/DataConnectorConfigs/blob/develop/CONTRIBUTING.md#add-configuration-files) to support it. This configuration file describes the API's main attributes like the URL, query parameters, authorization method, pagination properties, etc.
+
+### Database
+
+Connector now has adopted [connectorx](https://github.com/sfu-db/connector-x) in order to enable loading data from databases (Postgres, Mysql, SQLServer, etc.) into Python dataframes (pandas, dask, modin, arrow, polars) in the fastest and most memory efficient way. [[Benchmark]](https://github.com/sfu-db/connector-x/blob/main/Benchmark.md#benchmark-result-on-aws-r54xlarge)
+
+What you need to do is just install `connectorx` (`pip install -U connectorx`) and run one line of code:
+
+```python
+from dataprep.connector import read_sql
+read_sql("postgresql://username:password@server:port/database", "SELECT * FROM lineitem")
+```
+
+Check out [here](https://github.com/sfu-db/connector-x#supported-sources--destinations) for supported databases and dataframes and more examples usages.
 
 ## Documentation
 
