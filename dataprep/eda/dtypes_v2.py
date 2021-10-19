@@ -7,7 +7,6 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 from ..clean import validate_country, validate_lat_long
-from ..errors import UnreachableError
 
 STRING_PANDAS_DTYPES = [pd.StringDtype]
 STRING_DTYPES = STRING_PANDAS_DTYPES
@@ -202,15 +201,8 @@ def detect_without_known(col: Union[dd.Series, pd.Series], head: pd.Series) -> D
     """
     This function detects dtypes of column when users didn't specify.
     """
-    if is_nominal(col.dtype):
-        if is_geography(head):
-            return GeoGraphy()
-        if is_geopoint(head):
-            return GeoPoint()
-        else:
-            return Nominal()
 
-    elif is_continuous(col.dtype):
+    if is_continuous(col.dtype):
         # detect as categorical if distinct value is small
         if isinstance(col, dd.Series):
             nuniques = col.nunique_approx().compute()
@@ -225,8 +217,12 @@ def detect_without_known(col: Union[dd.Series, pd.Series], head: pd.Series) -> D
 
     elif is_datetime(col.dtype):
         return DateTime()
+    elif is_geography(head):
+        return GeoGraphy()
+    elif is_geopoint(head):
+        return GeoPoint()
     else:
-        raise UnreachableError
+        return Nominal()
 
 
 def is_dtype(dtype1: Any, dtype2: DType) -> bool:
