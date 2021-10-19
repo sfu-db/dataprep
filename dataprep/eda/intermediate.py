@@ -38,9 +38,9 @@ class Intermediate(Dict[str, Any]):
         Parameters
         ----------
         filename: Optional[str], default 'intermediate'
-            The filename used for saving report without the extension name.
+            The filename used for saving intermediate without the extension name.
         to: Optional[str], default Path.cwd()
-            The path to where the report will be saved.
+            The path to where the intermediate will be saved.
         """
         saved_file_path = None
 
@@ -50,9 +50,9 @@ class Intermediate(Dict[str, Any]):
 
             if posix_path.is_dir():
                 if path.endswith("/"):
-                    path += "report.json"
+                    path += "imdt.json"
                 else:
-                    path += "/report.json"
+                    path += "/imdt.json"
 
             elif extension:
                 if extension != ".json":
@@ -66,18 +66,18 @@ class Intermediate(Dict[str, Any]):
             saved_file_path = Path(path).expanduser()
 
         else:
-            path = str(Path.cwd()) + "/report.json"
+            path = str(Path.cwd()) + "/imdt.json"
             saved_file_path = Path(path).expanduser()
 
         inter_dict: Dict[str, Any] = {}
         for key in self.keys():
             inter_dict[key] = self[key]
-        self.df_to_dict(inter_dict)
+        self._standardize_type(inter_dict)
         with open(path, "w") as outfile:
             json.dump(inter_dict, outfile, indent=4)
         print(f"Intermediate has been saved to {saved_file_path}!")
 
-    def df_to_dict(self, inter_dict: Dict[str, Any]) -> None:
+    def _standardize_type(self, inter_dict: Dict[str, Any]) -> None:
         """
         In order to make intermediate could be saved as json file,
         check the type of data contained in the intermediate
@@ -92,7 +92,7 @@ class Intermediate(Dict[str, Any]):
         """
         for key in inter_dict:
             if isinstance(inter_dict[key], dict):
-                self.df_to_dict(inter_dict[key])
+                self._standardize_type(inter_dict[key])
             elif isinstance(
                 inter_dict[key],
                 (
