@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1634677618420,
+  "lastUpdate": 1634677976580,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -620,6 +620,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.04768959562697941",
             "extra": "mean: 6.327592624598765 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "wangxiaoying0369@gmail.com",
+            "name": "Xiaoying Wang",
+            "username": "wangxiaoying"
+          },
+          "committer": {
+            "email": "wangxiaoying0369@gmail.com",
+            "name": "Xiaoying Wang",
+            "username": "wangxiaoying"
+          },
+          "distinct": true,
+          "id": "a64e3563f4a1f95b44465bd372ddb4bd8ceb951c",
+          "message": "feat(connector): integrate connectorx into connector",
+          "timestamp": "2021-10-19T21:09:00Z",
+          "tree_id": "95c8fb19172a6f250f1b37b273896e0b7454d4d9",
+          "url": "https://github.com/sfu-db/dataprep/commit/a64e3563f4a1f95b44465bd372ddb4bd8ceb951c"
+        },
+        "date": 1634677975551,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.204863280161837,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02400732527459022",
+            "extra": "mean: 4.881304249400012 sec\nrounds: 5"
           }
         ]
       }
