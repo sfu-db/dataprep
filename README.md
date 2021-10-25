@@ -138,7 +138,7 @@ series
 Name: country, dtype: bool
 ```
 
-Check [clean_headers](https://docs.dataprep.ai/user_guide/clean/clean_headers.html), [clean_country](https://docs.dataprep.ai/user_guide/clean/clean_country.html), [clean_date](https://docs.dataprep.ai/user_guide/clean/clean_date.html), [clean_duplication](https://docs.dataprep.ai/user_guide/clean/clean_duplication.html), [clean_email](https://docs.dataprep.ai/user_guide/clean/clean_email.html), [clean_lat_long](https://docs.dataprep.ai/user_guide/clean/clean_lat_long.html), [clean_ip](https://docs.dataprep.ai/user_guide/clean/clean_ip.html), [clean_phone](https://docs.dataprep.ai/user_guide/clean/clean_phone.html), [clean_text](https://docs.dataprep.ai/user_guide/clean/clean_text.html), [clean_url](https://docs.dataprep.ai/user_guide/clean/clean_url.html), [clean_address](https://docs.dataprep.ai/user_guide/clean/clean_address.html) and [clean_df](https://docs.dataprep.ai/user_guide/clean/clean_df.html) to see how each function works.
+Check [Documentation of Dataprep.Clean](https://docs.dataprep.ai/user_guide/clean) to see how each function works.
 
 ## Connector
 
