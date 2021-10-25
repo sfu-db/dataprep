@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1635202644675,
+  "lastUpdate": 1635205006401,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -806,6 +806,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.05150359901659495",
             "extra": "mean: 5.256345267199981 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1ec9e491db0a93332b8f8609fe19b37054a67dc4",
+          "message": "Merge pull request #718 from sfu-db/connectorx\n\nDoc(Connector): add user guide and api reference for read_sql",
+          "timestamp": "2021-10-25T16:33:19-07:00",
+          "tree_id": "5f4cfb1faccf2d43486298d595c756f510a2e674",
+          "url": "https://github.com/sfu-db/dataprep/commit/1ec9e491db0a93332b8f8609fe19b37054a67dc4"
+        },
+        "date": 1635205005010,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1768275068565261,
+            "unit": "iter/sec",
+            "range": "stddev: 0.15730813834390825",
+            "extra": "mean: 5.655228746799997 sec\nrounds: 5"
           }
         ]
       }
