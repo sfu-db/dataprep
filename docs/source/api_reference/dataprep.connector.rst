@@ -58,3 +58,8 @@ Errors
    :members:
    :undoc-members:
    :show-inheritance:
+
+read_sql
+---------
+
+.. autofunction:: dataprep.connector.read_sql
