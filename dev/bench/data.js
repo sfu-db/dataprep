@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1634679020092,
+  "lastUpdate": 1635142004161,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -682,6 +682,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.10095000022809793",
             "extra": "mean: 6.231150030799995 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3969cc73588cef122f5a42c8b85e53df1d2fb883",
+          "message": "docs/readme\n\nChange the readme part of Clean. Add the number of clean functions.",
+          "timestamp": "2021-10-24T23:03:07-07:00",
+          "tree_id": "aeb2e6a4d726efb3cfe4ac9195b49151df8b935d",
+          "url": "https://github.com/sfu-db/dataprep/commit/3969cc73588cef122f5a42c8b85e53df1d2fb883"
+        },
+        "date": 1635142002469,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.18290919711389944,
+            "unit": "iter/sec",
+            "range": "stddev: 0.11744122707318705",
+            "extra": "mean: 5.467193644600002 sec\nrounds: 5"
           }
         ]
       }
