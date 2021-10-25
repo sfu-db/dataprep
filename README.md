@@ -138,7 +138,7 @@ series
 Name: country, dtype: bool
 ```
 
-Check [Documentation of Dataprep.Clean](https://docs.dataprep.ai/user_guide/clean) to see how each function works.
+Check [Documentation of Dataprep.Clean](https://docs.dataprep.ai/user_guide/clean/introduction.html) to see how each function works.
 
 ## Connector
 
