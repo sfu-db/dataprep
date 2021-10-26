@@ -217,7 +217,7 @@ def _format_missing(
         res["missing_tabs"] = ["Bar Chart", "Spectrum", "Heat Map"]
         # only display dendrogram when df has more than one column
         if ncols > 1:
-            res["missing_tabs"].append("Dendogram")
+            res["missing_tabs"].append("Dendrogram")
     return res
 
 
