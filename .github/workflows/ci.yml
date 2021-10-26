@@ -26,13 +26,15 @@ jobs:
       - name: Cache venv
         uses: actions/cache@v2
         with:
-          path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ hashFiles('poetry.lock') }}
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         run: |
+          echo "Cache Version ${{ secrets.CACHE_VERSION }}"
           pip install poetry
           poetry install
+          poetry config --list
 
       - name: Print tool versions
         run: |
@@ -48,7 +50,7 @@ jobs:
         run: poetry run mypy dataprep
 
       - name: Test the project
-        run: poetry run pytest --cov=dataprep dataprep/tests
+        run: poetry run pytest --cov-report xml --cov=dataprep dataprep/tests
         env:
           DATAPREP_BROWSER_TESTS: 0
           DATAPREP_CREDENTIAL_TESTS: 0
@@ -78,13 +80,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry config virtualenvs.in-project true
+          curl -L https://github.com/jgm/pandoc/releases/download/2.11.2/pandoc-2.11.2-1-amd64.deb -o /tmp/pandoc.deb && sudo dpkg -i /tmp/pandoc.deb
 
       - name: Cache venv
         uses: actions/cache@v2
         with:
-          path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ hashFiles('poetry.lock') }}
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         run: |
