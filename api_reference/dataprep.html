@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>API Reference &#8212; DataPrep 0.3.0 documentation</title>
+  <title>API Reference &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dataprep.eda.distribution" href="dataprep.eda.distribution.html" />
-    <link rel="prev" title="Pandas DataFrame" href="../user_guide/clean/clean_df.html" />
+    <link rel="prev" title="An example dataset containing bankaccount strings" href="../user_guide/clean/clean_nz_bankaccount.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
   <meta name="author" content="SFU Database Systems Lab">
@@ -275,6 +275,7 @@ auto-generated from the docstrings in the project source code.</p>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.connector.html#module-dataprep.connector.schema">Schema</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.connector.html#module-dataprep.connector.implicit_database">Implicit database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.connector.html#module-dataprep.connector.errors">Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.connector.html#read-sql">read_sql</a></li>
 </ul>
 </li>
 </ul>
@@ -296,6 +297,132 @@ auto-generated from the docstrings in the project source code.</p>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_text">Text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_url">URLs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_address">US Street Addresses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_au_abn">Australian Business Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_au_acn">Australian Company Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_au_tfn">Australian Tax File Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_be_vat">Belgian VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_bg_egn">Bulgarian National Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_bg_vat">Bulgarian VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_by_unp">Belarusian UNP Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ca_bn">Canadian Business Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ch_esr">Swiss Einzahlungsschein MIT Referenznummers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ch_ssn">Swiss Social Security Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ch_uid">Swiss Business Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ch_vat">Swiss VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cl_rut">Chile RUT/RUN Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cn_ric">Chinese Resident Identity Card Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_co_nit">Colombian Identity Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cr_cpf">Costa Rica Physical Person ID Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cr_cpj">Costa Rica Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cr_cr">Costa Rica Foreigners ID Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cu_ni">Cuban Identity Card Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cy_vat">Cypriot VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cz_dic">Czech VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cz_rc">Czech Birth Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_de_handelsregisternummer">German Company Registry IDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_de_idnr">German Personal Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_de_stnr">German Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_de_vat">German VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#german-securities-identification-codes">German Securities Identification Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_dk_cpr">Danish Citizen Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_dk_cvr">Danish CVR Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_do_cedula">Dominican Republic National Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_do_ncf">Dominican Republic Invoice Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_do_rnc">Dominican Republic Tax Registrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ec_ci">Ecuadorian Personal Identity Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ec_ruc">Ecuadorian Company Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ee_ik">Estonian Personcal ID Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ee_kmkr">Estonian KMKR Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_ccc">Spanish Bank Account Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_cif">Spanish Fiscal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_cups">Spanish Meter Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_dni">Spanish Personal Identity Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_iban">Spanish IBANs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_nie">Spanish Foreigner Identity Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_nif">Spanish NIF Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_eu_nace">Classification For Businesses In The European Union</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_eu_vat">European VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fi_alv">Finnish ALV Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fi_hetu">Finnish Personal Identity Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fi_ytunnus">Finnish Business Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fr_nif">French Tax Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fr_nir">French Personal Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fr_siren">French Company Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fr_tva">French TVA Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gb_sedol">Stock Exchange Daily Official List Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gb_upn">English Unique Pupil Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gb_utr">United Kingdom Unique Taxpayer References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gb_vat">United Kingdom VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gr_amka">Greek Social Security Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gr_vat">Greek VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gt_nit">Guatemala Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_hr_oib">Croatian Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_hu_anum">Hungarian ANUM Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_id_npwp">Indonesian VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ie_pps">Irish Personal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ie_vat">Irish VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_il_hp">Israeli Company Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_il_idnr">Israeli Personal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_in_aadhaar">Indian Digital Resident Personal Identity Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_in_pan">Indian Permanent Account Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_is_kennitala">Icelandic Identity Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_is_vsk">Icelandic VSK Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_it_aic">Italian Code For Identification Of Drugs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_it_codicefiscale">Italian Fiscal Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_it_iva">Italian IVA Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_jp_cn">Japanese Corporate Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_kr_brn">South Korea Business Registration Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_kr_rrn">South Korean Resident Registration Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_li_peid">Liechtenstein Tax Code For Individuals And Entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_lt_asmens">Lithuanian Personal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_lt_pvm">Lithuanian PVM Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_lu_tva">Luxembourgian TVA Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_lv_pvn">Latvian PVN (VAT) Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_mc_tva">Monacan TVA Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_md_idno">Moldavian Company Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_me_iban">Montenegro IBANs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_mt_vat">Maltese VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_mu_nid">Mauritian National ID Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_mx_curp">Mexican Personal Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_mx_rfc">Mexican Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_my_nric">Malaysian National Registration Identity Card Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nl_brin">BRIN Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nl_btw">Dutch BTW Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_no_iban">Norwegian IBANs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_no_kontonr">Norwegian Bank Account Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_no_mva">Norwegian VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_no_orgnr">Norwegian Organisation Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nz_ird">New Zealand IRD Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_pe_cui">Peruvian Personal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_pe_ruc">Peruvian Fiscal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_pl_nip">Polish VAT Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_pl_pesel">Polish National Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_pl_regon">Polish Register Of Economic Units</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_pt_nif">Portuguese NIF Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_py_ruc">Paraguay RUC Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ro_cf">Romanian CF (VAT) Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ro_cnp">Romanian Numerical Personal Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ro_cui">Romanian Company Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ro_onrc">Romanian Trade Register Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fr_siret">French Company Establishment Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_gb_nhs">United Kingdom National Health Service Patient Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nl_bsn">Dutch Citizen Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nl_onderwijsnummer">Dutch Student Identification Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_be_iban">Belgian IBANs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_bg_pnf">Bulgarian Personal Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_br_cnpj">Brazilian Company Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_br_cpf">Brazilian National Identifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ca_sin">Canadian Social Insurance Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_cn_uscc">Chinese Unified Social Credit Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_ee_registrikood">Estonian Organisation Registration Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_es_referenciacatastral">Spanish Real State IDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_eu_banknote">Euro Banknote Serial Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_eu_eic">European Energy Identification Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fi_associationid">Finnish Association Registry IDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_fi_veronumero">Finnish Individual Tax Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nl_postcode">Dutch Postal Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_no_fodselsnummer">Norwegian Birth Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataprep.clean.html#module-dataprep.clean.clean_nz_bankaccount">New Zealand Bank Account Numbers</a></li>
 </ul>
 </li>
 </ul>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Parameter Configurations: parameter summary settings &#8212; DataPrep 0.3.0 documentation</title>
+  <title>&lt;no title&gt; &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -64,7 +64,7 @@
         <a class="nav-link" href="../../installation.html">Installation</a>
       </li>
       
-      <li class="nav-item active">
+      <li class="nav-item ">
         <a class="nav-link" href="../user_guide.html">User Guide</a>
       </li>
       
@@ -128,75 +128,6 @@
         
       
         
-          
-            
-              <li class="">
-                  <a href="../datasets/introduction.html">Datasets</a>
-              </li>
-            
-          
-            
-              <li class="active">
-                  <a href="introduction.html">EDA</a>
-                  <ul>
-                  
-                      <li class="">
-                          <a href="plot.html">plot(): analyze distributions</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="plot_correlation.html">plot_correlation(): analyze correlations</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="plot_missing.html">plot_missing(): analyze missing values</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="plot_diff.html">plot_diff(): analyze difference betweenDataFrames</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="create_report.html">create_report(): create a profile report</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="how_to_guide.html">How-to guide: customize your output</a>
-                      </li>
-                  
-                      <li class="active">
-                          <a href="">Parameter configurations: parameter summarysettings</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="insights.html">Insight: automatically insight detection</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="titanic.html">Case study: Titanic</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="house_price.html">Case study: House Prices</a>
-                      </li>
-                  
-                  </ul>
-              </li>
-            
-          
-            
-              <li class="">
-                  <a href="../connector/introduction.html">Connector</a>
-              </li>
-            
-          
-            
-              <li class="">
-                  <a href="../clean/introduction.html">Clean</a>
-              </li>
-            
-          
-        
       
         
       
@@ -213,607 +144,272 @@
   <nav id="bd-toc-nav">
     <ul class="nav section-nav flex-column">
       
-        <li class="nav-item toc-entry toc-h2">
-          <a href="#Global-parameters" class="nav-link">Global parameters</a>
-        </li>
-      
-        <li class="nav-item toc-entry toc-h2">
-          <a href="#Local-parameters" class="nav-link">Local parameters</a><ul class="nav section-nav flex-column">
-            
-        <li class="nav-item toc-entry toc-h3">
-          <a href="#plot()" class="nav-link">plot()</a>
-        </li>
-      
-        <li class="nav-item toc-entry toc-h3">
-          <a href="#plot_missing()" class="nav-link">plot_missing()</a>
-        </li>
-      
-        <li class="nav-item toc-entry toc-h3">
-          <a href="#plot_correlation()" class="nav-link">plot_correlation()</a>
-        </li>
-      
-        <li class="nav-item toc-entry toc-h3">
-          <a href="#create_report()" class="nav-link">create_report()</a>
-        </li>
-      
-          </ul>
-        </li>
-      
     </ul>
   </nav>
 </div>
         <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
           <div>
             
-  <div class="section" id="Parameter-Configurations:-parameter-summary-settings">
-<h1><code class="docutils literal notranslate"><span class="pre">Parameter</span> <span class="pre">Configurations</span></code>: parameter summary settings<a class="headerlink" href="#Parameter-Configurations:-parameter-summary-settings" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="Global-parameters">
-<h2>Global parameters<a class="headerlink" href="#Global-parameters" title="Permalink to this headline">¶</a></h2>
-<p>To help users quickly manage the parameters, currently, we defined four global parameters. Global parameter applies to all the plots which has that parameter.</p>
-<table class="table">
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Global Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">width</span></code></p></td>
-<td><p>Change the plots’ width in <code class="docutils literal notranslate"><span class="pre">plot(df,</span> <span class="pre">col1)</span></code>, <code class="docutils literal notranslate"><span class="pre">plot(df,</span> <span class="pre">col1,</span> <span class="pre">col2)</span></code>, <code class="docutils literal notranslate"><span class="pre">plot(df,</span> <span class="pre">col1,</span> <span class="pre">col2,</span> <span class="pre">col3)</span></code>, <code class="docutils literal notranslate"><span class="pre">plot_correlation()</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_missing()</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">height</span></code></p></td>
-<td><p>Change the plots’ height in <code class="docutils literal notranslate"><span class="pre">plot(df,</span> <span class="pre">col1)</span></code>, <code class="docutils literal notranslate"><span class="pre">plot(df,</span> <span class="pre">col1,</span> <span class="pre">col2)</span></code> and <code class="docutils literal notranslate"><span class="pre">plot(df,</span> <span class="pre">col1,</span> <span class="pre">col2,</span> <span class="pre">col3)</span></code>, <code class="docutils literal notranslate"><span class="pre">plot_correlation()</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_missing()</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bins</span></code></p></td>
-<td><p>Apply to <code class="docutils literal notranslate"><span class="pre">bins</span></code> for <code class="docutils literal notranslate"><span class="pre">Histogram</span></code>, <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code>, <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code>, <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Length</span></code>, <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code>, <code class="docutils literal notranslate"><span class="pre">Spectrum</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ngroups</span></code></p></td>
-<td><p>Apply to <code class="docutils literal notranslate"><span class="pre">bars</span></code> and <code class="docutils literal notranslate"><span class="pre">slices</span></code> for the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code> and <code class="docutils literal notranslate"><span class="pre">Pie</span> <span class="pre">Chart</span></code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="Local-parameters">
-<h2>Local parameters<a class="headerlink" href="#Local-parameters" title="Permalink to this headline">¶</a></h2>
-<p>Local parameters are plot-specified and the names are separated by <code class="docutils literal notranslate"><span class="pre">.</span></code>. The portion before the first <code class="docutils literal notranslate"><span class="pre">.</span></code> is plot name and the portion after the first <code class="docutils literal notranslate"><span class="pre">.</span></code> is parameter name. The <code class="docutils literal notranslate"><span class="pre">.</span></code> is also used when the parameter name contains more than one word. When global parameter and local parameter are both entered by a user in config, the global parameter will be overwrote by local parameters for specific plots</p>
-<p>In the following tables we summarize the parameters for each API. You can also find the parameters for each plot in the Config API reference.</p>
-<div class="section" id="plot()">
-<h3><code class="docutils literal notranslate"><span class="pre">plot()</span></code><a class="headerlink" href="#plot()" title="Permalink to this headline">¶</a></h3>
-<table class="table">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Local Parameter</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Default</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hist.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins to display in the <code class="docutils literal notranslate"><span class="pre">Histogram</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hist.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">Histogram</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bar.bars</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of bars to display in the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bar.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the bars in descending order in the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bar.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bar.color</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“#1f77b4”</p></td>
-<td><p>Color of the bars in the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.duplicates.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1</p></td>
-<td><p>Warn if the percent of duplicated values is above this threshold in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.similar_distribution.threshold</span></code></p></td>
-<td><p>float</p></td>
-<td><p>0.05</p></td>
-<td><p>The significance level for Kolmogorov–Smirnov test in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.uniform.threshold</span></code></p></td>
-<td><p>float</p></td>
-<td><p>0.999</p></td>
-<td><p>The p-value threshold for chi-square test in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.missing.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1</p></td>
-<td><p>Warn if the percent of missing values is above this threshold in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.skewed.threshold</span></code></p></td>
-<td><p>float</p></td>
-<td><p>1e-5</p></td>
-<td><p>The p-value for the scipy.skewtest which test whether the skew is different from the normal distributionin in the
-<code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.infinity.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1</p></td>
-<td><p>Warn if the percent of infinites is above this threshold in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.zeros.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>5</p></td>
-<td><p>Warn if the percent of zeros is above this threshold in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.negatives.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1</p></td>
-<td><p>Warn if the percent of megatives is above this threshold in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.normal.threshold</span></code></p></td>
-<td><p>float</p></td>
-<td><p>0.99</p></td>
-<td><p>The p-value threshold for normal test, it is based on D’Agostino and Pearson’s test that combines skew and kurtosis to
-produce an omnibus test of normality in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.high_cardinality.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>The threshold for unique values count, count larger than threshold yields high cardinality in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.constant.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1</p></td>
-<td><p>The threshold for unique values count, count equals to threshold yields constant value in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.outstanding_no1.threshold</span></code></p></td>
-<td><p>float</p></td>
-<td><p>1.5</p></td>
-<td><p>The threshold for outstanding no1 insight, measures the ratio of the largest category count to the second-largest category
-count in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.attribution.threshold</span></code></p></td>
-<td><p>float</p></td>
-<td><p>0.5</p></td>
-<td><p>The threshold for the attribution insight, measures the percentage of the top 2 categories in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.high_word_cardinality.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1000</p></td>
-<td><p>The threshold for the high word cardinality insight, which measures the number of words of that cateogory in the
-<code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">insight.outstanding_no1_word.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>0</p></td>
-<td><p>The threshold for the outstanding no1 word threshold, which measures the ratio of the most frequent word count to the
-second most frequent word count in the <code class="docutils literal notranslate"><span class="pre">Insights</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insight.outlier.threshold</span></code></p></td>
-<td><p>int</p></td>
-<td><p>0</p></td>
-<td><p>The threshold for the outlier count for the <code class="docutils literal notranslate"><span class="pre">Insights</span></code> in the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kde.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins to display in the <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kde.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kde.hist_color</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“#aec7e8”</p></td>
-<td><p>Color of the histogram in the <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kde.line_color</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“#d62728”</p></td>
-<td><p>Color of the line in the <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">box.ngroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>15</p></td>
-<td><p>Maximum number of groups for categorical column to display in the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">box.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins for numerical column to display in the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">box.unit</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“auto”</p></td>
-<td><p>Defines the time unit to group values over for a datetime column. It can be “year”, “quarter”, “month”, “week”, “day”,
-“hour”,“minute”, “second”. With default value “auto”, it will use the time unit such that the resulting number of groups
-is closest to 15 in the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">box.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the boxes in descending order of frequency in the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">box.color</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“#d62728”</p></td>
-<td><p>Color of the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">value_table.ngroups</span></code></p></td>
-<td></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pie.slices</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of pie slices to display in the <code class="docutils literal notranslate"><span class="pre">Pie</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pie.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the slices in descending order of frequency in the <code class="docutils literal notranslate"><span class="pre">Pie</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pie.colors</span></code></p></td>
-<td><p>List[str]</p></td>
-<td><p>None</p></td>
-<td><p>Colors of the slices in the <code class="docutils literal notranslate"><span class="pre">Pie</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.top_words</span></code></p></td>
-<td><p>int</p></td>
-<td><p>30</p></td>
-<td><p>Maximum number of most frequent words to display in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.stopword</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to remove stopwords in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.lemmatize</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to lemmatize the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.stem</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to apply Potter Stem on the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordfreq.top_words</span></code></p></td>
-<td><p>int</p></td>
-<td><p>30</p></td>
-<td><p>Maximum number of most frequent words to display in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordfreq.stopword</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to remove stopwords in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordfreq.lemmatize</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to lemmatize the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordfreq.stem</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to apply Potter Stem on the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordfreq.color</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“#1f77b4”</p></td>
-<td><p>Color of the bars in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordlen.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Length</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordlen.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Length</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordlen.color</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“#aec7e8”</p></td>
-<td><p>Color of the bars in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Length</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">line.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins to display in the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">line.ngroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of groups to display in the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">line.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the groups in descending order of frequency in the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">line.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">line.unit</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“auto”</p></td>
-<td><p>Defines the time unit to group values over for a datetime column. It can be “year”, “quarter”, “month”, “week”, “day”,
-“hour”, “minute”, “second”. With default value “auto”, it will use the time unit such that the resulting number of groups
-is closest to 15 in the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">line.agg</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“mean”</p></td>
-<td><p>Specify the aggregate to use when aggregating over a numeric column in the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">scatter.sample_size</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1000</p></td>
-<td><p>Number of points to randomly sample per partition in the <code class="docutils literal notranslate"><span class="pre">Scatter</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hexbin.tile_size</span></code></p></td>
-<td><p>float</p></td>
-<td><p>“auto”</p></td>
-<td><p>The size of the tile in the hexbin plot. Measured from the middle of a hexagon to its left or right corner in the
-<code class="docutils literal notranslate"><span class="pre">Hexbin</span> <span class="pre">Plot</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nested.ngroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of most frequent values from the first column to display in the <code class="docutils literal notranslate"><span class="pre">Nested</span> <span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nested.nsubgroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>5</p></td>
-<td><p>Maximum number of most frequent values from the second column to display (computed on the filtered data consisting of the
-most frequent values from the first column) in the <code class="docutils literal notranslate"><span class="pre">Nested</span> <span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stacked.ngroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of most frequent values from the first column to display in the <code class="docutils literal notranslate"><span class="pre">Stacked</span> <span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stacked.nsubgroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>5</p></td>
-<td><p>Maximum number of most frequent values from the second column to display (computed on the filtered data consisting of the
-most frequent values from the first column) in the <code class="docutils literal notranslate"><span class="pre">Stacked</span> <span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stacked.unit</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“auto”</p></td>
-<td><p>Defines the time unit to group values over for a datetime column. It can be “year”, “quarter”, “month”, “week”, “day”,
-“hour”, “minute”, “second”. With default value “auto”, it will use the time unit such that the resulting number of groups
-is closest to 15 in the <code class="docutils literal notranslate"><span class="pre">Stacked</span> <span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stacked.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the groups in descending order of frequency in the <code class="docutils literal notranslate"><span class="pre">Stacked</span> <span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">heatmap.ngroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of most frequent values from the first column to display in the <code class="docutils literal notranslate"><span class="pre">Heat</span> <span class="pre">Map</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">heatmap.nsubgroups</span></code></p></td>
-<td><p>int</p></td>
-<td><p>5</p></td>
-<td><p>Maximum number of most frequent values from the second column to display (computed on the filtered data consisting of the
-most frequent values from the first column)in the <code class="docutils literal notranslate"><span class="pre">Heat</span> <span class="pre">Map</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="plot_missing()">
-<h3><code class="docutils literal notranslate"><span class="pre">plot_missing()</span></code><a class="headerlink" href="#plot_missing()" title="Permalink to this headline">¶</a></h3>
-<table class="table">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Local Parameter</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Default</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">spectrum.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>20</p></td>
-<td><p>Maximum number of bins to display in the <code class="docutils literal notranslate"><span class="pre">Spectrum</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PDF.sample_size</span></code></p></td>
-<td><p>int</p></td>
-<td><p>100</p></td>
-<td><p>Number of evenly spaced samples between the minimum and maximum values to compute the <code class="docutils literal notranslate"><span class="pre">PDF</span></code> at</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CDF.sample_size</span></code></p></td>
-<td><p>int</p></td>
-<td><p>100</p></td>
-<td><p>Number of evenly spaced samples between the minimum and maximum values to compute the <code class="docutils literal notranslate"><span class="pre">CDF</span></code> at</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="plot_correlation()">
-<h3><code class="docutils literal notranslate"><span class="pre">plot_correlation()</span></code><a class="headerlink" href="#plot_correlation()" title="Permalink to this headline">¶</a></h3>
-<table class="table">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Local Parameter</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Default</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">scatter.sample_size</span></code></p></td>
-<td><p>int</p></td>
-<td><p>1000</p></td>
-<td><p>Number of points to randomly sample per partition in the <code class="docutils literal notranslate"><span class="pre">Scatter</span> <span class="pre">Plot</span></code> in <code class="docutils literal notranslate"><span class="pre">plot_correlation(df,</span> <span class="pre">x,</span> <span class="pre">y)</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="create_report()">
-<h3><code class="docutils literal notranslate"><span class="pre">create_report()</span></code><a class="headerlink" href="#create_report()" title="Permalink to this headline">¶</a></h3>
-<table class="table">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Local Parameter</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Default</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bar.bars</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of bars to display in the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bar.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the bars in descending order in the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bar.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">Bar</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pie.slices</span></code></p></td>
-<td><p>int</p></td>
-<td><p>10</p></td>
-<td><p>Maximum number of pie slices to display in the <code class="docutils literal notranslate"><span class="pre">Pie</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pie.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the slices in descending order of frequency in the <code class="docutils literal notranslate"><span class="pre">Pie</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.top_words</span></code></p></td>
-<td><p>int</p></td>
-<td><p>30</p></td>
-<td><p>Maximum number of most frequent words to display in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.stopword</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to remove stopwords in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.lemmatize</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to lemmatize the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.stem</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to apply Potter Stem on the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Cloud</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordfreq.top_words</span></code></p></td>
-<td><p>int</p></td>
-<td><p>30</p></td>
-<td><p>Maximum number of most frequent words to display in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.stopword</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to remove stopwords in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.lemmatize</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to lemmatize the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordcloud.stem</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>False</p></td>
-<td><p>Whether to apply Potter Stem on the words in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Frequency</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wordlen.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins in the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Length</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wordlen.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">Word</span> <span class="pre">Length</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">line.unit</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“auto”</p></td>
-<td><p>Defines the time unit to group values over for a datetime column. It can be “year”, “quarter”, “month”, “week”, “day”,
-“hour”, “minute”, “second”. With default value “auto”, it will use the time unit such that the resulting number of groups
-is closest to 15 in the <code class="docutils literal notranslate"><span class="pre">Line</span> <span class="pre">Chart</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kde.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>50</p></td>
-<td><p>Maximum number of bins in the <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kde.yscale</span></code></p></td>
-<td><p>str</p></td>
-<td><p>“linear”</p></td>
-<td><p>Y-axis scale (“linear” or “log”) for the <code class="docutils literal notranslate"><span class="pre">KDE</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">box.sort_descending</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>True</p></td>
-<td><p>Whether to sort the boxes in descending order of frequency in the <code class="docutils literal notranslate"><span class="pre">Box</span> <span class="pre">Plot</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">spectrum.bins</span></code></p></td>
-<td><p>int</p></td>
-<td><p>20</p></td>
-<td><p>Maximum number of bins to display in the <code class="docutils literal notranslate"><span class="pre">Spectrum</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
+  <dl>
+<dt>{</dt><dd><dl>
+<dt>“cells”: [</dt><dd><dl>
+<dt>{</dt><dd><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“# <cite>Parameter Configurations</cite>: parameter summary settings”</p>
+</div></blockquote>
+<p>]</p>
+</dd>
+</dl>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“## Global parameters”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“To help users quickly manage the parameters, currently, we defined four global parameters. Global parameter applies to all the plots which has that parameter.n”,
+“n”,
+“| Global Parameter | Description <a href="#id17"><span class="problematic" id="id18">|\n&quot;,
+&quot;|</span></a> — | — | n”,
+“| <cite>width</cite> | Change the plots’ width in <cite>plot(df, col1)</cite>, <cite>plot(df, col1, col2)</cite>, <cite>plot(df, col1, col2, col3)</cite>, <cite>plot_correlation()</cite> and <cite>plot_missing()</cite>.n”,
+“| <cite>height</cite> | Change the plots’ height in <cite>plot(df, col1)</cite>, <cite>plot(df, col1, col2)</cite> and <cite>plot(df, col1, col2, col3)</cite>, <cite>plot_correlation()</cite> and <cite>plot_missing()</cite>.n”,
+“| <cite>bins</cite> | Apply to <cite>bins</cite> for <cite>Histogram</cite>, <cite>KDE Plot</cite>, <cite>Box Plot</cite>, <cite>Word Length</cite>, <cite>Line Chart</cite>, <cite>Spectrum</cite>.n”,
+“| <cite>ngroups</cite> | Apply to <cite>bars</cite> and <cite>slices</cite> for the <cite>Bar Chart</cite> and <cite>Pie Chart</cite>.”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“## Local parameters”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“Local parameters are plot-specified and the names are separated  by <cite>.</cite>. The portion before the first <cite>.</cite> is plot name and the portion after the first <cite>.</cite> is parameter name. The <cite>.</cite> is also used when the parameter name contains more than one word. When global parameter and local parameter are both entered by a user in config, the global parameter will be overwrote by local parameters for specific plotsn”,
+“n”,
+“In the following tables we summarize the parameters for each API. You can also find the parameters for each plot in the Config API reference.n”,
+“n”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“### <cite>plot()</cite>n”,
+“n”,
+“| Local Parameter | Type <a href="#id19"><span class="problematic" id="id20">|Default | Description |\n&quot;,
+&quot;|</span></a> — | — | — | — <a href="#id21"><span class="problematic" id="id22">|\n&quot;,
+&quot;|`hist.bins` | int | 50 | Maximum number of bins to display in the `Histogram` |\n&quot;,
+&quot;|</span></a> <cite>hist.yscale`| str | &quot;linear&quot; |  Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the `Histogram</cite> <a href="#id23"><span class="problematic" id="id24">|\n&quot;,
+&quot;|</span></a> <cite>bar.bars</cite> | int | 10 | Maximum number of bars to display in the <cite>Bar Chart</cite> <a href="#id25"><span class="problematic" id="id26">|\n&quot;,
+&quot;|</span></a> <cite>bar.sort_descending</cite> | bool | True|  Whether to sort the bars in descending order in the <cite>Bar Chart`|n”,
+“| `bar.yscale</cite> | str | &quot;linear&quot; |  Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the <cite>Bar Chart</cite> <a href="#id27"><span class="problematic" id="id28">|\n&quot;,
+&quot;|</span></a> <cite>bar.color</cite> | str | &quot;#1f77b4&quot; | Color of the bars in the <cite>Bar Chart</cite> <a href="#id29"><span class="problematic" id="id30">|\n&quot;,
+&quot;|</span></a> <cite>insight.duplicates.threshold</cite> | int | 1 | Warn if the percent of duplicated values is above this threshold in the <cite>Insights`|n”,
+“| `insight.similar_distribution.threshold</cite> | float | 0.05 | The significance level for Kolmogorov–Smirnov test in the <cite>Insights</cite> <a href="#id31"><span class="problematic" id="id32">|\n&quot;,
+&quot;|</span></a> <cite>insight.uniform.threshold</cite> | float | 0.999 | The p-value threshold for chi-square test in the <cite>Insights</cite> <a href="#id33"><span class="problematic" id="id34">|\n&quot;,
+&quot;|</span></a> <cite>insight.missing.threshold</cite> | int | 1 | Warn if the percent of missing values is above this threshold in the <cite>Insights</cite> <a href="#id35"><span class="problematic" id="id36">|\n&quot;,
+&quot;|</span></a> <cite>insight.skewed.threshold</cite> | float | 1e-5 | The p-value for the scipy.skewtest which test whether the skew is different from the normal distributionin in the <cite>Insights</cite> <a href="#id37"><span class="problematic" id="id38">|\n&quot;,
+&quot;|</span></a> <cite>insight.infinity.threshold</cite> | int | 1 | Warn if the percent of infinites is above this threshold in the <cite>Insights</cite> <a href="#id39"><span class="problematic" id="id40">|\n&quot;,
+&quot;|</span></a> <cite>insight.zeros.threshold</cite> | int | 5 |  Warn if the percent of zeros is above this threshold in the <cite>Insights</cite> <a href="#id41"><span class="problematic" id="id42">|\n&quot;,
+&quot;|</span></a> <cite>insight.negatives.threshold</cite> | int | 1 |  Warn if the percent of megatives is above this threshold in the <cite>Insights</cite> <a href="#id43"><span class="problematic" id="id44">|\n&quot;,
+&quot;|</span></a> <cite>insight.normal.threshold</cite> | float | 0.99 | The p-value threshold for normal test, it is based on D’Agostino and Pearson’s test that combines skew and kurtosis to produce an omnibus test of normality in the <cite>Insights</cite> <a href="#id45"><span class="problematic" id="id46">|\n&quot;,
+&quot;|</span></a> <cite>insight.high_cardinality.threshold</cite> | int | 50 | The threshold for unique values count, count larger than threshold yields high cardinality in the <cite>Insights</cite> <a href="#id47"><span class="problematic" id="id48">|\n&quot;,
+&quot;|</span></a> <cite>insight.constant.threshold</cite> | int | 1 | The threshold for unique values count, count equals to threshold yields constant value in the <cite>Insights</cite> <a href="#id49"><span class="problematic" id="id50">|\n&quot;,
+&quot;|</span></a> <cite>insight.outstanding_no1.threshold</cite> | float | 1.5 <a href="#id51"><span class="problematic" id="id52">|The threshold for outstanding no1 insight, measures the ratio of the largest category count to the second-largest category count in the `Insights` |\n&quot;,
+&quot;|</span></a> <cite>insight.attribution.threshold</cite> | float | 0.5 | The threshold for the attribution insight, measures the percentage of the top 2 categories in the <cite>Insights</cite> <a href="#id53"><span class="problematic" id="id54">|\n&quot;,
+&quot;|</span></a> <cite>insight.high_word_cardinality.threshold</cite> | int | 1000 | The threshold for the high word cardinality insight, which measures the number of words of that cateogory in the <cite>Insights</cite> <a href="#id55"><span class="problematic" id="id56">|\n&quot;,
+&quot;|</span></a> <cite>insight.outstanding_no1_word.threshold</cite> | int | 0 | The threshold for the outstanding no1 word threshold, which measures the ratio of the most frequent word count to the second most frequent word count in the <cite>Insights</cite> <a href="#id57"><span class="problematic" id="id58">|\n&quot;,
+&quot;|</span></a> <cite>insight.outlier.threshold</cite> | int | 0 | The threshold for the outlier count for the <cite>Insights</cite> in the <cite>Box Plot`|n”,
+“|`kde.bins</cite> | int | 50 | Maximum number of bins to display in the <cite>KDE Plot</cite> <a href="#id59"><span class="problematic" id="id60">|\n&quot;,
+&quot;|</span></a> <cite>kde.yscale`| str | &quot;linear&quot; | Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the `KDE Plot</cite> <a href="#id61"><span class="problematic" id="id62">|\n&quot;,
+&quot;|</span></a> <cite>kde.hist_color</cite> | str | &quot;#aec7e8&quot; | Color of the histogram in the <cite>KDE Plot</cite> <a href="#id63"><span class="problematic" id="id64">|\n&quot;,
+&quot;|</span></a> <cite>kde.line_color</cite> | str | &quot;#d62728&quot; | Color of the line in the <cite>KDE Plot</cite> <a href="#id65"><span class="problematic" id="id66">|\n&quot;,
+&quot;|</span></a> <cite>box.ngroups`| int | 15 | Maximum number of groups for categorical column to display in the `Box Plot</cite> <a href="#id67"><span class="problematic" id="id68">|\n&quot;,
+&quot;|</span></a> <cite>box.bins`| int | 50 | Maximum number of bins for numerical column to display in the `Box Plot</cite> <a href="#id69"><span class="problematic" id="id70">|\n&quot;,
+&quot;|</span></a> <cite>box.unit`| str | &quot;auto&quot; | Defines the time unit to group values over for a datetime column. It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;,&quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the time unit such that the resulting number of groups is closest to 15 in the `Box Plot</cite> <a href="#id71"><span class="problematic" id="id72">|\n&quot;,
+&quot;|</span></a> <cite>box.sort_descending`| bool | True | Whether to sort the boxes in descending order of frequency in the `Box Plot</cite> <a href="#id73"><span class="problematic" id="id74">|\n&quot;,
+&quot;|</span></a> <cite>box.color</cite> | str | &quot;#d62728&quot; | Color of the <cite>Box Plot</cite> <a href="#id75"><span class="problematic" id="id76">|\n&quot;,
+&quot;|</span></a> <cite>value_table.ngroups</cite> | <a href="#id77"><span class="problematic" id="id78">|int | 10 | number of values to show in the value table |\n&quot;,
+&quot;|</span></a> <cite>pie.slices`| int | 10 | Maximum number of pie slices to display in the `Pie Chart`|n”,
+“| `pie.sort_descending`| bool | True | Whether to sort the slices in descending order of frequency in the `Pie Chart`|n”,
+“| `pie.colors</cite> | List[str] | None | Colors of the slices in the <cite>Pie Chart</cite> <a href="#id79"><span class="problematic" id="id80">|\n&quot;,
+&quot;|</span></a> <cite>wordcloud.top_words`| int | 30 | Maximum number of most frequent words to display in the `Word Cloud`|n”,
+“| `wordcloud.stopword`| bool | True | Whether to remove stopwords in the `Word Cloud`|n”,
+“| `wordcloud.lemmatize`| bool | False |  Whether to lemmatize the words in the `Word Cloud`|n”,
+“| `wordcloud.stem`| bool | False |  Whether to apply Potter Stem on the words in the `Word Cloud`|n”,
+“| `wordfreq.top_words`| int | 30 | Maximum number of most frequent words to display in the `Word Frequency`|n”,
+“| `wordfreq.stopword`| bool | True | Whether to remove stopwords in the `Word Frequency`|n”,
+“| `wordfreq.lemmatize`| bool | False |  Whether to lemmatize the words in the `Word Frequency`|n”,
+“| `wordfreq.stem`| bool | False |  Whether to apply Potter Stem on the words in the `Word Frequency`|n”,
+“| `wordfreq.color</cite> | str | &quot;#1f77b4&quot; | Color of the bars in the <cite>Word Frequency Plot</cite> <a href="#id81"><span class="problematic" id="id82">|\n&quot;,
+&quot;|</span></a> <cite>wordlen.bins`| int | 50 | Maximum number of bins in the `Word Length`|n”,
+“| `wordlen.yscale`| str | &quot;linear&quot; | Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the `Word Length`|n”,
+“| `wordlen.color</cite> | str | &quot;#aec7e8&quot; | Color of the bars in the <cite>Word Length Plot</cite> <a href="#id83"><span class="problematic" id="id84">|\n&quot;,
+&quot;|</span></a> <cite>line.bins`| int | 50 |  Maximum number of bins to display in the `Line Chart`|n”,
+“| `line.ngroups`| int | 10 | Maximum number of groups to display in the `Line Chart</cite> <a href="#id85"><span class="problematic" id="id86">|\n&quot;,
+&quot;|</span></a> <cite>line.sort_descending`| bool | True | Whether to sort the groups in descending order of frequency in the `Line Chart</cite> <a href="#id87"><span class="problematic" id="id88">|\n&quot;,
+&quot;|</span></a> <cite>line.yscale`| str | &quot;linear&quot; | Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the `Line Chart</cite> <a href="#id89"><span class="problematic" id="id90">|\n&quot;,
+&quot;|</span></a> <cite>line.unit`| str | &quot;auto&quot; | Defines the time unit to group values over for a datetime column. It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;, &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the time unit such that the resulting number of groups is closest to 15 in the `Line Chart</cite> <a href="#id91"><span class="problematic" id="id92">|\n&quot;,
+&quot;|</span></a> <cite>line.agg`| str | &quot;mean&quot; | Specify the aggregate to use when aggregating over a numeric column in the `Line Chart</cite> <a href="#id93"><span class="problematic" id="id94">|\n&quot;,
+&quot;|</span></a> <cite>scatter.sample_size`| int | 1000 | Number of points to randomly sample per partition in the `Scatter Plot</cite> <a href="#id95"><span class="problematic" id="id96">|\n&quot;,
+&quot;|</span></a> <cite>scatter.sample_rate`| float | &quot;None&quot; | Defines the sample rate per partition in the `Scatter Plot</cite>. Cannot be used with sample_size. Set it to 1.0 for no sampling <a href="#id97"><span class="problematic" id="id98">|\n&quot;,
+&quot;|</span></a> <cite>hexbin.tile_size</cite> | float | &quot;auto&quot; | The size of the tile in the hexbin plot. Measured from the middle of a hexagon to its left or right corner in the <cite>Hexbin Plot</cite>.|n”,
+“| <cite>nested.ngroups`| int | 10 | Maximum number of most frequent values from the first column to display in the `Nested Bar Chart</cite> <a href="#id99"><span class="problematic" id="id100">|\n&quot;,
+&quot;|</span></a> <cite>nested.nsubgroups`| int | 5 | Maximum number of most frequent values from the second column to display (computed on the filtered data consisting of the most frequent values from the first column) in the `Nested Bar Chart</cite> <a href="#id101"><span class="problematic" id="id102">|\n&quot;,
+&quot;|</span></a> <cite>stacked.ngroups`| int | 10 | Maximum number of most frequent values from the first column to display in the `Stacked Bar Chart</cite> <a href="#id103"><span class="problematic" id="id104">|\n&quot;,
+&quot;|</span></a> <cite>stacked.nsubgroups`| int | 5 | Maximum number of most frequent values from the second column to display (computed on the filtered data consisting of the most frequent values from the first column) in the `Stacked Bar Chart</cite> <a href="#id105"><span class="problematic" id="id106">|\n&quot;,
+&quot;|</span></a> <cite>stacked.unit`| str | &quot;auto&quot; |         Defines the time unit to group values over for a datetime column. It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;, &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the time unit such that the resulting number of groups is closest to 15 in the `Stacked Bar Chart</cite> <a href="#id107"><span class="problematic" id="id108">|\n&quot;,
+&quot;|</span></a> <cite>stacked.sort_descending`| bool | True | Whether to sort the groups in descending order of frequency in the `Stacked Bar Chart</cite> <a href="#id109"><span class="problematic" id="id110">|\n&quot;,
+&quot;|</span></a> <cite>heatmap.ngroups`| int | 10 | Maximum number of most frequent values from the first column to display in the `Heat Map</cite> <a href="#id111"><span class="problematic" id="id112">|\n&quot;,
+&quot;|</span></a> <cite>heatmap.nsubgroups`| int | 5 | Maximum number of most frequent values from the second column to display (computed on the filtered data consisting of the most frequent values from the first column)in the `Heat Map</cite> <a href="#id1"><span class="problematic" id="id2">|</span></a>n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”,
+“n”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“### <cite>plot_missing()</cite>n”,
+“n”,
+“| Local Parameter | Type <a href="#id113"><span class="problematic" id="id114">|Default | Description |\n&quot;,
+&quot;|</span></a> — | — | — | — <a href="#id115"><span class="problematic" id="id116">|\n&quot;,
+&quot;|</span></a> <cite>spectrum.bins</cite> | int | 20 | Maximum number of bins to display in the <cite>Spectrum</cite> <a href="#id3"><span class="problematic" id="id4">|</span></a>n”,
+“<a href="#id5"><span class="problematic" id="id6">|</span></a><cite>PDF.sample_size</cite> | int | 100 | Number of evenly spaced samples between the minimum and maximum values to compute the <cite>PDF</cite> at <a href="#id7"><span class="problematic" id="id8">|</span></a>n”,
+“<a href="#id9"><span class="problematic" id="id10">|</span></a><cite>CDF.sample_size</cite> | int | 100 | Number of evenly spaced samples between the minimum and maximum values to compute the <cite>CDF</cite> at <a href="#id11"><span class="problematic" id="id12">|</span></a>n”,
+“n”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“### <cite>plot_correlation()</cite>n”,
+“n”,
+“| Local Parameter | Type <a href="#id117"><span class="problematic" id="id118">|Default | Description |\n&quot;,
+&quot;|</span></a> — | — | — | — <a href="#id119"><span class="problematic" id="id120">|\n&quot;,
+&quot;|</span></a> <cite>scatter.sample_size`| int | 1000 | Number of points to randomly sample per partition in the `Scatter Plot</cite> in <cite>plot_correlation(df, x, y)`|”,
+“| `scatter.sample_rate`| float | &quot;None&quot; | Defines the sample rate per partition in the `Scatter Plot</cite>. Cannot be used with sample_size. Set it to 1.0 for no sampling <a href="#id13"><span class="problematic" id="id14">|</span></a>n”,</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>},
+{</p>
+<blockquote>
+<div><p>“cell_type”: “markdown”,
+“metadata”: {},
+“source”: [</p>
+<blockquote>
+<div><p>“### <cite>create_report()</cite>n”,
+“n”,
+“| Local Parameter | Type <a href="#id121"><span class="problematic" id="id122">|Default | Description |\n&quot;,
+&quot;|</span></a> — | — | — | — <a href="#id123"><span class="problematic" id="id124">|\n&quot;,
+&quot;|</span></a> <cite>bar.bars</cite> | int | 10 | Maximum number of bars to display in the <cite>Bar Chart</cite> <a href="#id125"><span class="problematic" id="id126">|\n&quot;,
+&quot;|</span></a> <cite>bar.sort_descending</cite> | bool | True|  Whether to sort the bars in descending order in the <cite>Bar Chart`|n”,
+“| `bar.yscale</cite> | str | &quot;linear&quot; |  Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the <cite>Bar Chart</cite> <a href="#id127"><span class="problematic" id="id128">|\n&quot;,
+&quot;|</span></a> <cite>pie.slices`| int | 10 | Maximum number of pie slices to display in the `Pie Chart`|n”,
+“| `pie.sort_descending`| bool | True | Whether to sort the slices in descending order of frequency in the `Pie Chart`|n”,
+“| `wordcloud.top_words`| int | 30 | Maximum number of most frequent words to display in the `Word Cloud`|n”,
+“| `wordcloud.stopword`| bool | True | Whether to remove stopwords in the `Word Cloud`|n”,
+“| `wordcloud.lemmatize`| bool | False |  Whether to lemmatize the words in the `Word Cloud`|n”,
+“| `wordcloud.stem`| bool | False |  Whether to apply Potter Stem on the words in the `Word Cloud`|n”,
+“| `wordfreq.top_words`| int | 30 | Maximum number of most frequent words to display in the `Word Frequency`|n”,
+“| `wordcloud.stopword`| bool | True | Whether to remove stopwords in the `Word Frequency`|n”,
+“| `wordcloud.lemmatize`| bool | False |  Whether to lemmatize the words in the `Word Frequency`|n”,
+“| `wordcloud.stem`| bool | False |  Whether to apply Potter Stem on the words in the `Word Frequency`|n”,
+“| `wordlen.bins`| int | 50 | Maximum number of bins in the `Word Length`|n”,
+“| `wordlen.yscale`| str | &quot;linear&quot; | Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the `Word Length`|n”,
+“| `line.unit`| str | &quot;auto&quot; | Defines the time unit to group values over for a datetime column. It can be &quot;year&quot;, &quot;quarter&quot;, &quot;month&quot;, &quot;week&quot;, &quot;day&quot;, &quot;hour&quot;, &quot;minute&quot;, &quot;second&quot;. With default value &quot;auto&quot;, it will use the time unit such that the resulting number of groups is closest to 15 in the `Line Chart</cite> <a href="#id129"><span class="problematic" id="id130">|\n&quot;,
+&quot;|`kde.bins` | int | 50 | Maximum number of bins in the `KDE Plot` |\n&quot;,
+&quot;|</span></a> <cite>kde.yscale`| str | &quot;linear&quot; | Y-axis scale (&quot;linear&quot; or &quot;log&quot;) for the `KDE Plot</cite> <a href="#id131"><span class="problematic" id="id132">|\n&quot;,
+&quot;|</span></a> <cite>box.sort_descending`| bool | True | Whether to sort the boxes in descending order of frequency in the `Box Plot</cite> <a href="#id133"><span class="problematic" id="id134">|\n&quot;,
+&quot;|</span></a> <cite>spectrum.bins</cite> | int | 20 | Maximum number of bins to display in the <cite>Spectrum</cite> <a href="#id15"><span class="problematic" id="id16">|</span></a>n”</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+<p>],
+“metadata”: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“kernelspec”: {</dt><dd><p>“display_name”: “Python 3”,
+“language”: “python”,
+“name”: “python3”</p>
+</dd>
+</dl>
+<p>},
+“language_info”: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“codemirror_mode”: {</dt><dd><p>“name”: “ipython”,
+“version”: 3</p>
+</dd>
+</dl>
+<p>},
+“file_extension”: “.py”,
+“mimetype”: “text/x-python”,
+“name”: “python”,
+“nbconvert_exporter”: “python”,
+“pygments_lexer”: “ipython3”,
+“version”: “3.9.1”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>},
+“nbformat”: 4,
+“nbformat_minor”: 2</p>
+</dd>
+</dl>
+<p>}</p>
 
 
           </div>

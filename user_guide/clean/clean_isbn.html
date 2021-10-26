@@ -1,0 +1,1802 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>An example dataset containing ISBN strings &#8212; DataPrep 0.4.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/clean/clean_isbn.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#1.-Default-clean_isbn" class="nav-link">1. Default clean_isbn</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#2.-Output-formats" class="nav-link">2. Output formats</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+.. _isbn_userguide:
+
+ISBN Strings
+============Introduction
+------------
+
+The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans a column containing ISBN strings, and standardizes them in a given format. The function :func:`validate_isbn() <dataprep.clean.clean_isbn.validate_isbn>` validates either a single ISBN strings, a column of ISBN strings or a DataFrame of ISBN strings, returning `True` if the value is valid, and `False` otherwise.<p>Currently, an ISBN is composed by following components:</p>
+<ul class="simple">
+<li><p>3-digit (only in ISBN-13) Bookland Code</p></li>
+<li><p>1 to 5-digit Group Identifier (identifies country or language)</p></li>
+<li><p>1 to 7-digit Publisher Code</p></li>
+<li><p>1 to 8-digit Item Number (identifies the book)</p></li>
+<li><p>a Check Digit</p></li>
+</ul>
+<p>Usually, the delimiters of ISBN is <code class="docutils literal notranslate"><span class="pre">-</span></code>.</p>
+<p>ISBN strings can be converted to the following formats via the <code class="docutils literal notranslate"><span class="pre">output_format</span></code> parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">compact</span></code>: only number strings without any seperators, like “9789024538270”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">standard</span></code>: ISBN strings with proper delimiters in the proper places, like “978-90-245-3827-0”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">isbn13</span></code>: standard format of 13-digits ISBN string, like “978-90-245-3827-0”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">isbn10</span></code>: standard format of 10-digits ISBN string, like “90-245-3827-0”</p></li>
+</ul>
+<p>Invalid parsing is handled with the <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default): invalid parsing will be set to NaN</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ignore</span></code>: invalid parsing will return the input</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raise</span></code>: invalid parsing will raise an exception</p></li>
+</ul>
+<p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_isbn()</span></code> and <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code>.</p>
+<div class="section" id="An-example-dataset-containing-ISBN-strings">
+<h1>An example dataset containing ISBN strings<a class="headerlink" href="#An-example-dataset-containing-ISBN-strings" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;isbn&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;978-9024538270&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;978-9024538271&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1-85798-218-5&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;9780471117094&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1857982185&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;NULL&quot;</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;123 Pine Ave.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;main st&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1234 west main heights 57033&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;apt 1 789 s maple rd manhattan&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;robie house, 789 north main street&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1111 S Figueroa St, Los Angeles, CA 90015&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;(staples center) 1111 S Figueroa St, Los Angeles&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-9024538270</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>978-9024538271</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9780471117094</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1857982185</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="1.-Default-clean_isbn">
+<h2>1. Default <code class="docutils literal notranslate"><span class="pre">clean_isbn</span></code><a class="headerlink" href="#1.-Default-clean_isbn" title="Permalink to this headline">¶</a></h2>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">clean_isbn</span></code> will clean isbn strings and output them in the standard format with proper separators.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">clean_isbn</span>
+<span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;isbn&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>address</th>
+      <th>isbn_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-9024538270</td>
+      <td>123 Pine Ave.</td>
+      <td>978-90-245-3827-0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>978-9024538271</td>
+      <td>main st</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+      <td>1-85798-218-5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9780471117094</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>978-0-471-11709-4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1857982185</td>
+      <td>robie house, 789 north main street</td>
+      <td>1-85798-218-5</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_clean</span> <span class="o">=</span> <span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df_clean</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-90-245-3827-0</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>978-0-471-11709-4</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1-85798-218-5</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="2.-Output-formats">
+<h2>2. Output formats<a class="headerlink" href="#2.-Output-formats" title="Permalink to this headline">¶</a></h2>
+<p>This section demonstrates the output parameter.</p>
+</div>
+</div>
+<div class="section" id="standard-(default)">
+<h1><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)<a class="headerlink" href="#standard-(default)" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-90-245-3827-0</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>978-0-471-11709-4</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1-85798-218-5</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="compact">
+<h1><code class="docutils literal notranslate"><span class="pre">compact</span></code><a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;compact&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>9789024538270</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1857982185</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9780471117094</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1857982185</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="isbn13">
+<h1><code class="docutils literal notranslate"><span class="pre">isbn13</span></code><a class="headerlink" href="#isbn13" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;isbn13&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-90-245-3827-0</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>978-1-85798-218-3</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>978-0-471-11709-4</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>978-1-85798-218-3</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="isbn10">
+<h1><code class="docutils literal notranslate"><span class="pre">isbn10</span></code><a class="headerlink" href="#isbn10" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;isbn10&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>90-245-3827-0</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0-471-11709-9</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1-85798-218-5</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="3.-split-parameter">
+<h2>3. <code class="docutils literal notranslate"><span class="pre">split</span></code> parameter<a class="headerlink" href="#3.-split-parameter" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">split</span></code> parameter adds individual columns containing the cleaned 13-digits ISBN values to the given DataFrame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span> <span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "69d1486319714885998e24e3d9fb4162"}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>address</th>
+      <th>isbn_clean</th>
+      <th>prefix_code</th>
+      <th>group_code</th>
+      <th>publisher_code</th>
+      <th>item_code</th>
+      <th>check_digit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-9024538270</td>
+      <td>123 Pine Ave.</td>
+      <td>978-90-245-3827-0</td>
+      <td>978</td>
+      <td>90</td>
+      <td>245</td>
+      <td>3827</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>978-9024538271</td>
+      <td>main st</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+      <td>1-85798-218-5</td>
+      <td>978</td>
+      <td>1</td>
+      <td>85798</td>
+      <td>218</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9780471117094</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>978-0-471-11709-4</td>
+      <td>978</td>
+      <td>0</td>
+      <td>471</td>
+      <td>11709</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1857982185</td>
+      <td>robie house, 789 north main street</td>
+      <td>1-85798-218-5</td>
+      <td>978</td>
+      <td>1</td>
+      <td>85798</td>
+      <td>218</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="4.-inplace-parameter">
+<h2>4. <code class="docutils literal notranslate"><span class="pre">inplace</span></code> parameter<a class="headerlink" href="#4.-inplace-parameter" title="Permalink to this headline">¶</a></h2>
+<p>This deletes the given column from the returned DataFrame. A new column containing cleaned ISBN strings is added with a title in the format <code class="docutils literal notranslate"><span class="pre">&quot;{original</span> <span class="pre">title}_clean&quot;</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-90-245-3827-0</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>978-0-471-11709-4</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1-85798-218-5</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="inplace-and-split">
+<h1><code class="docutils literal notranslate"><span class="pre">inplace</span></code> and <code class="docutils literal notranslate"><span class="pre">split</span></code><a class="headerlink" href="#inplace-and-split" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "73281d9afdd14457bcf8289b94d9a6f6"}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn_clean</th>
+      <th>address</th>
+      <th>prefix_code</th>
+      <th>group_code</th>
+      <th>publisher_code</th>
+      <th>item_code</th>
+      <th>check_digit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-90-245-3827-0</td>
+      <td>123 Pine Ave.</td>
+      <td>978</td>
+      <td>90</td>
+      <td>245</td>
+      <td>3827</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+      <td>978</td>
+      <td>1</td>
+      <td>85798</td>
+      <td>218</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>978-0-471-11709-4</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>978</td>
+      <td>0</td>
+      <td>471</td>
+      <td>11709</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1-85798-218-5</td>
+      <td>robie house, 789 north main street</td>
+      <td>978</td>
+      <td>1</td>
+      <td>85798</td>
+      <td>218</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>hello</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="5.-errors-parameter">
+<h2>5. <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter<a class="headerlink" href="#5.-errors-parameter" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+<div class="section" id="coerce-(default)">
+<h1><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)<a class="headerlink" href="#coerce-(default)" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>address</th>
+      <th>isbn_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-9024538270</td>
+      <td>123 Pine Ave.</td>
+      <td>978-90-245-3827-0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>978-9024538271</td>
+      <td>main st</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+      <td>1-85798-218-5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9780471117094</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>978-0-471-11709-4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1857982185</td>
+      <td>robie house, 789 north main street</td>
+      <td>1-85798-218-5</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="ignore">
+<h1><code class="docutils literal notranslate"><span class="pre">ignore</span></code><a class="headerlink" href="#ignore" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;isbn&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>address</th>
+      <th>isbn_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>978-9024538270</td>
+      <td>123 Pine Ave.</td>
+      <td>978-90-245-3827-0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>978-9024538271</td>
+      <td>main st</td>
+      <td>978-9024538271</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1-85798-218-5</td>
+      <td>1234 west main heights 57033</td>
+      <td>1-85798-218-5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9780471117094</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>978-0-471-11709-4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1857982185</td>
+      <td>robie house, 789 north main street</td>
+      <td>1-85798-218-5</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>hello</td>
+      <td>1111 S Figueroa St, Los Angeles, CA 90015</td>
+      <td>hello</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="4.-validate_isbn()">
+<h2>4. <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code><a class="headerlink" href="#4.-validate_isbn()" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code> returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when the input is a valid phone number. Otherwise it returns <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>The input of <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code> can be a string, a Pandas DataSeries, a Dask DataSeries, a Pandas DataFrame and a dask DataFrame.</p>
+<p>When the input is a string, a Pandas DataSeries or a Dask DataSeries, user doesn’t need to specify a column name to be validated.</p>
+<p>When the input is a Pandas DataFrame or a dask DataFrame, user can both specify or not specify a column name to be validated. If user specify the column name, <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code> only returns the validation result for the specified column. If user doesn’t specify the column name, <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code> returns the validation result for the whole DataFrame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">validate_isbn</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;978-9024538270&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;978-9024538271&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;1-85798-218-5&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;9780471117094&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;1857982185&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_isbn</span><span class="p">(</span><span class="s2">&quot;NULL&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+False
+True
+True
+True
+False
+False
+False
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="DataFrame-+-Specify-Column">
+<h1>DataFrame + Specify Column<a class="headerlink" href="#DataFrame-+-Specify-Column" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">validate_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;isbn&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     True
+1    False
+2     True
+3     True
+4     True
+5    False
+6    False
+7    False
+Name: isbn, dtype: bool
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Only-DataFrame">
+<h1>Only DataFrame<a class="headerlink" href="#Only-DataFrame" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">validate_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"3cdda0d110614d00a0ba3f09e79910cd": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": "2", "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "5c20c1449a7245c28b6307ea888af387": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "eff54fec7a954fc89a82642cc34116e3": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_3cdda0d110614d00a0ba3f09e79910cd", "max": 9.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_5c20c1449a7245c28b6307ea888af387", "value": 9.0}}, "b8d83f5f07fb4f6d829c80d96fc1b487": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "a5ad69fb79dc455cb47ca442481ec9ac": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "939bbbc8f4984d58b9f9299892143d52": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_b8d83f5f07fb4f6d829c80d96fc1b487", "placeholder": "\u200b", "style": "IPY_MODEL_a5ad69fb79dc455cb47ca442481ec9ac", "value": "  0%"}}, "2bc26069ad14465094305e130801c1de": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "d75aa82fb760480ea9f59212e6205202": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "4019a8cc44f74259b5b8060bf63d809b": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_2bc26069ad14465094305e130801c1de", "placeholder": "\u200b", "style": "IPY_MODEL_d75aa82fb760480ea9f59212e6205202", "value": " 0/9 [00:00&lt;?, ?it/s]"}}, "5f3db262d0364135b2a40effb7d6a751": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": "inline-flex", "flex": null, "flex_flow": "row wrap", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "69d1486319714885998e24e3d9fb4162": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_939bbbc8f4984d58b9f9299892143d52", "IPY_MODEL_eff54fec7a954fc89a82642cc34116e3", "IPY_MODEL_4019a8cc44f74259b5b8060bf63d809b"], "layout": "IPY_MODEL_5f3db262d0364135b2a40effb7d6a751"}}, "9bf68e5d58b643b3a36656c05e424ecc": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": "2", "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "7431452e36b04f9a9b3d3fb3a7d8be90": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "99f46e487a404f12acc9f742163b01eb": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_9bf68e5d58b643b3a36656c05e424ecc", "max": 9.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_7431452e36b04f9a9b3d3fb3a7d8be90", "value": 9.0}}, "443384911d2c453d84b995560dc28262": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "0a4589164ce1402fb994dc2dfc16b169": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "fc55462037194b7d8a9be8f9fc882ccb": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_443384911d2c453d84b995560dc28262", "placeholder": "\u200b", "style": "IPY_MODEL_0a4589164ce1402fb994dc2dfc16b169", "value": "  0%"}}, "3b48c7941f9b4d5bb3a03c5c1da11ed0": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "0208adabbc274ec6a6a658971332dfd7": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "a42dc9cdecaa455d8e10afa2e222f47c": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_3b48c7941f9b4d5bb3a03c5c1da11ed0", "placeholder": "\u200b", "style": "IPY_MODEL_0208adabbc274ec6a6a658971332dfd7", "value": " 0/9 [00:00&lt;?, ?it/s]"}}, "a268f8fdf65d48aabba8375db2c5f6ce": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": "inline-flex", "flex": null, "flex_flow": "row wrap", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "73281d9afdd14457bcf8289b94d9a6f6": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_fc55462037194b7d8a9be8f9fc882ccb", "IPY_MODEL_99f46e487a404f12acc9f742163b01eb", "IPY_MODEL_a42dc9cdecaa455d8e10afa2e222f47c"], "layout": "IPY_MODEL_a268f8fdf65d48aabba8375db2c5f6ce"}}}, "version_major": 2, "version_minor": 0}
+</script></div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

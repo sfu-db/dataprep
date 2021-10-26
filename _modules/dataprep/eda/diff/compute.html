@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.diff.compute &#8212; DataPrep 0.3.0 documentation</title>
+  <title>dataprep.eda.diff.compute &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -160,6 +160,7 @@
 <span class="kn">from</span> <span class="nn">...dtypes</span> <span class="kn">import</span> <span class="n">DTypeDef</span>
 <span class="kn">from</span> <span class="nn">...configs</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">.multiple_df</span> <span class="kn">import</span> <span class="n">compare_multiple_df</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">.multiple_column</span> <span class="kn">import</span> <span class="n">compare_multiple_col</span>  <span class="c1"># type: ignore</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compute_diff&quot;</span><span class="p">]</span>
 
@@ -195,6 +196,7 @@
 <span class="sd">        dtype = {&quot;a&quot;: Continuous(), &quot;b&quot;: &quot;nominal&quot;}</span>
 <span class="sd">        or dtype = Continuous() or dtype = &quot;Continuous&quot; or dtype = Continuous()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint:disable = too-many-branches</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">cfg</span><span class="p">:</span>
@@ -206,7 +208,6 @@
             <span class="k">raise</span> <span class="n">DataprepError</span><span class="p">(</span><span class="s2">&quot;plot_diff needs at least 2 DataFrames.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataprepError</span><span class="p">(</span><span class="s2">&quot;Too many DataFrames, max: 5.&quot;</span><span class="p">)</span>
-
         <span class="n">label</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">diff</span><span class="o">.</span><span class="n">label</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">label</span><span class="p">:</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">diff</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;df</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))]</span>
@@ -221,8 +222,10 @@
             <span class="n">df_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">dfs</span> <span class="ow">in</span> <span class="n">df</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">dfs</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DataprepError</span><span class="p">(</span><span class="s2">&quot;x must exist in at least two DataFrames&quot;</span><span class="p">)</span>
             <span class="c1"># return compare_multiple_on_column(df_list, x)</span>
-            <span class="k">return</span> <span class="n">Intermediate</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">compare_multiple_col</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">compare_multiple_df</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 

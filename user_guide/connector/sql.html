@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>read_sql() function &#8212; DataPrep 0.4.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Clean" href="../clean/introduction.html" />
+    <link rel="prev" title="Auto-pagination" href="pagination.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/connector/sql.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="introduction.html">Connector</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../clean/introduction.html">Clean</a>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Install-connectorx" class="nav-link">Install connectorx</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#API" class="nav-link">API</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Parameters" class="nav-link">Parameters</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Examples" class="nav-link">Examples</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  <div class="section" id="read_sql()-function">
+<h1><code class="docutils literal notranslate"><span class="pre">read_sql()</span></code> function<a class="headerlink" href="#read_sql()-function" title="Permalink to this headline">¶</a></h1>
+<p>The read_sql function issues a SQL query to a specific database and return the result in a Python DataFrame. In this section, we show how to use this feature.</p>
+<div class="section" id="Install-connectorx">
+<h2>Install <code class="docutils literal notranslate"><span class="pre">connectorx</span></code><a class="headerlink" href="#Install-connectorx" title="Permalink to this headline">¶</a></h2>
+<p>Connector wrap up the function on <a class="reference external" href="https://github.com/sfu-db/connector-x">connectorx</a>, in order to enable <code class="docutils literal notranslate"><span class="pre">read_sql</span></code>, you need to first install it by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">connectorx</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="API">
+<h2>API<a class="headerlink" href="#API" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">read_sql</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pandas&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="n">partition_on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">partition_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">partition_num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Run the SQL query, download the data from database into a Pandas dataframe.</p>
+</div>
+<div class="section" id="Parameters">
+<h2>Parameters<a class="headerlink" href="#Parameters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">conn:</span> <span class="pre">str</span></code>: Connection string URI. Supported URI scheme: <code class="docutils literal notranslate"><span class="pre">(postgres|postgressql|mysql|mssql|sqlite)://username:password&#64;addr:port/dbname</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query:</span> <span class="pre">Union[str,</span> <span class="pre">List[str]]</span></code>: SQL query or list of SQL queries for fetching data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">return_type:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&quot;pandas&quot;</span></code>: The return type of this function. It can be <code class="docutils literal notranslate"><span class="pre">arrow</span></code>, <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">modin</span></code>, <code class="docutils literal notranslate"><span class="pre">dask</span></code> or <code class="docutils literal notranslate"><span class="pre">polars</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">protocol:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&quot;binary&quot;</span></code>: The protocol used to fetch data from source, default is <code class="docutils literal notranslate"><span class="pre">binary</span></code>. Check out <a class="reference external" href="https://github.com/sfu-db/connector-x/blob/main/Types.md">here</a> to see more details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">partition_on:</span> <span class="pre">Optional[str]</span></code>: The column to partition the result.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">partition_range:</span> <span class="pre">Optional[Tuple[int,</span> <span class="pre">int]]</span></code>: The value range of the partition column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">partition_num:</span> <span class="pre">Optioinal[int]</span></code>: The number of partitions to generate.</p></li>
+</ul>
+</div>
+<div class="section" id="Examples">
+<h2>Examples<a class="headerlink" href="#Examples" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Read a DataFrame from a SQL using a single thread</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataprep.connector</span> <span class="k">as</span> <span class="n">cx</span>
+
+<span class="n">postgres_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://username:password@server:port/database&quot;</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM lineitem&quot;</span>
+
+<span class="n">cx</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">postgres_url</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Read a DataFrame parallelly using 10 threads by automatically partitioning the provided SQL on the partition column (<code class="docutils literal notranslate"><span class="pre">partition_range</span></code> will be automatically queried if not given)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">connectorx</span> <span class="k">as</span> <span class="nn">cx</span>
+
+<span class="n">postgres_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://username:password@server:port/database&quot;</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM lineitem&quot;</span>
+
+<span class="n">cx</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">postgres_url</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">partition_on</span><span class="o">=</span><span class="s2">&quot;l_orderkey&quot;</span><span class="p">,</span> <span class="n">partition_num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Read a DataFrame parallelly using 2 threads by manually providing two partition SQLs (the schemas of all the query results should be same)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">connectorx</span> <span class="k">as</span> <span class="nn">cx</span>
+
+<span class="n">postgres_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://username:password@server:port/database&quot;</span>
+<span class="n">queries</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SELECT * FROM lineitem WHERE l_orderkey &lt;= 30000000&quot;</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM lineitem WHERE l_orderkey &gt; 30000000&quot;</span><span class="p">]</span>
+
+<span class="n">cx</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">postgres_url</span><span class="p">,</span> <span class="n">queries</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Read a DataFrame parallelly using 4 threads from a more complex query</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">connectorx</span> <span class="k">as</span> <span class="nn">cx</span>
+
+<span class="n">postgres_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://username:password@server:port/database&quot;</span>
+<span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT l_orderkey,</span>
+<span class="s2">       SUM(l_extendedprice * ( 1 - l_discount )) AS revenue,</span>
+<span class="s2">       o_orderdate,</span>
+<span class="s2">       o_shippriority</span>
+<span class="s2">FROM   customer,</span>
+<span class="s2">       orders,</span>
+<span class="s2">       lineitem</span>
+<span class="s2">WHERE  c_mktsegment = &#39;BUILDING&#39;</span>
+<span class="s2">       AND c_custkey = o_custkey</span>
+<span class="s2">       AND l_orderkey = o_orderkey</span>
+<span class="s2">       AND o_orderdate &lt; DATE &#39;1995-03-15&#39;</span>
+<span class="s2">       AND l_shipdate &gt; DATE &#39;1995-03-15&#39;</span>
+<span class="s2">GROUP  BY l_orderkey,</span>
+<span class="s2">          o_orderdate,</span>
+<span class="s2">          o_shippriority</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">cx</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">postgres_url</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">partition_on</span><span class="o">=</span><span class="s2">&quot;l_orderkey&quot;</span><span class="p">,</span> <span class="n">partition_num</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

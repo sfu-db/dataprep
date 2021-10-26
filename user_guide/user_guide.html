@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>User Guide &#8212; DataPrep 0.3.0 documentation</title>
+  <title>User Guide &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -189,7 +189,6 @@
 <li class="toctree-l2"><a class="reference internal" href="eda/plot_diff.html">plot_diff(): analyze difference betweenDataFrames</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eda/create_report.html">create_report(): create a profile report</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eda/how_to_guide.html">How-to guide: customize your output</a></li>
-<li class="toctree-l2"><a class="reference internal" href="eda/parameter_configurations.html">Parameter configurations: parameter summarysettings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eda/insights.html">Insight: automatically insight detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eda/titanic.html">Case study: Titanic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eda/house_price.html">Case study: House Prices</a></li>
@@ -203,6 +202,7 @@
 <li class="toctree-l2"><a class="reference internal" href="connector/info.html">info(): get information of a website</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connector/authorization.html">Authorization schemes supported</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connector/pagination.html">Auto-pagination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connector/sql.html">read_sql(): fetch data into DataFrames via SQL query</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="clean/introduction.html">Clean</a><ul>
@@ -218,6 +218,1059 @@
 <li class="toctree-l2"><a class="reference internal" href="clean/clean_url.html">URLs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clean/clean_address.html">US Street Addresses</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clean/clean_df.html">Whole DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html">An example dataset containing ABN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_abn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html">An example dataset containing ACN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#abn"><code class="docutils literal notranslate"><span class="pre">abn</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_acn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html">An example dataset containing TFN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_au_tfn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html">An example dataset containing EGN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_egn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html">An example dataset containing UNP strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_by_unp.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html">An example dataset containing BN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_bn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html">An example dataset containing ESR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_esr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html">An example dataset containing SSN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_ssn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html">An example dataset containing UID strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_uid.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ch_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html">An example dataset containing RUT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cl_rut.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html">An example dataset containing RIC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#birthplace"><code class="docutils literal notranslate"><span class="pre">birthplace</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_ric.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html">An example dataset containing NIT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_co_nit.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html">An example dataset containing CPF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpf.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html">An example dataset containing CPJ strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cpj.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html">An example dataset containing CR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cr_cr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html">An example dataset containing NI strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#gender"><code class="docutils literal notranslate"><span class="pre">gender</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cu_ni.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cy_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html">An example dataset containing DIC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_dic.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html">An example dataset containing RC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cz_rc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html">An example dataset containing handelsregisternummer strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_handelsregisternummer.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html">An example dataset containing IDNR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_idnr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html">An example dataset containing STNR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_stnr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html">An example dataset containing WKN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#isin"><code class="docutils literal notranslate"><span class="pre">isin</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_de_wkn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html">An example dataset containing CPR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cpr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html">An example dataset containing CVR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_dk_cvr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html">An example dataset containing Cedula strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_cedula.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html">An example dataset containing NCF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_ncf.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html">An example dataset containing RNC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_do_rnc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html">An example dataset containing CI strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ci.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html">An example dataset containing RUC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ec_ruc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html">An example dataset containing IK strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_ik.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html">An example dataset containing KMKR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_kmkr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html">An example dataset containing CCC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#iban"><code class="docutils literal notranslate"><span class="pre">iban</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_ccc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html">An example dataset containing CIF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cif.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html">An example dataset containing CUPS strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_cups.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html">An example dataset containing DNI strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_dni.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html">An example dataset containing IBAN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#ccc"><code class="docutils literal notranslate"><span class="pre">ccc</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_iban.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html">An example dataset containing NIE strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nie.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html">An example dataset containing NIF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_nif.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html">An example dataset containing NACE strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#label"><code class="docutils literal notranslate"><span class="pre">label</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_nace.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#country"><code class="docutils literal notranslate"><span class="pre">country</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html">An example dataset containing ALV strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_alv.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html">An example dataset containing HETU strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_hetu.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html">An example dataset containing y-tunnus strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_ytunnus.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html">An example dataset containing NIF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nif.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html">An example dataset containing NIR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_nir.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html">An example dataset containing SIREN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#tva"><code class="docutils literal notranslate"><span class="pre">tva</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siren.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html">An example dataset containing TVA strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_tva.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html">An example dataset containing SEDOL strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#isin"><code class="docutils literal notranslate"><span class="pre">isin</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_sedol.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html">An example dataset containing UPN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_upn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html">An example dataset containing UTR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_utr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html">An example dataset containing AMKA strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#gender"><code class="docutils literal notranslate"><span class="pre">gender</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_amka.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gr_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html">An example dataset containing NIT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gt_nit.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html">An example dataset containing OIB strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hr_oib.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html">An example dataset containing ANUM strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_hu_anum.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html">An example dataset containing NPWP strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_id_npwp.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html">An example dataset containing PPS strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_pps.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ie_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html">An example dataset containing HP strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_hp.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html">An example dataset containing IDNR strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_il_idnr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html">An example dataset containing Aadhaar strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#mask"><code class="docutils literal notranslate"><span class="pre">mask</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_aadhaar.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html">An example dataset containing PAN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#info"><code class="docutils literal notranslate"><span class="pre">info</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#mask"><code class="docutils literal notranslate"><span class="pre">mask</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_in_pan.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html">An example dataset containing Kennitala strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_kennitala.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html">An example dataset containing VSK strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_is_vsk.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html">An example dataset containing AIC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#base10"><code class="docutils literal notranslate"><span class="pre">base10</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#base32"><code class="docutils literal notranslate"><span class="pre">base32</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_aic.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html">An example dataset containing Codice Fiscale strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#gender"><code class="docutils literal notranslate"><span class="pre">gender</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_codicefiscale.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html">An example dataset containing IVA strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_it_iva.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html">An example dataset containing CN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_jp_cn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html">An example dataset containing BRN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_brn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html">An example dataset containing RRN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_kr_rrn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html">An example dataset containing PEID strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_li_peid.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html">An example dataset containing Asmens koda strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_asmens.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html">An example dataset containing PVM strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lt_pvm.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html">An example dataset containing TVA strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lu_tva.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html">An example dataset containing PVN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_lv_pvn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html">An example dataset containing TVA strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mc_tva.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html">An example dataset containing IDNO strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_md_idno.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html">An example dataset containing IBAN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_me_iban.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html">An example dataset containing VAT strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mt_vat.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html">An example dataset containing NID strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mu_nid.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html">An example dataset containing CURP strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#gender"><code class="docutils literal notranslate"><span class="pre">gender</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_curp.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html">An example dataset containing RFC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_mx_rfc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html">An example dataset containing NRIC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#birthplace"><code class="docutils literal notranslate"><span class="pre">birthplace</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_my_nric.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html">An example dataset containing BRIN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_brin.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html">An example dataset containing BTW strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_btw.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html">An example dataset containing IBAN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#kontonr"><code class="docutils literal notranslate"><span class="pre">kontonr</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_iban.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html">An example dataset containing kontonr strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#iban"><code class="docutils literal notranslate"><span class="pre">iban</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_kontonr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html">An example dataset containing ABN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_mva.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html">An example dataset containing Orgnr strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_orgnr.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html">An example dataset containing IRD strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_ird.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html">An example dataset containing CUI strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#ruc"><code class="docutils literal notranslate"><span class="pre">ruc</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_cui.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html">An example dataset containing RUC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#dni"><code class="docutils literal notranslate"><span class="pre">dni</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pe_ruc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html">An example dataset containing NIP strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_nip.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html">An example dataset containing PESEL strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#gender"><code class="docutils literal notranslate"><span class="pre">gender</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_pesel.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html">An example dataset containing REGON strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pl_regon.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html">An example dataset containing NIF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_pt_nif.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html">An example dataset containing RUC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_py_ruc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html">An example dataset containing CF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cf.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html">An example dataset containing CNP strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cnp.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html">An example dataset containing CUI strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_cui.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html">An example dataset containing ONRC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ro_onrc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html">An example dataset containing SIRET strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#siren"><code class="docutils literal notranslate"><span class="pre">siren</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#tva"><code class="docutils literal notranslate"><span class="pre">tva</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fr_siret.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html">An example dataset containing NHS strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_gb_nhs.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html">An example dataset containing BSN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_bsn.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html">An example dataset containing Onderwijsnummer strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_onderwijsnummer.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html">An example dataset containing Belgian IBAN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#bic"><code class="docutils literal notranslate"><span class="pre">bic</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_be_iban.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html">An example dataset containing PNF strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_bg_pnf.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html">An example dataset containing cnpj strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cnpj.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html">An example dataset containing cpf strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_br_cpf.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html">An example dataset containing SIN strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ca_sin.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html">An example dataset containing USCC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_cn_uscc.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html">An example dataset containing Registrikood strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_ee_registrikood.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html">An example dataset containing Referenciacatastral strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_es_referenciacatastral.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html">An example dataset containing Euro banknote strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_banknote.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html">An example dataset containing EIC strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_eu_eic.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html">An example dataset containing Finnish association registry id strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_associationid.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html">An example dataset containing Veronumero strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_fi_veronumero.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html">An example dataset containing postcode strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nl_postcode.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html">An example dataset containing fodselsnummer strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#birthdate"><code class="docutils literal notranslate"><span class="pre">birthdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#gender"><code class="docutils literal notranslate"><span class="pre">gender</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_no_fodselsnummer.html#Only-DataFrame">Only DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html">An example dataset containing bankaccount strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#standard-(default)"><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#compact"><code class="docutils literal notranslate"><span class="pre">compact</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#info"><code class="docutils literal notranslate"><span class="pre">info</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#coerce-(default)"><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#ignore"><code class="docutils literal notranslate"><span class="pre">ignore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#Series">Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#DataFrame-+-Specify-Column">DataFrame + Specify Column</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean/clean_nz_bankaccount.html#Only-DataFrame">Only DataFrame</a></li>
 </ul>
 </li>
 </ul>

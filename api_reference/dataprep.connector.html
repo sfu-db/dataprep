@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.data_connector &#8212; DataPrep 0.3.0 documentation</title>
+  <title>dataprep.data_connector &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -220,6 +220,10 @@
       
         <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.connector.errors" class="nav-link">Errors</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#read-sql" class="nav-link">read_sql</a>
         </li>
       
     </ul>
@@ -618,6 +622,41 @@ is not 200.</p>
 <code class="sig-name descname"><span class="pre">uparam</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#dataprep.connector.errors.UniversalParameterOverridden.uparam" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="read-sql">
+<h2>read_sql<a class="headerlink" href="#read-sql" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="dataprep.connector.read_sql">
+<code class="sig-prename descclassname"><span class="pre">dataprep.connector.</span></code><code class="sig-name descname"><span class="pre">read_sql</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pandas'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'binary'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/connector/sql.html#read_sql"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.connector.read_sql" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the SQL query, download the data from database into a dataframe.
+Please check out <a class="reference external" href="https://github.com/sfu-db/connector-x">https://github.com/sfu-db/connector-x</a> for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conn</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the connection string.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a SQL query or a list of SQL query.</p></li>
+<li><p><strong>return_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the return type of this function. It can be “arrow”, “pandas”, “modin”, “dask” or “polars”.</p></li>
+<li><p><strong>protocol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the protocol used to fetch data from source. Valid protocols are database dependent
+(<a class="reference external" href="https://github.com/sfu-db/connector-x/blob/main/Types.md">https://github.com/sfu-db/connector-x/blob/main/Types.md</a>).</p></li>
+<li><p><strong>partition_on</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the column to partition the result.</p></li>
+<li><p><strong>partition_range</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – the value range of the partition column.</p></li>
+<li><p><strong>partition_num</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – how many partition to generate.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db_url</span> <span class="o">=</span> <span class="s2">&quot;postgresql://username:password@server:port/database&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM lineitem&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_sql</span><span class="p">(</span><span class="n">db_url</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">partition_on</span><span class="o">=</span><span class="s2">&quot;partition_col&quot;</span><span class="p">,</span> <span class="n">partition_num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

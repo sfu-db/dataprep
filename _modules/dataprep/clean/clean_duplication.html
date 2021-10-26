@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_duplication &#8212; DataPrep 0.3.0 documentation</title>
+  <title>dataprep.clean.clean_duplication &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -158,6 +158,7 @@
 <span class="kn">from</span> <span class="nn">ipywidgets.widgets</span> <span class="kn">import</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">Checkbox</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Text</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
+<span class="kn">from</span> <span class="nn">varname</span> <span class="kn">import</span> <span class="n">argname</span>
 
 <span class="kn">from</span> <span class="nn">.clean_duplication_utils</span> <span class="kn">import</span> <span class="n">Clusterer</span>
 
@@ -167,10 +168,13 @@
 
 
 <div class="viewcode-block" id="clean_duplication"><a class="viewcode-back" href="../../../api_reference/dataprep.clean.html#dataprep.clean.clean_duplication.clean_duplication">[docs]</a><span class="k">def</span> <span class="nf">clean_duplication</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df_var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;df&quot;</span><span class="p">,</span> <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">df_var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Box</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Cleans and standardized duplicate values in a DataFrame.</span>
+<span class="sd">    Cleans and standardizes duplicate values in a DataFrame.</span>
 
 <span class="sd">    Read more in the :ref:`User Guide &lt;duplication_userguide&gt;`.</span>
 
@@ -181,11 +185,11 @@
 <span class="sd">    column</span>
 <span class="sd">        The name of the column containing duplicate values.</span>
 <span class="sd">    df_var_name</span>
-<span class="sd">        The variable name of the DataFrame being cleaned.</span>
-<span class="sd">        This is only needed for creating exported code snippets with</span>
-<span class="sd">        the correct variable name.</span>
+<span class="sd">        Optional parameter containing the variable name of the DataFrame being cleaned.</span>
+<span class="sd">        This is only needed for legacy compatibility with the original veraion of this</span>
+<span class="sd">        function, which needed it to produce correct exported code.</span>
 
-<span class="sd">        (default: &#39;df&#39;)</span>
+<span class="sd">        (default: &#39;default&#39;)</span>
 <span class="sd">    page_size</span>
 <span class="sd">        The number of clusters to display on each page.</span>
 
@@ -204,6 +208,8 @@
 <span class="sd">    0    New York</span>
 <span class="sd">    1    New York</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">df_var_name</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+        <span class="n">df_var_name</span> <span class="o">=</span> <span class="n">argname</span><span class="p">(</span><span class="s2">&quot;df&quot;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">clean_duplication</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">UserInterface</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">df_var_name</span><span class="p">,</span> <span class="n">page_size</span><span class="p">)</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
 

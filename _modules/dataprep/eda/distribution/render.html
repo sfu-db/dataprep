@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda.distribution.render &#8212; DataPrep 0.3.0 documentation</title>
+  <title>dataprep.eda.distribution.render &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -1065,7 +1065,7 @@
     <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">spl_sz</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">sample_sr_and_name</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">plot_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">plot_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -1073,7 +1073,17 @@
 <span class="sd">    Render a scatter plot</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">spl_sz</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> (sample size </span><span class="si">{</span><span class="n">spl_sz</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="k">if</span> <span class="n">sample_sr_and_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;sample size&quot;</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">sample_sr_and_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> (sample size </span><span class="si">{</span><span class="n">sample_sr_and_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sample_sr_and_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;sample rate&quot;</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> (sample rate </span><span class="si">{</span><span class="n">sample_sr_and_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;parameter name should be either &#39;sample size&#39; or &#39;sample rate&#39;&quot;</span><span class="p">)</span>
+
     <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;(x, y)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;(@</span><span class="se">{{</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">}}</span><span class="s2">, @</span><span class="se">{{</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">)]</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
         <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
@@ -1760,6 +1770,7 @@
 
     <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">value_table</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
         <span class="n">htgs</span><span class="p">[</span><span class="s2">&quot;Value Table&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">value_table</span><span class="o">.</span><span class="n">how_to_guide</span><span class="p">()</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span>
         <span class="n">value_table</span> <span class="o">=</span> <span class="n">_value_table</span><span class="p">(</span>
             <span class="n">data</span><span class="p">[</span><span class="s2">&quot;value_table&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;npres&quot;</span><span class="p">],</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;nuniq&quot;</span><span class="p">]</span>
         <span class="p">)</span>
@@ -1769,7 +1780,10 @@
     <span class="c1"># panel.child.children[0] is a figure</span>
     <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">:]:</span>
         <span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
-    <span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width_bar</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tabs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width_bar</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="n">format_cat_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">len_stats</span><span class="p">,</span> <span class="n">letter_stats</span><span class="p">)</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">enable</span> <span class="k">else</span> <span class="p">[],</span>
         <span class="s2">&quot;value_table&quot;</span><span class="p">:</span> <span class="n">value_table</span><span class="p">,</span>
@@ -2066,7 +2080,6 @@
         <span class="n">panel</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
         <span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">plot_width_hist</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)</span>
-
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;tabledata&quot;</span><span class="p">:</span> <span class="n">format_num_stats</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">enable</span> <span class="k">else</span> <span class="p">[],</span>
         <span class="s2">&quot;value_table&quot;</span><span class="p">:</span> <span class="n">value_table</span><span class="p">,</span>
@@ -2294,12 +2307,21 @@
 
     <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">scatter</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
         <span class="c1"># scatter plot</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">scatter</span><span class="o">.</span><span class="n">sample_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_sr_and_name</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">scatter</span><span class="o">.</span><span class="n">sample_size</span><span class="p">,</span>
+                <span class="s2">&quot;sample size&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">scatter</span><span class="o">.</span><span class="n">sample_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_sr_and_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">scatter</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="s2">&quot;sample rate&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;In scatter plot, sample size and sample rate are both not None&quot;</span><span class="p">)</span>
         <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">scatter_viz</span><span class="p">(</span>
                 <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scat&quot;</span><span class="p">],</span>
                 <span class="n">x</span><span class="p">,</span>
                 <span class="n">y</span><span class="p">,</span>
-                <span class="n">cfg</span><span class="o">.</span><span class="n">scatter</span><span class="o">.</span><span class="n">sample_size</span><span class="p">,</span>
+                <span class="n">sample_sr_and_name</span><span class="p">,</span>
                 <span class="n">plot_width</span><span class="p">,</span>
                 <span class="n">plot_height</span><span class="p">,</span>
             <span class="p">)</span>

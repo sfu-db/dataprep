@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.3.0 documentation</title>
+  <title>dataprep.eda auxiliary modules &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -501,6 +501,23 @@ This is immutable.</p>
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dataprep.eda.intermediate.</span></code><code class="sig-name descname"><span class="pre">Intermediate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#Intermediate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 <p>This class contains intermediate results.</p>
+<dl class="py method">
+<dt id="dataprep.eda.intermediate.Intermediate.save">
+<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/intermediate.html#Intermediate.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save intermediate to current working directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default 'intermediate'</em>) – The filename used for saving intermediate without the extension name.</p></li>
+<li><p><strong>to</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>default Path.cwd</em><em>(</em><em>)</em>) – The path to where the intermediate will be saved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt id="dataprep.eda.intermediate.Intermediate.visual_type">
 <code class="sig-name descname"><span class="pre">visual_type</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#dataprep.eda.intermediate.Intermediate.visual_type" title="Permalink to this definition">¶</a></dt>
@@ -1112,10 +1129,35 @@ time unit such that the resulting number of groups is closest to 15</p>
 <dl class="simple">
 <dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
 </dd>
+<dt>value_range</dt><dd><p>If the correlation value is out of the range, don’t show it.</p>
+</dd>
+<dt>k</dt><dd><p>Choose top-k element</p>
+</dd>
 </dl>
 <dl class="py attribute">
 <dt id="dataprep.eda.configs.Correlations.enable">
 <code class="sig-name descname"><span class="pre">enable</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#dataprep.eda.configs.Correlations.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dataprep.eda.configs.Correlations.how_to_guide">
+<code class="sig-name descname"><span class="pre">how_to_guide</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Correlations.how_to_guide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.configs.Correlations.how_to_guide" title="Permalink to this definition">¶</a></dt>
+<dd><p>how-to guide for plot_correlation(df, x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Correlations.k">
+<code class="sig-name descname"><span class="pre">k</span></code><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dataprep.eda.configs.Correlations.k" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Correlations.value_range">
+<code class="sig-name descname"><span class="pre">value_range</span></code><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dataprep.eda.configs.Correlations.value_range" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1168,6 +1210,11 @@ time unit such that the resulting number of groups is closest to 15</p>
 <dl class="py attribute">
 <dt id="dataprep.eda.configs.Diff.baseline">
 <code class="sig-name descname"><span class="pre">baseline</span></code><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#dataprep.eda.configs.Diff.baseline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dataprep.eda.configs.Diff.density">
+<code class="sig-name descname"><span class="pre">density</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#dataprep.eda.configs.Diff.density" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2024,12 +2071,16 @@ on the filtered data consisting of the most frequent values from the first colum
 
 <dl class="py class">
 <dt id="dataprep.eda.configs.Scatter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dataprep.eda.configs.</span></code><code class="sig-name descname"><span class="pre">Scatter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.configs.Scatter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dataprep.eda.configs.</span></code><code class="sig-name descname"><span class="pre">Scatter</span></code><a class="reference internal" href="../_modules/dataprep/eda/configs.html#Scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.eda.configs.Scatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
 <dl class="simple">
 <dt>enable: bool, default True</dt><dd><p>Whether to create this element</p>
 </dd>
-<dt>sample_size: int, default 1000</dt><dd><p>Number of points to randomly sample per partition</p>
+<dt>sample_size: int, optional, default=1000</dt><dd><p>Number of points to randomly sample per partition.
+Cannot be used with sample_rate.</p>
+</dd>
+<dt>sample_rate: float, optional, default None</dt><dd><p>sample rate per partition. Cannot be used with
+sample_size. Set it to 1.0 for no sampling.</p>
 </dd>
 <dt>height: int, default “auto”</dt><dd><p>Height of the plot</p>
 </dd>
@@ -2058,8 +2109,13 @@ on the filtered data consisting of the most frequent values from the first colum
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="dataprep.eda.configs.Scatter.sample_rate">
+<code class="sig-name descname"><span class="pre">sample_rate</span></code><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dataprep.eda.configs.Scatter.sample_rate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="dataprep.eda.configs.Scatter.sample_size">
-<code class="sig-name descname"><span class="pre">sample_size</span></code><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#dataprep.eda.configs.Scatter.sample_size" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">sample_size</span></code><em class="property"><span class="pre">:</span> <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dataprep.eda.configs.Scatter.sample_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

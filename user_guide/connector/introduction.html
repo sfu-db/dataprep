@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Connector &#8212; DataPrep 0.3.0 documentation</title>
+  <title>Connector &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -144,37 +144,6 @@
             
               <li class="active">
                   <a href="">Connector</a>
-                  <ul>
-                  
-                      <li class="">
-                          <a href="dblp.html">Case study: dblp API</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="config.html">Configuration files: usage and composition</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="connect.html">connect(): establish the connection and load the configurationfiles</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="query.html">query(): fetch data into DataFrames via APIs</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="info.html">info(): get information of a website</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="authorization.html">Authorization schemes supported</a>
-                      </li>
-                  
-                      <li class="">
-                          <a href="pagination.html">Auto-pagination</a>
-                      </li>
-                  
-                  </ul>
               </li>
             
           
@@ -201,6 +170,24 @@
   <nav id="bd-toc-nav">
     <ul class="nav section-nav flex-column">
       
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#Web-APIS" class="nav-link">Web APIS</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#DBs" class="nav-link">DBs</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Supported-databases:" class="nav-link">Supported databases:</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Supported-dataframes:" class="nav-link">Supported dataframes:</a>
+        </li>
+      
+          </ul>
+        </li>
+      
     </ul>
   </nav>
 </div>
@@ -209,9 +196,10 @@
             
   <div class="section" id="Connector">
 <span id="userguide-connector"></span><h1>Connector<a class="headerlink" href="#Connector" title="Permalink to this headline">¶</a></h1>
-<p>DataPrep.Connector aims to simplify data collection from Web APIs by providing a standard set of operations.
-Connector wraps-up complex API calls into a set of easy-to-use Python functions.
-By using Connector, you can skip the complex API configuration process and rapidly query different Web APIs in few steps, enabling you to execute the analysis workflow you are familiar with in a direct way.</p>
+<p>DataPrep.Connector aims to simplify data collection from Web APIs and databases by providing a standard set of operations.</p>
+<div class="section" id="Web-APIS">
+<h2>Web APIS<a class="headerlink" href="#Web-APIS" title="Permalink to this headline">¶</a></h2>
+<p>Connector wraps-up complex API calls into a set of easy-to-use Python functions. By using Connector, you can skip the complex API configuration process and rapidly query different Web APIs in few steps, enabling you to execute the analysis workflow you are familiar with in a direct way.</p>
 <p>Watch our introduction in PyGlobal Conference <a class="reference external" href="https://www.youtube.com/watch?v=56qu-0Ka-dA/">here</a>.</p>
 <p>Connector offers essential features to facilitate the process of collecting data, for example:</p>
 <ul class="simple">
@@ -220,6 +208,31 @@ By using Connector, you can skip the complex API configuration process and rapid
 <li><p>Authorization: Access more Web APIs quickly! Even the ones that implement authorization!</p></li>
 </ul>
 <p>The user guide first presents a case study for <a class="reference external" href="https://dblp.org/">dblp</a> as an example for the process overview and provides a detailed explanation of the functionalities in the following sections.</p>
+</div>
+<div class="section" id="DBs">
+<h2>DBs<a class="headerlink" href="#DBs" title="Permalink to this headline">¶</a></h2>
+<p>Connector wraps on <a class="reference external" href="https://github.com/sfu-db/connector-x%3E">connectorx</a> to allow user fetch data from databases through SQL query. The result of the query will be stored into a Python dataframe.</p>
+<div class="section" id="Supported-databases:">
+<h3>Supported databases:<a class="headerlink" href="#Supported-databases:" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Postgres</p></li>
+<li><p>Mysql</p></li>
+<li><p>Sqlite</p></li>
+<li><p>SQL Server</p></li>
+<li><p>Oracle</p></li>
+<li><p>Redshift (through postgres protocol)</p></li>
+<li><p>Clickhouse (through mysql protocol)</p></li>
+</ul>
+</div>
+<div class="section" id="Supported-dataframes:">
+<h3>Supported dataframes:<a class="headerlink" href="#Supported-dataframes:" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Pandas</p></li>
+<li><p>Arrow</p></li>
+<li><p>Dask</p></li>
+<li><p>Modin</p></li>
+<li><p>Polars</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Section Contents</span></p>
 <ul>
@@ -230,7 +243,10 @@ By using Connector, you can skip the complex API configuration process and rapid
 <li class="toctree-l1"><a class="reference internal" href="info.html">info(): get information of a website</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authorization.html">Authorization schemes supported</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pagination.html">Auto-pagination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sql.html">read_sql(): fetch data into DataFrames via SQL query</a></li>
 </ul>
+</div>
+</div>
 </div>
 </div>
 

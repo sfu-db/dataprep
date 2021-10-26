@@ -1,0 +1,1847 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>An example dataset containing Orgnr strings &#8212; DataPrep 0.4.0 documentation</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-bootstrap.css" type="text/css" />
+  <link href="../../_static/custom.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="An example dataset containing IRD strings" href="clean_nz_ird.html" />
+    <link rel="prev" title="An example dataset containing ABN strings" href="clean_no_mva.html" />
+  <meta charset="utf-8">
+  <meta name="description" content="DataPrep, documentation site.">
+  <meta name="author" content="SFU Database Systems Lab">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg">
+  <link rel="mask-icon" href="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/icon_cropped.jpg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27761864-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-27761864-7', {'anonymize_ip': true});
+  </script>
+<link rel="canonical" href="https://docs.bokeh.org/en/latest/user_guide/clean/clean_no_orgnr.html" />
+  </head>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60"><nav class="navbar navbar-light navbar-expand-lg bg-light bd-navbar fixed-top" id="navbar-main">
+  <a class="navbar-brand" href="../../index.html">
+    <img src="https://raw.githubusercontent.com/sfu-db/dataprep/develop/assets/logo_cropped.jpg" alt="DataPrep"
+      height="60" width="210">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu"
+    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div id="navbar-menu" class="collapse navbar-collapse">
+    <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+      
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+      </li>
+      
+      <li class="nav-item active">
+        <a class="nav-link" href="../user_guide.html">User Guide</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../api_reference/dataprep.html">API Reference</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../contribute.html">Contribute</a>
+      </li>
+      
+      <li class="nav-item ">
+        <a class="nav-link" href="../../acknowledgement.html">Acknowledgement</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link nav-external" href="https://discord.gg/xwbkFNk" target="_blank" rel="noopener">
+          Community
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/sfu-db/dataprep" target="_blank" rel="noopener">
+          <span><i class="fa fa-github-square" style="color:#333;font-size:2rem;"></i></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://twitter.com/sfu_db" target="_blank" rel="noopener">
+          <span><i class="fa fa-twitter-square" style="color:#55acee;font-size:2rem"></i></span>
+        </a>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.youtube.com/channel/UC7OpZsQwWcmuD0SUaOjGBMA" target="_blank"
+          rel="noopener">
+          <span><i class="fa fa-youtube-square" style="color:#FF0000;font-size:2rem"></i></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container-fluid" id="banner"></div>
+
+  <div class="container-fluid" id="main-content">
+
+    <div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+  <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+    <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+  </form>
+
+  <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+
+    <ul class="nav bd-sidenav">
+      
+        
+      
+        
+          
+            
+              <li class="">
+                  <a href="../datasets/introduction.html">Datasets</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../eda/introduction.html">EDA</a>
+              </li>
+            
+          
+            
+              <li class="">
+                  <a href="../connector/introduction.html">Connector</a>
+              </li>
+            
+          
+            
+              <li class="active">
+                  <a href="introduction.html">Clean</a>
+                  <ul>
+                  
+                      <li class="">
+                          <a href="clean_headers.html">Column Headers</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_country.html">Country Names</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_date.html">Dates and Times</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_duplication.html">Duplicate Values</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_email.html">Email Addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_lat_long.html">Geographic Goordinates</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ip.html">IP Addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_phone.html">Phone Numbers</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_text.html">Text</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_url.html">URLs</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_address.html">US Street Addresses</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_df.html">Whole DataFrame</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_au_abn.html">An example dataset containing ABN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_au_acn.html">An example dataset containing ACN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_au_tfn.html">An example dataset containing TFN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_be_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_bg_egn.html">An example dataset containing EGN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_bg_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_by_unp.html">An example dataset containing UNP strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ca_bn.html">An example dataset containing BN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ch_esr.html">An example dataset containing ESR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ch_ssn.html">An example dataset containing SSN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ch_uid.html">An example dataset containing UID strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ch_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cl_rut.html">An example dataset containing RUT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cn_ric.html">An example dataset containing RIC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_co_nit.html">An example dataset containing NIT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cr_cpf.html">An example dataset containing CPF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cr_cpj.html">An example dataset containing CPJ strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cr_cr.html">An example dataset containing CR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cu_ni.html">An example dataset containing NI strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cy_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cz_dic.html">An example dataset containing DIC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cz_rc.html">An example dataset containing RC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_de_handelsregisternummer.html">An example dataset containing handelsregisternummer strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_de_idnr.html">An example dataset containing IDNR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_de_stnr.html">An example dataset containing STNR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_de_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_de_wkn.html">An example dataset containing WKN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_dk_cpr.html">An example dataset containing CPR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_dk_cvr.html">An example dataset containing CVR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_do_cedula.html">An example dataset containing Cedula strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_do_ncf.html">An example dataset containing NCF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_do_rnc.html">An example dataset containing RNC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ec_ci.html">An example dataset containing CI strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ec_ruc.html">An example dataset containing RUC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ee_ik.html">An example dataset containing IK strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ee_kmkr.html">An example dataset containing KMKR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_ccc.html">An example dataset containing CCC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_cif.html">An example dataset containing CIF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_cups.html">An example dataset containing CUPS strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_dni.html">An example dataset containing DNI strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_iban.html">An example dataset containing IBAN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_nie.html">An example dataset containing NIE strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_nif.html">An example dataset containing NIF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_eu_nace.html">An example dataset containing NACE strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_eu_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fi_alv.html">An example dataset containing ALV strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fi_hetu.html">An example dataset containing HETU strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fi_ytunnus.html">An example dataset containing y-tunnus strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fr_nif.html">An example dataset containing NIF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fr_nir.html">An example dataset containing NIR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fr_siren.html">An example dataset containing SIREN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fr_tva.html">An example dataset containing TVA strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gb_sedol.html">An example dataset containing SEDOL strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gb_upn.html">An example dataset containing UPN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gb_utr.html">An example dataset containing UTR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gb_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gr_amka.html">An example dataset containing AMKA strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gr_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gt_nit.html">An example dataset containing NIT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_hr_oib.html">An example dataset containing OIB strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_hu_anum.html">An example dataset containing ANUM strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_id_npwp.html">An example dataset containing NPWP strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ie_pps.html">An example dataset containing PPS strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ie_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_il_hp.html">An example dataset containing HP strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_il_idnr.html">An example dataset containing IDNR strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_in_aadhaar.html">An example dataset containing Aadhaar strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_in_pan.html">An example dataset containing PAN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_is_kennitala.html">An example dataset containing Kennitala strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_is_vsk.html">An example dataset containing VSK strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_it_aic.html">An example dataset containing AIC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_it_codicefiscale.html">An example dataset containing Codice Fiscale strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_it_iva.html">An example dataset containing IVA strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_jp_cn.html">An example dataset containing CN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_kr_brn.html">An example dataset containing BRN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_kr_rrn.html">An example dataset containing RRN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_li_peid.html">An example dataset containing PEID strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_lt_asmens.html">An example dataset containing Asmens koda strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_lt_pvm.html">An example dataset containing PVM strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_lu_tva.html">An example dataset containing TVA strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_lv_pvn.html">An example dataset containing PVN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_mc_tva.html">An example dataset containing TVA strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_md_idno.html">An example dataset containing IDNO strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_me_iban.html">An example dataset containing IBAN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_mt_vat.html">An example dataset containing VAT strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_mu_nid.html">An example dataset containing NID strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_mx_curp.html">An example dataset containing CURP strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_mx_rfc.html">An example dataset containing RFC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_my_nric.html">An example dataset containing NRIC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nl_brin.html">An example dataset containing BRIN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nl_btw.html">An example dataset containing BTW strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_no_iban.html">An example dataset containing IBAN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_no_kontonr.html">An example dataset containing kontonr strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_no_mva.html">An example dataset containing ABN strings</a>
+                      </li>
+                  
+                      <li class="active">
+                          <a href="">An example dataset containing Orgnr strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nz_ird.html">An example dataset containing IRD strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_pe_cui.html">An example dataset containing CUI strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_pe_ruc.html">An example dataset containing RUC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_pl_nip.html">An example dataset containing NIP strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_pl_pesel.html">An example dataset containing PESEL strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_pl_regon.html">An example dataset containing REGON strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_pt_nif.html">An example dataset containing NIF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_py_ruc.html">An example dataset containing RUC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ro_cf.html">An example dataset containing CF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ro_cnp.html">An example dataset containing CNP strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ro_cui.html">An example dataset containing CUI strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ro_onrc.html">An example dataset containing ONRC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fr_siret.html">An example dataset containing SIRET strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_gb_nhs.html">An example dataset containing NHS strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nl_bsn.html">An example dataset containing BSN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nl_onderwijsnummer.html">An example dataset containing Onderwijsnummer strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_be_iban.html">An example dataset containing Belgian IBAN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_bg_pnf.html">An example dataset containing PNF strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_br_cnpj.html">An example dataset containing cnpj strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_br_cpf.html">An example dataset containing cpf strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ca_sin.html">An example dataset containing SIN strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_cn_uscc.html">An example dataset containing USCC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_ee_registrikood.html">An example dataset containing Registrikood strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_es_referenciacatastral.html">An example dataset containing Referenciacatastral strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_eu_banknote.html">An example dataset containing Euro banknote strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_eu_eic.html">An example dataset containing EIC strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fi_associationid.html">An example dataset containing Finnish association registry id strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_fi_veronumero.html">An example dataset containing Veronumero strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nl_postcode.html">An example dataset containing postcode strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_no_fodselsnummer.html">An example dataset containing fodselsnummer strings</a>
+                      </li>
+                  
+                      <li class="">
+                          <a href="clean_nz_bankaccount.html">An example dataset containing bankaccount strings</a>
+                      </li>
+                  
+                  </ul>
+              </li>
+            
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+
+  </nav>
+</div>
+
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+  <nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#1.-Default-clean_no_orgnr" class="nav-link">1. Default clean_no_orgnr</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#2.-Output-formats" class="nav-link">2. Output formats</a>
+        </li>
+      
+    </ul>
+  </nav>
+</div>
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+          <div>
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+.. _orgnr_userguide:
+
+Orgnr Strings
+============Introduction
+------------
+
+The function :func:`clean_no_orgnr() <dataprep.clean.clean_no_orgnr.clean_no_orgnr>` cleans a column containing Norwegian organisation number (Orgnr) strings, and standardizes them in a given format. The function :func:`validate_no_orgnr() <dataprep.clean.clean_no_orgnr.validate_no_orgnr>` validates either a single Orgnr strings, a column of Orgnr strings or a DataFrame of Orgnr strings, returning `True` if the value is valid, and `False` otherwise.<p>Orgnr strings can be converted to the following formats via the <code class="docutils literal notranslate"><span class="pre">output_format</span></code> parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">compact</span></code>: only number strings without any seperators or whitespace, like “988077917”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">standard</span></code>: Orgnr strings with proper whitespace in the proper places, like “988 077 917”</p></li>
+</ul>
+<p>Invalid parsing is handled with the <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default): invalid parsing will be set to NaN</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ignore</span></code>: invalid parsing will return the input</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raise</span></code>: invalid parsing will raise an exception</p></li>
+</ul>
+<p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_no_orgnr()</span></code> and <code class="docutils literal notranslate"><span class="pre">validate_no_orgnr()</span></code>.</p>
+<div class="section" id="An-example-dataset-containing-Orgnr-strings">
+<h1>An example dataset containing Orgnr strings<a class="headerlink" href="#An-example-dataset-containing-Orgnr-strings" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;orgnr&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;988077917&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;988 077 918&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;51824753556&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;51 824 753 556&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;NULL&quot;</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;123 Pine Ave.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;main st&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1234 west main heights 57033&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;apt 1 789 s maple rd manhattan&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;robie house, 789 north main street&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;(staples center) 1111 S Figueroa St, Los Angeles&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988077917</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>988 077 918</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51824753556</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>51 824 753 556</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hello</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NULL</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="1.-Default-clean_no_orgnr">
+<h2>1. Default <code class="docutils literal notranslate"><span class="pre">clean_no_orgnr</span></code><a class="headerlink" href="#1.-Default-clean_no_orgnr" title="Permalink to this headline">¶</a></h2>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">clean_no_orgnr</span></code> will clean orgnr strings and output them in the standard format with proper separators.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">clean_no_orgnr</span>
+<span class="n">clean_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;orgnr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+      <th>orgnr_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988077917</td>
+      <td>123 Pine Ave.</td>
+      <td>988 077 917</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>988 077 918</td>
+      <td>main st</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51824753556</td>
+      <td>1234 west main heights 57033</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>51 824 753 556</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hello</td>
+      <td>robie house, 789 north main street</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="2.-Output-formats">
+<h2>2. Output formats<a class="headerlink" href="#2.-Output-formats" title="Permalink to this headline">¶</a></h2>
+<p>This section demonstrates the output parameter.</p>
+</div>
+</div>
+<div class="section" id="standard-(default)">
+<h1><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)<a class="headerlink" href="#standard-(default)" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;orgnr&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+      <th>orgnr_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988077917</td>
+      <td>123 Pine Ave.</td>
+      <td>988 077 917</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>988 077 918</td>
+      <td>main st</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51824753556</td>
+      <td>1234 west main heights 57033</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>51 824 753 556</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hello</td>
+      <td>robie house, 789 north main street</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="compact">
+<h1><code class="docutils literal notranslate"><span class="pre">compact</span></code><a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;orgnr&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;compact&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+      <th>orgnr_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988077917</td>
+      <td>123 Pine Ave.</td>
+      <td>988077917</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>988 077 918</td>
+      <td>main st</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51824753556</td>
+      <td>1234 west main heights 57033</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>51 824 753 556</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hello</td>
+      <td>robie house, 789 north main street</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="3.-inplace-parameter">
+<h2>3. <code class="docutils literal notranslate"><span class="pre">inplace</span></code> parameter<a class="headerlink" href="#3.-inplace-parameter" title="Permalink to this headline">¶</a></h2>
+<p>This deletes the given column from the returned DataFrame. A new column containing cleaned Orgnr strings is added with a title in the format <code class="docutils literal notranslate"><span class="pre">&quot;{original</span> <span class="pre">title}_clean&quot;</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;orgnr&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr_clean</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988 077 917</td>
+      <td>123 Pine Ave.</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>main st</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NaN</td>
+      <td>1234 west main heights 57033</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>NaN</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>NaN</td>
+      <td>robie house, 789 north main street</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NaN</td>
+      <td>hello</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="4.-errors-parameter">
+<h2>4. <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter<a class="headerlink" href="#4.-errors-parameter" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+<div class="section" id="coerce-(default)">
+<h1><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)<a class="headerlink" href="#coerce-(default)" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;orgnr&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+      <th>orgnr_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988077917</td>
+      <td>123 Pine Ave.</td>
+      <td>988 077 917</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>988 077 918</td>
+      <td>main st</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51824753556</td>
+      <td>1234 west main heights 57033</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>51 824 753 556</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hello</td>
+      <td>robie house, 789 north main street</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="ignore">
+<h1><code class="docutils literal notranslate"><span class="pre">ignore</span></code><a class="headerlink" href="#ignore" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clean_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;orgnr&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+      <th>orgnr_clean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>988077917</td>
+      <td>123 Pine Ave.</td>
+      <td>988 077 917</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>988 077 918</td>
+      <td>main st</td>
+      <td>988 077 918</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51824753556</td>
+      <td>1234 west main heights 57033</td>
+      <td>51824753556</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>51 824 753 556</td>
+      <td>apt 1 789 s maple rd manhattan</td>
+      <td>51 824 753 556</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hello</td>
+      <td>robie house, 789 north main street</td>
+      <td>hello</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+      <td>(staples center) 1111 S Figueroa St, Los Angeles</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>NULL</td>
+      <td>hello</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="4.-validate_no_orgnr()">
+<h2>4. <code class="docutils literal notranslate"><span class="pre">validate_no_orgnr()</span></code><a class="headerlink" href="#4.-validate_no_orgnr()" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">validate_no_orgnr()</span></code> returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when the input is a valid Orgnr. Otherwise it returns <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>The input of <code class="docutils literal notranslate"><span class="pre">validate_no_orgnr()</span></code> can be a string, a Pandas DataSeries, a Dask DataSeries, a Pandas DataFrame and a dask DataFrame.</p>
+<p>When the input is a string, a Pandas DataSeries or a Dask DataSeries, user doesn’t need to specify a column name to be validated.</p>
+<p>When the input is a Pandas DataFrame or a dask DataFrame, user can both specify or not specify a column name to be validated. If user specify the column name, <code class="docutils literal notranslate"><span class="pre">validate_no_orgnr()</span></code> only returns the validation result for the specified column. If user doesn’t specify the column name, <code class="docutils literal notranslate"><span class="pre">validate_no_orgnr()</span></code> returns the validation result for the whole DataFrame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataprep.clean</span> <span class="kn">import</span> <span class="n">validate_no_orgnr</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="s2">&quot;988077917&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="s2">&quot;988 077 918&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="s2">&quot;51824753556&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="s2">&quot;51 824 753 556&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="s2">&quot;NULL&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+False
+False
+False
+False
+False
+False
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Series">
+<h1>Series<a class="headerlink" href="#Series" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;orgnr&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     True
+1    False
+2    False
+3    False
+4    False
+5    False
+6    False
+Name: orgnr, dtype: bool
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="DataFrame-+-Specify-Column">
+<h1>DataFrame + Specify Column<a class="headerlink" href="#DataFrame-+-Specify-Column" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;orgnr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     True
+1    False
+2    False
+3    False
+4    False
+5    False
+6    False
+Name: orgnr, dtype: bool
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Only-DataFrame">
+<h1>Only DataFrame<a class="headerlink" href="#Only-DataFrame" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">validate_no_orgnr</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>orgnr</th>
+      <th>address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </main>
+
+    </div>
+  </div>  <script>
+    // TOC sidebar - add "active" class to parent list
+    //
+    // Bootstrap's scrollspy adds the active class to the <a> link,
+    // but for the automatic collapsing we need this on the parent list item.
+    //
+    // The event is triggered on "window" (and not the nav item as documented),
+    // see https://github.com/twbs/bootstrap/issues/20086
+    $(window).on("activate.bs.scrollspy", function(){
+    var navLinks = document.querySelectorAll('#bd-toc-nav a');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.remove('active');
+    }
+    var navLinks = document.querySelectorAll('#bd-toc-nav a.active');
+    for (var i = 0; i < navLinks.length; i++) {
+        var navLink = navLinks[i];
+        navLink.parentElement.classList.add('active');
+    }
+    });
+  </script>
+  <footer class="container-fluid footer-copy">
+
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-10 py-2">
+          <p>
+            ©2020 SFU Database Systems Lab. <a href="https://data.cs.sfu.ca/index.html">SFU Data Science Research Group</a>.
+          </p>
+          <p>
+            Created using <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </footer>
+  </body>
+</html>

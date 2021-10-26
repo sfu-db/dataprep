@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>dataprep.clean.clean_ip &#8212; DataPrep 0.3.0 documentation</title>
+  <title>dataprep.clean.clean_ip &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -200,6 +200,7 @@
 <span class="sd">            - &#39;binary&#39;: binary representation (&#39;00001100000000110000010000000101&#39;)</span>
 <span class="sd">            - &#39;hexa&#39;: hexadecimal representation (&#39;0xc030405&#39;)</span>
 <span class="sd">            - &#39;integer&#39;: integer representation (201524229)</span>
+<span class="sd">            - &#39;packed&#39;: packed binary representation (big-endian, a bytes object)</span>
 
 <span class="sd">        (default: &#39;compressed&#39;)</span>
 <span class="sd">    inplace</span>
@@ -249,10 +250,10 @@
             <span class="sa">f</span><span class="s1">&#39;input_format </span><span class="si">{</span><span class="n">input_format</span><span class="si">}</span><span class="s1"> is invalid, it needs to be &quot;ipv4&quot;, &quot;ipv6&quot; or &quot;auto&quot;&#39;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;compressed&quot;</span><span class="p">,</span> <span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;hexa&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;compressed&quot;</span><span class="p">,</span> <span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;hexa&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;packed&quot;</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;output_format </span><span class="si">{</span><span class="n">output_format</span><span class="si">}</span><span class="s1"> is invalid, it needs to be &quot;compressed&quot;, &quot;full&quot;, &#39;</span>
-            <span class="s1">&#39;&quot;binary&quot;, &quot;hexa&quot; or &quot;integer&quot;&#39;</span>
+            <span class="s1">&#39;&quot;binary&quot;, &quot;hexa&quot;, &quot;integer&quot; or &quot;packed&quot;&#39;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inplace</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
@@ -343,6 +344,7 @@
 <span class="sd">        2 := the value is cleaned and the cleaned value is DIFFERENT than the input value</span>
 <span class="sd">        3 := the value is cleaned and is THE SAME as the input value (no transformation)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-branches</span>
     <span class="n">address</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_check_ip</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">input_format</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
@@ -371,6 +373,10 @@
     <span class="c1"># converts to integer format</span>
     <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;integer&quot;</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+
+    <span class="c1"># converts to packed binary format (big-endian)</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;packed&quot;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">address</span><span class="o">.</span><span class="n">packed</span>
 
     <span class="c1"># convert to full representation</span>
     <span class="k">else</span><span class="p">:</span>
