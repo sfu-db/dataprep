@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1635218763295,
+  "lastUpdate": 1635222525361,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1023,6 +1023,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.07260911943227713",
             "extra": "mean: 6.513916598399999 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "924e271c53939685f1ec089987b71ae9185090f1",
+          "message": "Merge pull request #715 from Waterpine/develop\n\nfeat(eda): save imdt as json file",
+          "timestamp": "2021-10-25T21:25:09-07:00",
+          "tree_id": "d712d96c2a02623fa5f603b77b4a488942837ab9",
+          "url": "https://github.com/sfu-db/dataprep/commit/924e271c53939685f1ec089987b71ae9185090f1"
+        },
+        "date": 1635222524195,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.16963672476495786,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07239214595117281",
+            "extra": "mean: 5.894949937199987 sec\nrounds: 5"
           }
         ]
       }
