@@ -61,12 +61,14 @@ jobs:
         run: poetry run pylint dataprep
 
       - uses: codecov/codecov-action@v2
+        if: github.event.pull_request.head.repo.full_name == github.repository
         with:
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
           # path_to_write_report: ./coverage.xml
 
       - uses: codacy/codacy-coverage-reporter-action@v1
+        if: github.event.pull_request.head.repo.full_name == github.repository
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: coverage.xml
