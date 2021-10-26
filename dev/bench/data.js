@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1635222911214,
+  "lastUpdate": 1635260992375,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1085,6 +1085,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.3065213021475138",
             "extra": "mean: 6.442410555599986 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "702ca991a8d485b98d71ebfe45de779fe6fc291d",
+          "message": "Merge pull request #698 from devinllu/feat/plot_diff_density\n\nfeat(eda): added density parameter to plot_diff(df)",
+          "timestamp": "2021-10-26T08:06:13-07:00",
+          "tree_id": "6d31350db6bc5a957654670a897ea47c64035ddd",
+          "url": "https://github.com/sfu-db/dataprep/commit/702ca991a8d485b98d71ebfe45de779fe6fc291d"
+        },
+        "date": 1635260989934,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.16680566309010683,
+            "unit": "iter/sec",
+            "range": "stddev: 0.2399551173643202",
+            "extra": "mean: 5.995000298399998 sec\nrounds: 5"
           }
         ]
       }
