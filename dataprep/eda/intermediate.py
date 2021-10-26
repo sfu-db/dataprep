@@ -1,8 +1,12 @@
 """
 Intermediate class
 """
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Tuple, Union, Optional
 
+from pathlib import Path
+import json
+import os
+import numpy as np
 import pandas as pd
 
 
@@ -26,6 +30,101 @@ class Intermediate(Dict[str, Any]):
             self.visual_type = visual_type
         else:
             raise ValueError("Unsupported initialization")
+
+    def save(self, path: Optional[str] = None) -> None:
+        """
+        Save intermediate to current working directory.
+
+        Parameters
+        ----------
+        filename: Optional[str], default 'intermediate'
+            The filename used for saving intermediate without the extension name.
+        to: Optional[str], default Path.cwd()
+            The path to where the intermediate will be saved.
+        """
+        saved_file_path = None
+
+        if path:
+            extension = os.path.splitext(path)[1]
+            posix_path = Path(path).expanduser()
+
+            if posix_path.is_dir():
+                if path.endswith("/"):
+                    path += "imdt.json"
+                else:
+                    path += "/imdt.json"
+
+            elif extension:
+                if extension != ".json":
+                    raise ValueError(
+                        "Format '{extension}' is not supported (supported formats: json)"
+                    )
+
+            else:
+                path += ".json"
+
+            saved_file_path = Path(path).expanduser()
+
+        else:
+            path = str(Path.cwd()) + "/imdt.json"
+            saved_file_path = Path(path).expanduser()
+
+        # pylint: disable=no-member
+        inter_dict: Dict[str, Any] = {}
+        for key in self.keys():
+            inter_dict[key] = self[key]
+        self._standardize_type(inter_dict)
+        with open(path, "w") as outfile:
+            json.dump(inter_dict, outfile, indent=4)
+        print(f"Intermediate has been saved to {saved_file_path}!")
+
+    def _standardize_type(self, inter_dict: Dict[str, Any]) -> None:
+        """
+        In order to make intermediate could be saved as json file,
+        check the type of data contained in the intermediate
+
+        Parameters
+        ----------
+        inter_dict: Dict[str, Any], default "Intermediate"
+            The intermediate result
+        Returns
+        -------
+
+        """
+        for key in inter_dict:
+            if isinstance(inter_dict[key], dict):
+                self._standardize_type(inter_dict[key])
+            elif isinstance(
+                inter_dict[key],
+                (
+                    np.int_,
+                    np.intc,
+                    np.intp,
+                    np.int8,
+                    np.int16,
+                    np.int32,
+                    np.int64,
+                    np.uint8,
+                    np.uint16,
+                    np.uint32,
+                    np.uint64,
+                ),
+            ):
+                inter_dict[key] = int(inter_dict[key])
+            elif isinstance(inter_dict[key], (np.float_, np.float16, np.float32, np.float64)):
+                inter_dict[key] = float(inter_dict[key])
+            elif isinstance(inter_dict[key], (np.ndarray,)):
+                inter_dict[key] = inter_dict[key].tolist()
+            elif isinstance(inter_dict[key], tuple):
+                inter_dict[key] = list(inter_dict[key])
+                for index in range(len(inter_dict[key])):
+                    if isinstance(inter_dict[key][index], (np.ndarray,)):
+                        inter_dict[key][index] = inter_dict[key][index].tolist()
+                inter_dict[key] = tuple(inter_dict[key])
+            elif isinstance(inter_dict[key], pd.DataFrame):
+                inter_dict[key] = inter_dict[key].to_dict()
+            else:
+                pass
 
 
 class ColumnsMetadata:
