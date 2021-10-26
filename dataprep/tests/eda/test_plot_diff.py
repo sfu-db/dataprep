@@ -79,3 +79,4 @@ def test_dataset() -> None:
     df1 = df[df["Survived"] == 0]
     df2 = df[df["Survived"] == 1]
     plot_diff([df1, df2])
+    plot_diff([df1, df2], config={"diff.density": True})
