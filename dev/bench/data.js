@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1635260992375,
+  "lastUpdate": 1635261877605,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1116,6 +1116,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.2399551173643202",
             "extra": "mean: 5.995000298399998 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "272e980948802cc6ea94595eac6cadf5235957b9",
+          "message": "Merge pull request #721 from sfu-db/fix/typo\n\nstyle(eda): fix dendrogram typo",
+          "timestamp": "2021-10-26T08:20:53-07:00",
+          "tree_id": "6570a0bebaf2ba5bea684d32e17b5c6fd7e1440c",
+          "url": "https://github.com/sfu-db/dataprep/commit/272e980948802cc6ea94595eac6cadf5235957b9"
+        },
+        "date": 1635261876389,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.15993185031078488,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04387142598993089",
+            "extra": "mean: 6.2526632316000015 sec\nrounds: 5"
           }
         ]
       }
