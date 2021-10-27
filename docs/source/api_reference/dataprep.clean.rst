@@ -90,6 +90,14 @@ US Street Addresses
    :members:
    :undoc-members:
    :show-inheritance:
+   
+ISBN Numbers
+------------
+
+.. automodule:: dataprep.clean.clean_isbn
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Australian Business Numbers
 ---------------------------
@@ -111,6 +119,14 @@ Australian Tax File Numbers
 ---------------------------
 
 .. automodule:: dataprep.clean.clean_au_tfn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Belgian IBAN Numbers
+-------------------
+
+.. automodule:: dataprep.clean.clean_be_iban
    :members:
    :undoc-members:
    :show-inheritance:
@@ -999,7 +1015,7 @@ Brazilian Company Identifiers
 -----------------------------
 
 .. automodule:: dataprep.clean.clean_br_cnpj
-   :members:
+   :members:eu
    :undoc-members:
    :show-inheritance:
 
@@ -1099,3 +1115,10 @@ New Zealand Bank Account Numbers
    :undoc-members:
    :show-inheritance:
 
+SEPA Identifier of the Creditor
+--------------------------------
+
+.. automodule:: dataprep.clean.clean_eu_at_02
+   :members:
+   :undoc-members:
+   :show-inheritance:
