@@ -102,7 +102,7 @@ Check [plot](https://sfu-db.github.io/dataprep/user_guide/eda/plot.html), [plot_
 
 ## Clean
 
-DataPrep.Clean contains about **140+** simple functions designed for cleaning and validating data in a DataFrame. It provides
+DataPrep.Clean contains about **140+** functions designed for cleaning and validating data in a DataFrame. It provides
 
 - **A Unified API**: each function follows the syntax `clean_{type}(df, 'column name')` (see an example below).
 - **Speed**: the computations are parallelized using Dask. It can clean **50K rows per second** on a dual-core laptop (that means cleaning 1 million rows in only 20 seconds).
