@@ -90,6 +90,14 @@ US Street Addresses
    :members:
    :undoc-members:
    :show-inheritance:
+
+For Downstreaming ML Tasks
+-------------------
+
+.. automodule:: dataprep.clean.clean_ml
+   :members:
+   :undoc-members:
+   :show-inheritance:
    
 ISBN Numbers
 ------------
