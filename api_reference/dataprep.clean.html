@@ -239,6 +239,10 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_isbn" class="nav-link">ISBN Numbers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.clean.clean_au_abn" class="nav-link">Australian Business Numbers</a>
         </li>
       
@@ -248,6 +252,10 @@
       
         <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.clean.clean_au_tfn" class="nav-link">Australian Tax File Numbers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#belgian-iban-numbers" class="nav-link">Belgian IBAN Numbers</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -683,7 +691,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#module-dataprep.clean.clean_be_iban" class="nav-link">Belgian IBANs</a>
+          <a href="#module-0" class="nav-link">Belgian IBANs</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -691,7 +699,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#module-dataprep.clean.clean_br_cnpj" class="nav-link">Brazilian Company Identifiers</a>
+          <a href="#brazilian-company-identifiers" class="nav-link">Brazilian Company Identifiers</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -740,6 +748,10 @@
       
         <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.clean.clean_nz_bankaccount" class="nav-link">New Zealand Bank Account Numbers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#module-dataprep.clean.clean_eu_at_02" class="nav-link">SEPA Identifier of the Creditor</a>
         </li>
       
     </ul>
@@ -1875,6 +1887,85 @@ address to be successfully cleaned.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-dataprep.clean.clean_isbn">
+<span id="isbn-numbers"></span><h2>ISBN Numbers<a class="headerlink" href="#module-dataprep.clean.clean_isbn" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing ISBN numbers.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_isbn.clean_isbn">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_isbn.</span></code><code class="sig-name descname"><span class="pre">clean_isbn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_isbn.html#clean_isbn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_isbn.clean_isbn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean ISBN type data in a DataFrame column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing data of ISBN type.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The output format of standardized number string.
+If output_format = ‘compact’, return string without any separators.
+If output_format = ‘standard’, return string with proper separators.
+If output_format = ‘isbn13’, return ISBN string with 13 digits.
+If output_format = ‘isbn10’, return ISBN string with 10 digits.</p>
+<p>(default: “standard”)</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <dl class="simple">
+<dt>If True,</dt><dd><p>each component of derived from its number string will be put into its own column.</p>
+</dd>
+</dl>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned.
+Otherwise, keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>How to handle parsing errors.
+- ‘coerce’: invalid parsing will be set to NaN.
+- ‘ignore’: invalid parsing will return the input.
+- ‘raise’: invalid parsing will raise an exception.</p>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean a column of ISBN data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({{</span>
+<span class="go">        &quot;isbn&quot;: [</span>
+<span class="go">        &quot;978-9024538270&quot;,</span>
+<span class="go">        &quot;978-9024538271&quot;]</span>
+<span class="go">        })</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;isbn&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">       isbn_clean</span>
+<span class="go">0  978-90-245-3827-0</span>
+<span class="go">1         NaN</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_isbn.validate_isbn">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_isbn.</span></code><code class="sig-name descname"><span class="pre">validate_isbn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_isbn.html#validate_isbn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_isbn.validate_isbn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate if a data cell is ISBN in a DataFrame column. For each cell, return True or False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be validated.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column to be validated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-dataprep.clean.clean_au_abn">
 <span id="australian-business-numbers"></span><h2>Australian Business Numbers<a class="headerlink" href="#module-dataprep.clean.clean_au_abn" title="Permalink to this headline">¶</a></h2>
 <p>Clean and validate a DataFrame column containing Australian Business Numbers (ABNs).</p>
@@ -2075,6 +2166,79 @@ Otherwise, keep the original column.</p>
 <dt id="dataprep.clean.clean_au_tfn.validate_au_tfn">
 <code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_au_tfn.</span></code><code class="sig-name descname"><span class="pre">validate_au_tfn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_au_tfn.html#validate_au_tfn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_au_tfn.validate_au_tfn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate if a data cell is TFN in a DataFrame column. For each cell, return True or False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be validated.</p></li>
+<li><p><strong>col</strong> – The name of the column to be validated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="belgian-iban-numbers">
+<h2>Belgian IBAN Numbers<a class="headerlink" href="#belgian-iban-numbers" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-dataprep.clean.clean_be_iban"></span><p>Clean and validate a DataFrame column containing Belgian IBANs.</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_be_iban.clean_be_iban">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">clean_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#clean_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_be_iban.clean_be_iban" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean Belgian IBAN (International Bank Account Number) type data in a DataFrame column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>col</strong> – The name of the column containing data of Belgian IBAN type.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The output format of standardized number string.
+If output_format = ‘compact’, return string without any separators or whitespace.
+If output_format = ‘standard’, return string with proper separators and whitespace.
+If output_format = ‘bic’, return the BIC for the bank that this number refers to.</p>
+<p>(default: “standard”)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned.
+Otherwise, keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>How to handle parsing errors.
+- ‘coerce’: invalid parsing will be set to NaN.
+- ‘ignore’: invalid parsing will return the input.
+- ‘raise’: invalid parsing will raise an exception.</p>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean a column of Belgian IBANs data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({{</span>
+<span class="go">        &quot;be_iban&quot;: [</span>
+<span class="go">        &quot;BE32 123-4567890-02&quot;,</span>
+<span class="go">        &quot;BE41091811735141&quot;]</span>
+<span class="go">        })</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_be_iban</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;be_iban&#39;</span><span class="p">)</span>
+<span class="go">        be_iban                 be_iban_clean</span>
+<span class="go">0       BE32 123-4567890-02     BE32123456789002</span>
+<span class="go">1       BE41091811735141        NaN</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_be_iban.validate_be_iban">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">validate_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#validate_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_be_iban.validate_be_iban" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate if a data cell is Belgian IBAN in a DataFrame column.
+For each cell, return True or False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -9918,12 +10082,12 @@ For each cell, return True or False.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-dataprep.clean.clean_be_iban">
-<span id="belgian-ibans"></span><h2>Belgian IBANs<a class="headerlink" href="#module-dataprep.clean.clean_be_iban" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-0">
+<span id="belgian-ibans"></span><h2>Belgian IBANs<a class="headerlink" href="#module-0" title="Permalink to this headline">¶</a></h2>
 <p>Clean and validate a DataFrame column containing Belgian IBANs.</p>
 <dl class="py function">
-<dt id="dataprep.clean.clean_be_iban.clean_be_iban">
-<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">clean_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#clean_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_be_iban.clean_be_iban" title="Permalink to this definition">¶</a></dt>
+<dt id="id0">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">clean_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#clean_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean Belgian IBAN (International Bank Account Number) type data in a DataFrame column.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -9973,8 +10137,8 @@ Otherwise, keep the original column.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="dataprep.clean.clean_be_iban.validate_be_iban">
-<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">validate_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#validate_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_be_iban.validate_be_iban" title="Permalink to this definition">¶</a></dt>
+<dt id="id1">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">validate_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#validate_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate if a data cell is Belgian IBAN in a DataFrame column.
 For each cell, return True or False.</p>
 <dl class="field-list simple">
@@ -10063,78 +10227,8 @@ Otherwise, keep the original column.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-dataprep.clean.clean_br_cnpj">
-<span id="brazilian-company-identifiers"></span><h2>Brazilian Company Identifiers<a class="headerlink" href="#module-dataprep.clean.clean_br_cnpj" title="Permalink to this headline">¶</a></h2>
-<p>Clean and validate a DataFrame column containing CNPJ numbers, Brazilian company identifier.</p>
-<dl class="py function">
-<dt id="dataprep.clean.clean_br_cnpj.clean_br_cnpj">
-<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_br_cnpj.</span></code><code class="sig-name descname"><span class="pre">clean_br_cnpj</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_br_cnpj.html#clean_br_cnpj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_br_cnpj.clean_br_cnpj" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean Brazilian company identifier data in a DataFrame column.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
-<li><p><strong>col</strong> – The name of the column containing data of CNPJ type.</p></li>
-<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The output format of standardized number string.
-If output_format = ‘compact’, return string without any separators or whitespace.
-If output_format = ‘standard’, return string with proper separators and whitespace.</p>
-<p>(default: “standard”)</p>
-</p></li>
-<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned.
-Otherwise, keep the original column.</p>
-<p>(default: False)</p>
-</p></li>
-<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>How to handle parsing errors.
-- ‘coerce’: invalid parsing will be set to NaN.
-- ‘ignore’: invalid parsing will return the input.
-- ‘raise’: invalid parsing will raise an exception.</p>
-<p>(default: ‘coerce’)</p>
-</p></li>
-<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
-<p>(default: True)</p>
-</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<p>Clean a column of CNPJ data.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({{</span>
-<span class="go">        &quot;cnpj&quot;: [</span>
-<span class="go">        &#39;16727230000197&#39;,</span>
-<span class="go">        &#39;16.727.230.0001-98&#39;, # InvalidChecksum</span>
-<span class="go">        &#39;16.727.230/0001=97&#39;] # invalid delimiter</span>
-<span class="go">        })</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_br_cnpj</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;cnpj&#39;</span><span class="p">)</span>
-<span class="go">        cnpj                cnpj_clean</span>
-<span class="go">0       16727230000197      16.727.230/0001-97</span>
-<span class="go">1       16.727.230.0001-98  NaN</span>
-<span class="go">2       16.727.230/0001=97  NaN</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="dataprep.clean.clean_br_cnpj.validate_br_cnpj">
-<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_br_cnpj.</span></code><code class="sig-name descname"><span class="pre">validate_br_cnpj</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_br_cnpj.html#validate_br_cnpj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_br_cnpj.validate_br_cnpj" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate if a data cell is CNPJ in a DataFrame column. For each cell, return True or False.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be validated.</p></li>
-<li><p><strong>col</strong> – The name of the column to be validated.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="section" id="brazilian-company-identifiers">
+<h2>Brazilian Company Identifiers<a class="headerlink" href="#brazilian-company-identifiers" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-dataprep.clean.clean_br_cpf">
 <span id="brazilian-national-identifiers"></span><h2>Brazilian National Identifiers<a class="headerlink" href="#module-dataprep.clean.clean_br_cpf" title="Permalink to this headline">¶</a></h2>
@@ -10997,6 +11091,78 @@ Otherwise, keep the original column.</p>
 <code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_nz_bankaccount.</span></code><code class="sig-name descname"><span class="pre">validate_nz_bankaccount</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_nz_bankaccount.html#validate_nz_bankaccount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_nz_bankaccount.validate_nz_bankaccount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate if a data cell is bankaccount in a DataFrame column.
 For each cell, return True or False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be validated.</p></li>
+<li><p><strong>col</strong> – The name of the column to be validated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataprep.clean.clean_eu_at_02">
+<span id="sepa-identifier-of-the-creditor"></span><h2>SEPA Identifier of the Creditor<a class="headerlink" href="#module-dataprep.clean.clean_eu_at_02" title="Permalink to this headline">¶</a></h2>
+<p>Clean and validate a DataFrame column containing AT-02 (SEPA Creditor identifier).</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_eu_at_02.clean_eu_at_02">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_eu_at_02.</span></code><code class="sig-name descname"><span class="pre">clean_eu_at_02</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_eu_at_02.html#clean_eu_at_02"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_eu_at_02.clean_eu_at_02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean AT-02 (SEPA Creditor identifier) type data in a DataFrame column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>col</strong> – The name of the column containing data of AT-02 type.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The output format of standardized number string.
+If output_format = ‘compact’, return string without any separators or whitespace.
+If output_format = ‘standard’, return string with proper separators and whitespace.
+Note: in the case of AT-02, the compact format is the same as the standard one.</p>
+<p>(default: “standard”)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned.
+Otherwise, keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>How to handle parsing errors.
+- ‘coerce’: invalid parsing will be set to NaN.
+- ‘ignore’: invalid parsing will return the input.
+- ‘raise’: invalid parsing will raise an exception.</p>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean a column of AT-02 data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({{</span>
+<span class="go">        &quot;at_02&quot;: [</span>
+<span class="go">        &#39;ES++()+23ZZZ4//7690558N&#39;,</span>
+<span class="go">        &#39;ES2900047690558N&#39;]</span>
+<span class="go">        })</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_eu_at_02</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;at_02&#39;</span><span class="p">)</span>
+<span class="go">        at_02                       at_02_clean</span>
+<span class="go">0       ES++()+23ZZZ4//7690558N     ES23ZZZ47690558N</span>
+<span class="go">1       ES2900047690558N            NaN</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_eu_at_02.validate_eu_at_02">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_eu_at_02.</span></code><code class="sig-name descname"><span class="pre">validate_eu_at_02</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_eu_at_02.html#validate_eu_at_02"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_eu_at_02.validate_eu_at_02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate if a data cell is AT-02 in a DataFrame column. For each cell, return True or False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
