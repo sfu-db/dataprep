@@ -243,6 +243,14 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
+          <a href="#for-downstreaming-ml-tasks" class="nav-link">For Downstreaming ML Tasks</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#id1" class="nav-link">ISBN Numbers</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
           <a href="#module-dataprep.clean.clean_au_abn" class="nav-link">Australian Business Numbers</a>
         </li>
       
@@ -691,7 +699,7 @@
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#module-0" class="nav-link">Belgian IBANs</a>
+          <a href="#module-1" class="nav-link">Belgian IBANs</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
@@ -1951,6 +1959,323 @@ Otherwise, keep the original column.</p>
 <dl class="py function">
 <dt id="dataprep.clean.clean_isbn.validate_isbn">
 <code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_isbn.</span></code><code class="sig-name descname"><span class="pre">validate_isbn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_isbn.html#validate_isbn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_isbn.validate_isbn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate if a data cell is ISBN in a DataFrame column. For each cell, return True or False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be validated.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column to be validated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="for-downstreaming-ml-tasks">
+<h2>For Downstreaming ML Tasks<a class="headerlink" href="#for-downstreaming-ml-tasks" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-dataprep.clean.clean_ml"></span><p>Implement clean_ml function</p>
+<dl class="py function">
+<dt id="dataprep.clean.clean_ml.clean_ml">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ml.</span></code><code class="sig-name descname"><span class="pre">clean_ml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'target'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_null_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_null_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one_hot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standardize'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customized_cat_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customized_num_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ml.html#clean_ml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ml.clean_ml" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function transforms an arbitrary tabular dataset
+into a format that’s suitable for a typical ML application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Training dataframe. Pandas or Dask DataFrame.</p></li>
+<li><p><strong>test_df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Test dataframe. Pandas or Dask DataFrame.</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of target column. String.</p></li>
+<li><p><strong>cat_imputation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The mode of imputation for categorical columns.
+If it equals to “constant”,</p>
+<blockquote>
+<div><p>then all missing values are filled with <cite>fill_val</cite>.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>If it equals to “most_frequent”,</dt><dd><p>then all missing values are filled with most frequent value.</p>
+</dd>
+<dt>If it equals to “drop”,</dt><dd><p>then all categorical columns with missing values will be dropped.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>cat_null_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Specified categorical null values which should be recognized.</p></li>
+<li><p><strong>fill_val</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>When cat_imputation = “constant”,</dt><dd><p>then all missing values are filled with <cite>fill_val</cite>.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>num_imputation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The mode of imputation for numerical columns.
+If it equals to “mean”,</p>
+<blockquote>
+<div><p>then all missing values are filled with mean value.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>If it equals to “median”,</dt><dd><p>then all missing values are filled with median value.</p>
+</dd>
+<dt>If it equals to “most_frequent”,</dt><dd><p>then all missing values are filled with most frequent value.</p>
+</dd>
+<dt>If it equals to “drop”,</dt><dd><p>then all numerical columns with missing values will be dropped.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>num_null_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Specified numerical null values which should be recognized.</p></li>
+<li><p><strong>cat_encoding</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode of encoding categorical columns.
+If it equals to “one_hot”, do one-hot encoding.
+If it equals to “no_encoding”, nothing will be done.</p></li>
+<li><p><strong>variance_threshold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <dl class="simple">
+<dt>If it is True,</dt><dd><p>then dropping numerical columns with variance less than <cite>variance</cite>.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>variance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Variance value when variance_threshold = True.</p></li>
+<li><p><strong>num_scaling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode of scaling for numerical columns.
+If it equals to “standardize”, do standardize for all numerical columns.
+If it equals to “minmax”, do minmax scaling for all numerical columns.
+If it equals to “maxabs”, do maxabs scaling for all numerical columns.
+If it equals to “no_scaling”, nothing will be done.</p></li>
+<li><p><strong>include_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components included for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>exclude_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components excluded for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_ml.format_data_with_customized_cat">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ml.</span></code><code class="sig-name descname"><span class="pre">format_data_with_customized_cat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_null_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standardize'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customized_cat_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ml.html#format_data_with_customized_cat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ml.format_data_with_customized_cat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function transforms an arbitrary tabular dataset
+into a format that’s suitable for a typical ML application.
+Customized categorical pipeline and related parameters should be provided by users</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of training dataset. Dask Series.</p></li>
+<li><p><strong>test_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of test dataset. Dask Series.</p></li>
+<li><p><strong>num_imputation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The mode of imputation for numerical columns.
+If it equals to “mean”,</p>
+<blockquote>
+<div><p>then all missing values are filled with mean value.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>If it equals to “median”,</dt><dd><p>then all missing values are filled with median value.</p>
+</dd>
+<dt>If it equals to “most_frequent”,</dt><dd><p>then all missing values are filled with most frequent value.</p>
+</dd>
+<dt>If it equals to “drop”,</dt><dd><p>then all numerical columns with missing values will be dropped.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>num_null_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Specified numerical null values which should be recognized.</p></li>
+<li><p><strong>variance_threshold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If it is True, then dropping numerical columns with variance less than <cite>variance</cite>.</p></li>
+<li><p><strong>variance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Variance value when variance_threshold = True.</p></li>
+<li><p><strong>num_scaling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode of scaling for numerical columns.
+If it equals to “standardize”, do standardize for all numerical columns.
+If it equals to “minmax”, do minmax scaling for all numerical columns.
+If it equals to “maxabs”, do maxabs scaling for all numerical columns.
+If it equals to “no_scaling”, nothing will be done.</p></li>
+<li><p><strong>include_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components included for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>exclude_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components excluded for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>customized_cat_pipeline</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]) – User-specified pipeline managing categorical columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_ml.format_data_with_customized_cat_and_num">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ml.</span></code><code class="sig-name descname"><span class="pre">format_data_with_customized_cat_and_num</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customized_cat_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customized_num_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ml.html#format_data_with_customized_cat_and_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ml.format_data_with_customized_cat_and_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function transforms an arbitrary tabular dataset
+into a format that’s suitable for a typical ML application.
+Both customized pipeline managing categorical columns and numerical columns should be provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of training dataset. Dask Series.</p></li>
+<li><p><strong>test_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of test dataset. Dask Series.</p></li>
+<li><p><strong>include_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components included for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>exclude_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components excluded for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>customized_cat_pipeline</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]) – User-specified pipeline managing categorical columns.</p></li>
+<li><p><strong>customized_num_pipeline</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]) – User-specified pipeline managing numerical columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_ml.format_data_with_customized_num">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ml.</span></code><code class="sig-name descname"><span class="pre">format_data_with_customized_num</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_null_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one_hot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customized_num_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ml.html#format_data_with_customized_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ml.format_data_with_customized_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function transforms an arbitrary tabular dataset
+into a format that’s suitable for a typical ML application.
+Customized numerical pipeline and related parameters should be provided by users</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of training dataset. Dask Series.</p></li>
+<li><p><strong>test_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of test dataset. Dask Series.</p></li>
+<li><p><strong>cat_imputation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The mode of imputation for categorical columns.
+If it equals to “constant”,</p>
+<blockquote>
+<div><p>then all missing values are filled with <cite>fill_val</cite>.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>If it equals to “most_frequent”,</dt><dd><p>then all missing values are filled with most frequent value.</p>
+</dd>
+<dt>If it equals to “drop”,</dt><dd><p>then all categorical columns with missing values will be dropped.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>cat_null_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Specified categorical null values which should be recognized.</p></li>
+<li><p><strong>fill_val</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – When cat_imputation = “constant”, then all missing values are filled with <cite>fill_val</cite>.</p></li>
+<li><p><strong>cat_encoding</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode of encoding categorical columns.
+If it equals to “one_hot”, do one-hot encoding.
+If it equals to “no_encoding”, nothing will be done.</p></li>
+<li><p><strong>include_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components included for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>exclude_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components excluded for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>customized_num_pipeline</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]) – User-specified pipeline managing numerical columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataprep.clean.clean_ml.format_data_with_default">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_ml.</span></code><code class="sig-name descname"><span class="pre">format_data_with_default</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_null_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_null_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat_encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one_hot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standardize'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_operators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_ml.html#format_data_with_default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dataprep.clean.clean_ml.format_data_with_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function transforms an arbitrary tabular dataset
+into a format that’s suitable for a typical ML application.
+No customized pipeline should be provided. Use default pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of training dataset. Dask Series.</p></li>
+<li><p><strong>test_row</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – One column of test dataset. Dask Series.</p></li>
+<li><p><strong>cat_imputation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The mode of imputation for categorical columns.
+If it equals to “constant”,</p>
+<blockquote>
+<div><p>then all missing values are filled with <cite>fill_val</cite>.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>If it equals to “most_frequent”,</dt><dd><p>then all missing values are filled with most frequent value.</p>
+</dd>
+<dt>If it equals to “drop”,</dt><dd><p>then all categorical columns with missing values will be dropped.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>cat_null_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Specified categorical null values which should be recognized.</p></li>
+<li><p><strong>fill_val</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – When cat_imputation = “constant”, then all missing values are filled with <cite>fill_val</cite>.</p></li>
+<li><p><strong>num_imputation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The mode of imputation for numerical columns.
+If it equals to “mean”,</p>
+<blockquote>
+<div><p>then all missing values are filled with mean value.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>If it equals to “median”,</dt><dd><p>then all missing values are filled with median value.</p>
+</dd>
+<dt>If it equals to “most_frequent”,</dt><dd><p>then all missing values are filled with most frequent value.</p>
+</dd>
+<dt>If it equals to “drop”,</dt><dd><p>then all numerical columns with missing values will be dropped.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>num_null_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Specified numerical null values which should be recognized.</p></li>
+<li><p><strong>cat_encoding</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode of encoding categorical columns.
+If it equals to “one_hot”, do one-hot encoding.
+If it equals to “no_encoding”, nothing will be done.</p></li>
+<li><p><strong>variance_threshold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If it is True, then dropping numerical columns with variance less than <cite>variance</cite>.</p></li>
+<li><p><strong>variance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Variance value when variance_threshold = True.</p></li>
+<li><p><strong>num_scaling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode of scaling for numerical columns.
+If it equals to “standardize”, do standardize for all numerical columns.
+If it equals to “minmax”, do minmax scaling for all numerical columns.
+If it equals to “maxabs”, do maxabs scaling for all numerical columns.
+If it equals to “no_scaling”, nothing will be done.</p></li>
+<li><p><strong>include_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components included for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+<li><p><strong>exclude_operators</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Components excluded for <cite>clean_ml</cite>, like “one_hot”, “standardize”, etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h2>ISBN Numbers<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-0"></span><p>Clean and validate a DataFrame column containing ISBN numbers.</p>
+<dl class="py function">
+<dt id="id0">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_isbn.</span></code><code class="sig-name descname"><span class="pre">clean_isbn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_isbn.html#clean_isbn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean ISBN type data in a DataFrame column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A pandas or Dask DataFrame containing the data to be cleaned.</p></li>
+<li><p><strong>column</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the column containing data of ISBN type.</p></li>
+<li><p><strong>output_format</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>The output format of standardized number string.
+If output_format = ‘compact’, return string without any separators.
+If output_format = ‘standard’, return string with proper separators.
+If output_format = ‘isbn13’, return ISBN string with 13 digits.
+If output_format = ‘isbn10’, return ISBN string with 10 digits.</p>
+<p>(default: “standard”)</p>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <dl class="simple">
+<dt>If True,</dt><dd><p>each component of derived from its number string will be put into its own column.</p>
+</dd>
+</dl>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, delete the column containing the data that was cleaned.
+Otherwise, keep the original column.</p>
+<p>(default: False)</p>
+</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <p>How to handle parsing errors.
+- ‘coerce’: invalid parsing will be set to NaN.
+- ‘ignore’: invalid parsing will return the input.
+- ‘raise’: invalid parsing will raise an exception.</p>
+<p>(default: ‘coerce’)</p>
+</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <p>If True, display a progress bar.</p>
+<p>(default: True)</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Clean a column of ISBN data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({{</span>
+<span class="go">        &quot;isbn&quot;: [</span>
+<span class="go">        &quot;978-9024538270&quot;,</span>
+<span class="go">        &quot;978-9024538271&quot;]</span>
+<span class="go">        })</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_isbn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;isbn&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">       isbn_clean</span>
+<span class="go">0  978-90-245-3827-0</span>
+<span class="go">1         NaN</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="id2">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_isbn.</span></code><code class="sig-name descname"><span class="pre">validate_isbn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_isbn.html#validate_isbn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate if a data cell is ISBN in a DataFrame column. For each cell, return True or False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -10082,12 +10407,12 @@ For each cell, return True or False.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-0">
-<span id="belgian-ibans"></span><h2>Belgian IBANs<a class="headerlink" href="#module-0" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-1">
+<span id="belgian-ibans"></span><h2>Belgian IBANs<a class="headerlink" href="#module-1" title="Permalink to this headline">¶</a></h2>
 <p>Clean and validate a DataFrame column containing Belgian IBANs.</p>
 <dl class="py function">
-<dt id="id0">
-<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">clean_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#clean_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dt id="id3">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">clean_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coerce'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#clean_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean Belgian IBAN (International Bank Account Number) type data in a DataFrame column.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -10137,8 +10462,8 @@ Otherwise, keep the original column.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="id1">
-<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">validate_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#validate_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dt id="id4">
+<code class="sig-prename descclassname"><span class="pre">dataprep.clean.clean_be_iban.</span></code><code class="sig-name descname"><span class="pre">validate_be_iban</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataprep/clean/clean_be_iban.html#validate_be_iban"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate if a data cell is Belgian IBAN in a DataFrame column.
 For each cell, return True or False.</p>
 <dl class="field-list simple">
