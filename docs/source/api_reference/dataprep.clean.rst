@@ -99,6 +99,22 @@ ISBN Numbers
    :undoc-members:
    :show-inheritance:
 
+For Downstreaming ML Tasks
+-------------------
+
+.. automodule:: dataprep.clean.clean_ml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   
+ISBN Numbers
+------------
+
+.. automodule:: dataprep.clean.clean_isbn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Australian Business Numbers
 ---------------------------
 
