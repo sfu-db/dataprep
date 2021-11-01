@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1635622829541,
+  "lastUpdate": 1635792109130,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1333,6 +1333,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.8055610803918611",
             "extra": "mean: 6.151298272000008 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "wangxiaoying0369@gmail.com",
+            "name": "Xiaoying Wang",
+            "username": "wangxiaoying"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "df81c233b098f5b80b3fc8eea6ab617237ea60cd",
+          "message": "Merge pull request #732 from sfu-db/fix/cx\n\nfix(connectorx) fix and update doc on connectorx",
+          "timestamp": "2021-11-01T11:38:15-07:00",
+          "tree_id": "f2ee72dff44dc5dcea69d3842958cec76ec47285",
+          "url": "https://github.com/sfu-db/dataprep/commit/df81c233b098f5b80b3fc8eea6ab617237ea60cd"
+        },
+        "date": 1635792106888,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.17963210054182274,
+            "unit": "iter/sec",
+            "range": "stddev: 0.09461087972831507",
+            "extra": "mean: 5.566933732800033 sec\nrounds: 5"
           }
         ]
       }
