@@ -26,6 +26,8 @@ from .clean_currency import clean_currency, validate_currency
 
 from .clean_df import clean_df
 
+from .clean_df_gui import clean_df_gui
+
 from .clean_text import clean_text, default_text_pipeline
 
 from .clean_au_abn import clean_au_abn, validate_au_abn
@@ -376,6 +378,7 @@ __all__ = [
     "clean_currency",
     "validate_currency",
     "clean_df",
+    "clean_df_gui",
     "clean_text",
     "default_text_pipeline",
     "clean_au_abn",
