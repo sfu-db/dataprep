@@ -94,10 +94,6 @@ def format_diff_report(
             for x in df:
                 edaframe = EDAFrame(x)
                 computations.append(format_basic(edaframe, cfg))
-        # elif mode == "full":
-        #     comps = format_full(df)
-        # elif mode == "minimal":
-        #     comps = format_mini(df)
         else:
             raise ValueError(f"Unknown mode: {mode}")
     return computations
