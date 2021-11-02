@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>An example dataset containing PNF strings &#8212; DataPrep 0.4.0 documentation</title>
+  <title>Bulgarian Personal Numbers &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="An example dataset containing cnpj strings" href="clean_br_cnpj.html" />
-    <link rel="prev" title="An example dataset containing Belgian IBAN strings" href="clean_be_iban.html" />
+    <link rel="prev" title="Belgian IBAN Numbers" href="clean_be_iban.html" />
   <meta charset="utf-8">
   <meta name="description" content="DataPrep, documentation site.">
   <meta name="author" content="SFU Database Systems Lab">
@@ -205,23 +205,23 @@
                       </li>
                   
                       <li class="">
-                          <a href="clean_au_abn.html">An example dataset containing ABN strings</a>
+                          <a href="clean_au_abn.html">Australian Business Numbers</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_au_acn.html">An example dataset containing ACN strings</a>
+                          <a href="clean_au_acn.html">Australian Company Numbers</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_au_tfn.html">An example dataset containing TFN strings</a>
+                          <a href="clean_au_tfn.html">Australian Tax File Numbers</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_be_vat.html">An example dataset containing VAT strings</a>
+                          <a href="clean_be_vat.html">Belgian VAT Numbers</a>
                       </li>
                   
                       <li class="">
-                          <a href="clean_bg_egn.html">An example dataset containing EGN strings</a>
+                          <a href="clean_bg_egn.html">Bulgarian National Identification Numbers</a>
                       </li>
                   
                       <li class="">
@@ -649,11 +649,11 @@
                       </li>
                   
                       <li class="">
-                          <a href="clean_be_iban.html">An example dataset containing Belgian IBAN strings</a>
+                          <a href="clean_be_iban.html">Belgian IBANs</a>
                       </li>
                   
                       <li class="active">
-                          <a href="">An example dataset containing PNF strings</a>
+                          <a href="">Bulgarian Personal Numbers</a>
                       </li>
                   
                       <li class="">
@@ -730,11 +730,67 @@
     <ul class="nav section-nav flex-column">
       
         <li class="nav-item toc-entry toc-h2">
+          <a href="#Introduction" class="nav-link">Introduction</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#An-example-dataset-containing-PNF-strings" class="nav-link">An example dataset containing PNF strings</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
           <a href="#1.-Default-clean_bg_pnf" class="nav-link">1. Default clean_bg_pnf</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#2.-Output-formats" class="nav-link">2. Output formats</a>
+          <a href="#2.-Output-formats" class="nav-link">2. Output formats</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#standard-(default)" class="nav-link">standard (default)</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#compact" class="nav-link">compact</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#3.-inplace-parameter" class="nav-link">3. inplace parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#4.-errors-parameter" class="nav-link">4. errors parameter</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#coerce-(default)" class="nav-link">coerce (default)</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#ignore" class="nav-link">ignore</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#4.-validate_bg_pnf()" class="nav-link">4. validate_bg_pnf()</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Series" class="nav-link">Series</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#DataFrame-+-Specify-Column" class="nav-link">DataFrame + Specify Column</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Only-DataFrame" class="nav-link">Only DataFrame</a>
+        </li>
+      
+          </ul>
         </li>
       
     </ul>
@@ -976,13 +1032,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-.. _pnf_userguide:
-
-Bulgarian Personal Numbers
-==========================Introduction
-------------
-
-The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` cleans a column containing Bulgarian personal number of a foreigner, and standardizes them in a given format. The function :func:`validate_bg_pnf() <dataprep.clean.clean_bg_pnf.validate_bg_pnf>` validates either a single PNF strings, a column of PNF strings or a DataFrame of PNF strings, returning `True` if the value is valid, and `False` otherwise.<p>PNF strings can be converted to the following formats via the <code class="docutils literal notranslate"><span class="pre">output_format</span></code> parameter:</p>
+<div class="section" id="Bulgarian-Personal-Numbers">
+<h1>Bulgarian Personal Numbers<a class="headerlink" href="#Bulgarian-Personal-Numbers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The function <code class="docutils literal notranslate"><span class="pre">clean_bg_pnf()</span></code> cleans a column containing Bulgarian personal number of a foreigner, and standardizes them in a given format. The function <code class="docutils literal notranslate"><span class="pre">validate_bg_pnf()</span></code> validates either a single PNF strings, a column of PNF strings or a DataFrame of PNF strings, returning <code class="docutils literal notranslate"><span class="pre">True</span></code> if the value is valid, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+<p>PNF strings can be converted to the following formats via the <code class="docutils literal notranslate"><span class="pre">output_format</span></code> parameter:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">compact</span></code>: only number strings without any seperators or whitespace, like “7111042925”</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">standard</span></code>: PNF strings with proper whitespace in the proper places. Note that in the case of PNF, the compact format is the same as the standard one.</p></li>
@@ -995,7 +1050,7 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </ul>
 <p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_bg_pnf()</span></code> and <code class="docutils literal notranslate"><span class="pre">validate_bg_pnf()</span></code>.</p>
 <div class="section" id="An-example-dataset-containing-PNF-strings">
-<h1>An example dataset containing PNF strings<a class="headerlink" href="#An-example-dataset-containing-PNF-strings" title="Permalink to this headline">¶</a></h1>
+<h3>An example dataset containing PNF strings<a class="headerlink" href="#An-example-dataset-containing-PNF-strings" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -1096,6 +1151,8 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </table>
 </div></div>
 </div>
+</div>
+</div>
 <div class="section" id="1.-Default-clean_bg_pnf">
 <h2>1. Default <code class="docutils literal notranslate"><span class="pre">clean_bg_pnf</span></code><a class="headerlink" href="#1.-Default-clean_bg_pnf" title="Permalink to this headline">¶</a></h2>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">clean_bg_pnf</span></code> will clean pnf strings and output them in the standard format with proper separators.</p>
@@ -1188,10 +1245,8 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 <div class="section" id="2.-Output-formats">
 <h2>2. Output formats<a class="headerlink" href="#2.-Output-formats" title="Permalink to this headline">¶</a></h2>
 <p>This section demonstrates the output parameter.</p>
-</div>
-</div>
 <div class="section" id="standard-(default)">
-<h1><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)<a class="headerlink" href="#standard-(default)" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)<a class="headerlink" href="#standard-(default)" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -1278,7 +1333,7 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </div>
 </div>
 <div class="section" id="compact">
-<h1><code class="docutils literal notranslate"><span class="pre">compact</span></code><a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">compact</span></code><a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -1363,6 +1418,8 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </table>
 </div></div>
 </div>
+</div>
+</div>
 <div class="section" id="3.-inplace-parameter">
 <h2>3. <code class="docutils literal notranslate"><span class="pre">inplace</span></code> parameter<a class="headerlink" href="#3.-inplace-parameter" title="Permalink to this headline">¶</a></h2>
 <p>This deletes the given column from the returned DataFrame. A new column containing cleaned PNF strings is added with a title in the format <code class="docutils literal notranslate"><span class="pre">&quot;{original</span> <span class="pre">title}_clean&quot;</span></code>.</p>
@@ -1445,10 +1502,8 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </div>
 <div class="section" id="4.-errors-parameter">
 <h2>4. <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter<a class="headerlink" href="#4.-errors-parameter" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
 <div class="section" id="coerce-(default)">
-<h1><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)<a class="headerlink" href="#coerce-(default)" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)<a class="headerlink" href="#coerce-(default)" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -1535,7 +1590,7 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </div>
 </div>
 <div class="section" id="ignore">
-<h1><code class="docutils literal notranslate"><span class="pre">ignore</span></code><a class="headerlink" href="#ignore" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">ignore</span></code><a class="headerlink" href="#ignore" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -1620,6 +1675,8 @@ The function :func:`clean_bg_pnf() <dataprep.clean.clean_bg_pnf.clean_bg_pnf>` c
 </table>
 </div></div>
 </div>
+</div>
+</div>
 <div class="section" id="4.-validate_bg_pnf()">
 <h2>4. <code class="docutils literal notranslate"><span class="pre">validate_bg_pnf()</span></code><a class="headerlink" href="#4.-validate_bg_pnf()" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">validate_bg_pnf()</span></code> returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when the input is a valid PNF. Otherwise it returns <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
@@ -1658,10 +1715,8 @@ False
 False
 </pre></div></div>
 </div>
-</div>
-</div>
 <div class="section" id="Series">
-<h1>Series<a class="headerlink" href="#Series" title="Permalink to this headline">¶</a></h1>
+<h3>Series<a class="headerlink" href="#Series" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -1689,7 +1744,7 @@ Name: pnf, dtype: bool
 </div>
 </div>
 <div class="section" id="DataFrame-+-Specify-Column">
-<h1>DataFrame + Specify Column<a class="headerlink" href="#DataFrame-+-Specify-Column" title="Permalink to this headline">¶</a></h1>
+<h3>DataFrame + Specify Column<a class="headerlink" href="#DataFrame-+-Specify-Column" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -1717,7 +1772,7 @@ Name: pnf, dtype: bool
 </div>
 </div>
 <div class="section" id="Only-DataFrame">
-<h1>Only DataFrame<a class="headerlink" href="#Only-DataFrame" title="Permalink to this headline">¶</a></h1>
+<h3>Only DataFrame<a class="headerlink" href="#Only-DataFrame" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -1801,6 +1856,8 @@ Name: pnf, dtype: bool
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span>
 </pre></div>
+</div>
+</div>
 </div>
 </div>
 </div>
