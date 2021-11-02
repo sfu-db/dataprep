@@ -1,32 +1,32 @@
 
 <div class="ov-container">
-    <div class="tb-container">
-        <div class="tabledata-{{ context.rnd }}">
-            <h3>Dataset Statistics</h3>
-            <table>
-                <tr id="comp-label-{{ context.rnd }}">
-                <th></th>
-                {% for df_label in context.df_labels %}
-                <td>{{ df_label }}</td>
+    
+    <div class="diff-overview-container">
+        <h3 style="text-align:center;">Dataset Statistics</h3>
+        <table style="width:100%;">
+            <tr id="comp-label-{{ context.rnd }}">
+            <th></th>
+            {% for df_label in context.df_labels %}
+            <td>{{ df_label }}</td>
+            {% endfor %}
+            </tr>
+            
+            {% for k, v in context.stats.items() %}
+            {% if v is defined and v %}
+            <tr>
+                <th>{{ k }}</th>
+                {% for stats in v %}
+                <td>{{ stats }}</td>
                 {% endfor %}
-                </tr>
-                
-                {% for k, v in context.stats.items() %}
-                {% if v is defined and v %}
-                <tr>
-                    <th>{{ k }}</th>
-                    {% for stats in v %}
-                    <td>{{ stats }}</td>
-                    {% endfor %}
-                </tr>
-                {% endif %}
-                {% endfor %}
-            </table>
-        </div>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
     </div>
+    
 
-
-    {% if context.insights %}
+    <!-- shows data set insights -->
+    <!-- {% if context.insights %}
     <div class="tb-container">
         <h3 class="tb-title">Dataset Insights</h3>
         {% for ins in context.insights %}
@@ -59,6 +59,6 @@
             </ul>
         </div>
     </div>
-    {% endif %}
+    {% endif %} -->
 
 </div>
