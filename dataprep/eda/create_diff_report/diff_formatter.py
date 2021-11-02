@@ -220,12 +220,12 @@ def format_basic(dfs: List[EDAFrame], cfg: Config) -> Dict[str, Any]:
         (data,) = dask.compute(data)
 
     res_overview = _format_overview(data, cfg)
-    # res_variables = _format_variables(df, cfg, data)
+    res_variables = _format_variables(dfs, cfg, data)
     # res_interaction = _format_interaction(data, cfg)
     # res_correlations = _format_correlation(data, cfg)
     # res_missing = _format_missing(data, cfg, completions, df.shape[1])
     # res = {**res_overview, **res_variables, **res_interaction, **res_correlations, **res_missing}
-    res = {**res_overview}
+    res = {**res_overview, **res_variables}
 
     return res
 

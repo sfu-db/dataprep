@@ -11,33 +11,33 @@
 <body class="bg-container">
   <nav class="navbar-top">
     <a href="#"><span>{{ context.title }}</span></a>
-    {% if context.components.has_overview %}
+    {% if context.components[0].has_overview %}
     <a href="#overview">Overview</a>
     {% endif %}
     <div class="subnav" onclick="hideDropdown(this)">
-      {% if context.components.has_variables %}
+      {% if context.components[0].has_variables %}
       <a href="#variables">Variables ≡</a>
       <div class="subcontent">
-        {% for var in context.components.variables.keys() %}
+        {% for var in context.components[0].variables.keys() %}
         <a href="#{{ var|e }}">{{ var|e }}</a>
         {% endfor %}
       </div>
       {% endif %}
     </div>
-    {% if context.components.has_interaction %}
+    {% if context.components[0].has_interaction %}
     <a href="#interactions">Interactions</a>
     {% endif %}
-    {% if context.components.has_correlation %}
+    {% if context.components[0].has_correlation %}
     <a href="#correlations">Correlations</a>
     {% endif %}
-    {% if context.components.has_missing %}
+    {% if context.components[0].has_missing %}
     <a href="#missing-values">Missing Values</a>
     {% endif %}
   </nav>
 
   <div class="container-main">
 
-    {% if context.components.has_overview %}
+    {% if context.components[0].has_overview %}
     <div>
       <a class="id-anchor" id="overview"></a>
       <h1 class="tb-title">Overview</h1>
@@ -48,7 +48,7 @@
       </div>
     </section>
     {% endif %}
-    {% if context.components.has_variables %}
+    {% if context.components[0].has_variables %}
     <div>
       <a class="id-anchor" id="variables"></a>
       <h1 class="tb-title">Variables</h1>
@@ -58,7 +58,7 @@
     </section>
     {% endif %}
 
-    {% if context.components.has_interaction %}
+    {% if context.components[0].has_interaction %}
     <div>
       <a class="id-anchor" id="interactions"></a>
       <h1 class="tb-title">Interactions</h1>
@@ -68,7 +68,7 @@
     </section>
     {% endif %}
 
-    {% if context.components.has_correlation %}
+    {% if context.components[0].has_correlation %}
     <div>
       <a class="id-anchor" id="correlations"></a>
       <h1 class="tb-title">Correlations</h1>
@@ -78,7 +78,7 @@
     </section>
     {% endif %}
 
-    {% if context.components.has_missing %}
+    {% if context.components[0].has_missing %}
     <div>
       <a class="id-anchor" id="missing-values"></a>
       <h1 class="tb-title">Missing Values</h1>
@@ -90,8 +90,8 @@
 
   </div>
 
-  {% if context.components.has_interaction and context.components.interactions[0] != 0%}
-  {{ context.components.interactions[0] }}
+  {% if context.components[0].has_interaction and context.components[0].interactions[0] != 0%}
+  {{ context.components[0].interactions[0] }}
   {% endif %}
 
   <footer class="footer">

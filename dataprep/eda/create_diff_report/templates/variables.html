@@ -1,0 +1,164 @@
+<div class="section-start">
+{% for key, value in context.components[0].variables.items() %}
+    {% if value.error %}
+        <div class="section-variable">
+        {% with error_message = value.error %}
+            {% include "error.html" %}
+        {% endwith %}
+        </div>
+    {% else %}
+        <div class="section-variable">
+            <a class="id-anchor" id="{{ key|escape }}"></a>
+            <div class="var-container">
+                <div class="var-title">
+                    <h2 class="tb-title">{{ key|escape }}</h2>
+                    <p>{{ value.col_type }}</p>
+                    {% if value.col_type != "datetime" %}
+                    <button class="var-toggle" onclick="toggleDetails(this)">Show Details</button>
+                    {% endif %}
+                </div>
+                <div class="tb-container">
+                    <div class="tb-{{ value.col_type }}">
+                        <table class="rp-table">
+                            {% for h, d in value.tabledata["Overview"].items() %}
+                            <tr>
+                                <th>{{ h }}</th>
+                                <td>{{ d }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="var-ovplot">
+                    {% if value.insights_tab["Bar Chart"] %}
+                    <div class="insight-container-column">
+                        <input type="checkbox" style="display: none" id="ib-bar-{{ key|escape }}" class="insight-check-column">
+                        <label class="insight-btn-column" for="ib-bar-{{ key|escape }}"></label>
+                            <div class="insight-panel-column">
+                                <ul>
+                                {% for insight in value.insights_tab["Bar Chart"] %}
+                                    <li class="entry-column">
+                                    {{ insight|escape }}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                    {% endif %}
+                    {% if value.insights_tab["Histogram"] %}
+                    <div class="insight-container-column">
+                        <input type="checkbox" style="display: none" id="ib-histogram-{{ key|escape }}" class="insight-check-column">
+                        <label class="insight-btn-column" for="ib-histogram-{{ key|escape }}"></label>
+                            <div class="insight-panel-column">
+                                <ul>
+                                {% for insight in value.insights_tab["Histogram"] %}
+                                    <li class="entry-column">
+                                    {{ insight }}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                    {% endif %}
+                    {{ value.plots[1][0] }}
+                </div>
+            </div>
+            <div class="var-plot">
+                <div class="vp-switch">
+                    <input type="radio" name="{{ key|escape }}" checked id="vp-switch-{{ key|escape }}-stats" />
+                    <label for="vp-switch-{{ key|escape }}-stats" onclick="openTab(this)">Stats</label>
+
+                    {% for tab in value.tab_name[1:] %}
+                    <input type="radio" name="{{ key|escape }}" id="vp-switch-{{ key|escape }}-{{ tab }}"/>
+                    <label for="vp-switch-{{ key|escape }}-{{ tab }}" onclick="openTab(this)">{{ tab }}</label>
+                    {% endfor %}
+                </div>
+
+                {% if value.col_type == "numerical" %}
+                <div class="vp-table">
+                    <div class="stats-table">
+                        <h4 class="tb-title">Quantile Statistics</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Quantile Statistics"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    <td>{{ d }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                    <div class="stats-table">
+                        <h4 class="tb-title">Descriptive Statistics</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Descriptive Statistics"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    <td>{{ d }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                </div>
+                {% endif %}
+                {% if value.col_type == "categorical" %}
+                <div class="vp-table">
+                    <div class="stats-table">
+                        <h4 class="tb-title">Length</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Length"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    <td>{{ d }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                    <div class="stats-table">
+                        <h4 class="tb-title">Sample</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Sample"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    <td>{{ d }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                    <div class="stats-table">
+                        <h4 class="tb-title">Letter</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Letter"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    <td>{{ d }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                </div>
+                {% endif %}
+                {% for div,tab,insight_key in value.plots_tab %}
+                <div class="vp-plot">
+                    {% if value.insights_tab[insight_key] %}
+                    <div class="insight-container-column-wide">
+                        <input type="checkbox"  style="display: none" id="ib-{{ insight_key }}-{{ key|escape }}" class="insight-check-column">
+                        <label class="insight-btn-column-wide" for="ib-{{ insight_key }}-{{ key|escape }}"></label>
+                            <div class="insight-panel-column">
+                                <ul>
+                                {% for insight in value.insights_tab[insight_key] %}
+                                    <li class="entry-column">
+                                    {{ insight|escape }}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                    {% endif %}
+                    {{ div }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+</div>

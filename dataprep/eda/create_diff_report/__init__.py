@@ -1,5 +1,5 @@
 """
-    This module implements the create_report(df) function.
+    This module implements the create_diff_report([df1, df2]) function.
 """
 import warnings
 from typing import Any, Dict, List, Optional, Union
@@ -18,7 +18,7 @@ from ..palette import CATEGORY10
 __all__ = ["create_diff_report"]
 
 ENV_LOADER = Environment(
-    loader=PackageLoader("dataprep", "eda/create_report/templates"),
+    loader=PackageLoader("dataprep", "eda/create_diff_report/templates"),
 )
 
 
