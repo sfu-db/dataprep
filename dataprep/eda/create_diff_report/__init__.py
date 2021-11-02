@@ -13,6 +13,7 @@ from .diff_formatter import format_diff_report
 from ..configs import Config
 from ..create_report.report import Report
 from collections import defaultdict
+from ..palette import CATEGORY10
 
 __all__ = ["create_diff_report"]
 
@@ -75,6 +76,11 @@ def create_diff_report(
                 dict_stats[key].append(value)
         insights.append(comps["overview_insights"])
 
+    legend_lables = [
+        {"label": label, "color": color}
+        for label, color in zip(cfg.diff.label, CATEGORY10[: len(cfg.diff.label)])  # type: ignore
+    ]
+
     context = {
         "resources": INLINE.render(),
         "title": title,
@@ -83,6 +89,7 @@ def create_diff_report(
         "insights": insights,
         "is_diff_report": True,
         "df_labels": cfg.diff.label,
+        "legend_labels": legend_lables
     }
 
     template_base = ENV_LOADER.get_template("base.html")
