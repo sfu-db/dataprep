@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>An example dataset containing ISBN strings &#8212; DataPrep 0.4.0 documentation</title>
+  <title>ISBN Numbers &#8212; DataPrep 0.4.0 documentation</title>
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -143,11 +143,81 @@
     <ul class="nav section-nav flex-column">
       
         <li class="nav-item toc-entry toc-h2">
+          <a href="#Introduction" class="nav-link">Introduction</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#An-example-dataset-containing-ISBN-strings" class="nav-link">An example dataset containing ISBN strings</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
           <a href="#1.-Default-clean_isbn" class="nav-link">1. Default clean_isbn</a>
         </li>
       
         <li class="nav-item toc-entry toc-h2">
-          <a href="#2.-Output-formats" class="nav-link">2. Output formats</a>
+          <a href="#2.-Output-formats" class="nav-link">2. Output formats</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#standard-(default)" class="nav-link">standard (default)</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#compact" class="nav-link">compact</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#isbn13" class="nav-link">isbn13</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#isbn10" class="nav-link">isbn10</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#3.-split-parameter" class="nav-link">3. split parameter</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#4.-inplace-parameter" class="nav-link">4. inplace parameter</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#inplace-and-split" class="nav-link">inplace and split</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#5.-errors-parameter" class="nav-link">5. errors parameter</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#coerce-(default)" class="nav-link">coerce (default)</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#ignore" class="nav-link">ignore</a>
+        </li>
+      
+          </ul>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h2">
+          <a href="#4.-validate_isbn()" class="nav-link">4. validate_isbn()</a><ul class="nav section-nav flex-column">
+            
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#DataFrame-+-Specify-Column" class="nav-link">DataFrame + Specify Column</a>
+        </li>
+      
+        <li class="nav-item toc-entry toc-h3">
+          <a href="#Only-DataFrame" class="nav-link">Only DataFrame</a>
+        </li>
+      
+          </ul>
         </li>
       
     </ul>
@@ -389,13 +459,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-.. _isbn_userguide:
-
-ISBN Numbers
-============Introduction
-------------
-
-The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans a column containing ISBN strings, and standardizes them in a given format. The function :func:`validate_isbn() <dataprep.clean.clean_isbn.validate_isbn>` validates either a single ISBN strings, a column of ISBN strings or a DataFrame of ISBN strings, returning `True` if the value is valid, and `False` otherwise.<p>Currently, an ISBN is composed by following components:</p>
+<div class="section" id="ISBN-Numbers">
+<h1>ISBN Numbers<a class="headerlink" href="#ISBN-Numbers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The function <code class="docutils literal notranslate"><span class="pre">clean_isbn()</span></code> cleans a column containing ISBN strings, and standardizes them in a given format. The function <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code> validates either a single ISBN strings, a column of ISBN strings or a DataFrame of ISBN strings, returning <code class="docutils literal notranslate"><span class="pre">True</span></code> if the value is valid, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+<p>Currently, an ISBN is composed by following components:</p>
 <ul class="simple">
 <li><p>3-digit (only in ISBN-13) Bookland Code</p></li>
 <li><p>1 to 5-digit Group Identifier (identifies country or language)</p></li>
@@ -419,7 +488,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </ul>
 <p>The following sections demonstrate the functionality of <code class="docutils literal notranslate"><span class="pre">clean_isbn()</span></code> and <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code>.</p>
 <div class="section" id="An-example-dataset-containing-ISBN-strings">
-<h1>An example dataset containing ISBN strings<a class="headerlink" href="#An-example-dataset-containing-ISBN-strings" title="Permalink to this headline">¶</a></h1>
+<h3>An example dataset containing ISBN strings<a class="headerlink" href="#An-example-dataset-containing-ISBN-strings" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -526,6 +595,8 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
   </tbody>
 </table>
 </div></div>
+</div>
+</div>
 </div>
 <div class="section" id="1.-Default-clean_isbn">
 <h2>1. Default <code class="docutils literal notranslate"><span class="pre">clean_isbn</span></code><a class="headerlink" href="#1.-Default-clean_isbn" title="Permalink to this headline">¶</a></h2>
@@ -707,10 +778,8 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 <div class="section" id="2.-Output-formats">
 <h2>2. Output formats<a class="headerlink" href="#2.-Output-formats" title="Permalink to this headline">¶</a></h2>
 <p>This section demonstrates the output parameter.</p>
-</div>
-</div>
 <div class="section" id="standard-(default)">
-<h1><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)<a class="headerlink" href="#standard-(default)" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">standard</span></code> (default)<a class="headerlink" href="#standard-(default)" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -794,7 +863,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </div>
 </div>
 <div class="section" id="compact">
-<h1><code class="docutils literal notranslate"><span class="pre">compact</span></code><a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">compact</span></code><a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -878,7 +947,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </div>
 </div>
 <div class="section" id="isbn13">
-<h1><code class="docutils literal notranslate"><span class="pre">isbn13</span></code><a class="headerlink" href="#isbn13" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">isbn13</span></code><a class="headerlink" href="#isbn13" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -962,7 +1031,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </div>
 </div>
 <div class="section" id="isbn10">
-<h1><code class="docutils literal notranslate"><span class="pre">isbn10</span></code><a class="headerlink" href="#isbn10" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">isbn10</span></code><a class="headerlink" href="#isbn10" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -1044,6 +1113,8 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </table>
 </div></div>
 </div>
+</div>
+</div>
 <div class="section" id="3.-split-parameter">
 <h2>3. <code class="docutils literal notranslate"><span class="pre">split</span></code> parameter<a class="headerlink" href="#3.-split-parameter" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">split</span></code> parameter adds individual columns containing the cleaned 13-digits ISBN values to the given DataFrame.</p>
@@ -1060,7 +1131,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "5615c6be129642c5a25dea4add2f2fda"}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "d6d93cb8f3a944f4a0de2cf2f856fc28"}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -1273,10 +1344,8 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </table>
 </div></div>
 </div>
-</div>
-</div>
 <div class="section" id="inplace-and-split">
-<h1><code class="docutils literal notranslate"><span class="pre">inplace</span></code> and <code class="docutils literal notranslate"><span class="pre">split</span></code><a class="headerlink" href="#inplace-and-split" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">inplace</span></code> and <code class="docutils literal notranslate"><span class="pre">split</span></code><a class="headerlink" href="#inplace-and-split" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -1290,7 +1359,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "828e47983b494d1b91c21e6654b2ef41"}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "4ec817e1f75e4ea087b30dfb96c1cd81"}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -1409,12 +1478,12 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </table>
 </div></div>
 </div>
+</div>
+</div>
 <div class="section" id="5.-errors-parameter">
 <h2>5. <code class="docutils literal notranslate"><span class="pre">errors</span></code> parameter<a class="headerlink" href="#5.-errors-parameter" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
 <div class="section" id="coerce-(default)">
-<h1><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)<a class="headerlink" href="#coerce-(default)" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">coerce</span></code> (default)<a class="headerlink" href="#coerce-(default)" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -1507,7 +1576,7 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </div>
 </div>
 <div class="section" id="ignore">
-<h1><code class="docutils literal notranslate"><span class="pre">ignore</span></code><a class="headerlink" href="#ignore" title="Permalink to this headline">¶</a></h1>
+<h3><code class="docutils literal notranslate"><span class="pre">ignore</span></code><a class="headerlink" href="#ignore" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -1598,6 +1667,8 @@ The function :func:`clean_isbn() <dataprep.clean.clean_isbn.clean_isbn>` cleans 
 </table>
 </div></div>
 </div>
+</div>
+</div>
 <div class="section" id="4.-validate_isbn()">
 <h2>4. <code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code><a class="headerlink" href="#4.-validate_isbn()" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">validate_isbn()</span></code> returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when the input is a valid phone number. Otherwise it returns <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
@@ -1636,10 +1707,8 @@ False
 False
 </pre></div></div>
 </div>
-</div>
-</div>
 <div class="section" id="DataFrame-+-Specify-Column">
-<h1>DataFrame + Specify Column<a class="headerlink" href="#DataFrame-+-Specify-Column" title="Permalink to this headline">¶</a></h1>
+<h3>DataFrame + Specify Column<a class="headerlink" href="#DataFrame-+-Specify-Column" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
@@ -1668,7 +1737,7 @@ Name: isbn, dtype: bool
 </div>
 </div>
 <div class="section" id="Only-DataFrame">
-<h1>Only DataFrame<a class="headerlink" href="#Only-DataFrame" title="Permalink to this headline">¶</a></h1>
+<h3>Only DataFrame<a class="headerlink" href="#Only-DataFrame" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
@@ -1751,8 +1820,10 @@ Name: isbn, dtype: bool
 </div></div>
 </div>
 <script type="application/vnd.jupyter.widget-state+json">
-{"state": {"2bc0c680e1a94a9296085de82586e801": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": "2", "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "cbdafb22538246e18d67319b35c43b66": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "d6b4fb663a5245d0bb15dc7283893725": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_2bc0c680e1a94a9296085de82586e801", "max": 9.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_cbdafb22538246e18d67319b35c43b66", "value": 9.0}}, "6c0db32facfa4f4386addee88ec9ec0e": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9ca76c5bed444bfba36e7d42f8fc2b3d": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "5389d323d52b4f4bb6985b82e0f4a0e8": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_6c0db32facfa4f4386addee88ec9ec0e", "placeholder": "\u200b", "style": "IPY_MODEL_9ca76c5bed444bfba36e7d42f8fc2b3d", "value": "  0%"}}, "eafe7a0dac2140109948df7daaacc4ac": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "6d76e86a374d4e81aa2102b244151d23": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "d2c22e1dfe2b4212a63c1fb4be0c3d5e": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_eafe7a0dac2140109948df7daaacc4ac", "placeholder": "\u200b", "style": "IPY_MODEL_6d76e86a374d4e81aa2102b244151d23", "value": " 0/9 [00:00&lt;?, ?it/s]"}}, "ea44a969d9944799ba52f3e92f73600c": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": "inline-flex", "flex": null, "flex_flow": "row wrap", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "5615c6be129642c5a25dea4add2f2fda": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_5389d323d52b4f4bb6985b82e0f4a0e8", "IPY_MODEL_d6b4fb663a5245d0bb15dc7283893725", "IPY_MODEL_d2c22e1dfe2b4212a63c1fb4be0c3d5e"], "layout": "IPY_MODEL_ea44a969d9944799ba52f3e92f73600c"}}, "8a6c4dedb77440df80783143373cff82": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": "2", "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "cabcd16c4fdf485ab174ee2b842b9f61": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "b264280cfec843a4939ca7d91e7ef3ba": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_8a6c4dedb77440df80783143373cff82", "max": 9.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_cabcd16c4fdf485ab174ee2b842b9f61", "value": 9.0}}, "bb567e3c367d4d87877163586501f2cb": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "28e3a74929b34cc09b233779e3ed0568": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "b1bd068c93b04a4488859d8a7dc81838": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_bb567e3c367d4d87877163586501f2cb", "placeholder": "\u200b", "style": "IPY_MODEL_28e3a74929b34cc09b233779e3ed0568", "value": "  0%"}}, "4a07d2b015c84b629ba7392e902489f7": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c48f18e8a7cc42e59facdbe344971bad": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "a20766801e61439288f76f7f25d54163": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_4a07d2b015c84b629ba7392e902489f7", "placeholder": "\u200b", "style": "IPY_MODEL_c48f18e8a7cc42e59facdbe344971bad", "value": " 0/9 [00:00&lt;?, ?it/s]"}}, "8da45422d7c94e87aa711a8c4775fd31": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": "inline-flex", "flex": null, "flex_flow": "row wrap", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "828e47983b494d1b91c21e6654b2ef41": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_b1bd068c93b04a4488859d8a7dc81838", "IPY_MODEL_b264280cfec843a4939ca7d91e7ef3ba", "IPY_MODEL_a20766801e61439288f76f7f25d54163"], "layout": "IPY_MODEL_8da45422d7c94e87aa711a8c4775fd31"}}}, "version_major": 2, "version_minor": 0}
+{"state": {"412899977475432495ee010ad3e4e5b1": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": "2", "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "180dbdd9d5a545fc824414feec52497e": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "db539fdc172b4d459339f02cdbd7c93d": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_412899977475432495ee010ad3e4e5b1", "max": 9.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_180dbdd9d5a545fc824414feec52497e", "value": 9.0}}, "ff3a98f308834d9fa7402f43899fc04f": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "beca378f8eb4480c91b6f73c1c5d3f54": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "6922ed01d231469caf03c2576532921a": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_ff3a98f308834d9fa7402f43899fc04f", "placeholder": "\u200b", "style": "IPY_MODEL_beca378f8eb4480c91b6f73c1c5d3f54", "value": "  0%"}}, "9fd3cd1747a14aafb0a28c5f426e8999": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "915b1bee0874459381c3d0a4de537c7b": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "c368d95d0ead4bc7ab90fd3c1bd0d2d8": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_9fd3cd1747a14aafb0a28c5f426e8999", "placeholder": "\u200b", "style": "IPY_MODEL_915b1bee0874459381c3d0a4de537c7b", "value": " 0/9 [00:00&lt;?, ?it/s]"}}, "bcfebe2765bf4358842d6e4eac6ab9e0": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": "inline-flex", "flex": null, "flex_flow": "row wrap", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "d6d93cb8f3a944f4a0de2cf2f856fc28": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_6922ed01d231469caf03c2576532921a", "IPY_MODEL_db539fdc172b4d459339f02cdbd7c93d", "IPY_MODEL_c368d95d0ead4bc7ab90fd3c1bd0d2d8"], "layout": "IPY_MODEL_bcfebe2765bf4358842d6e4eac6ab9e0"}}, "3bfd26479bd448cc91133f24b0d111ba": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": "2", "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "59aea7bd203f4e9da46d736ef542f54d": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "bb82986db7c04c7f873fb7701e26d09a": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_3bfd26479bd448cc91133f24b0d111ba", "max": 9.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_59aea7bd203f4e9da46d736ef542f54d", "value": 9.0}}, "8af4cb7621114b80af8f2912992be7f7": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "ee6ae37de5ac49e38a9fb814f264882f": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "eb8be5c5cf2b4b8c87c6a4e4b2cdda13": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_8af4cb7621114b80af8f2912992be7f7", "placeholder": "\u200b", "style": "IPY_MODEL_ee6ae37de5ac49e38a9fb814f264882f", "value": "  0%"}}, "fe6e67131f204b57803014d6cbc13beb": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "50973fadb6e245ae8c3c8c36887b261f": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "22477a042af34c8cb83ea652f5c7323e": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HTMLView", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_fe6e67131f204b57803014d6cbc13beb", "placeholder": "\u200b", "style": "IPY_MODEL_50973fadb6e245ae8c3c8c36887b261f", "value": " 0/9 [00:00&lt;?, ?it/s]"}}, "e5edc531f629441f8b43bd7b54574211": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": "inline-flex", "flex": null, "flex_flow": "row wrap", "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "4ec817e1f75e4ea087b30dfb96c1cd81": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_eb8be5c5cf2b4b8c87c6a4e4b2cdda13", "IPY_MODEL_bb82986db7c04c7f873fb7701e26d09a", "IPY_MODEL_22477a042af34c8cb83ea652f5c7323e"], "layout": "IPY_MODEL_e5edc531f629441f8b43bd7b54574211"}}}, "version_major": 2, "version_minor": 0}
 </script></div>
+</div>
+</div>
 
 
           </div>
