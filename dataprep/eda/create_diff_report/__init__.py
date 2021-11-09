@@ -92,6 +92,8 @@ def create_diff_report(
         "legend_labels": legend_lables
     }
 
+    # return context
+
     template_base = ENV_LOADER.get_template("base.html")
     report = template_base.render(context=context)
     return Report(report)

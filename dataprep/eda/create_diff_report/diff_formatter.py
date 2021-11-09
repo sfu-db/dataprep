@@ -11,6 +11,7 @@ from ...errors import DataprepError
 import pandas as pd
 from bokeh.embed import components
 from bokeh.plotting import Figure
+from ..diff import compute_diff
 from ..configs import Config
 from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
@@ -40,12 +41,13 @@ from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ...progress_bar import ProgressBar
+from ..diff import render_diff, compute_diff
 
 # pylint: disable=E1133
 
 
 def format_diff_report(
-    df: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]],
+    dfs: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]],
     cfg: Config,
     mode: Optional[str],
     progress: bool = True,
@@ -55,7 +57,7 @@ def format_diff_report(
 
     Parameters
     ----------
-    df
+    dfs
         The DataFrame for which data are calculated.
     cfg
         The config instance
@@ -71,35 +73,35 @@ def format_diff_report(
         A dictionary in which formatted data will be stored.
         This variable acts like an API in passing data to the template engine.
     """
-    if isinstance(df, list):
+    if isinstance(dfs, list):
 
         if not cfg.diff.label:
-            cfg.diff.label = [f"df{i+1}" for i in range(len(df))]
+            cfg.diff.label = [f"dfs{i+1}" for i in range(len(dfs))]
 
-        if len(df) < 2:
-            raise DataprepError("plot_diff needs at least 2 DataFrames.")
-        if len(df) > 5:
+        if len(dfs) < 2:
+            raise DataprepError("create_plot_diff needs at least 2 DataFrames.")
+        if len(dfs) > 5:
             raise DataprepError("Too many DataFrames, max: 5.")
 
-    elif isinstance(df, dict):
+    elif isinstance(dfs, dict):
 
         if not cfg.diff.label:
-            cfg.diff.label = list(df.keys())
+            cfg.diff.label = list(dfs.keys())
 
-        df = list(df.values())
+        dfs = list(dfs.values())
 
     computations = []
     with ProgressBar(minimum=1, disable=not progress):
         if mode == "basic":
-            for x in df:
+            for i, x in enumerate(dfs):
                 edaframe = EDAFrame(x)
-                computations.append(format_basic(edaframe, cfg))
+                computations.append(format_basic(edaframe, cfg, dfs, i))
         else:
             raise ValueError(f"Unknown mode: {mode}")
     return computations
 
 
-def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[str, Any]:
+def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]]) -> Dict[str, Any]:
     res: Dict[str, Any] = {}
     # variables
     if not cfg.variables.enable:
@@ -158,6 +160,14 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
 
     return res
 
+def _format_plots(
+    dfs: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]],
+    cfg: Config
+) -> Dict[str, Any]:
+
+    itmdt = compute_diff(dfs, cfg=cfg)
+    return render_diff(itmdt, cfg=cfg)
+
 
 def _format_overview(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
     """Format of Overview section"""
@@ -183,7 +193,11 @@ def _format_overview(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
     return res
 
 
-def format_basic(dfs: List[EDAFrame], cfg: Config) -> Dict[str, Any]:
+def format_basic(dfs: List[EDAFrame], 
+cfg: Config, 
+df_list: Union[List[Union[pd.DataFrame, dd.DataFrame]], 
+Union[pd.DataFrame, dd.DataFrame]],
+index: int) -> Dict[str, Any]:
     """
     Format basic version.
 
@@ -220,11 +234,17 @@ def format_basic(dfs: List[EDAFrame], cfg: Config) -> Dict[str, Any]:
         (data,) = dask.compute(data)
 
     res_overview = _format_overview(data, cfg)
-    res_variables = _format_variables(dfs, cfg, data)
+    res_variables = _format_variables(dfs, cfg, data, df_list)
+    res_plots = None
+    if index == 0:
+        res_plots = _format_plots(cfg=cfg, dfs=df_list)
     # res_interaction = _format_interaction(data, cfg)
     # res_correlations = _format_correlation(data, cfg)
     # res_missing = _format_missing(data, cfg, completions, df.shape[1])
     # res = {**res_overview, **res_variables, **res_interaction, **res_correlations, **res_missing}
+    if res_plots:
+        res = {**res_overview, **res_variables, **res_plots}
+        return res
     res = {**res_overview, **res_variables}
 
     return res
