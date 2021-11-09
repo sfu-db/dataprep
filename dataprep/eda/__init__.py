@@ -7,10 +7,7 @@ from bokeh.io import output_notebook
 from ..utils import is_notebook
 from .correlation import compute_correlation, plot_correlation, render_correlation
 from .create_report import create_report
-<<<<<<< HEAD
 from .create_diff_report import create_diff_report
-=======
->>>>>>> 27b36f5c332403378b9bfe656d7bae0cd54a5928
 from .distribution import compute, plot, render
 from .dtypes import (
     Categorical,

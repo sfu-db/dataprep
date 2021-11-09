@@ -36,13 +36,15 @@ from ..dtypes_v2 import (
     GeoPoint,
     SmallCardNum,
 )
+from ..dtypes import is_dtype
 from ..eda_frame import EDAFrame
 from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ...progress_bar import ProgressBar
 
-from ..diff import render_diff, compute_diff
+from ..diff import compute_diff, render_diff
+from ..diff.render import hist_viz, bar_viz
 
 
 
@@ -196,6 +198,73 @@ def _format_overview(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
     return res
 
 
+def render_plots(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
+    """
+    Create visualizations for plot(df)
+    """
+    # pylint: disable=too-many-locals, line-too-long
+    plot_width = cfg.plot.width if cfg.plot.width is not None else 324
+    plot_height = cfg.plot.height if cfg.plot.height is not None else 300
+    df_labels: List[str] = cfg.diff.label  # type: ignore
+    baseline: int = cfg.diff.baseline
+
+    figs: List[Figure] = []
+    nrows = itmdt["stats"]["nrows"]
+    titles: List[str] = []
+    for col, dtp, data, orig in itmdt["data"]:
+        fig = None
+        if is_dtype(dtp, Nominal()):
+            df, ttl_grps = data
+            fig = bar_viz(
+                list(df),
+                ttl_grps,
+                nrows,
+                col,
+                cfg.bar.yscale,
+                plot_width,
+                plot_height,
+                False,
+                orig,
+                df_labels,
+                baseline if len(df) > 1 else 0,
+            )
+        elif is_dtype(dtp, Continuous()):
+            fig = hist_viz(
+                data,
+                nrows,
+                col,
+                cfg.hist.yscale,
+                plot_width,
+                plot_height,
+                False,
+                df_labels,
+                orig,
+            )
+        if fig:
+            fig.frame_height = plot_height
+            titles.append(fig.title.text)
+            fig.title.text = ""
+            figs.append(fig)
+
+    if cfg.stats.enable:
+        toggle_content = "Stats"
+    else:
+        toggle_content = None  # type: ignore
+    return {
+        "layout": figs,
+        "meta": titles,
+        # "comparison_stats": format_ov_stats(itmdt["stats"]) if cfg.stats.enable else None,
+        "container_width": plot_width * 3,
+        "toggle_content": toggle_content,
+        "df_labels": cfg.diff.label,
+        # "legend_labels": [
+        #     {"label": label, "color": color}
+        #     for label, color in zip(cfg.diff.label, CATEGORY10[: len(cfg.diff.label)])  # type: ignore
+        # ],
+        "baseline": baseline,
+    }
+
+
 def format_basic(dfs: List[EDAFrame], 
 cfg: Config, 
 df_list: Union[List[Union[pd.DataFrame, dd.DataFrame]], 
@@ -239,8 +308,20 @@ index: int) -> Dict[str, Any]:
     res_overview = _format_overview(data, cfg)
     res_variables = _format_variables(dfs, cfg, data, df_list)
     res_plots = None
+    figs_var: List[Figure] = []
     if index == 0:
         res_plots = _format_plots(cfg=cfg, dfs=df_list)
+        layout = res_plots["layout"]
+
+        for tab in layout:
+            try:
+                fig = tab.children[0]
+            except AttributeError:
+                fig = tab
+            figs_var.append(fig)
+        # plots = {str(k): v for k, v in enumerate(figs_var)}
+        plots = components(figs_var)
+        res_plots["graphs"] = plots
     # res_interaction = _format_interaction(data, cfg)
     # res_correlations = _format_correlation(data, cfg)
     # res_missing = _format_missing(data, cfg, completions, df.shape[1])
