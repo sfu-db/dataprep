@@ -1,20 +1,6 @@
-{{ context.resources }}
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.2.0.min.js"></script>
 
-{% if context.components.has_variables%}
-{% for var in context.components.variables.values() %}
-{% if var.plots[0] != 0 %}
-{{ var.plots[0] }}
-{% endif %}
-{% endfor %}
-{% endif %}
-
-{% if context.components.has_correlation and context.components.correlations[0] != 0%}
-{{ context.components.correlations[0] }}
-{% endif %}
-
-{% if context.components.has_missing and context.components.missing[0] != 0 %}
-{{ context.components.missing[0] }}
-{% endif %}
+{{ context.components[0].graphs[0] }}
 
 <script>
     setTimeout(init, 50);
