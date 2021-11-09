@@ -41,7 +41,10 @@ from ..intermediate import Intermediate
 from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ...progress_bar import ProgressBar
+
 from ..diff import render_diff, compute_diff
+
+
 
 # pylint: disable=E1133
 
