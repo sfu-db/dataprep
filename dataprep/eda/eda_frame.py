@@ -12,7 +12,14 @@ import numpy as np
 import pandas as pd
 import pandas._libs.missing as libmissing
 
-from .dtypes_v2 import NUMERICAL_DTYPES, DType, DTypeDef, detect_dtype, Nominal, GeoGraphy
+from .dtypes_v2 import (
+    NUMERICAL_DTYPES,
+    DType,
+    DTypeDef,
+    detect_dtype,
+    Nominal,
+    GeoGraphy,
+)
 
 DataFrame = Union[pd.DataFrame, dd.DataFrame, "EDAFrame"]
 
@@ -108,6 +115,11 @@ class EDAFrame:
         for col in ddf.columns:
             if isinstance(self._eda_dtypes[col], (Nominal, GeoGraphy)):
                 ddf[col] = ddf[col].apply(_to_str_if_not_na, meta=(col, "object"))
+
+            # transform pandas extension type to the numpy type,
+            # to avoid computation issue of pandas type, e.g., #733.
+            elif issubclass(type(ddf[col].dtype), pd.api.extensions.ExtensionDtype):
+                ddf[col] = ddf[col].astype(ddf[col].dtype.type)
 
         self._ddf = ddf.persist()
         self._columns = self._ddf.columns
