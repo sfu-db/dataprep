@@ -50,7 +50,7 @@ from ..diff.render import hist_viz, bar_viz
 
 
 def format_diff_report(
-    dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
+    df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
     cfg: Config,
     mode: Optional[str],
     progress: bool = True,
@@ -60,7 +60,7 @@ def format_diff_report(
 
     Parameters
     ----------
-    dfs
+    df_list
         The DataFrame for which data are calculated.
     cfg
         The config instance
@@ -72,35 +72,33 @@ def format_diff_report(
 
     Returns
     -------
-    List[Dict[str, Any]]
-        A list of dictionaries for each dataframe.
+    Dict[str, Any]
+        A dictionary of results
     """
-    if isinstance(dfs, list):
+    if isinstance(df_list, list):
 
         if not cfg.diff.label:
-            cfg.diff.label = [f"df{i+1}" for i in range(len(dfs))]
+            cfg.diff.label = [f"df{i+1}" for i in range(len(df_list))]
 
-        if len(dfs) < 2:
+        if len(df_list) < 2:
             raise DataprepError("create_plot_diff needs at least 2 DataFrames.")
-        if len(dfs) > 5:
+        if len(df_list) > 5:
             raise DataprepError("Too many DataFrames, max: 5.")
 
-    elif isinstance(dfs, dict):
+    elif isinstance(df_list, dict):
 
         if not cfg.diff.label:
-            cfg.diff.label = list(dfs.keys())
+            cfg.diff.label = list(df_list.keys())
 
-        dfs = list(dfs.values())
+        df_list = list(df_list.values())
 
     computations = []
     with ProgressBar(minimum=1, disable=not progress):
         if mode == "basic":
-            for i, x in enumerate(dfs):
-                edaframe = EDAFrame(x)
-                computations.append(format_basic(edaframe, cfg, dfs, i))
+            report = format_basic(df_list, cfg)
         else:
             raise ValueError(f"Unknown mode: {mode}")
-    return computations
+    return report
 
 
 def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]]) -> Dict[str, Any]:
@@ -163,11 +161,11 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Unio
     return res
 
 def _format_plots(
-    dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
+    df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
     cfg: Config
 ) -> Dict[str, Any]:
 
-    itmdt = compute_diff(dfs, cfg=cfg)
+    itmdt = compute_diff(df_list, cfg=cfg)
     return render_diff(itmdt, cfg=cfg)
 
 
@@ -262,11 +260,10 @@ def render_plots(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     }
 
 
-def format_basic(dfs: List[EDAFrame], 
-cfg: Config, 
-df_list: Union[List[Union[pd.DataFrame, dd.DataFrame]], 
-Union[pd.DataFrame, dd.DataFrame]],
-index: int) -> Dict[str, Any]:
+def format_basic(
+df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
+cfg: Config
+) -> Dict[str, Any]:
     """
     Format basic version.
 
@@ -285,50 +282,46 @@ index: int) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals,too-many-statements,too-many-branches
     # aggregate all computations
+    final_results = {"dfs": []}
 
-    setattr(getattr(cfg, "plot"), "report", True)
-    # data, completions = basic_computations(dfs, cfg)
-    data, _ = basic_computations(dfs, cfg)
-    with catch_warnings():
-        filterwarnings(
-            "ignore",
-            "invalid value encountered in true_divide",
-            category=RuntimeWarning,
-        )
-        filterwarnings(
-            "ignore",
-            "overflow encountered in long_scalars",
-            category=RuntimeWarning,
-        )
-        (data,) = dask.compute(data)
+    for df in df_list:
+        df = EDAFrame(df)
+        setattr(getattr(cfg, "plot"), "report", True)
+        # data, completions = basic_computations(df, cfg)
+        data, _ = basic_computations(df, cfg)
+        with catch_warnings():
+            filterwarnings(
+                "ignore",
+                "invalid value encountered in true_divide",
+                category=RuntimeWarning,
+            )
+            filterwarnings(
+                "ignore",
+                "overflow encountered in long_scalars",
+                category=RuntimeWarning,
+            )
+            (data,) = dask.compute(data)
 
-    res_overview = _format_overview(data, cfg)
-    res_variables = _format_variables(dfs, cfg, data, df_list)
-    res_plots = None
+        res_overview = _format_overview(data, cfg)
+        res_variables = _format_variables(df, cfg, data, df_list)
+        res = {**res_overview, **res_variables}
+        final_results["dfs"].append(res)
+
     figs_var: List[Figure] = []
-    if index == 0:
-        res_plots = _format_plots(cfg=cfg, dfs=df_list)
-        layout = res_plots["layout"]
+    res_plots = _format_plots(cfg=cfg, df_list=df_list)
+    layout = res_plots["layout"]
 
-        for tab in layout:
-            try:
-                fig = tab.children[0]
-            except AttributeError:
-                fig = tab
-            figs_var.append(fig)
-        # plots = {str(k): v for k, v in enumerate(figs_var)}
-        plots = components(figs_var)
-        res_plots["graphs"] = plots
-    # res_interaction = _format_interaction(data, cfg)
-    # res_correlations = _format_correlation(data, cfg)
-    # res_missing = _format_missing(data, cfg, completions, df.shape[1])
-    # res = {**res_overview, **res_variables, **res_interaction, **res_correlations, **res_missing}
-    if res_plots:
-        res = {**res_overview, **res_variables, **res_plots}
-        return res
-    res = {**res_overview, **res_variables}
+    for tab in layout:
+        try:
+            fig = tab.children[0]
+        except AttributeError:
+            fig = tab
+        figs_var.append(fig)
+    # plots = {str(k): v for k, v in enumerate(figs_var)}
+    plots = components(figs_var)
+    final_results["graphs"] = plots
 
-    return res
+    return final_results
 
 
 def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:

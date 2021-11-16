@@ -1,5 +1,5 @@
 <div class="section-start">
-{% for key, value in context.components[0].variables.items() %}
+{% for key, value in context.components.dfs[0].variables.items() %}
     {% if value.error %}
         <div class="section-variable">
         {% with error_message = value.error %}
@@ -23,7 +23,7 @@
                             {% for h, d in value.tabledata["Overview"].items() %}
                             <tr>
                                 <th>{{ h }}</th>
-                                {% for comps in context.components %}
+                                {% for comps in context.components.dfs %}
                                 {% if key in comps.variables %}
                                 {% if h in comps.variables[key].tabledata["Overview"] %}
                                 <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Overview"][h] }}</td>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="var-ovplot">
-                    {{ context.components[0].graphs[1][loop.index0] }}
+                    {{ context.components.graphs[1][loop.index0] }}
                 </div>
             </div>
         </div>
