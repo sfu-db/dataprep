@@ -13,7 +13,6 @@ from bokeh.embed import components
 from bokeh.plotting import Figure
 from ..diff import compute_diff
 from ..configs import Config
-from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
 from ..distribution import render
 from ..utils import _calc_line_dt
@@ -39,7 +38,6 @@ from ..dtypes_v2 import (
 from ..dtypes import is_dtype
 from ..eda_frame import EDAFrame
 from ..intermediate import Intermediate
-from ..missing import render_missing
 from ..missing.compute.nullivariate import compute_missing_nullivariate
 from ...progress_bar import ProgressBar
 
@@ -52,13 +50,13 @@ from ..diff.render import hist_viz, bar_viz
 
 
 def format_diff_report(
-    dfs: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]],
+    dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
     cfg: Config,
     mode: Optional[str],
     progress: bool = True,
-) -> Dict[str, Any]:
+) -> List[Any]:
     """
-    Format the data and figures needed by report
+    Format the data and figures needed by diff_report
 
     Parameters
     ----------
@@ -74,14 +72,13 @@ def format_diff_report(
 
     Returns
     -------
-    Dict[str, Any]
-        A dictionary in which formatted data will be stored.
-        This variable acts like an API in passing data to the template engine.
+    List[Dict[str, Any]]
+        A list of dictionaries for each dataframe.
     """
     if isinstance(dfs, list):
 
         if not cfg.diff.label:
-            cfg.diff.label = [f"dfs{i+1}" for i in range(len(dfs))]
+            cfg.diff.label = [f"df{i+1}" for i in range(len(dfs))]
 
         if len(dfs) < 2:
             raise DataprepError("create_plot_diff needs at least 2 DataFrames.")
@@ -106,7 +103,7 @@ def format_diff_report(
     return computations
 
 
-def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]]) -> Dict[str, Any]:
+def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]]) -> Dict[str, Any]:
     res: Dict[str, Any] = {}
     # variables
     if not cfg.variables.enable:
@@ -166,7 +163,7 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Unio
     return res
 
 def _format_plots(
-    dfs: Union[List[Union[pd.DataFrame, dd.DataFrame]], Union[pd.DataFrame, dd.DataFrame]],
+    dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
     cfg: Config
 ) -> Dict[str, Any]:
 
