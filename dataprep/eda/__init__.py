@@ -7,6 +7,7 @@ from bokeh.io import output_notebook
 from ..utils import is_notebook
 from .correlation import compute_correlation, plot_correlation, render_correlation
 from .create_report import create_report
+from .create_diff_report import create_diff_report
 from .distribution import compute, plot, render
 from .dtypes import (
     Categorical,
@@ -44,6 +45,7 @@ __all__ = [
     "DateTime",
     "Text",
     "create_report",
+    "create_diff_report",
     "plot_diff",
     "compute_diff",
     "render_diff",
