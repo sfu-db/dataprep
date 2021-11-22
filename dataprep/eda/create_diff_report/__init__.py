@@ -78,7 +78,7 @@ def create_diff_report(
         "components": components,
         "is_diff_report": True,
         "df_labels": cfg.diff.label,
-        "legend_labels": components["legend_lables"]
+        "legend_labels": components["legend_lables"],
     }
 
     # return context

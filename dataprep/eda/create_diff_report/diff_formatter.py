@@ -35,13 +35,24 @@ from ..dtypes_v2 import (
 )
 
 from collections import OrderedDict
-from ..dtypes import DTypeDef, is_dtype, detect_dtype, Continuous as Continuous_v1, Nominal as Nominal_v1, DateTime as DateTime_v1
+from ..dtypes import (
+    DTypeDef,
+    is_dtype,
+    detect_dtype,
+    Continuous as Continuous_v1,
+    Nominal as Nominal_v1,
+    DateTime as DateTime_v1,
+)
 from ..eda_frame import EDAFrame
 from ..intermediate import Intermediate
 from ..diff.compute.multiple_df import _is_all_int
 from ...progress_bar import ProgressBar
 
-from ..diff.compute.multiple_df import _cont_calcs as diff_cont_calcs, _nom_calcs as diff_nom_calcs, calc_stats as diff_calc_stats
+from ..diff.compute.multiple_df import (
+    _cont_calcs as diff_cont_calcs,
+    _nom_calcs as diff_nom_calcs,
+    calc_stats as diff_calc_stats,
+)
 from ..diff.compute.multiple_df import Srs, Dfs
 from ..diff import render_diff
 from ..palette import CATEGORY10
@@ -97,10 +108,8 @@ def format_diff_report(
             raise ValueError(f"Unknown mode: {mode}")
     return report
 
-def format_basic(
-df_list: List[pd.DataFrame],
-cfg: Config
-) -> Dict[str, Any]:
+
+def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
     """
     Format basic version.
 
@@ -143,26 +152,21 @@ cfg: Config
             )
             # data = dask.compute(data)
             delayed_results.append(data)
-    
 
     res_plots = dask.delayed(_format_plots)(cfg=cfg, df_list=df_list)
-    
 
-    dask_results['df_computations'] = (delayed_results)
-    dask_results['plots'] = res_plots
+    dask_results["df_computations"] = delayed_results
+    dask_results["plots"] = res_plots
 
     dask_results = dask.compute(dask_results)
-    
-    
-    for df, data in zip(df_list, dask_results[0]['df_computations']):
+
+    for df, data in zip(df_list, dask_results[0]["df_computations"]):
         res_overview = _format_overview(data, cfg)
         res_variables = _format_variables(EDAFrame(df), cfg, data, df_list)
         res = {**res_overview, **res_variables}
         final_results["dfs"].append(res)
-        
 
-    
-    layout = dask_results[0]['plots']["layout"]
+    layout = dask_results[0]["plots"]["layout"]
 
     for tab in layout:
         try:
@@ -170,7 +174,6 @@ cfg: Config
         except AttributeError:
             fig = tab
         figs_var.append(fig)
-    
 
     plots = components(figs_var)
     final_results["graphs"] = plots
@@ -181,6 +184,7 @@ cfg: Config
     ]
 
     return final_results
+
 
 def basic_computations(
     df: EDAFrame, cfg: Config
@@ -218,6 +222,7 @@ def basic_computations(
         data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))
 
     return data
+
 
 def compute_plot_data(
     df_list: List[dd.DataFrame], cfg: Config, dtype: Optional[DTypeDef]
@@ -270,7 +275,6 @@ def compute_plot_data(
                 norm_srs = srs.apply("dropna").apply("astype", "str")
 
             data.append((col, Nominal_v1(), diff_nom_calcs(norm_srs, cfg), orig))
-        
 
     stats = diff_calc_stats(dfs, cfg, dtype)
     data, stats = dask.compute(data, stats)
@@ -285,8 +289,9 @@ def compute_plot_data(
                 plot_data.append((col, dtp, (datum["bar"], datum["nuniq"]), orig))
         elif is_dtype(dtp, DateTime_v1()):
             plot_data.append((col, dtp, dask.compute(*datum), orig))  # workaround
-    
+
     return Intermediate(data=plot_data, stats=stats, visual_type="comparison_grid")
+
 
 def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     """Computation of Variables section."""
@@ -352,7 +357,12 @@ def _compute_overview(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     return data
 
 
-def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]]) -> Dict[str, Any]:
+def _format_variables(
+    df: EDAFrame,
+    cfg: Config,
+    data: Dict[str, Any],
+    dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
+) -> Dict[str, Any]:
     """Formatting of variables section"""
     res: Dict[str, Any] = {}
     # variables
@@ -396,9 +406,9 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any], dfs: Unio
 
     return res
 
+
 def _format_plots(
-    df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
-    cfg: Config
+    df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]], cfg: Config
 ) -> Dict[str, Any]:
     """Formatting of plots section"""
     df_list = list(map(to_dask, df_list))
