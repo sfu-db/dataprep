@@ -1,0 +1,103 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> {{ context.title }} </title>
+  {% include 'scripts.html' %}
+  {% include 'styles.html' %}
+</head>
+
+<body class="bg-container">
+  <nav class="navbar-top">
+    <a href="#"><span>{{ context.title }}</span></a>
+    {% if context.components.dfs[0].has_overview %}
+    <a href="#overview">Overview</a>
+    {% endif %}
+    <div class="subnav" onclick="hideDropdown(this)">
+      {% if context.components.dfs[0].has_variables %}
+      <a href="#variables">Variables ≡</a>
+      <div class="subcontent">
+        {% for var in context.components.dfs[0].variables.keys() %}
+        <a href="#{{ var|e }}">{{ var|e }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% if context.components.dfs[0].has_interaction %}
+    <a href="#interactions">Interactions</a>
+    {% endif %}
+    {% if context.components.dfs[0].has_correlation %}
+    <a href="#correlations">Correlations</a>
+    {% endif %}
+    {% if context.components.dfs[0].has_missing %}
+    <a href="#missing-values">Missing Values</a>
+    {% endif %}
+  </nav>
+
+  <div class="container-main">
+
+    {% if context.components.dfs[0].has_overview %}
+    <div>
+      <a class="id-anchor" id="overview"></a>
+      <h1 class="tb-title">Overview</h1>
+    </div>
+    <section class="section">
+      <div class="section-start">
+        {% include 'overview.html' %}
+      </div>
+    </section>
+    {% endif %}
+    {% if context.components.dfs[0].has_variables %}
+    <div>
+      <a class="id-anchor" id="variables"></a>
+      <h1 class="tb-title">Variables</h1>
+    </div>
+    <section class="section">
+      {% include 'variables.html' %}
+    </section>
+    {% endif %}
+
+    {% if context.components.dfs[0].has_interaction %}
+    <div>
+      <a class="id-anchor" id="interactions"></a>
+      <h1 class="tb-title">Interactions</h1>
+    </div>
+    <section class="section">
+      {% include 'interactions.html' %}
+    </section>
+    {% endif %}
+
+    {% if context.components.dfs[0].has_correlation %}
+    <div>
+      <a class="id-anchor" id="correlations"></a>
+      <h1 class="tb-title">Correlations</h1>
+    </div>
+    <section class="section">
+      {% include 'correlation.html' %}
+    </section>
+    {% endif %}
+
+    {% if context.components.dfs[0].has_missing %}
+    <div>
+      <a class="id-anchor" id="missing-values"></a>
+      <h1 class="tb-title">Missing Values</h1>
+    </div>
+    <section class="section">
+      {% include 'missing.html' %}
+    </section>
+    {% endif %}
+
+  </div>
+
+  {% if context.components.dfs[0].has_interaction and context.components.dfs[0].interactions.dfs[0] != 0%}
+  {{ context.components.dfs[0].interactions.dfs[0] }}
+  {% endif %}
+
+  <footer class="footer">
+    <p>Report generated with <a href="https://dataprep.ai/">DataPrep</a></p>
+  </footer>
+
+</body>
+
+</html>
