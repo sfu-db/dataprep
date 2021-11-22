@@ -1,0 +1,45 @@
+<div class="section-start">
+{% for key, value in context.components.dfs[0].variables.items() %}
+    {% if value.error %}
+        <div class="section-variable">
+        {% with error_message = value.error %}
+            {% include "error.html" %}
+        {% endwith %}
+        </div>
+    {% else %}
+        <div class="section-variable">
+            <a class="id-anchor" id="{{ key|escape }}"></a>
+            <div class="var-container">
+                <div class="var-title">
+                    <h2 class="tb-title">{{ key|escape }}</h2>
+                    <p>{{ value.col_type }}</p>
+                    {% if value.col_type != "datetime" %}
+                    <button class="var-toggle" onclick="toggleDetails(this)">Show Details</button>
+                    {% endif %}
+                </div>
+                <div class="tb-container">
+                    <div class="tb-{{ value.col_type }}">
+                        <table class="rp-table">
+                            {% for h, d in value.tabledata["Overview"].items() %}
+                            <tr>
+                                <th>{{ h }}</th>
+                                {% for comps in context.components.dfs %}
+                                {% if key in comps.variables %}
+                                {% if h in comps.variables[key].tabledata["Overview"] %}
+                                <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Overview"][h] }}</td>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="var-ovplot">
+                    {{ context.components.graphs[1][loop.index0] }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+</div>

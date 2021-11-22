@@ -1,0 +1,63 @@
+<div class="ov-container">
+    
+    <div class="diff-overview-container">
+        <h3 style="text-align:center;">Dataset Statistics</h3>
+        <table style="width:100%;">
+            <tr id="comp-label-{{ context.rnd }}">
+            <th></th>
+            {% for df_label in context.df_labels %}
+            <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ df_label }}</td>
+            {% endfor %}
+            </tr>
+            
+            {% for k, v in context.stats.items() %}
+            {% if v is defined and v %}
+            <tr>
+                <th>{{ k }}</th>
+                {% for stats in v %}
+                <td>{{ stats }}</td>
+                {% endfor %}
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    
+
+    <!-- shows data set insights -->
+    <!-- {% if context.insights %}
+    <div class="tb-container">
+        <h3 class="tb-title">Dataset Insights</h3>
+        {% for ins in context.insights %}
+        {% for page, content in ins.items() %}
+        <div class="page-box" id="page-{{ loop.index }}">
+            <table>
+                {% for entry in content %}
+                {% for ins_type, insight in entry.items() %}
+                <tr>
+                    <th id="des">
+                        {{ insight|escape|replace('/*start*/', '<span class="col-name">')|replace('/*end*/', '</span>') }}
+                    </th>
+                    <td><span class="ins-type">{{ ins_type }}</span></td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+        {% endfor %}
+        {% endfor %}
+        <div class="page-switch-box">
+            <ul class="page-switch">
+                {% for ins in context.insights %}
+                {% for _ in ins %}
+                {% if loop.length > 1 %}
+                <li id="switch-{{ loop.index }}" onclick="switchPage(this)">{{ loop.index }}</li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %} -->
+
+</div>
