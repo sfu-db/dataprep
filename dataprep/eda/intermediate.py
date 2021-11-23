@@ -9,6 +9,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from .dtypes_v2 import Continuous, Nominal, SmallCardNum
+
 
 class Intermediate(Dict[str, Any]):
     """This class contains intermediate results."""
@@ -79,6 +81,7 @@ class Intermediate(Dict[str, Any]):
         print(f"Intermediate has been saved to {saved_file_path}!")
 
     def _standardize_type(self, inter_dict: Dict[str, Any]) -> None:
+        # pylint: disable=too-many-nested-blocks, too-many-branches
         """
         In order to make intermediate could be saved as json file,
         check the type of data contained in the intermediate
@@ -123,6 +126,47 @@ class Intermediate(Dict[str, Any]):
                 inter_dict[key] = tuple(inter_dict[key])
             elif isinstance(inter_dict[key], pd.DataFrame):
                 inter_dict[key] = inter_dict[key].to_dict()
+            elif isinstance(inter_dict[key], list):
+                for idx, value in enumerate(inter_dict[key]):
+                    if isinstance(value, tuple):
+                        value = list(value)
+                        for list_idx, list_value in enumerate(value):
+                            if isinstance(list_value, Continuous):
+                                value[list_idx] = "Continuous"
+                            elif isinstance(list_value, Nominal):
+                                value[list_idx] = "Nominal"
+                            elif isinstance(list_value, SmallCardNum):
+                                value[list_idx] = "SmallCardNum"
+                            elif isinstance(value[list_idx], tuple):
+                                ndy_value = list(list_value)
+                                for ndy_idx, ndy_val in enumerate(ndy_value):
+                                    if isinstance(ndy_val, (np.ndarray,)):
+                                        ndy_value[ndy_idx] = ndy_val.tolist()
+                                    elif isinstance(ndy_val, pd.DataFrame):
+                                        ndy_value[ndy_idx] = ndy_val.to_dict()
+                                    elif isinstance(
+                                        ndy_value[ndy_idx],
+                                        (
+                                            np.int_,
+                                            np.intc,
+                                            np.intp,
+                                            np.int8,
+                                            np.int16,
+                                            np.int32,
+                                            np.int64,
+                                            np.uint8,
+                                            np.uint16,
+                                            np.uint32,
+                                            np.uint64,
+                                        ),
+                                    ):
+                                        ndy_value[ndy_idx] = int(ndy_val)
+                                value[list_idx] = tuple(ndy_value)
+                            else:
+                                pass
+                    elif isinstance(value, (np.ndarray,)):
+                        inter_dict[key][idx] = value.tolist()
+                    inter_dict[key][idx] = tuple(value)
             else:
                 pass
 
