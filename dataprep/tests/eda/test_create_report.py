@@ -33,6 +33,7 @@ def simpledf() -> pd.DataFrame:
     # test when column is object but some cells are numerical
     df["h"] = pd.Series([0, "x"] * 500)
     df["i"] = pd.Series(["str"] * 1000).astype("string")
+    df["j"] = pd.Series(list(range(1000)), dtype=pd.Int64Dtype())
 
     idx = np.arange(1000)
     np.random.shuffle(idx)
