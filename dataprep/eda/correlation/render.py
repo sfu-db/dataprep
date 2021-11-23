@@ -57,7 +57,7 @@ def render_correlation(itmdt: Intermediate, cfg: Config) -> Any:
     elif itmdt.visual_type == "correlation_scatter":
         visual_elem = render_scatter(itmdt, plot_width, plot_height, cfg)
     elif itmdt.visual_type == "correlation_crossfilter":
-        visual_elem = render_crossfilter(itmdt, plot_width, plot_height)
+        visual_elem = render_crossfilter(itmdt, plot_width, plot_height, cfg)
     else:
         raise NotImplementedError(f"Unknown visual type {itmdt.visual_type}")
 
@@ -372,25 +372,34 @@ def render_scatter(
 
 
 ######### Interactions for report #########
-def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -> column:
+def render_crossfilter(
+    itmdt: Intermediate, plot_width: int, plot_height: int, cfg: Config
+) -> column:
     """
     Render crossfilter scatter plot with a regression line.
     """
 
     # pylint: disable=too-many-locals, too-many-function-args
-    df = itmdt["data"]
-    df["__x__"] = df[df.columns[0]]
-    df["__y__"] = df[df.columns[0]]
-    source_scatter = ColumnDataSource(df)
-    source_xy_value = ColumnDataSource({"x": [df.columns[0]], "y": [df.columns[0]]})
-    var_list = list(df.columns[:-2])
+
+    if cfg.interactions.cat_enable:
+        all_cols = itmdt["all_cols"]
+    else:
+        all_cols = itmdt["num_cols"]
+
+    scatter_df = itmdt["scatter_source"]
+    # all other plots except for scatter plot, used for cat-cat and cat-num interactions.
+    other_plots = itmdt["other_plots"]
+    scatter_df["__x__"] = scatter_df[scatter_df.columns[0]]
+    scatter_df["__y__"] = scatter_df[scatter_df.columns[0]]
+    source_scatter = ColumnDataSource(scatter_df)
+    source_xy_value = ColumnDataSource({"x": [scatter_df.columns[0]], "y": [scatter_df.columns[0]]})
+    var_list = list(all_cols)
 
     xcol = source_xy_value.data["x"][0]
     ycol = source_xy_value.data["y"][0]
 
     tooltips = [("X-Axis: ", "@__x__"), ("Y-Axis: ", "@__y__")]
-
-    fig = Figure(
+    scatter_fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
         toolbar_location=None,
@@ -399,10 +408,12 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
         x_axis_label=xcol,
         y_axis_label=ycol,
     )
-    scatter = fig.scatter("__x__", "__y__", source=source_scatter)
+    scatter = scatter_fig.scatter("__x__", "__y__", source=source_scatter)
 
     hover = HoverTool(tooltips=tooltips, renderers=[scatter])
-    fig.add_tools(hover)
+    scatter_fig.add_tools(hover)
+
+    fig_all_in_one = column(scatter_fig, sizing_mode="stretch_width")
 
     x_select = Select(title="X-Axis", value=xcol, options=var_list, width=150)
     y_select = Select(title="Y-Axis", value=ycol, options=var_list, width=150)
@@ -413,19 +424,31 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
             args=dict(
                 scatter=source_scatter,
                 xy_value=source_xy_value,
-                x_axis=fig.xaxis[0],
+                fig_all_in_one=fig_all_in_one,
+                scatter_plot=scatter_fig,
+                x_axis=scatter_fig.xaxis[0],
+                other_plots=other_plots,
             ),
             code="""
         let currentSelect = this.value;
         let xyValueData = xy_value.data;
         let scatterData = scatter.data;
-
         xyValueData['x'][0] = currentSelect;
-        scatterData['__x__'] = scatterData[currentSelect];
-
-        x_axis.axis_label = currentSelect;
-        scatter.change.emit();
         xy_value.change.emit();
+
+        const children = []
+        let ycol = xyValueData['y'][0];
+        let col = currentSelect + '_' + ycol
+        if (col in other_plots) {
+            children.push(other_plots[col])
+        }
+        else {
+            scatterData['__x__'] = scatterData[currentSelect];
+            x_axis.axis_label = currentSelect;
+            scatter.change.emit();
+            children.push(scatter_plot)
+        }
+        fig_all_in_one.children = children;        
         """,
         ),
     )
@@ -435,25 +458,39 @@ def render_crossfilter(itmdt: Intermediate, plot_width: int, plot_height: int) -
             args=dict(
                 scatter=source_scatter,
                 xy_value=source_xy_value,
-                y_axis=fig.yaxis[0],
+                fig_all_in_one=fig_all_in_one,
+                scatter_plot=scatter_fig,
+                y_axis=scatter_fig.yaxis[0],
+                other_plots=other_plots,
             ),
             code="""
-        let currentSelect = this.value;
+        let ycol = this.value;
         let xyValueData = xy_value.data;
         let scatterData = scatter.data;
-
-        xyValueData['y'][0] = currentSelect;
-        scatterData['__y__'] = scatterData[currentSelect];
-
-        y_axis.axis_label = currentSelect;
-        scatter.change.emit();
+        xyValueData['y'][0] = ycol;
         xy_value.change.emit();
+
+        const children = []
+        let xcol = xyValueData['x'][0];
+        let col = xcol + '_' + ycol;
+        if (col in other_plots) {
+            children.push(other_plots[col])
+        }
+        else {
+            scatterData['__y__'] = scatterData[ycol];
+            y_axis.axis_label = ycol;
+            scatter.change.emit();
+            children.push(scatter_plot)
+        }
+        fig_all_in_one.children = children;        
         """,
         ),
     )
 
-    fig = column(row(x_select, y_select, align="center"), fig, sizing_mode="stretch_width")
-    return fig
+    interaction_fig = column(
+        row(x_select, y_select, align="center"), fig_all_in_one, sizing_mode="stretch_width"
+    )
+    return interaction_fig
 
 
 # ######### Interactions for report #########
