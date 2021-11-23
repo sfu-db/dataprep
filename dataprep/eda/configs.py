@@ -1109,9 +1109,14 @@ class Interactions(BaseModel):
     """
     enable: bool, default True
         Whether to create this element
+    cat_enable: bool, default False
+        where enable categorical column in interactions. By default it is False,
+        which means only numerical interactions are computed. If set to True, cat-cat
+        and cat-num interactions will be computed.
     """
 
     enable: bool = True
+    cat_enable: bool = False
 
 
 class Correlations(BaseModel):

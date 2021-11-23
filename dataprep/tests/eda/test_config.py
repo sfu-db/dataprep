@@ -52,3 +52,4 @@ def test_sanity_compute_3(simpledf: dd.DataFrame) -> None:
 
 def test_report(simpledf: dd.DataFrame) -> None:
     create_report(simpledf, display=["Overview", "Interactions"])
+    create_report(simpledf, display=["Interactions"], config={"interactions.cat_enable": True})
