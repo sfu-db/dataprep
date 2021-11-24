@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1637699723552,
+  "lastUpdate": 1637745540402,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1519,6 +1519,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.05296779792059889",
             "extra": "mean: 5.529179085800001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fcf47cf839ba4f2df347794b043f0facddabc0aa",
+          "message": "Merge pull request #758 from sfu-db/interaction\n\nfeat(eda):add categorical interaction in create_report",
+          "timestamp": "2021-11-24T01:15:18-08:00",
+          "tree_id": "b5ede1611a7cee0ada4fa3561438c3ad6a4dea0a",
+          "url": "https://github.com/sfu-db/dataprep/commit/fcf47cf839ba4f2df347794b043f0facddabc0aa"
+        },
+        "date": 1637745535708,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.20030339918217077,
+            "unit": "iter/sec",
+            "range": "stddev: 0.043293418855521924",
+            "extra": "mean: 4.992426509400002 sec\nrounds: 5"
           }
         ]
       }
