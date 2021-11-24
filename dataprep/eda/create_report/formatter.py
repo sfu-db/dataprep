@@ -13,7 +13,7 @@ from bokeh.plotting import Figure
 from ..configs import Config
 from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
-from ..distribution import render
+from ..distribution import compute, render
 from ..utils import _calc_line_dt
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import calc_stats_dt, cont_comps, nom_comps
@@ -146,16 +146,21 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
 def _format_interaction(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
     """Format of Interaction section"""
     res: Dict[str, Any] = {}
-    if len(data["num_cols"]) > 0:
-        # interactions
-        if cfg.interactions.enable:
-            res["has_interaction"] = True
-            itmdt = Intermediate(data=data["scat"], visual_type="correlation_crossfilter")
-            rndrd = render_correlation(itmdt, cfg)
-            rndrd.sizing_mode = "stretch_width"
-            res["interactions"] = components(rndrd)
-        else:
-            res["has_interaction"] = False
+    # interactions
+    if cfg.interactions.enable:
+        res["has_interaction"] = True
+        itmdt = Intermediate(
+            scatter_source=data["interaction.scatter_source"],
+            other_plots=data["interaction.other_plots"],
+            num_cols=data["num_cols"],
+            all_cols=data["all_cols"],
+            visual_type="correlation_crossfilter",
+        )
+        rndrd = render_correlation(itmdt, cfg)
+        rndrd.sizing_mode = "stretch_width"
+        res["interactions"] = components(rndrd)
+    else:
+        res["has_interaction"] = False
     return res
 
 
@@ -372,24 +377,43 @@ def basic_computations(
     cfg
         The config dict user passed in. E.g. config =  {"hist.bins": 20}
         Without user's specifications, the default is "auto"
-    """  # pylint: disable=too-many-branches
+    """
+    # pylint: disable=too-many-branches, protected-access, too-many-locals
 
     variables_data = _compute_variables(df, cfg)
     overview_data = _compute_overview(df, cfg)
     data: Dict[str, Any] = {**variables_data, **overview_data}
 
     df_num = df.select_num_columns()
+    num_columns = df_num.columns
+    cat_columns = [col for col in df.columns if col not in num_columns]
     data["num_cols"] = df_num.columns
+    data["all_cols"] = df.columns
     # interactions
     if cfg.interactions.enable:
         if cfg.scatter.sample_size is not None:
             sample_func = lambda x: x.sample(n=min(cfg.scatter.sample_size, x.shape[0]))
         else:
             sample_func = lambda x: x.sample(frac=cfg.scatter.sample_rate)
-        data["scat"] = df_num.frame.map_partitions(
+        data["interaction.scatter_source"] = df_num.frame.map_partitions(
             sample_func,
             meta=df_num.frame,
         )
+
+        data["interaction.other_plots"] = {}
+        if cfg.interactions.cat_enable:
+            other_plots = {}
+            curr_cfg = Config.from_dict(display=["Box Plot", "Nested Bar Chart"])
+            for cat_col in cat_columns:
+                for other_col in df.columns:
+                    if (cat_col == other_col) or (cat_col + "_" + other_col in other_plots):
+                        continue
+                    # print(f"cat col:{cat_col}, other col:{other_col}")
+                    imdt = compute(df._ddf, cat_col, other_col, cfg=curr_cfg)
+                    box_plot = render(imdt, curr_cfg)["layout"][0]
+                    other_plots[cat_col + "_" + other_col] = box_plot
+                    other_plots[other_col + "_" + cat_col] = box_plot
+            data["interaction.other_plots"] = other_plots
 
     # correlations
     if cfg.correlations.enable:
