@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1637745540402,
+  "lastUpdate": 1637785482882,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1550,6 +1550,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.043293418855521924",
             "extra": "mean: 4.992426509400002 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "9e6f8e8464a12da0d8c2bed0e1a5d002ef188f50",
+          "message": "add clean gui ci",
+          "timestamp": "2021-11-24T12:20:36-08:00",
+          "tree_id": "b71a1fe146e3bb60361c6d53dea8782a5f817f01",
+          "url": "https://github.com/sfu-db/dataprep/commit/9e6f8e8464a12da0d8c2bed0e1a5d002ef188f50"
+        },
+        "date": 1637785477475,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1646051382041892,
+            "unit": "iter/sec",
+            "range": "stddev: 0.1566483943606885",
+            "extra": "mean: 6.075144499800007 sec\nrounds: 5"
           }
         ]
       }
