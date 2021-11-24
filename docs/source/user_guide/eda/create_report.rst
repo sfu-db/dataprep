@@ -46,10 +46,24 @@ Or we want to open the report in browser::
 
 Or just save the report to local::
 
-    report.save(filename='report_01', to='~/Desktop')
+    report.save(filename='report.html')
 
 
 You can see the full report :download:`here <../../_static/images/create_report/titanic_dp.html>`
+
+
+Enable/Disable sections
+==================
+Computing all the sections is time consuming. You can enable/disable sections using the following two approaches.
+
+1. Just show a few sections by setting `display` argument. E.g., run the following code to show only the overview section and the variables section::
+
+    report = create_report(df, display=['Overview', 'Variables'])
+
+2. Just disable a few sections by setting `enable` to False. E.g., run the following code to disable interactions section::
+
+    report = create_report(df, config={'interactions.enable': False})
+
 
 `Overview` section
 ==================
@@ -82,19 +96,23 @@ For datetime variable, the report shows line chart
 `Interactions` section
 ======================
 
-In this section, the report will show an interactive plot, user can use the dropdown menu above the plot to select which two variables user wants to compare.
+In this section, the report will show an interactive plot, user can use the dropdown menu above the plot to select which two variables user wants to compare. 
 
-The plot has scatter plot and the regression line regarding to the two variabes.
+By default, it show the scatter plot for all numerical columns.
 
 .. raw:: html
 
     <iframe src="../../_static/images/create_report/interactions.html" height="625" width="70%" style="border: 0"></iframe>
 
+You can also enable categorical variables by setting `interactions.cat_enable` to True. It will add categorical-categorical and categorical-numerical interactions::
+
+    report = create_report(df, config={'interactions.cat_enable': True})
+
 
 `Correlations` section
 ======================
 
-In this section, we can see the correlations bewteen variables in Spearman, Pearson and Kendall matrices.
+In this section, we can see the correlations between variables in Spearman, Pearson and Kendall matrices.
 
 .. raw:: html
 
