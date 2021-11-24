@@ -5,13 +5,14 @@ import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 from warnings import catch_warnings, filterwarnings
 
+from collections import OrderedDict
 import dask
 import dask.dataframe as dd
-from ..utils import to_dask
-from ...errors import DataprepError
 import pandas as pd
 from bokeh.embed import components
 from bokeh.plotting import Figure
+from ..utils import to_dask
+from ...errors import DataprepError
 from ..configs import Config
 from ..correlation.compute.overview import correlation_nxn
 from ..distribution.compute.overview import calc_stats
@@ -34,7 +35,6 @@ from ..dtypes_v2 import (
     SmallCardNum,
 )
 
-from collections import OrderedDict
 from ..dtypes import (
     DTypeDef,
     is_dtype,
@@ -45,15 +45,15 @@ from ..dtypes import (
 )
 from ..eda_frame import EDAFrame
 from ..intermediate import Intermediate
-from ..diff.compute.multiple_df import _is_all_int
+from ..diff.compute.multiple_df import _is_all_int  # type: ignore
 from ...progress_bar import ProgressBar
 
-from ..diff.compute.multiple_df import (
+from ..diff.compute.multiple_df import (  # type: ignore
     _cont_calcs as diff_cont_calcs,
     _nom_calcs as diff_nom_calcs,
     calc_stats as diff_calc_stats,
 )
-from ..diff.compute.multiple_df import Srs, Dfs
+from ..diff.compute.multiple_df import Srs, Dfs  # type: ignore
 from ..diff import render_diff
 from ..palette import CATEGORY10
 
@@ -103,7 +103,9 @@ def format_diff_report(
 
     with ProgressBar(minimum=1, disable=not progress):
         if mode == "basic":
-            report = format_basic(df_list, cfg)
+            # note: we need the type ignore comment for mypy otherwise it complains because
+            # it doesn't realize that we converted df_list to a list if it's a dictionary
+            report = format_basic(df_list, cfg)  # type: ignore
         else:
             raise ValueError(f"Unknown mode: {mode}")
     return report
@@ -160,13 +162,13 @@ def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
 
     dask_results = dask.compute(dask_results)
 
-    for df, data in zip(df_list, dask_results[0]["df_computations"]):
-        res_overview = _format_overview(data, cfg)
-        res_variables = _format_variables(EDAFrame(df), cfg, data, df_list)
+    for df, data in zip(df_list, dask_results[0]["df_computations"]):  # type: ignore
+        res_overview = _format_overview(data, cfg)  # type: ignore
+        res_variables = _format_variables(EDAFrame(df), cfg, data)  # type: ignore
         res = {**res_overview, **res_variables}
         final_results["dfs"].append(res)
 
-    layout = dask_results[0]["plots"]["layout"]
+    layout = dask_results[0]["plots"]["layout"]  # type: ignore
 
     for tab in layout:
         try:
@@ -180,15 +182,13 @@ def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
 
     final_results["legend_lables"] = [
         {"label": label, "color": color}
-        for label, color in zip(cfg.diff.label, CATEGORY10[: len(cfg.diff.label)])
+        for label, color in zip(cfg.diff.label, CATEGORY10[: len(cfg.diff.label)])  # type: ignore
     ]
 
     return final_results
 
 
-def basic_computations(
-    df: EDAFrame, cfg: Config
-) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
+def basic_computations(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     """Computations for the basic version.
 
     Parameters
@@ -241,11 +241,12 @@ def compute_plot_data(
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
+    # pylint: disable=too-many-branches, too-many-locals
 
     dfs = Dfs(df_list)
     dfs_cols = dfs.columns.apply("to_list").data
 
-    labeled_cols = dict(zip(cfg.diff.label, dfs_cols))
+    labeled_cols = dict(zip(cfg.diff.label, dfs_cols))  # type: ignore
     baseline: int = cfg.diff.baseline
     data: List[Any] = []
     aligned_dfs = dd.concat(df_list, axis=1)
@@ -357,12 +358,7 @@ def _compute_overview(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     return data
 
 
-def _format_variables(
-    df: EDAFrame,
-    cfg: Config,
-    data: Dict[str, Any],
-    dfs: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
-) -> Dict[str, Any]:
+def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[str, Any]:
     """Formatting of variables section"""
     res: Dict[str, Any] = {}
     # variables

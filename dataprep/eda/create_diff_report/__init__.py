@@ -4,6 +4,7 @@
 import warnings
 from typing import Any, Dict, List, Optional, Union
 
+from collections import defaultdict
 import pandas as pd
 from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
@@ -11,7 +12,6 @@ from jinja2 import Environment, PackageLoader
 from .diff_formatter import format_diff_report
 from ..configs import Config
 from ..create_report.report import Report
-from collections import defaultdict
 
 __all__ = ["create_diff_report"]
 
@@ -58,6 +58,7 @@ def create_diff_report(
     df_test = load_dataset('house_prices_test')
     create_diff_report([df_train, df_test]) # show in browser on jupyter notebook
     """
+    # pylint: disable=too-many-arguments
 
     _suppress_warnings()
     cfg = Config.from_dict(display, config)
