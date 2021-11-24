@@ -1,5 +1,5 @@
 """
-    module for testing create_report(df) function.
+    module for testing create_diff_report(df) function.
 """
 import logging
 import numpy as np
@@ -47,14 +47,3 @@ def test_diff_report(simpledf: pd.DataFrame) -> None:
 
         matplotlib.use("PS")
     create_diff_report([simpledf, simpledf], mode="basic")
-
-
-def test_diff_report_show_with_keys(simpledf: pd.DataFrame) -> None:
-    from sys import platform
-
-    if platform == "darwin":
-        import matplotlib
-
-        matplotlib.use("PS")
-    report = create_diff_report({"key1": simpledf, "key2": simpledf}, mode="basic")
-    report.show()
