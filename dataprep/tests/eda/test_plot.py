@@ -99,6 +99,7 @@ def test_geo(geodf: dd.DataFrame) -> None:
 
 def test_random_df(random_df: pd.DataFrame) -> None:
     plot(random_df)
+    plot(random_df, display=["Bar Chart"])
 
 
 def test_plot_titanic() -> None:
