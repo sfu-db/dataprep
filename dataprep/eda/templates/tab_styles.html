@@ -42,7 +42,7 @@
         background: white;
     }
 
-    {% if not context.comparison_stats %}
+    {% if not (context.comparison_stats or context.tabledata) %}
     .contents-{{ context.rnd }}>div:nth-of-type(1) {
         display: flex;
         flex-flow: column nowrap;
