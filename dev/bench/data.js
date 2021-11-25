@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1637785482882,
+  "lastUpdate": 1637806503198,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1581,6 +1581,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.1566483943606885",
             "extra": "mean: 6.075144499800007 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e23e3a78099aeea027c028400acbd34cdfe9f9f4",
+          "message": "Merge pull request #759 from sfu-db/doc/parameter\n\ndocs(eda): enrich parameters in report",
+          "timestamp": "2021-11-24T18:10:53-08:00",
+          "tree_id": "e5e5fe666a129d3112b6cc774510d549e2220b93",
+          "url": "https://github.com/sfu-db/dataprep/commit/e23e3a78099aeea027c028400acbd34cdfe9f9f4"
+        },
+        "date": 1637806497718,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.16983634706654624,
+            "unit": "iter/sec",
+            "range": "stddev: 0.11144355901094626",
+            "extra": "mean: 5.888021128999992 sec\nrounds: 5"
           }
         ]
       }
