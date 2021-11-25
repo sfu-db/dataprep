@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1637823981411,
+  "lastUpdate": 1637828136520,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1705,6 +1705,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.13065575023279716",
             "extra": "mean: 6.354974074999984 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3bd0277a47c29efb464580a17174882da60b6884",
+          "message": "Merge pull request #763 from devinllu/refactor/diff_report\n\nrefactor(eda): removed unnecessary html code and styles",
+          "timestamp": "2021-11-25T00:11:23-08:00",
+          "tree_id": "4bb096e88e052fe3470ddad1d536e1f0f80eeffb",
+          "url": "https://github.com/sfu-db/dataprep/commit/3bd0277a47c29efb464580a17174882da60b6884"
+        },
+        "date": 1637828131032,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1735616480602744,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03639561093590472",
+            "extra": "mean: 5.761641532999965 sec\nrounds: 5"
           }
         ]
       }
