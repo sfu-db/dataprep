@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 #### Documentations ####
 doc-clean-notebooks:
     fd ".*\.ipynb" -t f docs/source/ -x jupyter nbconvert --clear-output
