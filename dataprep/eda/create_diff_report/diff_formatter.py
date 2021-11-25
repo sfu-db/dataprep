@@ -14,7 +14,6 @@ from bokeh.plotting import Figure
 from ..utils import to_dask
 from ...errors import DataprepError
 from ..configs import Config
-from ..correlation.compute.overview import correlation_nxn
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import cont_comps, nom_comps
 from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats, stats_viz_dt
@@ -203,23 +202,6 @@ def basic_computations(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
     variables_data = _compute_variables(df, cfg)
     overview_data = _compute_overview(df, cfg)
     data: Dict[str, Any] = {**variables_data, **overview_data}
-
-    df_num = df.select_num_columns()
-    data["num_cols"] = df_num.columns
-    # interactions
-    if cfg.interactions.enable:
-        if cfg.scatter.sample_size is not None:
-            sample_func = lambda x: x.sample(n=min(cfg.scatter.sample_size, x.shape[0]))
-        else:
-            sample_func = lambda x: x.sample(frac=cfg.scatter.sample_rate)
-        data["scat"] = df_num.frame.map_partitions(
-            sample_func,
-            meta=df_num.frame,
-        )
-
-    # correlations
-    if cfg.correlations.enable:
-        data.update(zip(("cordx", "cordy", "corrs"), correlation_nxn(df_num, cfg)))
 
     return data
 
