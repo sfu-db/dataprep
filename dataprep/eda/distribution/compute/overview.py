@@ -68,8 +68,6 @@ def compute_overview(
             data.append(
                 (col, col_dtype, dask.delayed(_calc_line_dt)(frame.frame[[col]], cfg.line.unit))
             )
-        else:
-            raise ValueError(f"unprocessed col:{col}, type:{col_dtype}")
 
     ov_stats = calc_stats(frame, cfg)  # overview statistics
     data, ov_stats = dask.compute(data, ov_stats)
