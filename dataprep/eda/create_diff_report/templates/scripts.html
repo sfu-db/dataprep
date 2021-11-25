@@ -46,13 +46,6 @@
         }
     }
 
-    function toggleDetails(e) {
-        const plotSection = e.parentNode.parentNode.nextElementSibling;
-        const displayStyle = window.getComputedStyle(plotSection).display;
-        plotSection.style.display = (displayStyle === 'none') ? 'block' : 'none';
-        e.innerText = (e.innerText === 'Show Details') ? 'Hide Details' : 'Show Details';
-    }
-
     function showStats(e) {
         e.style.backgroundColor = '#b5d6ea';
         e.nextElementSibling.style.backgroundColor = 'white';
@@ -73,29 +66,6 @@
             const displayStyle = window.getComputedStyle(subContent).display;
             subContent.style.display = (displayStyle === 'none') ? 'block' : 'none';
         }
-    }
-
-    function openTab(e) {
-        const btnIndex = [...e.parentElement.children].indexOf(e);
-        const allContentEle = e.parentElement.parentElement.children;
-        for (let i of [...allContentEle].slice(1)) {
-            i.style.display = 'none';
-        }
-        allContentEle[Math.round(btnIndex/2)].style.display = (btnIndex == 1) ? 'flex' : 'block';
-    }
-
-    function switchPage(e) {
-        const pageTo = e.id.replace('switch', 'page');
-        const pageBox = document.getElementById(pageTo);
-        const pageBoxAll = document.getElementsByClassName('page-box');
-        for (let i of pageBoxAll) {
-            i.style.display = 'none';
-        }
-        for (let i of document.querySelectorAll('.page-switch li')) {
-            i.style.backgroundColor = 'white';
-        }
-        pageBox.style.display = 'block';
-        e.style.backgroundColor = '#5DADE2';
     }
 
 </script>
