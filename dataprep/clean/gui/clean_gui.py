@@ -29,7 +29,7 @@ from dataprep.clean import (
 DEBUG = True
 
 # instantiate the app
-app = Flask(__name__, static_folder="dist/static", template_folder="dist")
+app = Flask(__name__, static_folder="frontend_dist/static", template_folder="dist")
 app.config.from_object(__name__)
 
 # enable CORS
