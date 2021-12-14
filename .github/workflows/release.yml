@@ -3,7 +3,6 @@ name: release
 on:
   push:
     branches:
-      - prerelease
       - release
 
 jobs:
@@ -55,6 +54,9 @@ jobs:
           draft: true
           tag: v${{ env.DATAPREP_VERSION }}
           commit: ${{ env.GITHUB_SHA }}
+
+      - name: Upload wheels
+        run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
   docs-build:
     runs-on: ubuntu-latest
