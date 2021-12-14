@@ -1,24 +1,18 @@
-name: CI
+name: release
 
 on:
   push:
     branches:
-      - develop
-      - master
-  pull_request:
-    branches:
-      - develop
+      - prerelease
+      - release
 
 jobs:
   build:
-    name: ubuntu-latest x ${{ matrix.python }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python: ["3.7"]
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
 
       - uses: actions/setup-python@v1
         with:
@@ -33,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "Cache Version ${{ secrets.CACHE_VERSION }}"
-          pip install poetry
+          pip install poetry toml-cli
           poetry install
           poetry config --list
 
@@ -44,35 +38,23 @@ jobs:
           poetry run pytest --version 
           poetry run black --version
 
-      - name: Check if the code is formatted
-        run: poetry run black --check --quiet dataprep
+      - name: Build wheels
+        run: poetry build
 
-      - name: Type check the project
-        run: poetry run mypy dataprep
+      - name: Parse version from pyproject.toml
+        run: echo "DATAPREP_VERSION=`toml get --toml-path pyproject.toml tool.poetry.version`" >> $GITHUB_ENV
 
-      - name: Test the project
-        run: poetry run pytest --cov-report xml --cov=dataprep dataprep/tests
-        env:
-          DATAPREP_BROWSER_TESTS: 0
-          DATAPREP_CREDENTIAL_TESTS: 0
-          DATAPREP_DATA_CONNECTOR_YELP_TOKEN: ""
-          DATAPREP_DATA_CONNECTOR_YOUTUBE_TOKEN: ""
+      - name: Create release note
+        run: poetry run python scripts/release-note.py $(git rev-parse --short HEAD) > RELEASE.md
 
-      - name: Style check the project
-        run: poetry run pylint dataprep
-
-      - uses: codecov/codecov-action@v2
-        if: github.event.pull_request.head.repo.full_name == github.repository
+      - uses: ncipollo/release-action@v1
         with:
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          # path_to_write_report: ./coverage.xml
-
-      - uses: codacy/codacy-coverage-reporter-action@v1
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage.xml
+          artifacts: "dist/*.whl,dist/*.tar.gz"
+          bodyFile: "RELEASE.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
+          tag: v${{ env.DATAPREP_VERSION }}
+          commit: ${{ env.GITHUB_SHA }}
 
   docs-build:
     runs-on: ubuntu-latest
@@ -104,3 +86,25 @@ jobs:
         with:
           name: docs
           path: docs/build/html
+
+  docs-deploy:
+    runs-on: ubuntu-latest
+    needs: docs-build
+    if: ${{ github.event.ref == 'refs/heads/release' }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download docs
+        uses: actions/download-artifact@v2
+        with:
+          name: docs
+          path: docs/build/html
+
+      - run: echo 'docs.dataprep.ai' > docs/build/html/CNAME
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs/build/html # The folder the action should deploy.
+          clean-exclude: dev
