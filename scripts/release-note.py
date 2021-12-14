@@ -1,6 +1,6 @@
 """ReleaseNote
 Usage:
-    release-note [<hash>]
+    release-note <hash>
 """
 
 import re
@@ -79,22 +79,10 @@ def main() -> None:
 
     repo = Repo(".")
     assert repo.bare == False
-
-    (develop,) = [branch for branch in repo.branches if branch.name == "develop"]
-    seed = develop.commit
-
+  
     hash = args["<hash>"]
-    if hash is not None:
-        seed = find_commit_by_hash(seed, hash)
-        if seed is None:
-            raise ValueError(f"Cannot find commit with hash {hash}")
+    this_commits, handle = commits_since_previous(repo.commit(hash))
 
-        this_commits, handle = commits_since_previous(seed)
-    else:
-        if VERSION_REG.findall(seed.message):
-            this_commits, handle = commits_since_previous(*seed.parents)
-        else:
-            this_commits, handle = commits_since_previous(seed)
 
     version = VERSION_REG.match(handle.message).group()
 
