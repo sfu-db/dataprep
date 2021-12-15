@@ -1,5 +1,13 @@
 {{ context.components.graphs[0] }}
 
+{% for var in context.components.dfs[0].variables.values() %}
+{{ var.plots[0] }}
+{% endfor %}
+
+{% for var in context.components.dfs[1].variables.values() %}
+{{ var.plots[0] }}
+{% endfor %}
+
 <script>
     setTimeout(init, 50);
 
@@ -44,6 +52,22 @@
                 }
             }
         }
+    }
+
+    function openTab(e) {
+        const btnIndex = [...e.parentElement.children].indexOf(e);
+        const allContentEle = e.parentElement.parentElement.children;
+        for (let i of [...allContentEle].slice(1)) {
+            i.style.display = 'none';
+        }
+        allContentEle[Math.round(btnIndex/2)].style.display = (btnIndex == 1) ? 'flex' : 'block';
+    }
+
+    function toggleDetails(e) {
+        const plotSection = e.parentNode.parentNode.nextElementSibling;
+        const displayStyle = window.getComputedStyle(plotSection).display;
+        plotSection.style.display = (displayStyle === 'none') ? 'block' : 'none';
+        e.innerText = (e.innerText === 'Show Details') ? 'Hide Details' : 'Show Details';
     }
 
     function showStats(e) {

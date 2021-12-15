@@ -660,7 +660,6 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
         if fig is not None:
             fig.frame_height = plot_height
             titles.append(fig.title.text)
-            fig.title.text = ""
             figs.append(fig)
 
     if cfg.stats.enable:
