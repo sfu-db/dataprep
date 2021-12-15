@@ -16,7 +16,13 @@ from ...errors import DataprepError
 from ..configs import Config
 from ..distribution.compute.overview import calc_stats
 from ..distribution.compute.univariate import cont_comps, nom_comps
-from ..distribution.render import format_cat_stats, format_num_stats, format_ov_stats, stats_viz_dt
+from ..distribution.render import (
+    format_cat_stats,
+    format_num_stats,
+    format_ov_stats,
+    stats_viz_dt,
+)
+from ..distribution import render
 from ..distribution.compute.overview import (
     _nom_calcs,
     _cont_calcs,
@@ -137,8 +143,6 @@ def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
     for df in df_list:
         df = EDAFrame(df)
         setattr(getattr(cfg, "plot"), "report", True)
-        # data, completions = basic_computations(df, cfg)
-        # data = dask.delayed(basic_computations)(df, cfg)
         data = basic_computations(df, cfg)
         with catch_warnings():
             filterwarnings(
@@ -354,14 +358,17 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
         try:
             stats: Any = None  # needed for pylint
             dtp = df.get_eda_dtype(col)
+            tab_names: List[str] = []
             if isinstance(dtp, Continuous):
                 itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
                 stats = format_num_stats(data[col])
+                tab_names = ["Stats", "KDE Plot", "Normal Q-Q Plot", "Box Plot"]
             elif type(dtp) in [Nominal, SmallCardNum, GeoGraphy, GeoPoint]:
                 itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
                 stats = format_cat_stats(
                     data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
                 )
+                tab_names = ["Stats", "Pie Chart", "Word Cloud", "Word Frequency", "Word Length"]
             elif isinstance(dtp, DateTime):
                 itmdt = Intermediate(
                     col=col,
@@ -373,9 +380,23 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
             else:
                 raise RuntimeError(f"the type of column {col} is unknown: {type(dtp)}")
 
+            rndrd = render(itmdt, cfg)
+            layout = rndrd["layout"]
+            figs_var: List[Figure] = []
+            for tab in layout:
+                try:
+                    fig = tab.children[0]
+                except AttributeError:
+                    fig = tab
+                # fig.title = Title(text=tab.title, align="center")
+                figs_var.append(fig)
+            comp = components(figs_var)
+
             res["variables"][col] = {
                 "tabledata": stats,
                 "col_type": itmdt.visual_type.replace("_column", ""),
+                "tab_names": tab_names,
+                "plots": comp,
             }
 
         except:
