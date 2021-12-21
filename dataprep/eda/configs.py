@@ -20,8 +20,9 @@ the global parameter will be overwrote by local parameters for specific plots.
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple, Union
-
 from pydantic import BaseModel, Field
+from ..utils import is_notebook
+
 
 # This dictionary map the plot names in display to their canonicalized names in Config
 DISPLAY_MAP = {
@@ -465,7 +466,7 @@ class WordCloud(BaseModel):
         Whether to apply Potter Stem on the words
     """
 
-    enable: bool = True
+    enable: bool = is_notebook()
     top_words: int = 30
     stopword: bool = True
     lemmatize: bool = False
