@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1639527504365,
+  "lastUpdate": 1640061450545,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1922,6 +1922,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.009585647015040671",
             "extra": "mean: 4.97137927980001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f212d174c368cb5788420bc87a2baae514f0f7f1",
+          "message": "Merge pull request #772 from sfu-db/terminal\n\nfix(eda):wordcloud setting in terminal",
+          "timestamp": "2021-12-20T20:34:18-08:00",
+          "tree_id": "8d627b2475f95623ce34790d226562580d6a7e77",
+          "url": "https://github.com/sfu-db/dataprep/commit/f212d174c368cb5788420bc87a2baae514f0f7f1"
+        },
+        "date": 1640061445635,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.30278453095476826,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0427409559279298",
+            "extra": "mean: 3.302678630399998 sec\nrounds: 5"
           }
         ]
       }
