@@ -39,6 +39,120 @@
                     {{ context.components.graphs[1][loop.index0] }}
                 </div>
             </div>
+            <div class="var-plot">
+                <div class="vp-switch">
+
+                    {% for tab in value.tab_names %}
+                    <input type="radio" name="{{ key|escape }}" id="vp-switch-{{ key|escape }}-{{ tab }}"/>
+                    <label for="vp-switch-{{ key|escape }}-{{ tab }}" onclick="openTab(this)">{{ tab }}</label>
+                    {% endfor %}
+                    
+                </div>
+
+                {% if value.col_type == "numerical" %}
+                <div class="vp-table">
+                    <div class="stats-table">
+                        <h4 class="tb-title">Quantile Statistics</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Quantile Statistics"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    {% for comps in context.components.dfs %}
+                                    {% if key in comps.variables %}
+                                    {% if h in comps.variables[key].tabledata["Quantile Statistics"] %}
+                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Quantile Statistics"][h] }}</td>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                    <div class="stats-table">
+                        <h4 class="tb-title">Descriptive Statistics</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Descriptive Statistics"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    {% for comps in context.components.dfs %}
+                                    {% if key in comps.variables %}
+                                    {% if h in comps.variables[key].tabledata["Descriptive Statistics"] %}
+                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Descriptive Statistics"][h] }}</td>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                </div>
+                {% endif %}
+                {% if value.col_type == "categorical" %}
+                <div class="vp-table">
+                    <div class="stats-table">
+                        <h4 class="tb-title">Length</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Length"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    {% for comps in context.components.dfs %}
+                                    {% if key in comps.variables %}
+                                    {% if h in comps.variables[key].tabledata["Length"] %}
+                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Length"][h] }}</td>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                    <div class="stats-table">
+                        <h4 class="tb-title">Sample</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Sample"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    {% for comps in context.components.dfs %}
+                                    {% if key in comps.variables %}
+                                    {% if h in comps.variables[key].tabledata["Sample"] %}
+                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Sample"][h] }}</td>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                    <div class="stats-table">
+                        <h4 class="tb-title">Letter</h4>
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Letter"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    {% for comps in context.components.dfs %}
+                                    {% if key in comps.variables %}
+                                    {% if h in comps.variables[key].tabledata["Letter"] %}
+                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Letter"][h] }}</td>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% for div in value.plots[1] %}
+                <div class="vp-plot">
+                    {{ div }}
+                    {% if key in context.components.dfs[1].variables %}
+                    {{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+            </div>
         </div>
     {% endif %}
 {% endfor %}
