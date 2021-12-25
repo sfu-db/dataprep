@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1640138189086,
+  "lastUpdate": 1640412961782,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -1984,6 +1984,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.01901679800255346",
             "extra": "mean: 4.697086341800014 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6dfb9c659e8bf73f07978ae195d0372495c6f118",
+          "message": "Merge pull request #774 from Bowen0729/on_yarn_doc\n\nadd the doc of run dataprep.eda on Hadoop yarn",
+          "timestamp": "2021-12-24T22:12:34-08:00",
+          "tree_id": "014146174665a0dc83ebf673b2d2dc6c49032454",
+          "url": "https://github.com/sfu-db/dataprep/commit/6dfb9c659e8bf73f07978ae195d0372495c6f118"
+        },
+        "date": 1640412956629,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2966245333409923,
+            "unit": "iter/sec",
+            "range": "stddev: 0.058753052256889135",
+            "extra": "mean: 3.3712653122000007 sec\nrounds: 5"
           }
         ]
       }
