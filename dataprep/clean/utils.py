@@ -162,7 +162,7 @@ def _get_rate(base_cur: str, dest_cur: str, url: str) -> Any:
         rate = np.round(response_json["rates"][dest_cur], 4)
         if not rate:
             raise RatesNotAvailableError(
-                "Currency Rate {0} => {1} not available latest".format(base_cur, dest_cur)
+                f"Currency Rate {base_cur} => {dest_cur} not available latest"
             )
         return rate
     raise RatesNotAvailableError("Currency Rates Source Not Ready / Available")
@@ -183,7 +183,7 @@ def _get_rate_crypto(base_cur: str, dest_cur: str, url: str) -> Any:
         rate = response_json[base_cur][dest_cur]
         if not rate:
             raise RatesNotAvailableError(
-                "Currency Rate {0} => {1} not available latest".format(base_cur, dest_cur)
+                f"Currency Rate {base_cur} => {dest_cur} not available latest"
             )
         return rate
     raise RatesNotAvailableError("Currency Rates Source Not Ready / Available")
@@ -203,9 +203,7 @@ def _get_crypto_symbol_and_id(crypto_name: str, file_path: str) -> Any:
         return crypto_id, crypto_symbol
     except Exception as key_error:
         raise KeyError(
-            "The target curency name `{0}` doesn't sound correct, please recheck your value".format(
-                crypto_name
-            )
+            f"The target curency name `{crypto_name}` doesn't sound correct, please recheck your value"
         ) from key_error
 
 
