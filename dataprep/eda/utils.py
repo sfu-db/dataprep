@@ -88,7 +88,7 @@ def preprocess_dataframe(
     # Resolve duplicate names in columns.
     # Duplicate names will be renamed as col_{id}.
     column_count = Counter(columns)
-    current_id: Dict[Any, int] = dict()
+    current_id: Dict[Any, int] = {}
     for i, col in enumerate(columns):
         if column_count[col] > 1:
             current_id[col] = current_id.get(col, 0) + 1
