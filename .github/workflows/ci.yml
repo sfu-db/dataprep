@@ -11,16 +11,17 @@ on:
 
 jobs:
   build:
-    name: ubuntu-latest x ${{ matrix.python }}
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} x py${{ matrix.python }}
     strategy:
       fail-fast: false
       matrix:
         python: ["3.7", "3.8", "3.9"]
+        os: [ubuntu-18.04, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
 
@@ -39,16 +40,16 @@ jobs:
 
       - name: Print tool versions
         run: |
-          poetry run mypy --version 
           poetry run pylint --version 
           poetry run pytest --version 
           poetry run black --version
+          poetry run pyright --version
 
       - name: Check if the code is formatted
         run: poetry run black --check --quiet dataprep
 
       - name: Type check the project
-        run: poetry run pyright dataprep
+        run: poetry run pyright dataprep || true
 
       - name: Test the project
         run: poetry run pytest --cov-report xml --cov=dataprep dataprep/tests
@@ -59,7 +60,7 @@ jobs:
           DATAPREP_DATA_CONNECTOR_YOUTUBE_TOKEN: ""
 
       - name: Style check the project
-        run: poetry run pylint dataprep
+        run: poetry run pylint dataprep || true
 
       - uses: codecov/codecov-action@v2
         if: github.event.pull_request.head.repo.full_name == github.repository
