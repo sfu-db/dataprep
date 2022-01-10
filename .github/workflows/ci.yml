@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - master
+      - release
   pull_request:
     branches:
       - develop
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.7"]
+        python: ["3.7", "3.8", "3.9"]
     steps:
       - uses: actions/checkout@v2
 
@@ -48,7 +48,7 @@ jobs:
         run: poetry run black --check --quiet dataprep
 
       - name: Type check the project
-        run: poetry run mypy dataprep
+        run: poetry run pyright dataprep
 
       - name: Test the project
         run: poetry run pytest --cov-report xml --cov=dataprep dataprep/tests
