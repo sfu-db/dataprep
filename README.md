@@ -187,9 +187,9 @@ Check out [here](https://github.com/sfu-db/connector-x#supported-sources--destin
 
 The following documentation can give you an impression of what DataPrep can do:
 
-- [Connector](https://sfu-db.github.io/dataprep/user_guide/connector/connector.html)
-- [EDA](https://sfu-db.github.io/dataprep/user_guide/eda/introduction.html)
-- [Clean](https://sfu-db.github.io/dataprep/user_guide/clean/introduction.html)
+- [Connector](https://docs.dataprep.ai/user_guide/connector/introduction.html)
+- [EDA](https://docs.dataprep.ai/user_guide/eda/introduction.html)
+- [Clean](https://docs.dataprep.ai/user_guide/clean/introduction.html)
 
 ## Contribute
 
