@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1642278637763,
+  "lastUpdate": 1642742099292,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2046,6 +2046,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.08392425551515681",
             "extra": "mean: 4.061928483399993 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e67a3a0951364b3f41c27ed1d4126038090a49ee",
+          "message": "Merge pull request #789 from khoatxp/test/780-add-test-for-imdt-compute\n\ntest(eda): add tests for intermediate compute functions",
+          "timestamp": "2022-01-20T21:11:12-08:00",
+          "tree_id": "3a50d1b994801ead9d945cd50017fec2059c2e5e",
+          "url": "https://github.com/sfu-db/dataprep/commit/e67a3a0951364b3f41c27ed1d4126038090a49ee"
+        },
+        "date": 1642742093817,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.24687831225969445,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04058288381101501",
+            "extra": "mean: 4.050578565800009 sec\nrounds: 5"
           }
         ]
       }
