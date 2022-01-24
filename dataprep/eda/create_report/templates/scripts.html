@@ -18,11 +18,13 @@
 
 <script>
     setTimeout(init, 50);
+    let originalVariables;
 
     function init() {
         const tableRows = document.querySelectorAll('.rp-table tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
+        originalVariables = Array.from(document.getElementsByClassName("section-variable"));
     }
 
     function highlightTableValue(element, color) {
@@ -112,6 +114,63 @@
         }
         pageBox.style.display = 'block';
         e.style.backgroundColor = '#5DADE2';
+    }
+
+    function sortBy(e){
+        const selectedOption = e.options[e.selectedIndex].value;
+        const isReverseOrder = document.getElementById("id-variable-reverse-order").checked ? true : false;
+        let variableSection = document.getElementById("id-variable-section");
+        let variables = originalVariables.slice();
+
+        if (selectedOption === 'original'){
+            //do nothing if it is the original feature order
+        }
+        else if (selectedOption === 'alphabetical'){
+            variables.sort(alphabeticalComparator);
+        }
+        else if (selectedOption === 'missing'){
+            variables.sort(missingComparator);
+        }
+
+        if(isReverseOrder){
+            variables.reverse();
+        }
+
+        variables.forEach(v => {
+            variableSection.appendChild(v);
+        })
+    }
+
+    function alphabeticalComparator(a, b) {
+        const x = alphabeticalAttributeExtractor(a);
+        const y = alphabeticalAttributeExtractor(b);
+        if (x < y)
+            return -1;
+        if (x > y)
+            return 1;
+        return 0;
+    }
+
+    function alphabeticalAttributeExtractor(x){
+        return x.childNodes[1].id;
+    }
+
+    function missingComparator(a, b){
+        const x = missingAttributeExtractor(a);
+        const y = missingAttributeExtractor(b);
+        if (x > y)
+            return -1;
+        if (x < y)
+            return 1;
+        return 0;
+    }
+
+    function missingAttributeExtractor(x){
+        return x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[6].childNodes[3].innerHTML;
+    }
+
+    function onReverseClick(){
+        sortBy(document.getElementById("section-sort-by-list"));
     }
 
 </script>
