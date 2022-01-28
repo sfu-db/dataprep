@@ -1,9 +1,9 @@
 ---
-name: Bug report
+name: Bug report for the EDA module
 about: Create a report to help us improve
 title: ''
 labels: 'type: bug'
-assignees: dovahcrow
+assignees: jinglinpeng
 
 ---
 
