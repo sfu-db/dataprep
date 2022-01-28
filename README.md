@@ -9,13 +9,10 @@
   <a href="https://www.codacy.com/gh/sfu-db/dataprep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sfu-db/dataprep&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/ed658f08dcce4f088c850253475540ba"/></a>
 <!--   <a href="https://codecov.io/gh/sfu-db/dataprep"><img src="https://img.shields.io/codecov/c/github/sfu-db/dataprep?style=flat-square"/></a> -->
   <a href="https://www.codacy.com/gh/sfu-db/dataprep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sfu-db/dataprep&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/ed658f08dcce4f088c850253475540ba"/></a>
-  <a href="https://discord.gg/xwbkFNk"><img src="https://img.shields.io/discord/702765817154109472?style=flat-square"/></a>
 </p>
 
 <p align="center">
   <a href="https://sfu-db.github.io/dataprep/">Documentation</a>
-  |
-  <a href="https://discord.gg/xwbkFNk">Discord</a>
   | 
   <a href="https://github.com/sfu-db/dataprep/discussions">Forum</a>
 </p>
@@ -198,7 +195,7 @@ There are many ways to contribute to DataPrep.
 - Submit bugs and help us verify fixes as they are checked in.
 - Review the source code changes.
 - Engage with other DataPrep users and developers on StackOverflow.
-- Help each other in the [DataPrep Community Discord](https://discord.gg/xwbkFNk) and [Forum].
+- Help each other in the [Forum].
 - [![Twitter]](https://twitter.com/dataprepai)
 - Contribute bug fixes.
 - Providing use cases and writing down your user experience.
