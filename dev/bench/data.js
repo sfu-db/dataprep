@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1643349447704,
+  "lastUpdate": 1643349895746,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2108,6 +2108,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06947040680040345",
             "extra": "mean: 3.342076008599986 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3c67fa0d6e1278f8dd0ee89d8586c98d3b71c974",
+          "message": "Update and rename bug_report.md to bug_report_eda.md",
+          "timestamp": "2022-01-27T22:00:57-08:00",
+          "tree_id": "cb0ccfcd28ac6bc69b8365c118d73d6804d4bd77",
+          "url": "https://github.com/sfu-db/dataprep/commit/3c67fa0d6e1278f8dd0ee89d8586c98d3b71c974"
+        },
+        "date": 1643349890356,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.22995869410419206,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08030776443776855",
+            "extra": "mean: 4.348607057000026 sec\nrounds: 5"
           }
         ]
       }
