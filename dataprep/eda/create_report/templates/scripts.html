@@ -118,18 +118,22 @@
 
     function sortBy(e){
         const selectedOption = e.options[e.selectedIndex].value;
-        const isReverseOrder = document.getElementById("id-variable-reverse-order").checked ? true : false;
+        const isReverseOrder = !!document.getElementById("id-variable-reverse-order").checked;
         let variableSection = document.getElementById("id-variable-section");
         let variables = originalVariables.slice();
 
-        if (selectedOption === 'original'){
-            //do nothing if it is the original feature order
-        }
-        else if (selectedOption === 'alphabetical'){
-            variables.sort(alphabeticalComparator);
-        }
-        else if (selectedOption === 'missing'){
-            variables.sort(missingComparator);
+        switch (selectedOption){
+            case 'original':
+                break;
+            case 'alphabetical':
+                variables.sort(alphabeticalComparator);
+                break;
+            case 'missing':
+                variables.sort(missingComparator);
+                break;
+            case 'unique':
+                variables.sort(uniqueComparator);
+                break;
         }
 
         if(isReverseOrder){
@@ -166,7 +170,21 @@
     }
 
     function missingAttributeExtractor(x){
-        return x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[6].childNodes[3].innerHTML;
+        return parseFloat(x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[6].childNodes[3].innerHTML);
+    }
+
+    function uniqueComparator(a, b){
+        const x = uniqueAttributeExtractor(a);
+        const y = uniqueAttributeExtractor(b);
+        if (x > y)
+            return -1;
+        if (x < y)
+            return 1;
+        return 0;
+    }
+
+    function uniqueAttributeExtractor(x){
+        return parseFloat(x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[2].childNodes[3].innerHTML);
     }
 
     function onReverseClick(){
