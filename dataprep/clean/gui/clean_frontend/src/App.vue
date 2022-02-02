@@ -4,9 +4,19 @@
   </div>
 </template>
 
-<script>
+<!--<script>
 export default {
   name: 'App'
+}
+</script>-->
+
+<script>
+import SampleDF from './components/SampleDF'
+export default {
+  name: 'App',
+  components:{
+    SampleDF
+  }
 }
 </script>
 

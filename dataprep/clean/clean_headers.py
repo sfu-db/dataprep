@@ -191,9 +191,9 @@ def _replace_values(name: Any, mapping: Dict[str, str]) -> Any:
         # If the old value or the new value is not alphanumeric, add underscores to the
         # beginning and end so the new value will be parsed correctly for _convert_case()
         new_val = (
-            fr"{new_value}" if old_value.isalnum() and new_value.isalnum() else fr"_{new_value}_"
+            rf"{new_value}" if old_value.isalnum() and new_value.isalnum() else rf"_{new_value}_"
         )
-        name = re.sub(fr"{old_value}", new_val, name, flags=re.IGNORECASE)
+        name = re.sub(rf"{old_value}", new_val, name, flags=re.IGNORECASE)
 
     return name
 
