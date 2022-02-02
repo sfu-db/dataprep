@@ -1196,7 +1196,7 @@ class Config(BaseModel):
     diff: Diff = Field(default_factory=Diff)
 
     def _set_enable_for_plots(self, display: List[str]) -> None:
-        """set the enable for all plots from display, used for 'from_dict' constructor """
+        """set the enable for all plots from display, used for 'from_dict' constructor"""
         all_plot_names = vars(self).keys()
         try:
             # set all plots not in display list to enable=False except for Plot and Diff class
@@ -1226,7 +1226,7 @@ class Config(BaseModel):
                 raise AttributeError(f"{plot_name} plot does not have parameter {param}")
 
     def _set_global_param_for_plots(self, global_params: Dict[str, Any]) -> None:
-        """set the global parameters for all plots, used for 'from_dict' constructor """
+        """set the global parameters for all plots, used for 'from_dict' constructor"""
         all_plot_names = vars(self).keys()
         valid_global_params = vars(self.plot).keys()
         for param, val in global_params.items():
@@ -1243,7 +1243,7 @@ class Config(BaseModel):
                     self._set_param_for_plot(plot_name, param, val, raise_error_if_not_exists=False)
 
     def _set_local_param_for_plots(self, local_params: Dict[str, Any]) -> None:
-        """set the local parameters for all plots, used for 'from_dict' constructor """
+        """set the local parameters for all plots, used for 'from_dict' constructor"""
         for key, value in local_params.items():
             plot_name, rest = key.split(".", 1)
             param = rest.replace(".", "__")
