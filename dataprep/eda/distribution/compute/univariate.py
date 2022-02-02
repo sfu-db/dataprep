@@ -278,7 +278,7 @@ def _calc_word_freq(
     """
     col = df.columns[0]
 
-    regex = fr"\b(?:{'|'.join(ess)})\b|[^\w+ ]" if stopword else r"[^\w+ ]"
+    regex = rf"\b(?:{'|'.join(ess)})\b|[^\w+ ]" if stopword else r"[^\w+ ]"
     # use a regex to replace stop words and non-alphanumeric characters with empty string
     df[col] = df[col].str.replace(regex, "").str.lower().str.split()
 

@@ -23,7 +23,7 @@ REGEX_BRACKETS = {
 REGEX_DIGITS = re.compile(r"\d+")
 REGEX_DIGITS_BLOCK = re.compile(r"\b\d+\b")
 REGEX_HTML = re.compile(r"<[A-Za-z/][^>]*>|&(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});")
-REGEX_PUNCTUATION = re.compile(fr"[{re.escape(string.punctuation)}]")
+REGEX_PUNCTUATION = re.compile(rf"[{re.escape(string.punctuation)}]")
 REGEX_URL = re.compile(r"(?:https?://|www\.)\S+")
 REGEX_WHITESPACE = re.compile(r"[\n\t]|[ ]{2,}")
 
@@ -281,9 +281,9 @@ def _remove_prefixed(text: Any, prefix: Union[str, Set[str]]) -> Any:
     text = str(text)
     if isinstance(prefix, set):
         for pre in prefix:
-            text = re.sub(fr"{pre}\S+", "", text)
+            text = re.sub(rf"{pre}\S+", "", text)
     else:
-        text = re.sub(fr"{prefix}\S+", "", text)
+        text = re.sub(rf"{prefix}\S+", "", text)
 
     return text
 
@@ -347,7 +347,7 @@ def _replace_bracketed(
         return text
 
     text = str(text)
-    value = value if inclusive else fr"\g<1>{value}\g<2>"
+    value = value if inclusive else rf"\g<1>{value}\g<2>"
     if isinstance(brackets, set):
         for bracket in brackets:
             text = re.sub(REGEX_BRACKETS[bracket], value, text)
@@ -382,9 +382,9 @@ def _replace_prefixed(text: Any, prefix: Union[str, Set[str]], value: str) -> An
     text = str(text)
     if isinstance(prefix, set):
         for pre in prefix:
-            text = re.sub(fr"{pre}\S+", value, text)
+            text = re.sub(rf"{pre}\S+", value, text)
     else:
-        text = re.sub(fr"{prefix}\S+", value, text)
+        text = re.sub(rf"{prefix}\S+", value, text)
 
     return text
 
@@ -419,9 +419,9 @@ def _replace_text(text: Any, value: Dict[str, str], block: Optional[bool] = True
     text = str(text)
     for old_value, new_value in value.items():
         text = (
-            re.sub(fr"\b{old_value}\b", new_value, text, flags=re.IGNORECASE)
+            re.sub(rf"\b{old_value}\b", new_value, text, flags=re.IGNORECASE)
             if block
-            else re.sub(fr"{old_value}", new_value, text, flags=re.IGNORECASE)
+            else re.sub(rf"{old_value}", new_value, text, flags=re.IGNORECASE)
         )
 
     return text

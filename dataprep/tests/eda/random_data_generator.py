@@ -6,7 +6,7 @@ import pytest
 
 
 def _resolve_random_state(random_state: Union[int, np.random.RandomState]) -> np.random.RandomState:
-    """ Return a RandomState based on Input Integer (as seed) or RandomState"""
+    """Return a RandomState based on Input Integer (as seed) or RandomState"""
     if isinstance(random_state, int):
         return np.random.RandomState(random_state)
     elif isinstance(random_state, np.random.RandomState):
