@@ -4,8 +4,7 @@ from enum import Enum, auto
 
 import dask
 import numpy as np
-from bottleneck import nanrankdata as nanrankdata_
-from bottleneck import rankdata as rankdata_
+from scipy.stats.mstats import rankdata
 from scipy.stats import kendalltau as kendalltau_
 
 
@@ -18,16 +17,18 @@ class CorrelationMethod(Enum):
     KendallTau = auto()
 
 
-@dask.delayed(name="rankdata-bottleneck", pure=True)  # pylint: disable=no-value-for-parameter
-def rankdata(data: np.ndarray, axis: int = 0) -> np.ndarray:
-    """delayed version of rankdata"""
-    return rankdata_(data, axis=axis)
+# @dask.delayed(name="rankdata-bottleneck", pure=True)  # pylint: disable=no-value-for-parameter
+# def nanrankdata(data: np.ndarray, axis: int = 0) -> np.ndarray:
+#     """delayed version of rankdata."""
+#     return nanrankdata_(data, axis=axis)
 
 
-@dask.delayed(name="rankdata-bottleneck", pure=True)  # pylint: disable=no-value-for-parameter
+@dask.delayed(name="nanrankdata", pure=True)  # pylint: disable=no-value-for-parameter
 def nanrankdata(data: np.ndarray, axis: int = 0) -> np.ndarray:
     """delayed version of rankdata."""
-    return nanrankdata_(data, axis=axis)
+    ranks = rankdata(np.ma.masked_invalid(data), axis=axis)
+    ranks[ranks == 0] = np.nan
+    return ranks
 
 
 @dask.delayed(name="kendalltau-scipy", pure=True)  # pylint: disable=no-value-for-parameter
