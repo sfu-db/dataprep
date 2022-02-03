@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1643786071917,
+  "lastUpdate": 1643879844421,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2263,6 +2263,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.05818805263716981",
             "extra": "mean: 3.248924692199995 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f54f3ee79d2eaece8a920185e4373c2c9ba7760e",
+          "message": "Merge pull request #799 from sfu-db/remove_bottneck\n\nchore(eda): remove dependency on bottleneck lib",
+          "timestamp": "2022-02-03T01:13:59-08:00",
+          "tree_id": "f4832f71374b045c36307efa44b4a34392ba05bc",
+          "url": "https://github.com/sfu-db/dataprep/commit/f54f3ee79d2eaece8a920185e4373c2c9ba7760e"
+        },
+        "date": 1643879839346,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.29594411390926756,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0514557669141963",
+            "extra": "mean: 3.379016351400003 sec\nrounds: 5"
           }
         ]
       }
