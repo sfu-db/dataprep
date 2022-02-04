@@ -32,10 +32,10 @@ jobs:
 
       - name: Print tool versions
         run: |
-          poetry run mypy --version 
           poetry run pylint --version 
           poetry run pytest --version 
           poetry run black --version
+          poetry run pyright --version
 
       - name: Build wheels
         run: poetry build

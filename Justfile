@@ -18,27 +18,19 @@ gen-apidocs:
 black:
   poetry run black dataprep
   
-ci: format ci-black typeck test lint
-
-ci-black:
-  poetry run black --check --quiet dataprep
+ci: format ci-black pyright test lint
 
 format:
   poetry run black dataprep
 
-typeck: ci-mypy
-
 test +ARGS="":
   poetry run pytest dataprep/tests {{ARGS}}
-
-testf +ARGS="dataprep":
-  poetry run pytest {{ARGS}}
 
 lint:
   poetry run pylint dataprep
 
-ci-mypy:
-  poetry run mypy dataprep
+pyright:
+  poetry run pyright dataprep
 
 build:
   poetry build
