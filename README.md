@@ -195,7 +195,7 @@ There are many ways to contribute to DataPrep.
 - Submit bugs and help us verify fixes as they are checked in.
 - Review the source code changes.
 - Engage with other DataPrep users and developers on StackOverflow.
-- Help each other in the [Forum].
+- Ask questions & propose new ideas in our [Forum].
 - [![Twitter]](https://twitter.com/dataprepai)
 - Contribute bug fixes.
 - Providing use cases and writing down your user experience.
