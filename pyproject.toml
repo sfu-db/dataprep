@@ -72,6 +72,7 @@ ipykernel = "^6"
 ipython = "^7"
 nbsphinx = "^0.8"
 pylint = "^2"
+pyright = "^0.0.13"
 pytest = "^6"
 pytest-cov = "^3"
 rope = "^0.16"
@@ -81,7 +82,6 @@ sphinx = "^4"
 sphinx-autobuild = "^2021"
 sphinx-autodoc-typehints = "^1"
 toml = "^0.10"
-pyright = "^0.0.13"
 
 [tool.black]
 exclude = '''
@@ -98,15 +98,6 @@ exclude = '''
 '''
 line-length = 100
 target-version = ['py36', 'py37']
-
-[tool.semantic_release]
-branch = "master"
-commit_author = "Weiyuan Wu <youngw@sfu.ca>"
-commit_message = "Bump to v{version}"
-commit_subject = "v{version}"
-commit_version_number = true
-version_source = "tag"
-version_variable = "dataprep/__init__.py:__version__"
 
 [build-system]
 build-backend = "poetry.masonry.api"
