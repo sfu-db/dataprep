@@ -1,11 +1,15 @@
 {{ context.components.graphs[0] }}
 
 {% for var in context.components.dfs[0].variables.values() %}
+{% if var.plots[0] != 0 %}
 {{ var.plots[0] }}
+{% endif %}
 {% endfor %}
 
 {% for var in context.components.dfs[1].variables.values() %}
+{% if var.plots[0] != 0 %}
 {{ var.plots[0] }}
+{% endif %}
 {% endfor %}
 
 <script>
