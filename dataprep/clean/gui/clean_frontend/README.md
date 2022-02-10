@@ -14,6 +14,9 @@ npm run dev
 # build for production with minification
 npm run build
 
+# Easier developing command line for developer
+npm run build && npm run dev
+
 # build for production and view the bundle analyzer report
 npm run build --report
 ```
