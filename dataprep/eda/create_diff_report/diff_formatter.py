@@ -396,7 +396,7 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
                 "tabledata": stats,
                 "col_type": itmdt.visual_type.replace("_column", ""),
                 "tab_names": tab_names,
-                "plots": comp
+                "plots": comp,
             }
 
         except:
