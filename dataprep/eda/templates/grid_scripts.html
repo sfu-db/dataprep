@@ -3,11 +3,13 @@
 
 <script>
     setTimeout(init, 50);
+    const DEFAULT_NUM_PER_PAGE = 3;
 
     function init() {
         const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
+        paginateVariables();
     }
 
     function switchPage{{ context.rnd }}(e) {
@@ -89,4 +91,74 @@
             }
         )
     }
+
+    function increaseNum() {
+        let button = document.getElementById('increase-num-per-page-{{ context.rnd }}');
+        button.disabled = true;
+        let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+        value = isNaN(value) ? DEFAULT_NUM_PER_PAGE : value;
+        value++;
+        document.getElementById('num-per-page-{{ context.rnd }}').value = value;
+        paginateVariables();
+        button.disabled = false;
+    }
+
+    function decreaseNum() {
+        let button = document.getElementById('decrease-num-per-page-{{ context.rnd }}');
+        button.disabled = true;
+        let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+        value = isNaN(value) ? DEFAULT_NUM_PER_PAGE : value;
+        value--;
+        if(value < 1){
+          value = 1;
+        }
+        document.getElementById('num-per-page-{{ context.rnd }}').value = value;
+        paginateVariables();
+        button.disabled = false;
+    }
+
+    function changeNum() {
+        let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+        value = isNaN(value) ? DEFAULT_NUM_PER_PAGE : value;
+        if(value < 1){
+          return;
+        }
+        paginateVariables();
+    }
+
+    let paginateVariables = function(){
+        jQuery(function($) {
+            let items = $(".fig-{{ context.rnd }}");
+            let pagination = $(".pagination-{{ context.rnd }}");
+            let numItems = items.length;
+            let perPage = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+            perPage = isNaN(perPage) ? DEFAULT_NUM_PER_PAGE : perPage;
+
+            items.slice(perPage).hide();
+
+            pagination.pagination({
+                items: numItems,
+                itemsOnPage: perPage,
+                cssStyle: "light-theme",
+                onPageClick: function(pageNumber) {
+                    let showFrom = perPage * (pageNumber - 1);
+                    let showTo = showFrom + perPage;
+                    items.hide().slice(showFrom, showTo).show();
+                }
+            });
+
+            function checkFragment() {
+                let hash = window.location.hash || "#page-1";
+                hash = hash.match(/^#page-(\d+)$/);
+                if(hash) {
+                    pagination.pagination("selectPage", parseInt(hash[1]));
+                }
+            };
+
+            $(window).bind("popstate", checkFragment);
+            checkFragment();
+        });
+    }
+
+
 </script>

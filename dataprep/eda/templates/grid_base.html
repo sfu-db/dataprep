@@ -2,6 +2,8 @@
 
 <head>
     <title> {{ context.title }} </title>
+    {% include 'jquery.html' %}
+    {% include 'pagination.html' %}
     {% include 'grid_scripts.html' %}
     {% include 'grid_styles.html' %}
 </head>
@@ -167,6 +169,14 @@
         </div>
         {% endfor %}
     </div>
+    <div class="pagination-{{ context.rnd }}"></div>
+    <form class="pagination-form-{{ context.rnd }}" onsubmit="return false">
+        <p>Number of plots per page</p>
+        <div class="pagination-button-{{ context.rnd }}" id="decrease-num-per-page-{{ context.rnd }}" onclick="decreaseNum()" value="Decrease Num">-</div>
+        <input type="number" id="num-per-page-{{ context.rnd }}" value="3" onchange="changeNum()"/>
+        <div class="pagination-button-{{ context.rnd }}" id="increase-num-per-page-{{ context.rnd }}" onclick="increaseNum()" value="Increase Num">+</div>
+    </form>
+    <br/><br/>
 </body>
 
 </html>
