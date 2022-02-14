@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1644867374122,
+  "lastUpdate": 1644870152562,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2418,6 +2418,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06823912677261681",
             "extra": "mean: 4.410441959600007 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "yixuy@sfu.ca",
+            "name": "henryye",
+            "username": "yixuy"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "691257dc250682060d41ce8a33e92d1ead40e586",
+          "message": "Fix when minute and second of lat and long are 60",
+          "timestamp": "2022-02-14T12:18:44-08:00",
+          "tree_id": "7042b04249581efc493411b0358cb0cad54f4546",
+          "url": "https://github.com/sfu-db/dataprep/commit/691257dc250682060d41ce8a33e92d1ead40e586"
+        },
+        "date": 1644870147106,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.26137982817687866,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07012953044713187",
+            "extra": "mean: 3.8258499402000097 sec\nrounds: 5"
           }
         ]
       }
