@@ -607,16 +607,42 @@ def check_date(date: str, clean: bool) -> Union[str, bool]:
     date = str(date)
     tokens = split(date, JUMP)
     remain_tokens = tokens.copy()
+
     # Handle timezone
     for token in tokens:
         if token in all_timezones or token in ZONE:
             remain_tokens.remove(token)
+    invalid_judge = not remain_tokens
+    if invalid_judge:
+        return "unknown" if clean else False
+
+    # Handle weekdays text
     for token in tokens:
-        if token in MONTHS or token in WEEKDAYS:
+        if token in WEEKDAYS:
             remain_tokens.remove(token)
+    invalid_judge = not remain_tokens
+    if invalid_judge:
+        return "unknown" if clean else False
+
+    # Handle single AM and PM text
+    for token in tokens:
+        if token in AM + PM:
+            remain_tokens.remove(token)
+    invalid_judge = not remain_tokens
+    if invalid_judge:
+        return "unknown" if clean else False
+
+    # Handle month text
+    for token in tokens:
+        if token in MONTHS:
+            remain_tokens.remove(token)
+
+    # Handle single numbers
     for token in remain_tokens:
         if token.isnumeric():
             remain_tokens.remove(token)
+
+    # Handle connected AM, PM
     for token in remain_tokens:
         tokens = split(token, AM + PM + [":"])
         invalid_judge = False in [temp_token.isnumeric() for temp_token in tokens]
