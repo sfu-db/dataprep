@@ -686,14 +686,10 @@
         cursor: default;
     }
 
-    .pagination-form-{{ context.rnd }} {
-        text-align: center;
-        padding-top: 50px;
-    }
-
     .pagination-{{ context.rnd }} {
         text-align: center;
         padding-top: 50px;
+        padding-bottom: 50px;
     }
 
     .pagination-button-{{ context.rnd }} {
@@ -718,26 +714,19 @@
         cursor: pointer;
     }
 
-    form #decrease-num-per-page-{{ context.rnd }} {
-        margin-right: -4px;
-        border-radius: 8px 0 0 8px;
+    html {
+        display: table;
+        margin: auto;
     }
 
-    form #increase-num-per-page-{{ context.rnd }} {
-        margin-left: -4px;
-        border-radius: 0 8px 8px 0;
-    }
-
-    form #input-wrap {
-        margin: 0px;
-        padding: 0px;
+    body {
+        display: table-cell;
+        vertical-align: middle;
     }
 
     input#num-per-page-{{ context.rnd }} {
         text-align: center;
-        border: none;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+        border: 1px solid #ddd;
         margin: 0px;
         width: 40px;
         height: 40px;
@@ -749,13 +738,48 @@
         margin: 0;
     }
 
-    html {
-        display: table;
-        margin: auto;
+    .num-of-plots-{{ context.rnd }} {
+         text-align: center;
+         padding-top: 30px;
     }
 
-    body {
-        display: table-cell;
-        vertical-align: middle;
+    .num-of-plots-{{ context.rnd }} input,
+    .num-of-plots-{{ context.rnd }} p {
+         display: inline-block;
+         margin: 0;
+         vertical-align: middle;
+         box-shadow: none;
+         font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'Lucida Grande', sans-serif;
+         font-size: 15px;
     }
+
+    .num-of-plots-minus-{{ context.rnd }},
+    .num-of-plots-plus-{{ context.rnd }} {
+         padding: 7px 10px 8px;
+         height: 41px;
+         background-color: #ffffff;
+         border: 1px solid #ddd;
+         cursor:pointer;
+    }
+
+    .num-of-plots-minus-{{ context.rnd }} {
+        margin-right: -4px;
+        border-radius: 8px 0 0 8px;
+    }
+
+    .num-of-plots-plus-{{ context.rnd }} {
+        margin-left: -4px;
+        border-radius: 0 8px 8px 0;
+    }
+
+    .num-of-plots-minus-{{ context.rnd }}:hover,
+    .num-of-plots-plus-{{ context.rnd }}:hover {
+        background: #eeeeee;
+    }
+
+    .num-of-plots-minus-{{ context.rnd }}:focus,
+    .num-of-plots-plus-{{ context.rnd }}:focus {
+        outline: none;
+    }
+
 </style>
