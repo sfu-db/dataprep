@@ -499,15 +499,15 @@ def _check_lat_or_long(val: Any, clean: bool, hor_dir: str) -> Any:
     # range is [-90, 90] for latitude and [-180, 180] for longitude
     bound = 90 if hor_dir == "lat" else 180
 
-    # minutes and seconds need to be in the interval [0, 60)
+    # minutes and seconds need to be in the interval [0, 60]
     # for degrees:
     #  if hemisphere is give, then 0<=deg<=bound
     #  if hemisphere is not given, then -bound<=deg<=bound
     # decimal degrees must be -bound<=lat<=bound
     # the first given hemisphere and last hemisphere cannot both be set
     if (
-        not 0 <= mins < 60
-        or not 0 <= secs < 60
+        not 0 <= mins <= 60
+        or not 0 <= secs <= 60
         or hem
         and not 0 <= float(mch.group("deg")) <= bound
         or not hem
