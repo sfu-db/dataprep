@@ -1,6 +1,8 @@
 """
 Common definitions and classes for the clean_date function.
 """
+# pylint: disable-msg=too-many-branches
+
 import datetime
 from typing import Dict, List, Union
 
