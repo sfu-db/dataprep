@@ -256,7 +256,7 @@ def _format_country(
 
     if status == "null":
         return np.nan, 0
-    if status == "unknown":
+    if status in "none" or status in "unknown":
         if errors == "raise":
             raise ValueError(f"unable to parse value {val}")
         return val if errors == "ignore" else np.nan, 1
@@ -289,7 +289,7 @@ def _check_country(country: str, input_formats: Tuple[str, ...], strict: bool, c
         If True, a tuple (index, status) is returned.
         If False, the function returns True/False to be used by the validate country function.
     """
-    if country in NULL_VALUES:
+    if country in "none" or country in NULL_VALUES:
         return (None, "null") if clean else False
 
     country_format = _get_format_from_name(country)
