@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1644898802580,
+  "lastUpdate": 1644968016355,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2480,6 +2480,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.148339165854006",
             "extra": "mean: 4.417641886000001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "c192ab43259714822d0daa4ff556811dbf85c763",
+          "message": "fix(clean): remove usaddress library",
+          "timestamp": "2022-02-15T15:30:21-08:00",
+          "tree_id": "88c404af82037913c6ce0ac48eba670e57f004e4",
+          "url": "https://github.com/sfu-db/dataprep/commit/c192ab43259714822d0daa4ff556811dbf85c763"
+        },
+        "date": 1644968010767,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.3143412438753122,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03996851375572618",
+            "extra": "mean: 3.1812561013999927 sec\nrounds: 5"
           }
         ]
       }
