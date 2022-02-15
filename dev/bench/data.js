@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1644870152562,
+  "lastUpdate": 1644898802580,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2449,6 +2449,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.07012953044713187",
             "extra": "mean: 3.8258499402000097 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "yixuy@sfu.ca",
+            "name": "henryye",
+            "username": "yixuy"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "5b3a9f4f4218da1e8d358451407186986f2ecedb",
+          "message": "Fix the bug and make None as NaN",
+          "timestamp": "2022-02-14T20:16:08-08:00",
+          "tree_id": "8f30cf849908b21188483a1df0c3e6d3123c36bb",
+          "url": "https://github.com/sfu-db/dataprep/commit/5b3a9f4f4218da1e8d358451407186986f2ecedb"
+        },
+        "date": 1644898796952,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.22636511193202674,
+            "unit": "iter/sec",
+            "range": "stddev: 0.148339165854006",
+            "extra": "mean: 4.417641886000001 sec\nrounds: 5"
           }
         ]
       }
