@@ -10,7 +10,6 @@ import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import usaddress
 
 from ..progress_bar import ProgressBar
 from .address_utils import (
@@ -21,6 +20,8 @@ from .address_utils import (
     PREFIXES,
     SUFFIXES,
     TAG_MAPPING,
+    tag,
+    RepeatedLabelError,
 )
 from .utils import NULL_VALUES, create_report_new, to_dask
 
@@ -266,9 +267,9 @@ def _check_address(address: Any, must_contain: Tuple[str, ...], clean: bool) -> 
     address = re.sub(r"[().]", "", str(address))
 
     try:
-        address, _ = usaddress.tag(address, TAG_MAPPING)
+        address, _ = tag(address, TAG_MAPPING)
 
-    except usaddress.RepeatedLabelError:
+    except RepeatedLabelError:
         return (None, "unknown") if clean else False
 
     status = _check_status(address, must_contain)
