@@ -3,7 +3,10 @@
 
 <script>
     setTimeout(init, 50);
-    const DEFAULT_NUM_PER_PAGE = 3;
+
+    function getDefaultNumPerPage(){
+        return 3;
+    }
 
     function init() {
         const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
@@ -96,7 +99,7 @@
         let button = document.getElementById('increase-num-per-page-{{ context.rnd }}');
         button.disabled = true;
         let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
-        value = isNaN(value) ? DEFAULT_NUM_PER_PAGE : value;
+        value = isNaN(value) ? getDefaultNumPerPage() : value;
         value++;
         document.getElementById('num-per-page-{{ context.rnd }}').value = value;
         paginateVariables();
@@ -107,7 +110,7 @@
         let button = document.getElementById('decrease-num-per-page-{{ context.rnd }}');
         button.disabled = true;
         let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
-        value = isNaN(value) ? DEFAULT_NUM_PER_PAGE : value;
+        value = isNaN(value) ? getDefaultNumPerPage() : value;
         value--;
         if(value < 1){
           value = 1;
@@ -119,20 +122,20 @@
 
     function changeNum() {
         let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
-        value = isNaN(value) ? DEFAULT_NUM_PER_PAGE : value;
+        value = isNaN(value) ? getDefaultNumPerPage() : value;
         if(value < 1){
           return;
         }
         paginateVariables();
     }
 
-    let paginateVariables = function(){
+    function paginateVariables(){
         jQuery(function($) {
             let items = $(".fig-{{ context.rnd }}");
             let pagination = $(".pagination-{{ context.rnd }}");
             let numItems = items.length;
             let perPage = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
-            perPage = isNaN(perPage) ? DEFAULT_NUM_PER_PAGE : perPage;
+            perPage = isNaN(perPage) ? getDefaultNumPerPage() : perPage;
 
             items.slice(perPage).hide();
 
