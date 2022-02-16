@@ -18,13 +18,16 @@
 
 <script>
     setTimeout(init, 50);
-    let originalVariables;
+    function getOriginalVariables(){}
 
     function init() {
         const tableRows = document.querySelectorAll('.rp-table tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
-        originalVariables = Array.from(document.getElementsByClassName("section-variable"));
+        const originalVariables = Array.from(document.getElementsByClassName("section-variable"));
+        getOriginalVariables = function(){
+            return originalVariables;
+        }
     }
 
     function highlightTableValue(element, color) {
@@ -120,7 +123,7 @@
         const selectedOption = e.options[e.selectedIndex].value;
         const isReverseOrder = !!document.getElementById("id-variable-reverse-order").checked;
         let variableSection = document.getElementById("id-variable-section");
-        let variables = originalVariables.slice();
+        let variables = getOriginalVariables().slice();
 
         switch (selectedOption){
             case 'original':
