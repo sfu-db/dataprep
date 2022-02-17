@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645062609434,
+  "lastUpdate": 1645074334797,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2542,6 +2542,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0543909577075387",
             "extra": "mean: 3.3580082802000106 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ab38a36287d21f6a2b1ec208c6bb53d4572b70ea",
+          "message": "Merge pull request #791 from khoatxp/feature/add-sort-by-for-variables\n\nfeat(eda): add sort by for variables section in create_report",
+          "timestamp": "2022-02-16T21:02:10-08:00",
+          "tree_id": "b115281e4634f581430f3126bfb5867b05d1a39a",
+          "url": "https://github.com/sfu-db/dataprep/commit/ab38a36287d21f6a2b1ec208c6bb53d4572b70ea"
+        },
+        "date": 1645074330015,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.29534274820149226,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06477423505339747",
+            "extra": "mean: 3.3858965764000004 sec\nrounds: 5"
           }
         ]
       }
