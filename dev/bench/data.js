@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1644968016355,
+  "lastUpdate": 1645062609434,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2511,6 +2511,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.03996851375572618",
             "extra": "mean: 3.1812561013999927 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "de06223cb3197c8cacbd9ece7203a437a180981b",
+          "message": "Merge pull request #798 from jwa345/newt\n\ndocs(eda): add doc for getting imdt result.",
+          "timestamp": "2022-02-16T17:46:41-08:00",
+          "tree_id": "e67135fb00680ee1f345fa65603c1099d20b96f0",
+          "url": "https://github.com/sfu-db/dataprep/commit/de06223cb3197c8cacbd9ece7203a437a180981b"
+        },
+        "date": 1645062604322,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.29779557301759774,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0543909577075387",
+            "extra": "mean: 3.3580082802000106 sec\nrounds: 5"
           }
         ]
       }
