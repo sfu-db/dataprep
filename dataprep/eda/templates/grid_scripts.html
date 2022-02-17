@@ -5,14 +5,26 @@
     setTimeout(init, 50);
 
     function getDefaultNumPerPage(){
-        return 3;
+        return 9;
+    }
+
+    function getPaginationThreshold(){
+        return 18;
     }
 
     function init() {
         const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
-        paginateVariables();
+
+        if(document.getElementsByClassName("fig-{{ context.rnd }}").length < getPaginationThreshold()){
+            document.getElementById("pagination-{{ context.rnd }}").style.display = "none";
+            document.getElementById("num-of-plots-{{ context.rnd }}").style.display = "none";
+        }
+        else {
+            document.getElementById('num-per-page-{{ context.rnd }}').value = getDefaultNumPerPage();
+            paginateVariables();
+        }
     }
 
     function switchPage{{ context.rnd }}(e) {
@@ -134,6 +146,9 @@
             let items = $(".fig-{{ context.rnd }}");
             let pagination = $(".pagination-{{ context.rnd }}");
             let numItems = items.length;
+            if(numItems < getPaginationThreshold()){
+                return;
+            }
             let perPage = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
             perPage = isNaN(perPage) ? getDefaultNumPerPage() : perPage;
 
@@ -154,7 +169,13 @@
                 let hash = window.location.hash || "#page-1";
                 hash = hash.match(/^#page-(\d+)$/);
                 if(hash) {
-                    pagination.pagination("selectPage", parseInt(hash[1]));
+                    let pageNum =  parseInt(hash[1]);
+                    if(pageNum * perPage <= (Math.ceil(numItems/perPage) * perPage)){
+                        pagination.pagination("selectPage", pageNum);
+                    }
+                    else{
+                        pagination.pagination("selectPage", 1);
+                    }
                 }
             };
 

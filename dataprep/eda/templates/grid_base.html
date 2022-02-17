@@ -123,10 +123,10 @@
         {% endfor %}
     </div>
     {% endif %}
-    <div class="num-of-plots-{{ context.rnd }}">
+    <div class="num-of-plots-{{ context.rnd }}" id="num-of-plots-{{ context.rnd }}">
         <p>Number of plots per page: </p>
 	    <input type="button" id="decrease-num-per-page-{{ context.rnd }}" value="-" class="num-of-plots-minus-{{ context.rnd }}" onclick="decreaseNum()">
-        <input type="number" id="num-per-page-{{ context.rnd }}" value="3" onchange="changeNum()"/>
+        <input type="number" id="num-per-page-{{ context.rnd }}" onchange="changeNum()"/>
         <input type="button" id="increase-num-per-page-{{ context.rnd }}" value="+" class="num-of-plots-plus-{{ context.rnd }}" onclick="increaseNum()">
     </div>
     <div class="plot-{{ context.rnd }}">
@@ -175,7 +175,7 @@
         </div>
         {% endfor %}
     </div>
-    <div class="pagination-{{ context.rnd }}"></div>
+    <div class="pagination-{{ context.rnd }}" id="pagination-{{ context.rnd }}"></div>
 </body>
 
 </html>
