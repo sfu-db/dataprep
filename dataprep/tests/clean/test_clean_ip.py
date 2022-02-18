@@ -44,6 +44,7 @@ def test_clean_input_ipv4(df_ips: pd.DataFrame) -> None:
         "177.195.148.116",
         np.nan,
     ]
+
     assert df_check.equals(df_clean)
 
 
