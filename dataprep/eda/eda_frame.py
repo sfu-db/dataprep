@@ -93,7 +93,7 @@ class EDAFrame:
         # if index is object type, convert it to string
         # to make sure the element is comparable. Otherwise it will throw
         # error when dask divide and sort data by index.
-        if df.index.dtype == np.object:
+        if df.index.dtype == object:
             df.index = df.index.astype(str)
 
         if isinstance(df, dd.DataFrame):
