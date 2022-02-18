@@ -12,7 +12,7 @@ import dask
 import dask.array as da
 import dask.dataframe as dd
 from pandas.api.types import is_integer_dtype
-from ...utils import DTMAP, _get_timeunit
+from ...utils import DTMAP, _get_timeunit, to_dask
 from ...intermediate import Intermediate
 from ...dtypes import (
     Nominal,
@@ -353,6 +353,12 @@ def _nom_calcs(srs: Srs, cfg: Config) -> Dict[str, List[Any]]:
     return data
 
 
+def _dask_group_by_time_series(dd: dd.DataFrame, key: str, freq: str) -> dd.DataFrame:
+    df = dd.compute()
+    gb_df = df.groupby(pd.Grouper(key=key, freq=freq)).size().reset_index()
+    return to_dask(gb_df)
+
+
 def _calc_line_dt(srs: Srs, x: str, unit: str) -> Tuple[List[pd.DataFrame], str]:
     """
     Calculate a line or multiline chart with date on the x axis. If df contains
@@ -373,9 +379,7 @@ def _calc_line_dt(srs: Srs, x: str, unit: str) -> Tuple[List[pd.DataFrame], str]
     dfs = Dfs(srs.apply("to_frame").self_map(drop_null))
     if unit not in DTMAP.keys():
         raise ValueError
-    grouper = pd.Grouper(key=x, freq=DTMAP[unit][0])  # for grouping the time values
-
-    dfr = dfs.apply("groupby", grouper).apply("size").apply("reset_index").data
+    dfr = dfs.self_map(_dask_group_by_time_series, key=x, freq=DTMAP[unit][0])
     for df in dfr:
         df.columns = [x, "freq"]
         df["pct"] = df["freq"] / len(df) * 100
