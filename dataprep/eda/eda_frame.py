@@ -90,11 +90,16 @@ class EDAFrame:
         if isinstance(df, (dd.Series, pd.Series)):
             df = df.to_frame()
 
+        org_index = df.index
+        org_columns = df.columns
+
         # if index is object type, convert it to string
         # to make sure the element is comparable. Otherwise it will throw
         # error when dask divide and sort data by index.
         if df.index.dtype == object:
             df.index = df.index.astype(str)
+
+        df.columns = _process_column_name(df.columns)
 
         if isinstance(df, dd.DataFrame):
             ddf = df
@@ -108,7 +113,6 @@ class EDAFrame:
         else:
             raise ValueError(f"{type(df)} not supported")
 
-        ddf.columns = _process_column_name(ddf.columns)
         self._eda_dtypes = _detect_dtypes(ddf, dtype)
 
         # Transform categorical column to string for non-na values.
@@ -134,6 +138,9 @@ class EDAFrame:
         for col in self._ddf.columns:
             nulls_cnt[col] = pd_null[col].sum()
         self._nulls_cnt = nulls_cnt
+
+        df.index = org_index
+        df.columns = org_columns
 
     @property
     def columns(self) -> pd.Index:
