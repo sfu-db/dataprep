@@ -4,10 +4,27 @@
 <script>
     setTimeout(init, 50);
 
+    function getDefaultNumPerPage(){
+        return 9;
+    }
+
+    function getPaginationThreshold(){
+        return 18;
+    }
+
     function init() {
         const tableRows = document.querySelectorAll('.tabledata-{{ context.rnd }} tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
+
+        if(document.getElementsByClassName("fig-{{ context.rnd }}").length < getPaginationThreshold()){
+            document.getElementById("pagination-{{ context.rnd }}").style.display = "none";
+            document.getElementById("num-of-plots-{{ context.rnd }}").style.display = "none";
+        }
+        else {
+            document.getElementById('num-per-page-{{ context.rnd }}').value = getDefaultNumPerPage();
+            paginateVariables();
+        }
     }
 
     function switchPage{{ context.rnd }}(e) {
@@ -88,5 +105,82 @@
                 }, 1500);
             }
         )
+    }
+
+    function increaseNum() {
+        let button = document.getElementById('increase-num-per-page-{{ context.rnd }}');
+        button.disabled = true;
+        let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+        value = isNaN(value) ? getDefaultNumPerPage() : value;
+        value++;
+        document.getElementById('num-per-page-{{ context.rnd }}').value = value;
+        paginateVariables();
+        button.disabled = false;
+    }
+
+    function decreaseNum() {
+        let button = document.getElementById('decrease-num-per-page-{{ context.rnd }}');
+        button.disabled = true;
+        let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+        value = isNaN(value) ? getDefaultNumPerPage() : value;
+        value--;
+        if(value < 1){
+          value = 1;
+        }
+        document.getElementById('num-per-page-{{ context.rnd }}').value = value;
+        paginateVariables();
+        button.disabled = false;
+    }
+
+    function changeNum() {
+        let value = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+        value = isNaN(value) ? getDefaultNumPerPage() : value;
+        if(value < 1){
+          return;
+        }
+        paginateVariables();
+    }
+
+    function paginateVariables(){
+        jQuery(function($) {
+            let items = $(".fig-{{ context.rnd }}");
+            let pagination = $(".pagination-{{ context.rnd }}");
+            let numItems = items.length;
+            if(numItems < getPaginationThreshold()){
+                return;
+            }
+            let perPage = parseInt(document.getElementById('num-per-page-{{ context.rnd }}').value, 10);
+            perPage = isNaN(perPage) ? getDefaultNumPerPage() : perPage;
+
+            items.slice(perPage).hide();
+
+            pagination.pagination({
+                items: numItems,
+                itemsOnPage: perPage,
+                cssStyle: "light-theme",
+                onPageClick: function(pageNumber) {
+                    let showFrom = perPage * (pageNumber - 1);
+                    let showTo = showFrom + perPage;
+                    items.hide().slice(showFrom, showTo).show();
+                }
+            });
+
+            function checkFragment() {
+                let hash = window.location.hash || "#page-1";
+                hash = hash.match(/^#page-(\d+)$/);
+                if(hash) {
+                    let pageNum =  parseInt(hash[1]);
+                    if(pageNum * perPage <= (Math.ceil(numItems/perPage) * perPage)){
+                        pagination.pagination("selectPage", pageNum);
+                    }
+                    else{
+                        pagination.pagination("selectPage", 1);
+                    }
+                }
+            };
+
+            $(window).bind("popstate", checkFragment);
+            checkFragment();
+        });
     }
 </script>
