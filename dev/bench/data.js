@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645146144036,
+  "lastUpdate": 1645156486985,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2635,6 +2635,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.08976753006101974",
             "extra": "mean: 3.6248552747999896 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f7b4b2fafb3f621cb2a5cef576784305d6373e2f",
+          "message": "Merge pull request #816 from jwa345/bug\n\nfix(eda): index 0 is out of bounds for axis 0 with size 0 for datapre…",
+          "timestamp": "2022-02-17T19:51:37-08:00",
+          "tree_id": "e9cbbceedfd94ab274b20533581fd50237a9ae61",
+          "url": "https://github.com/sfu-db/dataprep/commit/f7b4b2fafb3f621cb2a5cef576784305d6373e2f"
+        },
+        "date": 1645156482427,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.3155954679479646,
+            "unit": "iter/sec",
+            "range": "stddev: 0.13491785673173745",
+            "extra": "mean: 3.1686133089999884 sec\nrounds: 5"
           }
         ]
       }
