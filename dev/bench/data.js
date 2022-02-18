@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645143357578,
+  "lastUpdate": 1645146144036,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2604,6 +2604,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.051961856060204016",
             "extra": "mean: 3.4050656567999966 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0a3d037e3c543112a87acd9ba1afea18b1e6cff6",
+          "message": "Merge pull request #818 from sfu-db/fix/755\n\nfix(eda): fix cat-cat error",
+          "timestamp": "2022-02-17T16:58:51-08:00",
+          "tree_id": "af1a13f9214098f367b558654bbd407d00542a52",
+          "url": "https://github.com/sfu-db/dataprep/commit/0a3d037e3c543112a87acd9ba1afea18b1e6cff6"
+        },
+        "date": 1645146139079,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2758730829757548,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08976753006101974",
+            "extra": "mean: 3.6248552747999896 sec\nrounds: 5"
           }
         ]
       }
