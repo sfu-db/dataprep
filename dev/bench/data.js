@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645156486985,
+  "lastUpdate": 1645159224044,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2666,6 +2666,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.13491785673173745",
             "extra": "mean: 3.1686133089999884 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1550d4bdafcf700b992c6290fe6a1bb5be775898",
+          "message": "Merge pull request #807 from devinllu/fix/report_plots\n\nrefactor(eda): restyled plots, re-ordered plot titles",
+          "timestamp": "2022-02-17T20:36:22-08:00",
+          "tree_id": "67088e201aeb24654d40d4b74caaef6a776d08e1",
+          "url": "https://github.com/sfu-db/dataprep/commit/1550d4bdafcf700b992c6290fe6a1bb5be775898"
+        },
+        "date": 1645159218510,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.21782962227869015,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06477858174484921",
+            "extra": "mean: 4.590743855400001 sec\nrounds: 5"
           }
         ]
       }
