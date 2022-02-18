@@ -142,15 +142,18 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 {% for div in value.plots[1] %}
-                <div class="vp-plot">
-                    {{ div }}
-                    {% if key in context.components.dfs[1].variables %}
-                    {{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}
-                    {% endif %}
-                </div>
+                <table class="vp-plot">
+                    <tr>
+                        <td>{{ div }}</td>
+                        {% if key in context.components.dfs[1].variables %}
+                        <td>{{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}</td>
+                        {% endif %}
+                    </tr>
+                </table>
                 {% endfor %}
+
 
             </div>
         </div>

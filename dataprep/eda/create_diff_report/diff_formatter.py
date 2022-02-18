@@ -362,13 +362,13 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
             if isinstance(dtp, Continuous):
                 itmdt = Intermediate(col=col, data=data[col], visual_type="numerical_column")
                 stats = format_num_stats(data[col])
-                tab_names = ["Stats", "KDE Plot", "Normal Q-Q Plot", "Box Plot"]
+                tab_names = ["Stats", "Histogram", "KDE Plot", "Normal Q-Q Plot"]
             elif type(dtp) in [Nominal, SmallCardNum, GeoGraphy, GeoPoint]:
                 itmdt = Intermediate(col=col, data=data[col], visual_type="categorical_column")
                 stats = format_cat_stats(
                     data[col]["stats"], data[col]["len_stats"], data[col]["letter_stats"]
                 )
-                tab_names = ["Stats", "Pie Chart", "Word Cloud", "Word Frequency", "Word Length"]
+                tab_names = ["Stats", "Word Length", "Pie Chart", "Word Cloud", "Word Frequency"]
             elif isinstance(dtp, DateTime):
                 itmdt = Intermediate(
                     col=col,

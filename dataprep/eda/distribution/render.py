@@ -1549,10 +1549,10 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     # pylint: disable=too-many-locals,too-many-branches
 
     if cfg.plot.report:
-        plot_width = 450
-        plot_height = 400
-        plot_width_bar = 280
-        plot_height_bar = 248
+        plot_width = 400
+        plot_height = 350
+        plot_width_bar = plot_width
+        plot_height_bar = plot_height
     else:
         plot_width = cfg.plot.width if cfg.plot.width is not None else 450
         plot_height = cfg.plot.height if cfg.plot.height is not None else 400
@@ -1866,10 +1866,10 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals
     if cfg.plot.report:
-        plot_width = 450
-        plot_height = 400
-        plot_width_hist = 280
-        plot_height_hist = 248
+        plot_width = 400
+        plot_height = 350
+        plot_width_hist = plot_width
+        plot_height_hist = plot_height
     else:
         plot_width = cfg.plot.width if cfg.plot.width is not None else 450
         plot_height = cfg.plot.height if cfg.plot.height is not None else 400
