@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645159224044,
+  "lastUpdate": 1645221632299,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2697,6 +2697,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06477858174484921",
             "extra": "mean: 4.590743855400001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ba961a1869f59fba3e6b8144a6d9c8fb0a146b7e",
+          "message": "Merge pull request #810 from khoatxp/feat/802-add-pagination-in-plot\n\n802/ feat(eda.plot): Add pagination in plot",
+          "timestamp": "2022-02-18T13:56:48-08:00",
+          "tree_id": "3ce591aab2a17170785163633217dcc44606da89",
+          "url": "https://github.com/sfu-db/dataprep/commit/ba961a1869f59fba3e6b8144a6d9c8fb0a146b7e"
+        },
+        "date": 1645221626992,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.24713906073601763,
+            "unit": "iter/sec",
+            "range": "stddev: 0.11941833895777605",
+            "extra": "mean: 4.046304930599996 sec\nrounds: 5"
           }
         ]
       }
