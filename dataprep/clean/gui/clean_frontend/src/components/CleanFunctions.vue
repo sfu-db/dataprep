@@ -1,41 +1,41 @@
 <template>
   <el-row>
-    <el-col :span="2" class="para-img-col">
-      <img src="../assets/columns.png" class="para-img" /><br />Columns
-    </el-col>
-    <!-- <el-form ref="rulesForm" :model="rulesForm" :rules="rules"> -->
-    <el-col :span="3" class="el-col-select-box0">
-      <!-- <el-form-item
-        label="Columns"
-        :rules="[
-          {
-            required: true,
-            message: 'Please select a column',
-            trigger: 'blur',
-          },
-        ]"
-      > -->
-      <el-select
-        v-model="initColValue"
-        :rules="[{ required: true, message: 'Please', trigger: 'blur' }]"
-        placeholder="Select Column"
-        @change="changeColSelection"
-      >
-        <el-option
-          v-for="item in tableCols"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-      <!-- </el-form-item> -->
-    </el-col>
-    <!-- </el-form> -->
+    <!--<el-col :span="2" class="para-img-col">
+      <img src="../assets/columns.png" class="para-img" />
+    </el-col>-->
+    <el-form ref="rulesForm" :model="rulesForm" :rules="rules">
+      <el-col :span="2" class="el-col-select-box0">
+        <el-form-item
+          label="Columns"
+          :rules="[
+            {
+              required: true,
+              message: 'Please select a column',
+              trigger: 'blur',
+            },
+          ]"
+        >
+          <el-select
+            v-model="initColValue"
+            :rules="[{ required: true, trigger: 'blur' }]"
+            placeholder="Select"
+            @change="changeColSelection"
+          >
+            <el-option
+              v-for="item in tableCols"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </el-form>
     <el-col :span="2" class="para-img-col">
       <img src="../assets/para.png" class="para-img" /><br />Params
     </el-col>
     <el-col
-      :span="3"
+      :span="2"
       class="el-col-select-box"
       v-for="(item, key) in paramDic"
       :key="key"
@@ -56,7 +56,7 @@
         </el-option>
       </el-select>
     </el-col>
-    <el-col :span="3">
+    <el-col :span="2">
       <el-button
         icon="el-icon-circle-check"
         class="el-col-select-box-button"
@@ -204,7 +204,7 @@ export default {
   padding-top: 20px;
   padding-left: 10px;
   margin-left: 10px;
-  width: 80px;
+  width: 100px;
   word-break: break-all;
   word-wrap: break-word;
 }

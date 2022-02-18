@@ -29,7 +29,43 @@ export default {
       options: [
         {
           value: "clean_email",
-          label: "clean_email",
+          label: "Email",
+        },
+        {
+          value: "clean_headers",
+          label: "Headers",
+        },
+        {
+          value: "clean_country",
+          label: "Country",
+        },
+        {
+          value: "clean_date",
+          label: "Date",
+        },
+        {
+          value: "clean_lat_long",
+          label: "Coordinate",
+        },
+        {
+          value: "clean_ip",
+          label: "IP address",
+        },
+        {
+          value: "clean_phone",
+          label: "Phone Number",
+        },
+        //{
+        //  value: "clean_text",
+        //  label: "Text",
+        //},
+        {
+          value: "clean_url",
+          label: "URL",
+        },
+        {
+          value: "clean_address",
+          label: "Address",
         },
       ],
       value: "",
@@ -57,6 +93,7 @@ export default {
             let tableColumns = res.data.tableColumns;
             let paramDic = res.data.paramDic;
             let paramDefault = res.data.paramDefault;
+
             _this.$emit(
               "optionsValue",
               nval,

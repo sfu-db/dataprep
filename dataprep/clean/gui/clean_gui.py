@@ -1,6 +1,7 @@
 """
 Flask backend of Dataprep.Clean GUI.
 """
+# pylint: disable=R0912, R0915
 from typing import Any
 
 import threading
@@ -30,7 +31,7 @@ from dataprep.clean import (
     clean_lat_long,
     clean_ip,
     clean_phone,
-    clean_text,
+    # clean_text,
     clean_url,
     clean_address,
     clean_df,
@@ -68,7 +69,7 @@ clean_function_dic = {
     "clean_lat_long": clean_lat_long,
     "clean_ip": clean_ip,
     "clean_phone": clean_phone,
-    "clean_text": clean_text,
+    # "clean_text": clean_text,
     "clean_url": clean_url,
     "clean_address": clean_address,
     "clean_df": clean_df,
@@ -253,25 +254,291 @@ def getFunctionParams() -> Any:
     param_default = {}
     info = request.get_json()
     clean_func = info["clean_func"]
-    # print(clean_func)
-    args = inspect.signature(clean_function_dic[clean_func]).parameters
-    args_list = list(args.keys())
-    for arg in args_list:
-        temp_option_list = []
-        if arg in ("df", "column"):
-            continue
-        if arg == "inplace":
-            break
-        if isinstance(args[arg].default, bool):
-            temp_option_list.append({"value": "True", "label": "True"})
-            temp_option_list.append({"value": "False", "label": "False"})
-            param_dic[arg] = temp_option_list
-            param_default[arg] = str(args[arg].default)
-        if arg == "output_format":
-            temp_option_list.append({"value": "standard", "label": "standard"})
-            temp_option_list.append({"value": "compact", "label": "compact"})
-            param_dic[arg] = temp_option_list
-            param_default[arg] = str(args[arg].default)
+
+    if clean_func == "clean_email":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if isinstance(args[arg].default, bool):
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_headers":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+
+        for arg in args_list:
+            temp_option_list = []
+            if arg == "df":
+                continue
+            if arg == "case":
+                temp_option_list.append({"value": "snake", "label": "Snake ('column_name')"})
+                temp_option_list.append({"value": "kebab", "label": "Kebab ('column-name')"})
+                temp_option_list.append({"value": "camel", "label": "Camel ('columnName')"})
+                temp_option_list.append({"value": "pascal", "label": "Pascal ('ColumnName')"})
+                temp_option_list.append({"value": "const", "label": "Const ('COLUMN_NAME')"})
+                temp_option_list.append({"value": "sentence", "label": "Sentence ('Column name')"})
+                temp_option_list.append({"value": "title", "label": "Title ('Column Name')"})
+                temp_option_list.append({"value": "lower", "label": "Lower ('column name')"})
+                temp_option_list.append({"value": "upper", "label": "Upper ('COLUMN NAME')"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "remove_accents":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_country":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg == "input_format":
+                temp_option_list.append({"value": "auto", "label": "Auto"})
+                temp_option_list.append({"value": "name", "label": "Name"})
+                temp_option_list.append({"value": "official", "label": "Official"})
+                temp_option_list.append({"value": "alpha-2", "label": "Alpha-2"})
+                temp_option_list.append({"value": "alpha-3", "label": "Alpha-3"})
+                temp_option_list.append({"value": "numeric", "label": "Numeric"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "output_format":
+                temp_option_list.append({"value": "name", "label": "Name"})
+                temp_option_list.append({"value": "official", "label": "Official"})
+                temp_option_list.append({"value": "alpha-2", "label": "Alpha-2"})
+                temp_option_list.append({"value": "alpha-3", "label": "Alpha-3"})
+                temp_option_list.append({"value": "numeric", "label": "Numeric"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "fuzzy_dist":
+                for i in range(0, 11):
+                    temp_option_list.append({"value": str(i), "label": str(i)})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "strict":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_date":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg == "output_format":
+                temp_option_list.append(
+                    {"value": "YYYY-MM-DD hh:mm:ss", "label": "YYYY-MM-DD hh:mm:ss"}
+                )
+                temp_option_list.append({"value": "YYYY-MM-DD", "label": "YYYY-MM-DD"})
+                temp_option_list.append(
+                    {"value": "YYYY-MM-DD AD at hh:mm:ss Z", "label": "YYYY-MM-DD AD at hh:mm:ss Z"}
+                )
+                temp_option_list.append(
+                    {"value": "EEE, d MMM yyyy HH:mm:ss Z", "label": "EEE, d MMM yyyy HH:mm:ss Z"}
+                )
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "fix_missing":
+                temp_option_list.append(
+                    {
+                        "value": "minimum",
+                        "label": "Fill hour, minute, second with 0, "
+                        "and month, day, year with January, 1st, 2000.",
+                    }
+                )
+                temp_option_list.append(
+                    {"value": "current", "label": "Fill with the current date and time"}
+                )
+                temp_option_list.append({"value": "empty", "label": "None"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "infer_day_first":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_lat_long":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg == "split":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "output_format":
+                temp_option_list.append(
+                    {"value": "dd", "label": "Decimal degrees (51.4934, 0.0098)"}
+                )
+                temp_option_list.append(
+                    {
+                        "value": "ddh",
+                        "label": "Decimal degrees with hemisphere ('51.4934° N, 0.0098° E')",
+                    }
+                )
+                temp_option_list.append(
+                    {"value": "dm", "label": "Degrees minutes ('51° 29.604' N, 0° 0.588' E')"}
+                )
+                temp_option_list.append(
+                    {
+                        "value": "dms",
+                        "label": "Degrees minutes seconds ('51° 29' 36.24\" N, 0° 0' 35.28\" E')",
+                    }
+                )
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_ip":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg == "input_format":
+                temp_option_list.append({"value": "auto", "label": "Auto"})
+                temp_option_list.append({"value": "ipv4", "label": "IPV4"})
+                temp_option_list.append({"value": "ipv6", "label": "IPV6"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "output_format":
+                temp_option_list.append({"value": "compressed", "label": "Compressed (12.3.4.5)"})
+                temp_option_list.append({"value": "full", "label": "Full ('0012.0003.0004.0005')"})
+                temp_option_list.append(
+                    {"value": "binary", "label": "Binary ('00001100000000110000010000000101')"}
+                )
+                temp_option_list.append({"value": "hexa", "label": "Hexa ('0xc030405')"})
+                temp_option_list.append({"value": "integer", "label": "Integer (201524229)"})
+                temp_option_list.append({"value": "packed", "label": "Packed"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_phone":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg == "output_format":
+                temp_option_list.append({"value": "nanp", "label": "nanp ('NPA-NXX-XXXX')"})
+                temp_option_list.append({"value": "e164", "label": "e164 ('+1NPANXXXXXX')"})
+                temp_option_list.append(
+                    {"value": "national", "label": "National ('(NPA) NXX-XXXX)"}
+                )
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "fix_missing":
+                temp_option_list.append({"value": "empty", "label": "Empty"})
+                temp_option_list.append({"value": "auto", "label": "Auto"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "split":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    # elif clean_func == "clean_text":
+    #    pass
+    elif clean_func == "clean_url":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg in ["remove_auth", "split"]:
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    elif clean_func == "clean_address":
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            if arg == "output_format":
+                temp_option_list.append(
+                    {
+                        "value": "(building) house_number street_prefix_abbr street_name "
+                        "street_suffix_abbr,apartment, city, state_abbr zipcode",
+                        "label": "(building) house_number street_prefix_abbr street_name "
+                        "street_suffix_abbr,apartment, city, state_abbr zipcode",
+                    }
+                )
+                temp_option_list.append(
+                    {
+                        "value": "(zipcode) street_prefix_full street_name ~state_full~",
+                        "label": "(zipcode) street_prefix_full street_name ~state_full~",
+                    }
+                )
+                temp_option_list.append(
+                    {
+                        "value": "house_number street_name street_suffix_full (building)",
+                        "label": "house_number street_name street_suffix_full (building)",
+                    }
+                )
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "split":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    else:
+        args = inspect.signature(clean_function_dic[clean_func]).parameters
+        args_list = list(args.keys())
+        for arg in args_list:
+            temp_option_list = []
+            if arg in ("df", "column"):
+                continue
+            if arg == "inplace":
+                break
+            # if isinstance(args[arg].default, bool):
+            # temp_option_list.append({"value": "True", "label": "True"})
+            # temp_option_list.append({"value": "False", "label": "False"})
+            # param_dic[arg] = temp_option_list
+            # param_default[arg] = str(args[arg].default)
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "standard"})
+                temp_option_list.append({"value": "compact", "label": "compact"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+    print(param_dic)
+    print(param_default)
 
     return {"tableColumns": table_columns, "paramDic": param_dic, "paramDefault": param_default}
 
@@ -286,51 +553,109 @@ def cleanSingleCol() -> Any:
     selected_col = params["selected_col"]
     selected_params = literal_eval(params["selected_params"])
     param_str = ""
-    for param_name in selected_params:
-        if isinstance(literal_eval(selected_params[param_name]), str):
-            param_str += f"{param_name}='{selected_params[param_name]}', "
-        else:
-            param_str += f"{param_name}={selected_params[param_name]}, "
-        selected_params[param_name] = literal_eval(selected_params[param_name])
-    param_str = param_str[: (len(param_str) - 2)]
-
+    df_cleaned = ""
     global index_df
 
-    df_cleaned = clean_function_dic[clean_func](
-        index_df, column=selected_col, report=False, **selected_params
-    )
-    df_cleaned = df_cleaned.astype(str)
-    col_names = df_cleaned.columns.values.tolist()
-    table_columns = []
-    for col_name in col_names:
-        temp_dic = {}
-        temp_dic["colName"] = col_name
-        temp_dic["colLabel"] = col_name
-        temp_dic["colWidth"] = 180
-        table_columns.append(temp_dic)
-    transposed_json = df_cleaned.T.to_dict()
-    table_data = []
-    for key in transposed_json:
-        table_data.append(transposed_json[key])
-    index_df = df_cleaned
+    try:
+        for param_name in selected_params:
+            if clean_func in [
+                "clean_email",
+                "clean_country",
+                "clean_ip",
+                "clean_phone",
+                "clean_url",
+                "clean_headers",
+                "clean_date",
+                "clean_lat_long",
+                # "clean_text",
+                "clean_address",
+            ]:
+                if selected_params[param_name] == "True":
+                    param_str += f"{param_name}={selected_params[param_name]}, "
+                    selected_params[param_name] = True
+                elif selected_params[param_name] == "False":
+                    param_str += f"{param_name}={selected_params[param_name]}, "
+                    selected_params[param_name] = False
+                elif selected_params[param_name].isnumeric():
+                    param_str += f"{param_name}={selected_params[param_name]}, "
+                    selected_params[param_name] = int(selected_params[param_name])
+                else:
+                    param_str += f"{param_name}='{selected_params[param_name]}', "
+            else:
+                param_str += f"{param_name}={selected_params[param_name]}, "
+                selected_params[param_name] = selected_params[param_name]
 
-    global tmp_dir
-    ts = time.time()
-    df_file = path.join(tmp_dir, f"df_{str(int(ts))}.pkl").replace("\\", "/")
-    index_df.to_pickle(df_file)
-    global ts_list
-    global ts_point
-    ts_list.append(ts)
-    ts_point += 1
+        param_str = param_str[: (len(param_str) - 2)]
 
-    # Update log with clean_df function
-    log = f"{clean_func}(df, column='{selected_col}', {param_str})"
-    global all_logs
-    all_logs.append(log)
-    global operation_log
-    operation_log = all_logs[:ts_point]
+        if clean_func in [
+            "clean_email",
+            "clean_country",
+            "clean_ip",
+            "clean_phone",
+            "clean_url",
+            "clean_date",
+            "clean_address",
+        ]:
+            df_cleaned = clean_function_dic[clean_func](
+                index_df, column=selected_col, report=False, **selected_params
+            )
+        elif clean_func == "clean_lat_long":
+            df_cleaned = clean_function_dic[clean_func](
+                index_df, lat_long=selected_col, report=False, **selected_params
+            )
+            # elif clean_func == "clean_text":
+            #    df_cleaned = clean_function_dic[clean_func](
+            #        index_df, column=selected_col
+            #    )
+            print(df_cleaned)
+        elif clean_func == "clean_headers":
+            df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
+        # elif clean_func in "clean_headers" or clean_func in "clean_lat_long":
+        #    df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
+        else:
+            df_cleaned = clean_function_dic[clean_func](
+                index_df, column=selected_col, **selected_params
+            )
 
-    return {"tableData": table_data, "tableColumns": table_columns}
+        df_cleaned = df_cleaned.astype(str)
+        col_names = df_cleaned.columns.values.tolist()
+        table_columns = []
+        for col_name in col_names:
+            temp_dic = {}
+            temp_dic["colName"] = col_name
+            temp_dic["colLabel"] = col_name
+            temp_dic["colWidth"] = 180
+            table_columns.append(temp_dic)
+        transposed_json = df_cleaned.T.to_dict()
+        table_data = []
+        for key in transposed_json:
+            table_data.append(transposed_json[key])
+        index_df = df_cleaned
+
+        global tmp_dir
+        ts = time.time()
+        df_file = path.join(tmp_dir, f"df_{str(int(ts))}.pkl").replace("\\", "/")
+        index_df.to_pickle(df_file)
+        global ts_list
+        global ts_point
+        ts_list.append(ts)
+        ts_point += 1
+
+        # Update log with clean_df function
+        log = f"{clean_func}(df, column='{selected_col}', {param_str})"
+        global all_logs
+        all_logs.append(log)
+        global operation_log
+        operation_log = all_logs[:ts_point]
+
+        return {"tableData": table_data, "tableColumns": table_columns}
+
+    except TypeError:
+        print(f'{"There is a type error."}')
+    except KeyError:
+        print(f"The {selected_col} column can not clean, please try it again.")
+    except ValueError:
+        print(f'{"Some field value is not valid"}')
 
 
 @app.route("/getOriginData", methods=["GET"])
