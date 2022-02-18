@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645074334797,
+  "lastUpdate": 1645143357578,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2573,6 +2573,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06477423505339747",
             "extra": "mean: 3.3858965764000004 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "da4dc01e283234d3c0439e5dca287ba57d009879",
+          "message": "Merge pull request #817 from sfu-db/fix/layout\n\nfix(eda):fix stat layout issue",
+          "timestamp": "2022-02-17T16:12:32-08:00",
+          "tree_id": "935731819f66096350eb1ef7638ce947372d468f",
+          "url": "https://github.com/sfu-db/dataprep/commit/da4dc01e283234d3c0439e5dca287ba57d009879"
+        },
+        "date": 1645143352786,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2936800933641254,
+            "unit": "iter/sec",
+            "range": "stddev: 0.051961856060204016",
+            "extra": "mean: 3.4050656567999966 sec\nrounds: 5"
           }
         ]
       }
