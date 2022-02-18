@@ -10,7 +10,7 @@ import pandas as pd
 from ..clean import validate_country, validate_lat_long
 from ..errors import UnreachableError
 
-CATEGORICAL_NUMPY_DTYPES = [np.bool, np.object]
+CATEGORICAL_NUMPY_DTYPES = [bool, object]
 CATEGORICAL_PANDAS_DTYPES = [pd.CategoricalDtype, pd.PeriodDtype]
 CATEGORICAL_DTYPES = CATEGORICAL_NUMPY_DTYPES + CATEGORICAL_PANDAS_DTYPES
 
