@@ -2302,10 +2302,18 @@ def parse_grps(
 
     x_lrgst = xgrps.nlargest(ngroups)
     df = df[df[x].isin(x_lrgst.index)]
-    stats = {f"{x}_ttl": len(xgrps), f"{x}_shw": len(x_lrgst)}
     y_lrgst = ygrps.nlargest(nsubgroups)
     df = df[df[y].isin(y_lrgst.index)]
-    stats.update(zip((f"{y}_ttl", f"{y}_shw"), (len(ygrps), len(y_lrgst))))
+    stats = {
+        f"{x}_ttl": len(xgrps),
+        f"{x}_shw": len(x_lrgst),
+        f"{y}_ttl": len(ygrps),
+        f"{y}_shw": len(y_lrgst),
+    }
+    if df.empty:
+        size = min(len(x_lrgst), len(y_lrgst))
+        df = pd.DataFrame({x: x_lrgst[:size], y: y_lrgst[:size]})
+        df["cnt"] = 0
     df[[x, y]] = df[[x, y]].astype(str)
     # final format
     df = df.pivot_table(index=y, columns=x, values="cnt", fill_value=0, aggfunc="sum")

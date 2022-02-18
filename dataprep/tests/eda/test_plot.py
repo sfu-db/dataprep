@@ -106,3 +106,4 @@ def test_plot_titanic() -> None:
     df = load_dataset("titanic")
     plot(df, "Sex", display=["Value Table"])
     plot(df, "Age", display=["Value Table"])
+    plot(df, "Name", "Ticket")
