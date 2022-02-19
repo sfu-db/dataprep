@@ -20,7 +20,7 @@ def df_ips() -> pd.DataFrame:
             "messy_ip": [
                 "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
                 "12.3.4.5",
-                "233.5.6.000",
+                "233.5.6.0",
                 None,
                 {},
                 2982384756,
@@ -38,7 +38,7 @@ def test_clean_input_ipv4(df_ips: pd.DataFrame) -> None:
     df_check["messy_ip_clean"] = [
         np.nan,
         "12.3.4.5",
-        np.nan,
+        "233.5.6.0",
         np.nan,
         np.nan,
         "177.195.148.116",
@@ -69,7 +69,7 @@ def test_clean_default(df_ips: pd.DataFrame) -> None:
     df_check["messy_ip_clean"] = [
         "2001:db8:85a3::8a2e:370:7334",
         "12.3.4.5",
-        np.nan,
+        "233.5.6.0",
         np.nan,
         np.nan,
         "177.195.148.116",
@@ -85,7 +85,7 @@ def test_clean_output_full(df_ips: pd.DataFrame) -> None:
     df_check["messy_ip_clean"] = [
         "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
         "0012.0003.0004.0005",
-        np.nan,
+        "0233.0005.0006.0000",
         np.nan,
         np.nan,
         "0177.0195.0148.0116",
@@ -100,7 +100,7 @@ def test_clean_output_hexa(df_ips: pd.DataFrame) -> None:
     df_check["messy_ip_clean"] = [
         "0x20010db885a3000000008a2e03707334",
         "0xc030405",
-        np.nan,
+        "0xe9050600",
         np.nan,
         np.nan,
         "0xb1c39474",
@@ -115,7 +115,7 @@ def test_clean_output_binary(df_ips: pd.DataFrame) -> None:
     df_check["messy_ip_clean"] = [
         42540766452641154071740215577757643572,
         201524229,
-        np.nan,
+        3909420544,
         np.nan,
         np.nan,
         2982384756,
@@ -130,7 +130,7 @@ def test_clean_output_packed(df_ips: pd.DataFrame) -> None:
     df_check["messy_ip_clean"] = [
         b" \x01\r\xb8\x85\xa3\x00\x00\x00\x00\x8a.\x03ps4",
         b"\x0c\x03\x04\x05",
-        np.nan,
+        b"\xe9\x05\x06\x00",
         np.nan,
         np.nan,
         b"\xb1\xc3\x94t",
@@ -142,12 +142,12 @@ def test_clean_output_packed(df_ips: pd.DataFrame) -> None:
 def test_validate_value() -> None:
     assert validate_ip("2001:0db8:85a3:0000:0000:8a2e:0370:7334") == True
     assert validate_ip("") == False
-    assert validate_ip("233.5.6.000") == False
+    assert validate_ip("233.5.6.0") == True
     assert validate_ip(np.nan) == False
     assert validate_ip("873.234.1.0") == False
 
 
 def test_validate_series(df_ips: pd.DataFrame) -> None:
     df_valid = validate_ip(df_ips["messy_ip"])
-    df_check = pd.Series([True, True, False, False, False, True, True])
+    df_check = pd.Series([True, True, True, False, False, True, True])
     assert df_check.equals(df_valid)
