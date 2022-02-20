@@ -15,18 +15,15 @@ gen-apidocs:
   poetry run sphinx-apidoc --ext-doctest --ext-autodoc --ext-mathjax -f -o docs/source dataprep
 
 #### CI ####
-black:
-  poetry run black dataprep
-  
-ci: format ci-black pyright test lint
+ci: black pyright test pylint
 
-format:
+black:
   poetry run black dataprep
 
 test +ARGS="":
   poetry run pytest dataprep/tests {{ARGS}}
 
-lint:
+pylint:
   poetry run pylint dataprep
 
 pyright:
