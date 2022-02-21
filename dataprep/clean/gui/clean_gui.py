@@ -527,18 +527,11 @@ def getFunctionParams() -> Any:
                 continue
             if arg == "inplace":
                 break
-            # if isinstance(args[arg].default, bool):
-            # temp_option_list.append({"value": "True", "label": "True"})
-            # temp_option_list.append({"value": "False", "label": "False"})
-            # param_dic[arg] = temp_option_list
-            # param_default[arg] = str(args[arg].default)
             if arg == "output_format":
                 temp_option_list.append({"value": "standard", "label": "standard"})
                 temp_option_list.append({"value": "compact", "label": "compact"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    print(param_dic)
-    print(param_default)
 
     return {"tableColumns": table_columns, "paramDic": param_dic, "paramDefault": param_default}
 
