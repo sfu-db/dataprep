@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645476548257,
+  "lastUpdate": 1645476592455,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2945,6 +2945,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.05234386221044922",
             "extra": "mean: 6.448637552799982 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "distinct": true,
+          "id": "14dfcd3a7b910f133d65641ac1fa68392e187dff",
+          "message": "build(deps-dev): bump shelljs in /dataprep/clean/gui/clean_frontend\n\nBumps [shelljs](https://github.com/shelljs/shelljs) from 0.7.8 to 0.8.5.\n- [Release notes](https://github.com/shelljs/shelljs/releases)\n- [Changelog](https://github.com/shelljs/shelljs/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/shelljs/shelljs/compare/v0.7.8...v0.8.5)\n\n---\nupdated-dependencies:\n- dependency-name: shelljs\n  dependency-type: direct:development\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2022-02-21T12:46:03-08:00",
+          "tree_id": "253ab805e6e9cd4e87f75c7bcd9e1fece6fed83b",
+          "url": "https://github.com/sfu-db/dataprep/commit/14dfcd3a7b910f133d65641ac1fa68392e187dff"
+        },
+        "date": 1645476586645,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.15949942855015245,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06733209429470548",
+            "extra": "mean: 6.269614939000007 sec\nrounds: 5"
           }
         ]
       }
