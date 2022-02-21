@@ -649,9 +649,8 @@ def getOriginData() -> Any:
     """
     global index_df
     global origin_df
-    # print(origin_df)
-    index_df = copy.deepcopy(origin_df)
 
+    index_df = copy.deepcopy(origin_df)
     index_df = index_df.astype(str)
     col_names = index_df.columns.values.tolist()
     table_columns = []
