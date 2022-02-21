@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645476595326,
+  "lastUpdate": 1645476657045,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3007,6 +3007,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.12822760482953866",
             "extra": "mean: 5.821111558199999 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "distinct": true,
+          "id": "9016a6f10ecfc6088352a38be107841589bf4e71",
+          "message": "build(deps): bump url-parse in /dataprep/clean/gui/clean_frontend\n\nBumps [url-parse](https://github.com/unshiftio/url-parse) from 1.5.3 to 1.5.7.\n- [Release notes](https://github.com/unshiftio/url-parse/releases)\n- [Commits](https://github.com/unshiftio/url-parse/compare/1.5.3...1.5.7)\n\n---\nupdated-dependencies:\n- dependency-name: url-parse\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2022-02-21T12:46:19-08:00",
+          "tree_id": "3140dd1245bc884e08c3bba5e834497b5f2ce066",
+          "url": "https://github.com/sfu-db/dataprep/commit/9016a6f10ecfc6088352a38be107841589bf4e71"
+        },
+        "date": 1645476651810,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.203419296021057,
+            "unit": "iter/sec",
+            "range": "stddev: 0.022911959042757",
+            "extra": "mean: 4.915954482000001 sec\nrounds: 5"
           }
         ]
       }
