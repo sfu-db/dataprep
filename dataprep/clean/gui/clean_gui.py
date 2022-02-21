@@ -600,7 +600,6 @@ def cleanSingleCol() -> Any:
             #    df_cleaned = clean_function_dic[clean_func](
             #        index_df, column=selected_col
             #    )
-            print(df_cleaned)
         elif clean_func == "clean_headers":
             df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
         # elif clean_func in "clean_headers" or clean_func in "clean_lat_long":
