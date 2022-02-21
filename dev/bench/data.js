@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645467076019,
+  "lastUpdate": 1645476534098,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2883,6 +2883,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.08934284487791957",
             "extra": "mean: 3.7574934772000064 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "distinct": true,
+          "id": "03337d80b239bf9729f0dffbf3225cc410df8266",
+          "message": "build(deps-dev): bump node-notifier\n\nBumps [node-notifier](https://github.com/mikaelbr/node-notifier) from 5.4.5 to 8.0.1.\n- [Release notes](https://github.com/mikaelbr/node-notifier/releases)\n- [Changelog](https://github.com/mikaelbr/node-notifier/blob/v8.0.1/CHANGELOG.md)\n- [Commits](https://github.com/mikaelbr/node-notifier/compare/v5.4.5...v8.0.1)\n\n---\nupdated-dependencies:\n- dependency-name: node-notifier\n  dependency-type: direct:development\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2022-02-21T12:45:51-08:00",
+          "tree_id": "48795ad1c8b56c4a2ec080b4ddc9df174886641d",
+          "url": "https://github.com/sfu-db/dataprep/commit/03337d80b239bf9729f0dffbf3225cc410df8266"
+        },
+        "date": 1645476529569,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.22406782347309098,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02277722810276499",
+            "extra": "mean: 4.4629344120000045 sec\nrounds: 5"
           }
         ]
       }
