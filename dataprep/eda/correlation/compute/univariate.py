@@ -93,7 +93,7 @@ def _pearson_1xn(x: da.Array, data: da.Array) -> da.Array:
         xy = fused[:, [-1, j]]
         mask_ = mask[:, -1] & mask[:, j]
         xy = xy[mask_]
-        corr = da.from_delayed(corrcoef(xy), dtype=np.float, shape=())
+        corr = da.from_delayed(corrcoef(xy), dtype=float, shape=())
         # not usable because xy has unknown rows due to the null filter
         # _, (corr, _) = da.corrcoef(xy, rowvar=False)
         corrs.append(corr)
@@ -102,8 +102,8 @@ def _pearson_1xn(x: da.Array, data: da.Array) -> da.Array:
 
 
 def _spearman_1xn(x: da.Array, data: da.Array) -> da.Array:
-    xrank = da.from_delayed(nanrankdata(x), dtype=np.float, shape=x.shape)
-    ranks = da.from_delayed(nanrankdata(data), dtype=np.float, shape=data.shape)
+    xrank = da.from_delayed(nanrankdata(x), dtype=float, shape=x.shape)
+    ranks = da.from_delayed(nanrankdata(data), dtype=float, shape=data.shape)
 
     return _pearson_1xn(xrank, ranks)
 
@@ -119,7 +119,7 @@ def _kendall_tau_1xn(x: da.Array, data: da.Array) -> da.Array:
         y = data[:, [j]]
 
         mask = ~(xmask | datamask[:, j])
-        corr = da.from_delayed(kendalltau(x[mask], y[mask]), dtype=np.float, shape=())
+        corr = da.from_delayed(kendalltau(x[mask], y[mask]), dtype=float, shape=())
         corrs.append(corr)
 
     return da.stack(corrs)
