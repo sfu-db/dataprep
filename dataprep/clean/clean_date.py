@@ -221,7 +221,7 @@ def _is_day_first(date: Union[str, dd.Series]) -> Optional[bool]:
     """
     if isinstance(date, dd.Series):
         judge_col = date.apply(_check_is_day_first, meta=object)
-        return (judge_col.index == True).any()
+        return (judge_col.unique() == True).any().compute()
     return _check_is_day_first(date)
 
 
