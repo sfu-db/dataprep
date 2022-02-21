@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645476592455,
+  "lastUpdate": 1645476595326,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2976,6 +2976,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.06733209429470548",
             "extra": "mean: 6.269614939000007 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "distinct": true,
+          "id": "5c985d7992d86ae541ca331537389115936f2252",
+          "message": "build(deps): bump follow-redirects in /dataprep/clean/gui/clean_frontend\n\nBumps [follow-redirects](https://github.com/follow-redirects/follow-redirects) from 1.14.5 to 1.14.8.\n- [Release notes](https://github.com/follow-redirects/follow-redirects/releases)\n- [Commits](https://github.com/follow-redirects/follow-redirects/compare/v1.14.5...v1.14.8)\n\n---\nupdated-dependencies:\n- dependency-name: follow-redirects\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2022-02-21T12:46:11-08:00",
+          "tree_id": "f11a73cdeedcf9ebd791b6db99e1fc15a1f04847",
+          "url": "https://github.com/sfu-db/dataprep/commit/5c985d7992d86ae541ca331537389115936f2252"
+        },
+        "date": 1645476588939,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.17178849606332222,
+            "unit": "iter/sec",
+            "range": "stddev: 0.12822760482953866",
+            "extra": "mean: 5.821111558199999 sec\nrounds: 5"
           }
         ]
       }
