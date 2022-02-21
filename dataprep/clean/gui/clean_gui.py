@@ -130,8 +130,6 @@ def getInitSheet() -> Any:
     table_data = []
     for key in transposed_json:
         table_data.append(transposed_json[key])
-    # print(ts_list)
-    # print(ts_point)
 
     return {"tableData": table_data, "tableColumns": table_columns}
 
@@ -145,10 +143,6 @@ def getUploadedFile() -> Any:
     if not file:
         return "No File"
     stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
-    # csv_input = csv.reader(stream)
-    # print(csv_input)
-    # for row in csv_input:
-    #    print(row)
 
     global index_df
     index_df = pd.read_csv(stream)
@@ -527,18 +521,11 @@ def getFunctionParams() -> Any:
                 continue
             if arg == "inplace":
                 break
-            # if isinstance(args[arg].default, bool):
-            # temp_option_list.append({"value": "True", "label": "True"})
-            # temp_option_list.append({"value": "False", "label": "False"})
-            # param_dic[arg] = temp_option_list
-            # param_default[arg] = str(args[arg].default)
             if arg == "output_format":
                 temp_option_list.append({"value": "standard", "label": "standard"})
                 temp_option_list.append({"value": "compact", "label": "compact"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    print(param_dic)
-    print(param_default)
 
     return {"tableColumns": table_columns, "paramDic": param_dic, "paramDefault": param_default}
 
@@ -607,11 +594,8 @@ def cleanSingleCol() -> Any:
             #    df_cleaned = clean_function_dic[clean_func](
             #        index_df, column=selected_col
             #    )
-            print(df_cleaned)
         elif clean_func == "clean_headers":
             df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
-        # elif clean_func in "clean_headers" or clean_func in "clean_lat_long":
-        #    df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
         else:
             df_cleaned = clean_function_dic[clean_func](
                 index_df, column=selected_col, **selected_params
@@ -811,6 +795,8 @@ def exportDF() -> Any:
     final_df.to_pickle(df_file)
     # code to read the file and delete the temporary directory afterwards
     execute_code = (
+        "import ipympl"
+        "％matplotlib inline\n"
         "import pandas as pd\n"
         "import shutil\n"
         f"cleaned_df = pd.read_pickle('{df_file}')\n"
