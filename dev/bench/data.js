@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645464512533,
+  "lastUpdate": 1645467076019,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -2852,6 +2852,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.052705302196025754",
             "extra": "mean: 3.2894950945999994 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "0e072a8007554fdfdcc50485db33d43bd15747ef",
+          "message": "fix(clean): delete abundant print",
+          "timestamp": "2022-02-21T10:07:32-08:00",
+          "tree_id": "7b629f1b8e4305311f720add47876b4981d0d011",
+          "url": "https://github.com/sfu-db/dataprep/commit/0e072a8007554fdfdcc50485db33d43bd15747ef"
+        },
+        "date": 1645467070724,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.26613485986545904,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08934284487791957",
+            "extra": "mean: 3.7574934772000064 sec\nrounds: 5"
           }
         ]
       }
