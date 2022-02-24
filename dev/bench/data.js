@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645673206369,
+  "lastUpdate": 1645673549794,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3193,6 +3193,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.14336656541757997",
             "extra": "mean: 6.675173147800001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "c741937297248c047076c9ac42701b08bca419dc",
+          "message": "add video cover of clean gui",
+          "timestamp": "2022-02-23T19:28:36-08:00",
+          "tree_id": "db87874d62ac24fa447ef8d2717b1b9f3e302388",
+          "url": "https://github.com/sfu-db/dataprep/commit/c741937297248c047076c9ac42701b08bca419dc"
+        },
+        "date": 1645673544561,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.16197948247757415,
+            "unit": "iter/sec",
+            "range": "stddev: 0.10995020585594967",
+            "extra": "mean: 6.1736214038000075 sec\nrounds: 5"
           }
         ]
       }
