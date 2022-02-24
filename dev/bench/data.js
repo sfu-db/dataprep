@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645670362053,
+  "lastUpdate": 1645672722009,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3100,6 +3100,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.15589569096455266",
             "extra": "mean: 4.772079202799995 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e3f11ffbadda7eb7396bb2f1f27fb1ca26953e1b",
+          "message": "Update README.md\n\nAdd clean gui video",
+          "timestamp": "2022-02-23T19:15:13-08:00",
+          "tree_id": "204fc9afdc35fe3fd7cc5434c76ddb4049b871c9",
+          "url": "https://github.com/sfu-db/dataprep/commit/e3f11ffbadda7eb7396bb2f1f27fb1ca26953e1b"
+        },
+        "date": 1645672716959,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1962441152305623,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02821317676072066",
+            "extra": "mean: 5.095694201199995 sec\nrounds: 5"
           }
         ]
       }
