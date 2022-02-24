@@ -213,10 +213,12 @@ def cleanWholeDF() -> Any:
     ts_point += 1
 
     # Update log with clean_df function
-    log = f"clean_df(df, clean_header={clean_headers},\
-                         data_type_detection='{data_type_detection}',\
-                         standardize_missing_values='{standardize_missing}',\
-                         downcast_memory={downcast_memory})"
+    log = (
+        f"clean_df(df, clean_header={clean_headers},"
+        f"data_type_detection='{data_type_detection}',"
+        f"standardize_missing_values='{standardize_missing}',"
+        f"downcast_memory={downcast_memory})"
+    )
     global all_logs
     all_logs.append(log)
     global operation_log
