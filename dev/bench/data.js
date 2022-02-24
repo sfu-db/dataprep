@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645673086984,
+  "lastUpdate": 1645673206369,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3162,6 +3162,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.053213031086330576",
             "extra": "mean: 4.7980111681999915 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "96c3f17bdb776fad7aac9f14f1556b3b67b6986b",
+          "message": "revise the levenshtein package to python-levenshtein to fit for conda forge",
+          "timestamp": "2022-02-23T19:22:36-08:00",
+          "tree_id": "87db8c3be560ee10232f584556c1788577425af8",
+          "url": "https://github.com/sfu-db/dataprep/commit/96c3f17bdb776fad7aac9f14f1556b3b67b6986b"
+        },
+        "date": 1645673200591,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1498088480790314,
+            "unit": "iter/sec",
+            "range": "stddev: 0.14336656541757997",
+            "extra": "mean: 6.675173147800001 sec\nrounds: 5"
           }
         ]
       }
