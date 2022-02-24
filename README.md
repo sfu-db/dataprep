@@ -106,6 +106,9 @@ DataPrep.Clean contains about **140+** functions designed for cleaning and valid
 - **Speed**: the computations are parallelized using Dask. It can clean **50K rows per second** on a dual-core laptop (that means cleaning 1 million rows in only 20 seconds).
 - **Transparency**: a report is generated that summarizes the alterations to the data that occured during cleaning.
 
+The following video shows how to use GUI of Dataprep.Clean
+<a href="https://www.youtube.com/watch?v=WtJaVBIVoxQ&t=73s"></a>
+
 The following example shows how to clean and standardize a column of country names.
 
 ```python
