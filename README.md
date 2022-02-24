@@ -107,7 +107,7 @@ DataPrep.Clean contains about **140+** functions designed for cleaning and valid
 - **Transparency**: a report is generated that summarizes the alterations to the data that occured during cleaning.
 
 The following video shows how to use GUI of Dataprep.Clean
-<a href="https://www.youtube.com/watch?v=WtJaVBIVoxQ&t=73s"></a>
+<a href="https://youtu.be/WtJaVBIVoxQ"><img src="assets/eda_video_cover.png"/></a>
 
 The following example shows how to clean and standardize a column of country names.
 
