@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645674039655,
+  "lastUpdate": 1645731415001,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3286,6 +3286,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.04453994167473252",
             "extra": "mean: 6.280896969000014 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "qidanrui@gmail.com",
+            "name": "qidanrui",
+            "username": "qidanrui"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "7e60e9b08fc0b7745583e77f18da77224f5673d6",
+          "message": "fix the log expression of clean df on clean gui",
+          "timestamp": "2022-02-24T11:33:30-08:00",
+          "tree_id": "46bba0b55fd81ed35b034a7b81c67d8f2bc4091e",
+          "url": "https://github.com/sfu-db/dataprep/commit/7e60e9b08fc0b7745583e77f18da77224f5673d6"
+        },
+        "date": 1645731410284,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.20111904594454078,
+            "unit": "iter/sec",
+            "range": "stddev: 0.051514263297475923",
+            "extra": "mean: 4.972179513400005 sec\nrounds: 5"
           }
         ]
       }
