@@ -14,11 +14,91 @@
 
 <script>
     setTimeout(init, 50);
+    function getOriginalVariables(){}
 
     function init() {
         const tableRows = document.querySelectorAll('.rp-table tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
+        const originalVariables = Array.from(document.getElementsByClassName("section-variable"));
+        getOriginalVariables = function(){
+            return originalVariables;
+        }
+    }
+
+    function sortBy(e){
+        const selectedOption = e.options[e.selectedIndex].value;
+        const isReverseOrder = !!document.getElementById("id-variable-reverse-order").checked;
+        let variableSection = document.getElementById("id-variable-section");
+        let variables = getOriginalVariables().slice();
+
+        switch (selectedOption){
+            case 'original':
+                break;
+            case 'alphabetical':
+                variables.sort(alphabeticalComparator);
+                break;
+            case 'missing':
+                variables.sort(missingComparator);
+                break;
+            case 'unique':
+                variables.sort(uniqueComparator);
+                break;
+        }
+
+        if(isReverseOrder){
+            variables.reverse();
+        }
+
+        variables.forEach(v => {
+            variableSection.appendChild(v);
+        })
+    }
+
+    function alphabeticalComparator(a, b) {
+        const x = alphabeticalAttributeExtractor(a);
+        const y = alphabeticalAttributeExtractor(b);
+        if (x < y)
+            return -1;
+        if (x > y)
+            return 1;
+        return 0;
+    }
+
+    function alphabeticalAttributeExtractor(x){
+        return x.childNodes[1].id;
+    }
+
+    function missingComparator(a, b){
+        const x = missingAttributeExtractor(a);
+        const y = missingAttributeExtractor(b);
+        if (x > y)
+            return -1;
+        if (x < y)
+            return 1;
+        return 0;
+    }
+
+    function missingAttributeExtractor(x){
+        return parseFloat(x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[6].childNodes[3].innerHTML);
+    }
+
+    function uniqueComparator(a, b){
+        const x = uniqueAttributeExtractor(a);
+        const y = uniqueAttributeExtractor(b);
+        if (x > y)
+            return -1;
+        if (x < y)
+            return 1;
+        return 0;
+    }
+
+    function uniqueAttributeExtractor(x){
+        return parseFloat(x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[2].childNodes[3].innerHTML);
+    }
+
+    function onReverseClick(){
+        sortBy(document.getElementById("section-sort-by-list"));
     }
 
     function highlightTableValue(element, color) {
