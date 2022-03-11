@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1645731415001,
+  "lastUpdate": 1646957877108,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3317,6 +3317,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.051514263297475923",
             "extra": "mean: 4.972179513400005 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "yixuy@sfu.ca",
+            "name": "henryye",
+            "username": "yixuy"
+          },
+          "committer": {
+            "email": "qidanrui@gmail.com",
+            "name": "Danrui Qi",
+            "username": "qidanrui"
+          },
+          "distinct": true,
+          "id": "5a727c2cfc69f15a674570b286f23e74381fb65f",
+          "message": "Add clean functions in the selection UI",
+          "timestamp": "2022-03-10T16:14:28-08:00",
+          "tree_id": "03b11b73197411c9a531dc63b5070ad9be6b7ee5",
+          "url": "https://github.com/sfu-db/dataprep/commit/5a727c2cfc69f15a674570b286f23e74381fb65f"
+        },
+        "date": 1646957872639,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.20227021935480194,
+            "unit": "iter/sec",
+            "range": "stddev: 0.38048145116369914",
+            "extra": "mean: 4.9438815224 sec\nrounds: 5"
           }
         ]
       }
