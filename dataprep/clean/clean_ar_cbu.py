@@ -65,7 +65,7 @@ def clean_ar_cbu(
     --------
     Clean a column of Argentine CBU Numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ar_cbu": [
             "2850590940090418135201"]
             })

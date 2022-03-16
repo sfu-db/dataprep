@@ -59,7 +59,7 @@ def clean_md_idno(
     --------
     Clean a column of IDNO data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "idno": [
             '1008600038413',
             '1008600038412',]

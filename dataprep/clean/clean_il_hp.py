@@ -59,7 +59,7 @@ def clean_il_hp(
     --------
     Clean a column of HP data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "hp": [
             ' 5161 79157 ',
             '516179150',]

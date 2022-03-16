@@ -58,7 +58,7 @@ def clean_gb_vat(
     --------
     Clean a column of VAT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "vat": [
             "980780684",
             "802311781"]

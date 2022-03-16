@@ -58,7 +58,7 @@ def clean_es_cups(
     --------
     Clean a column of CUPS data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cups": [
             "ES1234123456789012JY1F",
             "ES 1234-123456789012-XY 1F",]

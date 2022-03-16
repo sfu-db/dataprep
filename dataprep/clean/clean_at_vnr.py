@@ -65,7 +65,7 @@ def clean_at_vnr(
     --------
     Clean a column of Austrian VNR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "at_vnr": [
             "1237 010180",
             "2237 010180"]

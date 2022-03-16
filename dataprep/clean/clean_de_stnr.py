@@ -58,7 +58,7 @@ def clean_de_stnr(
     --------
     Clean a column of STNR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "stnr": [
             "181/815/0815 5",
             "136695978"]

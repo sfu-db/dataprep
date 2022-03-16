@@ -59,7 +59,7 @@ def clean_nl_btw(
     --------
     Clean a column of BTW data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "btw": [
             '004495445B01',
             '123456789B90',]

@@ -59,7 +59,7 @@ def clean_fr_nir(
     --------
     Clean a column of NIR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nir": [
             "295109912611193",
             "253072C07300443"]

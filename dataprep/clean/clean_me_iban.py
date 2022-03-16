@@ -58,7 +58,7 @@ def clean_me_iban(
     --------
     Clean a column of IBAN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "iban": [
             "ME25510000000006234133",
             "ME52510000000006234132",]

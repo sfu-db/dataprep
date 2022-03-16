@@ -59,7 +59,7 @@ def clean_be_iban(
     --------
     Clean a column of Belgian IBANs data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "be_iban": [
             "BE32 123-4567890-02",
             "BE41091811735141"]

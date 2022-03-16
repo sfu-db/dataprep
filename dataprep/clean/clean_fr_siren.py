@@ -61,7 +61,7 @@ def clean_fr_siren(
     --------
     Clean a column of SIREN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "siren": [
             '552 008 443',
             '404833047']

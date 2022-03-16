@@ -59,7 +59,7 @@ def clean_mc_tva(
     --------
     Clean a column of TVA data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "tva": [
             '53 0000 04605',
             'FR 61 954 506 077',]

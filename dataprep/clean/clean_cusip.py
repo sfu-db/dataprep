@@ -66,7 +66,7 @@ def clean_cusip(
     --------
     Clean a column of CUSIP numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cusip": [
             "DUS0421C5"]
             })

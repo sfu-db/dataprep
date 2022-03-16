@@ -59,7 +59,7 @@ def clean_gb_nhs(
     --------
     Clean a column of NHS data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nhs": [
             "9434765870",
             "9434765871"]

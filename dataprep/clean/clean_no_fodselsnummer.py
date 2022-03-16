@@ -60,7 +60,7 @@ def clean_no_fodselsnummer(
     --------
     Clean a column of fodselsnummer data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "fodselsnummer": [
             '15108695088',
             '15108695077']

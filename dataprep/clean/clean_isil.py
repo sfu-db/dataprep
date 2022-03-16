@@ -65,7 +65,7 @@ def clean_isil(
     --------
     Clean a column of ISIL data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "isil": [
             "it-RM0267",
             "OCLC-DLC"]

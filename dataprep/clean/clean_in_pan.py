@@ -62,7 +62,7 @@ def clean_in_pan(
     --------
     Clean a column of PAN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "pan": [
             'ACUPA7085R',
             '234123412347',]

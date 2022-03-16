@@ -61,7 +61,7 @@ def clean_de_wkn(
     --------
     Clean a column of WKN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "wkn": [
             'A0MNRK',
             'AOMNRK']

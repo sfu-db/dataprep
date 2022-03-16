@@ -58,7 +58,7 @@ def clean_es_referenciacatastral(
     --------
     Clean a column of Referencia Catastral data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "referenciacatastral": [
             "4A08169P03PRAT0001LR",
             "7837301/VG8173B 0001 TT",]

@@ -65,7 +65,7 @@ def clean_al_nipt(
     --------
     Clean a column of Albanian NIPT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "al_nipt": [
             "AL J 91402501 L",
             "K22218003V",

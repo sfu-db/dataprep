@@ -59,7 +59,7 @@ def clean_fi_hetu(
     --------
     Clean a column of HETU data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "hetu": [
             '131052a308t',
             '131052-308U']

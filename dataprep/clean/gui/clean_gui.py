@@ -36,162 +36,163 @@ from dataprep.clean import (
     clean_address,
     clean_df,
     clean_currency,
-    clean_au_abn,
-    clean_au_acn,
-    clean_au_tfn,
-    clean_be_iban,
-    clean_be_vat,
-    clean_bg_egn,
-    clean_bg_pnf,
-    clean_bg_vat,
-    clean_br_cnpj,
-    clean_br_cpf,
-    clean_by_unp,
-    clean_ca_bn,
-    clean_ca_sin,
-    clean_ch_esr,
-    clean_ch_ssn,
-    clean_ch_uid,
-    clean_ch_vat,
-    clean_cl_rut,
-    clean_cn_ric,
-    clean_cn_uscc,
-    clean_co_nit,
-    clean_cr_cpf,
-    clean_cr_cpj,
-    clean_cr_cr,
-    clean_cu_ni,
-    clean_cy_vat,
-    clean_cz_dic,
-    clean_cz_rc,
-    clean_de_handelsregisternummer,
-    clean_de_idnr,
-    clean_de_stnr,
-    clean_de_vat,
-    clean_de_wkn,
-    clean_dk_cpr,
-    clean_dk_cvr,
-    clean_do_cedula,
-    clean_do_ncf,
-    clean_do_rnc,
-    clean_ec_ci,
-    clean_ec_ruc,
-    clean_ee_ik,
-    clean_ee_kmkr,
-    clean_ee_registrikood,
-    clean_es_ccc,
-    clean_es_cif,
-    clean_es_cups,
-    clean_es_dni,
-    clean_es_iban,
-    clean_es_nie,
-    clean_es_nif,
-    clean_es_referenciacatastral,
-    clean_eu_at_02,
-    clean_eu_banknote,
-    clean_eu_eic,
-    clean_eu_nace,
-    clean_eu_vat,
-    clean_fi_alv,
-    clean_fi_associationid,
-    clean_fi_hetu,
-    clean_fi_veronumero,
-    clean_fi_ytunnus,
-    clean_fr_nif,
-    clean_fr_nir,
-    clean_fr_siren,
-    clean_fr_siret,
-    clean_fr_tva,
-    clean_gb_nhs,
-    clean_gb_sedol,
-    clean_gb_upn,
-    clean_gb_utr,
-    clean_gb_vat,
-    clean_gr_amka,
-    clean_gr_vat,
-    clean_gt_nit,
-    clean_hr_oib,
-    clean_hu_anum,
-    clean_id_npwp,
-    clean_ie_pps,
-    clean_ie_vat,
-    clean_il_hp,
-    clean_il_idnr,
-    clean_in_aadhaar,
-    clean_in_pan,
-    clean_is_kennitala,
-    clean_is_vsk,
-    clean_it_aic,
-    clean_it_codicefiscale,
-    clean_it_iva,
-    clean_jp_cn,
-    clean_kr_brn,
-    clean_kr_rrn,
-    clean_li_peid,
-    clean_lt_pvm,
-    clean_lt_asmens,
-    clean_lu_tva,
-    clean_lv_pvn,
-    clean_mc_tva,
-    clean_md_idno,
-    clean_me_iban,
-    clean_mt_vat,
-    clean_mu_nid,
-    clean_mx_curp,
-    clean_mx_rfc,
-    clean_my_nric,
-    clean_nl_brin,
-    clean_nl_btw,
-    clean_nl_bsn,
-    clean_nl_onderwijsnummer,
-    clean_nl_postcode,
-    clean_no_fodselsnummer,
-    clean_no_iban,
-    clean_no_kontonr,
-    clean_no_mva,
-    clean_no_orgnr,
-    clean_nz_bankaccount,
-    clean_nz_ird,
-    clean_pe_cui,
-    clean_pe_ruc,
-    clean_pl_nip,
-    clean_pl_pesel,
-    clean_pl_regon,
-    clean_pt_nif,
-    clean_py_ruc,
-    clean_ro_cf,
-    clean_ro_cnp,
-    clean_ro_cui,
-    clean_ro_onrc,
-    clean_isbn,
-    clean_bic,
-    clean_bitcoin,
-    clean_casrn,
-    clean_cusip,
-    clean_ean,
-    clean_figi,
-    clean_grid,
-    clean_iban,
-    clean_imei,
-    clean_imo,
-    clean_imsi,
-    clean_isan,
-    clean_isil,
-    clean_isin,
-    clean_ismn,
-    clean_issn,
-    clean_ad_nrt,
-    clean_al_nipt,
-    clean_ar_cbu,
-    clean_ar_cuit,
-    clean_ar_dni,
-    clean_at_uid,
-    clean_at_vnr,
-    clean_lei,
-    clean_meid,
-    clean_vatin,
 )
+from dataprep.clean.clean_au_abn import clean_au_abn
+from dataprep.clean.clean_au_acn import clean_au_acn
+from dataprep.clean.clean_au_tfn import clean_au_tfn
+from dataprep.clean.clean_be_iban import clean_be_iban
+from dataprep.clean.clean_be_vat import clean_be_vat
+from dataprep.clean.clean_bg_egn import clean_bg_egn
+from dataprep.clean.clean_bg_pnf import clean_bg_pnf
+from dataprep.clean.clean_bg_vat import clean_bg_vat
+from dataprep.clean.clean_br_cnpj import clean_br_cnpj
+from dataprep.clean.clean_br_cpf import clean_br_cpf
+from dataprep.clean.clean_by_unp import clean_by_unp
+from dataprep.clean.clean_ca_bn import clean_ca_bn
+from dataprep.clean.clean_ca_sin import clean_ca_sin
+from dataprep.clean.clean_ch_esr import clean_ch_esr
+from dataprep.clean.clean_ch_ssn import clean_ch_ssn
+from dataprep.clean.clean_ch_uid import clean_ch_uid
+from dataprep.clean.clean_ch_vat import clean_ch_vat
+from dataprep.clean.clean_cl_rut import clean_cl_rut
+from dataprep.clean.clean_cn_ric import clean_cn_ric
+from dataprep.clean.clean_cn_uscc import clean_cn_uscc
+from dataprep.clean.clean_co_nit import clean_co_nit
+from dataprep.clean.clean_cr_cpf import clean_cr_cpf
+from dataprep.clean.clean_cr_cpj import clean_cr_cpj
+from dataprep.clean.clean_cr_cr import clean_cr_cr
+from dataprep.clean.clean_cu_ni import clean_cu_ni
+from dataprep.clean.clean_cy_vat import clean_cy_vat
+from dataprep.clean.clean_cz_dic import clean_cz_dic
+from dataprep.clean.clean_cz_rc import clean_cz_rc
+from dataprep.clean.clean_de_handelsregisternummer import clean_de_handelsregisternummer
+from dataprep.clean.clean_de_idnr import clean_de_idnr
+from dataprep.clean.clean_de_stnr import clean_de_stnr
+from dataprep.clean.clean_de_vat import clean_de_vat
+from dataprep.clean.clean_de_wkn import clean_de_wkn
+from dataprep.clean.clean_dk_cpr import clean_dk_cpr
+from dataprep.clean.clean_dk_cvr import clean_dk_cvr
+from dataprep.clean.clean_do_cedula import clean_do_cedula
+from dataprep.clean.clean_do_ncf import clean_do_ncf
+from dataprep.clean.clean_do_rnc import clean_do_rnc
+from dataprep.clean.clean_ec_ci import clean_ec_ci
+from dataprep.clean.clean_ec_ruc import clean_ec_ruc
+from dataprep.clean.clean_ee_ik import clean_ee_ik
+from dataprep.clean.clean_ee_kmkr import clean_ee_kmkr
+from dataprep.clean.clean_ee_registrikood import clean_ee_registrikood
+from dataprep.clean.clean_es_ccc import clean_es_ccc
+from dataprep.clean.clean_es_cif import clean_es_cif
+from dataprep.clean.clean_es_cups import clean_es_cups
+from dataprep.clean.clean_es_dni import clean_es_dni
+from dataprep.clean.clean_es_iban import clean_es_iban
+from dataprep.clean.clean_es_nie import clean_es_nie
+from dataprep.clean.clean_es_nif import clean_es_nif
+from dataprep.clean.clean_es_referenciacatastral import clean_es_referenciacatastral
+from dataprep.clean.clean_eu_at_02 import clean_eu_at_02
+from dataprep.clean.clean_eu_banknote import clean_eu_banknote
+from dataprep.clean.clean_eu_eic import clean_eu_eic
+from dataprep.clean.clean_eu_nace import clean_eu_nace
+from dataprep.clean.clean_eu_vat import clean_eu_vat
+from dataprep.clean.clean_fi_alv import clean_fi_alv
+from dataprep.clean.clean_fi_associationid import clean_fi_associationid
+from dataprep.clean.clean_fi_hetu import clean_fi_hetu
+from dataprep.clean.clean_fi_veronumero import clean_fi_veronumero
+from dataprep.clean.clean_fi_ytunnus import clean_fi_ytunnus
+from dataprep.clean.clean_fr_nif import clean_fr_nif
+from dataprep.clean.clean_fr_nir import clean_fr_nir
+from dataprep.clean.clean_fr_siren import clean_fr_siren
+from dataprep.clean.clean_fr_siret import clean_fr_siret
+from dataprep.clean.clean_fr_tva import clean_fr_tva
+from dataprep.clean.clean_gb_nhs import clean_gb_nhs
+from dataprep.clean.clean_gb_sedol import clean_gb_sedol
+from dataprep.clean.clean_gb_upn import clean_gb_upn
+from dataprep.clean.clean_gb_utr import clean_gb_utr
+from dataprep.clean.clean_gb_vat import clean_gb_vat
+from dataprep.clean.clean_gr_amka import clean_gr_amka
+from dataprep.clean.clean_gr_vat import clean_gr_vat
+from dataprep.clean.clean_gt_nit import clean_gt_nit
+from dataprep.clean.clean_hr_oib import clean_hr_oib
+from dataprep.clean.clean_hu_anum import clean_hu_anum
+from dataprep.clean.clean_id_npwp import clean_id_npwp
+from dataprep.clean.clean_ie_pps import clean_ie_pps
+from dataprep.clean.clean_ie_vat import clean_ie_vat
+from dataprep.clean.clean_il_hp import clean_il_hp
+from dataprep.clean.clean_il_idnr import clean_il_idnr
+from dataprep.clean.clean_in_aadhaar import clean_in_aadhaar
+from dataprep.clean.clean_in_pan import clean_in_pan
+from dataprep.clean.clean_is_kennitala import clean_is_kennitala
+from dataprep.clean.clean_is_vsk import clean_is_vsk
+from dataprep.clean.clean_it_aic import clean_it_aic
+from dataprep.clean.clean_it_codicefiscale import clean_it_codicefiscale
+from dataprep.clean.clean_it_iva import clean_it_iva
+from dataprep.clean.clean_jp_cn import clean_jp_cn
+from dataprep.clean.clean_kr_brn import clean_kr_brn
+from dataprep.clean.clean_kr_rrn import clean_kr_rrn
+from dataprep.clean.clean_li_peid import clean_li_peid
+from dataprep.clean.clean_lt_pvm import clean_lt_pvm
+from dataprep.clean.clean_lt_asmens import clean_lt_asmens
+from dataprep.clean.clean_lu_tva import clean_lu_tva
+from dataprep.clean.clean_lv_pvn import clean_lv_pvn
+from dataprep.clean.clean_mc_tva import clean_mc_tva
+from dataprep.clean.clean_md_idno import clean_md_idno
+from dataprep.clean.clean_me_iban import clean_me_iban
+from dataprep.clean.clean_mt_vat import clean_mt_vat
+from dataprep.clean.clean_mu_nid import clean_mu_nid
+from dataprep.clean.clean_mx_curp import clean_mx_curp
+from dataprep.clean.clean_mx_rfc import clean_mx_rfc
+from dataprep.clean.clean_my_nric import clean_my_nric
+from dataprep.clean.clean_nl_brin import clean_nl_brin
+from dataprep.clean.clean_nl_btw import clean_nl_btw
+from dataprep.clean.clean_nl_bsn import clean_nl_bsn
+from dataprep.clean.clean_nl_onderwijsnummer import clean_nl_onderwijsnummer
+from dataprep.clean.clean_nl_postcode import clean_nl_postcode
+from dataprep.clean.clean_no_fodselsnummer import clean_no_fodselsnummer
+from dataprep.clean.clean_no_iban import clean_no_iban
+from dataprep.clean.clean_no_kontonr import clean_no_kontonr
+from dataprep.clean.clean_no_mva import clean_no_mva
+from dataprep.clean.clean_no_orgnr import clean_no_orgnr
+from dataprep.clean.clean_nz_bankaccount import clean_nz_bankaccount
+from dataprep.clean.clean_nz_ird import clean_nz_ird
+from dataprep.clean.clean_pe_cui import clean_pe_cui
+from dataprep.clean.clean_pe_ruc import clean_pe_ruc
+from dataprep.clean.clean_pl_nip import clean_pl_nip
+from dataprep.clean.clean_pl_pesel import clean_pl_pesel
+from dataprep.clean.clean_pl_regon import clean_pl_regon
+from dataprep.clean.clean_pt_nif import clean_pt_nif
+from dataprep.clean.clean_py_ruc import clean_py_ruc
+from dataprep.clean.clean_ro_cf import clean_ro_cf
+from dataprep.clean.clean_ro_cnp import clean_ro_cnp
+from dataprep.clean.clean_ro_cui import clean_ro_cui
+from dataprep.clean.clean_ro_onrc import clean_ro_onrc
+from dataprep.clean.clean_isbn import clean_isbn
 
+# with split
+from dataprep.clean.clean_bic import clean_bic
+from dataprep.clean.clean_bitcoin import clean_bitcoin
+from dataprep.clean.clean_casrn import clean_casrn
+from dataprep.clean.clean_cusip import clean_cusip
+from dataprep.clean.clean_ean import clean_ean
+from dataprep.clean.clean_figi import clean_figi
+from dataprep.clean.clean_grid import clean_grid
+from dataprep.clean.clean_iban import clean_iban
+from dataprep.clean.clean_imei import clean_imei
+from dataprep.clean.clean_imo import clean_imo
+from dataprep.clean.clean_imsi import clean_imsi
+from dataprep.clean.clean_isan import clean_isan
+from dataprep.clean.clean_isil import clean_isil
+from dataprep.clean.clean_isin import clean_isin
+from dataprep.clean.clean_ismn import clean_ismn
+from dataprep.clean.clean_issn import clean_issn
+from dataprep.clean.clean_ad_nrt import clean_ad_nrt
+from dataprep.clean.clean_al_nipt import clean_al_nipt
+from dataprep.clean.clean_ar_cbu import clean_ar_cbu
+from dataprep.clean.clean_ar_cuit import clean_ar_cuit
+from dataprep.clean.clean_ar_dni import clean_ar_dni
+from dataprep.clean.clean_at_uid import clean_at_uid
+from dataprep.clean.clean_at_vnr import clean_at_vnr
+from dataprep.clean.clean_lei import clean_lei
+from dataprep.clean.clean_meid import clean_meid
+from dataprep.clean.clean_vatin import clean_vatin
 
 # configuration
 DEBUG = True
@@ -215,6 +216,176 @@ index_df = pd.DataFrame({})
 all_logs = []
 operation_log = []
 
+
+clean_list = [
+    "clean_email",
+    "clean_country",
+    "clean_ip",
+    "clean_phone",
+    "clean_url",
+    "clean_headers",
+    "clean_date",
+    "clean_lat_long",
+    # "clean_text",
+    "clean_address",
+    "clean_df",
+    # "clean_duplication",
+    "clean_currency",
+    "clean_au_abn",
+    "clean_au_acn",
+    "clean_au_tfn",
+    "clean_be_iban",
+    "clean_be_vat",
+    "clean_bg_egn",
+    "clean_bg_pnf",
+    "clean_bg_vat",
+    "clean_br_cnpj",
+    "clean_br_cpf",
+    "clean_by_unp",
+    "clean_ca_bn",
+    "clean_ca_sin",
+    "clean_ch_esr",
+    "clean_ch_ssn",
+    "clean_ch_uid",
+    "clean_ch_vat",
+    "clean_cl_rut",
+    "clean_cn_ric",
+    "clean_cn_uscc",
+    "clean_co_nit",
+    "clean_cr_cpf",
+    "clean_cr_cpj",
+    "clean_cr_cr",
+    "clean_cu_ni",
+    "clean_cy_vat",
+    "clean_cz_dic",
+    "clean_cz_rc",
+    "clean_de_handelsregisternummer",
+    "clean_de_idnr",
+    "clean_de_stnr",
+    "clean_de_vat",
+    "clean_de_wkn",
+    "clean_dk_cpr",
+    "clean_dk_cvr",
+    "clean_do_cedula",
+    "clean_do_ncf",
+    "clean_do_rnc",
+    "clean_ec_ci",
+    "clean_ec_ruc",
+    "clean_ee_ik",
+    "clean_ee_kmkr",
+    "clean_ee_registrikood",
+    "clean_es_ccc",
+    "clean_es_cif",
+    "clean_es_cups",
+    "clean_es_dni",
+    "clean_es_iban",
+    "clean_es_nie",
+    "clean_es_nif",
+    "clean_es_referenciacatastral",
+    "clean_eu_at_02",
+    "clean_eu_banknote",
+    "clean_eu_eic",
+    "clean_eu_nace",
+    "clean_eu_vat",
+    "clean_fi_alv",
+    "clean_fi_associationid",
+    "clean_fi_hetu",
+    "clean_fi_veronumero",
+    "clean_fi_ytunnus",
+    "clean_fr_nif",
+    "clean_fr_nir",
+    "clean_fr_siren",
+    "clean_fr_siret",
+    "clean_fr_tva",
+    "clean_gb_nhs",
+    "clean_gb_sedol",
+    "clean_gb_upn",
+    "clean_gb_utr",
+    "clean_gb_vat",
+    "clean_gr_amka",
+    "clean_gr_vat",
+    "clean_gt_nit",
+    "clean_hr_oib",
+    "clean_hu_anum",
+    "clean_id_npwp",
+    "clean_ie_pps",
+    "clean_ie_vat",
+    "clean_il_hp",
+    "clean_il_idnr",
+    "clean_in_aadhaar",
+    "clean_in_pan",
+    "clean_is_kennitala",
+    "clean_is_vsk",
+    "clean_it_aic",
+    "clean_it_codicefiscale",
+    "clean_it_iva",
+    "clean_jp_cn",
+    "clean_kr_brn",
+    "clean_kr_rrn",
+    "clean_li_peid",
+    "clean_lt_pvm",
+    "clean_lt_asmens",
+    "clean_lu_tva",
+    "clean_lv_pvn",
+    "clean_mc_tva",
+    "clean_md_idno",
+    "clean_me_iban",
+    "clean_mt_vat",
+    "clean_mu_nid",
+    "clean_mx_curp",
+    "clean_mx_rfc",
+    "clean_my_nric",
+    "clean_nl_brin",
+    "clean_nl_btw",
+    "clean_nl_bsn",
+    "clean_nl_onderwijsnummer",
+    "clean_nl_postcode",
+    "clean_no_fodselsnummer",
+    "clean_no_iban",
+    "clean_no_kontonr",
+    "clean_no_mva",
+    "clean_no_orgnr",
+    "clean_nz_bankaccount",
+    "clean_nz_ird",
+    "clean_pe_cui",
+    "clean_pe_ruc",
+    "clean_pl_nip",
+    "clean_pl_pesel",
+    "clean_pl_regon",
+    "clean_pt_nif",
+    "clean_py_ruc",
+    "clean_ro_cf",
+    "clean_ro_cnp",
+    "clean_ro_cui",
+    "clean_ro_onrc",
+    "clean_isbn",
+    "clean_bic",
+    "clean_bitcoin",
+    "clean_casrn",
+    "clean_cusip",
+    "clean_ean",
+    "clean_figi",
+    "clean_grid",
+    "clean_iban",
+    "clean_imei",
+    "clean_imo",
+    "clean_imsi",
+    "clean_isan",
+    "clean_isil",
+    "clean_isin",
+    "clean_ismn",
+    "clean_issn",
+    "clean_ad_nrt",
+    "clean_al_nipt",
+    "clean_ar_cbu",
+    "clean_ar_cuit",
+    "clean_ar_dni",
+    "clean_at_uid",
+    "clean_at_vnr",
+    "clean_lei",
+    "clean_meid",
+    "clean_vatin",
+]
 # Dictionary of functions
 clean_function_dic = {
     "clean_email": clean_email,
@@ -227,165 +398,214 @@ clean_function_dic = {
     "clean_url": clean_url,
     "clean_address": clean_address,
     "clean_df": clean_df,
-    # Uncomment when add the function to backend
-    # "clean_duplication": clean_duplication,
-    # "clean_currency": clean_currency,
-    # "clean_au_abn": clean_au_abn,
-    # "clean_au_acn": clean_au_acn,
-    # "clean_au_tfn": clean_au_tfn,
-    # "clean_be_iban": clean_be_iban,
-    # "clean_be_vat": clean_be_vat,
-    # "clean_bg_egn": clean_bg_egn,
-    # "clean_bg_pnf": clean_bg_pnf,
-    # "clean_bg_vat": clean_bg_vat,
-    # "clean_br_cnpj": clean_br_cnpj,
-    # "clean_br_cpf": clean_br_cpf,
-    # "clean_by_unp": clean_by_unp,
-    # "clean_ca_bn": clean_ca_bn,
-    # "clean_ca_sin": clean_ca_sin,
-    # "clean_ch_esr": clean_ch_esr,
-    # "clean_ch_ssn": clean_ch_ssn,
-    # "clean_ch_uid": clean_ch_uid,
-    # "clean_ch_vat": clean_ch_vat,
-    # "clean_cl_rut": clean_cl_rut,
-    # "clean_cn_ric": clean_cn_ric,
-    # "clean_cn_uscc": clean_cn_uscc,
-    # "clean_co_nit": clean_co_nit,
-    # "clean_cr_cpf": clean_cr_cpf,
-    # "clean_cr_cpj": clean_cr_cpj,
-    # "clean_cr_cr": clean_cr_cr,
-    # "clean_cu_ni": clean_cu_ni,
-    # "clean_cy_vat": clean_cy_vat,
-    # "clean_cz_dic": clean_cz_dic,
-    # "clean_cz_rc": clean_cz_rc,
-    # "clean_de_handelsregisternummer": clean_de_handelsregisternummer,
-    # "clean_de_idnr": clean_de_idnr,
-    # "clean_de_stnr": clean_de_stnr,
-    # "clean_de_vat": clean_de_vat,
-    # "clean_de_wkn": clean_de_wkn,
-    # "clean_dk_cpr": clean_dk_cpr,
-    # "clean_dk_cvr": clean_dk_cvr,
-    # "clean_do_cedula": clean_do_cedula,
-    # "clean_do_ncf": clean_do_ncf,
-    # "clean_do_rnc": clean_do_rnc,
-    # "clean_ec_ci": clean_ec_ci,
-    # "clean_ec_ruc": clean_ec_ruc,
-    # "clean_ee_ik": clean_ee_ik,
-    # "clean_ee_kmkr": clean_ee_kmkr,
-    # "clean_ee_registrikood": clean_ee_registrikood,
-    # "clean_es_ccc": clean_es_ccc,
-    # "clean_es_cif": clean_es_cif,
-    # "clean_es_cups": clean_es_cups,
-    # "clean_es_dni": clean_es_dni,
-    # "clean_es_iban": clean_es_iban,
-    # "clean_es_nie": clean_es_nie,
-    # "clean_es_nif": clean_es_nif,
-    # "clean_es_referenciacatastral": clean_es_referenciacatastral,
-    # "clean_eu_at_02": clean_eu_at_02,
-    # "clean_eu_banknote": clean_eu_banknote,
-    # "clean_eu_eic": clean_eu_eic,
-    # "clean_eu_nace": clean_eu_nace,
-    # "clean_eu_vat": clean_eu_vat,
-    # "clean_fi_alv": clean_fi_alv,
-    # "clean_fi_associationid": clean_fi_associationid,
-    # "clean_fi_hetu": clean_fi_hetu,
-    # "clean_fi_veronumero": clean_fi_veronumero,
-    # "clean_fi_ytunnus": clean_fi_ytunnus,
-    # "clean_fr_nif": clean_fr_nif,
-    # "clean_fr_nir": clean_fr_nir,
-    # "clean_fr_siren": clean_fr_siren,
-    # "clean_fr_siret": clean_fr_siret,
-    # "clean_fr_tva": clean_fr_tva,
-    # "clean_gb_nhs": clean_gb_nhs,
-    # "clean_gb_sedol": clean_gb_sedol,
-    # "clean_gb_upn": clean_gb_upn,
-    # "clean_gb_utr": clean_gb_utr,
-    # "clean_gb_vat": clean_gb_vat,
-    # "clean_gr_amka": clean_gr_amka,
-    # "clean_gr_vat": clean_gr_vat,
-    # "clean_gt_nit": clean_gt_nit,
-    # "clean_hr_oib": clean_hr_oib,
-    # "clean_hu_anum": clean_hu_anum,
-    # "clean_id_npwp": clean_id_npwp,
-    # "clean_ie_pps": clean_ie_pps,
-    # "clean_ie_vat": clean_ie_vat,
-    # "clean_il_hp": clean_il_hp,
-    # "clean_il_idnr": clean_il_idnr,
-    # "clean_in_aadhaar": clean_in_aadhaar,
-    # "clean_in_pan": clean_in_pan,
-    # "clean_is_kennitala": clean_is_kennitala,
-    # "clean_is_vsk": clean_is_vsk,
-    # "clean_it_aic": clean_it_aic,
-    # "clean_it_codicefiscale": clean_it_codicefiscale,
-    # "clean_it_iva": clean_it_iva,
-    # "clean_jp_cn": clean_jp_cn,
-    # "clean_kr_brn": clean_kr_brn,
-    # "clean_kr_rrn": clean_kr_rrn,
-    # "clean_li_peid": clean_li_peid,
-    # "clean_lt_pvm": clean_lt_pvm,
-    # "clean_lt_asmens": clean_lt_asmens,
-    # "clean_lu_tva": clean_lu_tva,
-    # "clean_lv_pvn": clean_lv_pvn,
-    # "clean_mc_tva": clean_mc_tva,
-    # "clean_md_idno": clean_md_idno,
-    # "clean_me_iban": clean_me_iban,
-    # "clean_mt_vat": clean_mt_vat,
-    # "clean_mu_nid": clean_mu_nid,
-    # "clean_mx_curp": clean_mx_curp,
-    # "clean_mx_rfc": clean_mx_rfc,
-    # "clean_my_nric": clean_my_nric,
-    # "clean_nl_brin": clean_nl_brin,
-    # "clean_nl_btw": clean_nl_btw,
-    # "clean_nl_bsn": clean_nl_bsn,
-    # "clean_nl_onderwijsnummer": clean_nl_onderwijsnummer,
-    # "clean_nl_postcode": clean_nl_postcode,
-    # "clean_no_fodselsnummer": clean_no_fodselsnummer,
-    # "clean_no_iban": clean_no_iban,
-    # "clean_no_kontonr": clean_no_kontonr,
-    # "clean_no_mva": clean_no_mva,
-    # "clean_no_orgnr": clean_no_orgnr,
-    # "clean_nz_bankaccount": clean_nz_bankaccount,
-    # "clean_nz_ird": clean_nz_ird,
-    # "clean_pe_cui": clean_pe_cui,
-    # "clean_pe_ruc": clean_pe_ruc,
-    # "clean_pl_nip": clean_pl_nip,
-    # "clean_pl_pesel": clean_pl_pesel,
-    # "clean_pl_regon": clean_pl_regon,
-    # "clean_pt_nif": clean_pt_nif,
-    # "clean_py_ruc": clean_py_ruc,
-    # "clean_ro_cf": clean_ro_cf,
-    # "clean_ro_cnp": clean_ro_cnp,
-    # "clean_ro_cui": clean_ro_cui,
-    # "clean_ro_onrc": clean_ro_onrc,
-    # "clean_isbn": clean_isbn,
-    # "clean_bic":clean_bic,
-    # "clean_bitcoin":clean_bitcoin,
-    # "clean_casrn":clean_casrn,
-    # "clean_cusip":clean_cusip,
-    # "clean_ean":clean_ean,
-    # "clean_figi":clean_figi,
-    # "clean_grid":clean_grid,
-    # "clean_iban":clean_iban,
-    # "clean_imei":clean_imei,
-    # "clean_imo":clean_imo,
-    # "clean_imsi":clean_imsi,
-    # "clean_isan":clean_isan,
-    # "clean_isil":clean_isil,
-    # "clean_isin":clean_isin,
-    # "clean_ismn":clean_ismn,
-    # "clean_issn":clean_issn,
-    # "clean_ad_nrt":clean_ad_nrt,
-    # "clean_al_nipt":clean_al_nipt,
-    # "clean_ar_cbu":clean_ar_cbu,
-    # "clean_ar_cuit":clean_ar_cuit,
-    # "clean_ar_dni":clean_ar_dni,
-    # "clean_at_uid":clean_at_uid,
-    # "clean_at_vnr":clean_at_vnr,
-    # "clean_lei":clean_lei,
-    # "clean_meid":clean_meid,
-    # "clean_vatin":clean_vatin,
+    "clean_duplication": clean_duplication,
+    "clean_currency": clean_currency,
+    "clean_au_abn": clean_au_abn,
+    "clean_au_acn": clean_au_acn,
+    "clean_au_tfn": clean_au_tfn,
+    "clean_be_iban": clean_be_iban,
+    "clean_be_vat": clean_be_vat,
+    "clean_bg_egn": clean_bg_egn,
+    "clean_bg_pnf": clean_bg_pnf,
+    "clean_bg_vat": clean_bg_vat,
+    "clean_br_cnpj": clean_br_cnpj,
+    "clean_br_cpf": clean_br_cpf,
+    "clean_by_unp": clean_by_unp,
+    "clean_ca_bn": clean_ca_bn,
+    "clean_ca_sin": clean_ca_sin,
+    "clean_ch_esr": clean_ch_esr,
+    "clean_ch_ssn": clean_ch_ssn,
+    "clean_ch_uid": clean_ch_uid,
+    "clean_ch_vat": clean_ch_vat,
+    "clean_cl_rut": clean_cl_rut,
+    "clean_cn_ric": clean_cn_ric,
+    "clean_cn_uscc": clean_cn_uscc,
+    "clean_co_nit": clean_co_nit,
+    "clean_cr_cpf": clean_cr_cpf,
+    "clean_cr_cpj": clean_cr_cpj,
+    "clean_cr_cr": clean_cr_cr,
+    "clean_cu_ni": clean_cu_ni,
+    "clean_cy_vat": clean_cy_vat,
+    "clean_cz_dic": clean_cz_dic,
+    "clean_cz_rc": clean_cz_rc,
+    "clean_de_handelsregisternummer": clean_de_handelsregisternummer,
+    "clean_de_idnr": clean_de_idnr,
+    "clean_de_stnr": clean_de_stnr,
+    "clean_de_vat": clean_de_vat,
+    "clean_de_wkn": clean_de_wkn,
+    "clean_dk_cpr": clean_dk_cpr,
+    "clean_dk_cvr": clean_dk_cvr,
+    "clean_do_cedula": clean_do_cedula,
+    "clean_do_ncf": clean_do_ncf,
+    "clean_do_rnc": clean_do_rnc,
+    "clean_ec_ci": clean_ec_ci,
+    "clean_ec_ruc": clean_ec_ruc,
+    "clean_ee_ik": clean_ee_ik,
+    "clean_ee_kmkr": clean_ee_kmkr,
+    "clean_ee_registrikood": clean_ee_registrikood,
+    "clean_es_ccc": clean_es_ccc,
+    "clean_es_cif": clean_es_cif,
+    "clean_es_cups": clean_es_cups,
+    "clean_es_dni": clean_es_dni,
+    "clean_es_iban": clean_es_iban,
+    "clean_es_nie": clean_es_nie,
+    "clean_es_nif": clean_es_nif,
+    "clean_es_referenciacatastral": clean_es_referenciacatastral,
+    "clean_eu_at_02": clean_eu_at_02,
+    "clean_eu_banknote": clean_eu_banknote,
+    "clean_eu_eic": clean_eu_eic,
+    "clean_eu_nace": clean_eu_nace,
+    "clean_eu_vat": clean_eu_vat,
+    "clean_fi_alv": clean_fi_alv,
+    "clean_fi_associationid": clean_fi_associationid,
+    "clean_fi_hetu": clean_fi_hetu,
+    "clean_fi_veronumero": clean_fi_veronumero,
+    "clean_fi_ytunnus": clean_fi_ytunnus,
+    "clean_fr_nif": clean_fr_nif,
+    "clean_fr_nir": clean_fr_nir,
+    "clean_fr_siren": clean_fr_siren,
+    "clean_fr_siret": clean_fr_siret,
+    "clean_fr_tva": clean_fr_tva,
+    "clean_gb_nhs": clean_gb_nhs,
+    "clean_gb_sedol": clean_gb_sedol,
+    "clean_gb_upn": clean_gb_upn,
+    "clean_gb_utr": clean_gb_utr,
+    "clean_gb_vat": clean_gb_vat,
+    "clean_gr_amka": clean_gr_amka,
+    "clean_gr_vat": clean_gr_vat,
+    "clean_gt_nit": clean_gt_nit,
+    "clean_hr_oib": clean_hr_oib,
+    "clean_hu_anum": clean_hu_anum,
+    "clean_id_npwp": clean_id_npwp,
+    "clean_ie_pps": clean_ie_pps,
+    "clean_ie_vat": clean_ie_vat,
+    "clean_il_hp": clean_il_hp,
+    "clean_il_idnr": clean_il_idnr,
+    "clean_in_aadhaar": clean_in_aadhaar,
+    "clean_in_pan": clean_in_pan,
+    "clean_is_kennitala": clean_is_kennitala,
+    "clean_is_vsk": clean_is_vsk,
+    "clean_it_aic": clean_it_aic,
+    "clean_it_codicefiscale": clean_it_codicefiscale,
+    "clean_it_iva": clean_it_iva,
+    "clean_jp_cn": clean_jp_cn,
+    "clean_kr_brn": clean_kr_brn,
+    "clean_kr_rrn": clean_kr_rrn,
+    "clean_li_peid": clean_li_peid,
+    "clean_lt_pvm": clean_lt_pvm,
+    "clean_lt_asmens": clean_lt_asmens,
+    "clean_lu_tva": clean_lu_tva,
+    "clean_lv_pvn": clean_lv_pvn,
+    "clean_mc_tva": clean_mc_tva,
+    "clean_md_idno": clean_md_idno,
+    "clean_me_iban": clean_me_iban,
+    "clean_mt_vat": clean_mt_vat,
+    "clean_mu_nid": clean_mu_nid,
+    "clean_mx_curp": clean_mx_curp,
+    "clean_mx_rfc": clean_mx_rfc,
+    "clean_my_nric": clean_my_nric,
+    "clean_nl_brin": clean_nl_brin,
+    "clean_nl_btw": clean_nl_btw,
+    "clean_nl_bsn": clean_nl_bsn,
+    "clean_nl_onderwijsnummer": clean_nl_onderwijsnummer,
+    "clean_nl_postcode": clean_nl_postcode,
+    "clean_no_fodselsnummer": clean_no_fodselsnummer,
+    "clean_no_iban": clean_no_iban,
+    "clean_no_kontonr": clean_no_kontonr,
+    "clean_no_mva": clean_no_mva,
+    "clean_no_orgnr": clean_no_orgnr,
+    "clean_nz_bankaccount": clean_nz_bankaccount,
+    "clean_nz_ird": clean_nz_ird,
+    "clean_pe_cui": clean_pe_cui,
+    "clean_pe_ruc": clean_pe_ruc,
+    "clean_pl_nip": clean_pl_nip,
+    "clean_pl_pesel": clean_pl_pesel,
+    "clean_pl_regon": clean_pl_regon,
+    "clean_pt_nif": clean_pt_nif,
+    "clean_py_ruc": clean_py_ruc,
+    "clean_ro_cf": clean_ro_cf,
+    "clean_ro_cnp": clean_ro_cnp,
+    "clean_ro_cui": clean_ro_cui,
+    "clean_ro_onrc": clean_ro_onrc,
+    "clean_isbn": clean_isbn,
+    "clean_bic": clean_bic,
+    "clean_bitcoin": clean_bitcoin,
+    "clean_casrn": clean_casrn,
+    "clean_cusip": clean_cusip,
+    "clean_ean": clean_ean,
+    "clean_figi": clean_figi,
+    "clean_grid": clean_grid,
+    "clean_iban": clean_iban,
+    "clean_imei": clean_imei,
+    "clean_imo": clean_imo,
+    "clean_imsi": clean_imsi,
+    "clean_isan": clean_isan,
+    "clean_isil": clean_isil,
+    "clean_isin": clean_isin,
+    "clean_ismn": clean_ismn,
+    "clean_issn": clean_issn,
+    "clean_ad_nrt": clean_ad_nrt,
+    "clean_al_nipt": clean_al_nipt,
+    "clean_ar_cbu": clean_ar_cbu,
+    "clean_ar_cuit": clean_ar_cuit,
+    "clean_ar_dni": clean_ar_dni,
+    "clean_at_uid": clean_at_uid,
+    "clean_at_vnr": clean_at_vnr,
+    "clean_lei": clean_lei,
+    "clean_meid": clean_meid,
+    "clean_vatin": clean_vatin,
 }
 
+contain_birthday_place = ["clean_cn_ric", "clean_my_nric"]
+contain_isin = ["clean_de_wkn", "clean_gb_sedol", "clean_cusip"]
+contain_mask = ["clean_in_aadhaar", "clean_in_pan"]
+contain_iban = ["clean_no_kontonr", "clean_es_ccc"]
+contain_gender = [
+    "clean_cu_ni",
+    "clean_ee_ik",
+    "clean_gr_amka",
+    "clean_mx_curp",
+    "clean_it_codicefiscale",
+    "clean_no_fodselsnummer",
+    "clean_pl_pesel",
+]
+contain_birthdate = [
+    "clean_bg_egn",
+    "clean_dk_cpr",
+    "clean_kr_rrn",
+    "clean_mu_nid",
+    "clean_lt_asmens",
+    "clean_lv_pvn",
+    "clean_ro_cnp",
+]
+contain_split = [
+    "clean_bic",
+    "clean_bitcoin",
+    "clean_casrn",
+    "clean_cusip",
+    "clean_ean",
+    "clean_figi",
+    "clean_grid",
+    "clean_iban",
+    "clean_imei",
+    "clean_imo",
+    "clean_imsi",
+    "clean_isan",
+    "clean_isil",
+    "clean_isin",
+    "clean_ismn",
+    "clean_issn",
+    "clean_ad_nrt",
+    "clean_al_nipt",
+    "clean_ar_cbu",
+    "clean_ar_cuit",
+    "clean_ar_dni",
+    "clean_at_uid",
+    "clean_at_vnr",
+    "clean_lei",
+    "clean_meid",
+    "clean_vatin",
+]
 DECODE_FUNC = """
     function b64DecodeUnicode(str) {
         // Going backwards: from bytestream, to percent-encoding, to original string.
@@ -441,8 +661,6 @@ def getInitSheet() -> Any:
     table_data = []
     for key in transposed_json:
         table_data.append(transposed_json[key])
-    # print(ts_list)
-    # print(ts_point)
 
     return {"tableData": table_data, "tableColumns": table_columns}
 
@@ -568,28 +786,23 @@ def getFunctionParams() -> Any:
     info = request.get_json()
     clean_func = info["clean_func"]
 
-    if clean_func == "clean_email":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+    args = inspect.signature(clean_function_dic[clean_func]).parameters
+    args_list = list(args.keys())
+
+    for arg in args_list:
+        temp_option_list = []
+        if arg in ("df", "column"):
+            continue
+        if arg == "inplace":
+            break
+
+        if clean_func == "clean_email":
             if isinstance(args[arg].default, bool):
                 temp_option_list.append({"value": "True", "label": "True"})
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_headers":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-
-        for arg in args_list:
-            temp_option_list = []
-            if arg == "df":
-                continue
+        elif clean_func == "clean_headers":
             if arg == "case":
                 temp_option_list.append({"value": "snake", "label": "Snake ('column_name')"})
                 temp_option_list.append({"value": "kebab", "label": "Kebab ('column-name')"})
@@ -607,15 +820,7 @@ def getFunctionParams() -> Any:
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_country":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        elif clean_func == "clean_country":
             if arg == "input_format":
                 temp_option_list.append({"value": "auto", "label": "Auto"})
                 temp_option_list.append({"value": "name", "label": "Name"})
@@ -643,16 +848,7 @@ def getFunctionParams() -> Any:
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_date":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        elif clean_func == "clean_date":
             if arg == "output_format":
                 temp_option_list.append(
                     {"value": "YYYY-MM-DD hh:mm:ss", "label": "YYYY-MM-DD hh:mm:ss"}
@@ -687,15 +883,7 @@ def getFunctionParams() -> Any:
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_lat_long":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        elif clean_func == "clean_lat_long":
             if arg == "split":
                 temp_option_list.append({"value": "True", "label": "True"})
                 temp_option_list.append({"value": "False", "label": "False"})
@@ -723,15 +911,7 @@ def getFunctionParams() -> Any:
 
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_ip":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        elif clean_func == "clean_ip":
             if arg == "input_format":
                 temp_option_list.append({"value": "auto", "label": "Auto"})
                 temp_option_list.append({"value": "ipv4", "label": "IPV4"})
@@ -749,16 +929,7 @@ def getFunctionParams() -> Any:
                 temp_option_list.append({"value": "packed", "label": "Packed"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_phone":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        elif clean_func == "clean_phone":
             if arg == "output_format":
                 temp_option_list.append({"value": "nanp", "label": "nanp ('NPA-NXX-XXXX')"})
                 temp_option_list.append({"value": "e164", "label": "e164 ('+1NPANXXXXXX')"})
@@ -777,32 +948,15 @@ def getFunctionParams() -> Any:
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    # elif clean_func == "clean_text":
-    #    pass
-    elif clean_func == "clean_url":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        # elif clean_func == "clean_text":
+        #    pass
+        elif clean_func == "clean_url":
             if arg in ["remove_auth", "split"]:
                 temp_option_list.append({"value": "True", "label": "True"})
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    elif clean_func == "clean_address":
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        elif clean_func == "clean_address":
             if arg == "output_format":
                 temp_option_list.append(
                     {
@@ -831,18 +985,222 @@ def getFunctionParams() -> Any:
                 temp_option_list.append({"value": "False", "label": "False"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
-    else:
-        args = inspect.signature(clean_function_dic[clean_func]).parameters
-        args_list = list(args.keys())
-        for arg in args_list:
-            temp_option_list = []
-            if arg in ("df", "column"):
-                continue
-            if arg == "inplace":
-                break
+        # elif clean_func == "clean_duplication":
+        #     if arg == "page_size":
+        #         for i in range(5, 8):
+        #             temp_option_list.append({"value": str(i), "label": str(i)})
+        #         param_dic[arg] = temp_option_list
+        #         param_default[arg] = str(args[arg].default)
+        elif clean_func == "clean_currency":
+            if arg == "input_currency":
+                temp_option_list.append({"value": "usd", "label": "USD"})
+                temp_option_list.append(
+                    {
+                        "value": "Binance Coin",
+                        "label": "Binance Coin",
+                    }
+                )
+                temp_option_list.append(
+                    {
+                        "value": "ethereum",
+                        "label": "Ethereum",
+                    }
+                )
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "target_representation":
+                temp_option_list.append(
+                    {"value": "decimal", "label": "Decimal(floating point number)"}
+                )
+                temp_option_list.append(
+                    {
+                        "value": "abbreviation",
+                        "label": "Abbreviation((string with comma seprated values)",
+                    }
+                )
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_au_acn":
             if arg == "output_format":
-                temp_option_list.append({"value": "standard", "label": "standard"})
-                temp_option_list.append({"value": "compact", "label": "compact"})
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "abn", "label": "Australian Business Number"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func in contain_birthday_place:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "birthdate", "label": "Birthdate"})
+                temp_option_list.append({"value": "birthplace", "label": "Birthplace"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func in contain_gender:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "birthdate", "label": "Birthdate"})
+                temp_option_list.append({"value": "gender", "label": "Gender"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func in contain_isin:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "isin", "label": "ISIN"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func in contain_birthdate:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "birthdate", "label": "Birthdate"})
+
+            param_dic[arg] = temp_option_list
+            param_default[arg] = str(args[arg].default)
+        elif clean_func in contain_iban:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "iban", "label": "IBAN"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_es_iban":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "ccc", "label": "Código Cuenta Corriente"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_eu_nace":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "label", "label": "Label"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_eu_vat":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "country", "label": "Country"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_fr_siren":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "tva", "label": "TVA"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func in contain_mask:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "mask", "label": "Mask"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_it_aic":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "base10", "label": "BASE10"})
+                temp_option_list.append({"value": "base32", "label": "BASE32"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        elif clean_func == "clean_no_iban":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append(
+                    {"value": "kontonr", "label": "Norwegian bank account part"}
+                )
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func == "clean_nz_bankaccount":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "info", "label": "Supplied number"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func == "clean_pe_cui":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "ruc", "label": "RUC"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func == "clean_pe_ruc":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "dni", "label": "DNI (CUI)"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func == "clean_isbn":
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                temp_option_list.append({"value": "base10", "label": "BASE10"})
+                temp_option_list.append({"value": "base13", "label": "BASE13"})
+
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+        elif clean_func in contain_split:
+            if arg == "output_format":
+                if clean_func in contain_isin:
+                    temp_option_list.append({"value": "isin", "label": "ISIN"})
+                if clean_func == "clean_isan":
+                    temp_option_list.append({"value": "binary", "label": "Binary"})
+                    temp_option_list.append({"value": "urn", "label": "URN"})
+                    temp_option_list.append({"value": "xml", "label": "XML"})
+                if clean_func == "clean_issn":
+                    temp_option_list.append({"value": "ean", "label": "EAN"})
+                if clean_func == "clean_meid":
+                    temp_option_list.append({"value": "hex", "label": "Hex"})
+                    temp_option_list.append({"value": "dec", "label": "Decimal"})
+                    temp_option_list.append({"value": "binary", "label": "Binary"})
+                    temp_option_list.append({"value": "pseudo_esn", "label": "Pseudo_esn"})
+
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+            if arg == "split":
+                temp_option_list.append({"value": "True", "label": "True"})
+                temp_option_list.append({"value": "False", "label": "False"})
+                param_dic[arg] = temp_option_list
+                param_default[arg] = str(args[arg].default)
+
+        else:
+            if arg == "output_format":
+                temp_option_list.append({"value": "standard", "label": "Standard"})
+                temp_option_list.append({"value": "compact", "label": "Compact"})
                 param_dic[arg] = temp_option_list
                 param_default[arg] = str(args[arg].default)
 
@@ -864,150 +1222,7 @@ def cleanSingleCol() -> Any:
 
     try:
         for param_name in selected_params:
-            if clean_func in [
-                "clean_email",
-                "clean_country",
-                "clean_ip",
-                "clean_phone",
-                "clean_url",
-                "clean_headers",
-                "clean_date",
-                "clean_lat_long",
-                # "clean_text",
-                "clean_address",
-                "clean_df",
-                # Uncomment when add the function to backend
-                # "clean_duplication",
-                # "clean_currency",
-                # "clean_au_abn",
-                # "clean_au_acn",
-                # "clean_au_tfn",
-                # "clean_be_iban",
-                # "clean_be_vat",
-                # "clean_bg_egn",
-                # "clean_bg_pnf",
-                # "clean_bg_vat",
-                # "clean_br_cnpj",
-                # "clean_br_cpf",
-                # "clean_by_unp",
-                # "clean_ca_bn",
-                # "clean_ca_sin",
-                # "clean_ch_esr",
-                # "clean_ch_ssn",
-                # "clean_ch_uid",
-                # "clean_ch_vat",
-                # "clean_cl_rut",
-                # "clean_cn_ric",
-                # "clean_cn_uscc",
-                # "clean_co_nit",
-                # "clean_cr_cpf",
-                # "clean_cr_cpj",
-                # "clean_cr_cr",
-                # "clean_cu_ni",
-                # "clean_cy_vat",
-                # "clean_cz_dic",
-                # "clean_cz_rc",
-                # "clean_de_handelsregisternummer",
-                # "clean_de_idnr",
-                # "clean_de_stnr",
-                # "clean_de_vat",
-                # "clean_de_wkn",
-                # "clean_dk_cpr",
-                # "clean_dk_cvr",
-                # "clean_do_cedula",
-                # "clean_do_ncf",
-                # "clean_do_rnc",
-                # "clean_ec_ci",
-                # "clean_ec_ruc",
-                # "clean_ee_ik",
-                # "clean_ee_kmkr",
-                # "clean_ee_registrikood",
-                # "clean_es_ccc",
-                # "clean_es_cif",
-                # "clean_es_cups",
-                # "clean_es_dni",
-                # "clean_es_iban",
-                # "clean_es_nie",
-                # "clean_es_nif",
-                # "clean_es_referenciacatastral",
-                # "clean_eu_at_02",
-                # "clean_eu_banknote",
-                # "clean_eu_eic",
-                # "clean_eu_nace",
-                # "clean_eu_vat",
-                # "clean_fi_alv",
-                # "clean_fi_associationid",
-                # "clean_fi_hetu",
-                # "clean_fi_veronumero",
-                # "clean_fi_ytunnus",
-                # "clean_fr_nif",
-                # "clean_fr_nir",
-                # "clean_fr_siren",
-                # "clean_fr_siret",
-                # "clean_fr_tva",
-                # "clean_gb_nhs",
-                # "clean_gb_sedol",
-                # "clean_gb_upn",
-                # "clean_gb_utr",
-                # "clean_gb_vat",
-                # "clean_gr_amka",
-                # "clean_gr_vat",
-                # "clean_gt_nit",
-                # "clean_hr_oib",
-                # "clean_hu_anum",
-                # "clean_id_npwp",
-                # "clean_ie_pps",
-                # "clean_ie_vat",
-                # "clean_il_hp",
-                # "clean_il_idnr",
-                # "clean_in_aadhaar",
-                # "clean_in_pan",
-                # "clean_is_kennitala",
-                # "clean_is_vsk",
-                # "clean_it_aic",
-                # "clean_it_codicefiscale",
-                # "clean_it_iva",
-                # "clean_jp_cn",
-                # "clean_kr_brn",
-                # "clean_kr_rrn",
-                # "clean_li_peid",
-                # "clean_lt_pvm",
-                # "clean_lt_asmens",
-                # "clean_lu_tva",
-                # "clean_lv_pvn",
-                # "clean_mc_tva",
-                # "clean_md_idno",
-                # "clean_me_iban",
-                # "clean_mt_vat",
-                # "clean_mu_nid",
-                # "clean_mx_curp",
-                # "clean_mx_rfc",
-                # "clean_my_nric",
-                # "clean_nl_brin",
-                # "clean_nl_btw",
-                # "clean_nl_bsn",
-                # "clean_nl_onderwijsnummer",
-                # "clean_nl_postcode",
-                # "clean_no_fodselsnummer",
-                # "clean_no_iban",
-                # "clean_no_kontonr",
-                # "clean_no_mva",
-                # "clean_no_orgnr",
-                # "clean_nz_bankaccount",
-                # "clean_nz_ird",
-                # "clean_pe_cui",
-                # "clean_pe_ruc",
-                # "clean_pl_nip",
-                # "clean_pl_pesel",
-                # "clean_pl_regon",
-                # "clean_pt_nif",
-                # "clean_py_ruc",
-                # "clean_ro_cf",
-                # "clean_ro_cnp",
-                # "clean_ro_cui",
-                # "clean_ro_onrc",
-                # "clean_isbn",
-            ]:
+            if clean_func in clean_list:
                 if selected_params[param_name] == "True":
                     param_str += f"{param_name}={selected_params[param_name]}, "
                     selected_params[param_name] = True
@@ -1033,137 +1248,6 @@ def cleanSingleCol() -> Any:
             "clean_url",
             "clean_date",
             "clean_address",
-            # Uncomment when add the function to backend
-            # "clean_duplication",
-            # "clean_currency",
-            # "clean_au_abn",
-            # "clean_au_acn",
-            # "clean_au_tfn",
-            # "clean_be_iban",
-            # "clean_be_vat",
-            # "clean_bg_egn",
-            # "clean_bg_pnf",
-            # "clean_bg_vat",
-            # "clean_br_cnpj",
-            # "clean_br_cpf",
-            # "clean_by_unp",
-            # "clean_ca_bn",
-            # "clean_ca_sin",
-            # "clean_ch_esr",
-            # "clean_ch_ssn",
-            # "clean_ch_uid",
-            # "clean_ch_vat",
-            # "clean_cl_rut",
-            # "clean_cn_ric",
-            # "clean_cn_uscc",
-            # "clean_co_nit",
-            # "clean_cr_cpf",
-            # "clean_cr_cpj",
-            # "clean_cr_cr",
-            # "clean_cu_ni",
-            # "clean_cy_vat",
-            # "clean_cz_dic",
-            # "clean_cz_rc",
-            # "clean_de_handelsregisternummer",
-            # "clean_de_idnr",
-            # "clean_de_stnr",
-            # "clean_de_vat",
-            # "clean_de_wkn",
-            # "clean_dk_cpr",
-            # "clean_dk_cvr",
-            # "clean_do_cedula",
-            # "clean_do_ncf",
-            # "clean_do_rnc",
-            # "clean_ec_ci",
-            # "clean_ec_ruc",
-            # "clean_ee_ik",
-            # "clean_ee_kmkr",
-            # "clean_ee_registrikood",
-            # "clean_es_ccc",
-            # "clean_es_cif",
-            # "clean_es_cups",
-            # "clean_es_dni",
-            # "clean_es_iban",
-            # "clean_es_nie",
-            # "clean_es_nif",
-            # "clean_es_referenciacatastral",
-            # "clean_eu_at_02",
-            # "clean_eu_banknote",
-            # "clean_eu_eic",
-            # "clean_eu_nace",
-            # "clean_eu_vat",
-            # "clean_fi_alv",
-            # "clean_fi_associationid",
-            # "clean_fi_hetu",
-            # "clean_fi_veronumero",
-            # "clean_fi_ytunnus",
-            # "clean_fr_nif",
-            # "clean_fr_nir",
-            # "clean_fr_siren",
-            # "clean_fr_siret",
-            # "clean_fr_tva",
-            # "clean_gb_nhs",
-            # "clean_gb_sedol",
-            # "clean_gb_upn",
-            # "clean_gb_utr",
-            # "clean_gb_vat",
-            # "clean_gr_amka",
-            # "clean_gr_vat",
-            # "clean_gt_nit",
-            # "clean_hr_oib",
-            # "clean_hu_anum",
-            # "clean_id_npwp",
-            # "clean_ie_pps",
-            # "clean_ie_vat",
-            # "clean_il_hp",
-            # "clean_il_idnr",
-            # "clean_in_aadhaar",
-            # "clean_in_pan",
-            # "clean_is_kennitala",
-            # "clean_is_vsk",
-            # "clean_it_aic",
-            # "clean_it_codicefiscale",
-            # "clean_it_iva",
-            # "clean_jp_cn",
-            # "clean_kr_brn",
-            # "clean_kr_rrn",
-            # "clean_li_peid",
-            # "clean_lt_pvm",
-            # "clean_lt_asmens",
-            # "clean_lu_tva",
-            # "clean_lv_pvn",
-            # "clean_mc_tva",
-            # "clean_md_idno",
-            # "clean_me_iban",
-            # "clean_mt_vat",
-            # "clean_mu_nid",
-            # "clean_mx_curp",
-            # "clean_mx_rfc",
-            # "clean_my_nric",
-            # "clean_nl_brin",
-            # "clean_nl_btw",
-            # "clean_nl_bsn",
-            # "clean_nl_onderwijsnummer",
-            # "clean_nl_postcode",
-            # "clean_no_fodselsnummer",
-            # "clean_no_iban",
-            # "clean_no_kontonr",
-            # "clean_no_mva",
-            # "clean_no_orgnr",
-            # "clean_nz_bankaccount",
-            # "clean_nz_ird",
-            # "clean_pe_cui",
-            # "clean_pe_ruc",
-            # "clean_pl_nip",
-            # "clean_pl_pesel",
-            # "clean_pl_regon",
-            # "clean_pt_nif",
-            # "clean_py_ruc",
-            # "clean_ro_cf",
-            # "clean_ro_cnp",
-            # "clean_ro_cui",
-            # "clean_ro_onrc",
-            # "clean_isbn",
         ]:
             df_cleaned = clean_function_dic[clean_func](
                 index_df, column=selected_col, report=False, **selected_params
@@ -1178,8 +1262,6 @@ def cleanSingleCol() -> Any:
             #    )
         elif clean_func == "clean_headers":
             df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
-        # elif clean_func in "clean_headers" or clean_func in "clean_lat_long":
-        #    df_cleaned = clean_function_dic[clean_func](index_df, **selected_params)
         else:
             df_cleaned = clean_function_dic[clean_func](
                 index_df, column=selected_col, **selected_params

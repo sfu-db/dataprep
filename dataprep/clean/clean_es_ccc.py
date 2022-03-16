@@ -59,7 +59,7 @@ def clean_es_ccc(
     --------
     Clean a column of CCC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ccc": [
             "12341234161234567890",
             "134-1234-16 1234567890"]

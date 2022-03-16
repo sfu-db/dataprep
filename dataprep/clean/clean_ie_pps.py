@@ -59,7 +59,7 @@ def clean_ie_pps(
     --------
     Clean a column of PPS data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "pps": [
             '6433435OA',
             '6433435VH',]

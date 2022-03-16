@@ -59,7 +59,7 @@ def clean_cy_vat(
     --------
     Clean a column of VAT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "vat": [
             'CY-10259033P',
             'CY-10259033Z',]

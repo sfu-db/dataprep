@@ -61,7 +61,7 @@ def clean_lv_pvn(
     --------
     Clean a column of PVN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "pvn": [
             '161175-19997',
             '40003521601',]

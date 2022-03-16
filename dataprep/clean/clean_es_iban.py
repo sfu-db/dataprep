@@ -59,7 +59,7 @@ def clean_es_iban(
     --------
     Clean a column of IBAN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "iban": [
             "ES771234-1234-16 1234567890",
             "R1601101050000010547023795",]

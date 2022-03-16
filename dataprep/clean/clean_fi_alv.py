@@ -59,7 +59,7 @@ def clean_fi_alv(
     --------
     Clean a column of ALV data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "alv": [
             'FI 20774740',
             'FI 20774741']

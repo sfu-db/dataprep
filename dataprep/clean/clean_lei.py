@@ -65,7 +65,7 @@ def clean_lei(
     --------
     Clean a column of LEI Numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "lei": [
             "213800KUD8LAJWSQ9D15"]
             })

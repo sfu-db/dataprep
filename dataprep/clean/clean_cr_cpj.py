@@ -58,7 +58,7 @@ def clean_cr_cpj(
     --------
     Clean a column of CPJ data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cpj": [
             "4 000 042138",
             "3-534-123559"]

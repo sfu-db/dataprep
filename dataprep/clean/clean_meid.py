@@ -69,7 +69,7 @@ def clean_meid(
     --------
     Clean a column of MEID data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "meid": [
             "af0123450abcDEC"]
             })

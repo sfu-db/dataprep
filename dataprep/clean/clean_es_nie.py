@@ -59,7 +59,7 @@ def clean_es_nie(
     --------
     Clean a column of NIE data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nie": [
             'x-2482300w',
             'x-2482300a']

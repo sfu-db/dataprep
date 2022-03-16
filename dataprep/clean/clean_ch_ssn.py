@@ -58,7 +58,7 @@ def clean_ch_ssn(
     --------
     Clean a column of SSN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ssn": [
             '7569217076985',
             '756.9217.0769.84',]

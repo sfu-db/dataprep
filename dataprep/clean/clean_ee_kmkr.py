@@ -59,7 +59,7 @@ def clean_ee_kmkr(
     --------
     Clean a column of KMKR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "kmkr": [
             'EE 100 931 558',
             '100594103']

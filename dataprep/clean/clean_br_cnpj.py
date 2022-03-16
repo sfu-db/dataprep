@@ -58,7 +58,7 @@ def clean_br_cnpj(
     --------
     Clean a column of CNPJ data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cnpj": [
             '16727230000197',
             '16.727.230.0001-98', # InvalidChecksum

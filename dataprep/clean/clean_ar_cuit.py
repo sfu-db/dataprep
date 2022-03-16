@@ -65,7 +65,7 @@ def clean_ar_cuit(
     --------
     Clean a column of Argentinian CUIT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ar_cuit": [
             "20-05536168-2",
             "20267565393",

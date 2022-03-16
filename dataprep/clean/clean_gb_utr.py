@@ -60,7 +60,7 @@ def clean_gb_utr(
     --------
     Clean a column of UTR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "utr": [
             '1955839661',
             '2955839661',]

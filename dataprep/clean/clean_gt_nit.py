@@ -58,7 +58,7 @@ def clean_gt_nit(
     --------
     Clean a column of NIT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nit": [
             "39525503",
             "8977112-0",]

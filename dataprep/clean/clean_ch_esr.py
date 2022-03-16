@@ -58,7 +58,7 @@ def clean_ch_esr(
     --------
     Clean a column of ESR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "esr": [
             "18 78583",
             "210000000003139471430009016"]
