@@ -66,7 +66,7 @@ def clean_issn(
     --------
     Clean a column of FIGI Numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "issn": [
             "00249319",
             "00321478"]

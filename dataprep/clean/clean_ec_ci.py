@@ -59,7 +59,7 @@ def clean_ec_ci(
     --------
     Clean a column of CI data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ci": [
             '171430710-3',
             'BE431150351']

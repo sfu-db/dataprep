@@ -59,7 +59,7 @@ def clean_bg_pnf(
     --------
     Clean a column of PNF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "pnf": [
             '7111 042 925',
             '7111042922'] # invalid check digit

@@ -59,7 +59,7 @@ def clean_eu_banknote(
     --------
     Clean a column of Euro banknote data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "banknote": [
             'P36007033744',
             'P36007033743']

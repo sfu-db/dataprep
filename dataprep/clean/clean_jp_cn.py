@@ -58,7 +58,7 @@ def clean_jp_cn(
     --------
     Clean a column of CN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cn": [
             "5835678256246",
             "2-8356-7825-6246",]

@@ -59,7 +59,7 @@ def clean_bg_vat(
     --------
     Clean a column of VAT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "vat": [
             'BG 175 074 752',
             '175074752',

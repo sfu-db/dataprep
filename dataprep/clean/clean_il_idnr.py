@@ -58,7 +58,7 @@ def clean_il_idnr(
     --------
     Clean a column of IDNR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "idnr": [
             "39337423",
             "3933742-2",]

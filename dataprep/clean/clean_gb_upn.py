@@ -59,7 +59,7 @@ def clean_gb_upn(
     --------
     Clean a column of UPN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "upn": [
             'B801200005001',
             'A801200005001']

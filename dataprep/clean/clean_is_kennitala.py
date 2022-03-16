@@ -58,7 +58,7 @@ def clean_is_kennitala(
     --------
     Clean a column of Kennitala data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "kennitala": [
             "1201743399",
             "320174-3399",]

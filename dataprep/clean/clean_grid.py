@@ -65,7 +65,7 @@ def clean_grid(
     --------
     Clean a column of ISBN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "grid": [
             "A12425GABC1234002M",
             "A1-2425G-ABC1234002-M"]

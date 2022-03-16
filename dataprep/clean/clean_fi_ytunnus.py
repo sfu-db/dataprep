@@ -58,7 +58,7 @@ def clean_fi_ytunnus(
     --------
     Clean a column of y-tunnus data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ytunnus": [
             "20774740",
             "2077474-1",]

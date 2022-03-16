@@ -60,7 +60,7 @@ def clean_mu_nid(
     --------
     Clean a column of NID data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nid": [
             'J2906201304089',
             'J2906201304088',]

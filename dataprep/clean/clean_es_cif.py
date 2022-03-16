@@ -65,7 +65,7 @@ def clean_es_cif(
     --------
     Clean a column of CIF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cif": [
             'A13 585 625',
             'M-1234567-L',]

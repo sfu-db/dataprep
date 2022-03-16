@@ -58,7 +58,7 @@ def clean_pl_nip(
     --------
     Clean a column of NIP data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nip": [
             "PL 8567346215",
             "PL 8567346216",]

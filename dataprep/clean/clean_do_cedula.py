@@ -58,7 +58,7 @@ def clean_do_cedula(
     --------
     Clean a column of Cedula data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cedula": [
             "22400022111",
             "0011391820A"]

@@ -59,7 +59,7 @@ def clean_es_dni(
     --------
     Clean a column of DNI data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "dni": [
             '54362315-K',
             '54362315']

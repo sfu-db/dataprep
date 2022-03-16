@@ -61,7 +61,7 @@ def clean_cn_ric(
     --------
     Clean a column of RIC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ric": [
             "360426199101010071",
             "99999999999"]

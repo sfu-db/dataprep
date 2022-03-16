@@ -59,7 +59,7 @@ def clean_mt_vat(
     --------
     Clean a column of VAT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "vat": [
             'MT 1167-9112',
             '1167-9113',]

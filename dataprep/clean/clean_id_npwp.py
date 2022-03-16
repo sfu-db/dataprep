@@ -58,7 +58,7 @@ def clean_id_npwp(
     --------
     Clean a column of NPWP data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "npwp": [
             "013000666091000",
             "123456789",]

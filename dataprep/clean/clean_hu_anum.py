@@ -59,7 +59,7 @@ def clean_hu_anum(
     --------
     Clean a column of ANUM data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "anum": [
             'HU-12892312',
             'HU-12892313',]

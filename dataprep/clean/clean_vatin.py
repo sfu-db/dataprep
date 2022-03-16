@@ -65,7 +65,7 @@ def clean_vatin(
     --------
     Clean a column of VATIN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "vatin": [
             "FR 40 303 265 045",
             "DE136,695 976"]

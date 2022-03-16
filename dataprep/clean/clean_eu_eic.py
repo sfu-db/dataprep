@@ -59,7 +59,7 @@ def clean_eu_eic(
     --------
     Clean a column of EIC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "eic": [
             '22XWATTPLUS----G',
             '22XWATTPLUS----X']

@@ -59,7 +59,7 @@ def clean_dk_cvr(
     --------
     Clean a column of CVR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cvr": [
             'DK 13585628',
             'DK 13585627']

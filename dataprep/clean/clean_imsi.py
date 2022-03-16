@@ -65,7 +65,7 @@ def clean_imsi(
     --------
     Clean a column of ISBN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "imsi": [
             "429 011 234567890",
             "310-150-123456789"]

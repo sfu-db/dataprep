@@ -61,7 +61,7 @@ def clean_gb_sedol(
     --------
     Clean a column of SEDOL data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "sedol": [
             'B15KXQ8',
             'B15KXQ7']

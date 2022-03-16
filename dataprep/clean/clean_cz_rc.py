@@ -58,7 +58,7 @@ def clean_cz_rc(
     --------
     Clean a column of RC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "rc": [
             "7103192745",
             "7103192746"]

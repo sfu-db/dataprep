@@ -58,7 +58,7 @@ def clean_ch_uid(
     --------
     Clean a column of UID data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "uid": [
             'CHE100155212',
             'CHE-100.155.213',]

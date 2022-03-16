@@ -58,7 +58,7 @@ def clean_mx_rfc(
     --------
     Clean a column of RFC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "rfc": [
             "GODE561231GR8",
             "BUEI591231GH9",]

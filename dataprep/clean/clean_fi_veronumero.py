@@ -59,7 +59,7 @@ def clean_fi_veronumero(
     --------
     Clean a column of Veronumero data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "veronumero": [
             '123456789123',
             '12345678912A']

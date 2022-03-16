@@ -61,7 +61,7 @@ def clean_gr_amka(
     --------
     Clean a column of AMKA data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "amka": [
             '01013099997',
             '01013099999']

@@ -59,7 +59,7 @@ def clean_nl_postcode(
     --------
     Clean a column of postcode data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "postcode": [
             'NL-2611ET',
             '26112 ET',]

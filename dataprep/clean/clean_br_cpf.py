@@ -58,7 +58,7 @@ def clean_br_cpf(
     --------
     Clean a column of CPF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cpf": [
             '23100299900',
             '231.002.999-00', # InvalidChecksum

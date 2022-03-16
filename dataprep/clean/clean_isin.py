@@ -65,7 +65,7 @@ def clean_isin(
     --------
     Clean a column of ISIN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "isin": [
             "US0378331005",
             "GB00BYXJL758"]

@@ -34,10 +34,10 @@ export default {
         clean_lat_long: "Coordinate",
         clean_ip: "IP address",
         clean_phone: "Phone Number",
-        clean_text: "Text",
+        // clean_text: "Text",
         clean_url: "URL",
         clean_address: "Address",
-        clean_duplication: "Duplication",
+        // clean_duplication: "Duplication",
         clean_currency: "Currency",
         clean_au_abn: "Australian Business Numbers",
         clean_au_acn: "Australian Company Numbers",
@@ -105,7 +105,8 @@ export default {
         clean_fr_siren: "French Company Identification Numbers",
         clean_fr_siret: "French Company Establishment Identification Numbers",
         clean_fr_tva: "French TVA Numbers",
-        clean_gb_nhs: "United Kingdom National Health Service Patient Identifiers",
+        clean_gb_nhs:
+          "United Kingdom National Health Service Patient Identifiers",
         clean_gb_sedol: "Stock Exchange Daily Official List Numbers",
         clean_gb_upn: "English Unique Pupil Numbers",
         clean_gb_utr: "United Kingdom Unique Taxpayer References",
@@ -168,32 +169,41 @@ export default {
         clean_ro_cui: "Romanian Company Identifiers",
         clean_ro_onrc: "Romanian Trade Register Identifiers",
         clean_isbn: "ISBN Numbers",
-        // clean_bic: clean_bic,
-        // clean_bitcoin: clean_bitcoin,
-        // clean_casrn: clean_casrn,
-        // clean_cusip: clean_cusip,
-        // clean_ean: clean_ean,
-        // clean_figi: clean_figi,
-        // clean_grid: clean_grid,
-        // clean_iban: clean_iban,
-        // clean_imei: clean_imei,
-        // clean_imo: clean_imo,
-        // clean_imsi: clean_imsi,
-        // clean_isan: clean_isan,
-        // clean_isil: clean_isil,
-        // clean_isin: clean_isin,
-        // clean_ismn: clean_ismn,
-        // clean_issn: clean_issn,
-        // clean_ad_nrt: clean_ad_nrt,
-        // clean_al_nipt: clean_al_nipt,
-        // clean_ar_cbu: clean_ar_cbu,
-        // clean_ar_cuit: clean_ar_cuit,
-        // clean_ar_dni: clean_ar_dni,
-        // clean_at_uid: clean_at_uid,
-        // clean_at_vnr: clean_at_vnr,
-        // clean_lei: clean_lei,
-        // clean_meid: clean_meid,
-        // clean_vatin: clean_vatin,
+        clean_bic: "ISO 9362 Business identifier codes",
+        clean_bitcoin: "Bitcoin Addresses",
+        clean_casrn: "CAS Registry Numbers",
+        clean_cusip: "CUSIP numbers",
+        clean_ean: "EAN (International Article Number)",
+        clean_figi: "Financial Instrument Global Identifier (FIGI) Numbers",
+        clean_grid: "Global Release Identifier (GRID) numbers",
+        clean_iban: "IBAN numbers",
+        clean_imei: "International Mobile Equipment Identity (IMEI) numbers",
+        clean_imo: "International Maritime Organization Numbers",
+        clean_imsi: "International Mobile Subscriber Identity (IMSI) numbers",
+        clean_isan: "International Standard Audiovisual Numbers",
+        clean_isil:
+          "International Standard Identifier for Libraries (ISIL) numbers",
+        clean_isin:
+          "International Securities Identification Number (ISIN) numbers",
+        clean_ismn: "ISMN number",
+        clean_issn: "International Standard Serial Numbers",
+        clean_ad_nrt:
+          "Andorra NRT (Número de Registre Tributari, Andorra tax number)",
+        clean_al_nipt:
+          "NIPT (Numri i Identifikimit për Personin e Tatueshëm, Albanian VAT number)",
+        clean_ar_cbu:
+          "CBU (Clave Bancaria Uniforme, Argentine bank account number)",
+        clean_ar_cuit:
+          "CUIT (Código Único de Identificación Tributaria, Argentinian tax number)",
+        clean_ar_dni:
+          "DNI (Documento Nacional de Identidad, Argentinian national identity nr.)",
+        clean_at_uid:
+          "UID (Umsatzsteuer-Identifikationsnummer, Austrian VAT number)",
+        clean_at_vnr:
+          "VNR, SVNR, VSNR (Versicherungsnummer, Austrian social security number)",
+        clean_lei: "Legal Entity Identifier (LEI) Numbers",
+        clean_meid: "Mobile Equipment Identifiers (MEIDs)",
+        clean_vatin: "International value added tax identification numbers",
       },
       value: "",
       isWholeDF: false,
@@ -228,8 +238,6 @@ export default {
               paramDic,
               paramDefault
             );
-            //_this.options0 = res.data.tableColumns
-            //_this.list = res.data.operationLog
           });
       }
     },

@@ -61,7 +61,7 @@ def clean_in_aadhaar(
     --------
     Clean a column of Aadhaar data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "aadhaar": [
             "234123412346",
             "643343121",]

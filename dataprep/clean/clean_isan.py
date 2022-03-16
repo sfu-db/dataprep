@@ -68,7 +68,7 @@ def clean_isan(
     --------
     Clean a column of ISAN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "isan": [
             "000000018947000000000000"]
             })

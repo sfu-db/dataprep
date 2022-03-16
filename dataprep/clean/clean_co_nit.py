@@ -58,7 +58,7 @@ def clean_co_nit(
     --------
     Clean a column of NIT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nit": [
             "2131234321",
             "2131234325"]

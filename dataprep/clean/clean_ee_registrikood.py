@@ -59,7 +59,7 @@ def clean_ee_registrikood(
     --------
     Clean a column of Registrikood data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "registrikood": [
             '12345678',
             '12345679']

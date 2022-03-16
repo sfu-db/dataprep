@@ -59,7 +59,7 @@ def clean_cr_cr(
     --------
     Clean a column of CR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cr": [
             '122200569906',
             '12345678',]

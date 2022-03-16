@@ -63,7 +63,7 @@ def clean_it_aic(
     --------
     Clean a column of AIC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "aic": [
             '000307052',
             '999999',]

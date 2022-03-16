@@ -60,7 +60,7 @@ def clean_cn_uscc(
     --------
     Clean a column of USCC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "uscc": [
             "9 1 110000 600037341L",
             "A1110000600037341L"]

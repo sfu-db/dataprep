@@ -59,7 +59,7 @@ def clean_hr_oib(
     --------
     Clean a column of OIB data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "oib": [
             'HR 33392005961',
             '33392005962',]

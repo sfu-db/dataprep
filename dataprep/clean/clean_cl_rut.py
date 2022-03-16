@@ -58,7 +58,7 @@ def clean_cl_rut(
     --------
     Clean a column of RUT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "rut": [
             "125319092",
             "76086A28-5"]

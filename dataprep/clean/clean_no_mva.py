@@ -58,7 +58,7 @@ def clean_no_mva(
     --------
     Clean a column of MVA data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "mva": [
             "995525828MVA",
             "NO 995 525 829 MVA",]

@@ -58,7 +58,7 @@ def clean_ca_sin(
     --------
     Clean a column of SIN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "sin": [
             '123456782',
             '12345678Z',]

@@ -60,7 +60,7 @@ def clean_eu_nace(
     --------
     Clean a column of NACE data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nace": [
             "6201",
             "99999999999"]

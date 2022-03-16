@@ -64,7 +64,7 @@ def clean_bitcoin(
     --------
     Clean a column of Bitcoint Address data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "bitcoin": [
             "1NEDqZPvTWRaoho48qXuLLsrYomMXPABfD",
             "BC1QARDV855YJNGSPVXUTTQ897AQCA3LXJU2Y69JCE"]

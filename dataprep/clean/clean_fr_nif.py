@@ -58,7 +58,7 @@ def clean_fr_nif(
     --------
     Clean a column of NIF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nif": [
             "0701987765432",
             "070198776543"]

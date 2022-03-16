@@ -60,7 +60,7 @@ def clean_bg_egn(
     --------
     Clean a column of EGN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "egn": [
             '752316 926 3',
             '7552A10004']

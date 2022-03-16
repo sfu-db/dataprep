@@ -65,7 +65,7 @@ def clean_imei(
     --------
     Clean a column of IMEI data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "imei": [
             "35686800-004141-20",
             "354178036859789"]

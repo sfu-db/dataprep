@@ -64,7 +64,7 @@ def clean_casrn(
     --------
     Clean a column of CAS Registry Numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "casrn": [
             "87-86-5"]
             })
