@@ -107,6 +107,11 @@ def test_random_df(random_df: pd.DataFrame) -> None:
     create_report(random_df)
 
 
+def test_empty() -> None:
+    df = pd.DataFrame()
+    create_report(df)
+
+
 def test_cat_df() -> None:
     df = load_dataset("titanic")
     ddf = df[["Name", "Sex"]]
