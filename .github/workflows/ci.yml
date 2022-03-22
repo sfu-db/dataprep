@@ -7,7 +7,7 @@ on:
       - release
   pull_request:
     branches:
-      - develop
+       - develop
 
 jobs:
   build:
@@ -20,6 +20,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
       - uses: actions/setup-python@v2
         with:
@@ -37,6 +39,9 @@ jobs:
           pip install poetry
           poetry install
           poetry config --list
+
+      - name: Build binary dependencies
+        run: poetry build
 
       - name: Print tool versions
         run: |

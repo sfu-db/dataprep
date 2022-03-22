@@ -11,15 +11,15 @@ from typing import List, Set, Union, DefaultDict
 from itertools import permutations
 from os import path
 from tempfile import mkdtemp
-
 import pandas as pd
 import dask.dataframe as dd
 import dask
 from IPython.display import Javascript, display
-from Levenshtein import distance
 from metaphone import doublemetaphone
+from rapidfuzz.distance.Levenshtein import distance as LevenshteinDistance
 
 from .utils import to_dask
+
 
 DECODE_FUNC = """
     function b64DecodeUnicode(str) {
@@ -141,7 +141,7 @@ class Clusterer:
                     continue
 
                 cluster_map[center].add(center)
-                dist = distance(center, val)
+                dist = LevenshteinDistance(center, val)
                 if dist <= radius or radius < 0:
                     cluster_map[center].add(val)
 

@@ -1,13 +1,12 @@
 """Common functions"""
-from typing import Dict, Union, Any
 import http.client
 import json
+from math import ceil
+from typing import Any, Dict, Union
 
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-from math import ceil
-
 
 NULL_VALUES = {
     np.nan,
