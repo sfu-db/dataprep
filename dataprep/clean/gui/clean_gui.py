@@ -229,7 +229,7 @@ clean_list = [
     "clean_json",
     "clean_address",
     "clean_df",
-    # "clean_duplication",
+    "clean_duplication",
     "clean_currency",
     "clean_au_abn",
     "clean_au_acn",

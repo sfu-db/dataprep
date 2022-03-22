@@ -6,43 +6,45 @@ on:
       - release
 
 jobs:
-  # docs-build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
+#   docs-build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Install dependencies
+#         run: |
+#           pip install poetry
+#           curl -L https://github.com/jgm/pandoc/releases/download/2.11.2/pandoc-2.11.2-1-amd64.deb -o /tmp/pandoc.deb && sudo dpkg -i /tmp/pandoc.deb
 
-  #     - name: Install dependencies
-  #       run: |
-  #         pip install poetry
-  #         curl -L https://github.com/jgm/pandoc/releases/download/2.11.2/pandoc-2.11.2-1-amd64.deb -o /tmp/pandoc.deb && sudo dpkg -i /tmp/pandoc.deb
+#       - name: Cache venv
+#         uses: actions/cache@v2
+#         with:
+#           path: ~/.cache/pypoetry/virtualenvs
+#           key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
 
-  #     - name: Cache venv
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: ~/.cache/pypoetry/virtualenvs
-  #         key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
+#       - name: Install dependencies
+#         run: |
+#           pip install poetry
+#           poetry install
 
-  #     - name: Install dependencies
-  #       run: |
-  #         pip install poetry
-  #         poetry install
+#       - name: Build docs
+#         run: poetry run sphinx-build -M html docs/source docs/build
 
-  #     - name: Build docs
-  #       run: poetry run sphinx-build -M html docs/source docs/build
-
-  #     - name: Archive docs
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: docs
-  #         path: docs/build/html
-
-  build:
-    runs-on: ubuntu-latest
-    # needs: docs-build
+#       - name: Archive docs
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: docs
+#           path: docs/build/html
+  build-wheels-linux-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+          os: [ubuntu-latest, macos-latest]
+          python: ["3.8", "3.9"]
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: "0"
+          submodules: recursive
 
       - uses: actions/setup-python@v1
         with:
@@ -61,15 +63,148 @@ jobs:
           poetry install
           poetry config --list
 
-      - name: Print tool versions
+      - name: Build wheels
+        run: poetry build
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.os }}-${{ matrix.python}}"
+          path: dist/*.whl
+  
+  build-wheels-windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+          os: [windows-latest]
+          python: ["3.8", "3.9"]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Cache venv
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
         run: |
-          poetry run pylint --version 
-          poetry run pytest --version 
-          poetry run black --version
-          poetry run pyright --version
+          echo "Cache Version ${{ secrets.CACHE_VERSION }}"
+          pip install poetry toml-cli
+          poetry install
+          poetry config --list
 
       - name: Build wheels
         run: poetry build
+      
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.os }}-${{ matrix.python}}"
+          path: dist/*.whl
+          
+  build-sdist:
+    name: Build source distribution
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python: ["3.9"]
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.9'
+
+      - name: Cache venv
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          echo "Cache Version ${{ secrets.CACHE_VERSION }}"
+          pip install poetry toml-cli
+          poetry install
+          poetry config --list
+
+      - name: Build wheels
+        run: poetry build
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.tar.gz
+    
+  verify:
+    runs-on: ${{ matrix.os }}
+    needs: [build-wheels-linux-macos, build-wheels-windows, build-sdist]
+    strategy:
+      matrix:
+        python: ["3.8", "3.9"]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: "${{ matrix.os }}-${{ matrix.python}}"
+
+      - run: |
+          pip install *.whl
+          python -c "import dataprep"
+
+  upload:
+    runs-on: ${{ matrix.os }}
+    # needs: docs-build
+    needs: [verify]
+    strategy:
+      matrix:
+        python: ["3.9"]
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Cache venv
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-build-${{ matrix.python }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          echo "Cache Version ${{ secrets.CACHE_VERSION }}"
+          pip install poetry toml-cli
+          poetry install
+          poetry config --list
+          
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist
 
       - name: Parse version from pyproject.toml
         run: echo "DATAPREP_VERSION=`toml get --toml-path pyproject.toml tool.poetry.version`" >> $GITHUB_ENV
@@ -79,7 +214,7 @@ jobs:
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "dist/*.whl,dist/*.tar.gz"
+          artifacts: "dist/**/*.whl,dist/**/*.tar.gz"
           bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
@@ -88,25 +223,25 @@ jobs:
 
       - name: Upload wheels
         run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
+    
+#  docs-deploy:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    if: ${{ github.event.ref == 'refs/heads/release' }}
+#    steps:
+#      - uses: actions/checkout@v2
 
-  # docs-deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   if: ${{ github.event.ref == 'refs/heads/release' }}
-  #   steps:
-  #     - uses: actions/checkout@v2
+#      - name: Download docs
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: docs
+#          path: docs/build/html
 
-  #     - name: Download docs
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: docs
-  #         path: docs/build/html
+      # - run: echo 'docs.dataprep.ai' > docs/build/html/CNAME
 
-  #     - run: echo 'docs.dataprep.ai' > docs/build/html/CNAME
-
-  #     - name: Deploy 🚀
-  #       uses: JamesIves/github-pages-deploy-action@4.1.5
-  #       with:
-  #         branch: gh-pages # The branch the action should deploy to.
-  #         folder: docs/build/html # The folder the action should deploy.
-  #         clean-exclude: dev
+      # - name: Deploy 🚀
+      #   uses: JamesIves/github-pages-deploy-action@4.1.5
+      #   with:
+      #     branch: gh-pages # The branch the action should deploy to.
+      #     folder: docs/build/html # The folder the action should deploy.
+      #     clean-exclude: dev
