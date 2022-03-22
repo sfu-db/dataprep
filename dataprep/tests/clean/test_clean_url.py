@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean import clean_url, validate_url
+from dataprep.clean import clean_url, validate_url
 
 LOGGER = logging.getLogger(__name__)
 

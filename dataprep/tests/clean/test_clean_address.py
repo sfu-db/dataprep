@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean import clean_address, validate_address
+from dataprep.clean import clean_address, validate_address
 
 LOGGER = logging.getLogger(__name__)
 

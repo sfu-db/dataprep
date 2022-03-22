@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean import clean_phone, validate_phone
+from dataprep.clean import clean_phone, validate_phone
 
 LOGGER = logging.getLogger(__name__)
 

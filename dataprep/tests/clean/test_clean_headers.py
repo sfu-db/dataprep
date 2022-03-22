@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean import clean_headers
+from dataprep.clean import clean_headers
 
 LOGGER = logging.getLogger(__name__)
 

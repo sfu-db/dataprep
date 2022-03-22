@@ -6,7 +6,8 @@ import json
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-
+import os
+from ctypes import cdll
 
 NULL_VALUES = {
     np.nan,
@@ -61,6 +62,16 @@ NEARBYKEYS = {
     "z": ["a", "s", "x"],
     " ": ["c", "v", "b", "n", "m"],
 }
+
+
+def find_module(filename, search_path):
+    for root, dir, files in os.walk(search_path):
+        for file in files:
+            if file.startswith(filename):
+                try:
+                    return cdll.LoadLibrary(os.path.join(root, file))
+                except TypeError:
+                    print(f'{"There is a type error."}')
 
 
 def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:

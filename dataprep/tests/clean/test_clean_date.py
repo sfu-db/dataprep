@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean import clean_date, validate_date
+from dataprep.clean import clean_date, validate_date
 
 LOGGER = logging.getLogger(__name__)
 

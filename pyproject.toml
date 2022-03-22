@@ -7,6 +7,7 @@ maintainers = [
   "Pei Wang <peiw@sfu.ca>",
   "Brandon Lockhart <brandon_lockhart@sfu.ca>",
   "Song Bian <biansonghz@gmail.com>",
+  "Danrui Qi <qidanrui@gmail.com>"
 ]
 name = "dataprep"
 version = "0.4.4-alpha.1"
@@ -17,6 +18,18 @@ readme = "README.md" # Markdown files are supported
 
 homepage = "https://github.com/sfu-db/dataprep"
 repository = "https://github.com/sfu-db/dataprep"
+
+include = [
+#    # Source files for C extensions must be included in the source distribution.
+    { path = "CMakeLists.txt", format = "sdist" },
+    { path = "extern/Levenshtein/", format = "sdist" },
+    { path = "extern/python-crfsuite/", format = "sdist" },
+    # C extensions must be included in the wheel distribution.
+    { path = "extern/Levenshtein/*.so", format = "wheel" },
+    { path = "extern/Levenshtein/*.pyd", format = "wheel" },
+    { path = "extern/python-crfsuite/*.so", format = "wheel" },
+    { path = "extern/python-crfsuite/*.pyd", format = "wheel" },
+]
 
 keywords = ["dataprep", "eda", "connector", "data science", "exploratory data analysis", "data exploration"]
 
@@ -32,6 +45,10 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Framework :: IPython",
 ]
+
+[tool.poetry.build]
+generate-setup-file = false
+script = "build.py"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
@@ -59,11 +76,11 @@ tqdm = "^4.48"
 flask = "^2"
 flask_cors = "^3.0.10"
 metaphone = "^0.6"
-python-Levenshtein = "^0.12.2"
-python-crfsuite = "^0.9.7"
 python-stdnum = "^1.16"
 regex = "^2021.8.3"
 varname = "^0.8.1"
+scikit-build = "^0.13.1"
+Cython = "^0.29.28"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -103,4 +120,4 @@ target-version = ['py38']
 
 [build-system]
 build-backend = "poetry.masonry.api"
-requires = ["poetry>=1"]
+requires = ["poetry>=1", "scikit-build", "cmake", "cython", "ninja", "setuptools<61"]

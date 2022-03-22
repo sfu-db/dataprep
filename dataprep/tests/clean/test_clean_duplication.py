@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean.clean_duplication import UserInterface
+from dataprep.clean.clean_duplication import UserInterface
 
 LOGGER = logging.getLogger(__name__)
 

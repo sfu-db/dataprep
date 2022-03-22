@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ...clean import clean_ip, validate_ip
+from dataprep.clean import clean_ip, validate_ip
 
 LOGGER = logging.getLogger(__name__)
 

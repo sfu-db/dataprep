@@ -11,16 +11,14 @@ from typing import List, Set, Union, DefaultDict
 from itertools import permutations
 from os import path
 from tempfile import mkdtemp
-
 import pandas as pd
 import dask.dataframe as dd
 import dask
 from IPython.display import Javascript, display
-from Levenshtein import distance
 from metaphone import doublemetaphone
+from .utils import to_dask, find_module
 
-from .utils import to_dask
-
+Levenshtein = find_module("_levenshtein.cpython", "./_skbuild")
 DECODE_FUNC = """
     function b64DecodeUnicode(str) {
         // Going backwards: from bytestream, to percent-encoding, to original string.
@@ -141,7 +139,7 @@ class Clusterer:
                     continue
 
                 cluster_map[center].add(center)
-                dist = distance(center, val)
+                dist = Levenshtein.distance(center, val)
                 if dist <= radius or radius < 0:
                     cluster_map[center].add(val)
 
