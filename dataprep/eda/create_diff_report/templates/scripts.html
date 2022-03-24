@@ -22,8 +22,12 @@
         scientificNotationStrip(tableRows);
         const originalVariables = Array.from(document.getElementsByClassName("section-variable"));
         getOriginalVariables = function(){
+            // Cannot directly return context data since there are 
+            // multiple dataframes
+            //return '{{ context.components.dfs[0].variables|list }}';
             return originalVariables;
         }
+        console.log(getOriginalVariables)
     }
 
     function sortBy(e){
@@ -31,18 +35,14 @@
         const isReverseOrder = !!document.getElementById("id-variable-reverse-order").checked;
         let variableSection = document.getElementById("id-variable-section");
         let variables = getOriginalVariables().slice();
+        //let variables = Array.from(document.getElementsByClassName("section-variable"));
 
         switch (selectedOption){
             case 'original':
+                variables.sort(originalComparator);
                 break;
             case 'alphabetical':
                 variables.sort(alphabeticalComparator);
-                break;
-            case 'missing':
-                variables.sort(missingComparator);
-                break;
-            case 'unique':
-                variables.sort(uniqueComparator);
                 break;
         }
 
@@ -53,6 +53,13 @@
         variables.forEach(v => {
             variableSection.appendChild(v);
         })
+    }
+
+    function originalComparator(a, b){
+        const x = alphabeticalAttributeExtractor(a);
+        const y = alphabeticalAttributeExtractor(b);
+        const originalVariables = getOriginalVariables();
+        return originalVariables.indexOf(x) - originalVariables.indexOf(y);
     }
 
     function alphabeticalComparator(a, b) {
@@ -67,34 +74,6 @@
 
     function alphabeticalAttributeExtractor(x){
         return x.childNodes[1].id;
-    }
-
-    function missingComparator(a, b){
-        const x = missingAttributeExtractor(a);
-        const y = missingAttributeExtractor(b);
-        if (x > y)
-            return -1;
-        if (x < y)
-            return 1;
-        return 0;
-    }
-
-    function missingAttributeExtractor(x){
-        return parseFloat(x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[6].childNodes[3].innerHTML);
-    }
-
-    function uniqueComparator(a, b){
-        const x = uniqueAttributeExtractor(a);
-        const y = uniqueAttributeExtractor(b);
-        if (x > y)
-            return -1;
-        if (x < y)
-            return 1;
-        return 0;
-    }
-
-    function uniqueAttributeExtractor(x){
-        return parseFloat(x.childNodes[3].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[2].childNodes[3].innerHTML);
     }
 
     function onReverseClick(){
