@@ -337,6 +337,26 @@ def _calc_line_dt(
     return (dfr, DTMAP[unit][3], miss_pct) if agg is None else (dfr, DTMAP[unit][3])
 
 
+def _calc_running_total_dt(
+    df: dd.DataFrame,
+    unit: str,
+) -> Union[Tuple[pd.DataFrame, str],]:
+    """
+    Calculate a running total line for a df two columns: a datetime column and numerical column.
+
+    Parameters
+    ----------
+    df
+        A dataframe
+    unit
+        The unit of time over which to group the values
+    """
+    res_df, time_prefix = _calc_line_dt(df, unit, agg="sum")
+    res_df["sum"] = res_df["sum"].cumsum()
+    res_df.rename(columns={"sum": "runningtotal"}, inplace=True)
+    return res_df, time_prefix
+
+
 def _calc_groups(
     df: dd.DataFrame, x: str, ngroups: int, largest: bool = True
 ) -> Tuple[dd.DataFrame, Dict[str, int], List[str]]:

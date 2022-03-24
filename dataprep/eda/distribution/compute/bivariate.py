@@ -27,6 +27,7 @@ from ...utils import (
     _calc_box_stats,
     _calc_groups,
     _calc_line_dt,
+    _calc_running_total_dt,
     _get_timeunit,
 )
 from .common import gen_new_df_with_used_cols
@@ -109,31 +110,26 @@ def compute_bivariate(
     elif _check_type_combination((xtype, ytype), (DateTime, Continuous)):
         x, y = (x, y) if isinstance(xtype, DateTime) else (y, x)
         tmp_df = frame.frame[[x, y]].dropna()
-        dtnum: List[Any] = []
+        dtnum: Dict[Str, Any] = {}
         # line chart
         if cfg.line.enable:
-            dtnum.append(dask.delayed(_calc_line_dt)(tmp_df, cfg.line.unit, cfg.line.agg))
+            dtnum["linedata_agg"] = dask.delayed(_calc_line_dt)(
+                tmp_df, cfg.line.unit, agg=cfg.line.agg
+            )
+            dtnum["linedata_running_total"] = dask.delayed(_calc_running_total_dt)(
+                tmp_df, cfg.line.unit
+            )
         # box plot
         if cfg.box.enable:
-            dtnum.append(dask.delayed(_calc_box_dt)(tmp_df, cfg.box.unit))
+            dtnum["boxdata"] = dask.delayed(_calc_box_dt)(tmp_df, cfg.box.unit)
 
-        dtnum = dask.compute(*dtnum)
-
-        if len(dtnum) == 2:
-            linedata = dtnum[0]
-            boxdata = dtnum[1]
-        elif cfg.line.enable:
-            linedata = dtnum[0]
-            boxdata = []
-        else:
-            boxdata = dtnum[0]
-            linedata = []
-
+        dtnum = dask.compute(dtnum)[0]
         return Intermediate(
             x=x,
             y=y,
-            linedata=linedata,
-            boxdata=boxdata,
+            linedata_agg=dtnum.get("linedata_agg", []),
+            linedata_running_total=dtnum.get("linedata_running_total", []),
+            boxdata=dtnum.get("boxdata", []),
             visual_type="dt_and_num_cols",
         )
     elif _check_type_combination((xtype, ytype), (DateTime, (Nominal, SmallCardNum))):
