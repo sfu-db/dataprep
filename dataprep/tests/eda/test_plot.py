@@ -102,6 +102,33 @@ def test_random_df(random_df: pd.DataFrame) -> None:
     plot(random_df, display=["Bar Chart"])
 
 
+def test_plot_dt() -> None:
+    srs = pd.Series(
+        [
+            "3/11/2001",
+            "3/12/2002",
+            "3/12/2003",
+            "3/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+            "4/13/2003",
+        ]
+    )
+    dt_col = pd.to_datetime(srs, infer_datetime_format=True)
+    df = pd.DataFrame()
+    df["dt"] = dt_col
+    df["num"] = [1.0, 2.1, 3.5, 4.5, 2.5, 1.5, 2.3, 6.1, 8.1, 1.0, 3, 10.6, 7.8, 9.1, 20.6]
+    plot(df, "dt", "num")
+
+
 def test_plot_titanic() -> None:
     df = load_dataset("titanic")
     plot(df, "Sex", display=["Value Table"])
