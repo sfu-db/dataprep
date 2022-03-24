@@ -74,6 +74,12 @@ def test_specify_baseline_col(simpledf: dd.DataFrame) -> None:
     plot_diff([simpledf, simpledf], "a", config={"diff.baseline": 1})
 
 
+def test_col_not_align() -> None:
+    df2 = pd.DataFrame({"a": [1, 2], "c": ["a", "b"], "d": [2, 3]})
+    df1 = pd.DataFrame({"a": [2, 3], "e": ["a", "c"]})
+    plot_diff([df1, df2], config={"diff.label": ["train_df", "test_df"]})
+
+
 def test_dataset() -> None:
     df = load_dataset("titanic")
     df1 = df[df["Survived"] == 0]
