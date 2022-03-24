@@ -35,7 +35,6 @@ __all__ = ["render_correlation"]
 def render_correlation(itmdt: Intermediate, cfg: Config) -> Any:
     """
     Render a correlation plot
-
     Parameters
     ----------
     itmdt
@@ -385,12 +384,15 @@ def render_crossfilter(
         all_cols = itmdt["all_cols"]
     else:
         all_cols = itmdt["num_cols"]
-
     scatter_df = itmdt["scatter_source"]
     # all other plots except for scatter plot, used for cat-cat and cat-num interactions.
     other_plots = itmdt["other_plots"]
-    scatter_df["__x__"] = scatter_df[scatter_df.columns[0]]
-    scatter_df["__y__"] = scatter_df[scatter_df.columns[0]]
+    if scatter_df.empty:
+        scatter_df["__x__"] = [None] * len(itmdt["scatter_source"])
+        scatter_df["__y__"] = [None] * len(itmdt["scatter_source"])
+    else:
+        scatter_df["__x__"] = scatter_df[scatter_df.columns[0]]
+        scatter_df["__y__"] = scatter_df[scatter_df.columns[0]]
     source_scatter = ColumnDataSource(scatter_df)
     source_xy_value = ColumnDataSource({"x": [scatter_df.columns[0]], "y": [scatter_df.columns[0]]})
     var_list = list(all_cols)
@@ -435,7 +437,6 @@ def render_crossfilter(
         let scatterData = scatter.data;
         xyValueData['x'][0] = currentSelect;
         xy_value.change.emit();
-
         const children = []
         let ycol = xyValueData['y'][0];
         let col = currentSelect + '_' + ycol
@@ -469,7 +470,6 @@ def render_crossfilter(
         let scatterData = scatter.data;
         xyValueData['y'][0] = ycol;
         xy_value.change.emit();
-
         const children = []
         let xcol = xyValueData['x'][0];
         let col = xcol + '_' + ycol;

@@ -1267,14 +1267,14 @@ def dt_line_viz(
     Render a line chart
     """
     # pylint: disable=too-many-arguments
+    agg = "freq" if miss_pct is not None else f"{df.columns[1]}"
+    title_agg = agg if agg != "runningtotal" else "running total"
     if miss_pct is not None:
         title = f"{x} ({miss_pct}% missing)" if miss_pct > 0 else f"{x}"
         tooltips = [(timeunit, "@lbl"), ("Frequency", "@freq"), ("Percent", "@pct%")]
-        agg = "freq"
     else:
-        title = title = f"{df.columns[1]} of {y} by {x}"
-        agg = f"{df.columns[1]}"
-        tooltips = [(timeunit, "@lbl"), (agg, f"@{df.columns[1]}")]
+        title = f"{title_agg} of {y} by {x}"
+        tooltips = [(timeunit, "@lbl"), (title_agg, f"@{df.columns[1]}")]
     fig = Figure(
         plot_width=plot_width,
         plot_height=plot_height,
@@ -1303,9 +1303,10 @@ def dt_line_viz(
         _format_axis(fig, 0, df[agg].max(), "y")
 
     if y:
-        fig.yaxis.axis_label = f"{df.columns[1]} of {y}"
+        fig.yaxis.axis_label = f"{title_agg} of {y}"
         fig.xaxis.axis_label = x
-        return Panel(child=fig, title="Line Chart")
+        cap_agg = title_agg.title()
+        return Panel(child=fig, title=f"Line Chart ({cap_agg})")
 
     fig.yaxis.axis_label = "Frequency"
     return fig
@@ -1549,10 +1550,10 @@ def render_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     # pylint: disable=too-many-locals,too-many-branches
 
     if cfg.plot.report:
-        plot_width = 450
-        plot_height = 400
-        plot_width_bar = 280
-        plot_height_bar = 248
+        plot_width = 400
+        plot_height = 350
+        plot_width_bar = plot_width
+        plot_height_bar = plot_height
     else:
         plot_width = cfg.plot.width if cfg.plot.width is not None else 450
         plot_height = cfg.plot.height if cfg.plot.height is not None else 400
@@ -1866,10 +1867,10 @@ def render_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     """
     # pylint: disable=too-many-locals
     if cfg.plot.report:
-        plot_width = 450
-        plot_height = 400
-        plot_width_hist = 280
-        plot_height_hist = 248
+        plot_width = 400
+        plot_height = 350
+        plot_width_hist = plot_width
+        plot_height_hist = plot_height
     else:
         plot_width = cfg.plot.width if cfg.plot.width is not None else 450
         plot_height = cfg.plot.height if cfg.plot.height is not None else 400
@@ -2302,10 +2303,18 @@ def parse_grps(
 
     x_lrgst = xgrps.nlargest(ngroups)
     df = df[df[x].isin(x_lrgst.index)]
-    stats = {f"{x}_ttl": len(xgrps), f"{x}_shw": len(x_lrgst)}
     y_lrgst = ygrps.nlargest(nsubgroups)
     df = df[df[y].isin(y_lrgst.index)]
-    stats.update(zip((f"{y}_ttl", f"{y}_shw"), (len(ygrps), len(y_lrgst))))
+    stats = {
+        f"{x}_ttl": len(xgrps),
+        f"{x}_shw": len(x_lrgst),
+        f"{y}_ttl": len(ygrps),
+        f"{y}_shw": len(y_lrgst),
+    }
+    if df.empty:
+        size = min(len(x_lrgst), len(y_lrgst))
+        df = pd.DataFrame({x: x_lrgst[:size], y: y_lrgst[:size]})
+        df["cnt"] = 0
     df[[x, y]] = df[[x, y]].astype(str)
     # final format
     df = df.pivot_table(index=y, columns=x, values="cnt", fill_value=0, aggfunc="sum")
@@ -2323,10 +2332,10 @@ def render_dt_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 
     tabs: List[Panel] = []
     if cfg.line.enable:
-        linedf, timeunit = itmdt["linedata"]
+        linedf_agg, timeunit = itmdt["linedata_agg"]
         tabs.append(
             dt_line_viz(
-                linedf,
+                linedf_agg,
                 itmdt["x"],
                 timeunit,
                 cfg.line.yscale,
@@ -2336,6 +2345,21 @@ def render_dt_num(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
                 y=itmdt["y"],
             )
         )
+
+        linedf_running_total, timeunit = itmdt["linedata_running_total"]
+        tabs.append(
+            dt_line_viz(
+                linedf_running_total,
+                itmdt["x"],
+                timeunit,
+                cfg.line.yscale,
+                plot_width,
+                plot_height,
+                True,
+                y=itmdt["y"],
+            )
+        )
+
     if cfg.box.enable:
         boxdf, outx, outy, timeunit = itmdt["boxdata"]
         tabs.append(
@@ -2434,7 +2458,6 @@ def render_dt_num_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
 def render(itmdt: Intermediate, cfg: Config) -> Union[LayoutDOM, Dict[str, Any]]:
     """
     Render a basic plot
-
     Parameters
     ----------
     itmdt
@@ -2472,3 +2495,4 @@ def render(itmdt: Intermediate, cfg: Config) -> Union[LayoutDOM, Dict[str, Any]]
         visual_elem = render_dt_num_cat(itmdt, cfg)
 
     return visual_elem
+    

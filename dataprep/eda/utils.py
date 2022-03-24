@@ -59,7 +59,6 @@ def preprocess_dataframe(
         4. transform object column to string column (note that obj column can contain
         cells from different type).
         5. transform to dask dataframe if input is pandas dataframe.
-
     Parameters
     ----------------
     org_df: dataframe
@@ -88,7 +87,7 @@ def preprocess_dataframe(
     # Resolve duplicate names in columns.
     # Duplicate names will be renamed as col_{id}.
     column_count = Counter(columns)
-    current_id: Dict[Any, int] = dict()
+    current_id: Dict[Any, int] = {}
     for i, col in enumerate(columns):
         if column_count[col] > 1:
             current_id[col] = current_id.get(col, 0) + 1
@@ -271,7 +270,6 @@ def _calc_line_dt(
     by the time groups. If df contains a datetime, categorical, and numerical column,
     it will compute the aggregate of the numerical column for values in the categorical
     column grouped by time.
-
     Parameters
     ----------
     df
@@ -335,6 +333,25 @@ def _calc_line_dt(
     dfr["lbl"] = dfr[x].dt.to_period("S").dt.strftime(DTMAP[unit][1])
 
     return (dfr, DTMAP[unit][3], miss_pct) if agg is None else (dfr, DTMAP[unit][3])
+
+
+def _calc_running_total_dt(
+    df: dd.DataFrame,
+    unit: str,
+) -> Union[Tuple[pd.DataFrame, str],]:
+    """
+    Calculate a running total line for a df two columns: a datetime column and numerical column.
+    Parameters
+    ----------
+    df
+        A dataframe
+    unit
+        The unit of time over which to group the values
+    """
+    res_df, time_prefix = _calc_line_dt(df, unit, agg="sum")
+    res_df["sum"] = res_df["sum"].cumsum()
+    res_df.rename(columns={"sum": "runningtotal"}, inplace=True)
+    return res_df, time_prefix
 
 
 def _calc_groups(
