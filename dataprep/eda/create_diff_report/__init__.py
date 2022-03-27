@@ -22,6 +22,7 @@ ENV_LOADER = Environment(
 
 def create_diff_report(
     df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
+    target: Optional[str] = None,
     config: Optional[Dict[str, Any]] = None,
     display: Optional[List[str]] = None,
     title: Optional[str] = "DataPrep Report",
@@ -63,7 +64,7 @@ def create_diff_report(
     _suppress_warnings()
     cfg = Config.from_dict(display, config)
 
-    components = format_diff_report(df_list, cfg, mode, progress)
+    components = format_diff_report(df_list, cfg, mode, progress, target)
 
     dict_stats = defaultdict(list)
 

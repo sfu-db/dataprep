@@ -68,6 +68,7 @@ def format_diff_report(
     cfg: Config,
     mode: Optional[str],
     progress: bool = True,
+    target: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Format the data and figures needed by create_diff_report
@@ -110,13 +111,26 @@ def format_diff_report(
         if mode == "basic":
             # note: we need the type ignore comment for mypy otherwise it complains because
             # it doesn't realize that we converted df_list to a list if it's a dictionary
-            report = format_basic(df_list, cfg)  # type: ignore
+            if target:
+                validate_target(target, df_list)
+            report = format_basic(df_list, target, cfg)  # type: ignore
         else:
             raise ValueError(f"Unknown mode: {mode}")
     return report
 
+def validate_target(target: str, df_list: List[pd.DataFrame]):
+    """
+    Helper function, verify that target column exists
+    """
+    exists = False
+    for df in df_list:
+        if target in df.columns:
+            exists = True
+        break
+    if not exists:
+        raise ValueError(f'Sorry, {target} is not a valid column')
 
-def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
+def format_basic(df_list: List[pd.DataFrame], target: Optional[str], cfg: Config) -> Dict[str, Any]:
     """
     Format basic version.
 
@@ -158,7 +172,7 @@ def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
             # data = dask.compute(data)
             delayed_results.append(data)
 
-    res_plots = dask.delayed(_format_plots)(cfg=cfg, df_list=df_list)
+    res_plots = dask.delayed(_format_plots)(cfg=cfg, df_list=df_list, target=target)
 
     dask_results["df_computations"] = delayed_results
     dask_results["plots"] = res_plots
@@ -211,7 +225,7 @@ def basic_computations(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
 
 
 def compute_plot_data(
-    df_list: List[dd.DataFrame], cfg: Config, dtype: Optional[DTypeDef]
+    pd_list: List[pd.DataFrame], cfg: Config, dtype: Optional[DTypeDef], target: Optional[str]
 ) -> Intermediate:
     """
     Compute function for create_diff_report's plots
@@ -228,6 +242,10 @@ def compute_plot_data(
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
     """
     # pylint: disable=too-many-branches, too-many-locals
+
+    df_list = list(map(to_dask, pd_list))
+    for i, _ in enumerate(df_list):
+        df_list[i].columns = df_list[i].columns.astype(str)
 
     dfs = Dfs(df_list)
     dfs_cols = dfs.columns.apply("to_list").data
@@ -277,7 +295,7 @@ def compute_plot_data(
         elif is_dtype(dtp, DateTime_v1()):
             plot_data.append((col, dtp, dask.compute(*datum), orig))  # workaround
 
-    return Intermediate(data=plot_data, stats=stats, visual_type="comparison_grid")
+    return Intermediate(data=plot_data, stats=stats, visual_type="comparison_grid", target=target, df_list=pd_list)
 
 
 def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:
@@ -407,14 +425,11 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
 
 
 def _format_plots(
-    df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]], cfg: Config
+    df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]], cfg: Config, target: Optional[str]
 ) -> Dict[str, Any]:
     """Formatting of plots section"""
-    df_list = list(map(to_dask, df_list))
-    for i, _ in enumerate(df_list):
-        df_list[i].columns = df_list[i].columns.astype(str)
 
-    itmdt = compute_plot_data(df_list=df_list, cfg=cfg, dtype=None)
+    itmdt = compute_plot_data(pd_list=df_list, cfg=cfg, dtype=None, target=target)
     return render_diff(itmdt, cfg=cfg)
 
 
