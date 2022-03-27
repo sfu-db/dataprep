@@ -175,6 +175,21 @@ def clean_lat_long(
     # the cleaned values and code indicating how the initial value was
     # changed in a tuple. Then split the column of tuples and count the
     # amount of different codes to produce the report
+    def clean_lat_long_helper(df, col, col_name):
+        # A helper to clean a latitude and longitude column
+        df["clean_code_tup"] = df[col].map_partitions(
+            lambda srs: [_format_lat_or_long(x, output_format, errors, col_name) for x in srs],
+            meta=object,
+        )
+        df = df.assign(
+            _temp_=df["clean_code_tup"].map(itemgetter(0)),
+            _code_=df["clean_code_tup"].map(itemgetter(1)),
+        )
+        df = df.rename(columns={"_temp_": f"{col}_clean"})
+        if inplace:
+            df = df.drop(columns=col)
+        return df
+
     if lat_long:
         # clean a latitude and longitude column
         df["clean_code_tup"] = df[lat_long].map_partitions(
@@ -198,30 +213,10 @@ def clean_lat_long(
     else:
         # clean a latitude column
         if lat_col:
-            df["clean_code_tup"] = df[lat_col].map_partitions(
-                lambda srs: [_format_lat_or_long(x, output_format, errors, "lat") for x in srs],
-                meta=object,
-            )
-            df = df.assign(
-                _temp_=df["clean_code_tup"].map(itemgetter(0)),
-                _code_=df["clean_code_tup"].map(itemgetter(1)),
-            )
-            df = df.rename(columns={"_temp_": f"{lat_col}_clean"})
-            if inplace:
-                df = df.drop(columns=lat_col)
+            df = clean_lat_long_helper(df, lat_col, "lat")
         # clean a longitude column
         if long_col:
-            df["clean_code_tup"] = df[long_col].map_partitions(
-                lambda srs: [_format_lat_or_long(x, output_format, errors, "long") for x in srs],
-                meta=object,
-            )
-            df = df.assign(
-                _temp_=df["clean_code_tup"].map(itemgetter(0)),
-                _code_=df["clean_code_tup"].map(itemgetter(1)),
-            )
-            df = df.rename(columns={"_temp_": f"{long_col}_clean"})
-            if inplace:
-                df = df.drop(columns=long_col)
+            df = clean_lat_long_helper(df, long_col, "long")
         # merge the cleaned latitude and longitude
         if lat_col and long_col and not split:
             if output_format == "dd":
