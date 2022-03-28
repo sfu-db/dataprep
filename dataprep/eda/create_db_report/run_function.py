@@ -1,0 +1,231 @@
+import os
+import json
+import model.db_metadata
+import model.init_database
+import model.init_Table
+import model.init_view
+import model.init_tablecolumn
+import model.init_tableindex
+import model.add_foreignkey as foreignkey
+import views.main_page as main_page, views.template_pystache as template_pystache, views.columns_page as CP
+from sqlalchemy import create_engine
+from header.sql_metadata import plot_mysql_db, plot_postgres_db, plot_sqlite_db
+from views.constraints_page import HtmlConstraintsPage
+from views.table_page import HtmlTablePage
+
+
+def parse_database(engine_name, database_name, json_overview_dict):
+    metadata = model.db_metadata.DbMeta(
+        engine_name,
+        json_overview_dict["num_of_views"],
+        json_overview_dict["num_of_schemas"],
+        json_overview_dict["num_of_fk"],
+        json_overview_dict["num_of_uk"],
+        json_overview_dict["num_of_pk"],
+        json_overview_dict["num_of_tables"],
+        json_overview_dict["product_version"],
+    )
+    current_database = model.init_database.Database(
+        database_name, json_overview_dict["schema_names"], metadata
+    )
+    return metadata, current_database
+
+
+def parse_tables(json_table_dict, json_overview_dict, json_view_dict, current_database):
+
+    for table_name in json_table_dict.keys():
+        table_obj = model.init_Table.Table(
+            current_database, json_overview_dict["table_schema"][table_name], table_name
+        )
+        table_obj.num_row(json_table_dict[table_name]["num_of_rows"])
+        table_obj.num_columns(json_table_dict[table_name]["num_of_cols"])
+        current_database.addTable(table_name, table_obj)
+
+    for view_name in json_view_dict.keys():
+        view_obj = model.init_view.view(
+            current_database,
+            json_overview_dict["view_schema"][view_name],
+            view_name,
+            json_view_dict[view_name]["definition"],
+        )
+        view_obj.num_columns(json_view_dict[view_name]["num_of_cols"])
+        current_database.addView(view_name, view_obj)
+        current_database.addTable(view_name, view_obj)
+
+    existing_tables = current_database.getTablesMap()
+    for t in json_table_dict.keys():
+        current_columns = json_table_dict[t]
+        current_table = existing_tables[t]
+        for c in current_columns.keys():
+            if (
+                c == "constraints"
+                or c == "num_of_parents"
+                or c == "num_of_children"
+                or c == "num_of_rows"
+                or c == "num_of_cols"
+            ):
+                continue
+            elif c == "indices":
+                for current_index in current_columns["indices"]:
+                    create_index = model.init_tableindex.TableIndex(
+                        current_index, current_columns["indices"][current_index]["Index_type"]
+                    )
+                    if current_index == "PRIMARY" or "pkey" in current_index:
+                        create_index.setPrimary()
+                    col_string = current_columns["indices"][current_index]["Column_name"]
+                    if col_string:
+                        all_columns = col_string.upper().split(",")
+                        for col in all_columns:
+                            column = current_table.getColumn(col.strip())
+                            column.setIndex()
+                            create_index.addColumn(col_string, column)
+                    current_table.setIndex(current_index, create_index)
+            else:
+                column = current_columns[c]
+                create_table_column = model.init_tablecolumn.TableColumn(
+                    current_table,
+                    c,
+                    column["type"],
+                    str(column["attnotnull"]).upper() == "TRUE",
+                    column["default"],
+                    str(column["auto_increment"]).upper() == "TRUE"
+                    if "auto_increment" in column
+                    else False,
+                    column["description"] if "description" in column else "",
+                )
+                current_table.addColumn(c.upper(), create_table_column)
+
+    existing_views = current_database.getViewsMap()
+    for t in json_view_dict.keys():
+        collect_columns = {}
+        current_columns = json_view_dict[t]
+        current_view = existing_views[t]
+
+        for c in current_columns.keys():
+            if c == "num_of_cols" or c == "definition":
+                continue
+            column = current_columns[c]
+            create_view_column = model.init_tablecolumn.TableColumn(
+                current_view,
+                c,
+                column["type"],
+                column["attnotnull"] == "True",
+                column["default"],
+                str(column["auto_increment"]).upper() == "TRUE"
+                if "auto_increment" in column
+                else False,
+                column["description"] if "description" in column else "",
+            )
+            collect_columns[c.upper()] = create_view_column
+        current_view.setColumns(collect_columns)
+
+
+def parse_constraints(current_database, json_table_dict, json_view_dict):
+    existing_tables = current_database.getTablesMap()
+    for t in json_table_dict.keys():
+        columns = json_table_dict[t]
+        current_table = existing_tables[t]
+        constraints = columns["constraints"]
+        for current_constraint in constraints.keys():
+            if constraints[current_constraint]["constraint_type"].upper() == "PRIMARY KEY":
+                column_id = str(constraints[current_constraint]["col_name"]).upper().split(",")
+                for i in column_id:
+                    current_table.setPrimaryColumn(current_table.getColumn(i.strip()))
+            elif constraints[current_constraint]["constraint_type"].upper() == "FOREIGN KEY":
+                column_id = str(constraints[current_constraint]["col_name"]).upper().strip()
+                current_column = current_table.getColumn(column_id)
+                parent_table = constraints[current_constraint]["ref_table"]
+                parent_col = constraints[current_constraint]["ref_col"]
+                parent_column = existing_tables[parent_table].getColumn(parent_col.upper())
+                delete_constraint = constraints[current_constraint]["delete_rule"]
+                new_fk = model.add_foreignkey.ForeignKeyConstraint(
+                    current_table, current_constraint, delete_constraint, 0
+                )
+                new_fk.addChildColumn(current_column)
+                new_fk.addParentColumn(parent_column)
+                current_column.addParent(parent_column, new_fk)
+                parent_column.addChild(current_column, new_fk)
+                current_table.addForeignKey(new_fk)
+
+
+plot_db = {
+    "mysql": plot_mysql_db,
+    "postgresql": plot_postgres_db,
+    "sqlite": plot_sqlite_db,
+}
+
+
+def create_db_report(sql_engine):
+    overview_dict, table_dict, view_dict = plot_db[sql_engine.name](sql_engine)
+    json_overview_dict = json.loads(json.dumps(overview_dict))
+    json_table_dict = json.loads(json.dumps(table_dict))
+    json_view_dict = json.loads(json.dumps(view_dict))
+
+    database_name = os.path.splitext(os.path.basename(sql_engine.url.database))[0]
+    # setup database model
+    metadata, current_database = parse_database(sql_engine.name, database_name, json_overview_dict)
+
+    # create tables and columns, add to current database
+    parse_tables(json_table_dict, json_overview_dict, json_view_dict, current_database)
+
+    # define all constraints (primary keys and foreign keys) for the database tables
+    parse_constraints(current_database, json_table_dict, json_view_dict)
+
+    template_compiler = template_pystache.template_parser(database_name)
+
+    f = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "columns.html")))
+    htmlColumnsPage = CP.HtmlColumnPage(template_compiler)
+    htmlColumnsPage.pageWriter(current_database.getTables(), f)
+
+    f = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "constraints.html")))
+    htmlConstraintsPage = HtmlConstraintsPage(template_compiler)
+    constraints = foreignkey.ForeignKeyConstraint.getAllForeignKeyConstraints(
+        current_database.getTables()
+    )
+    htmlConstraintsPage.pageWriter(constraints, current_database.getTables(), f)
+
+    table_files = ["table.html", "table.js"]
+    for table in current_database.getTables():
+        table_file_name = table.getName() + ".html"
+        table_files.append(table_file_name)
+        f = str(
+            os.path.realpath(
+                os.path.join(os.path.dirname(__file__), "layout/tables", table_file_name)
+            )
+        )
+        htmlColumnsPage = HtmlTablePage(template_compiler)
+        htmlColumnsPage.pageWriter(table, f)
+
+    delete_table_files = [
+        f
+        for f in os.listdir(
+            os.path.realpath(os.path.join(os.path.dirname(__file__), "layout/tables"))
+        )
+        if f not in table_files
+    ]
+    for file_name in delete_table_files:
+        os.remove(
+            os.path.realpath(os.path.join(os.path.dirname(__file__), "layout/tables", file_name))
+        )
+
+    f = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "index.html")))
+    htmlMainIndexPage = main_page.HtmlMainIndexPage(template_compiler, "", metadata)
+    report = htmlMainIndexPage.pageWriter(
+        current_database, current_database.getTables(), current_database.getViews(), None, f
+    )
+    return report
+
+
+def main():
+    sql_engine = create_engine(
+        "mysql+pymysql" + "://" + "root" + ":" + "password" + "@127.0.0.1:3306" + "/" + "sakila"
+    )
+    user = "root"
+    pw = "password"
+    postgres_engine = create_engine("postgresql://" + user + ":" + pw + "@localhost:5432/dvdrental")
+
+    engine = create_engine("sqlite:////Users/saadahmad/Downloads/sakila.db")
+    create_db_report(engine)
+
+
+main()
