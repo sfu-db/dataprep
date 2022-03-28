@@ -14,6 +14,7 @@ from .views.constraints_page import HtmlConstraintsPage
 from .views.table_page import HtmlTablePage
 from .header.sql_metadata import plot_mysql_db, plot_postgres_db, plot_sqlite_db
 
+
 def parse_database(engine_name, database_name, json_overview_dict):
     metadata = DbMeta(
         engine_name,
@@ -25,9 +26,7 @@ def parse_database(engine_name, database_name, json_overview_dict):
         json_overview_dict["num_of_tables"],
         json_overview_dict["product_version"],
     )
-    current_database = Database(
-        database_name, json_overview_dict["schema_names"], metadata
-    )
+    current_database = Database(database_name, json_overview_dict["schema_names"], metadata)
     return metadata, current_database
 
 
@@ -179,9 +178,7 @@ def generate_db_report(sql_engine, show_browser=True):
 
     f = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "constraints.html")))
     html_constraints_page = HtmlConstraintsPage(template_compiler)
-    constraints = ForeignKeyConstraint.getAllForeignKeyConstraints(
-        current_database.getTables()
-    )
+    constraints = ForeignKeyConstraint.getAllForeignKeyConstraints(current_database.getTables())
     html_constraints_page.page_writer(constraints, current_database.getTables(), f)
 
     table_files = ["table.html", "table.js"]

@@ -7,9 +7,7 @@ from .run_function import generate_db_report
 __all__ = ["create_db_report"]
 
 
-def create_db_report(
-    sql_engine
-) -> None:
+def create_db_report(sql_engine) -> None:
     """
     Parameters
     ----------

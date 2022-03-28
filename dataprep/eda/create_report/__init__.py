@@ -9,7 +9,7 @@ from bokeh.resources import INLINE
 from jinja2 import Environment, PackageLoader
 
 from ..configs import Config
-from .formatter import format_report    
+from .formatter import format_report
 from .report import Report
 
 __all__ = ["create_report"]

@@ -15,12 +15,20 @@ class HtmlColumnPage:
 
         json_columns = []
         for mc in table_columns:
-            json_dict = {"tableName": mc.getColumn().getTable().getName(),
-                         "tableFileName": mc.getColumn().getTable().getName(),
-                         "tableType": mc.getColumn().getTable().getType(), "keyClass": mc.getKeyClass(),
-                         "keyTitle": mc.getKeyTitle(), "name": mc.getKeyIcon() + mc.getColumn().getName(),
-                         "type": mc.getColumn().getTypeName(), "length": "", "nullable": mc.getNullable(),
-                         "autoUpdated": mc.getAutoUpdated(), "defaultValue": mc.getDefaultValue(), "comments": ""}
+            json_dict = {
+                "tableName": mc.getColumn().getTable().getName(),
+                "tableFileName": mc.getColumn().getTable().getName(),
+                "tableType": mc.getColumn().getTable().getType(),
+                "keyClass": mc.getKeyClass(),
+                "keyTitle": mc.getKeyTitle(),
+                "name": mc.getKeyIcon() + mc.getColumn().getName(),
+                "type": mc.getColumn().getTypeName(),
+                "length": "",
+                "nullable": mc.getNullable(),
+                "autoUpdated": mc.getAutoUpdated(),
+                "defaultValue": mc.getDefaultValue(),
+                "comments": "",
+            }
             json_columns.append(json.loads(json.dumps(json_dict)))
 
         page_data = PageData("column.html", "column.js")

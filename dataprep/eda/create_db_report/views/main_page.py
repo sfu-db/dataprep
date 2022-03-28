@@ -9,7 +9,6 @@ from ..model.init_database import Database
 
 
 class HtmlMainIndexPage:
-
     def __init__(self, pystache_object, description, stats) -> None:
         self.pystache_object = pystache_object
         self.description = description
