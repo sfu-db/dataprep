@@ -15,7 +15,7 @@ class Template:
 
     @staticmethod
     def get_root_path():
-        return os.path.dirname(os.path.abspath(__file__))
+        return ""
 
     @staticmethod
     def get_root_path_to_home():

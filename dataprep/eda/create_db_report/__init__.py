@@ -2,9 +2,7 @@
     This module implements the create_db_report(sql_engine) function.
 """
 import warnings
-# import run_function.generate_db_report as generate_db_report
 from .run_function import generate_db_report
-from .report import Report
 
 __all__ = ["create_db_report"]
 

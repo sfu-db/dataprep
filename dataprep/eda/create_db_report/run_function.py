@@ -155,7 +155,7 @@ plot_db = {
 }
 
 
-def generate_db_report(sql_engine):
+def generate_db_report(sql_engine, show_browser=True):
     overview_dict, table_dict, view_dict = plot_db[sql_engine.name](sql_engine)
     json_overview_dict = json.loads(json.dumps(overview_dict))
     json_table_dict = json.loads(json.dumps(table_dict))
@@ -214,4 +214,6 @@ def generate_db_report(sql_engine):
     report = html_main_index_page.page_writer(
         current_database, current_database.getTables(), current_database.getViews(), None, f
     )
-    return report.show_browser()
+
+    if show_browser:
+        return report.show_browser()
