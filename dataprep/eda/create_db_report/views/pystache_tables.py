@@ -1,8 +1,4 @@
-from matplotlib.pyplot import streamplot
-import model.init_Table as MT
-
-
-class ps_table:
+class PSTable:
     def __init__(self, table, imageFile) -> None:
         self.table = table
         self.diagramName = imageFile

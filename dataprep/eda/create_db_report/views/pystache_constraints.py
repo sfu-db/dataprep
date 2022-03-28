@@ -1,5 +1,4 @@
-class ps_constraints:
-
+class PSConstraints:
     tableName = ""
     name = ""
     definition = ""

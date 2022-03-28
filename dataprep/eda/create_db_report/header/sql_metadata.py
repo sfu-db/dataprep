@@ -1,7 +1,7 @@
 import re
 import os
 import pandas as pd
-from simplejson import OrderedDict
+from collections import OrderedDict
 
 
 def plot_mysql_db(sql_engine):

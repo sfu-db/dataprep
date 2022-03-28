@@ -1,48 +1,46 @@
-from pydoc import html
-from tokenize import String
-import pystache
-import sys
 import os
-import views.pagedata as pagedata
-from report import Report
+import pystache
+from tokenize import String
+from .pagedata import PageData
+from ..report import Report
 
 
-class template_parser:
+class Template:
     databaseName: String
     htmlConfig: object
     template_directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "layout"))
 
-    def __init__(self, databaseName, htmlConfig=None) -> None:
-        self.databaseName = databaseName
-        self.htmlConfig = htmlConfig
+    def __init__(self, database_name, html_config=None) -> None:
+        self.databaseName = database_name
+        self.htmlConfig = html_config
 
-    def getRootPath():
+    @staticmethod
+    def get_root_path():
         return ""
 
-    def getRootPathtoHome():
+    @staticmethod
+    def get_root_path_to_home():
         return os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
 
     def write_data(
-        self, pageData: pagedata, output_file, pageScript, pagination_configs, rootPath=""
+        self, page_data: PageData, output_file, page_script, pagination_configs, root_path=""
     ):
-        containerScope = {}
         page_template = open(
-            os.path.realpath(os.path.join(self.template_directory, pageData.getTemplateName()))
+            os.path.realpath(os.path.join(self.template_directory, page_data.getTemplateName()))
         ).read()
-        pageScope = {
+
+        page_scope = {
             "toFileName": "true",
             "databaseName": self.databaseName,
             "paginationEnabled": "true",
             "displayNumRows": "true",
             "dataTableConfig": {},
         }
-
         for key, value in pagination_configs.items():
-            pageScope["dataTableConfig"][key] = value
-        pageScope_final = {**pageScope, **pageData.getScope()}
-        html_template = pystache.render(page_template, pageScope_final)
+            page_scope["dataTableConfig"][key] = value
+        page_scope.update(page_data.getScope())
+        html_template = pystache.render(page_template, page_scope)
 
-        # output here from the writer object
         file = open(output_file, "w")
         file.write(html_template)
         file.close()
@@ -52,13 +50,13 @@ class template_parser:
         tmpl = open(
             os.path.realpath(os.path.join(self.template_directory, "container.html"))
         ).read()
-        examples = {
+        container_scope = {
             "databaseName": self.databaseName,
             "content": fill,
-            "pageScript": pageScript,
-            "rootPath": rootPath or template_parser.getRootPath(),
-            "rootPathtoHome": template_parser.getRootPathtoHome(),
+            "pageScript": page_script,
+            "rootPath": root_path or Template.get_root_path(),
+            "rootPathtoHome": Template.get_root_path_to_home(),
         }
-        html = pystache.render(tmpl, examples)
+        html = pystache.render(tmpl, container_scope)
         open(output_file, "w").write(html)
         return Report(html, output_file)

@@ -1,7 +1,7 @@
 from tokenize import String
 
 
-class pageData:
+class PageData:
     templateName: String
     scope = {}
     scriptName: String

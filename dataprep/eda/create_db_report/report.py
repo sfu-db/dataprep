@@ -54,49 +54,6 @@ class Report:
         """
         return ""
 
-    def save(self, path: Optional[str] = None) -> None:
-        """
-        Save report to current working directory.
-
-        Parameters
-        ----------
-        filename: Optional[str], default 'report'
-            The filename used for saving report without the extension name.
-        to: Optional[str], default Path.cwd()
-            The path to where the report will be saved.
-        """
-
-        saved_file_path = None
-
-        if path:
-            extension = os.path.splitext(path)[1]
-            posix_path = Path(path).expanduser()
-
-            if posix_path.is_dir():
-                if path.endswith("/"):
-                    path += "report.html"
-                else:
-                    path += "/report.html"
-
-            elif extension:
-                if extension != ".html":
-                    raise ValueError(
-                        "Format '{extension}' is not supported (supported formats: html)"
-                    )
-
-            else:
-                path += ".html"
-
-            saved_file_path = Path(path).expanduser()
-
-        else:
-            path = str(Path.cwd()) + "/report.html"
-            saved_file_path = Path(path).expanduser()
-
-        with open(saved_file_path, "w", encoding="utf-8") as file:
-            file.write(self.report)
-        print(f"Report has been saved to {saved_file_path}!")
-
     def show_browser(self) -> None:
         """
         Open the report in the browser. This is useful when calling from terminal.
@@ -105,24 +62,3 @@ class Report:
         with open(self.path, "w", encoding="utf-8") as file:
             file.write(self.report)
         webbrowser.open(f"file://{self.path}", new=2)
-
-    def show(self) -> None:
-        """
-        Render the report. This is useful when calling plot in a for loop.
-        """
-        # if not called from notebook environment, ref to show_browser function.
-        if not is_notebook():
-            print(
-                "The plot will not show in a notebook environment, "
-                "please try 'show_browser' if you want to open it in browser",
-                file=sys.stderr,
-            )
-        try:
-            from IPython.display import (  # pylint: disable=import-outside-toplevel
-                HTML,
-                display,
-            )
-
-            display(HTML(self._repr_html_()))
-        except ImportError:
-            pass

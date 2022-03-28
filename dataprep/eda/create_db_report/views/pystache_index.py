@@ -1,4 +1,4 @@
-class ps_index:
+class PSIndex:
     def __init__(self, index) -> None:
         self.index = index
 

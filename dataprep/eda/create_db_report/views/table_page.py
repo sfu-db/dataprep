@@ -1,33 +1,32 @@
-import json
-import views.pagedata as PD
-import views.pystache_columns as PC
-import views.pystache_index as PI
+from .pagedata import PageData
+from .pystache_columns import MustacheTableColumn
+from .pystache_index import PSIndex
 
 
 class HtmlTablePage:
     def __init__(self, pystache_object) -> None:
         self.pystache_object = pystache_object
 
-    def pageWriter(self, table, new_file):
+    def page_writer(self, table, new_file):
         primaries = set(table.getPrimaryColumns())
         indexes = set()
         table_columns = set()
 
         for i in table.getIndexes():
-            indexes.add(PI.ps_index(i))
+            indexes.add(PSIndex(i))
 
         for c in table.getColumns():
-            table_columns.add(PC.MustacheTableColumn(c, None, ""))
-        check_constraints = None  # HtmlTablePage.collectCheckConstraints(table)
+            table_columns.add(MustacheTableColumn(c, None, ""))
+        check_constraints = None  # HtmlTablePage.collect_check_constraints(table)
 
-        pageData = PD.pageData("tables/table.html", "table.js")
-        pageData.addScope("table", table)
-        pageData.addScope("primaries", primaries)
-        pageData.addScope("columns", table_columns)
-        pageData.addScope("indexes", indexes)
-        pageData.addScope("checkConstraints", check_constraints)
-        pageData.addScope("sqlCode", self.sqlCode(table))
-        pageData.setDepth(0)
+        page_data = PageData("tables/table.html", "table.js")
+        page_data.addScope("table", table)
+        page_data.addScope("primaries", primaries)
+        page_data.addScope("columns", table_columns)
+        page_data.addScope("indexes", indexes)
+        page_data.addScope("checkConstraints", check_constraints)
+        page_data.addScope("sqlCode", self.sqlCode(table))
+        page_data.setDepth(0)
 
         pagination_configs = {
             "standardTable": {"paging": "true", "pageLength": 20, "lengthChange": "false"},
@@ -35,7 +34,7 @@ class HtmlTablePage:
             "checkTable": {"paging": "true", "pageLength": 10, "lengthChange": "false"},
         }
         return self.pystache_object.write_data(
-            pageData, new_file, "table.js", pagination_configs, "../"
+            page_data, new_file, "table.js", pagination_configs, "../"
         )
 
     def sqlCode(self, table):

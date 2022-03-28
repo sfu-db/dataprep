@@ -1,7 +1,7 @@
-from model.init_Table import Table
+from .init_Table import Table
 
 
-class view(Table):
+class View(Table):
     def __init__(self, db, schema, name, view_def) -> None:
         self.viewDefinition = None
         super().__init__(db, schema, name)

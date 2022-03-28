@@ -1,6 +1,3 @@
-from enum import unique
-
-
 class TableIndex:
     def __init__(self, name, indexType) -> None:
         self.name = name

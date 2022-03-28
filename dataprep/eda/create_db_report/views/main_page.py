@@ -1,15 +1,15 @@
-import views.pagedata as PD
-import views.pystache_tables
-import model.add_foreignkey as FK
-import views.template_pystache as template_pystache
-from tokenize import String
-from model.db_metadata import DbMeta
-from model.init_database import Database
 from datetime import datetime
+from tokenize import String
+from .pagedata import PageData
+from .pystache_tables import PSTable
+from .template_pystache import Template
+from ..model.add_foreignkey import ForeignKeyConstraint
+from ..model.db_metadata import DbMeta
+from ..model.init_database import Database
 
 
 class HtmlMainIndexPage:
-    pystache_object: template_pystache
+    pystache_object: Template
     description: String
     stats: DbMeta
 
@@ -18,42 +18,41 @@ class HtmlMainIndexPage:
         self.description = description
         self.stats = stats
 
-    def pageWriter(self, database: Database, tables, view, impliedConstraints, new_file):
-
-        columnsAmount = 0
-        tablesAmount = 0
-        viewsAmount = 0
-        constraintsAmount = len(
-            FK.ForeignKeyConstraint.getAllForeignKeyConstraints(database.getTables())
+    def page_writer(self, database: Database, tables, view, implied_constraints, new_file):
+        columns_amount = 0
+        tables_amount = 0
+        views_amount = 0
+        constraints_amount = len(
+            ForeignKeyConstraint.getAllForeignKeyConstraints(database.getTables())
         )
-        routinesAmount = 0
-        anomaliesAmount = 0
-        generationTime = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        routines_amount = 0
+        anomalies_amount = 0
+        generation_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
-        allTables = []
+        all_tables = []
         for t in tables:
             if t.is_view():
-                viewsAmount += 1
+                views_amount += 1
             else:
-                tablesAmount += 1
-            columnsAmount += len(t.getColumns())
-            allTables.append(views.pystache_tables.ps_table(t, ""))
+                tables_amount += 1
+            columns_amount += len(t.getColumns())
+            all_tables.append(PSTable(t, ""))
 
-        pageData = PD.pageData("main.html", "main.js")
-        pageData.addScope("database_name", database.getName())
-        pageData.addScope("generation_time", generationTime)
-        pageData.addScope("tablesAmount", tablesAmount)
-        pageData.addScope("viewsAmount", viewsAmount)
-        pageData.addScope("columnsAmount", columnsAmount)
-        pageData.addScope("constraintsAmount", constraintsAmount)
-        pageData.addScope("routinesAmount", routinesAmount)
-        pageData.addScope("anomaliesAmount", anomaliesAmount)
-        pageData.addScope("tables", allTables)
-        pageData.addScope("database", database)
-        pageData.addScope("schema", database.getSchema())
-        pageData.setDepth(0)
+        page_data = PageData("main.html", "main.js")
+        page_data.addScope("database_name", database.getName())
+        page_data.addScope("generation_time", generation_time)
+        page_data.addScope("tablesAmount", tables_amount)
+        page_data.addScope("viewsAmount", views_amount)
+        page_data.addScope("columnsAmount", columns_amount)
+        page_data.addScope("constraintsAmount", constraints_amount)
+        page_data.addScope("routinesAmount", routines_amount)
+        page_data.addScope("anomaliesAmount", anomalies_amount)
+        page_data.addScope("tables", all_tables)
+        page_data.addScope("database", database)
+        page_data.addScope("schema", database.getSchema())
+        page_data.setDepth(0)
 
         pagination_configs = {
             "databaseObjects": {"paging": "true", "pageLength": 10, "lengthChange": "false"}
         }
-        return self.pystache_object.write_data(pageData, new_file, "main.js", pagination_configs)
+        return self.pystache_object.write_data(page_data, new_file, "main.js", pagination_configs)

@@ -1,6 +1,3 @@
-from matplotlib.pyplot import table
-
-
 class MustacheTableColumn:
     def __init__(self, tableColumn, indexColumn, rootPath) -> None:
         self.tableColumn = tableColumn
