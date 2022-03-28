@@ -14,8 +14,6 @@ from .views.constraints_page import HtmlConstraintsPage
 from .views.table_page import HtmlTablePage
 from .header.sql_metadata import plot_mysql_db, plot_postgres_db, plot_sqlite_db
 
-__all__ = ["create_db_report"]
-
 def parse_database(engine_name, database_name, json_overview_dict):
     metadata = DbMeta(
         engine_name,

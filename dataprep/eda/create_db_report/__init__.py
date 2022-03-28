@@ -11,7 +11,7 @@ __all__ = ["create_db_report"]
 
 def create_db_report(
     sql_engine
-) -> Report:
+) -> None:
     """
     Parameters
     ----------
