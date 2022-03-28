@@ -6,7 +6,6 @@ from ..report import Report
 
 
 class Template:
-    databaseName: String
     htmlConfig: object
     template_directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "layout"))
 
@@ -16,7 +15,7 @@ class Template:
 
     @staticmethod
     def get_root_path():
-        return ""
+        return os.path.dirname(os.path.abspath(__file__))
 
     @staticmethod
     def get_root_path_to_home():

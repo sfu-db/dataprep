@@ -9,9 +9,6 @@ from ..model.init_database import Database
 
 
 class HtmlMainIndexPage:
-    pystache_object: Template
-    description: String
-    stats: DbMeta
 
     def __init__(self, pystache_object, description, stats) -> None:
         self.pystache_object = pystache_object
