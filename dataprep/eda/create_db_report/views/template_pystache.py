@@ -40,10 +40,10 @@ class Template:
         page_scope.update(page_data.getScope())
         html_template = pystache.render(page_template, page_scope)
 
-        file = open(output_file, "w")
+        file = open(output_file, "w", encoding="utf-8")
         file.write(html_template)
         file.close()
-        contents = open(output_file, "r")
+        contents = open(output_file, "r", encoding="utf-8")
         fill = contents.read()
 
         tmpl = open(
@@ -57,5 +57,5 @@ class Template:
             "rootPathtoHome": Template.get_root_path_to_home(),
         }
         html = pystache.render(tmpl, container_scope)
-        open(output_file, "w").write(html)
+        open(output_file, "w", encoding="utf-8").write(html)
         return Report(html, output_file)
