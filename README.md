@@ -75,6 +75,16 @@ df = load_dataset("titanic")
 create_report(df).show_browser()
 ```
 
+The following code demonstrates how to use DataPrep.EDA to create a database report for the SQLite sakila.db file.
+
+```python
+from dataprep.eda import create_db_report
+from dataprep.datasets import load_db
+from sqlalchemy import create_engine
+engine = create_engine(load_db('sakila.db'))
+create_db_report(engine)
+```
+
 Click [here](https://docs.dataprep.ai/_downloads/1a61c6aebb3ecbe9dc9742bd6ca78ddb/titanic_dp.html) to see the generated report of the above code.
 
 Click [here](https://docs.dataprep.ai/dev/bench/index.html) to see the benchmark result.
