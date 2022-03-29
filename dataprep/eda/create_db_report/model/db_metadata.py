@@ -14,14 +14,14 @@ class DbMeta:
 
     def __init__(
         self,
-        engine_name,
+        engine_name:str,
         num_of_views: int,
         num_of_schemas: int,
         num_of_fk: int,
         num_of_uk: int,
         num_of_pk: int,
         num_of_tables: int,
-        product_version,
+        product_version:str,
     ) -> None:
         self.num_of_views = num_of_views
         self.num_of_schemas = num_of_schemas

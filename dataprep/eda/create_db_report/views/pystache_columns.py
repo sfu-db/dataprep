@@ -28,7 +28,7 @@ class MustacheTableColumn:
         elif self.tableColumn.isForeignKey():
             keyTitle = "Foreign Key"
         elif self.getin():
-            keyType = " class='" + self.markAsIndexColumn() + "' title='Indexed'"
+            keyTitle = "Indexed"
 
         return keyTitle
 
@@ -39,7 +39,7 @@ class MustacheTableColumn:
         elif self.tableColumn.isForeignKey():
             keyClass = "foreignKey"
         elif self.getin():
-            keyType = " class='" + self.markAsIndexColumn() + "' title='Indexed'"
+            keyClass = "indexedColumn"
 
         return keyClass
 
@@ -73,13 +73,6 @@ class MustacheTableColumn:
     def getTitleAutoUpdated(self):
         if self.tableColumn.isautoupdated():
             return "Automatically updated by the database"
-        else:
-            return ""
-
-    def markAsIndexColumn(self):
-        if self.indexColumn:
-            print("yeas")
-            return "indexedColumn"
         else:
             return ""
 

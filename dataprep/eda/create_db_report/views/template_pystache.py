@@ -40,7 +40,7 @@ class Template:
         page_scope.update(page_data.getScope())
         html_template = pystache.render(page_template, page_scope)
 
-        file = open(output_file, "w")
+        file = open(output_file, "w",encoding="utf-8")
         file.write(html_template)
         file.close()
         contents = open(output_file, "r")

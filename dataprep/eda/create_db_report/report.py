@@ -1,8 +1,6 @@
-import sys
+
 import webbrowser
-from pathlib import Path
-from typing import Optional, Any
-import os
+from typing import Any
 
 
 def is_notebook() -> Any:

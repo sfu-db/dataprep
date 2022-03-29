@@ -1,3 +1,5 @@
+from .init_Table import Table
+
 class ForeignKeyConstraint:
 
     importedKeyCascade = 0
@@ -5,7 +7,7 @@ class ForeignKeyConstraint:
     importedKeySetNull = 2
     importedKeyNoAction = 3
 
-    def __init__(self, child, name, deleteRule, updateRule):
+    def __init__(self, child:Table, name:str, deleteRule:str, updateRule:int):
         self.name = name
         self.childTable = child
         self.deleteRule = deleteRule
@@ -92,7 +94,7 @@ class ForeignKeyConstraint:
         else:
             return ""
 
-    def getAllForeignKeyConstraints(tables):
+    def getAllForeignKeyConstraints(self,tables):
         constraints = []
 
         for table in tables:

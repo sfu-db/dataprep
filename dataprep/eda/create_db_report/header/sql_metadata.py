@@ -3,6 +3,9 @@ import os
 import pandas as pd
 from collections import OrderedDict
 
+"""
+Queries MySQL database and returns disctionaries for database tables, views, and metadata for databases, 
+"""
 
 def plot_mysql_db(sql_engine):
     db_name = sql_engine.url.database
@@ -29,16 +32,12 @@ def plot_mysql_db(sql_engine):
         % (db_name),
         sql_engine,
     )
-    # index=pd.read_sql("SELECT DISTINCT TABLE_NAME, INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS;",sql_engine)
 
-    # print(index)
     # List of schemas and tables
     schema_list = list(table_sql["schemaname"])
-    schema_str = ",".join(set(schema_list))
     table_list = list(table_sql["table_name"])
     view_list = list(view_sql["view_name"])
 
-    # table_list = [m + '.' + str(n) for m, n in zip(schema_list, table_list)]
     overview_dict = {}
     # Show the stats for schemas, tables and PK/FK
     overview_dict["num_of_schemas"] = len(set(schema_list))
@@ -158,6 +157,10 @@ def plot_mysql_db(sql_engine):
         view_dict[i] = temp
     return overview_dict, table_dict, view_dict
 
+
+"""
+Queries PostgresDB database and returns disctionaries for database tables, views, and metadata for databases, 
+"""
 
 def plot_postgres_db(postgres_engine):
     db_name = postgres_engine.url.database
@@ -341,6 +344,9 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
 
     return overview_dict, table_dict, view_dict
 
+"""
+Queries SQLite database and returns disctionaries for database tables, views, and metadata for databases, 
+"""
 
 def plot_sqlite_db(sqliteConnection):
     db_name = os.path.splitext(os.path.basename(sqliteConnection.url.database))[0]

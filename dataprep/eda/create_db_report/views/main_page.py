@@ -1,15 +1,13 @@
 from datetime import datetime
-from tokenize import String
 from .pagedata import PageData
 from .pystache_tables import PSTable
 from .template_pystache import Template
 from ..model.add_foreignkey import ForeignKeyConstraint
-from ..model.db_metadata import DbMeta
 from ..model.init_database import Database
 
 
 class HtmlMainIndexPage:
-    def __init__(self, pystache_object, description, stats) -> None:
+    def __init__(self, pystache_object:Template, description:str, stats) -> None:
         self.pystache_object = pystache_object
         self.description = description
         self.stats = stats

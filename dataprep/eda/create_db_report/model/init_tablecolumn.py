@@ -1,5 +1,7 @@
+from .init_Table import Table
+
 class TableColumn:
-    def __init__(self, table, name, typeName, notNull, defaultValue, isAutoUpdated, comments):
+    def __init__(self, table:Table, name:str, typeName:str, notNull:bool, defaultValue:str, isAutoUpdated:bool, comments:str):
         self.table = table
         self.name = name
         self.typeName = typeName
@@ -41,7 +43,7 @@ class TableColumn:
         return False
 
     def isForeignKey(self):
-        return not (len(self.parents) == 0)
+        return len(self.parents) != 0
 
     def getDefaultValue(self):
         return self.defaultValue

@@ -1,5 +1,7 @@
+from .init_database import Database
+
 class Table:
-    def __init__(self, db, schema, name) -> None:
+    def __init__(self, db:Database, schema:str, name:str) -> None:
         self.database = db
         self.schema = schema
         self.name = name
@@ -74,12 +76,6 @@ class Table:
 
     def getName(self):
         return self.name
-
-    def addedParent(self):
-        self.maxParents += 1
-
-    def addedChild(self):
-        self.maxChildren += 1
 
     def getCheckConstraints(self):
         return self.checkConstraints
