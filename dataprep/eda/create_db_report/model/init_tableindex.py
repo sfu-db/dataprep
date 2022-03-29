@@ -1,7 +1,5 @@
-
-
 class TableIndex:
-    def __init__(self, name:str, indexType:str) -> None:
+    def __init__(self, name: str, indexType: str) -> None:
         self.name = name
         self.isUnique = False
         self.isPrimary = False

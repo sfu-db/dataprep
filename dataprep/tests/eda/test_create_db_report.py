@@ -1,13 +1,12 @@
 import os
 from ...eda.create_db_report.run_function import generate_db_report
+from ...datasets import load_sqlite_db_url
 from sqlalchemy import create_engine
 
 
 def test_create_db_report_sqlite() -> None:
-    db_file = str(
-        os.path.realpath(os.path.join(os.path.dirname(__file__), "test_database", "sakila.db"))
-    )
-    engine = create_engine(f"sqlite:///{db_file}")
+    db_url = load_sqlite_db_url("dataprep/tests/datasets/sakila.db")
+    engine = create_engine(db_url)
     generate_db_report(engine, show_browser=False)
 
     # Check if table files were generated properly

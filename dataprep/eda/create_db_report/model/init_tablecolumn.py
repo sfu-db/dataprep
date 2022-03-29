@@ -1,7 +1,17 @@
 from .init_table import Table
 
+
 class TableColumn:
-    def __init__(self, table:Table, name:str, typeName:str, notNull:bool, defaultValue:str, isAutoUpdated:bool, comments:str):
+    def __init__(
+        self,
+        table: Table,
+        name: str,
+        typeName: str,
+        notNull: bool,
+        defaultValue: str,
+        isAutoUpdated: bool,
+        comments: str,
+    ):
         self.table = table
         self.name = name
         self.typeName = typeName

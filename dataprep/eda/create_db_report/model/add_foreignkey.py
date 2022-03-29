@@ -1,6 +1,7 @@
 from .init_table import Table
 from .init_tablecolumn import TableColumn
 
+
 class ForeignKeyConstraint:
 
     importedKeyCascade = 0
@@ -8,7 +9,7 @@ class ForeignKeyConstraint:
     importedKeySetNull = 2
     importedKeyNoAction = 3
 
-    def __init__(self, child:Table, name:str, deleteRule:str, updateRule:int):
+    def __init__(self, child: Table, name: str, deleteRule: str, updateRule: int):
         self.name = name
         self.childTable = child
         self.deleteRule = deleteRule
