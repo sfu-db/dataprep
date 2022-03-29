@@ -1,6 +1,6 @@
-
 from .init_table import Table
 from .db_metadata import DbMeta
+
 
 class Database:
     def __init__(self, databaseName: str, schema: str, database_stats) -> None:

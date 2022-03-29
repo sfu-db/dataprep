@@ -1,4 +1,3 @@
-
 class PSConstraints:
     tableName = ""
     name = ""

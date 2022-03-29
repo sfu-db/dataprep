@@ -24,6 +24,7 @@ class Template:
     """
     renders the html pages using template files for each section of the database 
     """
+
     def write_data(
         self, page_data: PageData, output_file, page_script, pagination_configs, root_path=""
     ):

@@ -2,12 +2,11 @@ from tokenize import String
 
 
 class PageData:
-
     def __init__(self, templateName: str, scriptName: str):
         self.templateName = templateName
         self.scriptName = scriptName
-        self.scope={}
-        self.depth=0
+        self.scope = {}
+        self.depth = 0
 
     def getTemplateName(self):
         return self.templateName

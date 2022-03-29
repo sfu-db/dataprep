@@ -11,9 +11,9 @@ class HtmlMainIndexPage:
         self.pystache_object = pystache_object
         self.description = description
         self.stats = stats
-    
+
     "compiles the data needed by the pystache template for index page"
-    
+
     def page_writer(self, database: Database, tables, view, implied_constraints, new_file):
         columns_amount = 0
         tables_amount = 0

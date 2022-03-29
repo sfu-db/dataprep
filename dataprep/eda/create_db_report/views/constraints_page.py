@@ -6,7 +6,7 @@ from .template_pystache import Template
 class HtmlConstraintsPage:
     def __init__(self, pystache_object: Template) -> None:
         self.pystache_object = pystache_object
-    
+
     "compiles the data needed by the pystache template for constraints page"
 
     def page_writer(self, constraints, table, new_file):

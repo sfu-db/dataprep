@@ -3,12 +3,13 @@ from .pystache_columns import MustacheTableColumn
 from .pystache_index import PSIndex
 from .template_pystache import Template
 
+
 class HtmlTablePage:
-    def __init__(self, pystache_object:Template) -> None:
+    def __init__(self, pystache_object: Template) -> None:
         self.pystache_object = pystache_object
 
     "compiles the data needed by the pystache template for tables pages"
-    
+
     def page_writer(self, table, new_file):
         primaries = set(table.getPrimaryColumns())
         indexes = set()

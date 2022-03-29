@@ -18,12 +18,12 @@ class ForeignKeyConstraint:
         self.childColumns = []
         self.parentTable = None
 
-    def addParentColumn(self, column:TableColumn):
+    def addParentColumn(self, column: TableColumn):
         if column != None:
             self.parentColumns.append(column)
             self.parentTable = column.getTable()
 
-    def addChildColumn(self, column:TableColumn):
+    def addChildColumn(self, column: TableColumn):
         if column != None:
             self.childColumns.append(column)
 

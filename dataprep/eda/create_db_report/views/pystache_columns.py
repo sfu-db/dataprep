@@ -6,7 +6,7 @@ class MustacheTableColumn:
 
     def getColumn(self):
         return self.tableColumn
-    
+
     def getKey(self):
         keyType = ""
         if self.tableColumn.isPrimary():
