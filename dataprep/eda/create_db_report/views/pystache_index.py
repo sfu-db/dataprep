@@ -1,6 +1,3 @@
-from .template_pystache import Template
-
-
 class PSIndex:
     def __init__(self, index) -> None:
         self.index = index
@@ -9,8 +6,6 @@ class PSIndex:
         return self.index
 
     def getKey(self):
-        keyType = ""
-
         if self.index.isPrimaryKey():
             keyType = " class='primaryKey' title='Primary Key'"
         elif self.index.isUniqueKey():

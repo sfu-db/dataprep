@@ -12,9 +12,10 @@ class HtmlMainIndexPage:
         self.description = description
         self.stats = stats
 
-    "compiles the data needed by the pystache template for index page"
-
     def page_writer(self, database: Database, tables, view, implied_constraints, new_file):
+        """
+        Compile the data needed by the pystache template for index page
+        """
         columns_amount = 0
         tables_amount = 0
         views_amount = 0

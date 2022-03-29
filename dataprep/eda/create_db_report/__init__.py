@@ -9,6 +9,8 @@ __all__ = ["create_db_report"]
 
 def create_db_report(sql_engine) -> None:
     """
+    This function is to generate and render database report and show in browser.
+
     Parameters
     ----------
     sql_engine

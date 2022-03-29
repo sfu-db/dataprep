@@ -1,11 +1,11 @@
 import os
 from ...eda.create_db_report.run_function import generate_db_report
-from ...datasets import load_sqlite_db_url
+from ...datasets import load_db
 from sqlalchemy import create_engine
 
 
 def test_create_db_report_sqlite() -> None:
-    db_url = load_sqlite_db_url("dataprep/tests/datasets/sakila.db")
+    db_url = load_db("sakila.db")
     engine = create_engine(db_url)
     generate_db_report(engine, show_browser=False)
 

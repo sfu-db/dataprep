@@ -8,9 +8,10 @@ class HtmlTablePage:
     def __init__(self, pystache_object: Template) -> None:
         self.pystache_object = pystache_object
 
-    "compiles the data needed by the pystache template for tables pages"
-
     def page_writer(self, table, new_file):
+        """
+        Compile the data needed by the pystache template for tables pages
+        """
         primaries = set(table.getPrimaryColumns())
         indexes = set()
         table_columns = set()

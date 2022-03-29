@@ -1,6 +1,5 @@
 import os
 import pystache
-from tokenize import String
 from .pagedata import PageData
 from ..report import Report
 
@@ -21,13 +20,12 @@ class Template:
     def get_root_path_to_home():
         return os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
 
-    """
-    renders the html pages using template files for each section of the database 
-    """
-
     def write_data(
         self, page_data: PageData, output_file, page_script, pagination_configs, root_path=""
     ):
+        """
+        Render the html pages using template files for each section of the database
+        """
         page_template = open(
             os.path.realpath(os.path.join(self.template_directory, page_data.getTemplateName()))
         ).read()

@@ -13,9 +13,22 @@ from .views.template_pystache import Template
 from .views.constraints_page import HtmlConstraintsPage
 from .views.table_page import HtmlTablePage
 from .header.sql_metadata import plot_mysql_db, plot_postgres_db, plot_sqlite_db
+from typing import Any, Dict
 
 
-def parse_database(engine_name, database_name, json_overview_dict):
+def parse_database(engine_name: str, database_name: str, json_overview_dict: Dict[str, Any]):
+    """
+    Initialize database metadata and return database object
+
+     Parameters
+    ----------
+    engine_name
+        Name of database engine object
+    database_name
+        Name of database/schema
+    json_overview_dict
+        A dictionary of database metadata
+    """
     metadata = DbMeta(
         engine_name,
         json_overview_dict["num_of_views"],
@@ -30,8 +43,26 @@ def parse_database(engine_name, database_name, json_overview_dict):
     return metadata, current_database
 
 
-def parse_tables(json_table_dict, json_overview_dict, json_view_dict, current_database):
+def parse_tables(
+    json_table_dict: Dict[str, Any],
+    json_overview_dict: Dict[str, Any],
+    json_view_dict: Dict[str, Any],
+    current_database: Database,
+):
+    """
+    Initialize database tables and views
 
+     Parameters
+    ----------
+    json_table_dict
+        A dictionary of tables data
+    json_overview_dict
+        A dictionary of database metadata
+    json_view_dict
+        A dictionary of views data
+    current_database
+        Database object
+    """
     for table_name in json_table_dict.keys():
         table_obj = Table(
             current_database, json_overview_dict["table_schema"][table_name], table_name
@@ -120,6 +151,17 @@ def parse_tables(json_table_dict, json_overview_dict, json_view_dict, current_da
 
 
 def parse_constraints(current_database, json_table_dict):
+    """
+    Initialize primary and foreign key constraints
+
+     Parameters
+    ----------
+
+    current_database
+        Database object
+    json_table_dict
+        A dictionary of tables data
+    """
     existing_tables = current_database.getTablesMap()
     for t in json_table_dict.keys():
         columns = json_table_dict[t]
@@ -155,6 +197,17 @@ plot_db = {
 
 
 def generate_db_report(sql_engine, show_browser=True):
+    """
+    Write database analysis to template files
+
+     Parameters
+    ----------
+
+    sql_engine
+        The database engine object
+    show_browser
+        Boolean whether show in browser or not
+    """
     overview_dict, table_dict, view_dict = plot_db[sql_engine.name](sql_engine)
     json_overview_dict = json.loads(json.dumps(overview_dict))
     json_table_dict = json.loads(json.dumps(table_dict))

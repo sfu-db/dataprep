@@ -7,9 +7,10 @@ class HtmlConstraintsPage:
     def __init__(self, pystache_object: Template) -> None:
         self.pystache_object = pystache_object
 
-    "compiles the data needed by the pystache template for constraints page"
-
     def page_writer(self, constraints, table, new_file):
+        """
+        Compile the data needed by the pystache template for constraints page
+        """
         page_data = PageData("constraint.html", "constraint.js")
         page_data.addScope("constraints", constraints)
         page_data.addScope("constraints_num", len(constraints))

@@ -78,21 +78,23 @@ def load_dataset(name: str) -> pd.DataFrame:
     return df
 
 
-def load_sqlite_db_url(path: str) -> str:
+def load_db(file_name: str) -> str:
     """
-    Load a SQLite database file
+    Load a database file
 
     Parameters
     ----------
-    path: str
-        Path to the sqlite database file from the root path of project
+    file_name: str
+        Name of the database file
 
     Returns
     -------
     db_url : str
         SQLite url
     """
-    db_file_path = str(os.path.join(os.getcwd(), path))
+    db_file_path = str(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", file_name)
+    )
     db_url = f"sqlite:///{db_file_path}"
     return db_url
 

@@ -79,9 +79,10 @@ The following code demonstrates how to use DataPrep.EDA to create a database rep
 
 ```python
 from dataprep.eda import create_db_report
+from dataprep.datasets import load_db
 from sqlalchemy import create_engine
-database_engine = create_engine("sqlite:////dataprep/tests/eda/test_database/sakila.db")
-create_db_report(database_engine).show_browser()
+engine = create_engine(load_db('sakila.db'))
+create_db_report(engine)
 ```
 
 Click [here](https://docs.dataprep.ai/_downloads/1a61c6aebb3ecbe9dc9742bd6ca78ddb/titanic_dp.html) to see the generated report of the above code.
