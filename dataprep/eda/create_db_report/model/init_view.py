@@ -1,4 +1,4 @@
-from .init_Table import Table
+from .init_table import Table
 from .init_database import Database
 
 class View(Table):

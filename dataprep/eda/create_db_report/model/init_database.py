@@ -1,5 +1,5 @@
 
-from .init_Table import Table
+from .init_table import Table
 from .db_metadata import DbMeta
 
 class Database:

@@ -2,7 +2,7 @@ import os
 import json
 from .model.db_metadata import DbMeta
 from .model.init_database import Database
-from .model.init_Table import Table
+from .model.init_table import Table
 from .model.init_view import View
 from .model.init_tablecolumn import TableColumn
 from .model.init_tableindex import TableIndex
