@@ -1,7 +1,5 @@
-from .init_database import Database
-
 class Table:
-    def __init__(self, db:Database, schema:str, name:str) -> None:
+    def __init__(self, db, schema: str, name: str) -> None:
         self.database = db
         self.schema = schema
         self.name = name

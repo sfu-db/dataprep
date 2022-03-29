@@ -3,8 +3,9 @@ from .pystache_columns import MustacheTableColumn
 from .pagedata import PageData
 from .template_pystache import Template
 
+
 class HtmlColumnPage:
-    def __init__(self, pystache_object:Template) -> None:
+    def __init__(self, pystache_object: Template) -> None:
         self.pystache_object = pystache_object
 
     def page_writer(self, tables, new_file):

@@ -1,9 +1,5 @@
-
-from .init_Table import Table
-from .db_metadata import DbMeta
-
 class Database:
-    def __init__(self, databaseName:str, schema:str, database_stats:DbMeta) -> None:
+    def __init__(self, databaseName: str, schema: str, database_stats) -> None:
         self.databaseName = databaseName
         self.schema = schema
         self.tables = {}
@@ -12,7 +8,7 @@ class Database:
             if not hasattr(self, key):
                 setattr(self, key, value)
 
-    def addTable(self, table_name: str, table_object: Table):
+    def addTable(self, table_name: str, table_object):
         self.tables[table_name] = table_object
 
     def addView(self, view_name, view_object):

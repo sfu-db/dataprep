@@ -7,6 +7,7 @@ from collections import OrderedDict
 Queries MySQL database and returns disctionaries for database tables, views, and metadata for databases, 
 """
 
+
 def plot_mysql_db(sql_engine):
     db_name = sql_engine.url.database
     # Table level SQL, schema name, table name, row count
@@ -161,6 +162,7 @@ def plot_mysql_db(sql_engine):
 """
 Queries PostgresDB database and returns disctionaries for database tables, views, and metadata for databases, 
 """
+
 
 def plot_postgres_db(postgres_engine):
     db_name = postgres_engine.url.database
@@ -344,9 +346,11 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
 
     return overview_dict, table_dict, view_dict
 
+
 """
 Queries SQLite database and returns disctionaries for database tables, views, and metadata for databases, 
 """
+
 
 def plot_sqlite_db(sqliteConnection):
     db_name = os.path.splitext(os.path.basename(sqliteConnection.url.database))[0]

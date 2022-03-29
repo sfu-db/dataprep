@@ -2,8 +2,9 @@ from .pagedata import PageData
 from .pystache_constraints import PSConstraints
 from .template_pystache import Template
 
+
 class HtmlConstraintsPage:
-    def __init__(self, pystache_object:Template) -> None:
+    def __init__(self, pystache_object: Template) -> None:
         self.pystache_object = pystache_object
 
     def page_writer(self, constraints, table, new_file):
@@ -20,7 +21,7 @@ class HtmlConstraintsPage:
             page_data, new_file, "constraint.js", pagination_configs
         )
 
-    def collect_check_constraints(self,tables):
+    def collect_check_constraints(self, tables):
         all_constraints = []
         results = []
         for table in tables:
