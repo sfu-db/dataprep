@@ -6,7 +6,9 @@ from .template_pystache import Template
 class HtmlColumnPage:
     def __init__(self, pystache_object:Template) -> None:
         self.pystache_object = pystache_object
-
+    
+    "compiles the data needed by the pystache template for columns page"
+    
     def page_writer(self, tables, new_file):
         table_columns = set()
         for t in tables:

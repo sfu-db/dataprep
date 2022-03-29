@@ -1,4 +1,5 @@
 from .init_database import Database
+from .init_tablecolumn import TableColumn
 
 class Table:
     def __init__(self, db:Database, schema:str, name:str) -> None:

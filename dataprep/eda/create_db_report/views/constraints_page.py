@@ -5,6 +5,8 @@ from .template_pystache import Template
 class HtmlConstraintsPage:
     def __init__(self, pystache_object:Template) -> None:
         self.pystache_object = pystache_object
+    
+    "compiles the data needed by the pystache template for constraints page"
 
     def page_writer(self, constraints, table, new_file):
         page_data = PageData("constraint.html", "constraint.js")
@@ -28,14 +30,3 @@ class HtmlConstraintsPage:
                 all_constraints.append(table.getCheckConstraints())
         for x in all_constraints:
             results.append(PSConstraints(x, x.keys(), x.values()))
-
-    """
-    def collect_check_constraints(table):
-        all_constraints=[]
-        results=[]
-        if len(table.getCheckConstraints())>0:
-                all_constraints.append(table.getCheckConstraints())
-        for x in all_constraints:
-            results.append(PC.ps_constraints(x,x.keys(),x.values()))
-        return results
-    """

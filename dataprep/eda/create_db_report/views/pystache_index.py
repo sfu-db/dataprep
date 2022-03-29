@@ -1,3 +1,4 @@
+from .template_pystache import Template
 class PSIndex:
     def __init__(self, index) -> None:
         self.index = index

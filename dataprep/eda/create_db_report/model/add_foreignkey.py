@@ -1,4 +1,5 @@
-from .init_Table import Table
+from .init_table import Table
+from .init_tablecolumn import TableColumn
 
 class ForeignKeyConstraint:
 
@@ -16,12 +17,12 @@ class ForeignKeyConstraint:
         self.childColumns = []
         self.parentTable = None
 
-    def addParentColumn(self, column):
+    def addParentColumn(self, column:TableColumn):
         if column != None:
             self.parentColumns.append(column)
             self.parentTable = column.getTable()
 
-    def addChildColumn(self, column):
+    def addChildColumn(self, column:TableColumn):
         if column != None:
             self.childColumns.append(column)
 
@@ -94,7 +95,7 @@ class ForeignKeyConstraint:
         else:
             return ""
 
-    def getAllForeignKeyConstraints(self,tables):
+    def getAllForeignKeyConstraints(tables):
         constraints = []
 
         for table in tables:

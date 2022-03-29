@@ -6,17 +6,14 @@ class MustacheTableColumn:
 
     def getColumn(self):
         return self.tableColumn
-
-    def getin(self):
-        return self.indexColumn
-
+    
     def getKey(self):
         keyType = ""
         if self.tableColumn.isPrimary():
             keyType = " class='primaryKey' title='Primary Key'"
         elif self.tableColumn.isForeignKey():
             keyType = " class='foreignKey' title='Foreign Key'"
-        elif self.getin():
+        elif self.indexColumn():
             keyType = " class='" + self.markAsIndexColumn() + "' title='Indexed'"
 
         return keyType
@@ -27,7 +24,7 @@ class MustacheTableColumn:
             keyTitle = "Primary Key"
         elif self.tableColumn.isForeignKey():
             keyTitle = "Foreign Key"
-        elif self.getin():
+        elif self.indexColumn():
             keyTitle = "Indexed"
 
         return keyTitle
@@ -38,7 +35,7 @@ class MustacheTableColumn:
             keyClass = "primaryKey"
         elif self.tableColumn.isForeignKey():
             keyClass = "foreignKey"
-        elif self.getin():
+        elif self.indexColumn():
             keyClass = "indexedColumn"
 
         return keyClass
@@ -47,7 +44,7 @@ class MustacheTableColumn:
         keyIcon = ""
         if self.tableColumn.isPrimary() or self.tableColumn.isForeignKey():
             keyIcon = "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>"
-        elif self.getin():
+        elif self.indexColumn():
             keyIcon = "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>"
 
         return keyIcon
