@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648532979953,
+  "lastUpdate": 1648609737688,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3441,6 +3441,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.10169568513057833",
             "extra": "mean: 6.9226573234000055 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8d4e0a022b9c881adbe73c66db3b0b90648054a6",
+          "message": "Merge pull request #869 from khoatxp/feature/create-db-report\n\nfeat(eda): add create_db_report submodule",
+          "timestamp": "2022-03-29T20:05:31-07:00",
+          "tree_id": "f2e531d5ac0a53c695df0adde4b9df9467605e69",
+          "url": "https://github.com/sfu-db/dataprep/commit/8d4e0a022b9c881adbe73c66db3b0b90648054a6"
+        },
+        "date": 1648609733448,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2289020149305645,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06461901263122702",
+            "extra": "mean: 4.3686815090000035 sec\nrounds: 5"
           }
         ]
       }
