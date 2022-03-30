@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648666232243,
+  "lastUpdate": 1648669999071,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3503,6 +3503,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.03189012218068904",
             "extra": "mean: 4.734698537600008 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a6790f3c0755a72a15594767ca0b4b4b32e0810c",
+          "message": "Merge pull request #863 from jwa345/acctest\n\nfeat(eda):add running total for time series test",
+          "timestamp": "2022-03-30T12:49:20-07:00",
+          "tree_id": "b9cb919156bb81d7bd33b6a9604a3eb5cf6127d8",
+          "url": "https://github.com/sfu-db/dataprep/commit/a6790f3c0755a72a15594767ca0b4b4b32e0810c"
+        },
+        "date": 1648669993290,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.18194901408948544,
+            "unit": "iter/sec",
+            "range": "stddev: 0.14863239697970476",
+            "extra": "mean: 5.4960451696000066 sec\nrounds: 5"
           }
         ]
       }
