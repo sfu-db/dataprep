@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648669999071,
+  "lastUpdate": 1648677984857,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3534,6 +3534,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.14863239697970476",
             "extra": "mean: 5.4960451696000066 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d4a24cc55c9e8dbcf2658bf95abafca3beb016c5",
+          "message": "Merge pull request #860 from sfu-db/fix/plot_diff\n\nfix(eda):plot_diff when columns are not aligned",
+          "timestamp": "2022-03-30T15:02:49-07:00",
+          "tree_id": "50741e6af808f1e45a698dfa9802c4563c310bf3",
+          "url": "https://github.com/sfu-db/dataprep/commit/d4a24cc55c9e8dbcf2658bf95abafca3beb016c5"
+        },
+        "date": 1648677979537,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2049373212103884,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04473211294045339",
+            "extra": "mean: 4.879540700999996 sec\nrounds: 5"
           }
         ]
       }
