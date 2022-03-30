@@ -6,6 +6,8 @@ from typing import List
 
 import pandas as pd
 import dask.dataframe as dd
+from sqlalchemy.engine.base import Engine
+from sqlalchemy import create_engine
 
 
 def get_dataset_names() -> List[str]:
@@ -78,7 +80,7 @@ def load_dataset(name: str) -> pd.DataFrame:
     return df
 
 
-def load_db(file_name: str) -> str:
+def load_db(file_name: str) -> Engine:
     """
     Load a database file
 
@@ -95,8 +97,8 @@ def load_db(file_name: str) -> str:
     db_file_path = str(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", file_name)
     )
-    db_url = f"sqlite:///{db_file_path}"
-    return db_url
+    db_engine = create_engine(f"sqlite:///{db_file_path}")
+    return db_engine
 
 
 def _load_dataset_as_dask(name: str) -> dd.DataFrame:

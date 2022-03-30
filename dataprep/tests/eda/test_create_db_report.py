@@ -5,9 +5,8 @@ from sqlalchemy import create_engine
 
 
 def test_create_db_report_sqlite() -> None:
-    db_url = load_db("sakila.db")
-    engine = create_engine(db_url)
-    generate_db_report(engine)
+    db_engine = load_db("sakila.db")
+    generate_db_report(db_engine)
 
     # Check if table files were generated properly
     table_folder_location = os.path.realpath(

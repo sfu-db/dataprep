@@ -3,8 +3,8 @@
 """
 import warnings
 import webbrowser
-from .run_function import generate_db_report
 from sqlalchemy.engine.base import Engine
+from .run_function import generate_db_report
 
 __all__ = ["create_db_report"]
 
@@ -25,9 +25,8 @@ def create_db_report(sql_engine: Engine, analyze: bool = False) -> None:
     --------
     >>> from dataprep.eda import create_db_report
     >>> from dataprep.datasets import load_db
-    >>> from sqlalchemy import create_engine
-    >>> engine = create_engine(load_db('sakila.db'))
-    >>> create_db_report(engine)
+    >>> db_engine = load_db('sakila.db')
+    >>> create_db_report(db_engine)
     """
     _suppress_warnings()
     output_file = generate_db_report(sql_engine, analyze)
