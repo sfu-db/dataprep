@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648679301048,
+  "lastUpdate": 1648681979210,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3596,6 +3596,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.07005530957618988",
             "extra": "mean: 5.007928722199995 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4309f768710cb88ddd851deb2e6be0bba56512c4",
+          "message": "Merge pull request #842 from devinllu/feat/diff_report_sort\n\nfeat(eda): added sorting feature for create_diff_report",
+          "timestamp": "2022-03-30T16:08:16-07:00",
+          "tree_id": "ac538598431af61b0051bbc9c612787a2a38a265",
+          "url": "https://github.com/sfu-db/dataprep/commit/4309f768710cb88ddd851deb2e6be0bba56512c4"
+        },
+        "date": 1648681973168,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.14149880425304928,
+            "unit": "iter/sec",
+            "range": "stddev: 0.053844768687070735",
+            "extra": "mean: 7.067197530599981 sec\nrounds: 5"
           }
         ]
       }
