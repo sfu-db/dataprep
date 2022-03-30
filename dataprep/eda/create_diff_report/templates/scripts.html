@@ -14,11 +14,70 @@
 
 <script>
     setTimeout(init, 50);
+    function getOriginalVariables(){}
 
     function init() {
         const tableRows = document.querySelectorAll('.rp-table tr');
         highlightTableValue(tableRows, '#f00');
         scientificNotationStrip(tableRows);
+        const originalVariables = Array.from(document.getElementsByClassName("section-variable"));
+        getOriginalVariables = function(){
+            // Cannot directly return context data since there are 
+            // multiple dataframes
+            //return '{{ context.components.dfs[0].variables|list }}';
+            return originalVariables;
+        }
+        console.log(getOriginalVariables)
+    }
+
+    function sortBy(e){
+        const selectedOption = e.options[e.selectedIndex].value;
+        const isReverseOrder = !!document.getElementById("id-variable-reverse-order").checked;
+        let variableSection = document.getElementById("id-variable-section");
+        let variables = getOriginalVariables().slice();
+        //let variables = Array.from(document.getElementsByClassName("section-variable"));
+
+        switch (selectedOption){
+            case 'original':
+                variables.sort(originalComparator);
+                break;
+            case 'alphabetical':
+                variables.sort(alphabeticalComparator);
+                break;
+        }
+
+        if(isReverseOrder){
+            variables.reverse();
+        }
+
+        variables.forEach(v => {
+            variableSection.appendChild(v);
+        })
+    }
+
+    function originalComparator(a, b){
+        const x = alphabeticalAttributeExtractor(a);
+        const y = alphabeticalAttributeExtractor(b);
+        const originalVariables = getOriginalVariables();
+        return originalVariables.indexOf(x) - originalVariables.indexOf(y);
+    }
+
+    function alphabeticalComparator(a, b) {
+        const x = alphabeticalAttributeExtractor(a);
+        const y = alphabeticalAttributeExtractor(b);
+        if (x < y)
+            return -1;
+        if (x > y)
+            return 1;
+        return 0;
+    }
+
+    function alphabeticalAttributeExtractor(x){
+        return x.childNodes[1].id;
+    }
+
+    function onReverseClick(){
+        sortBy(document.getElementById("section-sort-by-list"));
     }
 
     function highlightTableValue(element, color) {

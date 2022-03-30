@@ -1,162 +1,172 @@
-<div class="section-start">
-{% for key, value in context.components.dfs[0].variables.items() %}
-    {% if value.error %}
-        <div class="section-variable">
-        {% with error_message = value.error %}
-            {% include "error.html" %}
-        {% endwith %}
-        </div>
-    {% else %}
-        <div class="section-variable">
-            <a class="id-anchor" id="{{ key|escape }}"></a>
-            <div class="var-container">
-                <div class="var-title">
-                    <h2 class="tb-title">{{ key|escape }}</h2>
-                    <p>{{ value.col_type }}</p>
-                    {% if value.col_type != "datetime" %}
-                    <button class="var-toggle" onclick="toggleDetails(this)">Show Details</button>
-                    {% endif %}
-                </div>
-                <div class="tb-container">
-                    <div class="tb-{{ value.col_type }}">
-                        <table class="rp-table">
-                            {% for h, d in value.tabledata["Overview"].items() %}
-                            <tr>
-                                <th>{{ h }}</th>
-                                {% for comps in context.components.dfs %}
-                                {% if key in comps.variables %}
-                                {% if h in comps.variables[key].tabledata["Overview"] %}
-                                <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Overview"][h] }}</td>
-                                {% endif %}
-                                {% endif %}
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </div>
-                <div class="var-ovplot">
-                    {{ context.components.graphs[1][loop.index0] }}
-                </div>
+<div id="id-variable-section" class="section-start">
+    <div class="section-sort">
+        <label for="section-sort-by-list" class="sort-title">Sort by</label>
+        <select onchange="sortBy(this)" id="section-sort-by-list">
+            <option value="original" >Feature order</option>
+            <option value="alphabetical">Alphabetical</option>
+        </select>
+        <input type="checkbox" onchange="onReverseClick()" id="id-variable-reverse-order">
+        <label for="id-variable-reverse-order">Reverse order</label><br>
+    </div>
+
+    {% for key, value in context.components.dfs[0].variables.items() %}
+        {% if value.error %}
+            <div class="section-variable">
+            {% with error_message = value.error %}
+                {% include "error.html" %}
+            {% endwith %}
             </div>
-            <div class="var-plot">
-                <div class="vp-switch">
-
-                    {% for tab in value.tab_names %}
-                    <input type="radio" name="{{ key|escape }}" id="vp-switch-{{ key|escape }}-{{ tab }}"/>
-                    <label for="vp-switch-{{ key|escape }}-{{ tab }}" onclick="openTab(this)">{{ tab }}</label>
-                    {% endfor %}
-                    
-                </div>
-
-                {% if value.col_type == "numerical" %}
-                <div class="vp-table">
-                    <div class="stats-table">
-                        <h4 class="tb-title">Quantile Statistics</h4>
-                            <table class="rp-table">
-                                {% for h, d in value.tabledata["Quantile Statistics"].items() %}
-                                <tr>
-                                    <th>{{ h }}</th>
-                                    {% for comps in context.components.dfs %}
-                                    {% if key in comps.variables %}
-                                    {% if h in comps.variables[key].tabledata["Quantile Statistics"] %}
-                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Quantile Statistics"][h] }}</td>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    </div>
-                    <div class="stats-table">
-                        <h4 class="tb-title">Descriptive Statistics</h4>
-                            <table class="rp-table">
-                                {% for h, d in value.tabledata["Descriptive Statistics"].items() %}
-                                <tr>
-                                    <th>{{ h }}</th>
-                                    {% for comps in context.components.dfs %}
-                                    {% if key in comps.variables %}
-                                    {% if h in comps.variables[key].tabledata["Descriptive Statistics"] %}
-                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Descriptive Statistics"][h] }}</td>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    </div>
-                </div>
-                {% endif %}
-                {% if value.col_type == "categorical" %}
-                <div class="vp-table">
-                    <div class="stats-table">
-                        <h4 class="tb-title">Length</h4>
-                            <table class="rp-table">
-                                {% for h, d in value.tabledata["Length"].items() %}
-                                <tr>
-                                    <th>{{ h }}</th>
-                                    {% for comps in context.components.dfs %}
-                                    {% if key in comps.variables %}
-                                    {% if h in comps.variables[key].tabledata["Length"] %}
-                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Length"][h] }}</td>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    </div>
-                    <div class="stats-table">
-                        <h4 class="tb-title">Sample</h4>
-                            <table class="rp-table">
-                                {% for h, d in value.tabledata["Sample"].items() %}
-                                <tr>
-                                    <th>{{ h }}</th>
-                                    {% for comps in context.components.dfs %}
-                                    {% if key in comps.variables %}
-                                    {% if h in comps.variables[key].tabledata["Sample"] %}
-                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Sample"][h] }}</td>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    </div>
-                    <div class="stats-table">
-                        <h4 class="tb-title">Letter</h4>
-                            <table class="rp-table">
-                                {% for h, d in value.tabledata["Letter"].items() %}
-                                <tr>
-                                    <th>{{ h }}</th>
-                                    {% for comps in context.components.dfs %}
-                                    {% if key in comps.variables %}
-                                    {% if h in comps.variables[key].tabledata["Letter"] %}
-                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Letter"][h] }}</td>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% for div in value.plots[1] %}
-                <table class="vp-plot">
-                    <tr>
-                        <td>{{ div }}</td>
-                        {% if key in context.components.dfs[1].variables %}
-                        <td>{{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}</td>
+        {% else %}
+            <div class="section-variable">
+                <a class="id-anchor" id="{{ key|escape }}"></a>
+                <div class="var-container">
+                    <div class="var-title">
+                        <h2 class="tb-title">{{ key|escape }}</h2>
+                        <p>{{ value.col_type }}</p>
+                        {% if value.col_type != "datetime" %}
+                        <button class="var-toggle" onclick="toggleDetails(this)">Show Details</button>
                         {% endif %}
-                    </tr>
-                </table>
-                {% endfor %}
+                    </div>
+                    <div class="tb-container">
+                        <div class="tb-{{ value.col_type }}">
+                            <table class="rp-table">
+                                {% for h, d in value.tabledata["Overview"].items() %}
+                                <tr>
+                                    <th>{{ h }}</th>
+                                    {% for comps in context.components.dfs %}
+                                    {% if key in comps.variables %}
+                                    {% if h in comps.variables[key].tabledata["Overview"] %}
+                                    <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Overview"][h] }}</td>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                    <div class="var-ovplot">
+                        {{ context.components.graphs[1][loop.index0] }}
+                    </div>
+                </div>
+                <div class="var-plot">
+                    <div class="vp-switch">
+
+                        {% for tab in value.tab_names %}
+                        <input type="radio" name="{{ key|escape }}" id="vp-switch-{{ key|escape }}-{{ tab }}"/>
+                        <label for="vp-switch-{{ key|escape }}-{{ tab }}" onclick="openTab(this)">{{ tab }}</label>
+                        {% endfor %}
+                        
+                    </div>
+
+                    {% if value.col_type == "numerical" %}
+                    <div class="vp-table">
+                        <div class="stats-table">
+                            <h4 class="tb-title">Quantile Statistics</h4>
+                                <table class="rp-table">
+                                    {% for h, d in value.tabledata["Quantile Statistics"].items() %}
+                                    <tr>
+                                        <th>{{ h }}</th>
+                                        {% for comps in context.components.dfs %}
+                                        {% if key in comps.variables %}
+                                        {% if h in comps.variables[key].tabledata["Quantile Statistics"] %}
+                                        <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Quantile Statistics"][h] }}</td>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                        </div>
+                        <div class="stats-table">
+                            <h4 class="tb-title">Descriptive Statistics</h4>
+                                <table class="rp-table">
+                                    {% for h, d in value.tabledata["Descriptive Statistics"].items() %}
+                                    <tr>
+                                        <th>{{ h }}</th>
+                                        {% for comps in context.components.dfs %}
+                                        {% if key in comps.variables %}
+                                        {% if h in comps.variables[key].tabledata["Descriptive Statistics"] %}
+                                        <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Descriptive Statistics"][h] }}</td>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if value.col_type == "categorical" %}
+                    <div class="vp-table">
+                        <div class="stats-table">
+                            <h4 class="tb-title">Length</h4>
+                                <table class="rp-table">
+                                    {% for h, d in value.tabledata["Length"].items() %}
+                                    <tr>
+                                        <th>{{ h }}</th>
+                                        {% for comps in context.components.dfs %}
+                                        {% if key in comps.variables %}
+                                        {% if h in comps.variables[key].tabledata["Length"] %}
+                                        <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Length"][h] }}</td>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                        </div>
+                        <div class="stats-table">
+                            <h4 class="tb-title">Sample</h4>
+                                <table class="rp-table">
+                                    {% for h, d in value.tabledata["Sample"].items() %}
+                                    <tr>
+                                        <th>{{ h }}</th>
+                                        {% for comps in context.components.dfs %}
+                                        {% if key in comps.variables %}
+                                        {% if h in comps.variables[key].tabledata["Sample"] %}
+                                        <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Sample"][h] }}</td>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                        </div>
+                        <div class="stats-table">
+                            <h4 class="tb-title">Letter</h4>
+                                <table class="rp-table">
+                                    {% for h, d in value.tabledata["Letter"].items() %}
+                                    <tr>
+                                        <th>{{ h }}</th>
+                                        {% for comps in context.components.dfs %}
+                                        {% if key in comps.variables %}
+                                        {% if h in comps.variables[key].tabledata["Letter"] %}
+                                        <td style="color: {{ context.legend_labels[loop.index0].color }}">{{ comps.variables[key].tabledata["Letter"][h] }}</td>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% for div in value.plots[1] %}
+                    <table class="vp-plot">
+                        <tr>
+                            <td>{{ div }}</td>
+                            {% if key in context.components.dfs[1].variables %}
+                            <td>{{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                    {% endfor %}
 
 
+                </div>
             </div>
-        </div>
-    {% endif %}
-{% endfor %}
+        {% endif %}
+    {% endfor %}
 </div>
