@@ -65,7 +65,7 @@ def clean_figi(
     --------
     Clean a column of FIGI Numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "figi": [
             "87-86-5"]
             })

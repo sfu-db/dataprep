@@ -64,7 +64,7 @@ def clean_ismn(
     --------
     Clean a column of ISBN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ismn": [
             "978-9024538270",
             "978-9024538271"]

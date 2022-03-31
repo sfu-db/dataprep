@@ -58,7 +58,7 @@ def clean_cr_cpf(
     --------
     Clean a column of CPF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cpf": [
             "1-613-584",
             "30-1234-1234"]

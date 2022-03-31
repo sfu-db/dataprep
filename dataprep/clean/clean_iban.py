@@ -64,7 +64,7 @@ def clean_iban(
     --------
     Clean a column of ISBN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "iban": [
             "978-9024538270",
             "978-9024538271"]

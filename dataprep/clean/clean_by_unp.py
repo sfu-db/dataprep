@@ -59,7 +59,7 @@ def clean_by_unp(
     --------
     Clean a column of UNP data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "unp": [
             '200988541',
             'УНП MA1953684',

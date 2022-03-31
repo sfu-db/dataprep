@@ -61,7 +61,7 @@ def clean_cu_ni(
     --------
     Clean a column of NI data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ni": [
             '91021027775',
             '9102102777A',]

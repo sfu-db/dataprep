@@ -24,42 +24,37 @@ def clean_au_acn(
 ) -> pd.DataFrame:
     """
     Clean Australian Company Numbers (ACNs) type data in a DataFrame column.
-
     Parameters
     ----------
-        df
-            A pandas or Dask DataFrame containing the data to be cleaned.
-        col
-            The name of the column containing data of ACN type.
-        output_format
-            The output format of standardized number string.
-            If output_format = 'compact', return string without any separators or whitespace.
-            If output_format = 'standard', return string with proper separators and whitespace.
-            If output_format = 'abn', convert the number to an Australian Business Number (ABN).
+    df
+        A pandas or Dask DataFrame containing the data to be cleaned.
+    col
+        The name of the column containing data of ACN type.
+    output_format
+        The output format of standardized number string.
+        If output_format = 'compact', return string without any separators or whitespace.
+        If output_format = 'standard', return string with proper separators and whitespace.
+        If output_format = 'abn', convert the number to an Australian Business Number (ABN).
 
-            (default: "standard")
-        inplace
-           If True, delete the column containing the data that was cleaned.
-           Otherwise, keep the original column.
-
-           (default: False)
-        errors
-            How to handle parsing errors.
-            - ‘coerce’: invalid parsing will be set to NaN.
-            - ‘ignore’: invalid parsing will return the input.
-            - ‘raise’: invalid parsing will raise an exception.
-
-            (default: 'coerce')
-        progress
-            If True, display a progress bar.
-
-            (default: True)
-
+        (default: "standard")
+    inplace
+        If True, delete the column containing the data that was cleaned.
+        Otherwise, keep the original column.
+       (default: False)
+    errors
+        How to handle parsing errors.
+        - ‘coerce’: invalid parsing will be set to NaN.
+        - ‘ignore’: invalid parsing will return the input.
+        - ‘raise’: invalid parsing will raise an exception.
+        (default: 'coerce')
+    progress
+        If True, display a progress bar.
+        (default: True)
     Examples
     --------
     Clean a column of ACN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "acn": [
             "004085616",
             "999 999 999"]

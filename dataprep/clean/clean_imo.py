@@ -65,7 +65,7 @@ def clean_imo(
     --------
     Clean a column of FIGI Numbers data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "imo": [
             "8814275"]
             })

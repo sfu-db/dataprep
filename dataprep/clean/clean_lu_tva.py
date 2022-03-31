@@ -59,7 +59,7 @@ def clean_lu_tva(
     --------
     Clean a column of TVA data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "tva": [
             'LU 150 274 42',
             '150 274 43',]

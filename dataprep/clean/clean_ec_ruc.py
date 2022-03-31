@@ -59,7 +59,7 @@ def clean_ec_ruc(
     --------
     Clean a column of RUC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ruc": [
             '1792060346-001',
             '1763154690001']

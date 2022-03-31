@@ -60,7 +60,7 @@ def clean_de_handelsregisternummer(
     --------
     Clean a column of handelsregisternummer data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "handelsregisternummer": [
             'Aachen HRA 11223',
             'Aachen HRC 44123',]

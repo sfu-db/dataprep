@@ -59,7 +59,7 @@ def clean_es_nif(
     --------
     Clean a column of NIF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nif": [
             'ES B-58378431',
             'B64717839']

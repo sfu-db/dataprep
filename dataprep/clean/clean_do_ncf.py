@@ -59,7 +59,7 @@ def clean_do_ncf(
     --------
     Clean a column of NCF data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ncf": [
             'E310000000005',
             'Z0100000005',]

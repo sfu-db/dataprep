@@ -61,7 +61,7 @@ def clean_fr_siret(
     --------
     Clean a column of SIRET data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "siret": [
             "73282932000074",
             "73282932000079"]

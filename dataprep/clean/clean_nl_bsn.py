@@ -59,7 +59,7 @@ def clean_nl_bsn(
     --------
     Clean a column of BSN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "bsn": [
             "111222333",
             "1112223334",]

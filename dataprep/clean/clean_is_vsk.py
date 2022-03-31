@@ -59,7 +59,7 @@ def clean_is_vsk(
     --------
     Clean a column of VSK data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "vsk": [
             'IS 00621',
             'IS 0062199',]

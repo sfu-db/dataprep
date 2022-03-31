@@ -59,7 +59,7 @@ def clean_lt_pvm(
     --------
     Clean a column of PVM data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "pvm": [
             '119511515',
             '100001919018',]

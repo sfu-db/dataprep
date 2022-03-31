@@ -61,7 +61,7 @@ def clean_my_nric(
     --------
     Clean a column of NRIC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "nric": [
             "770305021234",
             "771305-02-1234",]

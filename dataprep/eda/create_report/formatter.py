@@ -70,6 +70,8 @@ def format_report(
         A dictionary in which formatted data will be stored.
         This variable acts like an API in passing data to the template engine.
     """
+    if len(df.index) == 0:
+        return {}
     with ProgressBar(minimum=1, disable=not progress):
         if mode == "basic":
             edaframe = EDAFrame(df)

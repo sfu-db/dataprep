@@ -65,7 +65,7 @@ def clean_ad_nrt(
     --------
     Clean a column of Andorra NRT data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ad_nrt": [
             "U-132950-X",
             "D059888N",

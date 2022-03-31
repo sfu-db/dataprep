@@ -65,7 +65,7 @@ def clean_ar_dni(
     --------
     Clean a column of Argentinian DNI data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "ar_dni": [
             "20.123.456",
             "20123456",

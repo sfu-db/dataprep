@@ -230,16 +230,17 @@ def _is_all_int(df_list: List[Union[dd.DataFrame, pd.DataFrame]], col: str) -> b
     Check whether the col in all dataframes are all integer type.
     """
     for df in df_list:
-        srs = df[col]
-        if isinstance(srs, (dd.DataFrame, pd.DataFrame)):
-            for dtype in srs.dtypes:
-                if not is_integer_dtype(dtype):
+        if col in df.columns:
+            srs = df[col]
+            if isinstance(srs, (dd.DataFrame, pd.DataFrame)):
+                for dtype in srs.dtypes:
+                    if not is_integer_dtype(dtype):
+                        return False
+            elif isinstance(srs, (dd.Series, pd.Series)):
+                if not is_integer_dtype(srs.dtype):
                     return False
-        elif isinstance(srs, (dd.Series, pd.Series)):
-            if not is_integer_dtype(srs.dtype):
-                return False
-        else:
-            raise ValueError(f"unprocessed type of data:{type(srs)}")
+            else:
+                raise ValueError(f"unprocessed type of data:{type(srs)}")
     return True
 
 

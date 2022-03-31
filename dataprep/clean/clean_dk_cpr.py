@@ -59,7 +59,7 @@ def clean_dk_cpr(
     --------
     Clean a column of CPR data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "cpr": [
             "2110625629",
             "511062-5629"]

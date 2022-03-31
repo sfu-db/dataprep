@@ -65,7 +65,7 @@ def clean_at_uid(
     --------
     Clean a column of Austrian UID data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "at_uid": [
             "AT U13585627",
             "U13585626"]

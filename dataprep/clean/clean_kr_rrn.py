@@ -60,7 +60,7 @@ def clean_kr_rrn(
     --------
     Clean a column of RRN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "rrn": [
             "971013-9019902",
             "971013-9019903",]

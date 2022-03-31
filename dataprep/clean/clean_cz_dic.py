@@ -59,7 +59,7 @@ def clean_cz_dic(
     --------
     Clean a column of DIC data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "dic": [
             'CZ 25123891',
             '25123890',]

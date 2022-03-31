@@ -60,7 +60,7 @@ def clean_li_peid(
     --------
     Clean a column of PEID data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "peid": [
             '00001234567',
             '00001234568913454545',]

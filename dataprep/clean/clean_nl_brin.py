@@ -59,7 +59,7 @@ def clean_nl_brin(
     --------
     Clean a column of BRIN data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "brin": [
             '05 KO',
             '30AJ0A',]

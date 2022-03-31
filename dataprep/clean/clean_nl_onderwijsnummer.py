@@ -60,7 +60,7 @@ def clean_nl_onderwijsnummer(
     --------
     Clean a column of onderwijsnummer data.
 
-    >>> df = pd.DataFrame({{
+    >>> df = pd.DataFrame({
             "onderwijsnummer": [
             '1012.22.331',
             '2112.22.337',]
