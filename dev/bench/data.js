@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648779747947,
+  "lastUpdate": 1648781423060,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3689,6 +3689,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.09552164329866387",
             "extra": "mean: 5.070837180800015 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e4302cd151700ae2b44a45ed0fbd82c3e60e46ba",
+          "message": "Merge pull request #875 from khoatxp/fix/create-db-report-missing-style-files\n\nfix(eda.create-db-report): Add missing style files",
+          "timestamp": "2022-03-31T19:46:49-07:00",
+          "tree_id": "fbe7ed98fc22d9a139219741595f80ac78c1f152",
+          "url": "https://github.com/sfu-db/dataprep/commit/e4302cd151700ae2b44a45ed0fbd82c3e60e46ba"
+        },
+        "date": 1648781417940,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.20388847161110538,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05259947752577609",
+            "extra": "mean: 4.9046421904 sec\nrounds: 5"
           }
         ]
       }
