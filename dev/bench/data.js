@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648763050034,
+  "lastUpdate": 1648779747947,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3658,6 +3658,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0262162429040161",
             "extra": "mean: 5.762557141000025 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a44953adc4e1c66e5c6ea8ed8e2496fadfb7e9fb",
+          "message": "Merge pull request #874 from sfu-db/fix/jinja\n\nfix(eda): jinja2.markup import broken with 3.1",
+          "timestamp": "2022-03-31T19:18:45-07:00",
+          "tree_id": "f5f244c531c363375907ae4cda153cc2dc01b0ba",
+          "url": "https://github.com/sfu-db/dataprep/commit/a44953adc4e1c66e5c6ea8ed8e2496fadfb7e9fb"
+        },
+        "date": 1648779743046,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.19720609523538915,
+            "unit": "iter/sec",
+            "range": "stddev: 0.09552164329866387",
+            "extra": "mean: 5.070837180800015 sec\nrounds: 5"
           }
         ]
       }
