@@ -34,15 +34,15 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = ">=3.8,<3.11"
 
 # Dependencies for EDA
 bokeh = "^2"
-dask = {version = "^2021.11", extras = ["array", "dataframe", "delayed"]}
+dask = {version = ">=2022.3.0", extras = ["array", "dataframe", "delayed"]}
 nltk = "^3.6.7"
 numpy = "^1.21"
 pandas = "^1.1"
-scipy = "<=1.7.1"
+scipy = "^1"
 wordcloud = "^1.8"
 pystache = "^0.6.0"
 sqlalchemy = "^1.4.32"
@@ -99,7 +99,7 @@ exclude = '''
 )
 '''
 line-length = 100
-target-version = ['py37']
+target-version = ['py38']
 
 [build-system]
 build-backend = "poetry.masonry.api"
