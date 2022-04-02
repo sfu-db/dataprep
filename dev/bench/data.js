@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648781423060,
+  "lastUpdate": 1648926887514,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3720,6 +3720,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.05259947752577609",
             "extra": "mean: 4.9046421904 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "356cab0951db72ceff8307f8fd688b996b9a5a22",
+          "message": "Merge pull request #877 from sfu-db/fix/upgrade_dask\n\nbuild: drop support for python3.7",
+          "timestamp": "2022-04-02T12:10:22-07:00",
+          "tree_id": "7f82c165f09163a24612f6c33e93e1259ca904f3",
+          "url": "https://github.com/sfu-db/dataprep/commit/356cab0951db72ceff8307f8fd688b996b9a5a22"
+        },
+        "date": 1648926881388,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1656257044600528,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07140613925759283",
+            "extra": "mean: 6.037710168600006 sec\nrounds: 5"
           }
         ]
       }
