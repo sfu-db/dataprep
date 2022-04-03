@@ -1,15 +1,15 @@
 import os
 import pystache
-from .pagedata import PageData
 from typing import Any, Dict
+from .page_data import PageData
 
 
-class Template:
+class PageTemplate:
     htmlConfig: object
     template_directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "layout"))
 
     def __init__(self, database_name: str) -> None:
-        self.databaseName = database_name
+        self.database_name = database_name
 
     @staticmethod
     def get_root_path():
@@ -31,19 +31,19 @@ class Template:
         Render the html pages using template files for each section of the database
         """
         page_template = open(
-            os.path.realpath(os.path.join(self.template_directory, page_data.getTemplateName()))
+            os.path.realpath(os.path.join(self.template_directory, page_data.template_name))
         ).read()
 
         page_scope = {
-            "toFileName": "true",
-            "databaseName": self.databaseName,
-            "paginationEnabled": "true",
-            "displayNumRows": "true",
-            "dataTableConfig": {},
+            "to_file_name": "true",
+            "database_name": self.database_name,
+            "pagination_enabled": "true",
+            "display_num_rows": "true",
+            "data_table_config": {},
         }
         for key, value in pagination_configs.items():
-            page_scope["dataTableConfig"][key] = value
-        page_scope.update(page_data.getScope())
+            page_scope["data_table_config"][key] = value
+        page_scope.update(page_data.scope)
         html_template = pystache.render(page_template, page_scope)
 
         file = open(output_file, "w", encoding="utf-8")
@@ -56,11 +56,11 @@ class Template:
             os.path.realpath(os.path.join(self.template_directory, "container.html"))
         ).read()
         container_scope = {
-            "databaseName": self.databaseName,
+            "database_name": self.database_name,
             "content": fill,
-            "pageScript": page_script,
-            "rootPath": root_path or Template.get_root_path(),
-            "rootPathtoHome": Template.get_root_path_to_home(),
+            "page_script": page_script,
+            "root_path": root_path or PageTemplate.get_root_path(),
+            "root_path_to_home": PageTemplate.get_root_path_to_home(),
         }
         html = pystache.render(tmpl, container_scope)
         open(output_file, "w", encoding="utf-8").write(html)

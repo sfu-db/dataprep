@@ -13,7 +13,26 @@ import pandas as pd
 from ..progress_bar import ProgressBar
 from .utils import NULL_VALUES, create_report_new, to_dask
 
-CA_US_PATTERN = re.compile(
+PHONE_PATTERN = re.compile(
+    r"""
+    ^\s*
+    (?:[+(]?(?P<country>(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
+                        2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
+                        4[987654310]|3[9643210]|2[70]|7|1))[)\/]?)?
+    [-. (]*
+    (?P<area>\d{3})?
+    [-. )\/]*
+    (?:(?P<office>\d{3})
+    [-. \/]*
+    (?P<station>\d{4})|
+    (?P<letters>[0-9A-Z-. \/]{7,13}?))
+    (?:[ \t]*(?:\#|x[.:]?|[Ee]xt[.:]?|[Ee]xtension)[ \t]*(?P<ext>\d+))?
+    \s*$
+    """,
+    re.VERBOSE,
+)
+
+US_PHONE_PATTERN = re.compile(
     r"""
     ^\s*
     (?:[+(]?(?P<country>1)[)\/]?)?
@@ -234,7 +253,6 @@ def _format_phone(
         3 := the value is cleaned and is THE SAME as the input value (no transformation)
     """
     country_code, area_code, office_code, station_code, ext_num, status = _check_phone(phone, True)
-
     if status == "null":
         return (np.nan, np.nan, np.nan, np.nan, np.nan, 0) if split else (np.nan, 0)
 
@@ -255,8 +273,12 @@ def _format_phone(
         area_code = f"{area_code}-" if area_code else ""
         ext_num = f" ext. {ext_num}" if ext_num else ""
         result = f"{area_code}{office_code}-{station_code}{ext_num}"
-    elif output_format == "e164":  # +1NPANXXXXXX
-        country_code = "+1" if area_code else ""
+    elif output_format == "e164":  # +NPANXXXXXX
+        print(country_code)
+        if country_code == None and area_code:
+            country_code = "+1"
+        else:
+            country_code = "+" + country_code if area_code else ""
         area_code = area_code if area_code else ""
         ext_num = f" ext. {ext_num}" if ext_num else ""
         result = f"{country_code}{area_code}{office_code}{station_code}{ext_num}"
@@ -266,6 +288,27 @@ def _format_phone(
         result = f"{area_code}{office_code}-{station_code}{ext_num}"
 
     return result, 2 if phone != result else 3
+
+
+def split_phone(mch, clean):
+    if mch.group("letters"):
+        # Check that there are 7 alphanumeric characters present
+        letters = re.sub(r"\W+", "", mch.group("letters"))
+        if len(letters) != 7:
+            return (None,) * 5 + ("unknown",) if clean else False
+        # Convert letters to numbers
+        numlist = [ALPHA_NUM_MAP[char] if char.isalpha() else char for char in letters]
+        numbers = "".join(numlist)
+    # Components for phone number
+    country_code = mch.group("country")
+    area_code = mch.group("area")
+    office_code = numbers[:3] if mch.group("letters") else mch.group("office")
+    station_code = numbers[3:] if mch.group("letters") else mch.group("station")
+    ext_num = mch.group("ext")
+
+    return (
+        (country_code, area_code, office_code, station_code, ext_num, "success") if clean else True
+    )
 
 
 def _check_phone(phone: Any, clean: bool) -> Any:
@@ -289,28 +332,16 @@ def _check_phone(phone: Any, clean: bool) -> Any:
     if phone in NULL_VALUES:
         return (None,) * 5 + ("null",) if clean else False
 
-    mch = re.match(CA_US_PATTERN, re.sub(r"''", r'"', str(phone)))
+    mch = re.match(US_PHONE_PATTERN, re.sub(r"''", r'"', str(phone)))
     # Check if the value was able to be parsed
+
     if not mch:
-        return (None,) * 5 + ("unknown",) if clean else False
+        mch = re.match(PHONE_PATTERN, re.sub(r"''", r'"', str(phone)))
+        if not mch:
+            return (None,) * 5 + ("unknown",) if clean else False
+        else:
+            return split_phone(mch, clean)
     if mch.group("country") and not mch.group("area"):
         return (None,) * 5 + ("unknown",) if clean else False
-    if mch.group("letters"):
-        # Check that there are 7 alphanumeric characters present
-        letters = re.sub(r"\W+", "", mch.group("letters"))
-        if len(letters) != 7:
-            return (None,) * 5 + ("unknown",) if clean else False
-        # Convert letters to numbers
-        numlist = [ALPHA_NUM_MAP[char] if char.isalpha() else char for char in letters]
-        numbers = "".join(numlist)
 
-    # Components for phone number
-    country_code = mch.group("country")
-    area_code = mch.group("area")
-    office_code = numbers[:3] if mch.group("letters") else mch.group("office")
-    station_code = numbers[3:] if mch.group("letters") else mch.group("station")
-    ext_num = mch.group("ext")
-
-    return (
-        (country_code, area_code, office_code, station_code, ext_num, "success") if clean else True
-    )
+    return split_phone(mch, clean)
