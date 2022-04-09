@@ -1,10 +1,10 @@
-var filterBy = function(tableType) {
+var filterBy = function(table_type) {
 $.fn.dataTableExt.afnFiltering.length = 0;
 $.fn.dataTable.ext.search.push(
     function( settings, data, dataIndex ) {        
         var type = data[1]; // use data for the Type column
  
-        if ( type == tableType || tableType=='All' )
+        if ( type == table_type || table_type=='All' )
         {
             return true;
         }
@@ -17,33 +17,33 @@ $(document).ready(function() {
 	var activeObject;
     var table = $('#column_table').DataTable( {
         deferRender: true,
-		data: tableData,
+		data: table_data,
         columns: [
-            { data: "tableName" },
-            { data: "tableType" },
+            { data: "table_name" },
+            { data: "table_type" },
             { data: "name" },
             { data: "type" },
             { data: "length" },
             { data: "nullable" },
-            { data: "autoUpdated" },
-            { data: "defaultValue" },
+            { data: "auto_updated" },
+            { data: "default_value" },
             { data: "comments" }
         ],
         columnDefs: [
             {
                 targets: 0,
                 render: function ( data, type, row, meta ) {
-                    return '<a href="tables/'+row.tableFileName+'.html" target="_top">'+data+'</a>';
+                    return '<a href="tables/'+row.table_file_name+'.html" target="_top">'+data+'</a>';
                 }
             },
             {
                 targets: 2,
                 createdCell: function(td, cellData, rowData, row, col) {
-                    if (rowData.keyTitle.length > 0) {
-                        $(td).prop('title', rowData.keyTitle);
+                    if (rowData.key_title.length > 0) {
+                        $(td).prop('title', rowData.key_title);
                     }
-                    if (rowData.keyClass.length > 0) {
-                        $(td).addClass(rowData.keyClass);
+                    if (rowData.key_class.length > 0) {
+                        $(td).addClass(rowData.key_class);
                     }
                 }
             },

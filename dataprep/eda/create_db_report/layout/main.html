@@ -32,7 +32,7 @@
                                 <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">TABLES</span>
-                                    <span class="info-box-number">{{tablesAmount}}</span>
+                                    <span class="info-box-number">{{tables_amount}}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -44,7 +44,7 @@
                                 <span class="info-box-icon bg-teal"><i class="fa fa-table"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">VIEWS</span>
-                                    <span class="info-box-number">{{viewsAmount}}</span>
+                                    <span class="info-box-number">{{views_amount}}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -56,7 +56,7 @@
                                 <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">COLUMNS</span>
-                                    <span class="info-box-number">{{columnsAmount}}</span>
+                                    <span class="info-box-number">{{columns_amount}}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -68,7 +68,7 @@
                                 <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Constraints</span>
-                                    <span class="info-box-number">{{constraintsAmount}}</span>
+                                    <span class="info-box-number">{{constraints_amount}}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -80,7 +80,7 @@
 <!--                                <span class="info-box-icon bg-red-active"><i class="fa fa-question" aria-hidden="true"></i></span>-->
 <!--                                <div class="info-box-content">-->
 <!--                                    <span class="info-box-text">Anomalies</span>-->
-<!--                                    <span class="info-box-number">{{anomaliesAmount}}</span>-->
+<!--                                    <span class="info-box-number">{{anomalies_amount}}</span>-->
 <!--                                </div>-->
 <!--                                &lt;!&ndash; /.info-box-content &ndash;&gt;-->
 <!--                            </div>-->
@@ -92,7 +92,7 @@
 <!--                                <span class="info-box-icon bg-navy"><i class="fa fa-file-code-o" aria-hidden="true"></i></span>-->
 <!--                                <div class="info-box-content">-->
 <!--                                    <span class="info-box-text">Routines</span>-->
-<!--                                    <span class="info-box-number">{{routinesAmount}}</span>-->
+<!--                                    <span class="info-box-number">{{routines_amount}}</span>-->
 <!--                                </div>-->
 <!--                                &lt;!&ndash; /.info-box-content &ndash;&gt;-->
 <!--                            </div>-->
@@ -106,7 +106,7 @@
                             <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <p>Database Type: {{database.databaseProduct}}</p>
+                            <p>Database Type: {{database.database_product}}</p>
                         </div><!-- /.box-body -->
                     </div>
                     {{#catalog}}
@@ -145,18 +145,18 @@
                                     id="database_objects"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{dataTableConfig.databaseObjects.paging}}"
-                                    data-page-length="{{dataTableConfig.databaseObjects.pageLength}}"
-                                    data-length-change="{{dataTableConfig.databaseObjects.lengthChange}}">
+                                    data-paging="{{data_table_config.database_objects.paging}}"
+                                    data-page-length="{{data_table_config.database_objects.pageLength}}"
+                                    data-length-change="{{data_table_config.database_objects.lengthChange}}">
                                 <thead>
                                     <tr>
                                         <th valign="bottom">Table / View</th>
                                         <th align="right" valign="bottom">Children</th>
                                         <th align="right" valign="bottom">Parents</th>
                                         <th align="right" valign="bottom">Columns</th>
-                                        {{#displayNumRows}}
+                                        {{#display_num_rows}}
                                         <th align="right" valign="bottom">Rows</th>
-                                        {{/displayNumRows}}
+                                        {{/display_num_rows}}
                                         <th align="right" valign="bottom">Type</th>
                                         <th class="toggle">Comments</th>
                                     </tr>
@@ -164,14 +164,14 @@
                                 <tbody>
                                     {{#tables}}
                                     <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html">{{table.name}}</a></td>
-                                        <td class="detail" align="right">{{table.maxChildren}}</td>
-                                        <td class="detail" align="right">{{table.maxParents}}</td>
-                                        <td class="detail" align="right">{{table.numCols}}</td>
-                                        {{#displayNumRows}}
-                                        <td class="detail" align="right">{{table.numRows}}</td>
-                                        {{/displayNumRows}}
-                                        <td class="detail" align="right">{{table.getType}}</td>
+                                        <td class="detail"><a href="tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html">{{table.name}}</a></td>
+                                        <td class="detail" align="right">{{table.max_children}}</td>
+                                        <td class="detail" align="right">{{table.max_parents}}</td>
+                                        <td class="detail" align="right">{{table.num_of_cols}}</td>
+                                        {{#display_num_rows}}
+                                        <td class="detail" align="right">{{table.num_of_rows}}</td>
+                                        {{/display_num_rows}}
+                                        <td class="detail" align="right">{{table.get_type}}</td>
                                         <td class="comment detail" style="display: table-cell;">{{{comments}}}</td>
                                     </tr>
                                     {{/tables}}
@@ -182,6 +182,6 @@
                 <!-- /.content -->
                 <script>
                     var config = {
-                        pagination: {{paginationEnabled}}
+                        pagination: {{pagination_enabled}}
                     }
                 </script>

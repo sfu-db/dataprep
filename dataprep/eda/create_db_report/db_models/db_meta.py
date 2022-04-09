@@ -29,4 +29,4 @@ class DbMeta:
         self.num_of_uk = num_of_uk
         self.num_of_pk = num_of_pk
         self.num_of_table = num_of_tables
-        self.databaseProduct = self.engine_name_dict[engine_name] + " - " + product_version
+        self.database_product = self.engine_name_dict[engine_name] + " - " + product_version

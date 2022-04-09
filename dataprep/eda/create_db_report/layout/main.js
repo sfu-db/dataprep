@@ -1,10 +1,10 @@
-var filterBy = function(tableType) {
+var filterBy = function(table_type) {
 $.fn.dataTableExt.afnFiltering.length = 0;
 $.fn.dataTable.ext.search.push(
     function( settings, data, dataIndex ) {
         var type = data[data.length - 2]; // use data for the Type column, which is the second to last
 
-        if ( type == tableType || tableType=='All' )
+        if ( type == table_type || table_type=='All' )
         {
             return true;
         }
