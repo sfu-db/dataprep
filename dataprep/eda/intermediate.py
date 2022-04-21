@@ -30,11 +30,11 @@ class Intermediate(Dict[str, Any]):
             visual_type = kwargs.pop("visual_type")
             super().__init__(**kwargs)
             self.visual_type = visual_type
-            if 'target' in kwargs:
-                self.target = kwargs.pop('target')
-            
-            if 'df_list' in kwargs:
-                self.df_list = kwargs.pop('df_list')
+            if "target" in kwargs:
+                self.target = kwargs.pop("target")
+
+            if "df_list" in kwargs:
+                self.df_list = kwargs.pop("df_list")
         else:
             raise ValueError("Unsupported initialization")
 

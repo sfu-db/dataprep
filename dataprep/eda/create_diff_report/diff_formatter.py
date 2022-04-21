@@ -68,7 +68,7 @@ def format_diff_report(
     cfg: Config,
     mode: Optional[str],
     progress: bool = True,
-    target: Optional[str] = None
+    target: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Format the data and figures needed by create_diff_report
@@ -118,6 +118,7 @@ def format_diff_report(
             raise ValueError(f"Unknown mode: {mode}")
     return report
 
+
 def validate_target(target: str, df_list: List[pd.DataFrame]):
     """
     Helper function, verify that target column exists
@@ -128,7 +129,8 @@ def validate_target(target: str, df_list: List[pd.DataFrame]):
             exists = True
         break
     if not exists:
-        raise ValueError(f'Sorry, {target} is not a valid column')
+        raise ValueError(f"Sorry, {target} is not a valid column")
+
 
 def format_basic(df_list: List[pd.DataFrame], target: Optional[str], cfg: Config) -> Dict[str, Any]:
     """
@@ -295,7 +297,9 @@ def compute_plot_data(
         elif is_dtype(dtp, DateTime_v1()):
             plot_data.append((col, dtp, dask.compute(*datum), orig))  # workaround
 
-    return Intermediate(data=plot_data, stats=stats, visual_type="comparison_grid", target=target, df_list=pd_list)
+    return Intermediate(
+        data=plot_data, stats=stats, visual_type="comparison_grid", target=target, df_list=pd_list
+    )
 
 
 def _compute_variables(df: EDAFrame, cfg: Config) -> Dict[str, Any]:

@@ -84,7 +84,7 @@ def bar_viz(
     df_labels: List[str],
     baseline: int,
     target: Optional[str] = None,
-    df_list: Optional[List[pd.DataFrame]] = None
+    df_list: Optional[List[pd.DataFrame]] = None,
 ) -> Figure:
     """
     Render a bar chart
@@ -119,7 +119,7 @@ def bar_viz(
         tools="hover",
         x_range=list(df[baseline].index),
         y_axis_type=yscale,
-        y_range=(min(col1_min, col2_min) * (1 - y_inc), max(col1_max, col2_max) * (1 + y_inc))
+        y_range=(min(col1_min, col2_min) * (1 - y_inc), max(col1_max, col2_max) * (1 + y_inc)),
     )
     row_names = None
     offset = np.linspace(-0.08 * len(df), 0.08 * len(df), len(df)) if len(df) > 1 else [0]
@@ -157,7 +157,7 @@ def bar_viz(
 
     if show_yticks and yscale == "linear":
         _format_axis(fig, 0, df[baseline].max(), "y")
-    
+
     df1, df2 = df_list[0], df_list[1]
     if target != col and target and col in df1.columns and col in df2.columns:
         col1, col2 = df_list[0][col], df_list[1][col]
@@ -166,12 +166,23 @@ def bar_viz(
         for names in row_names:
             row_avgs_1.append(df_list[0][target][col1 == names].mean())
             row_avgs_2.append(df_list[1][target][col2 == names].mean())
-        
+
         row_avgs_1 = [0 if math.isnan(x) else x for x in row_avgs_1]
         row_avgs_2 = [0 if math.isnan(x) else x for x in row_avgs_2]
-        fig.extra_y_ranges = {"Averages": Range1d(start=min(row_avgs_1 + row_avgs_2) * (1 - y_inc), end=max(row_avgs_1 + row_avgs_2) * (1 + y_inc))}
-        fig.multi_line([row_names, row_names], [row_avgs_1, row_avgs_2], color=['navy', 'firebrick'], y_range_name="Averages", line_width=4)
-        fig.add_layout(LinearAxis(y_range_name="Averages"), 'right')
+        fig.extra_y_ranges = {
+            "Averages": Range1d(
+                start=min(row_avgs_1 + row_avgs_2) * (1 - y_inc),
+                end=max(row_avgs_1 + row_avgs_2) * (1 + y_inc),
+            )
+        }
+        fig.multi_line(
+            [row_names, row_names],
+            [row_avgs_1, row_avgs_2],
+            color=["navy", "firebrick"],
+            y_range_name="Averages",
+            line_width=4,
+        )
+        fig.add_layout(LinearAxis(y_range_name="Averages"), "right")
     return fig
 
 
@@ -186,7 +197,7 @@ def hist_viz(
     df_labels: List[str],
     orig: Optional[List[str]] = None,
     target: Optional[str] = None,
-    df_list: Optional[List[pd.DataFrame]] = None
+    df_list: Optional[List[pd.DataFrame]] = None,
 ) -> Figure:
     """
     Render a histogram
@@ -222,14 +233,13 @@ def hist_viz(
         counts_max_2 = max(counts_list[1])
 
         y_start, y_end = min(counts_min_1, counts_min_2), max(counts_max_1, counts_max_2)
-    
 
     fig = Figure(
         plot_height=plot_height,
         plot_width=plot_width,
         title=col,
         toolbar_location=None,
-        y_axis_type=yscale
+        y_axis_type=yscale,
     )
     bins_list = []
     for i, hst in enumerate(hist):
@@ -252,7 +262,9 @@ def hist_viz(
         bottom = 0 if yscale == "linear" or df.empty else counts.min() / 2
         if y_start is not None and y_end is not None:
             # fig.y_range = (y_start * (1 - y_inc), y_end * (1 + y_inc))
-            fig.extra_y_ranges = {"Counts": Range1d(start=y_start * (1 - y_inc), end=y_end * (1 + y_inc))}
+            fig.extra_y_ranges = {
+                "Counts": Range1d(start=y_start * (1 - y_inc), end=y_end * (1 + y_inc))
+            }
             fig.quad(
                 source=df,
                 left="left",
@@ -262,7 +274,7 @@ def hist_viz(
                 top="freq",
                 fill_color=CATEGORY10[i],
                 line_color=CATEGORY10[i],
-                y_range_name="Counts"
+                y_range_name="Counts",
             )
         else:
             fig.quad(
@@ -273,11 +285,11 @@ def hist_viz(
                 alpha=0.5,
                 top="freq",
                 fill_color=CATEGORY10[i],
-                line_color=CATEGORY10[i]
+                line_color=CATEGORY10[i],
             )
         # if col == 'LotFrontage':
-            # breakpoint()
-    
+        # breakpoint()
+
     hover = HoverTool(tooltips=tooltips, attachment="vertical", mode="vline")
     fig.add_tools(hover)
 
@@ -325,9 +337,17 @@ def hist_viz(
         max_range = max(df1_bin_averages + df2_bin_averages)
         min_range = min(df1_bin_averages + df2_bin_averages)
 
-        fig.extra_y_ranges['Averages'] = Range1d(start=min_range * (1 - y_inc), end=max_range * (1 + y_inc))
-        fig.multi_line([bins_1, bins_2], [df1_bin_averages, df2_bin_averages], color=['navy', 'firebrick'], y_range_name="Averages", line_width=4)
-        fig.add_layout(LinearAxis(y_range_name="Averages", axis_label='Bin Averages'), 'right')
+        fig.extra_y_ranges["Averages"] = Range1d(
+            start=min_range * (1 - y_inc), end=max_range * (1 + y_inc)
+        )
+        fig.multi_line(
+            [bins_1, bins_2],
+            [df1_bin_averages, df2_bin_averages],
+            color=["navy", "firebrick"],
+            y_range_name="Averages",
+            line_width=4,
+        )
+        fig.add_layout(LinearAxis(y_range_name="Averages", axis_label="Bin Averages"), "right")
     return fig
 
 
@@ -678,7 +698,7 @@ def format_num_stats(data: Dict[str, List[Any]]) -> Dict[str, Dict[str, List[Any
     descriptive = {
         "Mean": data["mean"],
         "Standard Deviation": data["std"],
-        "Variance": [std**2 for std in data["std"]],
+        "Variance": [std ** 2 for std in data["std"]],
         "Sum": [mean * npres for mean, npres in zip(data["mean"], data["npres"])],
         "Skewness": [float(skew) for skew in data["skew"]],
         "Kurtosis": [float(kurt) for kurt in data["kurt"]],
@@ -734,7 +754,7 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
                 df_labels,
                 baseline if len(df) > 1 else 0,
                 target,
-                df_list
+                df_list,
             )
         elif is_dtype(dtp, Continuous()):
             if cfg.diff.density:
@@ -753,7 +773,7 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
                     df_labels,
                     orig,
                     target,
-                    df_list
+                    df_list,
                 )
         elif is_dtype(dtp, DateTime()):
             df, timeunit = data
