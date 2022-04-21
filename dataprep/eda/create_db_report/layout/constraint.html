@@ -18,9 +18,9 @@
                                     id="fk_table"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{dataTableConfig.fkTable.paging}}"
-                                    data-page-length="{{dataTableConfig.fkTable.pageLength}}"
-                                    data-length-change="{{dataTableConfig.fkTable.lengthChange}}">
+                                    data-paging="{{data_table_config.fk_table.paging}}"
+                                    data-page-length="{{data_table_config.fk_table.pageLength}}"
+                                    data-length-change="{{data_table_config.fk_table.lengthChange}}">
                                 <thead align='left'>
                                     <tr>
                                         <th>Constraint Name</th>
@@ -35,23 +35,23 @@
                                         <td>{{name}}</td>
                                         <td>
                                             <table border='0' cellspacing='0' cellpadding='0'>
-                                                {{#childColumns}}
+                                                {{#child_columns}}
                                                 <tr>
-                                                    <td><a href='tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
+                                                    <td><a href='tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
                                                 </tr>
-                                                {{/childColumns}}
+                                                {{/child_columns}}
                                             </table>
                                         </td>
                                         <td>
                                             <table border='0' cellspacing='0' cellpadding='0'>
-                                                {{#parentColumns}}
+                                                {{#parent_columns}}
                                                 <tr>
-                                                    <td><a href='tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
+                                                    <td><a href='tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
                                                 </tr>
-                                                {{/parentColumns}}
+                                                {{/parent_columns}}
                                             </table>
                                         </td>
-                                        <td><span title='{{deleteRuleDescription}}'>{{deleteRule}}</span></td>
+                                        <td><span title='{{deleteRuleDescription}}'>{{delete_rule}}</span></td>
                                     </tr>
                                     {{/constraints}}
                                 </tbody>
@@ -72,9 +72,9 @@
 <!--                                    id="check_table"-->
 <!--                                    class="table table-bordered table-striped dataTable"-->
 <!--                                    role="grid"-->
-<!--                                    data-paging="{{dataTableConfig.checkTable.paging}}"-->
-<!--                                    data-page-length="{{dataTableConfig.checkTable.pageLength}}"-->
-<!--                                    data-length-change="{{dataTableConfig.checkTable.lengthChange}}">-->
+<!--                                    data-paging="{{data_table_config.check_table.paging}}"-->
+<!--                                    data-page-length="{{data_table_config.check_table.pageLength}}"-->
+<!--                                    data-length-change="{{data_table_config.check_table.lengthChange}}">-->
 <!--                                <thead align='left'>-->
 <!--                                    <tr>-->
 <!--                                        <th>Table</th>-->
@@ -83,13 +83,13 @@
 <!--                                    </tr>-->
 <!--                                </thead>-->
 <!--                                <tbody>-->
-<!--                                    {{#checkConstraints}}-->
+<!--                                    {{#check_constraints}}-->
 <!--                                    <tr>-->
-<!--                                        <td><a href='tables/{{#toFileName}}{{tableName}}{{/toFileName}}.html'>{{tableName}}</a></td>-->
+<!--                                        <td><a href='tables/{{#to_file_name}}{{table_name}}{{/to_file_name}}.html'>{{table_name}}</a></td>-->
 <!--                                        <td>{{name}}</td>-->
 <!--                                        <td>{{definition}}</td>-->
 <!--                                    </tr>-->
-<!--                                    {{/checkConstraints}}-->
+<!--                                    {{/check_constraints}}-->
 <!--                                </tbody>-->
 <!--                            </table>-->
 <!--                        </div>-->
@@ -97,6 +97,6 @@
                 </section>
                 <script>
                     var config = {
-                        pagination: {{paginationEnabled}}
+                        pagination: {{pagination_enabled}}
                     }
                 </script>

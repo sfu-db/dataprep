@@ -22,9 +22,9 @@
                                             id="implied_constraint"
                                             class="table table-bordered table-striped dataTable"
                                             role="grid"
-                                            data-paging="{{dataTableConfig.anomalies.paging}}"
-                                            data-page-length="{{dataTableConfig.anomalies.pageLength}}"
-                                            data-length-change="{{dataTableConfig.anomalies.lengthChange}}">
+                                            data-paging="{{data_table_config.anomalies.paging}}"
+                                            data-page-length="{{data_table_config.anomalies.pageLength}}"
+                                            data-length-change="{{data_table_config.anomalies.lengthChange}}">
                                         <thead align='left'>
                                             <tr>
                                                 <th>Child Column</th>
@@ -34,8 +34,8 @@
                                         <tbody>
                                             {{#impliedConstraints}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{childTable.name}}{{/toFileName}}.html'>{{childTable.name}}</a>.{{childColumns}}</td>
-                                                <td><a href='tables/{{#toFileName}}{{parentTable.name}}{{/toFileName}}.html'>{{parentTable.name}}</a>.{{parentColumns}}</td>
+                                                <td><a href='tables/{{#to_file_name}}{{child_table.name}}{{/to_file_name}}.html'>{{child_table.name}}</a>.{{child_columns}}</td>
+                                                <td><a href='tables/{{#to_file_name}}{{parent_table.name}}{{/to_file_name}}.html'>{{parent_table.name}}</a>.{{parent_columns}}</td>
                                             </tr>
                                             {{/impliedConstraints}}
                                             {{^impliedConstraints}}
@@ -62,24 +62,24 @@
                                             id="un_indexed_table"
                                             class="table table-bordered table-striped dataTable"
                                             role="grid"
-                                            data-paging="{{dataTableConfig.anomalies.paging}}"
-                                            data-page-length="{{dataTableConfig.anomalies.pageLength}}"
-                                            data-length-change="{{dataTableConfig.anomalies.lengthChange}}">
+                                            data-paging="{{data_table_config.anomalies.paging}}"
+                                            data-page-length="{{data_table_config.anomalies.pageLength}}"
+                                            data-length-change="{{data_table_config.anomalies.lengthChange}}">
                                         <thead align='left'>
                                             <tr>
                                                 <th>Table</th>
-                                                {{#displayNumRows}}
+                                                {{#display_num_rows}}
                                                 <th>Rows</th>
-                                                {{/displayNumRows}}
+                                                {{/display_num_rows}}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {{#unIndexedTables}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{name}}{{/toFileName}}.html'>{{name}}</a></td>
-                                                {{#displayNumRows}}
-                                                <td>{{numRows}}</td>
-                                                {{/displayNumRows}}
+                                                <td><a href='tables/{{#to_file_name}}{{name}}{{/to_file_name}}.html'>{{name}}</a></td>
+                                                {{#display_num_rows}}
+                                                <td>{{num_of_rows}}</td>
+                                                {{/display_num_rows}}
                                             </tr>
                                             {{/unIndexedTables}}
                                             {{^unIndexedTables}}
@@ -106,9 +106,9 @@
                                             id="single_column_table"
                                             class="table table-bordered table-striped dataTable"
                                             role="grid"
-                                            data-paging="{{dataTableConfig.anomalies.paging}}"
-                                            data-page-length="{{dataTableConfig.anomalies.pageLength}}"
-                                            data-length-change="{{dataTableConfig.anomalies.lengthChange}}">
+                                            data-paging="{{data_table_config.anomalies.paging}}"
+                                            data-page-length="{{data_table_config.anomalies.pageLength}}"
+                                            data-length-change="{{data_table_config.anomalies.lengthChange}}">
                                         <thead align='left'>
                                             <tr>
                                                 <th>Table</th>
@@ -118,7 +118,7 @@
                                         <tbody>
                                             {{#oneColumnTables}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{name}}{{/toFileName}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{{#to_file_name}}{{name}}{{/to_file_name}}.html'>{{name}}</a></td>
                                                 {{#columns}}
                                                 <td>{{name}}</td>
                                                 {{/columns}}
@@ -148,9 +148,9 @@
                                             id="inc_column_table"
                                             class="table table-bordered table-striped dataTable"
                                             role="grid"
-                                            data-paging="{{dataTableConfig.anomalies.paging}}"
-                                            data-page-length="{{dataTableConfig.anomalies.pageLength}}"
-                                            data-length-change="{{dataTableConfig.anomalies.lengthChange}}">
+                                            data-paging="{{data_table_config.anomalies.paging}}"
+                                            data-page-length="{{data_table_config.anomalies.pageLength}}"
+                                            data-length-change="{{data_table_config.anomalies.lengthChange}}">
                                         <thead align='left'>
                                             <tr>
                                                 <th>Table</th>
@@ -159,7 +159,7 @@
                                         <tbody>
                                             {{#incrementingColumnNames}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{name}}{{/toFileName}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{{#to_file_name}}{{name}}{{/to_file_name}}.html'>{{name}}</a></td>
                                             </tr>
                                             {{/incrementingColumnNames}}
                                             {{^incrementingColumnNames}}
@@ -186,9 +186,9 @@
                                             id="null_string_table"
                                             class="table table-bordered table-striped dataTable"
                                             role="grid"
-                                            data-paging="{{dataTableConfig.anomalies.paging}}"
-                                            data-page-length="{{dataTableConfig.anomalies.pageLength}}"
-                                            data-length-change="{{dataTableConfig.anomalies.lengthChange}}">
+                                            data-paging="{{data_table_config.anomalies.paging}}"
+                                            data-page-length="{{data_table_config.anomalies.pageLength}}"
+                                            data-length-change="{{data_table_config.anomalies.lengthChange}}">
                                         <thead align='left'>
                                             <tr>
                                                 <th>Table</th>
@@ -197,7 +197,7 @@
                                         <tbody>
                                             {{#uniqueNullables}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a>.{{name}}</td>
+                                                <td><a href='tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html'>{{table.name}}</a>.{{name}}</td>
                                             </tr>
                                             {{/uniqueNullables}}
                                             {{^uniqueNullables}}
