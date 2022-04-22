@@ -36,6 +36,8 @@ def create_diff_report(
     ----------
     df_list
         The DataFrames for which data are calculated.
+    target
+        Target feature to be compared against all other columns.
     config
         A dictionary for configuring the visualizations
         E.g. config={"hist.bins": 20}

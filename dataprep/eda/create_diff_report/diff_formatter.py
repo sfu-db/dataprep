@@ -84,6 +84,8 @@ def format_diff_report(
         Currently only the 'basic' is fully implemented.
     progress
         Whether to show the progress bar.
+    target
+        Target feature to be compared against all other columns.
 
     Returns
     -------
@@ -122,6 +124,13 @@ def format_diff_report(
 def validate_target(target: str, df_list: List[pd.DataFrame]):
     """
     Helper function, verify that target column exists
+
+    Parameters
+    ----------
+    target
+        Target feature to be compared against all other columns.
+    df_list
+        The Dataframe for which data are calculated.
     """
     exists = False
     for df in df_list:
@@ -140,6 +149,8 @@ def format_basic(df_list: List[pd.DataFrame], target: Optional[str], cfg: Config
     ----------
     df_list
         The DataFrames for which data are calculated.
+    target
+        Target feature to be compared against all other columns.
     cfg
         The config dict user passed in. E.g. config =  {"hist.bins": 20}
         Without user's specifications, the default is "auto"
@@ -242,6 +253,8 @@ def compute_plot_data(
         E.g.  dtype = {"a": Continuous, "b": "Nominal"} or
         dtype = {"a": Continuous(), "b": "nominal"}
         or dtype = Continuous() or dtype = "Continuous" or dtype = Continuous()
+    target
+        Target feature to be compared against all other columns.
     """
     # pylint: disable=too-many-branches, too-many-locals
 
