@@ -101,6 +101,7 @@ def bar_viz(
         ("Source", "@orig"),
     ]
 
+    # Used to add y-padding to the graphs
     col1_min = df[0][col].min()
     col2_min = df[1][col].min()
     col1_max = df[0][col].max()
@@ -159,6 +160,7 @@ def bar_viz(
         _format_axis(fig, 0, df[baseline].max(), "y")
 
     df1, df2 = df_list[0], df_list[1]
+    # Feature analysis here
     if target != col and target and col in df1.columns and col in df2.columns:
         col1, col2 = df_list[0][col], df_list[1][col]
         row_avgs_1 = []
@@ -261,7 +263,6 @@ def hist_viz(
         )
         bottom = 0 if yscale == "linear" or df.empty else counts.min() / 2
         if y_start is not None and y_end is not None:
-            # fig.y_range = (y_start * (1 - y_inc), y_end * (1 + y_inc))
             fig.extra_y_ranges = {
                 "Counts": Range1d(start=y_start * (1 - y_inc), end=y_end * (1 + y_inc))
             }
@@ -287,8 +288,6 @@ def hist_viz(
                 fill_color=CATEGORY10[i],
                 line_color=CATEGORY10[i],
             )
-        # if col == 'LotFrontage':
-        # breakpoint()
 
     hover = HoverTool(tooltips=tooltips, attachment="vertical", mode="vline")
     fig.add_tools(hover)
@@ -312,6 +311,7 @@ def hist_viz(
     fig.xaxis.axis_label = x_axis_label
     fig.xaxis.axis_label_standoff = 0
 
+    # Feature analysis here
     if target and target != col and col in df1.columns and col in df2.columns:
         col1, col2 = df1[col], df2[col]
         source1, source2 = col1, col2
@@ -347,7 +347,7 @@ def hist_viz(
             y_range_name="Averages",
             line_width=4,
         )
-        fig.add_layout(LinearAxis(y_range_name="Averages", axis_label="Bin Averages"), "right")
+        fig.add_layout(LinearAxis(y_range_name="Averages"), "right")
     return fig
 
 

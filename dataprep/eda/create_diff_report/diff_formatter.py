@@ -282,6 +282,8 @@ def compute_plot_data(
             col_dtype = col_dtype[0]
 
         orig = [src for src, seq in labeled_cols.items() if col in seq]
+        if col == target and not is_dtype(col_dtype, Continuous_v1()):
+            raise ValueError("Sorry, target must be a numerical feature.")
 
         if is_dtype(col_dtype, Continuous_v1()):
             data.append((col, Continuous_v1(), diff_cont_calcs(srs.apply("dropna"), cfg), orig))

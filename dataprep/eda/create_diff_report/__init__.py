@@ -85,16 +85,6 @@ def create_diff_report(
         "legend_labels": components["legend_lables"],
     }
 
-    # {% for div in value.plots[1] %}
-    #             <div class="vp-plot">
-    #                 {{ div }}
-    #                 {% if key in context.components.dfs[1].variables %}
-    #                 {{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}
-    #                 {% endif %}
-    #             </div>
-
-    # return context
-
     template_base = ENV_LOADER.get_template("base.html")
     report = template_base.render(context=context, zip=zip)
     return Report(report)
