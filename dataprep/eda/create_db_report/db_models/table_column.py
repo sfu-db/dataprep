@@ -17,13 +17,13 @@ class TableColumn:
         self.name = name
         self.type_name = type_name
         self.not_null = not_null
-        self.default_value = default_value
+        self.default_value = default_value if default_value is not None else ""
         self.comments = comments
         self.parents = {}
         self.children = {}
         self.type = 0
         self.decimal_digits = 0
-        self.detailed_size = None
+        self.detailed_size = ""
         self.is_auto_updated = is_auto_updated
         self.index = False
 
@@ -56,7 +56,7 @@ class TableColumn:
         self.table.add_max_children()
 
     def get_parents(self):
-        return list(self.parents)
+        return list(self.parents.values())
 
     def get_children(self):
-        return list(self.children)
+        return list(self.children.values())

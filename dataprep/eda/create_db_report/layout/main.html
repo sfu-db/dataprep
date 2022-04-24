@@ -9,17 +9,17 @@
                             </div>
                         </div>
                     </div>
-                    {{#description}}
+                    {% if description %}
                     <div class="row">
                         <div class="col-md-12">
                             <div class="box box-solid">
                                 <div class="box-body">
-                                    <p>{{{description}}}</p>
+                                    <p>{{ description|safe }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {{/description}}
+                    {% endif %}
 <!--                    <a href="{{xmlName}}.xml" title="XML Representation">XML Representation</a><br />-->
 <!--                    <a href="insertionOrder.txt" title="Useful for loading data into a database">Insertion Order</a>-->
 <!--                    <a href="deletionOrder.txt" title="Useful for purging data from a database">Deletion Order</a>-->
@@ -32,7 +32,7 @@
                                 <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">TABLES</span>
-                                    <span class="info-box-number">{{tables_amount}}</span>
+                                    <span class="info-box-number">{{ tables_amount }}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -44,7 +44,7 @@
                                 <span class="info-box-icon bg-teal"><i class="fa fa-table"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">VIEWS</span>
-                                    <span class="info-box-number">{{views_amount}}</span>
+                                    <span class="info-box-number">{{ views_amount }}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -56,7 +56,7 @@
                                 <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">COLUMNS</span>
-                                    <span class="info-box-number">{{columns_amount}}</span>
+                                    <span class="info-box-number">{{ columns_amount }}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -68,7 +68,7 @@
                                 <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Constraints</span>
-                                    <span class="info-box-number">{{constraints_amount}}</span>
+                                    <span class="info-box-number">{{ constraints_amount }}</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -106,35 +106,35 @@
                             <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <p>Database Type: {{database.database_product}}</p>
+                            <p>Database Type: {{ database.database_product }}</p>
                         </div><!-- /.box-body -->
                     </div>
-                    {{#catalog}}
-                    {{#catalog.comment}}
+                    {% if catalog %}
+                    {% if catalog.comment %}
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Catalog {{catalog.name}}</h3>
+                            <h3 class="box-title">Catalog {{ catalog.name }}</h3>
                             <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <p> {{{catalog.comment}}} </p>
+                            <p> {{ catalog.comment|safe }} </p>
                         </div><!-- /.box-body -->
                     </div>
-                    {{/catalog.comment}}
-                    {{/catalog}}
-                    {{#schema}}
-                    {{#schema.comment}}
+                    {% endif %}
+                    {% endif %}
+                    {% if schema %}
+                    {% if schema.comment %}
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">Schema {{schema.name}}</h3>
                             <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <p> {{{schema.comment}}} </p>
+                            <p> {{ schema.comment|safe }} </p>
                         </div><!-- /.box-body -->
                     </div>
-                    {{/schema.comment}}
-                    {{/schema}}
+                    {% endif %}
+                    {% endif %}
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">Tables</h3>
@@ -145,36 +145,36 @@
                                     id="database_objects"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{data_table_config.database_objects.paging}}"
-                                    data-page-length="{{data_table_config.database_objects.pageLength}}"
-                                    data-length-change="{{data_table_config.database_objects.lengthChange}}">
+                                    data-paging="{{ data_table_config.database_objects.paging }}"
+                                    data-page-length="{{ data_table_config.database_objects.pageLength }}"
+                                    data-length-change="{{ data_table_config.database_objects.lengthChange }}">
                                 <thead>
                                     <tr>
                                         <th valign="bottom">Table / View</th>
                                         <th align="right" valign="bottom">Children</th>
                                         <th align="right" valign="bottom">Parents</th>
                                         <th align="right" valign="bottom">Columns</th>
-                                        {{#display_num_rows}}
+                                        {% if display_num_rows %}
                                         <th align="right" valign="bottom">Rows</th>
-                                        {{/display_num_rows}}
+                                        {% endif %}
                                         <th align="right" valign="bottom">Type</th>
                                         <th class="toggle">Comments</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{#tables}}
+                                    {% for table in tables %}
                                     <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html">{{table.name}}</a></td>
-                                        <td class="detail" align="right">{{table.max_children}}</td>
-                                        <td class="detail" align="right">{{table.max_parents}}</td>
-                                        <td class="detail" align="right">{{table.num_of_cols}}</td>
-                                        {{#display_num_rows}}
-                                        <td class="detail" align="right">{{table.num_of_rows}}</td>
-                                        {{/display_num_rows}}
-                                        <td class="detail" align="right">{{table.get_type}}</td>
-                                        <td class="comment detail" style="display: table-cell;">{{{comments}}}</td>
+                                        <td class="detail"><a href="tables/{% if to_file_name %}{{ table.name }}{% endif %}.html">{{ table.name }}</a></td>
+                                        <td class="detail" align="right">{{ table.max_children }}</td>
+                                        <td class="detail" align="right">{{ table.max_parents }}</td>
+                                        <td class="detail" align="right">{{ table.num_of_cols }}</td>
+                                        {% if display_num_rows %}
+                                        <td class="detail" align="right">{{ table.num_of_rows }}</td>
+                                        {% endif %}
+                                        <td class="detail" align="right">{{ table.get_type() }}</td>
+                                        <td class="comment detail" style="display: table-cell;">{{ comments|safe }}</td>
                                     </tr>
-                                    {{/tables}}
+                                    {% endfor %}
                             </table>
                         </div>
                     </div><!-- /.box-body -->
@@ -182,6 +182,6 @@
                 <!-- /.content -->
                 <script>
                     var config = {
-                        pagination: {{pagination_enabled}}
+                        pagination: {{ pagination_enabled }}
                     }
                 </script>

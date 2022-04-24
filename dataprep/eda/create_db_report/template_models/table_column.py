@@ -1,8 +1,11 @@
 from ..db_models.table_column import TableColumn
 
 
-class PystacheTableColumn:
+class TemplateTableColumn:
     def __init__(self, table_column: TableColumn, index_column: bool, root_path: str) -> None:
+        for attr in dir(table_column):
+            if not attr.startswith("__"):
+                setattr(self, attr, getattr(table_column, attr))
         self.table_column = table_column
         self.index_column = index_column
         self.root_path = root_path

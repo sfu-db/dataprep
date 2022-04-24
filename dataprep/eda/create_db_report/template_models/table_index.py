@@ -1,8 +1,11 @@
 from ..db_models.table_index import TableIndex
 
 
-class PystacheTableIndex:
+class TemplateTableIndex:
     def __init__(self, index: TableIndex) -> None:
+        for attr in dir(index):
+            if not attr.startswith("__"):
+                setattr(self, attr, getattr(index, attr))
         self.index = index
 
     def get_index(self):

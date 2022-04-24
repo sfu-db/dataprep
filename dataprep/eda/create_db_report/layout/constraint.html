@@ -7,7 +7,7 @@
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <i class="ion ion-key"></i>
-                            <h3 class="box-title">{{constraints_num}} Foreign Key Constraints</h3>
+                            <h3 class="box-title">{{ constraints_num }} Foreign Key Constraints</h3>
                             <div class="box-tools pull-right">
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
@@ -30,73 +30,37 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{#constraints}}
+                                    {% for constraint in constraints %}
                                     <tr>
-                                        <td>{{name}}</td>
+                                        <td>{{ constraint.name }}</td>
                                         <td>
                                             <table border='0' cellspacing='0' cellpadding='0'>
-                                                {{#child_columns}}
+                                                {% for table_column in constraint.child_columns %}
                                                 <tr>
-                                                    <td><a href='tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
+                                                    <td><a href='tables/{% if to_file_name %}{{ table_column.table.name }}{% endif %}.html'>{{ table_column.table.name }}</a><span>.{{ table_column.name }}</span></td>
                                                 </tr>
-                                                {{/child_columns}}
+                                                {% endfor %}
                                             </table>
                                         </td>
                                         <td>
                                             <table border='0' cellspacing='0' cellpadding='0'>
-                                                {{#parent_columns}}
+                                                {% for table_column in constraint.parent_columns %}
                                                 <tr>
-                                                    <td><a href='tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
+                                                    <td><a href='tables/{% if to_file_name %}{{ table_column.table.name }}{% endif %}.html'>{{ table_column.table.name }}</a><span>.{{ table_column.name }}</span></td>
                                                 </tr>
-                                                {{/parent_columns}}
+                                                {% endfor %}
                                             </table>
                                         </td>
-                                        <td><span title='{{deleteRuleDescription}}'>{{delete_rule}}</span></td>
+                                        <td><span title='{{ constraint.get_delete_rule_description() }}'>{{ constraint.delete_rule }}</span></td>
                                     </tr>
-                                    {{/constraints}}
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-<!--                    <div class="box box-primary">-->
-<!--                        <div class="box-header with-border">-->
-<!--                            <i class="fa fa-sitemap"></i>-->
-<!--                            <h3 class="box-title">Check Constraints</h3>-->
-<!--                            <div class="box-tools pull-right">-->
-<!--                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>-->
-<!--                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="box-body">-->
-<!--                            <table-->
-<!--                                    id="check_table"-->
-<!--                                    class="table table-bordered table-striped dataTable"-->
-<!--                                    role="grid"-->
-<!--                                    data-paging="{{data_table_config.check_table.paging}}"-->
-<!--                                    data-page-length="{{data_table_config.check_table.pageLength}}"-->
-<!--                                    data-length-change="{{data_table_config.check_table.lengthChange}}">-->
-<!--                                <thead align='left'>-->
-<!--                                    <tr>-->
-<!--                                        <th>Table</th>-->
-<!--                                        <th>Constraint Name</th>-->
-<!--                                        <th>Constraint</th>-->
-<!--                                    </tr>-->
-<!--                                </thead>-->
-<!--                                <tbody>-->
-<!--                                    {{#check_constraints}}-->
-<!--                                    <tr>-->
-<!--                                        <td><a href='tables/{{#to_file_name}}{{table_name}}{{/to_file_name}}.html'>{{table_name}}</a></td>-->
-<!--                                        <td>{{name}}</td>-->
-<!--                                        <td>{{definition}}</td>-->
-<!--                                    </tr>-->
-<!--                                    {{/check_constraints}}-->
-<!--                                </tbody>-->
-<!--                            </table>-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </section>
                 <script>
                     var config = {
-                        pagination: {{pagination_enabled}}
+                        pagination: {{ pagination_enabled }}
                     }
                 </script>

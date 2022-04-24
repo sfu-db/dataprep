@@ -3,21 +3,21 @@ from typing import List
 from ..db_models.table import Table
 from ..page_models.page_data import PageData
 from ..page_models.page_template import PageTemplate
-from ..pystache_models.pystache_table_column import PystacheTableColumn
+from ..template_models.table_column import TemplateTableColumn
 
 
 class ColumnPage:
-    def __init__(self, pystache_object: PageTemplate) -> None:
-        self.pystache_object = pystache_object
+    def __init__(self, template_object: PageTemplate) -> None:
+        self.template_object = template_object
 
     def page_writer(self, tables: List[Table], new_file: str):
         """
-        Compile the data needed by the pystache template for columns page
+        Compile the data needed by the template for columns page
         """
         table_columns = set()
         for t in tables:
             for c in t.get_columns():
-                table_columns.add(PystacheTableColumn(c, c.index, ""))
+                table_columns.add(TemplateTableColumn(c, c.index, ""))
 
         json_columns = []
         for mc in table_columns:
@@ -45,4 +45,4 @@ class ColumnPage:
             "columnTable": {"paging": "true", "pageLength": 20, "lengthChange": "false"}
         }
 
-        return self.pystache_object.write_data(page_data, new_file, "column.js", pagination_configs)
+        return self.template_object.write_data(page_data, new_file, "column.js", pagination_configs)

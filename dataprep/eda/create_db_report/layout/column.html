@@ -14,9 +14,9 @@
                                     id="column_table"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{data_table_config.columnTable.paging}}"
-                                    data-page-length="{{data_table_config.columnTable.pageLength}}"
-                                    data-length-change="{{data_table_config.columnTable.lengthChange}}">
+                                    data-paging="{{ data_table_config.columnTable.paging }}"
+                                    data-page-length="{{ data_table_config.columnTable.pageLength }}"
+                                    data-length-change="{{ data_table_config.columnTable.lengthChange }}">
                                 <thead align='left'>
                                     <tr>
                                         <th>Table</th>
@@ -36,8 +36,8 @@
                     </div>
                 </section>
                 <script>
-                    var table_data = {{{table_data}}};
+                    var table_data = {{ table_data|safe }};
                     var config = {
-                        pagination: {{pagination_enabled}}
+                        pagination: {{ pagination_enabled }}
                     };
                 </script>
