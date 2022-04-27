@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1650584790265,
+  "lastUpdate": 1651037285036,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3844,6 +3844,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.09648193497575942",
             "extra": "mean: 4.1347707667999885 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f681b8ec62d13e7ecf5acedb748f5ab4714b578e",
+          "message": "Merge pull request #891 from khoatxp/fix/create-db-report-remove-pystache\n\nfix(eda.create-db-report): Remove pystache dependency",
+          "timestamp": "2022-04-26T22:24:52-07:00",
+          "tree_id": "9570ea8bfe1b0087718482a186d19e39f8e52830",
+          "url": "https://github.com/sfu-db/dataprep/commit/f681b8ec62d13e7ecf5acedb748f5ab4714b578e"
+        },
+        "date": 1651037281091,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2393670988524336,
+            "unit": "iter/sec",
+            "range": "stddev: 0.016089690475044372",
+            "extra": "mean: 4.177683586400008 sec\nrounds: 5"
           }
         ]
       }
