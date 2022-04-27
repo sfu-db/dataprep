@@ -31,7 +31,7 @@
                                 <tbody>
                                     {{#routines}}
                                     <tr>
-                                        <td><a href="routines/{{#to_file_name}}{{name}}{{/to_file_name}}.html">{{name}}</a></td>
+                                        <td><a href="routines/{% if to_file_name %}{{name}}{% endif %}.html">{{name}}</a></td>
                                         <td>{{type}}</td>
                                         <td>{{definitionLanguage}}</td>
                                         <td>{{deterministic}}</td>

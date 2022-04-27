@@ -6,18 +6,18 @@ from ..db_models.constraint import ForeignKeyConstraint
 from ..db_models.table import Table
 from ..page_models.page_data import PageData
 from ..page_models.page_template import PageTemplate
-from ..pystache_models.pystache_table import PystacheTable
+from ..template_models.table import TemplateTable
 
 
 class MainPage:
-    def __init__(self, pystache_object: PageTemplate, description: str, stats: DbMeta) -> None:
-        self.pystache_object = pystache_object
+    def __init__(self, template_object: PageTemplate, description: str, stats: DbMeta) -> None:
+        self.template_object = template_object
         self.description = description
         self.stats = stats
 
     def page_writer(self, database: Database, tables: List[Table], new_file: str):
         """
-        Compile the data needed by the pystache template for index page
+        Compile the data needed by the template for index page
         """
         columns_amount = 0
         tables_amount = 0
@@ -36,7 +36,7 @@ class MainPage:
             else:
                 tables_amount += 1
             columns_amount += len(t.get_columns())
-            all_tables.append(PystacheTable(t))
+            all_tables.append(TemplateTable(t))
 
         page_data = PageData("main.html", "main.js")
         page_data.add_scope("database_name", database.name)
@@ -55,4 +55,4 @@ class MainPage:
         pagination_configs = {
             "database_objects": {"paging": "true", "pageLength": 10, "lengthChange": "false"}
         }
-        return self.pystache_object.write_data(page_data, new_file, "main.js", pagination_configs)
+        return self.template_object.write_data(page_data, new_file, "main.js", pagination_configs)

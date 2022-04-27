@@ -34,8 +34,8 @@
                                         <tbody>
                                             {{#impliedConstraints}}
                                             <tr>
-                                                <td><a href='tables/{{#to_file_name}}{{child_table.name}}{{/to_file_name}}.html'>{{child_table.name}}</a>.{{child_columns}}</td>
-                                                <td><a href='tables/{{#to_file_name}}{{parent_table.name}}{{/to_file_name}}.html'>{{parent_table.name}}</a>.{{parent_columns}}</td>
+                                                <td><a href='tables/{% if to_file_name %}{{child_table.name}}{% endif %}.html'>{{child_table.name}}</a>.{{child_columns}}</td>
+                                                <td><a href='tables/{% if to_file_name %}{{parent_table.name}}{% endif %}.html'>{{parent_table.name}}</a>.{{parent_columns}}</td>
                                             </tr>
                                             {{/impliedConstraints}}
                                             {{^impliedConstraints}}
@@ -76,7 +76,7 @@
                                         <tbody>
                                             {{#unIndexedTables}}
                                             <tr>
-                                                <td><a href='tables/{{#to_file_name}}{{name}}{{/to_file_name}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{% if to_file_name %}{{name}}{% endif %}.html'>{{name}}</a></td>
                                                 {{#display_num_rows}}
                                                 <td>{{num_of_rows}}</td>
                                                 {{/display_num_rows}}
@@ -118,7 +118,7 @@
                                         <tbody>
                                             {{#oneColumnTables}}
                                             <tr>
-                                                <td><a href='tables/{{#to_file_name}}{{name}}{{/to_file_name}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{% if to_file_name %}{{name}}{% endif %}.html'>{{name}}</a></td>
                                                 {{#columns}}
                                                 <td>{{name}}</td>
                                                 {{/columns}}
@@ -159,7 +159,7 @@
                                         <tbody>
                                             {{#incrementingColumnNames}}
                                             <tr>
-                                                <td><a href='tables/{{#to_file_name}}{{name}}{{/to_file_name}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{% if to_file_name %}{{name}}{% endif %}.html'>{{name}}</a></td>
                                             </tr>
                                             {{/incrementingColumnNames}}
                                             {{^incrementingColumnNames}}
@@ -197,7 +197,7 @@
                                         <tbody>
                                             {{#uniqueNullables}}
                                             <tr>
-                                                <td><a href='tables/{{#to_file_name}}{{table.name}}{{/to_file_name}}.html'>{{table.name}}</a>.{{name}}</td>
+                                                <td><a href='tables/{% if to_file_name %}{{table.name}}{% endif %}.html'>{{table.name}}</a>.{{name}}</td>
                                             </tr>
                                             {{/uniqueNullables}}
                                             {{^uniqueNullables}}

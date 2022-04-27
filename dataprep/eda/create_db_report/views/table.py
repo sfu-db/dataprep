@@ -1,27 +1,28 @@
+import json
 from ..db_models.table import Table
 from ..page_models.page_data import PageData
 from ..page_models.page_template import PageTemplate
-from ..pystache_models.pystache_table_column import PystacheTableColumn
-from ..pystache_models.pystache_table_index import PystacheTableIndex
+from ..template_models.table_column import TemplateTableColumn
+from ..template_models.table_index import TemplateTableIndex
 
 
 class TablePage:
-    def __init__(self, pystache_object: PageTemplate) -> None:
-        self.pystache_object = pystache_object
+    def __init__(self, template_object: PageTemplate) -> None:
+        self.template_object = template_object
 
     def page_writer(self, table: Table, new_file: str):
         """
-        Compile the data needed by the pystache template for tables pages
+        Compile the data needed by the template for tables pages
         """
         primaries = set(table.primary_keys)
         indexes = set()
         table_columns = set()
 
         for i in table.get_indexes():
-            indexes.add(PystacheTableIndex(i))
+            indexes.add(TemplateTableIndex(i))
 
         for c in table.get_columns():
-            table_columns.add(PystacheTableColumn(c, False, ""))
+            table_columns.add(TemplateTableColumn(c, False, ""))
         check_constraints = None  # HtmlTablePage.collect_check_constraints(table)
 
         page_data = PageData("tables/table.html", "table.js")
@@ -38,7 +39,7 @@ class TablePage:
             "indexes_table": {"paging": "true", "pageLength": 10, "lengthChange": "false"},
             "check_table": {"paging": "true", "pageLength": 10, "lengthChange": "false"},
         }
-        return self.pystache_object.write_data(
+        return self.template_object.write_data(
             page_data, new_file, "table.js", pagination_configs, "../"
         )
 
