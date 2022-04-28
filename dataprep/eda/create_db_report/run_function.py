@@ -272,4 +272,4 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
         current_database, current_database.get_tables(), file
     )
 
-    return report_output_file
+    return database_name, report_output_file
