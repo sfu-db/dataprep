@@ -3,12 +3,9 @@ This module implements the visualization for the plot_diff function.
 """  # pylint: disable=too-many-lines
 from turtle import color
 from typing import Any, Dict, List, Tuple, Optional
-from sklearn.preprocessing import MinMaxScaler
 import math
 import numpy as np
 import pandas as pd
-import dask.array as da
-import matplotlib.pyplot as plt
 from bokeh.models import (
     HoverTool,
     Panel,
