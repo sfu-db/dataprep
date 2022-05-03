@@ -271,7 +271,7 @@ def _format_country(
     return result, 2 if val != result else 3
 
 
-@lru_cache(maxsize=2 ** 20)
+@lru_cache(maxsize=2**20)
 def _check_country(country: str, input_formats: Tuple[str, ...], strict: bool, clean: bool) -> Any:
     """
     Finds the index of the given country in the DATA dataframe.
@@ -322,7 +322,7 @@ def _check_country(country: str, input_formats: Tuple[str, ...], strict: bool, c
     return (None, "unknown") if clean else False
 
 
-@lru_cache(maxsize=2 ** 20)
+@lru_cache(maxsize=2**20)
 def _check_fuzzy_dist(country: str, fuzzy_dist: int) -> Any:
     """
     A match is found if a country has an edit distance <= fuzzy_dist
