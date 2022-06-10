@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1651159483700,
+  "lastUpdate": 1654820348463,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3906,6 +3906,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.01077071598806421",
             "extra": "mean: 4.043876182999997 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "37cdf7192b637ee10f581f29ae215e7796e4d93e",
+          "message": "Merge pull request #903 from SultanOrazbayev/patch-1\n\nEnsure npartitions is passed to dask as int",
+          "timestamp": "2022-06-09T17:15:35-07:00",
+          "tree_id": "df7e0d6ea1d79c5f8545811e54ed0764f85f7500",
+          "url": "https://github.com/sfu-db/dataprep/commit/37cdf7192b637ee10f581f29ae215e7796e4d93e"
+        },
+        "date": 1654820344117,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.24668792252460428,
+            "unit": "iter/sec",
+            "range": "stddev: 0.16064871655495758",
+            "extra": "mean: 4.053704736599991 sec\nrounds: 5"
           }
         ]
       }
