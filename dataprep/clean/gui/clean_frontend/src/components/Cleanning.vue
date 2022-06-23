@@ -34,6 +34,7 @@ export default {
         clean_lat_long: "Coordinate",
         clean_ip: "IP address",
         clean_phone: "Phone Number",
+        clean_json: "JSON",
         // clean_text: "Text",
         clean_url: "URL",
         clean_address: "Address",

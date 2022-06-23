@@ -10,6 +10,8 @@ from .clean_country import clean_country, validate_country
 
 from .clean_url import clean_url, validate_url
 
+from .clean_json import clean_json, validate_json
+
 from .clean_phone import clean_phone, validate_phone
 
 from .clean_ip import clean_ip, validate_ip
@@ -367,6 +369,8 @@ __all__ = [
     "validate_url",
     "clean_phone",
     "validate_phone",
+    "clean_json",
+    "validate_json",
     "clean_ip",
     "validate_ip",
     "clean_headers",
