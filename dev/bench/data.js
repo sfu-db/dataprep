@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654820348463,
+  "lastUpdate": 1656211213492,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3937,6 +3937,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.16064871655495758",
             "extra": "mean: 4.053704736599991 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a332e4908e8e7b3dca5725a0d6a6f24e8e7d043d",
+          "message": "Merge pull request #858 from Bowen0729/use_case\n\nadd the use-case of dataprep.eda for spark dataframe with ray",
+          "timestamp": "2022-06-26T10:36:46+08:00",
+          "tree_id": "c747e74dad264178256b6e8c738e7f57868891ac",
+          "url": "https://github.com/sfu-db/dataprep/commit/a332e4908e8e7b3dca5725a0d6a6f24e8e7d043d"
+        },
+        "date": 1656211209670,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.20103446003766362,
+            "unit": "iter/sec",
+            "range": "stddev: 0.11671112170401349",
+            "extra": "mean: 4.97427157420002 sec\nrounds: 5"
           }
         ]
       }
