@@ -2,14 +2,17 @@
     This module implements the create_db_report(sql_engine) function.
 """
 import warnings
-import webbrowser
 from sqlalchemy.engine.base import Engine
 from .run_function import generate_db_report
+from .report import Report
 
 __all__ = ["create_db_report"]
 
 
-def create_db_report(sql_engine: Engine, analyze: bool = False) -> None:
+def create_db_report(
+    sql_engine: Engine,
+    analyze: bool = False,
+) -> Report:
     """
     This function is to generate and render database report and show in browser.
 
@@ -29,13 +32,12 @@ def create_db_report(sql_engine: Engine, analyze: bool = False) -> None:
     >>> create_db_report(db_engine)
     """
     _suppress_warnings()
-    output_file = generate_db_report(sql_engine, analyze)
-    webbrowser.open(f"file://{output_file}", new=2)
+    return Report(*generate_db_report(sql_engine, analyze))
 
 
 def _suppress_warnings() -> None:
     """
-    suppress warnings in create_diff_report
+    suppress warnings in create_db_report
     """
     warnings.filterwarnings(
         "ignore",
