@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1656211213492,
+  "lastUpdate": 1656822771818,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -3968,6 +3968,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.11671112170401349",
             "extra": "mean: 4.97427157420002 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d21a3d1c331008372a2a62e3cf442eb40a34336b",
+          "message": "Merge pull request #892 from khoatxp/feat/add-save-functionality\n\nFeat/add save functionality",
+          "timestamp": "2022-07-03T12:29:41+08:00",
+          "tree_id": "6f36ecc3cf4580750294166d0b9ac2745ccb32a0",
+          "url": "https://github.com/sfu-db/dataprep/commit/d21a3d1c331008372a2a62e3cf442eb40a34336b"
+        },
+        "date": 1656822767983,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.23610246849040198,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03733410356461552",
+            "extra": "mean: 4.235449152199999 sec\nrounds: 5"
           }
         ]
       }
