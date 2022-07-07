@@ -7,7 +7,7 @@ on:
       - release
   pull_request:
     branches:
-       - develop
+      - develop
 
 jobs:
   build:
@@ -40,9 +40,6 @@ jobs:
           poetry install
           poetry config --list
 
-      - name: Build binary dependencies
-        run: poetry build
-
       - name: Print tool versions
         run: |
           poetry run pylint --version 
@@ -55,6 +52,9 @@ jobs:
 
       - name: Type check the project
         run: poetry run pyright dataprep || true
+
+      - name: Build binary dependencies
+        run: poetry build
 
       - name: Test the project
         run: poetry run pytest --cov-report xml --cov=dataprep dataprep/tests
