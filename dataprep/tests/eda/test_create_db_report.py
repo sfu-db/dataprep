@@ -1,7 +1,6 @@
 import os
 from ...eda.create_db_report.run_function import generate_db_report
 from ...datasets import load_db
-from sqlalchemy import create_engine
 
 
 def test_create_db_report_sqlite() -> None:

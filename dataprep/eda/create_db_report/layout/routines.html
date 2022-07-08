@@ -14,9 +14,9 @@
                                     id="routine_table"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{dataTableConfig.routineTable.paging}}"
-                                    data-page-length="{{dataTableConfig.routineTable.pageLength}}"
-                                    data-length-change="{{dataTableConfig.routineTable.lengthChange}}">
+                                    data-paging="{{data_table_config.routineTable.paging}}"
+                                    data-page-length="{{data_table_config.routineTable.pageLength}}"
+                                    data-length-change="{{data_table_config.routineTable.lengthChange}}">
                                 <thead align='left'>
                                     <tr>
                                         <th>Name</th>
@@ -31,7 +31,7 @@
                                 <tbody>
                                     {{#routines}}
                                     <tr>
-                                        <td><a href="routines/{{#toFileName}}{{name}}{{/toFileName}}.html">{{name}}</a></td>
+                                        <td><a href="routines/{% if to_file_name %}{{name}}{% endif %}.html">{{name}}</a></td>
                                         <td>{{type}}</td>
                                         <td>{{definitionLanguage}}</td>
                                         <td>{{deterministic}}</td>
@@ -47,6 +47,6 @@
                 </section>
                 <script>
                     var config = {
-                        pagination: {{paginationEnabled}}
+                        pagination: {{pagination_enabled}}
                     }
                 </script>

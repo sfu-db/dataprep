@@ -39,6 +39,7 @@ export default {
         "clean_phone",
         "clean_text",
         "clean_url",
+        "clean_json",
         "clean_df",
       ],
     };

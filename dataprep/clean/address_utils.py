@@ -7,13 +7,11 @@ from builtins import zip
 from builtins import str
 from typing import Any, Dict, List, Optional, Tuple
 from collections import OrderedDict
-
-import os
 import string
 import re
+import os
 import warnings
 import pycrfsuite
-
 
 TAG_MAPPING = {
     "OccupancyType": "apartment",

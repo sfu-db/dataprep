@@ -554,7 +554,7 @@ def test_validate_value() -> None:
     assert validate_phone(1234) == False
     assert validate_phone(2346789) == True
     assert validate_phone("1 800 234 6789") == True
-    assert validate_phone("+44 7700 900077") == False
+    assert validate_phone("+44 7700 900077") == True
     assert validate_phone("555-234-6789 ext 32") == True
     assert validate_phone("1-866-4ZIPCAR") == True
     assert validate_phone("1-800-G-O-T-J-U-N-K") == True
@@ -586,3 +586,32 @@ def test_validate_series(df_phone: pd.DataFrame) -> None:
         name="messy_phone",
     )
     assert srs_check.equals(srs_valid)
+
+
+def test_npartition_type() -> None:
+    """
+    related to #901
+    """
+    df = pd.DataFrame(
+        {
+            "phone": [
+                "555-234-5678",
+                "(555) 234-5678",
+                "555.234.5678",
+                "555/234/5678",
+                15551234567,
+                "(1) 555-234-5678",
+                "+1 (234) 567-8901 x. 1234",
+                "2345678901 extension 1234",
+                "2345678",
+                "800-299-JUNK",
+                "1-866-4ZIPCAR",
+                "123 ABC COMPANY",
+                "+66 91 889 8948",
+                "hello",
+                np.nan,
+                "NULL",
+            ]
+        }
+    )
+    clean_phone(df, "phone")

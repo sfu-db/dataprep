@@ -31,7 +31,7 @@ from dataprep.clean import (
     clean_lat_long,
     clean_ip,
     clean_phone,
-    # clean_duplication,
+    clean_json,
     clean_url,
     clean_address,
     clean_df,
@@ -226,10 +226,10 @@ clean_list = [
     "clean_headers",
     "clean_date",
     "clean_lat_long",
-    # "clean_text",
+    "clean_json",
     "clean_address",
     "clean_df",
-    # "clean_duplication",
+    "clean_duplication",
     "clean_currency",
     "clean_au_abn",
     "clean_au_acn",
@@ -396,6 +396,7 @@ clean_function_dic = {
     "clean_ip": clean_ip,
     "clean_phone": clean_phone,
     "clean_url": clean_url,
+    "clean_json": clean_json,
     "clean_address": clean_address,
     "clean_df": clean_df,
     # "clean_duplication": clean_duplication,
@@ -1248,6 +1249,7 @@ def cleanSingleCol() -> Any:
             "clean_url",
             "clean_date",
             "clean_address",
+            "clean_json",
         ]:
             df_cleaned = clean_function_dic[clean_func](
                 index_df, column=selected_col, report=False, **selected_params
@@ -1266,7 +1268,7 @@ def cleanSingleCol() -> Any:
             df_cleaned = clean_function_dic[clean_func](
                 index_df, column=selected_col, **selected_params
             )
-
+        print(df_cleaned)
         df_cleaned = df_cleaned.astype(str)
         col_names = df_cleaned.columns.values.tolist()
         table_columns = []

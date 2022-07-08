@@ -15,16 +15,6 @@
       >
     </el-col>
     <el-col :span="11" class="el-row-col">DataPrep.Clean UI</el-col>
-    <!--<el-col :span="3" >
-              <el-upload
-                action=""
-                accept="csv"
-                :http-request="submitUpload"
-                multiple
-                show-file-list="false">
-                <el-button  icon="el-icon-upload2"><br>Import</el-button>
-              </el-upload>
-            </el-col>-->
     <el-col :span="7">
       <el-button
         icon="el-icon-download"

@@ -7,9 +7,10 @@ maintainers = [
   "Pei Wang <peiw@sfu.ca>",
   "Brandon Lockhart <brandon_lockhart@sfu.ca>",
   "Song Bian <biansonghz@gmail.com>",
+  "Danrui Qi <qidanrui@gmail.com>",
 ]
 name = "dataprep"
-version = "0.4.4-alpha.1"
+version = "0.4.4"
 
 license = "MIT"
 
@@ -33,6 +34,9 @@ classifiers = [
   "Framework :: IPython",
 ]
 
+[tool.poetry.build]
+generate-setup-file = false
+
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
 
@@ -43,9 +47,8 @@ nltk = "^3.6.7"
 numpy = "^1.21"
 pandas = "^1.1"
 scipy = "^1.8"
-wordcloud = "^1.8"
-pystache = "^0.6.0"
 sqlalchemy = "^1.4.32"
+wordcloud = "^1.8"
 
 # Dependencies for Connector
 aiohttp = "^3.6"
@@ -59,11 +62,11 @@ tqdm = "^4.48"
 flask = "^2"
 flask_cors = "^3.0.10"
 metaphone = "^0.6"
-python-Levenshtein = "^0.12.2"
-python-crfsuite = "^0.9.7"
 python-stdnum = "^1.16"
 regex = "^2021.8.3"
 varname = "^0.8.1"
+python-crfsuite = "0.9.8"
+rapidfuzz = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -84,6 +87,7 @@ sphinx = "^4"
 sphinx-autobuild = "^2021"
 sphinx-autodoc-typehints = "^1"
 toml = "^0.10"
+ray = "^1.13.0"
 
 [tool.black]
 exclude = '''

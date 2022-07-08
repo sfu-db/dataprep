@@ -1,12 +1,12 @@
 """Common functions"""
-from typing import Dict, Union, Any
 import http.client
 import json
+from math import ceil
+from typing import Any, Dict, Union
 
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-
 
 NULL_VALUES = {
     np.nan,
@@ -69,7 +69,7 @@ def to_dask(df: Union[pd.DataFrame, dd.DataFrame]) -> dd.DataFrame:
         return df
 
     df_size = df.memory_usage(deep=True).sum()
-    npartitions = np.ceil(df_size / 128 / 1024 / 1024)  # 128 MB partition size
+    npartitions = ceil(df_size / 128 / 1024 / 1024)  # 128 MB partition size
     return dd.from_pandas(df, npartitions=npartitions)
 
 

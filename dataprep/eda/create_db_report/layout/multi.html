@@ -1,7 +1,7 @@
 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <div class="callout callout-info">
-                        <h4>SchemaSpy Analysis of {{databaseName}}</h4>
+                        <h4>SchemaSpy Analysis of {{database_name}}</h4>
                         <p>Generated on {{connectTime}}</p>
                     </div>
                     {{#description}}
@@ -24,7 +24,7 @@
                             <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <p>Database Type: {{databaseProduct}}</p>
+                            <p>Database Type: {{database_product}}</p>
                         </div><!-- /.box-body -->
                     </div>
                     {{#catalog}}
@@ -50,9 +50,9 @@
                                     id="database_objects"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{dataTableConfig.databaseObjects.paging}}"
-                                    data-page-length="{{dataTableConfig.databaseObjects.pageLength}}"
-                                    data-length-change="{{dataTableConfig.databaseObjects.lengthChange}}">
+                                    data-paging="{{data_table_config.database_objects.paging}}"
+                                    data-page-length="{{data_table_config.database_objects.pageLength}}"
+                                    data-length-change="{{data_table_config.database_objects.lengthChange}}">
                                 <thead>
                                     <tr>
                                         <th valign="bottom">Schema</th>
@@ -62,7 +62,7 @@
                                 <tbody>
                                     {{#schemas}}
                                     <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="{{#toFileName}}{{name}}{{/toFileName}}/index.html">{{name}}</a></td>
+                                        <td class="detail"><a href="{% if to_file_name %}{{name}}{% endif %}/index.html">{{name}}</a></td>
                                         <td class="comment detail" style="display: table-cell;">{{{comment}}}</td>
                                     </tr>
                                     {{/schemas}}
