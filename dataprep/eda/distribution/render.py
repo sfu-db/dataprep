@@ -2455,43 +2455,42 @@ def render_dt_num_cat(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     }
 
 
-def render(itmdt: Intermediate, cfg: Config) -> Union[LayoutDOM, Dict[str, Any]]:
+def render(itmdt: Intermediate, config: Config) -> Union[LayoutDOM, Dict[str, Any]]:
     """
     Render a basic plot
     Parameters
     ----------
     itmdt
         The Intermediate containing results from the compute function.
-    cfg
+    config
         Config instance
     """
     # pylint: disable = too-many-branches
-
     if itmdt.visual_type == "distribution_grid":
-        visual_elem = render_distribution_grid(itmdt, cfg)
+        visual_elem = render_distribution_grid(itmdt, config)
     elif itmdt.visual_type == "categorical_column":
-        visual_elem = render_cat(itmdt, cfg)
+        visual_elem = render_cat(itmdt, config)
     elif itmdt.visual_type == "geography_column":
-        visual_elem = render_geo(itmdt, cfg)
+        visual_elem = render_geo(itmdt, config)
     elif itmdt.visual_type == "numerical_column":
-        visual_elem = render_num(itmdt, cfg)
+        visual_elem = render_num(itmdt, config)
     elif itmdt.visual_type == "datetime_column":
-        visual_elem = render_dt(itmdt, cfg)
+        visual_elem = render_dt(itmdt, config)
     elif itmdt.visual_type == "cat_and_num_cols":
-        visual_elem = render_cat_num(itmdt, cfg)
+        visual_elem = render_cat_num(itmdt, config)
     elif itmdt.visual_type == "geo_and_num_cols":
-        visual_elem = render_geo_num(itmdt, cfg)
+        visual_elem = render_geo_num(itmdt, config)
     elif itmdt.visual_type == "latlong_and_num_cols":
-        visual_elem = render_latlong_num(itmdt, cfg)
+        visual_elem = render_latlong_num(itmdt, config)
     elif itmdt.visual_type == "two_num_cols":
-        visual_elem = render_two_num(itmdt, cfg)
+        visual_elem = render_two_num(itmdt, config)
     elif itmdt.visual_type == "two_cat_cols":
-        visual_elem = render_two_cat(itmdt, cfg)
+        visual_elem = render_two_cat(itmdt, config)
     elif itmdt.visual_type == "dt_and_num_cols":
-        visual_elem = render_dt_num(itmdt, cfg)
+        visual_elem = render_dt_num(itmdt, config)
     elif itmdt.visual_type == "dt_and_cat_cols":
-        visual_elem = render_dt_cat(itmdt, cfg)
+        visual_elem = render_dt_cat(itmdt, config)
     elif itmdt.visual_type == "dt_cat_num_cols":
-        visual_elem = render_dt_num_cat(itmdt, cfg)
+        visual_elem = render_dt_num_cat(itmdt, config)
 
     return visual_elem

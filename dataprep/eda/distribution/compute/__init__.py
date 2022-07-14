@@ -25,7 +25,7 @@ def compute(
     col2: Optional[Union[str, LatLong]] = None,
     col3: Optional[str] = None,
     *,
-    cfg: Union[Config, Dict[str, Any], None] = None,
+    config: Union[Config, Dict[str, Any], None] = None,
     display: Optional[List[str]] = None,
     dtype: Optional[DTypeDef] = None,
 ) -> Intermediate:
@@ -36,10 +36,10 @@ def compute(
     ----------
     df
         DataFrame from which visualizations are generated
-    cfg: Union[Config, Dict[str, Any], None], default None
+    config: Union[Config, Dict[str, Any], None], default None
         When a user call plot(), the created Config object will be passed to compute().
         When a user call compute() directly, if he/she wants to customize the output,
-        cfg is a dictionary for configuring. If not, cfg is None and
+        config is a dictionary for configuring. If not, config is None and
         default values will be used for parameters.
     display: Optional[List[str]], default None
         A list containing the names of the visualizations to display. Only exist when
@@ -60,10 +60,9 @@ def compute(
 
     suppress_warnings()
 
-    if isinstance(cfg, dict):
-        cfg = Config.from_dict(display, cfg)
-
-    elif not cfg:
+    if isinstance(config, dict):
+        cfg = Config.from_dict(display, config)
+    else:
         cfg = Config()
 
     x, y, z = col1, col2, col3
