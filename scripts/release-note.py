@@ -9,7 +9,8 @@ from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 from docopt import docopt
-from git import Commit, Repo
+from git import Commit
+from git.repo import Repo
 from jinja2 import Template
 
 VERSION_REG = re.compile(r"^v(\d+)\.(\d+)\.(\d+)")
@@ -79,10 +80,8 @@ def main() -> None:
 
     repo = Repo(".")
     assert repo.bare == False
-  
     hash = args["<hash>"]
     this_commits, handle = commits_since_previous(repo.commit(hash))
-
 
     version = VERSION_REG.match(handle.message).group()
 
@@ -151,7 +150,7 @@ def commits_since_previous(
 
         if commit.binsha in commits:
             continue
-
+        print()
         matches = VERSION_REG.findall(commit.message)
 
         if matches:

@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - release
+  pull_request:
+    branches:
+      - release
 
 jobs:
   #  docs-build:
@@ -62,6 +65,9 @@ jobs:
           pip install poetry toml-cli
           poetry install
           poetry config --list
+
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
 
       - name: Build wheels
         run: poetry build
