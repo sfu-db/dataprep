@@ -1,21 +1,7 @@
 <template>
-  <el-row justify="center" align="middle">
-    <el-col :span="6">
-      <el-button
-        icon="el-icon-s-home"
-        class="header_button"
-        @click="pageToOrign"
-        ><br />origin</el-button
-      >
-      <el-button icon="el-icon-back" class="header_button" @click="clickUndo"
-        ><br />undo</el-button
-      >
-      <el-button icon="el-icon-right" class="header_button" @click="clickRedo"
-        ><br />redo</el-button
-      >
-    </el-col>
-    <el-col :span="11" class="el-row-col">DataPrep.Clean UI</el-col>
-    <el-col :span="7">
+  <el-row justify="center" align="middle" color = "red">
+    <el-col :span="23" class="el-row-col">DataPrep.Clean UI</el-col>
+    <!-- <el-col :span="7">
       <el-button
         icon="el-icon-download"
         class="header_button"
@@ -34,7 +20,7 @@
         @click="clickExportLog"
         ><br />Log</el-button
       >
-    </el-col>
+    </el-col> -->
   </el-row>
 </template>
 
@@ -147,6 +133,7 @@ export default {
   line-height: 60px;
   font-size: 25px;
   font-weight: 600;
+  /* color: red; */
 }
 .header_button {
   font-size: 18px;

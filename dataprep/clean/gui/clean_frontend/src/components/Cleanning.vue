@@ -1,11 +1,68 @@
+
+<style scoped>
+.header_center{
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  border-style:solid;
+  border-width:2px; 
+}
+.cleanning_img {
+  display: inline;
+  width: 45px;
+  height: 40px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.el-button {
+  margin-top: 6px;
+  width: 150px;
+}
+.el-select {
+  margin-top: 6px;
+  width: 150px;
+  margin-bottom: 40px;
+}
+.el-row-col {
+  line-height: 60px;
+  font-size: 20px;
+  font-weight: 600;
+  /* color: red; */
+}
+.new-block {
+  /* background-color: red; */
+  /* height: 40px; */
+  border: solid;
+  background-color:blanchedalmond;
+  margin: 20px;
+  height: 50px;
+}
+ .box-card {
+    border: groove;
+  }
+
+</style>
+
+
 <template>
-  <el-row class="el-main-1strow">
-    <el-col :span="10" class="el-main-1strow-1stcol">
+  <el-row >
+    <!-- <el-col :span="10" class="el-main-1strow-1stcol">
       <img src="../assets/cleanning.png" class="cleanning_img" /><br />Clean
-    </el-col>
-    <el-col :span="14">
-      <el-button @click="clickDataFrame">Whole DF</el-button><br />
-      <el-select v-model="value" placeholder="Single Col">
+    </el-col> -->
+
+      <div  class = "header_center">
+        <b class = "el-row-col">Recipe</b>
+        
+      </div>
+   <el-card class="box-card">
+        <div v-for="o in 4" :key="o" class="new-block ">
+            {{'Recipe ' + o }}
+        </div>
+        </el-card>
+   
+      
+      <!-- <el-button @click="clickDataFrame">Whole DF</el-button><br /> -->
+      <!-- <el-select v-model="value" placeholder="Single Col">
         <el-option
           v-for="(value, label) in options"
           :key="label"
@@ -13,17 +70,19 @@
           :value="label"
         >
         </el-option>
-      </el-select>
-    </el-col>
+      </el-select> -->
+
   </el-row>
 </template>
 
 <script>
 import axios from "axios";
 import endpoint from "../util/endpoint";
+import Header from './Header.vue';
 
 export default {
-  name: "Cleanning",
+  components: { Header },
+  name: "Recipe",
   data() {
     return {
       options: {
@@ -248,22 +307,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.cleanning_img {
-  display: inline;
-  width: 45px;
-  height: 40px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.el-button {
-  margin-top: 6px;
-  width: 150px;
-}
-.el-select {
-  margin-top: 6px;
-  width: 150px;
-  margin-bottom: 40px;
-}
-</style>

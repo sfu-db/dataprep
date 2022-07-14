@@ -1,45 +1,34 @@
 <template>
   <el-container>
-    <el-header
-      ><Header
+    <el-header>
+      <Header
         @newDataYes="updateTableData"
         @updateFooterLog="reloadFooterLog"
-        @getTheTrueFile="updateTableData"
-    /></el-header>
+        @getTheTrueFile="updateTableData"/>
+    </el-header>
     <el-main>
       <el-row class="el-main-params">
-        <el-col :span="6"
-          ><Cleanning
+        <el-col :span="4">  
+         <Cleanning
             @optionsValue="changeCleanning"
-            @parashow="paraShowChange"
-        /></el-col>
-        <el-col :span="16" :offset="1" class="el-main-1st-row-2ndcol">
-          <CleanWholeDF
-            v-show="parashow"
-            @updateFooterLog="reloadFooterLog"
-            @newDataYes="updateTableData"
-            v-bind:filenname="filenname"
-          />
-          <CleanFunctions
-            v-show="singColoumShow"
-            @clickButtonYes="reloadFooterLog"
-            @newDataYes="updateTableData"
-            @updateFooterLog="reloadFooterLog"
-            v-bind:filenname="filenname"
-            v-bind:clean_func="clean_func"
-            v-bind:table_cols="table_cols"
-            v-bind:param_dic="param_dic"
-            v-bind:param_default="param_default"
-          />
-        </el-col>
-      </el-row>
-      <el-row class="el-main-1st-row">
-        <el-col :span="24"
-          ><MainTable :key="timer2" v-bind:filenname="filenname"
-        /></el-col>
+            @parashow="paraShowChange"/>
+        </el-col>  
+        <el-col :span="10" class="block-div">  
+             <MainTable :key="timer2" v-bind:filenname="filenname"/>
+        
+        </el-col>  
+        <el-col :span="4">  
+        <Issue
+            @optionsValue="changeCleanning"
+            @parashow="paraShowChange"/>
+        </el-col> 
+        
+        <Suggestion
+            @optionsValue="changeCleanning"
+            @parashow="paraShowChange"/>
+       
       </el-row>
     </el-main>
-    <el-footer><FooterLog :key="timer" /></el-footer>
   </el-container>
 </template>
 
@@ -50,6 +39,8 @@ import MainTable from "./MainTable";
 import FooterLog from "./FooterLog";
 import CleanWholeDF from "./CleanWholeDF";
 import CleanFunctions from "./CleanFunctions";
+import Suggestion from "./Suggestion"
+import Issue from "./Issue"
 
 export default {
   name: "SampleDF",
@@ -59,7 +50,9 @@ export default {
     MainTable,
     FooterLog,
     CleanWholeDF,
-    CleanFunctions,
+    CleanFunctions,    
+    Suggestion,
+    Issue
   },
   data() {
     return {
@@ -111,25 +104,25 @@ export default {
   height: 10%;
   padding: 0;
   margin: 0;
-  border: 3px solid #ccc;
+  border: 3px solid #000;
 }
 
 .el-main {
-  color: #333;
+  color: #000;
   text-align: center;
   padding: 0;
   margin: 0;
 }
 
 .el-main-params {
-  margin-top: 5px;
-  height: 130px;
-  border: 3px solid #ccc;
+  margin-top: 10px;
+  /* height: 500px; */
+  border: 3px solid #000;
 }
 
 .el-main-1st-row {
   margin-top: 5px;
-  border: 3px solid #ccc;
+  border: 3px solid #000;
 }
 
 .el-footer {
@@ -138,10 +131,14 @@ export default {
   height: 100px !important;
   padding: 0;
   margin-top: 5px;
-  border: 3px solid #ccc;
+  border: 3px solid #000;
 }
 .el-main-1st-row-2ndcol {
-  border-left: 2px solid #ccc;
+  border-left: 2px solid #000;
   height: 100%;
+}
+
+.block-div {
+  border: groove;
 }
 </style>

@@ -10,8 +10,8 @@
     </el-col>
   </el-row>
 </template>
-
 <script>
+
 import axios from "axios";
 import endpoint from "../util/endpoint";
 
