@@ -9,23 +9,21 @@
     <el-main>
       <el-row class="el-main-params">
         <el-col :span="4">  
-         <Cleanning
+         <Recipe
             @optionsValue="changeCleanning"
             @parashow="paraShowChange"/>
         </el-col>  
         <el-col :span="10" class="block-div">  
-             <MainTable :key="timer2" v-bind:filenname="filenname"/>
-        
+          <MainTable :key="timer2" v-bind:filenname="filenname"/>
         </el-col>  
         <el-col :span="4">  
         <Issue
-            @optionsValue="changeCleanning"
-            @parashow="paraShowChange"/>
+          @optionsValue="changeCleanning"
+          @parashow="paraShowChange"/>
         </el-col> 
-        
         <Suggestion
-            @optionsValue="changeCleanning"
-            @parashow="paraShowChange"/>
+          @optionsValue="changeCleanning"
+          @parashow="paraShowChange"/>
        
       </el-row>
     </el-main>
@@ -34,7 +32,7 @@
 
 <script>
 import Header from "./Header";
-import Cleanning from "./Cleanning";
+import Recipe from "./Recipe";
 import MainTable from "./MainTable";
 import FooterLog from "./FooterLog";
 import CleanWholeDF from "./CleanWholeDF";
@@ -46,7 +44,7 @@ export default {
   name: "SampleDF",
   components: {
     Header,
-    Cleanning,
+    Recipe,
     MainTable,
     FooterLog,
     CleanWholeDF,
@@ -131,7 +129,7 @@ export default {
   height: 100px !important;
   padding: 0;
   margin-top: 5px;
-  border: 3px solid #000;
+  border: 1px solid #000;
 }
 .el-main-1st-row-2ndcol {
   border-left: 2px solid #000;

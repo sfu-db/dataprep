@@ -164,19 +164,15 @@ export default {
   },
   watch: {
     clean_func: function (val) {
-      console.log(val);
       this.cleanFunction = val;
     },
     table_cols: function (val) {
-      console.log(val);
       this.tableCols = val;
     },
     param_dic: function (val) {
-      console.log(val);
       this.paramDic = val;
     },
     param_default: function (val) {
-      console.log(val);
       this.paramDefault = val;
       this.selectedParams = val;
     },

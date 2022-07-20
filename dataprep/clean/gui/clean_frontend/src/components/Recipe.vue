@@ -7,6 +7,14 @@
   /* border-style:solid;
   border-width:1px;  */
 }
+
+.button_layout{
+  display: flex;
+  align-content: right;
+  justify-content: right;
+  /* border-style:solid;
+  border-width:1px;  */
+}
 .cleanning_img {
   display: inline;
   width: 45px;
@@ -17,13 +25,13 @@
 .el-button {
   margin-top: 6px;
   width: 150px;
+  
 }
 .el-select {
   margin-top: 6px;
   width: 150px;
   margin-bottom: 40px;
 }
-
 .el-row-col {
   line-height: 60px;
   font-size: 20px;
@@ -31,50 +39,44 @@
   margin: 10px;
 }
 .new-block {
+  background-color:blanchedalmond;
   border-radius: 5px;
-  background-color:rgb(244, 193, 187);
   margin: 5px;
-  height: 50px;
+  height: 100%;
 }
- 
+
+.shadow-button {
+   margin: 10px;
+   box-shadow: 0 3px #999;
+}
 </style>
 
 
 <template>
   <el-row >
+
     <div  class = "header_center">
-        <b class = "el-row-col">Issues</b>
+      <b class = "el-row-col">Recipe</b> 
     </div>
-   
-        <el-card>
-        <div class="new-block">
-            Missing value in 
-            <b> email </b>
-        </div>
-         <div class="new-block">
-            Missing format in 
-            <b> city of birth  </b>
-        </div>
-         <div class="new-block">
-             Duplicate values in 
-            <b> phone number </b>
-        </div>
-         <div class="new-block">
-             Invalid value in 
-            <b> email </b>
-        </div>
-        </el-card>
+    <div  class = "header_center">
+      <el-button class="shadow-button"  type="warning" >RollBack</el-button>
+      <el-button class="shadow-button"  type="primary" >Export</el-button>
+    </div>
+    <el-card>
+      <div v-for="o in 4" :key="o" class="new-block ">
+        {{'Recipe ' + o }}  
+      </div>
+    </el-card>
   </el-row>
 </template>
 
 <script>
 import axios from "axios";
 import endpoint from "../util/endpoint";
-import Header from './Header.vue';
 
 export default {
-  components: { Header },
-  name: "Issue",
+
+  name: "Recipe",
   data() {
     return {
       value: "",
@@ -94,9 +96,11 @@ export default {
       let _this = this;
       if (!(nval == "" && _this.isWholeDF)) {
         _this.isWholeDF = false;
-        axios.post(endpoint.API_URL + "getFunctionParams", {
+        axios
+          .post(endpoint.API_URL + "getFunctionParams", {
             clean_func: nval,
-          }).then(function (res) {
+          })
+          .then(function (res) {
             let tableColumns = res.data.tableColumns;
             let paramDic = res.data.paramDic;
             let paramDefault = res.data.paramDefault;

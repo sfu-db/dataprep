@@ -4,75 +4,77 @@
   display: flex;
   align-content: center;
   justify-content: center;
-  border-style:solid;
-  border-width:2px; 
+  /* border-style:solid;
+  border-width:1px;  */
 }
-.cleanning_img {
-  display: inline;
-  width: 45px;
-  height: 40px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.el-button {
-  margin-top: 6px;
-  width: 150px;
-}
-.el-select {
-  margin-top: 6px;
-  width: 150px;
-  margin-bottom: 40px;
+.shadow-button {
+   margin: 10px;
+   box-shadow: 0 3px #999;
 }
 .el-row-col {
   line-height: 60px;
   font-size: 20px;
   font-weight: 600;
-  /* color: red; */
+   margin: 10px;
 }
 .new-block {
-  /* background-color: red; */
-  /* height: 40px; */
-  border: solid;
-  background-color: rgb(85, 234, 35);
-  margin: 20px;
-  height: 50px;
+border-radius: 5px;
+  background-color: rgb(209, 252, 194);
+  margin:5px;
+  height: 100%;
 }
- .box-card {
-    /* height: 340px; */
-    border: groove;
-}
-
-
 </style>
 
 
 <template>
   <el-row >
-    <div  class = "header_center">
-        <b class = "el-row-col">Suggestions</b>
-      </div>
-        <el-card class="box-card">
-        <div v-for="o in 4" :key="o" class="new-block ">
-            {{'Suggestion ' + o }}
+    <div class = "header_center">
+      <b class = "el-row-col">Suggestions</b>
+    </div>
+    <el-card>
+        <div class="new-block ">
+          <b>Suggestion</b>
+          <br/>
+            
+          Transform all header formula into
+          
+          <el-select v-model="value" placeholder="Select">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>    
+          </el-select>
+          <el-button @click = "highlightCol" class="shadow-button"  type="success" >Preview</el-button>
+          <el-button class="shadow-button"  type="primary" >Apply</el-button>
         </div>
-        </el-card>
-
+    </el-card>
   </el-row>
 </template>
 
 <script>
 import axios from "axios";
+import MainTable from "./MainTable.vue";
 import endpoint from "../util/endpoint";
-import Header from './Header.vue';
 
 export default {
-  components: { Header },
   name: "Suggestion",
   data() {
     return {
       value: "",
       isWholeDF: false,
       parashow: "",
+      options: [{
+          value: 'name_of_col',
+          label: 'name_of_col'
+        }, {
+          value: 'name_of_row',
+          label: 'name_of_row'
+        }, {
+          value: 'parameter_name',
+          label: 'parameter_name'
+        }],
     };
   },
   methods: {
@@ -81,6 +83,10 @@ export default {
       this.parashow = new Date().getTime();
       this.value = "";
     },
+    highlightCol: function() {
+      console.log(this.$root.$refs)
+      MainTable.setCellColor();
+    }
   },
   watch: {
     value: function (nval, oval) {
