@@ -1,32 +1,40 @@
 <template>
   <el-container>
-    <el-header>
-      <Header
+    <!-- <el-col :span="23" >DataPrep.Clean UI</el-col> -->
+    <el-header class="el-row-col">
+      <img src="../assets/logo.png" class="img-size" />
+      <!-- <Header
         @newDataYes="updateTableData"
         @updateFooterLog="reloadFooterLog"
-        @getTheTrueFile="updateTableData"/>
+        @getTheTrueFile="updateTableData"/> -->
     </el-header>
-    <el-main>
-      <el-row class="el-main-params">
-        <el-col :span="4">  
-         <Recipe
-            @optionsValue="changeCleanning"
-            @parashow="paraShowChange"/>
-        </el-col>  
-        <el-col :span="10" class="block-div">  
-          <MainTable :key="timer2" v-bind:filenname="filenname"/>
-        </el-col>  
-        <el-col :span="4">  
+    <br/>
+
+  <el-row :gutter="10" class="main-part">
+    <el-col :span="6" >
+      <div class="grid-content bg-purple-light">
         <Issue
+        @optionsValue="changeCleanning"
+        @parashow="paraShowChange"/>
+        
+        <Recipe
+           @optionsValue="changeCleanning"
+           @parashow="paraShowChange"/>
+    </div>
+  </el-col>
+  <el-col :span="12">
+    <div class="grid-content bg-purple-light">
+        <MainTable :key="timer2" v-bind:filenname="filenname"/>
+    </div>
+  </el-col>
+  <el-col :span="6" class="el-container">
+  <div class="grid-content bg-purple-light">
+      <Suggestion
           @optionsValue="changeCleanning"
           @parashow="paraShowChange"/>
-        </el-col> 
-        <Suggestion
-          @optionsValue="changeCleanning"
-          @parashow="paraShowChange"/>
-       
-      </el-row>
-    </el-main>
+  </div></el-col>
+   </el-row>
+      
   </el-container>
 </template>
 
@@ -96,13 +104,25 @@ export default {
   padding: 0;
   margin: 0;
 }
+
+.block-part {
+  padding: 10;
+  margin:10;
+}
+
+.main-part {
+  background-color: #99a9bf;
+  border-radius: 10px;
+  min-height: 100%;
+  padding: 15px;
+  margin: 0;
+}
 .el-header {
   color: #333;
   text-align: center;
   height: 10%;
   padding: 0;
   margin: 0;
-  border: 3px solid #000;
 }
 
 .el-main {
@@ -111,18 +131,25 @@ export default {
   padding: 0;
   margin: 0;
 }
-
+.el-row-col {
+  line-height: 60px;
+  font-size: 25px;
+  font-weight: 600;
+  border-radius: 5px;
+  background-color:  #D3DCE6;;
+}
 .el-main-params {
   margin-top: 10px;
-  /* height: 500px; */
-  border: 3px solid #000;
 }
 
 .el-main-1st-row {
   margin-top: 5px;
   border: 3px solid #000;
 }
-
+.img-size {
+  width: 200px;
+  height: auto;
+}
 .el-footer {
   color: #333;
   text-align: center;
@@ -139,4 +166,20 @@ export default {
 .block-div {
   border: groove;
 }
+.el-col {
+    border-radius: 4px;
+  }
+  .bg-purple-dark {
+    background: #99a9bf;
+  }
+  .bg-purple {
+    background: #d3dce6;
+  }
+  .bg-purple-light {
+    background: #e5e9f2;
+  }
+  .grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+  }
 </style>

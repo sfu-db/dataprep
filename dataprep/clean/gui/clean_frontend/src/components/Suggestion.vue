@@ -7,36 +7,42 @@
   /* border-style:solid;
   border-width:1px;  */
 }
-.shadow-button {
+.shadow {
    margin: 10px;
+   margin-bottom: 30px;
    box-shadow: 0 3px #999;
 }
 .el-row-col {
   line-height: 60px;
   font-size: 20px;
   font-weight: 600;
-   margin: 10px;
+  margin: 10px;
 }
 .new-block {
-border-radius: 5px;
+  border-radius: 5px;
   background-color: rgb(209, 252, 194);
-  margin:5px;
-  height: 100%;
+  margin-bottom: 20px;
+  min-height: 100%;
+}
+.whole-block {
+  border-radius: 5px;
+  margin: 10px;
+  min-height: 890px;
 }
 </style>
 
 
 <template>
   <el-row >
-    <div class = "header_center">
-      <b class = "el-row-col">Suggestions</b>
-    </div>
-    <el-card>
+    <div class="whole-block">
+      <el-card class="shadow">
+      <div class = "header_center">
+        <b class = "el-row-col">Suggestions</b>
+      </div>
         <div class="new-block ">
-          <b>Suggestion</b>
+          <br/>  
+          <b>Transform all email into</b>
           <br/>
-            
-          Transform all header formula into
           
           <el-select v-model="value" placeholder="Select">
             <el-option
@@ -46,10 +52,28 @@ border-radius: 5px;
               :value="item.value">
             </el-option>    
           </el-select>
-          <el-button @click = "highlightCol" class="shadow-button"  type="success" >Preview</el-button>
-          <el-button class="shadow-button"  type="primary" >Apply</el-button>
+          <el-button @click = "highlightCol" class="shadow"  type="success" >Preview</el-button>
+          <el-button class="shadow"  type="primary" >Apply</el-button>
+        </div>
+        <div class="new-block ">
+          <br/>  
+          <b>Transform all header formula into</b>
+          <br/>
+          
+          <el-select v-model="value" placeholder="Select">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>    
+          </el-select>
+          <el-button @click = "highlightCol" class="shadow"  type="success" >Preview</el-button>
+          <el-button class="shadow"  type="primary" >Apply</el-button>
+          <br/>
         </div>
     </el-card>
+  </div>
   </el-row>
 </template>
 

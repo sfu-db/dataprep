@@ -5,11 +5,9 @@ import SampleDF from '../components/SampleDF'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'SampleDF',
-      component: SampleDF
-    }
-  ]
+    routes: [{
+        path: '/',
+        name: 'SampleDF',
+        component: SampleDF
+    }]
 })

@@ -45,8 +45,15 @@
   height: 100%;
 }
 
-.shadow-button {
+.whole-block {
+  border-radius: 5px;
+  margin: 10px;
+  min-height: 500px;
+}
+
+.shadow {
    margin: 10px;
+   margin-bottom: 30px;
    box-shadow: 0 3px #999;
 }
 </style>
@@ -54,19 +61,21 @@
 
 <template>
   <el-row >
-
-    <div  class = "header_center">
-      <b class = "el-row-col">Recipe</b> 
-    </div>
-    <div  class = "header_center">
-      <el-button class="shadow-button"  type="warning" >RollBack</el-button>
-      <el-button class="shadow-button"  type="primary" >Export</el-button>
-    </div>
-    <el-card>
+    <div class="whole-block">  
+      <el-card class="shadow" >
+        <div  class = "header_center">
+          <b class = "el-row-col">Recipe</b> 
+        </div>
+        <div  class = "header_center">
+        <el-button class="shadow"  type="warning" >RollBack</el-button>
+        <el-button class="shadow"  type="primary" >Export</el-button>
+      </div>
       <div v-for="o in 4" :key="o" class="new-block ">
-        {{'Recipe ' + o }}  
+        {{'Recipe ' + o }}: 
+        clean(df, column='Name', fix_domain=False, remove_whitespace=False, split=False)
       </div>
     </el-card>
+      </div>
   </el-row>
 </template>
 

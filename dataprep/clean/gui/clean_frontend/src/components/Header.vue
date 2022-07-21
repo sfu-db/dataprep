@@ -1,27 +1,8 @@
 <template>
-  <el-row justify="center" align="middle" color = "red">
-    <el-col :span="23" class="el-row-col">DataPrep.Clean UI</el-col>
-    <!-- <el-col :span="7">
-      <el-button
-        icon="el-icon-download"
-        class="header_button"
-        @click="clickExportCSV"
-        ><br />CSV</el-button
-      > 
-      <el-button
-        icon="el-icon-download"
-        class="header_button"
-        @click="clickExportDF"
-        ><br />DataFrame</el-button
-      >
-      <el-button
-        icon="el-icon-download"
-        class="header_button"
-        @click="clickExportLog"
-        ><br />Log</el-button
-      >
-    </el-col> -->
-  </el-row>
+<el-container>
+  <el-header class="el-row-col">Header</el-header>
+</el-container>
+  
 </template>
 
 <script>
@@ -133,6 +114,7 @@ export default {
   line-height: 60px;
   font-size: 25px;
   font-weight: 600;
+  background-color: black;
   /* color: red; */
 }
 .header_button {

@@ -1,12 +1,14 @@
 <template>
     <el-row>
-      <div>
+    <div class="block">
+      <div class="whole-block">
     <el-table
       :data="tableData"
       style="width: 100%;"
       :fit="true"
       :default-sort="{ prop: 'date', order: 'descending' }"
       :cell-style = "setColColor"
+      class="block"
     >
       <el-table-column
         sortable
@@ -19,7 +21,7 @@
       </el-table-column>
     </el-table>
      <!-- <el-button @click = "setCellColor" class="shadow-button"  type="primary" >Add</el-button> -->
-
+</div>
   </div>
   </el-row>
 </template>
@@ -60,4 +62,13 @@ export default {
 };
 </script>
 <style scoped>
+.whole-block {
+  border-radius: 5px;
+  margin: 10px;
+  box-shadow: 0 3px #999;
+}
+.block {
+  border-radius: 5px;
+  min-height: 910px;
+}
 </style>

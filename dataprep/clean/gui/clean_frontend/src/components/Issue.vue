@@ -4,8 +4,6 @@
   display: flex;
   align-content: center;
   justify-content: center;
-  /* border-style:solid;
-  border-width:1px;  */
 }
 .cleanning_img {
   display: inline;
@@ -23,7 +21,11 @@
   width: 150px;
   margin-bottom: 40px;
 }
-
+.shadow {
+   margin: 10px;
+   margin-bottom: 30px;
+   box-shadow: 0 3px #999;
+}
 .el-row-col {
   line-height: 60px;
   font-size: 20px;
@@ -36,34 +38,42 @@
   margin: 5px;
   height: 50px;
 }
+
+.whole-block {
+  border-radius: 5px;
+  margin: 10px;
+}
  
 </style>
 
 
 <template>
   <el-row >
-    <div  class = "header_center">
-        <b class = "el-row-col">Issues</b>
-    </div>
-   
-        <el-card>
-        <div class="new-block">
+    <div class = 'whole-block'>
+      
+      <el-card class="shadow">
+          
+                <div  class = "header_center">
+                  <b class = "el-row-col">Issues</b>
+              </div>
+          <div class="new-block">
             Missing value in 
             <b> email </b>
         </div>
          <div class="new-block">
-            Missing format in 
+           Missing format in 
             <b> city of birth  </b>
         </div>
          <div class="new-block">
-             Duplicate values in 
+           Duplicate values in 
             <b> phone number </b>
         </div>
          <div class="new-block">
-             Invalid value in 
+           Invalid value in 
             <b> email </b>
         </div>
         </el-card>
+           </div>
   </el-row>
 </template>
 
