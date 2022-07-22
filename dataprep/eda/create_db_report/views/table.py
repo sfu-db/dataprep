@@ -1,4 +1,5 @@
 import json
+from typing import List, Any
 from ..db_models.table import Table
 from ..page_models.page_data import PageData
 from ..page_models.page_template import PageTemplate
@@ -10,7 +11,9 @@ class TablePage:
     def __init__(self, template_object: PageTemplate) -> None:
         self.template_object = template_object
 
-    def page_writer(self, table: Table, new_file: str):
+    def page_writer(
+        self, table: Table, json_tables: List[Any], json_relationships: List[Any], new_file: str
+    ):
         """
         Compile the data needed by the template for tables pages
         """
@@ -32,6 +35,8 @@ class TablePage:
         page_data.add_scope("indexes", indexes)
         page_data.add_scope("check_constraints", check_constraints)
         page_data.add_scope("sql_code", self.sql_code(table))
+        page_data.add_scope("diagram_tables", json.dumps(json_tables))
+        page_data.add_scope("diagram_relationships", json.dumps(json_relationships))
         page_data.set_depth(0)
 
         pagination_configs = {

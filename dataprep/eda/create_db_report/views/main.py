@@ -30,13 +30,13 @@ class MainPage:
         generation_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
         all_tables = []
-        for t in tables:
-            if t.is_view():
+        for table in tables:
+            if table.is_view():
                 views_amount += 1
             else:
                 tables_amount += 1
-            columns_amount += len(t.get_columns())
-            all_tables.append(TemplateTable(t))
+            columns_amount += len(table.get_columns())
+            all_tables.append(TemplateTable(table))
 
         page_data = PageData("main.html", "main.js")
         page_data.add_scope("database_name", database.name)

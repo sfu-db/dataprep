@@ -3,7 +3,7 @@ from .db_meta import DbMeta
 
 class Database:
     def __init__(self, name: str, schema: str, stats: DbMeta) -> None:
-        self.name = name
+        self.name = name.replace("'", "")
         self.schema = schema
         self.tables = {}
         self.views = {}
@@ -20,5 +20,11 @@ class Database:
     def get_tables(self):
         return self.tables.values()
 
+    def get_tables_dict(self):
+        return self.tables
+
     def get_views(self):
         return self.views.values()
+
+    def get_name(self):
+        return self.name

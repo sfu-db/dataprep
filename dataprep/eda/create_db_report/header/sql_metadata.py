@@ -16,20 +16,20 @@ def plot_mysql_db(sql_engine: Engine):
     # Table level SQL, schema name, table name, row count
     version_sql = pd.read_sql("""SELECT version();""", sql_engine)
     table_sql = pd.read_sql(
-        """SELECT table_schema AS schemaname, concat_ws('.', table_schema, table_name) AS table_name, table_rows AS row_count FROM INFORMATION_SCHEMA.tables
+        """SELECT table_schema AS schemaname, table_name AS table_name, table_rows AS row_count FROM INFORMATION_SCHEMA.tables
     WHERE table_schema not in ('mysql','information_schema','performance_schema','sys', 'Z_README_TO_RECOVER') AND TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '%s' ORDER BY 1,2;"""
         % (db_name),
         sql_engine,
     )
     view_sql = pd.read_sql(
-        """SELECT table_schema AS schemaname, concat_ws('.', table_schema, table_name) AS view_name, view_definition AS definition FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA != 'sys' AND TABLE_SCHEMA = '%s' ORDER BY 1,2;"""
+        """SELECT table_schema AS schemaname, table_name AS view_name, view_definition AS definition FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA != 'sys' AND TABLE_SCHEMA = '%s' ORDER BY 1,2;"""
         % (db_name),
         sql_engine,
     )
     pk_fk = pd.read_sql(
-        """SELECT k.CONSTRAINT_NAME AS constraint_name, t.CONSTRAINT_TYPE AS constraint_type, concat_ws('.', k.CONSTRAINT_SCHEMA, k.TABLE_NAME) AS table_name, k.COLUMN_NAME AS col_name,
+        """SELECT k.CONSTRAINT_NAME AS constraint_name, t.CONSTRAINT_TYPE AS constraint_type, k.TABLE_NAME AS table_name, k.COLUMN_NAME AS col_name,
     CASE WHEN concat_ws('.', k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME) = '' THEN NULL
-    ELSE concat_ws('.', k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME) END AS ref_table, k.REFERENCED_COLUMN_NAME AS ref_col, r.UPDATE_RULE AS update_rule, r.DELETE_RULE AS delete_rule FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
+    ELSE k.REFERENCED_TABLE_NAME END AS ref_table, k.REFERENCED_COLUMN_NAME AS ref_col, r.UPDATE_RULE AS update_rule, r.DELETE_RULE AS delete_rule FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
     JOIN information_schema.table_constraints t on k.CONSTRAINT_CATALOG = t. CONSTRAINT_CATALOG AND k.constraint_schema = t.constraint_schema AND k.constraint_name = t.constraint_name AND k.TABLE_NAME = t.TABLE_NAME
     LEFT JOIN information_schema.referential_constraints r on k.CONSTRAINT_CATALOG = r.CONSTRAINT_CATALOG AND k.constraint_schema = r.constraint_schema AND k.constraint_name = r.constraint_name
     WHERE k.CONSTRAINT_SCHEMA not in ('mysql', 'performance_schema', 'sys') AND k.CONSTRAINT_SCHEMA = '%s' ORDER BY 3;"""
@@ -50,6 +50,7 @@ def plot_mysql_db(sql_engine: Engine):
     overview_dict["table_names"] = table_list
     overview_dict["num_of_views"] = len(view_list)
     overview_dict["view_names"] = view_list
+    overview_dict["connection_url"] = str(sql_engine.url)
     overview_dict["tables_no_index"] = list(
         table_sql[
             ~table_sql["table_name"].isin(
@@ -67,7 +68,7 @@ def plot_mysql_db(sql_engine: Engine):
     overview_dict["product_version"] = version_sql["version()"].values[0]
     # Stats for column level stats
     all_cols = pd.read_sql(
-        """SELECT concat_ws('.', table_schema, table_name) AS table_name, COLUMN_name AS col_name, COLUMN_TYPE AS type,
+        """SELECT table_name AS table_name, COLUMN_name AS col_name, COLUMN_TYPE AS type,
     CASE WHEN IS_NULLABLE  = 'YES' THEN 'False'
     ELSE 'True' END AS attnotnull , COLUMN_DEFAULT AS `default`, column_comment AS description,
     CASE WHEN EXTRA like '%s' THEN 'True'
@@ -170,7 +171,7 @@ def plot_postgres_db(postgres_engine: Engine):
     """
     # Table level SQL, schema name, table name, row count
     table_sql = pd.read_sql(
-        """SELECT s.schemaname, concat_ws('.', s.schemaname, tablename) AS table_name, hasindexes, n_live_tup AS row_count
+        """SELECT s.schemaname, tablename AS table_name, hasindexes, n_live_tup AS row_count
       FROM pg_stat_user_tables s
       JOIN pg_tables t ON t.tablename = s.relname AND t.schemaname = s.schemaname ORDER BY 1,2;""",
         postgres_engine,
@@ -178,7 +179,7 @@ def plot_postgres_db(postgres_engine: Engine):
     version_sql = pd.read_sql("""SELECT version();""", postgres_engine)
     # View level SQL
     view_sql = pd.read_sql(
-        """SELECT schemaname, concat_ws('.', v.schemaname, v.viewname) AS view_name, definition FROM pg_class c
+        """SELECT schemaname, v.viewname AS view_name, definition FROM pg_class c
 JOIN pg_views v on v.viewname = c.relname AND c.relnamespace = v.schemaname::regnamespace::oid
 WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND relkind = 'v' ORDER BY 1,2""",
         postgres_engine,
@@ -191,9 +192,9 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
             WHEN contype = 'f' THEN 'foreign key'
             WHEN contype = 'u' THEN 'unique key'
         END AS constraint_type
-          , concat_ws('.', n.nspname, conrelid::regclass) AS "table_name"
+          , conrelid::regclass AS "table_name"
           , CASE WHEN pg_get_constraintdef(c.oid) LIKE 'FOREIGN KEY %%' THEN substring(pg_get_constraintdef(c.oid), 14, position(')' in pg_get_constraintdef(c.oid))-14) WHEN pg_get_constraintdef(c.oid) LIKE 'PRIMARY KEY %%' THEN substring(pg_get_constraintdef(c.oid), 14, position(')' in pg_get_constraintdef(c.oid))-14) END AS "col_name"
-          , CASE WHEN pg_get_constraintdef(c.oid) LIKE 'FOREIGN KEY %%' THEN concat_ws('.', n.nspname, substring(pg_get_constraintdef(c.oid), position(' REFERENCES ' in pg_get_constraintdef(c.oid))+12, position('(' in substring(pg_get_constraintdef(c.oid), 14))-position(' REFERENCES ' in pg_get_constraintdef(c.oid))+1)) END AS "ref_table"
+          , CASE WHEN pg_get_constraintdef(c.oid) LIKE 'FOREIGN KEY %%' THEN substring(pg_get_constraintdef(c.oid), position(' REFERENCES ' in pg_get_constraintdef(c.oid))+12, position('(' in substring(pg_get_constraintdef(c.oid), 14))-position(' REFERENCES ' in pg_get_constraintdef(c.oid))+1) END AS "ref_table"
           , CASE WHEN pg_get_constraintdef(c.oid) LIKE 'FOREIGN KEY %%' THEN substring(pg_get_constraintdef(c.oid), position('(' in substring(pg_get_constraintdef(c.oid), 14))+14, position(')' in substring(pg_get_constraintdef(c.oid), position('(' in substring(pg_get_constraintdef(c.oid), 14))+14))-1) END AS "ref_col"
           , pg_get_constraintdef(c.oid) as constraint_def,
           CASE
@@ -230,6 +231,7 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
     overview_dict["table_names"] = table_list
     overview_dict["num_of_views"] = len(view_list)
     overview_dict["view_names"] = view_list
+    overview_dict["connection_url"] = postgres_engine.url
     overview_dict["tables_no_index"] = list(
         table_sql[table_sql["hasindexes"] == False]["table_name"]
     )
@@ -241,7 +243,7 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
 
     # Stats for column level stats
     all_cols = pd.read_sql(
-        """select concat_ws('.', n.nspname, attrelid::regclass) AS table_name, f.attname AS col_name,
+        """select attrelid::regclass AS table_name, f.attname AS col_name,
         pg_catalog.format_type(f.atttypid,f.atttypmod) AS type, attnotnull,
         CASE
             WHEN f.atthasdef = 't' THEN pg_get_expr(d.adbin, d.adrelid)
@@ -278,7 +280,7 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
     for i in table_list:
         indices = {}
         index = pd.read_sql(
-            "SELECT * FROM pg_indexes WHERE tablename= " + "'" + str(i).split(".")[1] + "'" + ";",
+            "SELECT * FROM pg_indexes WHERE tablename= " + "'" + str(i) + "'" + ";",
             postgres_engine,
         )
         for (idx, row) in index.iterrows():
@@ -459,6 +461,7 @@ def plot_sqlite_db(sqliteConnection: Engine, analyze: bool = False):
     overview_dict["table_names"] = table_list
     overview_dict["num_of_views"] = int(len(view_list))
     overview_dict["view_names"] = view_list
+    overview_dict["connection_url"] = sqliteConnection.url
     overview_dict["view_schema"] = dict([(x, "sakila") for x in view_list])
     overview_dict["tables_no_index"] = list(
         table_sql[~table_sql["table_name"].isin(set(pk_sql["table_name"]))]["table_name"]

@@ -14,6 +14,8 @@ from .views.main import MainPage
 from .views.column import ColumnPage
 from .views.constraint import ConstraintPage
 from .views.table import TablePage
+from .views.relationship import RelationshipPage
+from .diagram_factory import DiagramFactory
 from .header.sql_metadata import plot_mysql_db, plot_postgres_db, plot_sqlite_db
 
 
@@ -39,6 +41,7 @@ def parse_database(engine_name: str, database_name: str, json_overview_dict: Dic
         json_overview_dict["num_of_pk"],
         json_overview_dict["num_of_tables"],
         json_overview_dict["product_version"],
+        json_overview_dict["connection_url"],
     )
     current_database = Database(database_name, json_overview_dict["schema_names"], metadata)
     return metadata, current_database
@@ -174,17 +177,18 @@ def parse_constraints(current_database: Database, json_table_dict: Dict[str, Any
             elif constraints[current_constraint]["constraint_type"].upper() == "FOREIGN KEY":
                 column_id = str(constraints[current_constraint]["col_name"]).upper().strip()
                 current_column = current_table.get_column(column_id)
-                parent_table = constraints[current_constraint]["ref_table"]
-                parent_col = constraints[current_constraint]["ref_col"]
-                parent_column = existing_tables[parent_table].get_column(parent_col.upper())
+                parent_table = existing_tables[constraints[current_constraint]["ref_table"]]
+                parent_column_name = constraints[current_constraint]["ref_col"]
+                parent_column = parent_table.get_column(parent_column_name.upper())
                 delete_constraint = constraints[current_constraint]["delete_rule"]
                 new_fk = ForeignKeyConstraint(
-                    current_table, current_constraint, delete_constraint, 0
+                    current_table, current_constraint, delete_constraint, "0"
                 )
                 new_fk.add_child_column(current_column)
                 new_fk.add_parent_column(parent_column)
                 current_column.add_parent(parent_column, new_fk)
                 parent_column.add_child(current_column, new_fk)
+                parent_table.add_referenced_by_table(current_table)
                 current_table.add_foreign_key(new_fk)
 
 
@@ -212,6 +216,7 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
         if analyze
         else plot_db[sql_engine.name](sql_engine)
     )
+    overview_dict["connection_url"] = str(overview_dict["connection_url"])
     json_overview_dict = json.loads(json.dumps(overview_dict))
     json_table_dict = json.loads(json.dumps(table_dict))
     json_view_dict = json.loads(json.dumps(view_dict))
@@ -228,6 +233,9 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
 
     template_compiler = PageTemplate(database_name)
 
+    file = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout")))
+    diagram_generator = DiagramFactory(file)
+
     file = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "columns.html")))
     column_page = ColumnPage(template_compiler)
     column_page.page_writer(current_database.get_tables(), file)
@@ -242,6 +250,7 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
     constraint_page.page_writer(constraints, current_database.get_tables(), file)
 
     table_files = ["table.html", "table.js"]
+    result_tables = diagram_generator.generate_table_diagrams(current_database, str(sql_engine.url))
     for table in current_database.get_tables():
         table_file_name = table.name + ".html"
         table_files.append(table_file_name)
@@ -251,7 +260,12 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
             )
         )
         table_page = TablePage(template_compiler)
-        table_page.page_writer(table, file)
+        table_page.page_writer(
+            table,
+            result_tables[table.name]["json_tables"],
+            result_tables[table.name]["json_relationships"],
+            file,
+        )
 
     delete_table_files = [
         file
@@ -271,5 +285,14 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
     report_output_file = main_page.page_writer(
         current_database, current_database.get_tables(), file
     )
+
+    json_tables, json_relationships = diagram_generator.generate_summary_diagram(
+        current_database, str(sql_engine.url)
+    )
+    relationship_page = RelationshipPage(template_compiler)
+    file = str(
+        os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "relationships.html"))
+    )
+    relationship_page.page_writer(json_tables, json_relationships, file)
 
     return database_name, report_output_file

@@ -5,12 +5,13 @@ from .table_index import TableIndex
 class Table:
     def __init__(self, database: Database, schema: str, name: str) -> None:
         self.database = database
-        self.schema = schema
-        self.name = name
+        self.schema = schema.replace("'", "")
+        self.name = name.replace("'", "")
         self.foreign_keys = {}
         self.columns = {}
         self.primary_keys = []
         self.indexes = {}
+        self.referenced_by = {}
         self.id = None
         self.check_constraints = {}
         self.num_of_rows = 0
@@ -50,6 +51,12 @@ class Table:
     def add_max_children(self):
         self.max_children += 1
 
+    def add_referenced_by_table(self, table):
+        self.referenced_by[table.get_name()] = table
+
+    def get_referenced_by_tables(self):
+        return self.referenced_by
+
     def get_view_definition(self):
         return None
 
@@ -70,5 +77,11 @@ class Table:
     def get_foreign_keys(self):
         return self.foreign_keys.values()
 
+    def get_foreign_keys_dict(self):
+        return self.foreign_keys
+
     def add_foreign_key(self, foreign_key):
         self.foreign_keys[foreign_key.name] = foreign_key
+
+    def get_name(self):
+        return self.name

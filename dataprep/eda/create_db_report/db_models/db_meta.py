@@ -22,6 +22,7 @@ class DbMeta:
         num_of_pk: int,
         num_of_tables: int,
         product_version: str,
+        connection_url: str,
     ) -> None:
         self.num_of_views = num_of_views
         self.num_of_schemas = num_of_schemas
@@ -29,4 +30,5 @@ class DbMeta:
         self.num_of_uk = num_of_uk
         self.num_of_pk = num_of_pk
         self.num_of_table = num_of_tables
+        self.connection_url = connection_url
         self.database_product = self.engine_name_dict[engine_name] + " - " + product_version
