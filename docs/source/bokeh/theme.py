@@ -82,7 +82,7 @@ class BootstrapHTML5Translator(HTML5Translator):
         # but add 'table' class
         self.generate_targets_for_table(node)
 
-        self._table_row_index = 0
+        self._table_row_indices = [0]
 
         classes = [cls.strip(" \t\n") for cls in self.settings.table_style.split(",")]
         # classes.insert(0, "docutils")  # compat
