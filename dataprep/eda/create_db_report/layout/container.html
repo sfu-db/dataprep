@@ -38,6 +38,11 @@
         <script src="{{ root_path }}bower/html5shiv/html5shiv.min.js"></script>
         <script src="{{ root_path }}bower/respond/respond.min.js"></script>
         <![endif]-->
+        <!-- GoJS -->
+        <script src="{{ root_path }}bower/gojs/go.js"></script>
+        <script src="{{ root_path }}bower/gojs/Figures.js"></script>
+        <script src="{{ root_path }}bower/gojs/ZoomSlider.js"></script>
+        <link rel="stylesheet" href="{{ root_path }}bower/gojs/ZoomSlider.css" />
     </head>
     <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
     <body class="hold-transition skin-blue layout-top-nav">
@@ -57,7 +62,7 @@
                                 <li><a href="{{ root_path }}index.html">Tables <span class="sr-only">(current)</span></a></li>
                                 <li><a href="{{ root_path }}columns.html" title="All of the columns in the schema">Columns</a></li>
                                 <li><a href="{{ root_path }}constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
-<!--                                <li><a href="{{ root_path }}relationships.html" title="Diagram of table relationships">Relationships</a></li>-->
+                                <li><a href="{{ root_path }}relationships.html" title="Diagram of table relationships">Relationships</a></li>
 <!--                                <li><a href="{{ root_path }}orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>-->
 <!--                                <li><a href="{{ root_path }}anomalies.html" title="Things that might not be quite right">Anomalies</a></li>-->
 <!--                                <li><a href="{{ root_path }}routines.html" title="Procedures and functions">Routines</a></li>-->
@@ -124,5 +129,8 @@
         <script src="{{ root_path }}bower/admin-lte/dist/js/app.min.js"></script>
         <script src="{{ page_script }}"></script>
         <script src="{{ root_path }}schemaSpy.js"></script>
+        {% if diagram_tables or diagram_relationships %}
+        {% include 'diagram.html' %}
+        {% endif %}
     </body>
 </html>

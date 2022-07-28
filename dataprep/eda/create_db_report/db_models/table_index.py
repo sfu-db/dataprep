@@ -1,6 +1,6 @@
 class TableIndex:
     def __init__(self, name: str, index_type: str) -> None:
-        self.name = name
+        self.name = name.replace("'", "")
         self.is_unique = False
         self.is_primary = False
         self.columns = {}

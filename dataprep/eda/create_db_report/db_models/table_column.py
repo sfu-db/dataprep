@@ -14,11 +14,11 @@ class TableColumn:
         comments: str,
     ):
         self.table = table
-        self.name = name
+        self.name = name.replace("'", "")
         self.type_name = type_name
         self.not_null = not_null
-        self.default_value = default_value if default_value is not None else ""
-        self.comments = comments
+        self.default_value = default_value.replace("'", "") if default_value else ""
+        self.comments = comments.replace("'", "") if default_value else ""
         self.parents = {}
         self.children = {}
         self.type = 0
@@ -60,3 +60,6 @@ class TableColumn:
 
     def get_children(self):
         return list(self.children.values())
+
+    def get_name(self):
+        return self.name

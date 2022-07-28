@@ -59,6 +59,7 @@ class PageTemplate:
             "root_path": root_path or PageTemplate.get_root_path(),
             "root_path_to_home": PageTemplate.get_root_path_to_home(),
         }
+        container_scope.update(page_scope)
         html = env_loader.get_template("container.html").render(container_scope)
         open(output_file, "w", encoding="utf-8").write(html)
         return output_file

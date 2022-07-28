@@ -15,9 +15,9 @@ class ColumnPage:
         Compile the data needed by the template for columns page
         """
         table_columns = set()
-        for t in tables:
-            for c in t.get_columns():
-                table_columns.add(TemplateTableColumn(c, c.index, ""))
+        for table in tables:
+            for column in table.get_columns():
+                table_columns.add(TemplateTableColumn(column, column.index, ""))
 
         json_columns = []
         for mc in table_columns:
