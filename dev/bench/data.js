@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1657241525876,
+  "lastUpdate": 1658976758091,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -4092,6 +4092,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.04075642133694121",
             "extra": "mean: 3.9243069890000015 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a10a04bc7aa530b691c08df3609a8a847c748c9f",
+          "message": "Merge pull request #916 from khoatxp/feat/create-db-report-add-interactive-diagram\n\nfeat(eda.create_db_report): add interactive diagram functionality",
+          "timestamp": "2022-07-28T10:49:47+08:00",
+          "tree_id": "18a7b1253fdc389f4cece1f225d22ffc20921608",
+          "url": "https://github.com/sfu-db/dataprep/commit/a10a04bc7aa530b691c08df3609a8a847c748c9f"
+        },
+        "date": 1658976753620,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.2566177434628634,
+            "unit": "iter/sec",
+            "range": "stddev: 0.01307924924283994",
+            "extra": "mean: 3.8968466736000096 sec\nrounds: 5"
           }
         ]
       }
