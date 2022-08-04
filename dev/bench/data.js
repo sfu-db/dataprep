@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659626038257,
+  "lastUpdate": 1659656847459,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -4185,6 +4185,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.03693089386187893",
             "extra": "mean: 3.9827191897999965 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "98d39941b6db5c156933693a5b6e1b635e01310d",
+          "message": "Merge pull request #932 from sfu-db/vscode-display\n\nfix(eda): vscode display issue",
+          "timestamp": "2022-08-05T07:43:45+08:00",
+          "tree_id": "d14cab3df372306349aa4dca3cc2ad23b7284dff",
+          "url": "https://github.com/sfu-db/dataprep/commit/98d39941b6db5c156933693a5b6e1b635e01310d"
+        },
+        "date": 1659656843284,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.1746501828531351,
+            "unit": "iter/sec",
+            "range": "stddev: 0.056890509992394",
+            "extra": "mean: 5.725731194000002 sec\nrounds: 5"
           }
         ]
       }
