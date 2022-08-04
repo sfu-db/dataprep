@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659411778447,
+  "lastUpdate": 1659626038257,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -4154,6 +4154,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00959046603340107",
             "extra": "mean: 3.921891250399983 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "62c7d26a59db6d63b04f43e307c308422dc2ed51",
+          "message": "Merge pull request #925 from khoatxp/fix-docs-build-issue\n\nFix docs build failing",
+          "timestamp": "2022-08-04T23:11:06+08:00",
+          "tree_id": "7b173419998fc0e6573adfff44826892b13b4186",
+          "url": "https://github.com/sfu-db/dataprep/commit/62c7d26a59db6d63b04f43e307c308422dc2ed51"
+        },
+        "date": 1659626034158,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.25108473692071115,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03693089386187893",
+            "extra": "mean: 3.9827191897999965 sec\nrounds: 5"
           }
         ]
       }
