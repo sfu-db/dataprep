@@ -62,8 +62,10 @@ class DiagramFactory:
         return json_tables, json_relationships
 
     def generate_table_diagrams(self, database_object: Database, database_url: str):
+        # Generate diagram for each table
         database_tables = database_object.get_tables_dict()
         table_names = set(database_tables.keys())
+        orphan_table_names = list()
         result_tables = {}
         for table in table_names:
             related_table_names = {table}
@@ -74,6 +76,8 @@ class DiagramFactory:
                     table_foreign_keys[foreign_key].get_parent_table().get_name()
                 )
             related_table_names = list(related_table_names)
+            if len(related_table_names) == 1:
+                orphan_table_names.append(table)
             os.chdir(self.dirs["table"])
             if _WITH_GV:
                 render_er(
@@ -96,7 +100,29 @@ class DiagramFactory:
                 "json_tables": json_tables,
                 "json_relationships": json_relationships,
             }
-        return result_tables
+
+        # Generate diagram for orphan tables
+        os.chdir(self.dirs["orphan"])
+        if _WITH_GV:
+            render_er(database_url, "orphans.dot", include_tables=" ".join(orphan_table_names))
+        else:
+            raise self.import_err
+        os.chdir(self.cwd)
+        orphan_tables = {
+            key: value for key, value in database_tables.items() if key in orphan_table_names
+        }
+        json_tables = self.generate_diagram_tables(orphan_tables)
+        file = str(
+            os.path.realpath(
+                os.path.join(os.path.dirname(__file__), "layout/diagrams/orphans/orphans.dot")
+            )
+        )
+        json_relationships = self.generate_diagram_relationships(file)
+        orphan_result_tables = {
+            "json_tables": json_tables,
+            "json_relationships": json_relationships,
+        }
+        return orphan_result_tables, result_tables
 
     def generate_diagram_tables(self, tables: Dict[str, Any]):
         table_names = set(tables.keys())

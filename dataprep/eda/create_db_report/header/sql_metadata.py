@@ -518,8 +518,8 @@ def plot_sqlite_db(sqliteConnection: Engine, analyze: bool = False):
         temp_pk_fk = (
             pk_fk[pk_fk["table_name"] == i].drop(columns=["table_name"]).to_dict(orient="records")
         )
+        fk_counter, uk_counter = 1, 1
         for j in temp_pk_fk:
-            fk_counter, uk_counter = 1, 1
             if j["constraint_type"] == "primary key":
                 element = i + "_pkey"
                 temp["constraints"][element] = {}

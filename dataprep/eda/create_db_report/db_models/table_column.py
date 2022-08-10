@@ -18,7 +18,7 @@ class TableColumn:
         self.type_name = type_name
         self.not_null = not_null
         self.default_value = default_value.replace("'", "") if default_value else ""
-        self.comments = comments.replace("'", "") if default_value else ""
+        self.comments = comments.replace("'", "") if comments else ""
         self.parents = {}
         self.children = {}
         self.type = 0
