@@ -5,18 +5,24 @@ function init() {
   // For details, see https://gojs.net/latest/intro/buildingObjects.html
   const $ = go.GraphObject.make;  // for conciseness in defining templates
 
+  let layoutSelect = document.getElementById('diagram-layout-list');
+
   myDiagram =
     $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
       {
         allowDelete: false,
         allowCopy: false,
-        layout: $(go.LayeredDigraphLayout),
+        layout: $(go[layoutSelect[0].value]),
         "undoManager.isEnabled": true
       });
     function diagramInfo(model) {
       return "Model:\n" + model.nodeDataArray.length + " nodes, " +
                           model.linkDataArray.length + " links";
     }
+
+  layoutSelect.addEventListener("change", (event) => {
+      myDiagram.layout = $(go[event.target.value]);
+  });
 
   //provide a tooltip for the background of the Diagram, when not over any Part
   myDiagram.toolTip =
@@ -187,11 +193,6 @@ function init() {
     });
 
   zoomSlider = new ZoomSlider(myDiagram);
-
-  let layoutSelect = document.getElementById('diagram-layout-list');
-  layoutSelect.addEventListener("change", (event) => {
-      myDiagram.layout = $(go[event.target.value]);
-  });
 }
 window.addEventListener('DOMContentLoaded', init);
 </script>

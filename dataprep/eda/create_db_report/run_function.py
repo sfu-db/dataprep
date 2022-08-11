@@ -15,6 +15,7 @@ from .views.column import ColumnPage
 from .views.constraint import ConstraintPage
 from .views.table import TablePage
 from .views.relationship import RelationshipPage
+from .views.orphan import OrphanPage
 from .diagram_factory import DiagramFactory
 from .header.sql_metadata import plot_mysql_db, plot_postgres_db, plot_sqlite_db
 
@@ -249,8 +250,17 @@ def generate_db_report(sql_engine: Engine, analyze: bool = False):
     )
     constraint_page.page_writer(constraints, current_database.get_tables(), file)
 
+    orphan_result_tables, result_tables = diagram_generator.generate_table_diagrams(
+        current_database, str(sql_engine.url)
+    )
+
+    orphan_page = OrphanPage(template_compiler)
+    file = str(os.path.realpath(os.path.join(os.path.dirname(__file__), "layout", "orphans.html")))
+    orphan_page.page_writer(
+        orphan_result_tables["json_tables"], orphan_result_tables["json_relationships"], file
+    )
+
     table_files = ["table.html", "table.js"]
-    result_tables = diagram_generator.generate_table_diagrams(current_database, str(sql_engine.url))
     for table in current_database.get_tables():
         table_file_name = table.name + ".html"
         table_files.append(table_file_name)
