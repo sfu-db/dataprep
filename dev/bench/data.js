@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659656847459,
+  "lastUpdate": 1660261390800,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -4216,6 +4216,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.056890509992394",
             "extra": "mean: 5.725731194000002 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jlpengcs@gmail.com",
+            "name": "Jinglin Peng",
+            "username": "jinglinpeng"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c15ec4061d143909ef5353d83cfed7cc35ada3ed",
+          "message": "Merge pull request #935 from khoatxp/feat/create-db-report-add-orphan-page\n\nfeat(eda.create-db-report): add orphan page and fix foreign key bug",
+          "timestamp": "2022-08-12T07:39:54+08:00",
+          "tree_id": "f3d9f79602e32f34032cc174eaab51df6515b014",
+          "url": "https://github.com/sfu-db/dataprep/commit/c15ec4061d143909ef5353d83cfed7cc35ada3ed"
+        },
+        "date": 1660261386951,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.24725030746143145,
+            "unit": "iter/sec",
+            "range": "stddev: 0.019559269652416587",
+            "extra": "mean: 4.044484353800004 sec\nrounds: 5"
           }
         ]
       }
