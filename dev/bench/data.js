@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1666836477760,
+  "lastUpdate": 1666836938698,
   "repoUrl": "https://github.com/sfu-db/dataprep",
   "entries": {
     "DataPrep.EDA Benchmarks": [
@@ -4309,6 +4309,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.01618856625008676",
             "extra": "mean: 3.9410418859999994 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "committer": {
+            "email": "youngw@sfu.ca",
+            "name": "Weiyuan Wu",
+            "username": "dovahcrow"
+          },
+          "distinct": true,
+          "id": "55c3932a8cdc8f9ae69660a4083f3519fe159dc5",
+          "message": "update readme",
+          "timestamp": "2022-10-27T02:11:48Z",
+          "tree_id": "779979d851b73246ffb3b9262ac4113e38b7c549",
+          "url": "https://github.com/sfu-db/dataprep/commit/55c3932a8cdc8f9ae69660a4083f3519fe159dc5"
+        },
+        "date": 1666836933969,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "dataprep/tests/benchmarks/eda.py::test_create_report",
+            "value": 0.17065953860493113,
+            "unit": "iter/sec",
+            "range": "stddev: 0.12216139937014857",
+            "extra": "mean: 5.859619732800013 sec\nrounds: 5"
           }
         ]
       }
