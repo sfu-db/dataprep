@@ -17,7 +17,7 @@
   <a href="https://github.com/sfu-db/dataprep/discussions">Forum</a>
 </p>
 
-DataPrep lets you prepare your data using a single library with a few lines of code.
+<center><b>Low code data preparation</b></center>
 
 Currently, you can use DataPrep to:
 
