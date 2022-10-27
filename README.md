@@ -17,7 +17,7 @@
   <a href="https://github.com/sfu-db/dataprep/discussions">Forum</a>
 </p>
 
-<center><b>Low code data preparation</b></center>
+<p align="center"><b>Low code data preparation</b></p>
 
 Currently, you can use DataPrep to:
 
