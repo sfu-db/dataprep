@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import pandas._libs.missing as libmissing
 from bokeh.models import Legend, FuncTickFormatter
-from bokeh.plotting import Figure
+from bokeh.plotting import figure
 from scipy.stats import gaussian_kde as gaussian_kde_
 from scipy.stats import ks_2samp as ks_2samp_
 from scipy.stats import normaltest as normaltest_
@@ -129,7 +129,7 @@ def sample_n(arr: np.ndarray, n: int) -> np.ndarray:  # pylint: disable=C0103
     return arr[subsel]
 
 
-def relocate_legend(fig: Figure, loc: str) -> Figure:
+def relocate_legend(fig: figure, loc: str) -> figure:
     """Relocate legend(s) from center to `loc`."""
     remains = []
     targets = []
@@ -407,7 +407,7 @@ def skewtest(arr: np.ndarray) -> Tuple[float, float]:
 
 
 def tweak_figure(
-    fig: Figure,
+    fig: figure,
     ptype: Optional[str] = None,
     show_yticks: bool = False,
     max_lbl_len: int = 15,
@@ -473,7 +473,7 @@ def _format_ticks(ticks: List[float]) -> List[str]:
     return formatted_ticks
 
 
-def _format_axis(fig: Figure, minv: int, maxv: int, axis: str) -> None:
+def _format_axis(fig: figure, minv: int, maxv: int, axis: str) -> None:
     """
     Format the axis ticks
     """  # pylint: disable=too-many-locals

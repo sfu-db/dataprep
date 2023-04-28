@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 from bokeh.models import (
     HoverTool,
-    Panel,
+    TabPanel,
     FactorRange,
 )
-from bokeh.plotting import Figure, figure
+from bokeh.plotting import figure
 from bokeh.transform import dodge
 from bokeh.layouts import row
 
@@ -78,7 +78,7 @@ def bar_viz(
     orig: List[str],
     df_labels: List[str],
     baseline: int,
-) -> Figure:
+) -> figure:
     """
     Render a bar chart
     """
@@ -97,9 +97,9 @@ def bar_viz(
     if show_yticks:
         if len(df[baseline]) > 10:
             plot_width = 28 * len(df[baseline])
-    fig = Figure(
-        plot_width=plot_width,
-        plot_height=plot_height,
+    fig = figure(
+        width=plot_width,
+        height=plot_height,
         title=col,
         toolbar_location=None,
         tooltips=tooltips,
@@ -110,7 +110,7 @@ def bar_viz(
 
     offset = np.linspace(-0.08 * len(df), 0.08 * len(df), len(df)) if len(df) > 1 else [0]
     for i, (nrow, data) in enumerate(zip(nrows, df)):
-        data["pct"] = data[col] / nrow * 100
+        data["pct"] = data["count"] / nrow * 100
         data.index = [str(val) for val in data.index]
         data["orig"] = orig[i]
 
@@ -155,7 +155,7 @@ def hist_viz(
     show_yticks: bool,
     df_labels: List[str],
     orig: Optional[List[str]] = None,
-) -> Figure:
+) -> figure:
     """
     Render a histogram
     """
@@ -167,9 +167,9 @@ def hist_viz(
         ("Percent", "@pct{0.2f}%"),
         ("Source", "@orig"),
     ]
-    fig = Figure(
-        plot_height=plot_height,
-        plot_width=plot_width,
+    fig = figure(
+        height=plot_height,
+        width=plot_width,
         title=col,
         toolbar_location=None,
         y_axis_type=yscale,
@@ -234,14 +234,14 @@ def kde_viz_figure(
     plot_width: int,
     plot_height: int,
     cfg: Config,
-) -> Figure:
+) -> figure:
     """
     Render histogram with overlayed kde
     """
     # pylint: disable=too-many-arguments, too-many-locals
-    fig = Figure(
-        plot_width=plot_width,
-        plot_height=plot_height,
+    fig = figure(
+        width=plot_width,
+        height=plot_height,
         title=col,
         toolbar_location=None,
         y_axis_type=cfg.kde.yscale,
@@ -295,13 +295,13 @@ def kde_viz_panel(
     plot_width: int,
     plot_height: int,
     cfg: Config,
-) -> Panel:
+) -> TabPanel:
     """
     Render histogram with overlayed kde
     """
     # pylint: disable=too-many-arguments, too-many-locals
     fig = kde_viz_figure(hist, kde, col, plot_width, plot_height, cfg)
-    return Panel(child=row(fig), title="KDE Plot")
+    return TabPanel(child=row(fig), title="KDE Plot")
 
 
 def dt_line_viz(
@@ -314,7 +314,7 @@ def dt_line_viz(
     show_yticks: bool,
     orig: List[str],
     df_labels: List[str],
-) -> Figure:
+) -> figure:
     """
     Render a line chart
     """
@@ -324,9 +324,9 @@ def dt_line_viz(
     for i, _ in enumerate(df):
         df[i]["orig"] = orig[i]
 
-    fig = Figure(
-        plot_width=plot_width,
-        plot_height=plot_height,
+    fig = figure(
+        width=plot_width,
+        height=plot_height,
         toolbar_location=None,
         title=x,
         tools=[],
@@ -368,7 +368,7 @@ def box_viz(
     plot_height: int,
     cfg: Config,
     group_all: List[str],
-) -> Panel:
+) -> TabPanel:
     """
     Render a box plot visualization
     """
@@ -376,8 +376,8 @@ def box_viz(
 
     width, title = 0.7, f"{x}"
     fig = figure(
-        plot_width=plot_width,
-        plot_height=plot_height,
+        width=plot_width,
+        height=plot_height,
         title=title,
         toolbar_location=None,
         x_range=group_all,
@@ -454,13 +454,13 @@ def box_viz(
     maxw = max(otlrs) if otlrs else np.nan
     _format_axis(fig, min(df["lw"].min(), minw), max(df["uw"].max(), maxw), "y")
 
-    return Panel(child=row(fig), title="Box Plot")
+    return TabPanel(child=row(fig), title="Box Plot")
 
 
 # pylint:disable = unused-argument
 def render_correlation_single_heatmaps(
     df_list: List[Dict[str, pd.DataFrame]], col: str, plot_width: int, plot_height: int, cfg: Config
-) -> List[Panel]:
+) -> List[TabPanel]:
     """
     Render correlation heatmaps, but with single column
     """
@@ -473,7 +473,7 @@ def render_correlation_single_heatmaps(
         for i, df in enumerate(df_list):
             df[meth]["x"] = df[meth]["x"] + "_" + str(i + 1)
             corr[meth].append(df[meth])
-    tabs: List[Panel] = []
+    tabs: List[TabPanel] = []
     tooltips = [("y", "@y"), ("correlation", "@correlation{1.11}")]
     for method, dfs in corr.items():
         mapper, color_bar = create_color_mapper(RDBU)
@@ -483,8 +483,8 @@ def render_correlation_single_heatmaps(
         fig = figure(
             x_range=x_range,
             y_range=y_range,
-            plot_width=plot_width,
-            plot_height=plot_height,
+            width=plot_width,
+            height=plot_height,
             x_axis_location="below",
             tools="hover",
             toolbar_location=None,
@@ -505,7 +505,7 @@ def render_correlation_single_heatmaps(
             )
 
         fig.add_layout(color_bar, "right")
-        tab = Panel(child=fig, title=method)
+        tab = TabPanel(child=fig, title=method)
         tabs.append(tab)
         for panel in tabs:
             panel.child.frame_width = int(plot_width * 0.9)
@@ -606,7 +606,7 @@ def render_comparison_grid(itmdt: Intermediate, cfg: Config) -> Dict[str, Any]:
     df_labels: List[str] = cfg.diff.label  # type: ignore
     baseline: int = cfg.diff.baseline
 
-    figs: List[Figure] = []
+    figs: List[figure] = []
     nrows = itmdt["stats"]["nrows"]
     titles: List[str] = []
 
@@ -690,7 +690,7 @@ def render_comparison_continous(itmdt: Intermediate, cfg: Config) -> Dict[str, A
     plot_height = cfg.plot.height if cfg.plot.height is not None else 400
     df_labels: List[str] = cfg.diff.label  # type: ignore
     # baseline: int = cfg.diff.baseline
-    tabs: List[Panel] = []
+    tabs: List[TabPanel] = []
     htgs: Dict[str, List[Tuple[str, str]]] = {}
     col, data = itmdt["col"], itmdt["data"][0]
     if cfg.hist.enable:
@@ -698,7 +698,7 @@ def render_comparison_continous(itmdt: Intermediate, cfg: Config) -> Dict[str, A
         fig = hist_viz(
             data["hist"], nrows, col, cfg.hist.yscale, plot_width, plot_height, False, df_labels
         )
-        tabs.append(Panel(child=row(fig), title="Histogram"))
+        tabs.append(TabPanel(child=row(fig), title="Histogram"))
         # htgs["Histogram"] = cfg.hist.how_to_guide(plot_height, plot_width)
     if cfg.kde.enable:
         if data["kde"] is not None and (

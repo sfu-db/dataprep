@@ -18,7 +18,7 @@ from .random_data_generator import random_df
 LOGGER = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="module")  # type: ignore
+# @pytest.fixture(scope="module")  # type: ignore
 def simpledf() -> dd.DataFrame:
     df = pd.DataFrame(np.random.rand(1000, 3), columns=["a", "b", "c"])
 

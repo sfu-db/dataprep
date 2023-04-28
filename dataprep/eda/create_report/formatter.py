@@ -9,7 +9,7 @@ import dask
 import dask.dataframe as dd
 import pandas as pd
 from bokeh.embed import components
-from bokeh.plotting import Figure
+from bokeh.plotting import figure
 from ..configs import Config
 from ..correlation import render_correlation
 from ..correlation.compute.overview import correlation_nxn
@@ -119,7 +119,7 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
 
             rndrd = render(itmdt, cfg)
             layout = rndrd["layout"]
-            figs_var: List[Figure] = []
+            figs_var: List[figure] = []
             for tab in layout:
                 try:
                     fig = tab.children[0]
@@ -190,7 +190,7 @@ def _format_correlation(data: Dict[str, Any], cfg: Config) -> Dict[str, Any]:
             )
             rndrd = render_correlation(itmdt, cfg)
             res["correlation_names"] = []
-            figs_corr: List[Figure] = []
+            figs_corr: List[figure] = []
             # pylint: disable = not-an-iterable
             for tab in rndrd.tabs:
                 fig = tab.child
@@ -216,7 +216,7 @@ def _format_missing(
         itmdt = completions["miss"](data["miss"])
 
         rndrd = render_missing(itmdt, cfg)
-        figs_missing: List[Figure] = []
+        figs_missing: List[figure] = []
         for fig in rndrd["layout"]:
             fig.sizing_mode = "stretch_both"
             figs_missing.append(fig)

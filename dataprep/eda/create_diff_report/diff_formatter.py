@@ -10,7 +10,7 @@ import dask
 import dask.dataframe as dd
 import pandas as pd
 from bokeh.embed import components
-from bokeh.plotting import Figure
+from bokeh.plotting import figure
 from ..utils import to_dask
 from ...errors import DataprepError
 from ..configs import Config
@@ -137,7 +137,7 @@ def format_basic(df_list: List[pd.DataFrame], cfg: Config) -> Dict[str, Any]:
     # aggregate all computations
     final_results: Dict[str, Any] = {"dfs": []}
     delayed_results: List[Any] = []
-    figs_var: List[Figure] = []
+    figs_var: List[figure] = []
     dask_results = {}
 
     for df in df_list:
@@ -382,7 +382,7 @@ def _format_variables(df: EDAFrame, cfg: Config, data: Dict[str, Any]) -> Dict[s
 
             rndrd = render(itmdt, cfg)
             layout = rndrd["layout"]
-            figs_var: List[Figure] = []
+            figs_var: List[figure] = []
             for tab in layout:
                 try:
                     fig = tab.children[0]
