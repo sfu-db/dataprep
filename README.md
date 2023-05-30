@@ -184,6 +184,27 @@ read_sql("postgresql://username:password@server:port/database", "SELECT * FROM l
 
 Check out [here](https://github.com/sfu-db/connector-x#supported-sources--destinations) for supported databases and dataframes and more examples usages.
 
+
+## Lineage
+A Column Level Lineage Graph for SQL. This tool is intended to help you by creating an interactive graph on a webpage to explore the column level lineage among them.
+
+### The lineage module offers:
+A general introduction of the project can be found in this [blog post](https://medium.com/@shz1/lineagex-the-python-library-for-your-lineage-needs-5e51b77a0032).
+- **Automatic dependency creation**: When there are dependency among the SQL files, and those tables are not yet in the database, the lineage module will automatically tries to find the dependency table and creates it.
+- **Clean and simple but very interactive user interface**: The user interface is very simple to use with minimal clutters on the page while showing all of the necessary information.
+- **Variety of SQL statements**: The lineage module supports a variety of SQL statements, aside from the typical `SELECT` statement, it also supports `CREATE TABLE/VIEW [IF NOT EXISTS]` statement as well as the `INSERT` and `DELETE` statement.
+- **[dbt](https://docs.getdbt.com/) support**: The lineage module is also implemented in the [dbt-LineageX](https://github.com/sfu-db/dbt-lineagex), it is added into a dbt project and by using the dbt library [fal](https://github.com/fal-ai/fal), it is able to reuse the Python core and create the similar output from the dbt project.
+
+### Uses and Demo
+The interactive graph looks like this: 
+<img src="https://raw.githubusercontent.com/sfu-db/lineagex/main/docs/example.gif"/>
+Here is a [live demo](https://zshandy.github.io/lineagex-demo/) with the [mimic-iv concepts_postgres](https://github.com/MIT-LCP/mimic-code/tree/main/mimic-iv/concepts_postgres) files([navigation instructions](https://sfu-db.github.io/lineagex/output.html#how-to-navigate-the-webpage)) and that is created with one line of code:
+```python
+from dataprep.lineage import lineagex
+lineagex(sql=path/to/sql, target_schema="schema1", conn_string="postgresql://username:password@server:port/database", search_path_schema="schema1, public")
+```
+Check out more detailed usage and examples [here](https://sfu-db.github.io/lineagex/intro.html). 
+
 ## Documentation
 
 The following documentation can give you an impression of what DataPrep can do:
@@ -191,7 +212,8 @@ The following documentation can give you an impression of what DataPrep can do:
 - [Connector](https://docs.dataprep.ai/user_guide/connector/introduction.html)
 - [EDA](https://docs.dataprep.ai/user_guide/eda/introduction.html)
 - [Clean](https://docs.dataprep.ai/user_guide/clean/introduction.html)
-
+- [Lineage](https://sfu-db.github.io/lineagex/intro.html)
+- 
 ## Contribute
 
 There are many ways to contribute to DataPrep.
