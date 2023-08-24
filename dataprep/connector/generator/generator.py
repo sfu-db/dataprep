@@ -130,7 +130,14 @@ class ConfigGenerator:
 
 def _create_config(req: Dict[str, Any], table_path: Optional[str] = None) -> ConfigDef:
     requests = Request(req["url"])
-    resp = requests.post(_data=req["params"], _headers=req["headers"])
+    if req["method"] == "GET":
+        resp = requests.get(_headers=req["headers"])
+    elif req["method"] == "POST":
+        resp = requests.post(_data=req["params"], _headers=req["headers"])
+    elif req["method"] == "PUT":
+        resp = requests.put(_data=req["params"], _headers=req["headers"])
+    else:
+        raise RuntimeError(f"Unknown method {req['method']}")
 
     if resp.status != 200:
         raise RuntimeError(f"Request to HTTP endpoint not successful: {resp.status}: {resp.reason}")

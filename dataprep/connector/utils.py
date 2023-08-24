@@ -18,8 +18,10 @@ class Request:
 
     def __init__(self, _url: str) -> None:
         self.url: urllib.parse.ParseResult = urllib.parse.urlparse(_url)
+
+        qs = dict(urllib.parse.parse_qsl(self.url.query))
+        self.url = self.url._replace(query=urllib.parse.urlencode(qs))
         self.hostname: str = self.url.hostname or ""
-        self.path: str = self.url.path or ""
         self.headers: Dict[str, Any] = dict({"user-agent": "dataprep"})
 
     def get(self, _headers: Optional[Dict[str, Any]] = None) -> http.client.HTTPResponse:
@@ -34,8 +36,13 @@ class Request:
             self.headers.update(_headers)
 
         conn = http.client.HTTPSConnection(self.hostname)
+        path = self.url.path
+        if path == "":
+            path = "/"
+        if self.url.query:
+            path += "?" + self.url.query
+        conn.request(method="GET", url=path, headers=self.headers)
 
-        conn.request(method="GET", url=self.path, headers=self.headers)
         response = conn.getresponse()
 
         return response
@@ -54,15 +61,22 @@ class Request:
         if _headers:
             self.headers.update(_headers)
         conn = http.client.HTTPSConnection(self.hostname)
+
+        path = self.url.path
+        if path == "":
+            path = "/"
+        if self.url.query:
+            path += "?" + self.url.query
+
         if _data is not None:
             conn.request(
                 method="POST",
-                url=self.path,
+                url=path,
                 headers=self.headers,
                 body=urllib.parse.urlencode(_data),
             )
         else:
-            conn.request(method="POST", url=self.path, headers=self.headers)
+            conn.request(method="POST", url=path, headers=self.headers)
         response = conn.getresponse()
 
         return response
@@ -81,15 +95,22 @@ class Request:
         if _headers:
             self.headers.update(_headers)
         conn = http.client.HTTPSConnection(self.hostname)
+
+        path = self.url.path
+        if path == "":
+            path = "/"
+        if self.url.query:
+            path += "?" + self.url.query
+
         if _data is not None:
             conn.request(
                 method="PUT",
-                url=self.path,
+                url=path,
                 headers=self.headers,
                 body=urllib.parse.urlencode(_data),
             )
         else:
-            conn.request(method="PUT", url=self.path, headers=self.headers)
+            conn.request(method="PUT", url=path, headers=self.headers)
         response = conn.getresponse()
 
         return response
