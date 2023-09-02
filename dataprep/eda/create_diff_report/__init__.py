@@ -22,6 +22,7 @@ ENV_LOADER = Environment(
 
 def create_diff_report(
     df_list: Union[List[pd.DataFrame], Dict[str, pd.DataFrame]],
+    target: Optional[str] = None,
     config: Optional[Dict[str, Any]] = None,
     display: Optional[List[str]] = None,
     title: Optional[str] = "DataPrep Report",
@@ -35,6 +36,8 @@ def create_diff_report(
     ----------
     df_list
         The DataFrames for which data are calculated.
+    target
+        Target feature to be compared against all other columns.
     config
         A dictionary for configuring the visualizations
         E.g. config={"hist.bins": 20}
@@ -63,7 +66,7 @@ def create_diff_report(
     _suppress_warnings()
     cfg = Config.from_dict(display, config)
 
-    components = format_diff_report(df_list, cfg, mode, progress)
+    components = format_diff_report(df_list, cfg, mode, progress, target)
 
     dict_stats = defaultdict(list)
 
@@ -81,16 +84,6 @@ def create_diff_report(
         "df_labels": cfg.diff.label,
         "legend_labels": components["legend_lables"],
     }
-
-    # {% for div in value.plots[1] %}
-    #             <div class="vp-plot">
-    #                 {{ div }}
-    #                 {% if key in context.components.dfs[1].variables %}
-    #                 {{ context.components.dfs[1].variables[key].plots[1][loop.index0] }}
-    #                 {% endif %}
-    #             </div>
-
-    # return context
 
     template_base = ENV_LOADER.get_template("base.html")
     report = template_base.render(context=context, zip=zip)
