@@ -124,8 +124,9 @@ class Clusterer:
         """
         tokens = _ngram_tokens(val, block_size)
         for token in tokens:
-            if token in blocks:
-                blocks[token].add(val)
+            if token not in blocks:
+                blocks[token] = set()
+            blocks[token].add(val)
 
     @staticmethod
     def _get_nearest_neighbour_clusters(
