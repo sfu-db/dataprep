@@ -32,6 +32,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v1.2.0      
+
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
@@ -48,7 +51,6 @@ jobs:
           ${{ matrix.install_graphviz }}
           echo "Cache Version ${{ secrets.CACHE_VERSION }}"
           poetry install
-          poetry run pip install graphviz
           poetry run pip install ERAlchemy2
           poetry config --list
 
