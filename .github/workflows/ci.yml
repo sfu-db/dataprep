@@ -30,21 +30,6 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Graphviz
-        uses: ts-graphviz/setup-graphviz@v1
-        with:
-          # graphviz version on Ubuntu.
-          ubuntu-graphviz-version: '2.42.2-3build2'
-          # libgraphviz-dev version on Ubuntu.
-          ubuntu-libgraphvizdev-version: '2.42.2-3build2'
-          # Skip to run apt update command on Ubuntu.
-          ubuntu-skip-apt-update: 'true' # default false
-          #  graphviz version on Windows.
-          windows-graphviz-version: '2.49.3'
-          # Skip to run brew update command on macOS.
-          macos-skip-brew-update: 'true' # default false
-
       - uses: actions/checkout@v2
 
       - uses: actions/setup-python@v2
@@ -63,6 +48,7 @@ jobs:
           ${{ matrix.install_graphviz }}
           echo "Cache Version ${{ secrets.CACHE_VERSION }}"
           poetry install
+          poetry run pip install graphviz
           poetry run pip install ERAlchemy
           poetry config --list
 
