@@ -4,6 +4,7 @@ import pandas as pd
 from collections import OrderedDict
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.engine.base import Engine
+from sqlalchemy import text
 
 
 def plot_mysql_db(sql_engine: Engine):
@@ -361,7 +362,8 @@ def plot_sqlite_db(sqliteConnection: Engine, analyze: bool = False):
     if analyze:
         sqliteConnection.execute("ANALYZE")
     try:
-        version_sql = pd.read_sql("""select sqlite_version();""", sqliteConnection)
+        query = text("""select sqlite_version();""")
+        version_sql = pd.read_sql(query, sqliteConnection)
         index = pd.read_sql("SELECT * FROM sqlite_master WHERE type = 'index'", sqliteConnection)
         # Get all table names
         table_sql = pd.read_sql(
