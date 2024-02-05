@@ -362,85 +362,86 @@ def plot_sqlite_db(sqliteConnection: Engine, analyze: bool = False):
     if analyze:
         sqliteConnection.execute("ANALYZE")
     try:
-        query = text("""select sqlite_version();""")
-        version_sql = pd.read_sql(query, sqliteConnection)
-        index = pd.read_sql("SELECT * FROM sqlite_master WHERE type = 'index'", sqliteConnection)
-        # Get all table names
-        table_sql = pd.read_sql(
-            """select type, tbl_name as table_name, sql from sqlite_master where type = 'table' AND tbl_name not like 'sqlite_%';""",
-            sqliteConnection,
-        )
-        # Get row count for each table
-        table_row_sql = pd.read_sql(
-            """select DISTINCT tbl_name AS table_name, CASE WHEN stat is null then 0 else cast(stat as INT) END row_count
-        from sqlite_master m
-        LEFT JOIN sqlite_stat1 stat on   m.tbl_name = stat.tbl
-        where m.type='table'
-        and m.tbl_name not like 'sqlite_%'
-        order by 1""",
-            sqliteConnection,
-        )
-        # Get all the columns and their stats
-        all_cols = pd.read_sql(
-            """SELECT tbl_name as table_name, p.name as col_name, p.type as type,
-        CASE WHEN `notnull` = 0 THEN 'False'
-        ELSE 'True' END AS attnotnull, dflt_value as `default`, pk, sql
-        FROM
-          sqlite_master AS m
-        JOIN
-          pragma_table_info(m.name) AS p
-        WHERE tbl_name not like 'sqlite_%'
-        ORDER BY
-          m.name,
-          p.cid""",
-            sqliteConnection,
-        )
-        # Get all view names
-        view_sql = pd.read_sql(
-            """select type, tbl_name as view_name, sql AS definition from sqlite_master where type = 'view' AND tbl_name not like 'sqlite_%';""",
-            sqliteConnection,
-        )
-        # Get all fk stats
-        fk_sql = pd.read_sql(
-            """SELECT 'foreign key' AS constraint_type, tbl_name as table_name, `from` AS col_name,
-            `table` AS ref_table, `to` AS ref_col, sql AS constraint_def, on_update AS "update_rule", on_delete AS "delete_rule"
-        FROM
-          sqlite_master AS m
-        JOIN
-          pragma_foreign_key_list(m.name) AS p WHERE m.type = 'table'""",
-            sqliteConnection,
-        )
-        # Get all pk stats
-        pk_sql = pd.read_sql(
-            """SELECT DISTINCT 'primary key' AS constraint_type, tbl_name as table_name
-        ,group_concat(p.name) OVER (
-          PARTITION BY tbl_name) AS col_name, sql AS constraint_def
-        FROM
-          sqlite_master AS m
-        JOIN
-          pragma_table_info(m.name) AS p
-        WHERE tbl_name not like 'sqlite_%' AND pk != 0
-        ORDER BY
-          m.name,
-          p.cid""",
-            sqliteConnection,
-        )
-        # Get all uk stats
-        uk_sql = pd.read_sql(
-            """SELECT DISTINCT 'unique key' AS constraint_type, tbl_name as table_name, p.name as col_name, sql AS constraint_def
-        FROM
-          sqlite_master AS m
-        JOIN
-          pragma_index_list(m.name) AS p WHERE m.type = 'table' AND `unique` = 1 AND origin not in ('pk', 'fk')""",
-            sqliteConnection,
-        )
-        # Align the columns for pk and fk and concat them
-        pk_sql["ref_table"], pk_sql["ref_col"], uk_sql["ref_table"], uk_sql["ref_col"] = (
-            None,
-            None,
-            None,
-            None,
-        )
+        with sqliteConnection.begin() as conn:
+            query = text("""select sqlite_version();""")
+            version_sql = pd.read_sql(query, conn)
+            index = pd.read_sql(text("SELECT * FROM sqlite_master WHERE type = 'index'"), conn)
+            # Get all table names
+            table_sql = pd.read_sql(
+                text("""select type, tbl_name as table_name, sql from sqlite_master where type = 'table' AND tbl_name not like 'sqlite_%';"""),
+                conn,
+            )
+            # Get row count for each table
+            table_row_sql = pd.read_sql(
+                text("""select DISTINCT tbl_name AS table_name, CASE WHEN stat is null then 0 else cast(stat as INT) END row_count
+            from sqlite_master m
+            LEFT JOIN sqlite_stat1 stat on   m.tbl_name = stat.tbl
+            where m.type='table'
+            and m.tbl_name not like 'sqlite_%'
+            order by 1"""),
+                conn,
+            )
+            # Get all the columns and their stats
+            all_cols = pd.read_sql(
+                text("""SELECT tbl_name as table_name, p.name as col_name, p.type as type,
+            CASE WHEN `notnull` = 0 THEN 'False'
+            ELSE 'True' END AS attnotnull, dflt_value as `default`, pk, sql
+            FROM
+            sqlite_master AS m
+            JOIN
+            pragma_table_info(m.name) AS p
+            WHERE tbl_name not like 'sqlite_%'
+            ORDER BY
+            m.name,
+            p.cid"""),
+                conn,
+            )
+            # Get all view names
+            view_sql = pd.read_sql(
+                text("""select type, tbl_name as view_name, sql AS definition from sqlite_master where type = 'view' AND tbl_name not like 'sqlite_%';"""),
+                conn,
+            )
+            # Get all fk stats
+            fk_sql = pd.read_sql(
+                text("""SELECT 'foreign key' AS constraint_type, tbl_name as table_name, `from` AS col_name,
+                `table` AS ref_table, `to` AS ref_col, sql AS constraint_def, on_update AS "update_rule", on_delete AS "delete_rule"
+            FROM
+            sqlite_master AS m
+            JOIN
+            pragma_foreign_key_list(m.name) AS p WHERE m.type = 'table'"""),
+                conn,
+            )
+            # Get all pk stats
+            pk_sql = pd.read_sql(
+                text("""SELECT DISTINCT 'primary key' AS constraint_type, tbl_name as table_name
+            ,group_concat(p.name) OVER (
+            PARTITION BY tbl_name) AS col_name, sql AS constraint_def
+            FROM
+            sqlite_master AS m
+            JOIN
+            pragma_table_info(m.name) AS p
+            WHERE tbl_name not like 'sqlite_%' AND pk != 0
+            ORDER BY
+            m.name,
+            p.cid"""),
+                conn,
+            )
+            # Get all uk stats
+            uk_sql = pd.read_sql(
+                text("""SELECT DISTINCT 'unique key' AS constraint_type, tbl_name as table_name, p.name as col_name, sql AS constraint_def
+            FROM
+            sqlite_master AS m
+            JOIN
+            pragma_index_list(m.name) AS p WHERE m.type = 'table' AND `unique` = 1 AND origin not in ('pk', 'fk')"""),
+                conn,
+            )
+            # Align the columns for pk and fk and concat them
+            pk_sql["ref_table"], pk_sql["ref_col"], uk_sql["ref_table"], uk_sql["ref_col"] = (
+                None,
+                None,
+                None,
+                None,
+            )
     except OperationalError:
         raise Exception(
             "Cannot read statistics from the database. Please run 'analyze' in the database to collect the statistics first, or set analyze=True to allow us do this (note that 'analyze' usually collects the statistics and stores the result in the database)"
