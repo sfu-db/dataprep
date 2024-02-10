@@ -21,21 +21,6 @@ on:
       - develop
 
 jobs:
-  window-graphviz-install:
-    name: "Windows Graphviz install"
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Choco help
-        uses: crazy-max/ghaction-chocolatey@v3
-        with:
-          args: -h
-
-      - name: Install Graphviz for Windows
-        run: |
-          choco install graphviz --version=2.49.3  
   build:
     name: ${{ matrix.os }} x py${{ matrix.python }}
     needs: window-graphviz-install
@@ -48,6 +33,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: "Windows Graphviz install"
+        if: runner.os == 'Windows'
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: -h
+
+      - name: Install Graphviz for Windows
+        if: runner.os == 'Windows'
+        run: |
+          choco install graphviz --version=2.49.3  
+
 
       - uses: actions/setup-python@v2
         with:
