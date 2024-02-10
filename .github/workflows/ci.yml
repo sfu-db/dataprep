@@ -33,7 +33,18 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup Graphviz
-        uses: ts-graphviz/setup-graphviz@v1.2.0      
+        uses: ts-graphviz/setup-graphviz@v1.2.0
+        with:
+          # graphviz version on Ubuntu.
+          ubuntu-graphviz-version: '2.42.2-3build2'
+          # libgraphviz-dev version on Ubuntu.
+          ubuntu-libgraphvizdev-version: '2.42.2-3build2'
+          # Skip to run apt update command on Ubuntu.
+          ubuntu-skip-apt-update: 'true' # default false
+          #  graphviz version on Windows.
+          windows-graphviz-version: '2.49.3'
+          # Skip to run brew update command on macOS.
+          macos-skip-brew-update: 'true' # default false      
 
       - uses: actions/setup-python@v2
         with:
