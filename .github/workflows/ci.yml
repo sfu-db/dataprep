@@ -99,6 +99,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v1.2.0
+
       - name: Install dependencies
         run: |
           pip install poetry
@@ -114,6 +117,9 @@ jobs:
         run: |
           pip install poetry
           poetry install
+          poetry run apt-get -y install python3-dev graphviz libgraphviz-dev pkg-config
+          poetry run pip install ERAlchemy2
+          
 
       - name: Build docs
         run: poetry run sphinx-build -M html docs/source docs/build

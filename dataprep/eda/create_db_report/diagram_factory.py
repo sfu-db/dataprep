@@ -8,14 +8,9 @@ from typing import Dict, Any
 from .db_models.database import Database
 
 GRAPHVIZ_PATH = os.environ.get("GRAPHVIZ_PATH", "C:/Program Files/Graphviz/bin")
-if platform.system() == "Windows" and os.path.exists(GRAPHVIZ_PATH):
-    os.add_dll_directory(GRAPHVIZ_PATH)
-try:
-    from eralchemy2 import render_er
+from eralchemy2 import render_er
 
-    _WITH_GV = True
-except ImportError:
-    _WITH_GV = False
+_WITH_GV = True
 
 
 class DiagramFactory:
