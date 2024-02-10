@@ -46,7 +46,7 @@ jobs:
       - name: Install Graphviz for Windows
         if: runner.os == 'Windows'
         run: |
-          choco install graphviz --version=2.46.0
+          choco install graphviz --version=2.49.3
           python -m pip install --use-pep517 `
               --config-settings="--global-option=build_ext" `
               --config-settings="--global-option="-IC:\Program Files\Graphviz\include" `
