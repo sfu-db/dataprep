@@ -42,8 +42,11 @@ jobs:
       - name: Install Graphviz for Windows
         if: runner.os == 'Windows'
         run: |
-          choco install graphviz --version=2.49.3  
+          choco install graphviz --version=2.46.0
 
+      - name: Install Graphviz for other platforms
+        if: runner.os != 'Windows'
+        uses: ts-graphviz/setup-graphviz@v2
 
       - uses: actions/setup-python@v2
         with:
