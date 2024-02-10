@@ -47,10 +47,10 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install graphviz --version=2.49.3
-          python -m pip install --use-pep517 `
-              --config-settings="--global-option=build_ext" `
-              --config-settings="--global-option="-IC:\Program Files\Graphviz\include" `
-              --config-settings="--global-option="-LC:\Program Files\Graphviz\lib" `
+          python -m pip install --use-pep517 \
+              --config-settings="--global-option=build_ext" \
+              --config-settings="--global-option="-IC:\Program Files\Graphviz\include" \
+              --config-settings="--global-option="-LC:\Program Files\Graphviz\lib" \
               pygraphviz
 
       - name: Install Graphviz for other platforms
