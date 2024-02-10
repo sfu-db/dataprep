@@ -29,11 +29,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Choco help
-        runs-on: windows-latest
         uses: crazy-max/ghaction-chocolatey@v3
 
       - name: Install Graphviz for Windows
-        runs-on: windows-latest
         run: |
           choco install graphviz --version=2.49.3  
   build:
