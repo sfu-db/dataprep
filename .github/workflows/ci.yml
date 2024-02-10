@@ -51,11 +51,7 @@ jobs:
       - name: Install pygraphviz for Windows
         if: runner.os == 'Windows'
         run: |
-          python -m pip install --use-pep517 \
-              --config-settings="--global-option=build_ext" \
-              --config-settings="--global-option=-IC:\Program Files\Graphviz\include" \
-              --config-settings="--global-option=-LC:\Program Files\Graphviz\lib" \
-              pygraphviz
+          python -m pip install --use-pep517 --config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\\Program Files\\Graphviz\\include" --config-settings="--global-option=-LC:\\Program Files\\Graphviz\\lib" pygraphviz
 
       - name: Install Graphviz for other platforms
         if: runner.os != 'Windows'
