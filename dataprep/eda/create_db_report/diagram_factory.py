@@ -11,7 +11,7 @@ GRAPHVIZ_PATH = os.environ.get("GRAPHVIZ_PATH", "C:/Program Files/Graphviz/bin")
 if platform.system() == "Windows" and os.path.exists(GRAPHVIZ_PATH):
     os.add_dll_directory(GRAPHVIZ_PATH)
 try:
-    from eralchemy import render_er
+    from eralchemy2 import render_er
 
     _WITH_GV = True
 except ImportError:

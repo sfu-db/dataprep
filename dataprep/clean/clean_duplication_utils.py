@@ -124,6 +124,8 @@ class Clusterer:
         """
         tokens = _ngram_tokens(val, block_size)
         for token in tokens:
+            if token not in blocks:
+                blocks[token] = set()
             blocks[token].add(val)
 
     @staticmethod

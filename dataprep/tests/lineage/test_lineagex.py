@@ -12,18 +12,11 @@ from ...lineage import lineagex
 )
 def test_read_sql() -> None:
     db_url = environ["DB_URL"]
-    sql = os.path.join(os.getcwd(), 'dependency_example')
-    lx = lineagex(
-        sql,
-        "mimiciii_derived",
-        db_url,
-        "mimiciii_clinical, public"
-    )
+    sql = os.path.join(os.getcwd(), "dependency_example")
+    lx = lineagex(sql, "mimiciii_derived", db_url, "mimiciii_clinical, public")
     print("dependency test with database connection", lx)
     lx = lineagex(
-        sql=sql,
-        target_schema="mimiciii_derived",
-        search_path_schema="mimiciii_clinical, public"
+        sql=sql, target_schema="mimiciii_derived", search_path_schema="mimiciii_clinical, public"
     )
     print("dependency test without database connection", lx)
 
