@@ -57,6 +57,8 @@ jobs:
       - name: Install Graphviz for other platforms
         if: runner.os != 'Windows'
         uses: ts-graphviz/setup-graphviz@v2
+        with:
+          macos-skip-brew-update: 'true'
 
       - name: Cache venv
         uses: actions/cache@v2
