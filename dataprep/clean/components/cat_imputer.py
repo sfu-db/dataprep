@@ -9,7 +9,6 @@ from .cat_imputation import operator_dic
 
 
 class CatImputer:
-
     """Categorical imputer for imputing missing values in categorical columns
     Attributes:
         impute_type

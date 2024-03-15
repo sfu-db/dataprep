@@ -1,6 +1,7 @@
 """
 In this module lives the type tree.
 """
+
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Type, Union
 

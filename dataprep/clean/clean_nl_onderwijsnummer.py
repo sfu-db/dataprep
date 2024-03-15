@@ -2,6 +2,7 @@
 Clean and validate a DataFrame column containing Onderwijsnummer,
 the Dutch student identification number.
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
 from operator import itemgetter

@@ -44,10 +44,16 @@ python = ">=3.8,<3.13"
 bokeh = "^2"
 dask = {version = ">=2022.3.0", extras = ["array", "dataframe", "delayed"]}
 nltk = "^3.6.7"
-numpy = "^1.21"
+numpy = [
+  {version = ">=1.21", python = "<3.12"},
+  {version = ">=1.26", python = ">=3.12"}
+]
 pandas = "^1.1"
 pydot = "^1.4.2"
-scipy = "^1.8"
+scipy = [
+  {version = "^1.8", python = "<3.12"},
+  {version = ">1.8", python = ">=3.12"}
+]
 wordcloud = "^1.8"
 sqlalchemy = "2.0.25"
 
@@ -88,6 +94,7 @@ sphinx = "^4"
 sphinx-autobuild = "^2021"
 sphinx-autodoc-typehints = "^1"
 toml = "^0.10"
+
 
 [tool.black]
 exclude = '''

@@ -1,4 +1,5 @@
 """ProgressBar shows the how many dask tasks finished/remains using tqdm."""
+
 import warnings
 from time import time
 from typing import Any, Dict, Optional, Tuple, Union
@@ -11,6 +12,7 @@ if is_notebook():
     from tqdm.notebook import tqdm
 else:
     from tqdm import tqdm
+
 
 # pylint: disable=method-hidden,too-many-instance-attributes
 class ProgressBar(Callback):  # type: ignore

@@ -1,6 +1,7 @@
 """
 module for testing the functions clean_phone() and validate_phone()
 """
+
 import logging
 
 import numpy as np

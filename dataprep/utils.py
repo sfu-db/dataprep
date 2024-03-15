@@ -1,4 +1,5 @@
 """Utility functions used by the whole library."""
+
 from typing import Any
 import webbrowser
 from tempfile import NamedTemporaryFile

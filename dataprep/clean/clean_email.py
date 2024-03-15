@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing email addresses.
 """
+
 import re
 from operator import itemgetter
 from typing import Any, Union

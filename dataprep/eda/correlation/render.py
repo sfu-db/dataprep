@@ -2,6 +2,7 @@
     This module implements the visualization for
     plot_correlation(df) function
 """
+
 from typing import Any, Dict, List, Sequence, Tuple
 
 import numpy as np
@@ -92,6 +93,7 @@ def render_correlation(itmdt: Intermediate, cfg: Config) -> Any:
 #     fig = hv.render(heatmap, backend="bokeh")
 #     _discard_unused_visual_elems(fig)
 #     return fig
+
 
 ########## HeatMaps ##########
 def tweak_figure(fig: Figure) -> None:

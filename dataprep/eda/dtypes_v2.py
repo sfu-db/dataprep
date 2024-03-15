@@ -1,6 +1,7 @@
 """
 In this module lives the type tree.
 """
+
 from typing import Any, Dict, Optional, Type, Union
 
 import dask.dataframe as dd

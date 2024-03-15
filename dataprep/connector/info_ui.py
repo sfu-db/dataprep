@@ -1,4 +1,5 @@
 """This module handles displaying information on how to connect and query."""
+
 from typing import Any, Dict
 from jinja2 import Environment, PackageLoader, select_autoescape
 from ..utils import display_html

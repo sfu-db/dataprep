@@ -1,6 +1,7 @@
 """
 Common definitions and classes for the clean_date function.
 """
+
 # pylint: disable-msg=too-many-branches
 
 import datetime
@@ -200,7 +201,6 @@ TEXT_WEEKDAYS = [
 
 
 class ParsedDate:
-
     """Attributes of a parsed date.
     Attributes:
         year: Value of year.
@@ -388,7 +388,6 @@ class ParsedDate:
 
 
 class ParsedTargetFormat:
-
     """Attributes of a parsed target format.
     Attributes:
         year_token: Token standing of year.

@@ -1,6 +1,7 @@
 """
 module for testing the clean_duplication() function
 """
+
 import logging
 
 import numpy as np

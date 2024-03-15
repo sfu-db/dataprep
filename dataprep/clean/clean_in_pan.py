@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing Indian Permanent Account numbers (PANs).
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
 from operator import itemgetter

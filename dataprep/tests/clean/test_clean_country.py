@@ -1,6 +1,7 @@
 """
 module for testing the functions clean_country() and validate_country()
 """
+
 import logging
 
 import numpy as np

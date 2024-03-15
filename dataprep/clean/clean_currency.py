@@ -50,7 +50,6 @@ def clean_currency(
     report: bool = True,
     progress: bool = False,
 ) -> Union[pd.DataFrame, dd.DataFrame]:
-
     """
     Clean, standardize and convert currencies.
 

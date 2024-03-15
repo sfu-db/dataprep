@@ -20,7 +20,6 @@ class NumImputer:
     """
 
     def __init__(self, num_pipe_info: Dict[str, Any]) -> None:
-
         """
         This function initiate numerical imputer.
 

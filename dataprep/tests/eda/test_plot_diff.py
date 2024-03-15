@@ -1,6 +1,7 @@
 """
     module for testing plot_diff([df1, df2, ..., dfn]) function.
 """
+
 import logging
 
 import dask.dataframe as dd

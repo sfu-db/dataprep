@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing IP addresses.
 """
+
 from ipaddress import ip_address
 from operator import itemgetter
 from typing import Any, Union

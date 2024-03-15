@@ -85,7 +85,7 @@ def plot_mysql_db(sql_engine: Engine):
     for i in table_list:
         indices = {}
         index = pd.read_sql("SHOW INDEX FROM " + str(i) + " FROM " + db_name + ";", sql_engine)
-        for (idx, row) in index.iterrows():
+        for idx, row in index.iterrows():
             if row.loc["Key_name"] in indices:
                 indices[row.loc["Key_name"]]["Column_name"] += "," + row.loc["Column_name"]
                 # indices[row.loc['Key_name']]['Index_type']+="/"+row.loc['Index_type']
@@ -284,7 +284,7 @@ WHERE v.schemaname != 'pg_catalog' AND v.schemaname != 'information_schema' AND 
             "SELECT * FROM pg_indexes WHERE tablename= " + "'" + str(i) + "'" + ";",
             postgres_engine,
         )
-        for (idx, row) in index.iterrows():
+        for idx, row in index.iterrows():
             current_index = row.loc["indexname"]
             indices[current_index] = {}
             index_type, col_name = (row.loc["indexdef"].split("USING ", 1)[1]).split(" ", 1)
@@ -492,7 +492,7 @@ def plot_sqlite_db(sqliteConnection: Engine, analyze: bool = False):
     for i in table_list:
         indices = {}
         table_indexes = index.loc[index["tbl_name"] == str(i)]
-        for (idx, row) in table_indexes.iterrows():
+        for idx, row in table_indexes.iterrows():
             current_index = row.loc["name"]
             indices[current_index] = {}
             index_type = row.loc["type"]

@@ -1,6 +1,7 @@
 """
 Intermediate class
 """
+
 from typing import Any, Dict, Tuple, Union, Optional
 
 from pathlib import Path

@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing French tax identification numbers (NIFs).
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
 from operator import itemgetter

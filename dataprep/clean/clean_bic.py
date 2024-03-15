@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing ISO 9362 Business identifier codes.
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
 from operator import itemgetter

@@ -1,6 +1,7 @@
 """
     This module implements the create_db_report(sql_engine) function.
 """
+
 import warnings
 from sqlalchemy.engine.base import Engine
 from .run_function import generate_db_report
