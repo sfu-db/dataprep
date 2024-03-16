@@ -2,6 +2,7 @@
 This module contains the Connector class.
 Every data fetching action should begin with instantiating this Connector class.
 """
+
 import math
 import sys
 from asyncio import as_completed

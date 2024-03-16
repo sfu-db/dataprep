@@ -1,6 +1,7 @@
 """
 module for testing the functions clean_lat_long() and validate_lat_long()
 """
+
 import logging
 
 import numpy as np

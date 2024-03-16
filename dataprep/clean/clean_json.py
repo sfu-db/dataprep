@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing JSON.
 """
+
 from typing import Any, Union
 import json
 

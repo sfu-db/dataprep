@@ -2,6 +2,7 @@
 This module contains the method of lineagex.
 It is a wrapper on lineagex.lineagex function.
 """
+
 from typing import Optional, Union, List
 
 try:

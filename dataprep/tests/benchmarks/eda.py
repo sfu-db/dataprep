@@ -1,6 +1,7 @@
 """
 This module is for performance testing of EDA module in github action.
 """
+
 from functools import partial
 import pandas as pd
 from typing import Any

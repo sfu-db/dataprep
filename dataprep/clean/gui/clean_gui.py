@@ -1,6 +1,7 @@
 """
 Flask backend of Dataprep.Clean GUI.
 """
+
 # pylint: disable=R0912, R0915
 from typing import Any
 

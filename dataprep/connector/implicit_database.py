@@ -3,6 +3,7 @@ Module defines ImplicitDatabase and ImplicitTable,
 where ImplicitDatabase is a conceptual model describes
 a website and ImplicitTable describes an API endpoint.
 """
+
 from json import load as jload
 from json import loads as jloads
 from pathlib import Path

@@ -1,6 +1,7 @@
 """
 Module defines errors used in this library.
 """
+
 from typing import Set
 
 from ..errors import DataprepError

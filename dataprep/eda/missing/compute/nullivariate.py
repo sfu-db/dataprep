@@ -1,6 +1,7 @@
 """This module implements the plot_missing(df) function's
 calculating intermediate part
 """
+
 from typing import Any, Callable, Dict, Generator, List, Optional, Tuple
 
 import dask.array as da

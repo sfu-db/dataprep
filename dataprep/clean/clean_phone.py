@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing phone numbers.
 """
+
 import re
 from operator import itemgetter
 from typing import Any, Union

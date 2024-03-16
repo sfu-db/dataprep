@@ -1,6 +1,7 @@
 """
     This module implements the create_report(df) function.
 """
+
 import warnings
 from typing import Any, Dict, List, Optional
 

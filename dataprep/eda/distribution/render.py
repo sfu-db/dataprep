@@ -1,6 +1,7 @@
 """
 This module implements the visualization for the plot(df) function.
 """  # pylint: disable=too-many-lines
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 import json

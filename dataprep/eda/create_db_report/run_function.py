@@ -121,9 +121,11 @@ def parse_tables(
                     column["type"],
                     str(column["attnotnull"]).upper() == "TRUE",
                     column["default"],
-                    str(column["auto_increment"]).upper() == "TRUE"
-                    if "auto_increment" in column
-                    else False,
+                    (
+                        str(column["auto_increment"]).upper() == "TRUE"
+                        if "auto_increment" in column
+                        else False
+                    ),
                     column["description"] if "description" in column else "",
                 )
                 current_table.add_column(c.upper(), create_table_column)
@@ -144,9 +146,11 @@ def parse_tables(
                 column["type"],
                 column["attnotnull"] == "True",
                 column["default"],
-                str(column["auto_increment"]).upper() == "TRUE"
-                if "auto_increment" in column
-                else False,
+                (
+                    str(column["auto_increment"]).upper() == "TRUE"
+                    if "auto_increment" in column
+                    else False
+                ),
                 column["description"] if "description" in column else "",
             )
             collect_columns[c.upper()] = create_view_column

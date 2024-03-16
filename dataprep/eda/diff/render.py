@@ -1,6 +1,7 @@
 """
 This module implements the visualization for the plot_diff function.
 """  # pylint: disable=too-many-lines
+
 from typing import Any, Dict, List, Tuple, Optional
 
 import math

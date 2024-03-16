@@ -2,7 +2,6 @@
 Computations for plot(df, ...)
 """
 
-
 import warnings
 from typing import Optional, Union, List, Dict, Any, Tuple
 import dask.dataframe as dd
