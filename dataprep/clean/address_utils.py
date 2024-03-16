@@ -1,6 +1,7 @@
 """
 Constants used by the clean_address() and validate_address() functions
 """
+
 # pylint: disable=C0301, C0302, E1101
 
 from builtins import zip

@@ -2,6 +2,7 @@
 This module contains the method of read_sql.
 It is a wrapper on connectorx.read_sql function.
 """
+
 from typing import Optional, Tuple, Union, List, Any
 
 try:

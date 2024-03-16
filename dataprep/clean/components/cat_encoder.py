@@ -9,7 +9,6 @@ from .cat_encoding import operator_dic
 
 
 class CatEncoder:
-
     """Categorical encoder for encoding categorical columns
     Attributes:
         encode_type

@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing dates and times.
 """
+
 # pylint: disable=too-many-lines
 import datetime
 from copy import deepcopy

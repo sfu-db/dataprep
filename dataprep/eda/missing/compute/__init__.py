@@ -1,6 +1,7 @@
 """This module implements the plot_missing(df) function's
 calculating intermediate part
 """
+
 from typing import Optional, cast, List, Any, Dict, Union
 import warnings
 from scipy.cluster.hierarchy import ClusterWarning

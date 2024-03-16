@@ -1,6 +1,7 @@
 """
 module for testing the functions clean_address() and validate_address()
 """
+
 import logging
 
 import numpy as np

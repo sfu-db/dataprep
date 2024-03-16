@@ -2,6 +2,7 @@
 Clean and validate a DataFrame column containing
 CBU (Clave Bancaria Uniforme, Argentine bank account number).
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches, unused-argument, E1101, E1133
 from typing import Any, Union
 from operator import itemgetter

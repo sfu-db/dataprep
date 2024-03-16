@@ -229,7 +229,7 @@ def _format_ov_ins(data: Dict[str, Any], cfg: Config) -> List[Dict[str, str]]:
         ndup = data["nrows"] - data["nrows_wo_dups"]
         ins.append({"Duplicates": f"Dataset has {ndup} ({pdup}%) duplicate rows"})
 
-    for (*cols, test_result) in data.get("ks_tests", []):
+    for *cols, test_result in data.get("ks_tests", []):
         if test_result > cfg.insight.similar_distribution__threshold:
             msg = f"/*start*/{cols[0]}/*end*/ and /*start*/{cols[1]}/*end*/ have similar distributions"
             ins.append({"Similar Distribution": msg})

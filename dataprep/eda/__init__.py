@@ -2,6 +2,7 @@
 dataprep.eda
 ============
 """
+
 from bokeh.io import output_notebook
 
 from ..utils import is_notebook

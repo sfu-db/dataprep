@@ -2,6 +2,7 @@
 Clean and validate a DataFrame column containing
 South Korea Business Registration Numbers (BRNs).
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
 from operator import itemgetter

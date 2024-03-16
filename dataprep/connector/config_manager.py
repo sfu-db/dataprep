@@ -1,6 +1,7 @@
 """
 Functions for config downloading and maintaining
 """
+
 import json
 from json import dump as jdump
 from pathlib import Path

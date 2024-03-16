@@ -1,6 +1,5 @@
 """This module implements the generation of connector config generation UI."""
 
-
 from base64 import b64encode
 from typing import Any, Dict, Generator, Optional, Tuple
 from zipfile import ZipFile
@@ -206,9 +205,11 @@ class ConfigGeneratorUI:  # pylint: disable=too-many-instance-attributes
             "method": self.request_type.value,
             "params": params_value,
             "pagination": pagparams,
-            "authorization": (authparams, authparams_user)
-            if self.authtype_box.value != "No Authorization"
-            else None,
+            "authorization": (
+                (authparams, authparams_user)
+                if self.authtype_box.value != "No Authorization"
+                else None
+            ),
         }
 
         backend = ConfigGenerator(self.existing)

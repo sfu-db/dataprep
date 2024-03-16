@@ -1,4 +1,5 @@
 """Common functions"""
+
 import http.client
 import json
 from math import ceil

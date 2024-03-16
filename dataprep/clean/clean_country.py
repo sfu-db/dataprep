@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing country names.
 """
+
 from functools import lru_cache
 from operator import itemgetter
 from os import path
@@ -371,9 +372,7 @@ def _get_format_if_allowed(input_format: str, allowed_formats: Tuple[str, ...]) 
         return (
             "name"
             if "name" in allowed_formats
-            else "official"
-            if "official" in allowed_formats
-            else None
+            else "official" if "official" in allowed_formats else None
         )
 
     return input_format if input_format in allowed_formats else None

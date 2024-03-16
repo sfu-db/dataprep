@@ -2,6 +2,7 @@
 Conduct a set of operations that would be useful for
 cleaning and standardizing a full Pandas DataFrame.
 """
+
 # pylint: disable-msg=relative-beyond-top-level
 # pylint: disable-msg=cyclic-import
 # type: ignore

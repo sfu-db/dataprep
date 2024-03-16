@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing English Unique Pupil Numbers (UPNs).
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches
 from typing import Any, Union
 from operator import itemgetter

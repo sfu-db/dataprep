@@ -1,4 +1,5 @@
 """Strong typed schema definition."""
+
 import http.server
 import json
 import random

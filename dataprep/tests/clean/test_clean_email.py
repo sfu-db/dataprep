@@ -1,6 +1,7 @@
 """
 module for testing the functions clean_email() and validate_email()
 """
+
 import logging
 
 import numpy as np

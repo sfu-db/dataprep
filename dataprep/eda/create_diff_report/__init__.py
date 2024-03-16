@@ -1,6 +1,7 @@
 """
     This module implements the create_diff_report([df1, df2]) function.
 """
+
 import warnings
 from typing import Any, Dict, List, Optional, Union
 

@@ -1,6 +1,7 @@
 """
 module for testing the functions clean_text() and default_text_pipeline()
 """
+
 import re
 import logging
 from typing import Any, Dict, List

@@ -1,4 +1,5 @@
 """Common parts for compute missing."""
+
 from typing import Optional, Tuple
 
 import dask.array as da

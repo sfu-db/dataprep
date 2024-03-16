@@ -1,6 +1,7 @@
 """
     This module implements the Report class for create_db_report.
 """
+
 import os
 import shutil
 import warnings

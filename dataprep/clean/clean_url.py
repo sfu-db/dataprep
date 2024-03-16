@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing URLs.
 """
+
 import re
 from operator import itemgetter
 from typing import Any, List, Union

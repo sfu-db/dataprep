@@ -1,6 +1,7 @@
 """
     module for testing create_report(df) function.
 """
+
 import logging
 import numpy as np
 import pandas as pd

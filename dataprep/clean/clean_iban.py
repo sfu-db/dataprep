@@ -1,6 +1,7 @@
 """
 Clean and validate a DataFrame column containing IBAN numbers.
 """
+
 # pylint: disable=too-many-lines, too-many-arguments, too-many-branches, unused-argument
 from typing import Any, Union
 from operator import itemgetter

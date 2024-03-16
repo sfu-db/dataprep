@@ -2,6 +2,7 @@
     This module implements the plot_missing(df, x, y) function's
     visualization part.
 """
+
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np

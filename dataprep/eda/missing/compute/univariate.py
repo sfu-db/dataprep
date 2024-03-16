@@ -1,6 +1,7 @@
 """This module implements the plot_missing(df, x) function's
 calculating intermediate part
 """
+
 from typing import Any, Generator, List
 
 import numpy as np

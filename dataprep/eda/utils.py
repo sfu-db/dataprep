@@ -1,5 +1,6 @@
 """Miscellaneous functions
 """
+
 import logging
 from math import ceil
 from typing import Any, Dict, List, Optional, Tuple, Union, cast

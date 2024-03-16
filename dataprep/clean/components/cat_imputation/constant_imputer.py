@@ -72,7 +72,6 @@ class ConstantImputer:
         return self.fit(col_df).transform(col_df)
 
     def fillna(self, val: str) -> str:
-
         """
         Check if the value is in the list of null value.
         If yes, impute the data column with constant value.

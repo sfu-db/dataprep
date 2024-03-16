@@ -1,6 +1,7 @@
 """
 This module contains common utilities used by the connector
 """
+
 from typing import Any, Dict, Optional
 import http.client
 import urllib.parse

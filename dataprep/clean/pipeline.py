@@ -11,7 +11,6 @@ from .utils import NULL_VALUES
 
 
 class Pipeline:
-
     """Pipeline for managing categorical column and numerical column.
     Attributes:
         cat_pipeline

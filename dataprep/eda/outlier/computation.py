@@ -2,7 +2,6 @@
 Module containing plot_outlier function.
 """
 
-
 import dask.dataframe as dd
 
 from ..intermediate import Intermediate
