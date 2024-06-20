@@ -98,7 +98,7 @@ def plot(
     cfg = Config.from_dict(display, config)
 
     with ProgressBar(minimum=1, disable=not progress):
-        itmdt = compute(df, col1, col2, col3, cfg=cfg, dtype=dtype)
+        itmdt = compute(df, col1, col2, col3, config=cfg, dtype=dtype)
 
     to_render = render(itmdt, cfg)
 
